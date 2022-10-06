@@ -1,11 +1,16 @@
 package render
 
 import ktx.app.KtxScreen
+import mu.KotlinLogging
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.DungeonTileSet
+import render.tilesets.UITileSet
+import util.Tile
 import util.XY
 import world.Level
+
+val log = KotlinLogging.logger {}
 
 object GameScreen : KtxScreen {
 
@@ -20,23 +25,21 @@ object GameScreen : KtxScreen {
     private var width = 0
     private var height = 0
     private var aspectRatio = 1.0
-    private var stride: Double = 0.01
-    private var pixelStride: Double = 0.01
+    private var tileStride: Double = 0.01
 
     private val dungeonTiles = DungeonTileSet()
     private val dungeonDrawList = DrawList(tileVertShader(), tileFragShader(), dungeonTiles)
     //private val mobTiles
     //private val mobDrawList
-    //private val uiTiles
-    //private val uiDrawList
+    private val uiTiles = UITileSet()
+    private val uiDrawList = DrawList(tileVertShader(), tileFragShader(), uiTiles)
+
+    var cursorPosition: XY = XY(-1,-1)
 
     private val pov: XY
         get() = level?.pov ?: XY(0,0)
 
 
-    init {
-
-    }
 
     fun observeLevel(level: Level) {
         this.level = level
@@ -84,7 +87,7 @@ object GameScreen : KtxScreen {
                             level, tx, ty
                         )
                         dungeonDrawList.addTileQuad(
-                            tx - pov.x, ty - pov.y, stride,
+                            tx - pov.x, ty - pov.y, tileStride,
                             textureIndex,
                             vis,
                             aspectRatio
@@ -92,15 +95,39 @@ object GameScreen : KtxScreen {
                     }
                 }
             }
-
             dungeonDrawList.draw()
+        }
 
+        uiDrawList.clear()
+        if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
+            uiDrawList.addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
+            uiTiles.getIndex(Tile.CURSOR), 0.5f, aspectRatio)
+        }
+        uiDrawList.draw()
+    }
+
+    fun mouseMovedTo(screenX: Int, screenY: Int) {
+        val glX = (screenX.toFloat() / width) * 2.0 - 1.0
+        val glY = (screenY.toFloat() / height) * 2.0 - 1.0
+        val col = (((glX * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
+        val row = ((glY + tileStride * 0.5) / tileStride + pov.y).toInt()
+        if (col != cursorPosition.x || row != cursorPosition.y) {
+            if (level?.isWalkableAt(col, row) == true) {
+                cursorPosition.x = col
+                cursorPosition.y = row
+            } else {
+                cursorPosition.x = -1
+                cursorPosition.y = -1
+            }
+            log.info("cursor $col $row")
         }
     }
 
+
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
-        stride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01f) * zoom
-        pixelStride = height / (2.0 / stride)
+        tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01f) * zoom
+        log.info("Surface params updated to $width x $height (ratio $aspectRatio tileStride $tileStride)")
     }
+
 }
