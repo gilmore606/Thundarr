@@ -5,11 +5,10 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
 import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.graphics.VertexAttribute
-import com.badlogic.gdx.graphics.VertexAttributes.*
+import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 import render.tilesets.TileSet
-import java.lang.RuntimeException
 
 class DrawList(
     vertexShaderSource: String,

@@ -1,5 +1,7 @@
 package render
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20.*
 import ktx.app.KtxScreen
 import mu.KotlinLogging
 import render.shaders.tileFragShader
@@ -10,6 +12,8 @@ import render.tilesets.UITileSet
 import util.Tile
 import util.XY
 import world.Level
+import java.lang.Double.max
+import java.lang.Double.min
 
 val log = KotlinLogging.logger {}
 
@@ -68,6 +72,10 @@ object GameScreen : KtxScreen {
 
         this.width = width
         this.height = height
+
+        Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL_BLEND)
+
         updateSurfaceParams()
     }
 
@@ -108,7 +116,7 @@ object GameScreen : KtxScreen {
         uiDrawList.clear()
         if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
             uiDrawList.addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
-            uiTiles.getIndex(Tile.CURSOR), 0.5f, aspectRatio)
+            uiTiles.getIndex(Tile.CURSOR), 1f, aspectRatio)
         }
         uiDrawList.draw()
     }
@@ -126,10 +134,12 @@ object GameScreen : KtxScreen {
                 cursorPosition.x = -1
                 cursorPosition.y = -1
             }
-            log.info("cursor $col $row")
         }
     }
 
+    fun mouseScrolled(amount: Float) {
+        zoom = max(0.2, min(2.0, zoom - amount.toDouble() * 0.15))
+    }
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()

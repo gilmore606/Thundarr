@@ -8,4 +8,9 @@ object MouseProcessor : KtxInputAdapter {
         GameScreen.mouseMovedTo(screenX, screenY)
         return super.mouseMoved(screenX, screenY)
     }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        GameScreen.mouseScrolled(amountY)
+        return true
+    }
 }

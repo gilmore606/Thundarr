@@ -5,5 +5,5 @@ import util.Tile
 
 fun MobTileSet() =
     TileSet("tiles_mob.png", 7, 4).apply {
-        setTile(Tile.PLAYER, SimpleTile(this, 2, 2))
+        setTile(Tile.PLAYER, SimpleTile(this, 0, 0))
     }
