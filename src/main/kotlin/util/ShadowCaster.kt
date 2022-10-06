@@ -2,9 +2,8 @@ package util
 
 import java.lang.RuntimeException
 
-val MAX_SHADOWS_PER_LINE = 30
+const val MAX_SHADOWS_PER_LINE = 30
 
-// This code was a lot easier to understand before I made it zero-allocation.  If you're reading it, I apologize.
 class ShadowCaster(
     val isOpaqueAt: (x: Int, y: Int) -> Boolean,
     val setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
@@ -18,8 +17,8 @@ class ShadowCaster(
 
     class ShadowLine(val octant: Int) {
         val transform = XY(0,0)
-        val shadows = mutableListOf<Shadow>()
-        val shadowCache = mutableListOf<Shadow>().apply {
+        private val shadows = mutableListOf<Shadow>()
+        private val shadowCache = mutableListOf<Shadow>().apply {
             repeat (MAX_SHADOWS_PER_LINE) { add(Shadow()) }
         }
 

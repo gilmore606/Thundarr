@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 import render.tilesets.TileSet
+import util.Tile
+import world.Level
 
-class DrawList(
+class QuadBatch(
     vertexShaderSource: String,
     fragmentShaderSource: String,
     private val tileSet: TileSet
@@ -59,10 +61,10 @@ class DrawList(
 
     fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
                 textureIndex: Int, vis: Float) {
-        val x0 = (ix0).toFloat()
-        val y0 = (-iy0).toFloat()
-        val x1 = (ix1).toFloat()
-        val y1 = (-iy1).toFloat()
+        val x0 = ix0.toFloat()
+        val y0 = -iy0.toFloat()
+        val x1 = ix1.toFloat()
+        val y1 = -iy1.toFloat()
         val tx0 = (textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride
         val ty0 = (textureIndex / tileSet.tilesPerColumn) * tileSet.tileColumnStride
         val tx1 = tx0 + tileSet.tileRowStride
@@ -78,15 +80,22 @@ class DrawList(
         }
     }
 
+    fun getTextureIndex(tile: Tile, level: Level? = null, x: Int = 0, y: Int = 0) =
+        tileSet.getIndex(tile, level, x, y)
+
     fun draw() {
         mesh.setVertices(floats, 0, floatCount)
         tileShader.use { shader ->
             Gdx.gl.glActiveTexture(GL_TEXTURE0)
             tileSet.texture.bind()
-            shader.bind()
             shader.setUniformi("u_Texture", 0)
             mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount)
         }
     }
 
+    fun dispose() {
+        mesh.dispose()
+        tileSet.dispose()
+        tileShader.dispose()
+    }
 }

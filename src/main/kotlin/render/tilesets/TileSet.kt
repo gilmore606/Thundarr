@@ -5,8 +5,8 @@ import mu.KotlinLogging
 import world.Level
 import render.tileholders.TileHolder
 import util.Tile
+import util.log
 
-private val log = KotlinLogging.logger {}
 
 class TileSet(
     textureFileName: String,
@@ -21,7 +21,7 @@ class TileSet(
 
     init {
         texture = Texture(textureFileName)
-        log.info("loaded texture $textureFileName ${texture.width} ${texture.height}")
+        log.info("Loaded texture $textureFileName (${texture.width} x ${texture.height})")
         tileRowStride = (1.0f / tilesPerRow)
         tileColumnStride = (1.0f / tilesPerColumn)
     }
@@ -36,4 +36,8 @@ class TileSet(
         x: Int = 0,
         y: Int = 0
     ) = tileHolders[tile]?.getTextureIndex(level, x, y) ?: 0
+
+    fun dispose() {
+        texture.dispose()
+    }
 }

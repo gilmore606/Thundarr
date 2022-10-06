@@ -4,8 +4,6 @@ import util.*
 
 class Level(val width: Int, val height: Int) {
 
-    private val allVisible = false
-
     val tiles = Array(width) { Array(height) { Tile.WALL } }
     val visible = Array(width) { Array(height) { false } }
     val seen = Array(width) { Array(height) { false } }
@@ -13,17 +11,23 @@ class Level(val width: Int, val height: Int) {
     var pov = XY(0, 0)
         set(value) {
             field = value
-            isVisibilityDirty = true
-            updateStepMap()
+            isTransientDirty = true
         }
 
-    private var isVisibilityDirty = false
+    private var isTransientDirty = false
     private val stepMap = DijkstraMap(this)
     private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
+    fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                doThis(x, y)
+            }
+        }
+    }
 
     fun setTile(x: Int, y: Int, tile: Tile) {
         tiles[x][y] = tile
@@ -34,37 +38,18 @@ class Level(val width: Int, val height: Int) {
     } catch (e: ArrayIndexOutOfBoundsException) {
         Tile.FLOOR
     }
-
     fun getTile(xy: XY) = getTile(xy.x, xy.y)
 
-    fun updateVisibility() {
-        if (!isVisibilityDirty) return
-        isVisibilityDirty = false
+    // Update anything that changes when things move, like visibility, shadows, and pathing.
+    fun updateTransientData() {
+        if (!isTransientDirty) return
+        isTransientDirty = false
 
-        if (allVisible) {
-            for (y in 0 until height) {
-                for (x in 0 until width) {
-                    visible[x][y] = true
-                    seen[x][y] = true
-                }
-            }
-            return
-        }
-        val distance = 12f
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                visible[x][y] = false
-            }
-        }
-
-        shadowCaster.cast(pov, distance)
+        updateVisibility()
+        updateStepMaps()
     }
 
-    fun updateStepMap() {
-        stepMap.update(this.pov)
-    }
-
-    fun getPathToPOV(from: XY): List<XY> = stepMap.pathFrom(from)
+    fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
     fun isWalkableAt(x: Int, y: Int): Boolean = try {
         tiles[x][y] == Tile.FLOOR
@@ -81,6 +66,21 @@ class Level(val width: Int, val height: Int) {
     private fun isOpaqueAt(x: Int, y: Int): Boolean = try {
         tiles[x][y] !== Tile.FLOOR
     } catch (e: ArrayIndexOutOfBoundsException) { true }
+
+    private fun updateVisibility() {
+        val distance = 12f
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                visible[x][y] = false
+            }
+        }
+
+        shadowCaster.cast(pov, distance)
+    }
+
+    private fun updateStepMaps() {
+        stepMap.update(this.pov)
+    }
 
     private fun setTileVisibility(x: Int, y: Int, vis: Boolean) {
         try {

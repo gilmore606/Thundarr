@@ -1,5 +1,7 @@
 package util
 
+import mu.KotlinLogging
+
 inline fun <T> Iterable<T>.hasOneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return true
     return false
@@ -9,6 +11,8 @@ inline fun <T> Iterable<T>.hasNoneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return false
     return true
 }
+
+val log = KotlinLogging.logger {}
 
 val NORTH = XY(0, -1)
 val SOUTH = XY(0, 1)
