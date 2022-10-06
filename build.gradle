@@ -1,0 +1,50 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'application'
+}
+
+group = 'me.danbu'
+version = '1.0-SNAPSHOT'
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    apply plugin: 'application'
+}
+
+dependencies {
+
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api "io.github.libktx:ktx-collections:$ktxCollectionsVersion"
+    api "io.github.libktx:ktx-tiled:$ktxTiledVersion"
+    api "io.github.libktx:ktx-assets:$ktxAssetsVersion"
+    api "io.github.libktx:ktx-async:$ktxAsyncVersion"
+    api "io.github.libktx:ktx-assets-async:$ktxAssetsAsyncVersion"
+    api "io.github.libktx:ktx-preferences:$ktxPreferencesVersion"
+    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    api "io.github.libktx:ktx-freetype:$ktxFreetypeVersion"
+    api "io.github.libktx:ktx-freetype-async:$ktxFreetypeAsyncVersion"
+    api "io.github.libktx:ktx-graphics:$ktxGraphicsVersion"
+    api "io.github.libktx:ktx-math:$ktxMathVersion"
+    implementation "io.github.libktx:ktx-app:$ktxAppVersion"
+    api "io.github.libktx:ktx-log:$ktxLogVersion"
+
+    implementation 'io.github.microutils:kotlin-logging-jvm:3.0.0'
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
