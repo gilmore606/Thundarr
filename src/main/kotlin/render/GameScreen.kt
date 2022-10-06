@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.DungeonTileSet
+import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
 import util.Tile
 import util.XY
@@ -29,8 +30,8 @@ object GameScreen : KtxScreen {
 
     private val dungeonTiles = DungeonTileSet()
     private val dungeonDrawList = DrawList(tileVertShader(), tileFragShader(), dungeonTiles)
-    //private val mobTiles
-    //private val mobDrawList
+    private val mobTiles = MobTileSet()
+    private val mobDrawList = DrawList(tileVertShader(), tileFragShader(), mobTiles)
     private val uiTiles = UITileSet()
     private val uiDrawList = DrawList(tileVertShader(), tileFragShader(), uiTiles)
 
@@ -47,6 +48,8 @@ object GameScreen : KtxScreen {
 
     fun moveCenter(newX: Int, newY: Int) {
         level?.pov = XY(newX, newY)
+        cursorPosition.x = -1
+        cursorPosition.y = -1
     }
 
     // temporary testing horseshit
@@ -97,6 +100,10 @@ object GameScreen : KtxScreen {
             }
             dungeonDrawList.draw()
         }
+
+        mobDrawList.clear()
+        mobDrawList.addTileQuad(0, 0, tileStride, mobTiles.getIndex(Tile.PLAYER), 1f, aspectRatio)
+        mobDrawList.draw()
 
         uiDrawList.clear()
         if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
