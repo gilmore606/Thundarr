@@ -1,4 +1,5 @@
 import actors.Player
+import actors.WorldActor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
@@ -15,6 +16,8 @@ object App : KtxGame<Screen>() {
     val player: Player = Player()
     lateinit var level: Level
 
+    var turnTime = 0f
+
     override fun create() {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG")
         System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_DATE_TIME_KEY, "true")
@@ -29,6 +32,7 @@ object App : KtxGame<Screen>() {
         level = RoomyMaze.makeLevel()
         val playerStart = level.tempPlayerStart()
         level.director.add(player, playerStart.x, playerStart.y)
+        level.director.add(WorldActor, 0, 0)
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
