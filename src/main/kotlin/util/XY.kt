@@ -18,11 +18,12 @@ class XY(var x: Int, var y: Int) {
         return (other is XY) && (x == other.x && y == other.y)
     }
 
-    fun distanceTo(b: XY): Float {
+    fun distanceTo(bx: Int, by: Int): Float {
         val x0 = x.toFloat()
-        val x1 = b.x.toFloat()
+        val x1 = bx.toFloat()
         val y0 = y.toFloat()
-        val y1 = b.y.toFloat()
+        val y1 = by.toFloat()
         return sqrt((x1-x0).pow(2) + (y1-y0).pow(2))
     }
+    fun distanceTo(b: XY) = distanceTo(b.x, b.y)
 }

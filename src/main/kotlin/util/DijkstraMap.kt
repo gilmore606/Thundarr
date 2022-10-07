@@ -5,7 +5,7 @@ import world.Level
 
 class DijkstraMap(val level: Level) {
 
-    val map = Array(level.width) { Array(level.height) { -1 } }
+    private val map = Array(level.width) { Array(level.height) { -1 } }
 
 
     fun update(pov: XY) {

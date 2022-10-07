@@ -76,6 +76,19 @@ class ShadowCaster(
             end = (col.toFloat() + 1f) / (row.toFloat() + 1f)
         }
 
+        fun transformOctant(row: Int, col: Int) {
+            when (octant) {
+                0 -> { transform.x = col; transform.y = -row }
+                1 -> { transform.x = row; transform.y = -col }
+                2 -> { transform.x = row; transform.y = col }
+                3 -> { transform.x = col; transform.y = row }
+                4 -> { transform.x = -col; transform.y = row }
+                5 -> { transform.x = -row; transform.y = col }
+                6 -> { transform.x = -row; transform.y = -col }
+                7 -> { transform.x = -col; transform.y = -row }
+                else -> throw RuntimeException()
+            }
+        }
     }
 
     private val lineCache = Array(8) { n -> ShadowLine(n) }
@@ -88,20 +101,6 @@ class ShadowCaster(
         }
     }
 
-    private fun transformOctant(xy: XY, row: Int, col: Int, octant: Int) {
-        when (octant) {
-            0 -> { xy.x = col; xy.y = -row }
-            1 -> { xy.x = row; xy.y = -col }
-            2 -> { xy.x = row; xy.y = col }
-            3 -> { xy.x = col; xy.y = row }
-            4 -> { xy.x = -col; xy.y = row }
-            5 -> { xy.x = -row; xy.y = col }
-            6 -> { xy.x = -row; xy.y = -col }
-            7 -> { xy.x = -col; xy.y = -row }
-            else -> throw RuntimeException()
-        }
-    }
-
     private fun refreshOctant(line: ShadowLine, pov: XY, distance: Float) {
         line.reset()
         var fullShadow = false
@@ -109,26 +108,28 @@ class ShadowCaster(
         var done = false
         while (!done) {
             row++
-            transformOctant(line.transform, row, 0, line.octant)
-            var pos = pov + line.transform
-            if (pov.distanceTo(pos) > distance) {
+            line.transformOctant(row, 0)
+            var castX = pov.x + line.transform.x
+            var castY = pov.y + line.transform.y
+            if (pov.distanceTo(castX, castY) > distance) {
                 done = true
             } else {
                 var doneRow = false
                 var col = 0
                 while (!doneRow && col <= row) {
-                    transformOctant(line.transform, row, col, line.octant)
-                    pos = pov + line.transform
-                    if (pov.distanceTo(pos) > distance) {
+                    line.transformOctant(row, col)
+                    castX = pov.x + line.transform.x
+                    castY = pov.y + line.transform.y
+                    if (pov.distanceTo(castX, castY) > distance) {
                         doneRow = true
                     } else {
                         if (fullShadow) {
-                            setVisibility(pos.x, pos.y, false)
+                            setVisibility(castX, castY, false)
                         } else {
                             val projection = line.projectTile(row, col)
                             val visible = !line.isInShadow(projection)
-                            setVisibility(pos.x, pos.y, visible)
-                            if (visible && isOpaqueAt(pos.x, pos.y)) {
+                            setVisibility(castX, castY, visible)
+                            if (visible && isOpaqueAt(castX, castY)) {
                                 line.add(projection)
                                 fullShadow = line.isFullShadow()
                             } else {
