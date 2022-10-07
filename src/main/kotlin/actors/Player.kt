@@ -3,6 +3,7 @@ package actors
 import App
 import actors.actions.Action
 import util.Glyph
+import util.log
 
 class Player : Actor(
     Glyph.PLAYER,
@@ -13,6 +14,8 @@ class Player : Actor(
         super.queue(action)
         App.level.director.runQueue()
     }
+
+    override fun defaultAction(): Action? = null
 
     override fun moveTo(x: Int, y: Int) {
         super.moveTo(x, y)

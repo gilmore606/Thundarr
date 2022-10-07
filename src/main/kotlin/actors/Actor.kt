@@ -24,8 +24,16 @@ abstract class Actor(
     fun speed() = this.speed
 
     // What will I do right now?
-    open fun nextAction(): Action? = if (queuedActions.isNotEmpty())
-        queuedActions.removeAt(0) else null
+    fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
+        val action = queuedActions[0]
+        if (!action.shouldContinueFor(this)) {
+            queuedActions.remove(action)
+        }
+        action
+    } else defaultAction()
+
+    // With nothing queued, what should I decide to do now?
+    abstract fun defaultAction(): Action?
 
     // Queue an action to be executed next.
     open fun queue(action: Action) {

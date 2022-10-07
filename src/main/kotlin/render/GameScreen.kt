@@ -1,5 +1,6 @@
 package render
 
+import actors.actions.processes.WalkTo
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20.*
 import ktx.app.KtxScreen
@@ -57,8 +58,6 @@ object GameScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        App.level.updateTransientData()
-
         dungeonBatch.apply {
             clear()
             App.level.forEachCellToRender { tx, ty, vis, glyph ->
@@ -96,10 +95,8 @@ object GameScreen : KtxScreen {
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
-        val glX = (screenX.toFloat() / width) * 2.0 - 1.0
-        val glY = (screenY.toFloat() / height) * 2.0 - 1.0
-        val col = (((glX * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
-        val row = ((glY + tileStride * 0.5) / tileStride + pov.y).toInt()
+        val col = screenXtoTileX(screenX)
+        val row = screenYtoTileY(screenY)
         if (col != cursorPosition.x || row != cursorPosition.y) {
             if (App.level.isWalkableAt(col, row)) {
                 cursorPosition.x = col
@@ -117,11 +114,25 @@ object GameScreen : KtxScreen {
         zoom = max(0.2, min(2.0, zoom - amount.toDouble() * 0.15))
     }
 
+    fun mouseClicked(screenX: Int, screenY: Int): Boolean {
+        val x = screenXtoTileX(screenX)
+        val y = screenYtoTileY(screenY)
+        if (App.level.isWalkableAt(x, y)) {
+            App.player.queue(WalkTo(App.level, x, y))
+            return true
+        }
+        return false
+    }
+
     fun povMoved() {
         cursorPosition.x = -1
         cursorPosition.y = -1
         cursorLine.clear()
     }
+
+    private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
+
+    private fun screenYtoTileY(screenY: Int) = (((screenY.toFloat() / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + pov.y).toInt()
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()

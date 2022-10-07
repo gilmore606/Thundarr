@@ -13,4 +13,9 @@ object MouseProcessor : KtxInputAdapter {
         GameScreen.mouseScrolled(amountY)
         return true
     }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (GameScreen.mouseClicked(screenX, screenY)) return true
+        return super.touchDown(screenX, screenY, pointer, button)
+    }
 }

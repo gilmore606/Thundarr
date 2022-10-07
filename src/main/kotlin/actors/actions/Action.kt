@@ -12,4 +12,7 @@ abstract class Action(
 
     // Do whatever happens when actor does this.
     abstract fun execute(actor: Actor, level: Level)
+
+    // Should we do this again immediately?
+    open fun shouldContinueFor(actor: Actor): Boolean = false
 }

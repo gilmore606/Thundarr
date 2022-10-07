@@ -11,7 +11,6 @@ class Level(val width: Int, val height: Int) {
 
     val pov = XY(0, 0)
 
-    private var isTransientDirty = false
     private val stepMap = DijkstraMap(this)
     private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
@@ -54,7 +53,8 @@ class Level(val width: Int, val height: Int) {
     fun setPov(x: Int, y: Int) {
         pov.x = x
         pov.y = y
-        isTransientDirty = true
+        updateVisibility()
+        updateStepMaps()
         if (this == App.level) GameScreen.povMoved()
     }
 
@@ -67,16 +67,6 @@ class Level(val width: Int, val height: Int) {
     } catch (e: ArrayIndexOutOfBoundsException) {
         Glyph.FLOOR
     }
-    fun getTile(xy: XY) = getTile(xy.x, xy.y)
-
-    // Update anything that changes when things move, like visibility, shadows, and pathing.
-    fun updateTransientData() {
-        if (!isTransientDirty) return
-        isTransientDirty = false
-
-        updateVisibility()
-        updateStepMaps()
-    }
 
     fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
@@ -86,13 +76,18 @@ class Level(val width: Int, val height: Int) {
 
     fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
-    fun isReachableAt(x: Int, y: Int): Boolean = try {
-        stepMap.map[x][y] >= 0
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
-
     fun visibilityAt(x: Int, y: Int): Float = try {
         (if (seen[x][y]) 0.6f else 0f) + (if (visible[x][y]) 0.4f else 0f)
     } catch (e: ArrayIndexOutOfBoundsException) { 0f }
+
+    fun tempPlayerStart(): XY {
+        var xy: XY? = null
+        forEachCell { x, y ->
+            if (isWalkableAt(x, y)) xy = XY(x, y)
+        }
+        xy?.also { return it }
+        throw RuntimeException("No space to put player in level!")
+    }
 
     private fun isOpaqueAt(x: Int, y: Int): Boolean = try {
         glyphs[x][y] !== Glyph.FLOOR

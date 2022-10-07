@@ -27,7 +27,8 @@ object App : KtxGame<Screen>() {
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
 
         level = RoomyMaze.makeLevel()
-        level.director.add(player, 12, 8)
+        val playerStart = level.tempPlayerStart()
+        level.director.add(player, playerStart.x, playerStart.y)
 
         addScreen(GameScreen)
         setScreen<GameScreen>()

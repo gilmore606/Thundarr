@@ -14,6 +14,9 @@ class XY(var x: Int, var y: Int) {
     operator fun times(b: Int): XY {
         return XY(x * b, y * b)
     }
+    override fun equals(other: Any?): Boolean {
+        return (other is XY) && (x == other.x && y == other.y)
+    }
 
     fun distanceTo(b: XY): Float {
         val x0 = x.toFloat()
@@ -21,14 +24,5 @@ class XY(var x: Int, var y: Int) {
         val y0 = y.toFloat()
         val y1 = b.y.toFloat()
         return sqrt((x1-x0).pow(2) + (y1-y0).pow(2))
-    }
-}
-
-class glXY(var x: Float, var y: Float) {
-    operator fun plus(b: glXY): glXY {
-        return glXY(x + b.x, y + b.y)
-    }
-    operator fun minus(b: glXY): glXY {
-        return glXY(x - b.x, y - b.y)
     }
 }

@@ -17,8 +17,7 @@ class Director(
     fun add(actor: Actor, x: Int, y: Int) {
         actor.juice = 0f
         addOrdered(actor)
-        actor.xy.x = x
-        actor.xy.y = y
+        actor.moveTo(x, y)
     }
 
     fun remove(actor: Actor) {
@@ -52,7 +51,7 @@ class Director(
             if (actor.juice > 0f || actor is Player) {
                 actor.nextAction()?.also { action ->
                     val duration = action.duration()
-                    log.debug("$actor (j ${actor.juice}) executes $action for $duration turns")
+                    //log.debug("$actor (j ${actor.juice}) executes $action for $duration turns")
 
                     action.execute(actor, level)
 

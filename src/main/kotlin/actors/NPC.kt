@@ -4,13 +4,15 @@ import actors.actions.Action
 import actors.actions.Wait
 import util.Glyph
 
-class NPC(
+open class NPC(
     glyph: Glyph,
     speed: Float
 ) : Actor(glyph, speed) {
 
-    override fun nextAction(): Action {
-        return super.nextAction() ?: Wait(1f)
+    final override fun defaultAction(): Action {
+        return super.nextAction() ?: pickAction()
     }
+
+    open fun pickAction(): Action = Wait(1f)
 
 }

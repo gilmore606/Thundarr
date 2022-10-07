@@ -4,7 +4,6 @@ import App
 import actors.actions.Move
 import com.badlogic.gdx.Input
 import ktx.app.KtxInputAdapter
-import render.GameScreen
 import util.*
 
 object KeyboardProcessor : KtxInputAdapter {
