@@ -10,7 +10,7 @@ abstract class Actor(
 ) {
     val xy = XY(0,0)  // position in current level
 
-    private val queuedActions: MutableList<Action> = mutableListOf()
+    val queuedActions: MutableList<Action> = mutableListOf()
 
     // How many turns am I owed?
     var juice = 0f

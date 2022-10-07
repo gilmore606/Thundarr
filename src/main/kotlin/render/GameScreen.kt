@@ -67,7 +67,7 @@ object GameScreen : KtxScreen {
         val col = screenXtoTileX(screenX)
         val row = screenYtoTileY(screenY)
         if (col != cursorPosition.x || row != cursorPosition.y) {
-            if (App.level.isWalkableAt(col, row)) {
+            if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
                 cursorPosition.x = col
                 cursorPosition.y = row
                 cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
