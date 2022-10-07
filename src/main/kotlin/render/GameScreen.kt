@@ -11,14 +11,11 @@ import render.tilesets.UITileSet
 import util.Glyph
 import util.XY
 import util.log
-import world.Level
 import java.lang.Double.max
 import java.lang.Double.min
 
 
 object GameScreen : KtxScreen {
-
-    private var level: Level? = null
 
     var zoom = 0.4
         set(value) {
@@ -35,28 +32,10 @@ object GameScreen : KtxScreen {
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
 
-    var cursorPosition: XY = XY(-1,-1)
+    private var cursorPosition: XY = XY(-1,-1)
     private var cursorLine: MutableList<XY> = mutableListOf()
 
-    private val pov: XY
-        get() = level?.pov ?: XY(0,0)
-
-
-    fun observeLevel(level: Level) {
-        this.level = level
-    }
-
-    fun moveCenter(newX: Int, newY: Int) {
-        level?.pov = XY(newX, newY)
-        cursorPosition.x = -1
-        cursorPosition.y = -1
-        cursorLine.clear()
-    }
-
-    // temporary testing horseshit
-    fun movePlayer(dir: XY) {
-        level?.also { level -> moveCenter(level.pov.x + dir.x, level.pov.y + dir.y) }
-    }
+    private val pov get() = App.level.pov
 
     override fun show() {
         super.show()
@@ -78,45 +57,41 @@ object GameScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        level?.also { level ->
-            level.updateTransientData()
+        App.level.updateTransientData()
 
-            dungeonBatch.apply {
-                clear()
-                level.forEachCell { tx, ty ->
-                    val vis = level.visibilityAt(tx, ty)
-                    if (vis > 0f) {
-                        val textureIndex = getTextureIndex(
-                            level.glyphs[tx][ty],
-                            level, tx, ty
-                        )
-                        addTileQuad(
-                            tx - pov.x, ty - pov.y, tileStride,
-                            textureIndex, vis, aspectRatio
-                        )
-                    }
-                }
-                draw()
+        dungeonBatch.apply {
+            clear()
+            App.level.forEachCellToRender { tx, ty, vis, glyph ->
+                val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
+                addTileQuad(
+                    tx - pov.x, ty - pov.y, tileStride,
+                    textureIndex, vis, aspectRatio
+                )
             }
+            draw()
+        }
 
-            mobBatch.apply {
-                clear()
-                addTileQuad(0, 0, tileStride, getTextureIndex(Glyph.PLAYER), 1f, aspectRatio)
-                draw()
+        mobBatch.apply {
+            clear()
+            App.level.forEachActorToRender { tx, ty, glyph ->
+                addTileQuad(
+                    tx - pov.x, ty - pov.y, tileStride,
+                    getTextureIndex(glyph), 1f, aspectRatio)
             }
+            draw()
+        }
 
-            uiBatch.apply {
-                clear()
-                if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
-                    addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
+        uiBatch.apply {
+            clear()
+            if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
+                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
+                    getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
+                cursorLine.forEach { xy ->
+                    addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
                         getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
-                    cursorLine.forEach { xy ->
-                        addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
-                            getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
-                    }
                 }
-                draw()
             }
+            draw()
         }
     }
 
@@ -126,10 +101,10 @@ object GameScreen : KtxScreen {
         val col = (((glX * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
         val row = ((glY + tileStride * 0.5) / tileStride + pov.y).toInt()
         if (col != cursorPosition.x || row != cursorPosition.y) {
-            if (level?.isWalkableAt(col, row) == true) {
+            if (App.level.isWalkableAt(col, row)) {
                 cursorPosition.x = col
                 cursorPosition.y = row
-                level?.also { cursorLine = it.getPathToPOV(cursorPosition).toMutableList() }
+                cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
             } else {
                 cursorPosition.x = -1
                 cursorPosition.y = -1
@@ -140,6 +115,12 @@ object GameScreen : KtxScreen {
 
     fun mouseScrolled(amount: Float) {
         zoom = max(0.2, min(2.0, zoom - amount.toDouble() * 0.15))
+    }
+
+    fun povMoved() {
+        cursorPosition.x = -1
+        cursorPosition.y = -1
+        cursorLine.clear()
     }
 
     private fun updateSurfaceParams() {

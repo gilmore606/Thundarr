@@ -31,7 +31,6 @@ object App : KtxGame<Screen>() {
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
-        getScreen<GameScreen>().observeLevel(level)
 
         log.info("Thundarr started.")
     }

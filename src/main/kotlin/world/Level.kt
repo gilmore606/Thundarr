@@ -1,6 +1,6 @@
 package world
 
-import actors.Actor
+import render.GameScreen
 import util.*
 
 class Level(val width: Int, val height: Int) {
@@ -9,11 +9,7 @@ class Level(val width: Int, val height: Int) {
     val visible = Array(width) { Array(height) { false } }
     val seen = Array(width) { Array(height) { false } }
 
-    var pov = XY(0, 0)
-        set(value) {
-            field = value
-            isTransientDirty = true
-        }
+    val pov = XY(0, 0)
 
     private var isTransientDirty = false
     private val stepMap = DijkstraMap(this)
@@ -30,6 +26,36 @@ class Level(val width: Int, val height: Int) {
                 doThis(x, y)
             }
         }
+    }
+
+    fun forEachCellToRender(doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit) = forEachCell { x, y ->
+            val vis = visibilityAt(x, y)
+            if (vis > 0f) {
+                doThis(
+                    x, y,
+                    visibilityAt(x, y),
+                    glyphs[x][y]
+                )
+            }
+        }
+
+    fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
+        val x = actor.xy.x
+        val y = actor.xy.y
+        val vis = visibilityAt(x, y)
+        if (vis == 1f) {
+            doThis(
+                x, y,
+                actor.glyph
+            )
+        }
+    }
+
+    fun setPov(x: Int, y: Int) {
+        pov.x = x
+        pov.y = y
+        isTransientDirty = true
+        if (this == App.level) GameScreen.povMoved()
     }
 
     fun setTile(x: Int, y: Int, glyph: Glyph) {

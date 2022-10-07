@@ -15,6 +15,11 @@ abstract class Actor(
     // How many turns am I owed?
     var juice = 0f
 
+    open fun moveTo(x: Int, y: Int) {
+        this.xy.x = x
+        this.xy.y = y
+    }
+
     // What's my divider for action durations?
     fun speed() = this.speed
 
