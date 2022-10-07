@@ -5,8 +5,7 @@ import actors.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import util.log
-import java.lang.RuntimeException
+import kotlinx.coroutines.withContext
 
 // A delegate class for Level to manage actors in time and space.
 
@@ -84,7 +83,9 @@ class Director(
                 // Put the actor back in queue, in position for their next turn.
                 addOrdered(actor)
 
-                Thread.sleep(5)
+                withContext(Dispatchers.IO) {
+                    Thread.sleep(5)
+                }
             }
             running = false
         }
