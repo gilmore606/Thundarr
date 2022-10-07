@@ -1,10 +1,14 @@
 package util
 
-enum class Tile {
+enum class Glyph {
     WALL,
     FLOOR,
     OPEN_DOOR,
     CLOSED_DOOR,
+
+    CURSOR,
+
     PLAYER,
-    CURSOR
+    SKELETON,
+    SKULL
 }

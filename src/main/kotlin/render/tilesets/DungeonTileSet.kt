@@ -1,15 +1,14 @@
 package render.tilesets
 
-import render.tilesets.TileSet
 import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 import render.tileholders.WallTile
-import util.Tile
+import util.Glyph
 
 fun DungeonTileSet() =
     TileSet("tiles_dungeon.png", 10, 10).apply {
 
-        setTile(Tile.FLOOR, VariantsTile(this).apply {
+        setTile(Glyph.FLOOR, VariantsTile(this).apply {
             add(0.1f, 6, 0)
             add(0.1f, 7, 0)
             add(0.1f, 8, 0)
@@ -22,7 +21,7 @@ fun DungeonTileSet() =
             add(0.1f, 7, 2)
         })
 
-        setTile(Tile.WALL, WallTile(this, Tile.WALL).apply {
+        setTile(Glyph.WALL, WallTile(this, Glyph.WALL).apply {
             add(WallTile.Slot.TOP, 0.25f, 1, 0)
             add(WallTile.Slot.TOP, 0.25f, 2, 0)
             add(WallTile.Slot.TOP, 0.25f, 3, 0)
@@ -44,6 +43,6 @@ fun DungeonTileSet() =
         })
 
 
-        setTile(Tile.CLOSED_DOOR, SimpleTile(this, 6, 3))
-        setTile(Tile.OPEN_DOOR, SimpleTile(this, 6, 4))
+        setTile(Glyph.CLOSED_DOOR, SimpleTile(this, 6, 3))
+        setTile(Glyph.OPEN_DOOR, SimpleTile(this, 6, 4))
     }

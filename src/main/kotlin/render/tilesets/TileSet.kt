@@ -1,10 +1,9 @@
 package render.tilesets
 
 import com.badlogic.gdx.graphics.Texture
-import mu.KotlinLogging
 import world.Level
 import render.tileholders.TileHolder
-import util.Tile
+import util.Glyph
 import util.log
 
 
@@ -13,7 +12,7 @@ class TileSet(
     val tilesPerRow: Int,
     val tilesPerColumn: Int,
 ) {
-    var tileHolders: HashMap<Tile, TileHolder> = HashMap()
+    private var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
     var tileRowStride = 0.0f
     var tileColumnStride = 0.0f
 
@@ -26,16 +25,16 @@ class TileSet(
         tileColumnStride = (1.0f / tilesPerColumn)
     }
 
-    fun setTile(tile: Tile, holder: TileHolder) {
-        tileHolders[tile] = holder
+    fun setTile(glyph: Glyph, holder: TileHolder) {
+        tileHolders[glyph] = holder
     }
 
     fun getIndex(
-        tile: Tile,
+        glyph: Glyph,
         level: Level? = null,
         x: Int = 0,
         y: Int = 0
-    ) = tileHolders[tile]?.getTextureIndex(level, x, y) ?: 0
+    ) = tileHolders[glyph]?.getTextureIndex(level, x, y) ?: 0
 
     fun dispose() {
         texture.dispose()

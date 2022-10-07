@@ -8,7 +8,7 @@ import render.shaders.tileVertShader
 import render.tilesets.DungeonTileSet
 import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
-import util.Tile
+import util.Glyph
 import util.XY
 import util.log
 import world.Level
@@ -87,7 +87,7 @@ object GameScreen : KtxScreen {
                     val vis = level.visibilityAt(tx, ty)
                     if (vis > 0f) {
                         val textureIndex = getTextureIndex(
-                            level.tiles[tx][ty],
+                            level.glyphs[tx][ty],
                             level, tx, ty
                         )
                         addTileQuad(
@@ -101,7 +101,7 @@ object GameScreen : KtxScreen {
 
             mobBatch.apply {
                 clear()
-                addTileQuad(0, 0, tileStride, getTextureIndex(Tile.PLAYER), 1f, aspectRatio)
+                addTileQuad(0, 0, tileStride, getTextureIndex(Glyph.PLAYER), 1f, aspectRatio)
                 draw()
             }
 
@@ -109,10 +109,10 @@ object GameScreen : KtxScreen {
                 clear()
                 if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
                     addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
-                        getTextureIndex(Tile.CURSOR), 1f, aspectRatio)
+                        getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
                     cursorLine.forEach { xy ->
                         addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
-                            getTextureIndex(Tile.CURSOR), 1f, aspectRatio)
+                            getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
                     }
                 }
                 draw()

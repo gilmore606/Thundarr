@@ -1,20 +1,19 @@
+import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
 import input.KeyboardProcessor
 import input.MouseProcessor
 import ktx.app.KtxGame
-import ktx.app.KtxScreen
-import mu.KotlinLogging
 import render.GameScreen
-import render.tilesets.DungeonTileSet
-import render.tilesets.TileSet
 import util.log
 import world.cartos.RoomyMaze
-import world.cartos.TestCarto
-
+import world.Level
 
 object App : KtxGame<Screen>() {
+
+    val player: Player = Player()
+    lateinit var level: Level
 
     override fun create() {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG")
@@ -27,12 +26,12 @@ object App : KtxGame<Screen>() {
 
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
 
+        level = RoomyMaze.makeLevel()
+        level.director.add(player, 12, 8)
+
         addScreen(GameScreen)
         setScreen<GameScreen>()
-
-        val firstLevel = RoomyMaze.makeLevel()
-        getScreen<GameScreen>().observeLevel(firstLevel)
-        getScreen<GameScreen>().moveCenter(12, 8)
+        getScreen<GameScreen>().observeLevel(level)
 
         log.info("Thundarr started.")
     }

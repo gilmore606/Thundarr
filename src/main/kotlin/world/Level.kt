@@ -1,10 +1,11 @@
 package world
 
+import actors.Actor
 import util.*
 
 class Level(val width: Int, val height: Int) {
 
-    val tiles = Array(width) { Array(height) { Tile.WALL } }
+    val glyphs = Array(width) { Array(height) { Glyph.WALL } }
     val visible = Array(width) { Array(height) { false } }
     val seen = Array(width) { Array(height) { false } }
 
@@ -21,6 +22,8 @@ class Level(val width: Int, val height: Int) {
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
+    val director = Director(this)
+
     fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
         for (x in 0 until width) {
             for (y in 0 until height) {
@@ -29,14 +32,14 @@ class Level(val width: Int, val height: Int) {
         }
     }
 
-    fun setTile(x: Int, y: Int, tile: Tile) {
-        tiles[x][y] = tile
+    fun setTile(x: Int, y: Int, glyph: Glyph) {
+        glyphs[x][y] = glyph
     }
 
     fun getTile(x: Int, y: Int) = try {
-        tiles[x][y]
+        glyphs[x][y]
     } catch (e: ArrayIndexOutOfBoundsException) {
-        Tile.FLOOR
+        Glyph.FLOOR
     }
     fun getTile(xy: XY) = getTile(xy.x, xy.y)
 
@@ -52,8 +55,10 @@ class Level(val width: Int, val height: Int) {
     fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
     fun isWalkableAt(x: Int, y: Int): Boolean = try {
-        tiles[x][y] == Tile.FLOOR
+        glyphs[x][y] == Glyph.FLOOR
     } catch (e: ArrayIndexOutOfBoundsException) { false }
+
+    fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
     fun isReachableAt(x: Int, y: Int): Boolean = try {
         stepMap.map[x][y] >= 0
@@ -64,7 +69,7 @@ class Level(val width: Int, val height: Int) {
     } catch (e: ArrayIndexOutOfBoundsException) { 0f }
 
     private fun isOpaqueAt(x: Int, y: Int): Boolean = try {
-        tiles[x][y] !== Tile.FLOOR
+        glyphs[x][y] !== Glyph.FLOOR
     } catch (e: ArrayIndexOutOfBoundsException) { true }
 
     private fun updateVisibility() {

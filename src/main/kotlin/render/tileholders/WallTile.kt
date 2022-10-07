@@ -2,11 +2,11 @@ package render.tileholders
 
 import world.Level
 import render.tilesets.TileSet
-import util.Tile
+import util.Glyph
 
 class WallTile(
     set: TileSet,
-    val neighborType: Tile,
+    val neighborType: Glyph,
 ): TileHolder(set) {
 
     enum class Slot { TOP, LEFT, LEFTBOTTOM, BOTTOM, RIGHTBOTTOM, RIGHT }

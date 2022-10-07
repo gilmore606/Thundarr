@@ -25,7 +25,7 @@ object RoomyMaze : Carto() {
 
         forEachCell { x, y ->
             if (isRock(x, y)) {
-                if (neighborCount(x, y, Tile.FLOOR) == 0) {
+                if (neighborCount(x, y, Glyph.FLOOR) == 0) {
                     growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
                     nextRegion++
                 }

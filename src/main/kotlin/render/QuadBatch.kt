@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 import render.tilesets.TileSet
-import util.Tile
+import util.Glyph
 import world.Level
 
 class QuadBatch(
@@ -80,8 +80,8 @@ class QuadBatch(
         }
     }
 
-    fun getTextureIndex(tile: Tile, level: Level? = null, x: Int = 0, y: Int = 0) =
-        tileSet.getIndex(tile, level, x, y)
+    fun getTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0) =
+        tileSet.getIndex(glyph, level, x, y)
 
     fun draw() {
         mesh.setVertices(floats, 0, floatCount)
