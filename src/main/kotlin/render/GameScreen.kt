@@ -1,5 +1,6 @@
 package render
 
+import App
 import actors.actions.processes.WalkTo
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20.*
@@ -58,40 +59,8 @@ object GameScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        dungeonBatch.apply {
-            clear()
-            App.level.forEachCellToRender { tx, ty, vis, glyph ->
-                val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
-                addTileQuad(
-                    tx - pov.x, ty - pov.y, tileStride,
-                    textureIndex, vis, aspectRatio
-                )
-            }
-            draw()
-        }
-
-        mobBatch.apply {
-            clear()
-            App.level.forEachActorToRender { tx, ty, glyph ->
-                addTileQuad(
-                    tx - pov.x, ty - pov.y, tileStride,
-                    getTextureIndex(glyph), 1f, aspectRatio)
-            }
-            draw()
-        }
-
-        uiBatch.apply {
-            clear()
-            if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
-                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
-                    getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
-                cursorLine.forEach { xy ->
-                    addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
-                        getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
-                }
-            }
-            draw()
-        }
+        drawEverything()
+        App.level.director.runQueue()
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
@@ -128,6 +97,43 @@ object GameScreen : KtxScreen {
         cursorPosition.x = -1
         cursorPosition.y = -1
         cursorLine.clear()
+    }
+
+    private fun drawEverything() {
+        dungeonBatch.apply {
+            clear()
+            App.level.forEachCellToRender { tx, ty, vis, glyph ->
+                val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
+                addTileQuad(
+                    tx - pov.x, ty - pov.y, tileStride,
+                    textureIndex, vis, aspectRatio
+                )
+            }
+            draw()
+        }
+
+        mobBatch.apply {
+            clear()
+            App.level.forEachActorToRender { tx, ty, glyph ->
+                addTileQuad(
+                    tx - pov.x, ty - pov.y, tileStride,
+                    getTextureIndex(glyph), 1f, aspectRatio)
+            }
+            draw()
+        }
+
+        uiBatch.apply {
+            clear()
+            if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
+                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
+                    getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
+                cursorLine.forEach { xy ->
+                    addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
+                        getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
+                }
+            }
+            draw()
+        }
     }
 
     private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()

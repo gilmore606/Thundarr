@@ -2,10 +2,7 @@ package world
 
 import actors.Actor
 import actors.Player
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import actors.WorldActor
 
 // A delegate class for Level to manage actors in time and space.
 
@@ -14,7 +11,6 @@ class Director(
 ){
 
     val actors: MutableList<Actor> = mutableListOf()
-    private var running = false
 
     // Place actor into the level.
     fun add(actor: Actor, x: Int, y: Int) {
@@ -48,47 +44,34 @@ class Director(
 
     // Execute actors' actions until it's the player's turn.
     fun runQueue() {
-        if (running) return
-        CoroutineScope(Dispatchers.Default).launch {
-            running = true
-            var needInput = false
-            while (actors.isNotEmpty() && !needInput) {
-                // Pull the next actor out of queue.
+        var done = false
+        while (actors.isNotEmpty() && !done) {
+            if (actors[0].juice > 0f || actors[0] is Player) {
                 val actor = actors.removeAt(0)
-                if (actor.juice > 0f || actor is Player) {
-                    actor.nextAction()?.also { action ->
-                        val duration = action.duration()
-                        //log.debug("$actor (j ${actor.juice}) executes $action for $duration turns")
+                actor.nextAction()?.also { action ->
+                    val duration = action.duration()
+                    //log.debug("$actor (j ${actor.juice}) executes $action for $duration turns")
 
-                        action.execute(actor, level)
+                    action.execute(actor, level)
 
-                        if (actor is Player) {
-                            // Player actions give juice to everyone else.
-                            actors.forEach { it.juice += duration }
-                        } else {
-                            // NPC actions cost them juice.
-                            actor.juice -= duration
-                        }
-                    } ?: if (actor is Player) {
-                        // Player's turn, but has no queued actions, so we're done.
-                        needInput = true
-                    } else {
-                        // NPCs should always return an action, even if it's a wait.
-                        throw RuntimeException("NPC $actor had no next action!")
+                    when (actor) {
+                        is WorldActor -> { actor.juice -= duration ; done = true } // Stop executing actions to let the renderer draw.
+                        is Player -> { actors.forEach { it.juice += duration} } // Player actions give juice to everyone else.
+                        else -> { actor.juice -= duration } // NPC actions cost them juice.
                     }
+                } ?: if (actor is Player) {
+                    // Player's turn, but has no queued actions, so we're done.
+                    done = true
                 } else {
-                    // If this actor has no juice, nobody does, so we're done.
-                    needInput = true
+                    // NPCs should always return an action, even if it's a wait.
+                    throw RuntimeException("NPC $actor had no next action!")
                 }
                 // Put the actor back in queue, in position for their next turn.
                 addOrdered(actor)
-
-                withContext(Dispatchers.IO) {
-                    Thread.sleep(5)
-                }
+            } else {
+                // If this actor has no juice, nobody does, so we're done.
+                done = true
             }
-            running = false
         }
-
     }
 }
