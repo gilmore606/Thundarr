@@ -13,6 +13,7 @@ open class NPC(
         return super.nextAction() ?: pickAction()
     }
 
+    // NPC AI returns actions here.
     open fun pickAction(): Action = Wait(1f)
 
 }

@@ -1,10 +1,12 @@
 package util
 
+import kotlinx.serialization.Serializable
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 // A mutable 2D vector suitable for passing coordinates.
-class XY(var x: Int, var y: Int) {
+@Serializable
+data class XY(var x: Int, var y: Int) {
     operator fun plus(b: XY): XY {
         return XY(x + b.x, y + b.y)
     }
@@ -26,4 +28,10 @@ class XY(var x: Int, var y: Int) {
         return sqrt((x1-x0).pow(2) + (y1-y0).pow(2))
     }
     fun distanceTo(b: XY) = distanceTo(b.x, b.y)
+
+    override fun hashCode(): Int {
+        var result = x
+        result = 31 * result + y
+        return result
+    }
 }

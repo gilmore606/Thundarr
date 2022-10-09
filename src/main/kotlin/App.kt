@@ -1,47 +1,64 @@
 import actors.Player
-import actors.WorldActor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
 import input.KeyboardProcessor
 import input.MouseProcessor
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
+import ktx.async.KtxAsync
 import render.GameScreen
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
+import java.io.File
 
 object App : KtxGame<Screen>() {
 
     val player: Player = Player()
     lateinit var level: Level
-
     var turnTime = 0f
 
     override fun create() {
-        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG")
-        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_DATE_TIME_KEY, "true")
-        System.setProperty(org.slf4j.simple.SimpleLogger.DATE_TIME_FORMAT_KEY, "hh:mm:ss.SSS")
-        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_LOG_NAME_KEY, "false")
-        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "false")
-
-        log.info("Thundarr starting up!")
-
+        setupLog()
+        KtxAsync.initiate()
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
 
         level = RoomyMaze.makeLevel()
         val playerStart = level.tempPlayerStart()
         level.director.add(player, playerStart.x, playerStart.y)
-        level.director.add(WorldActor, 0, 0)
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
 
         log.info("Thundarr started.")
+        KtxAsync.launch {
+            File("savegame/level.json").writeText(Json.encodeToString(level))
+            log.info("Saved to disk")
+        }
     }
 
     override fun dispose() {
         log.info("Thundarr shutting down.")
         GameScreen.dispose()
+    }
+
+    private fun setupLog() {
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG")
+        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_DATE_TIME_KEY, "true")
+        System.setProperty(org.slf4j.simple.SimpleLogger.DATE_TIME_FORMAT_KEY, "hh:mm:ss.SSS")
+        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_LOG_NAME_KEY, "false")
+        System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_SHORT_LOG_NAME_KEY, "false")
+        log.info("Thundarr starting up!")
+    }
+
+    private fun saveState() {
+
+    }
+
+    private fun restoreState() {
+
     }
 }

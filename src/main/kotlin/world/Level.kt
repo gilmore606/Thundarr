@@ -1,22 +1,28 @@
 package world
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import render.GameScreen
 import util.*
 
+@Serializable
 class Level(val width: Int, val height: Int) {
 
     val glyphs = Array(width) { Array(height) { Glyph.WALL } }
-    val visible = Array(width) { Array(height) { false } }
     val seen = Array(width) { Array(height) { false } }
+    val visible = Array(width) { Array(height) { false } }
 
     val pov = XY(0, 0)
 
+    @Transient
     private val stepMap = DijkstraMap(this)
+    @Transient
     private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
+    @Transient
     val director = Director(this)
 
     fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {

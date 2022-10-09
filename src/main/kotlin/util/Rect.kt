@@ -1,6 +1,9 @@
 package util
 
-class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
 
     fun isTouching(other: Rect): Boolean {
         if (x0 > other.x1 + 1) return false

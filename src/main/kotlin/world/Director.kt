@@ -10,7 +10,7 @@ class Director(
     val level: Level
 ){
 
-    val actors: MutableList<Actor> = mutableListOf()
+    val actors: MutableList<Actor> = mutableListOf(WorldActor)
 
     // Place actor into the level.
     fun add(actor: Actor, x: Int, y: Int) {
