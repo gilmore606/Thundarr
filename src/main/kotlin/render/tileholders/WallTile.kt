@@ -46,7 +46,7 @@ class WallTile(
         return 0
     }
 
-    private fun neighborAt(level: Level, x: Int, y: Int) = level.getTile(x, y) == neighborType
+    private fun neighborAt(level: Level, x: Int, y: Int) = level.getGlyph(x, y) == neighborType
     private fun visibleAt(level: Level, x: Int, y: Int) = level.visibilityAt(x, y) == 1f
     private fun visibleOtherAt(level: Level, x: Int, y: Int) = !neighborAt(level, x, y) && visibleAt(level, x, y)
 }

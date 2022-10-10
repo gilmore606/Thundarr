@@ -6,10 +6,9 @@ import util.Glyph
 import util.XY
 import world.Level
 import util.Rect
+import world.terrains.Terrain
 
 abstract class Carto {
-
-
 
     protected lateinit var level: Level
     protected lateinit var regions: Array<Array<Int?>>
@@ -32,7 +31,7 @@ abstract class Carto {
 
     // Can the given tile be carved into?
     protected fun isRock(x: Int, y: Int): Boolean {
-        return level.getTile(x, y) == Glyph.WALL
+        return level.getGlyph(x, y) == Glyph.WALL
     }
     protected fun isRock(xy: XY): Boolean = isRock(xy.x, xy.y)
 
@@ -55,18 +54,21 @@ abstract class Carto {
 
     // TODO: don't pass regionId here, compute it automatically in a stage
     // where we floodfill successively until all space is regions
-    protected fun carve(x: Int, y: Int, regionId: Int, glyph: Glyph = Glyph.FLOOR) {
-        level.setTile(x, y, glyph)
+    protected fun carve(x: Int, y: Int, regionId: Int,
+                        type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
+        level.setTerrain(x, y, type)
         regions[x][y] = regionId
     }
-    protected fun carve(xy: XY, regionId: Int, glyph: Glyph = Glyph.FLOOR) {
-        carve(xy.x, xy.y, regionId, glyph)
+    protected fun carve(xy: XY, regionId: Int,
+                        type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
+        carve(xy.x, xy.y, regionId, type)
     }
 
-    protected fun carveRoom(room: Rect, regionId: Int, glyph: Glyph = Glyph.FLOOR) {
+    protected fun carveRoom(room: Rect, regionId: Int,
+                            type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
-                level.setTile(x, y, glyph)
+                level.setTerrain(x, y, type)
                 regions[x][y] = regionId
             }
         }
@@ -82,23 +84,23 @@ abstract class Carto {
 
     protected fun neighborCount(x: Int, y: Int, type: Glyph): Int {
         var c = 0
-        if (level.getTile(x-1,y) == type) c++
-        if (level.getTile(x+1,y) == type) c++
-        if (level.getTile(x-1,y-1) == type) c++
-        if (level.getTile(x,y-1) == type) c++
-        if (level.getTile(x+1,y-1) == type) c++
-        if (level.getTile(x-1,y+1) == type) c++
-        if (level.getTile(x,y+1) == type) c++
-        if (level.getTile(x+1,y+1) == type) c++
+        if (level.getGlyph(x-1,y) == type) c++
+        if (level.getGlyph(x+1,y) == type) c++
+        if (level.getGlyph(x-1,y-1) == type) c++
+        if (level.getGlyph(x,y-1) == type) c++
+        if (level.getGlyph(x+1,y-1) == type) c++
+        if (level.getGlyph(x-1,y+1) == type) c++
+        if (level.getGlyph(x,y+1) == type) c++
+        if (level.getGlyph(x+1,y+1) == type) c++
         return c
     }
 
     protected fun cardinalCount(x: Int, y: Int, type: Glyph): Int {
         var c = 0
-        if (level.getTile(x-1,y) == type) c++
-        if (level.getTile(x+1,y) == type) c++
-        if (level.getTile(x,y-1) == type) c++
-        if (level.getTile(x,y+1) == type) c++
+        if (level.getGlyph(x-1,y) == type) c++
+        if (level.getGlyph(x+1,y) == type) c++
+        if (level.getGlyph(x,y-1) == type) c++
+        if (level.getGlyph(x,y+1) == type) c++
         return c
     }
 
@@ -146,7 +148,7 @@ abstract class Carto {
         forEachCell { x, y ->
             if (!isRock(x, y)) {
                 if (cardinalCount(x, y, Glyph.WALL) == 3) {
-                    level.setTile(x, y, Glyph.WALL)
+                    level.setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
                     removed = true
                 }
             }
