@@ -65,8 +65,17 @@ class QuadBatch(
         addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB)
     }
 
-    private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
-                        textureIndex: Int, lightR: Float, lightG: Float, lightB: Float) {
+    fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int,
+                     textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f) {
+        val glx0 = (x0 / GameScreen.width.toDouble()) * 2f - 1f
+        val gly0 = (y0 / GameScreen.height.toDouble()) * 2f - 1f
+        val glx1 = (x1 / GameScreen.width.toDouble()) * 2f - 1f
+        val gly1 = (y1 / GameScreen.height.toDouble()) * 2f - 1f
+        addQuad(glx0, gly0, glx1, gly1, textureIndex, lightR, lightG, lightB)
+    }
+
+    fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
+                textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f) {
         val x0 = ix0.toFloat()
         val y0 = -iy0.toFloat()
         val x1 = ix1.toFloat()

@@ -15,6 +15,7 @@ import render.tilesets.DungeonTileSet
 import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
 import ui.Panel
+import ui.modals.Modal
 import util.Glyph
 import util.XY
 import util.log
@@ -30,8 +31,8 @@ object GameScreen : KtxScreen {
             updateSurfaceParams()
         }
 
-    private var width = 0
-    private var height = 0
+    var width = 0
+    var height = 0
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
 
@@ -41,15 +42,19 @@ object GameScreen : KtxScreen {
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
 
-    private val font = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
+    private val fontSize = 16
+    val fontColor = Color(0.7f, 0.7f, 0.4f, 0.6f)
+    val fontColorBold = Color(1f, 1f, 0.9f, 0.8f)
+    private val font = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/alegreyaSans.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
-            size = 16
+            size = fontSize
             borderWidth = 1.5f
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
 
     private val panels: MutableList<Panel> = mutableListOf()
+    var topModal: Modal? = null
 
     private var cursorPosition: XY = XY(-1,-1)
     private var cursorLine: MutableList<XY> = mutableListOf()
@@ -82,17 +87,21 @@ object GameScreen : KtxScreen {
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
-        val col = screenXtoTileX(screenX)
-        val row = screenYtoTileY(screenY)
-        if (col != cursorPosition.x || row != cursorPosition.y) {
-            if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
-                cursorPosition.x = col
-                cursorPosition.y = row
-                cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
-            } else {
-                cursorPosition.x = -1
-                cursorPosition.y = -1
-                cursorLine.clear()
+        topModal?.also { modal ->
+            modal.mouseMovedTo(screenX, screenY)
+        } ?: run {
+            val col = screenXtoTileX(screenX)
+            val row = screenYtoTileY(screenY)
+            if (col != cursorPosition.x || row != cursorPosition.y) {
+                if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
+                    cursorPosition.x = col
+                    cursorPosition.y = row
+                    cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
+                } else {
+                    cursorPosition.x = -1
+                    cursorPosition.y = -1
+                    cursorLine.clear()
+                }
             }
         }
     }
@@ -102,13 +111,16 @@ object GameScreen : KtxScreen {
     }
 
     fun mouseClicked(screenX: Int, screenY: Int): Boolean {
-        val x = screenXtoTileX(screenX)
-        val y = screenYtoTileY(screenY)
-        if (App.level.isWalkableAt(x, y)) {
-            App.player.queue(WalkTo(App.level, x, y))
-            return true
+        topModal?.also { modal ->
+            modal.mouseClicked(screenX, screenY)
+        } ?: run {
+            val x = screenXtoTileX(screenX)
+            val y = screenYtoTileY(screenY)
+            if (App.level.isWalkableAt(x, y)) {
+                App.player.queue(WalkTo(App.level, x, y))
+            }
         }
-        return false
+        return true
     }
 
     fun povMoved() {
@@ -119,6 +131,24 @@ object GameScreen : KtxScreen {
 
     fun addPanel(panel: Panel) {
         panels.add(panel)
+    }
+
+    fun addModal(modal: Modal) {
+        cursorPosition.x = -1
+        cursorPosition.y = -1
+        cursorLine.clear()
+        addPanel(modal)
+        topModal = modal
+    }
+
+    fun dismissModal(modal: Modal) {
+        panels.remove(modal)
+        if (topModal == modal) {
+            topModal = null
+            panels.forEach { panel ->
+                if (panel is Modal) topModal = panel
+            }
+        }
     }
 
     private fun drawEverything() {
@@ -158,6 +188,9 @@ object GameScreen : KtxScreen {
                         getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
                 }
             }
+            panels.forEach { panel ->
+                panel.renderBackground(this)
+            }
             draw()
         }
 
@@ -166,7 +199,7 @@ object GameScreen : KtxScreen {
             enableBlending()
             begin()
             panels.forEach { panel ->
-                panel.renderText(font, this)
+                panel.renderText(font, fontSize, this)
             }
             end()
         }

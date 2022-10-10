@@ -1,4 +1,4 @@
-package input
+package ui.input
 
 import ktx.app.KtxInputAdapter
 import render.GameScreen

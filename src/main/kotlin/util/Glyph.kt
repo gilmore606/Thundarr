@@ -10,6 +10,9 @@ enum class Glyph {
     CLOSED_DOOR,
 
     CURSOR,
+    BOX_BG,
+    BOX_BORDER,
+    BOX_SHADOW,
 
     PLAYER,
     SKELETON,
