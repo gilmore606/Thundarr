@@ -1,4 +1,5 @@
 import actors.Player
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
@@ -46,6 +47,8 @@ object App : KtxGame<Screen>() {
     }
 
     private fun buildUI() {
+        GameScreen.addPanel(Console)
+
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
     }
 

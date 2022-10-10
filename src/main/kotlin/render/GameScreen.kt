@@ -14,6 +14,7 @@ import render.shaders.tileVertShader
 import render.tilesets.DungeonTileSet
 import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
+import ui.Panel
 import util.Glyph
 import util.XY
 import util.log
@@ -42,11 +43,13 @@ object GameScreen : KtxScreen {
 
     private val font = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
-            size = 24
-            borderWidth = 2f
+            size = 16
+            borderWidth = 1.5f
             color = Color(1f, 1f, 0.8f, 0.9f)
-            borderColor = Color.BLACK
+            borderColor = Color(0f, 0f, 0f, 0.5f)
         })
+
+    private val panels: MutableList<Panel> = mutableListOf()
 
     private var cursorPosition: XY = XY(-1,-1)
     private var cursorLine: MutableList<XY> = mutableListOf()
@@ -55,9 +58,6 @@ object GameScreen : KtxScreen {
 
     override fun show() {
         super.show()
-
-        Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        Gdx.gl.glEnable(GL_BLEND)
 
         updateSurfaceParams()
     }
@@ -69,6 +69,8 @@ object GameScreen : KtxScreen {
         this.width = width
         this.height = height
         textCamera = OrthographicCamera(width.toFloat(), height.toFloat())
+
+        panels.forEach { it.onResize(width, height) }
 
         updateSurfaceParams()
     }
@@ -115,7 +117,15 @@ object GameScreen : KtxScreen {
         cursorLine.clear()
     }
 
+    fun addPanel(panel: Panel) {
+        panels.add(panel)
+    }
+
     private fun drawEverything() {
+
+        Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL_BLEND)
+
         dungeonBatch.apply {
             clear()
             App.level.forEachCellToRender { tx, ty, vis, glyph ->
@@ -153,8 +163,11 @@ object GameScreen : KtxScreen {
 
         textBatch.apply {
             projectionMatrix = textCamera.combined
+            enableBlending()
             begin()
-            font.draw(this, "Hello Thundarr!", 100f, 100f)
+            panels.forEach { panel ->
+                panel.renderText(font, this)
+            }
             end()
         }
     }
