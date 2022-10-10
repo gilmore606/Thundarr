@@ -60,6 +60,10 @@ object GameScreen : KtxScreen {
 
     override fun render(delta: Float) {
         drawEverything()
+
+        App.uiStage.act()
+        App.uiStage.draw()
+
         App.level.director.runQueue()
     }
 
