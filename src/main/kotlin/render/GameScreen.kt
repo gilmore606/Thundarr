@@ -3,7 +3,11 @@ package render
 import App
 import actors.actions.processes.WalkTo
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20.*
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ktx.app.KtxScreen
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
@@ -33,6 +37,16 @@ object GameScreen : KtxScreen {
     private val dungeonBatch = QuadBatch(tileVertShader(), tileFragShader(), DungeonTileSet())
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
+    private val textBatch = SpriteBatch()
+    private var textCamera = OrthographicCamera(100f, 100f)
+
+    private val font = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
+        .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+            size = 24
+            borderWidth = 2f
+            color = Color(1f, 1f, 0.8f, 0.9f)
+            borderColor = Color.BLACK
+        })
 
     private var cursorPosition: XY = XY(-1,-1)
     private var cursorLine: MutableList<XY> = mutableListOf()
@@ -54,15 +68,13 @@ object GameScreen : KtxScreen {
 
         this.width = width
         this.height = height
+        textCamera = OrthographicCamera(width.toFloat(), height.toFloat())
 
         updateSurfaceParams()
     }
 
     override fun render(delta: Float) {
         drawEverything()
-
-        App.uiStage.act()
-        App.uiStage.draw()
 
         App.level.director.runQueue()
     }
@@ -137,6 +149,13 @@ object GameScreen : KtxScreen {
                 }
             }
             draw()
+        }
+
+        textBatch.apply {
+            projectionMatrix = textCamera.combined
+            begin()
+            font.draw(this, "Hello Thundarr!", 100f, 100f)
+            end()
         }
     }
 

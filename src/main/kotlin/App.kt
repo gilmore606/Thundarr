@@ -2,11 +2,10 @@ import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import input.KeyboardProcessor
 import input.MouseProcessor
 import kotlinx.coroutines.launch
@@ -14,9 +13,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
 import ktx.async.KtxAsync
-import ktx.scene2d.Scene2DSkin
-import ktx.scene2d.*
-import ktx.style.*
+import ktx.freetype.*
 import render.GameScreen
 import ui.Console
 import util.log
@@ -30,7 +27,7 @@ object App : KtxGame<Screen>() {
     lateinit var level: Level
     var turnTime = 0f
 
-    lateinit var uiStage: Stage
+    lateinit var font: BitmapFont
 
     override fun create() {
         setupLog()
@@ -49,26 +46,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun buildUI() {
-        Scene2DSkin.defaultSkin = skin {
-            label {
-                font = BitmapFont(FileHandle("src/main/resources/font/amstrad36.fnt"))
-                fontColor = Color.YELLOW
-            }
-        }
-
-        uiStage = Stage()
-        uiStage.actors {
-            // Root actor added directly to the stage - a table:
-            table {
-                // Table settings:
-                setFillParent(true)
-                // Table children:
-                label("Hello world!")
-                Console
-            }
-        }
-
-        Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor, uiStage)
+        Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
     }
 
     private fun setupLog() {
