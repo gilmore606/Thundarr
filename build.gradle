@@ -40,7 +40,8 @@ dependencies {
     api "io.github.libktx:ktx-math:$ktxMathVersion"
     implementation "io.github.libktx:ktx-app:$ktxAppVersion"
     api "io.github.libktx:ktx-log:$ktxLogVersion"
-    api "io.github.libktx:ktx-vis:$ktxVisVersion"
+    api "io.github.libktx:ktx-scene2d:$ktxScene2DVersion"
+    api "io.github.libktx:ktx-style:$ktxStyleVersion"
 
     implementation 'io.github.microutils:kotlin-logging-jvm:3.0.0'
     implementation 'org.slf4j:slf4j-simple:2.0.3'

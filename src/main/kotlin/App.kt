@@ -2,8 +2,11 @@ import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.kotcrab.vis.ui.VisUI
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import input.KeyboardProcessor
 import input.MouseProcessor
 import kotlinx.coroutines.launch
@@ -13,7 +16,9 @@ import ktx.app.KtxGame
 import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 import ktx.scene2d.*
+import ktx.style.*
 import render.GameScreen
+import ui.Console
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
@@ -38,8 +43,19 @@ object App : KtxGame<Screen>() {
         addScreen(GameScreen)
         setScreen<GameScreen>()
 
-        VisUI.load()
-        Scene2DSkin.defaultSkin = VisUI.getSkin()
+        buildUI()
+
+        log.info("Thundarr started.")
+    }
+
+    private fun buildUI() {
+        Scene2DSkin.defaultSkin = skin {
+            label {
+                font = BitmapFont(FileHandle("src/main/resources/font/amstrad36.fnt"))
+                fontColor = Color.YELLOW
+            }
+        }
+
         uiStage = Stage()
         uiStage.actors {
             // Root actor added directly to the stage - a table:
@@ -48,22 +64,11 @@ object App : KtxGame<Screen>() {
                 setFillParent(true)
                 // Table children:
                 label("Hello world!")
+                Console
             }
         }
 
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor, uiStage)
-
-        log.info("Thundarr started.")
-
-        KtxAsync.launch {
-            File("savegame/level.json").writeText(Json.encodeToString(level))
-            log.info("Saved to disk")
-        }
-    }
-
-    override fun dispose() {
-        log.info("Thundarr shutting down.")
-        GameScreen.dispose()
     }
 
     private fun setupLog() {
@@ -75,8 +80,17 @@ object App : KtxGame<Screen>() {
         log.info("Thundarr starting up!")
     }
 
-    private fun saveState() {
+    override fun dispose() {
+        log.info("Thundarr shutting down.")
+        GameScreen.dispose()
+    }
 
+
+    private fun saveState() {
+        KtxAsync.launch {
+            File("savegame/level.json").writeText(Json.encodeToString(level))
+            log.info("Saved to disk")
+        }
     }
 
     private fun restoreState() {
