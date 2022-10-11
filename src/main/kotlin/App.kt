@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen
 import ui.input.KeyboardProcessor
 import ui.input.MouseProcessor
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
@@ -13,6 +14,8 @@ import render.GameScreen
 import ui.modals.ConfirmModal
 import ui.panels.Console
 import ui.modals.CreditsModal
+import util.gzipCompress
+import util.gzipDecompress
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
@@ -21,7 +24,7 @@ import kotlin.system.exitProcess
 
 object App : KtxGame<Screen>() {
 
-    val player: Player = Player()
+    lateinit var player: Player
     lateinit var level: Level
     var turnTime = 0f
 
@@ -29,9 +32,16 @@ object App : KtxGame<Screen>() {
         setupLog()
         KtxAsync.initiate()
 
-        level = RoomyMaze.makeLevel()
-        val playerStart = level.tempPlayerStart()
-        level.director.add(player, playerStart.x, playerStart.y)
+        if (hasSavedState()) {
+            log.info("Loading saved state...")
+            restoreState()
+        } else {
+            log.info("No saved state found, creating new world...")
+            level = RoomyMaze.makeLevel()
+            player = Player()
+            val playerStart = level.tempPlayerStart()
+            level.director.add(player, playerStart.x, playerStart.y)
+        }
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
@@ -61,16 +71,18 @@ object App : KtxGame<Screen>() {
         GameScreen.dispose()
     }
 
+    private fun hasSavedState(): Boolean = File("savegame/level.json.gz").exists()
 
     private fun saveState() {
         KtxAsync.launch {
-            File("savegame/level.json").writeText(Json.encodeToString(level))
-            log.info("Saved to disk")
+            File("savegame/level.json.gz").writeBytes(Json.encodeToString(level).gzipCompress())
+            log.info("Saved state.")
         }
     }
 
     private fun restoreState() {
-
+        level = Json.decodeFromString(File("savegame/level.json.gz").readBytes().gzipDecompress())
+        player = level.director.getPlayer()
     }
 
     fun restartWorld() {

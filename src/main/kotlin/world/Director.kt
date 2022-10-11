@@ -41,6 +41,7 @@ class Director {
         actors.add(actor)
     }
 
+    fun getPlayer(): Player = actors.firstOrNull { it is Player } as Player
 
     // Execute actors' actions until it's the player's turn.
     fun runQueue(level: Level) {

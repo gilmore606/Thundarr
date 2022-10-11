@@ -1,6 +1,10 @@
 package util
 
 import mu.KotlinLogging
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 inline fun <T> Iterable<T>.hasOneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return true
@@ -10,6 +14,18 @@ inline fun <T> Iterable<T>.hasOneWhere(predicate: (T) -> Boolean): Boolean {
 inline fun <T> Iterable<T>.hasNoneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return false
     return true
+}
+
+fun String.gzipCompress(): ByteArray {
+    val bos = ByteArrayOutputStream()
+    GZIPOutputStream(bos).bufferedWriter(Charsets.UTF_8).use { it.write(this) }
+    return bos.toByteArray()
+}
+
+fun ByteArray.gzipDecompress(): String {
+    val bais = ByteArrayInputStream(this)
+    lateinit var string: String
+    GZIPInputStream(bais).bufferedReader(Charsets.UTF_8).use { return it.readText() }
 }
 
 val log = KotlinLogging.logger {}
