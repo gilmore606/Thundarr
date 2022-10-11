@@ -15,7 +15,7 @@ import render.shaders.tileVertShader
 import render.tilesets.DungeonTileSet
 import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
-import ui.Panel
+import ui.panels.Panel
 import ui.modals.Modal
 import util.Glyph
 import util.XY

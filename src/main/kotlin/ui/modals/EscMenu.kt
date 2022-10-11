@@ -12,7 +12,7 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
         put("Credits") { App.openCredits() }
         put("Save and quit") { App.saveAndQuit() }
     }
-    var selection: Int = -1
+    var selection: Int = 0
     private val optionSpacing = GameScreen.fontSize + 12
     private val headerSpacing = 64
 
@@ -21,6 +21,13 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
         options.keys.forEachIndexed { n, optionText ->
             drawString(optionText, 56, headerSpacing + n * optionSpacing,
                 if (n == selection) GameScreen.fontColorBold else GameScreen.fontColor)
+        }
+    }
+
+    override fun drawBackground() {
+        super.drawBackground()
+        if (selection >= 0) {
+            drawSelectionBox(56, headerSpacing + selection * optionSpacing, width - 112, optionSpacing)
         }
     }
 
@@ -45,6 +52,8 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
         val hoverOption = mouseToOption(screenX, screenY)
         if (hoverOption >= 0) {
             selection = hoverOption
+        } else {
+            selection = -1
         }
     }
 
@@ -55,8 +64,8 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
     }
 
     private fun selectCurrentOption() {
-        dismiss()
         if (selection >= 0 && selection < options.keys.size) {
+            dismiss()
             options[options.keys.toList()[selection]]?.invoke()
         }
     }
@@ -64,7 +73,7 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
     private fun mouseToOption(screenX: Int, screenY: Int): Int {
         val localX = screenX - x
         val localY = screenY - y
-        if (localX > 0 && localX < width) {
+        if (localX in 1 until width) {
             val hoverOption = (localY - headerSpacing) / optionSpacing
             if (hoverOption >= 0 && hoverOption < options.keys.size) {
                 return hoverOption

@@ -1,12 +1,7 @@
 import actors.Player
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ui.input.KeyboardProcessor
 import ui.input.MouseProcessor
 import kotlinx.coroutines.launch
@@ -14,14 +9,15 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
 import ktx.async.KtxAsync
-import ktx.freetype.*
 import render.GameScreen
-import ui.Console
+import ui.modals.ConfirmModal
+import ui.panels.Console
 import ui.modals.CreditsModal
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
 import java.io.File
+import kotlin.system.exitProcess
 
 object App : KtxGame<Screen>() {
 
@@ -78,7 +74,20 @@ object App : KtxGame<Screen>() {
     }
 
     fun restartWorld() {
-        Console.say("You abandon the world.")
+        GameScreen.addModal(
+            ConfirmModal(
+                listOf(
+                    "Are you sure you want to abandon this world?",
+                    "All your progress, such as it is, will be lost."),
+                "Abandon", "Cancel"
+            ) { yes ->
+                if (yes) {
+                    Console.say("You abandon the world.")
+                } else {
+                    Console.say("You gather your resolve and carry on.")
+                }
+            }
+        )
     }
 
     fun openSettings() {
@@ -94,8 +103,20 @@ object App : KtxGame<Screen>() {
     }
 
     fun saveAndQuit() {
-        dispose()
-        System.exit(0)
+        GameScreen.addModal(
+            ConfirmModal(
+                listOf("Are you sure you want to save and exit the game?"),
+                "Save and exit", "Cancel"
+            ) { yes ->
+                if (yes) {
+                    saveState()
+                    dispose()
+                    exitProcess(0)
+                } else {
+                    Console.say("You remember that one thing you needed to do...")
+                }
+            }
+        )
     }
 
 }

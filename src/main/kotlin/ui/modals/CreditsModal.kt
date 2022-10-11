@@ -1,9 +1,8 @@
 package ui.modals
 
-import render.GameScreen
 import util.Glyph
 
-class CreditsModal : Modal(450, 180, "THUNDARR THE BARBARIAN") {
+class CreditsModal : Modal(450, 180, "THUNDARR the BARBARIAN") {
 
     override fun drawBackground() {
         super.drawBackground()
@@ -18,6 +17,16 @@ class CreditsModal : Modal(450, 180, "THUNDARR THE BARBARIAN") {
     }
 
     override fun drawText() {
+        super.drawText()
         drawString("a homofagge production", 132, 70)
+    }
+
+    override fun mouseClicked(screenX: Int, screenY: Int) {
+        dismiss()
+    }
+
+    override fun keyDown(keycode: Int) {
+        super.keyDown(keycode)
+        dismiss()
     }
 }

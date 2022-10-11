@@ -2,7 +2,8 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import render.GameScreen
-import ui.Panel
+import ui.panels.Panel
+import util.Glyph
 
 abstract class Modal(
     width: Int,
@@ -46,5 +47,11 @@ abstract class Modal(
 
     protected fun dismiss() {
         GameScreen.dismissModal(this)
+    }
+
+    protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
+        boxBatch.addPixelQuad(this.x + x0 - 9, this.y + y0 - 9,
+            this.x + x0 + width + 9, this.y + y0 + height - 8,
+            boxBatch.getTextureIndex(Glyph.BOX_SHADOW))
     }
 }

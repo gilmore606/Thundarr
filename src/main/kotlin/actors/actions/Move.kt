@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import util.XY
 import world.Level
-import ui.Console
+import ui.panels.Console
 
 class Move(
     private val dir: XY
