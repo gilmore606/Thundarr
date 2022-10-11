@@ -17,6 +17,7 @@ import ktx.async.KtxAsync
 import ktx.freetype.*
 import render.GameScreen
 import ui.Console
+import ui.modals.CreditsModal
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
@@ -75,4 +76,26 @@ object App : KtxGame<Screen>() {
     private fun restoreState() {
 
     }
+
+    fun restartWorld() {
+        Console.say("You abandon the world.")
+    }
+
+    fun openSettings() {
+
+    }
+
+    fun openControls() {
+
+    }
+
+    fun openCredits() {
+        GameScreen.addModal(CreditsModal())
+    }
+
+    fun saveAndQuit() {
+        dispose()
+        System.exit(0)
+    }
+
 }

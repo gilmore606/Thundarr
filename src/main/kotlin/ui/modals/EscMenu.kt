@@ -5,14 +5,20 @@ import render.GameScreen
 
 class EscMenu : Modal(270, 230, "- THUNDARR -") {
 
-    val options = listOf("Restart world", "Settings", "Controls", "Credits", "Save and quit")
+    private val options = LinkedHashMap<String, ()->Unit>().apply {
+        put("Restart world") { App.restartWorld() }
+        put("Settings") { App.openSettings() }
+        put("Controls") { App.openControls() }
+        put("Credits") { App.openCredits() }
+        put("Save and quit") { App.saveAndQuit() }
+    }
     var selection: Int = -1
-    val optionSpacing = GameScreen.fontSize + 12
-    val headerSpacing = 64
+    private val optionSpacing = GameScreen.fontSize + 12
+    private val headerSpacing = 64
 
     override fun drawText() {
         super.drawText()
-        options.forEachIndexed { n, optionText ->
+        options.keys.forEachIndexed { n, optionText ->
             drawString(optionText, 56, headerSpacing + n * optionSpacing,
                 if (n == selection) GameScreen.fontColorBold else GameScreen.fontColor)
         }
@@ -23,11 +29,11 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
         when (keycode) {
             Input.Keys.NUMPAD_2, Input.Keys.DOWN -> {
                 selection++
-                if (selection > options.lastIndex) selection = 0
+                if (selection >= options.keys.size) selection = 0
             }
             Input.Keys.NUMPAD_8, Input.Keys.UP -> {
                 selection--
-                if (selection < 0) selection = options.lastIndex
+                if (selection < 0) selection = options.keys.size - 1
             }
             Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
                 selectCurrentOption()
@@ -50,6 +56,9 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
 
     private fun selectCurrentOption() {
         dismiss()
+        if (selection >= 0 && selection < options.keys.size) {
+            options[options.keys.toList()[selection]]?.invoke()
+        }
     }
 
     private fun mouseToOption(screenX: Int, screenY: Int): Int {
@@ -57,7 +66,7 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
         val localY = screenY - y
         if (localX > 0 && localX < width) {
             val hoverOption = (localY - headerSpacing) / optionSpacing
-            if (hoverOption >= 0 && hoverOption <= options.lastIndex) {
+            if (hoverOption >= 0 && hoverOption < options.keys.size) {
                 return hoverOption
             }
         }

@@ -44,9 +44,9 @@ object GameScreen : KtxScreen {
     private var textCamera = OrthographicCamera(100f, 100f)
 
     const val fontSize = 16
-    const val titleFontSize = 28
+    const val titleFontSize = 24
     val fontColorDull = Color(0.7f, 0.7f, 0.4f, 0.6f)
-    val fontColor = Color(1f, 1f, 0.9f, 0.8f)
+    val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/alegreyaSans.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {

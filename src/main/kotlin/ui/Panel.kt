@@ -10,7 +10,7 @@ import util.Glyph
 abstract class Panel {
 
     private lateinit var textBatch: SpriteBatch
-    private lateinit var boxBatch: QuadBatch
+    protected lateinit var boxBatch: QuadBatch
 
     protected var x = 0
     protected var y = 0

@@ -81,7 +81,7 @@ class QuadBatch(
         val x1 = ix1.toFloat()
         val y1 = -iy1.toFloat()
         val tx0 = (textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride
-        val ty0 = (textureIndex / tileSet.tilesPerColumn) * tileSet.tileColumnStride
+        val ty0 = (textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride
         val tx1 = tx0 + tileSet.tileRowStride
         val ty1 = ty0 + tileSet.tileColumnStride
 
