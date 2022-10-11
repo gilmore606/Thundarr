@@ -16,6 +16,8 @@ class Level(val width: Int, val height: Int) {
 
     val pov = XY(0, 0)
 
+    val director = Director()
+
     @Transient
     private val stepMap = DijkstraMap(this)
     @Transient
@@ -24,7 +26,6 @@ class Level(val width: Int, val height: Int) {
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
-    val director = Director()
 
     fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
         for (x in 0 until width) {
@@ -76,6 +77,10 @@ class Level(val width: Int, val height: Int) {
     }
 
     fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
+
+    fun isSeenAt(x: Int, y: Int): Boolean = try {
+        seen[x][y]
+    } catch (e: ArrayIndexOutOfBoundsException) { false }
 
     fun isWalkableAt(x: Int, y: Int): Boolean = try {
         terrains[x][y].isWalkable()

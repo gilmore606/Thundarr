@@ -103,14 +103,16 @@ object GameScreen : KtxScreen {
             val col = screenXtoTileX(screenX)
             val row = screenYtoTileY(screenY)
             if (col != cursorPosition.x || row != cursorPosition.y) {
-                if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
-                    cursorPosition.x = col
-                    cursorPosition.y = row
-                    cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
-                } else {
-                    cursorPosition.x = -1
-                    cursorPosition.y = -1
-                    cursorLine.clear()
+                if (App.level.isSeenAt(col, row)) {
+                    if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
+                        cursorPosition.x = col
+                        cursorPosition.y = row
+                        cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
+                    } else {
+                        cursorPosition.x = -1
+                        cursorPosition.y = -1
+                        cursorLine.clear()
+                    }
                 }
             }
         }
