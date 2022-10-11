@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
 import util.*
-import world.terrains.BrickWall
 import world.terrains.Terrain
 
 @Serializable
@@ -12,7 +11,7 @@ class Level(val width: Int, val height: Int) {
 
     val seen = Array(width) { Array(height) { false } }
     val visible = Array(width) { Array(height) { false } }
-    val terrains: Array<Array<Terrain>> = Array(width) { Array(height) { BrickWall() } }
+    val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
 
     val pov = XY(0, 0)
 
@@ -41,7 +40,7 @@ class Level(val width: Int, val height: Int) {
                 doThis(
                     x, y,
                     visibilityAt(x, y),
-                    terrains[x][y].glyph()
+                    Terrain.get(terrains[x][y]).glyph()
                 )
             }
         }
@@ -67,11 +66,11 @@ class Level(val width: Int, val height: Int) {
     }
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
-        terrains[x][y] = Terrain.create(type)
+        terrains[x][y] = type
     }
 
     fun getGlyph(x: Int, y: Int) = try {
-        terrains[x][y].glyph()
+        Terrain.get(terrains[x][y]).glyph()
     } catch (e: ArrayIndexOutOfBoundsException) {
         Glyph.FLOOR
     }
@@ -83,7 +82,7 @@ class Level(val width: Int, val height: Int) {
     } catch (e: ArrayIndexOutOfBoundsException) { false }
 
     fun isWalkableAt(x: Int, y: Int): Boolean = try {
-        terrains[x][y].isWalkable()
+        Terrain.get(terrains[x][y]).isWalkable()
     } catch (e: ArrayIndexOutOfBoundsException) { false }
 
     fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
@@ -102,7 +101,7 @@ class Level(val width: Int, val height: Int) {
     }
 
     private fun isOpaqueAt(x: Int, y: Int): Boolean = try {
-        terrains[x][y].isOpaque()
+        Terrain.get(terrains[x][y]).isOpaque()
     } catch (e: ArrayIndexOutOfBoundsException) { true }
 
     private fun updateVisibility() {

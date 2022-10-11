@@ -1,10 +1,8 @@
 package world.terrains
 
-import kotlinx.serialization.Serializable
 import util.Glyph
 
-@Serializable
-class BrickWall : Terrain(
+object BrickWall : Terrain(
     Glyph.WALL,
     false,
     false,
