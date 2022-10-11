@@ -6,13 +6,13 @@ import ui.Panel
 
 abstract class Modal(
     width: Int,
-    height: Int
+    height: Int,
+    val title: String? = null
 ) : Panel() {
 
     init {
         this.width = width
         this.height = height
-        onResize(GameScreen.width, GameScreen.height)
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -25,7 +25,9 @@ abstract class Modal(
     }
 
     override fun drawText() {
-
+        title?.also { title ->
+            drawTitle(title)
+        }
     }
 
     open fun keyDown(keycode: Int) {
@@ -42,7 +44,7 @@ abstract class Modal(
 
     }
 
-    private fun dismiss() {
+    protected fun dismiss() {
         GameScreen.dismissModal(this)
     }
 }

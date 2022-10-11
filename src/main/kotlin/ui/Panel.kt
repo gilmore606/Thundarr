@@ -1,6 +1,7 @@
 package ui
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.GameScreen
 import render.QuadBatch
@@ -8,8 +9,6 @@ import util.Glyph
 
 abstract class Panel {
 
-    private lateinit var font: BitmapFont
-    protected var fontSize: Int = 14
     private lateinit var textBatch: SpriteBatch
     private lateinit var boxBatch: QuadBatch
 
@@ -23,9 +22,7 @@ abstract class Panel {
 
     open fun onResize(width: Int, height: Int) { }
 
-    fun renderText(font: BitmapFont, fontSize: Int, batch: SpriteBatch) {
-        this.font = font
-        this.fontSize = fontSize
+    fun renderText(batch: SpriteBatch) {
         this.textBatch = batch
         this.drawText()
     }
@@ -39,9 +36,15 @@ abstract class Panel {
 
     abstract fun drawText()
 
-    protected fun drawString(text: String, x: Int, y: Int, isBold: Boolean = false) {
-        font.setColor(if (isBold) GameScreen.fontColorBold else GameScreen.fontColor)
-        font.draw(textBatch, text, ((x  + this.x) - (GameScreen.width / 2f)), 0f - ((y + this.y) - (GameScreen.height / 2f)))
+    protected fun drawString(text: String, x: Int, y: Int, color: Color = GameScreen.fontColor) {
+        GameScreen.font.color = color
+        GameScreen.font.draw(textBatch, text, ((x  + this.x) - (GameScreen.width / 2f)), 0f - ((y + this.y) - (GameScreen.height / 2f)))
+    }
+
+    protected fun drawTitle(text: String) {
+        val xOffset = (width - GlyphLayout(GameScreen.titleFont, text).width) / 2f
+        val yOffset = 16f
+        GameScreen.titleFont.draw(textBatch, text, ((this.x + xOffset) - (GameScreen.width / 2f)), 0f - ((this.y + yOffset) - (GameScreen.height / 2f)))
     }
 
     protected fun drawBox(x: Int, y: Int, width: Int, height: Int) {

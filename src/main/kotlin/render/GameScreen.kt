@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20.*
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ktx.app.KtxScreen
@@ -42,14 +43,23 @@ object GameScreen : KtxScreen {
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
 
-    private val fontSize = 16
-    val fontColor = Color(0.7f, 0.7f, 0.4f, 0.6f)
-    val fontColorBold = Color(1f, 1f, 0.9f, 0.8f)
-    private val font = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/alegreyaSans.ttf"))
+    const val fontSize = 16
+    const val titleFontSize = 28
+    val fontColorDull = Color(0.7f, 0.7f, 0.4f, 0.6f)
+    val fontColor = Color(1f, 1f, 0.9f, 0.8f)
+    val fontColorBold = Color(1f, 1f, 1f, 1f)
+    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/alegreyaSans.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
             borderWidth = 1.5f
             color = Color(1f, 1f, 0.8f, 0.9f)
+            borderColor = Color(0f, 0f, 0f, 0.5f)
+        })
+    val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/worldOfWater.ttf"))
+        .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+            size = titleFontSize
+            borderWidth = 2f
+            color = Color(1f, 1f, 1f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
 
@@ -137,6 +147,7 @@ object GameScreen : KtxScreen {
         cursorPosition.x = -1
         cursorPosition.y = -1
         cursorLine.clear()
+        modal.onResize(this.width, this.height)
         addPanel(modal)
         topModal = modal
     }
@@ -146,7 +157,9 @@ object GameScreen : KtxScreen {
         if (topModal == modal) {
             topModal = null
             panels.forEach { panel ->
-                if (panel is Modal) topModal = panel
+                if (panel is Modal) {
+                    topModal = panel
+                }
             }
         }
     }
@@ -199,7 +212,7 @@ object GameScreen : KtxScreen {
             enableBlending()
             begin()
             panels.forEach { panel ->
-                panel.renderText(font, fontSize, this)
+                panel.renderText(this)
             }
             end()
         }

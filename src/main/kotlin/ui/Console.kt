@@ -1,5 +1,7 @@
 package ui
 
+import render.GameScreen
+
 
 object Console : Panel() {
 
@@ -19,16 +21,17 @@ object Console : Panel() {
 
     override fun onResize(width: Int, height: Int) {
         x = padding
-        y = height - (maxLines * (lineSpacing + fontSize)) - padding
+        y = height - (maxLines * (lineSpacing + GameScreen.fontSize)) - padding
         this.width = width - (padding * 2)
-        this.height = (maxLines * (lineSpacing + fontSize))
+        this.height = (maxLines * (lineSpacing + GameScreen.fontSize))
     }
 
     override fun drawText() {
         var offset = 0
         lines.forEachIndexed { n, line ->
-            drawString(line, 0, offset, n == lines.lastIndex)
-            offset += lineSpacing + fontSize
+            drawString(line, 0, offset,
+                if (n == lines.lastIndex) GameScreen.fontColor else GameScreen.fontColorDull)
+            offset += lineSpacing + GameScreen.fontSize
         }
     }
 

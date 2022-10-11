@@ -28,8 +28,6 @@ object App : KtxGame<Screen>() {
     lateinit var level: Level
     var turnTime = 0f
 
-    lateinit var font: BitmapFont
-
     override fun create() {
         setupLog()
         KtxAsync.initiate()
@@ -43,7 +41,7 @@ object App : KtxGame<Screen>() {
 
         buildUI()
 
-        log.info("Thundarr started.")
+        Console.say("The moon is broken in god-damned half!")
     }
 
     private fun buildUI() {
