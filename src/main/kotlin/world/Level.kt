@@ -24,8 +24,7 @@ class Level(val width: Int, val height: Int) {
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
-    @Transient
-    val director = Director(this)
+    val director = Director()
 
     fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
         for (x in 0 until width) {

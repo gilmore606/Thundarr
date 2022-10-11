@@ -2,11 +2,12 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Wait
+import kotlinx.serialization.Serializable
 import util.Glyph
 
-open class NPC(
-    glyph: Glyph,
-    speed: Float
+sealed class NPC(
+    override val glyph: Glyph,
+    override val speed: Float
 ) : Actor(glyph, speed) {
 
     final override fun defaultAction(): Action {

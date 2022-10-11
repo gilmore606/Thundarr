@@ -1,8 +1,10 @@
 package actors.actions
 
 import actors.Actor
+import kotlinx.serialization.Serializable
 import world.Level
 
+@Serializable
 abstract class Action(
     val duration: Float
 ) {

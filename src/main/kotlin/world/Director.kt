@@ -3,14 +3,14 @@ package world
 import actors.Actor
 import actors.Player
 import actors.WorldActor
+import kotlinx.serialization.Serializable
 
 // A delegate class for Level to manage actors in time and space.
 
-class Director(
-    val level: Level
-){
+@Serializable
+class Director {
 
-    val actors: MutableList<Actor> = mutableListOf(WorldActor)
+    val actors: MutableList<Actor> = mutableListOf(WorldActor())
 
     // Place actor into the level.
     fun add(actor: Actor, x: Int, y: Int) {
@@ -43,7 +43,7 @@ class Director(
 
 
     // Execute actors' actions until it's the player's turn.
-    fun runQueue() {
+    fun runQueue(level: Level) {
         var done = false
         while (actors.isNotEmpty() && !done) {
             if (actors[0].juice > 0f || actors[0] is Player) {

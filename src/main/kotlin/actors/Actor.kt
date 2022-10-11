@@ -1,12 +1,14 @@
 package actors
 
 import actors.actions.Action
+import kotlinx.serialization.Serializable
 import util.Glyph
 import util.XY
 
-abstract class Actor(
-    val glyph: Glyph,
-    private val speed: Float
+@Serializable
+sealed class Actor(
+    open val glyph: Glyph,
+    open val speed: Float
 ) {
     val xy = XY(0,0)  // position in current level
 

@@ -93,7 +93,7 @@ object GameScreen : KtxScreen {
     override fun render(delta: Float) {
         drawEverything()
 
-        App.level.director.runQueue()
+        App.level.director.runQueue(App.level)
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
