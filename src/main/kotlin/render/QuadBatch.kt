@@ -19,7 +19,7 @@ class QuadBatch(
 ) {
 
     private val FLOATS_PER_VERTEX = 8
-    private val MAX_QUADS = 20000
+    private val MAX_QUADS = 40000
 
     private val floats: FloatArray = FloatArray(MAX_QUADS * FLOATS_PER_VERTEX * 4 * 4)
     private var floatCount = 0

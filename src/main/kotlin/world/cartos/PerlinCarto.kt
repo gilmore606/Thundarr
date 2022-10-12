@@ -9,7 +9,7 @@ object PerlinCarto : Carto() {
 
     override fun doCarveLevel() {
         forEachCell { x, y ->
-            val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 54.0)
+            val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0)
             if (n > fullness * scale) {
                 carve(x, y, 0)
             }

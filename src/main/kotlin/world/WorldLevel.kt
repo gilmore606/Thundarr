@@ -97,8 +97,8 @@ class WorldLevel() : Level() {
     }
 
     override fun forEachCellToRender(doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit) {
-        for (x in pov.x - 50 until pov.x + 50) {
-            for (y in pov.y - 50 until pov.y + 50) {
+        for (x in pov.x - 80 until pov.x + 80) {
+            for (y in pov.y - 80 until pov.y + 80) {
                 val vis = visibilityAt(x, y)
                 if (vis > 0f) {
                     doThis(
@@ -114,7 +114,9 @@ class WorldLevel() : Level() {
 
     override fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y).setTerrain(x,y,type)
 
-    override fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y).getGlyph(x,y)
+    override fun getGlyph(x: Int, y: Int): Glyph = try {
+        chunkAt(x,y).getGlyph(x,y)
+    } catch (e: ArrayIndexOutOfBoundsException) { Glyph.FLOOR }
 
     override fun getPathToPOV(from: XY): List<XY> {
         // TODO: actually write this

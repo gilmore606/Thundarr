@@ -14,7 +14,7 @@ import world.cartos.PerlinCarto
 import world.terrains.Terrain
 import java.io.File
 
-const val CHUNK_SIZE = 50
+const val CHUNK_SIZE = 64
 
 @Serializable
 class Chunk {
