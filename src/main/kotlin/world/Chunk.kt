@@ -1,11 +1,18 @@
 package world
 
+import App.saveFileFolder
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import util.Dice
 import util.XY
+import util.gzipCompress
 import world.cartos.PerlinCarto
 import world.terrains.Terrain
+import java.io.File
 
 const val CHUNK_SIZE = 50
 
@@ -40,7 +47,11 @@ class Chunk {
     }
 
     fun unload() {
-
+        KtxAsync.launch {
+            File("$saveFileFolder/chunk$x=$y.json.gz").writeBytes(
+                Json.encodeToString(this@Chunk).gzipCompress()
+            )
+        }
     }
 
     fun getTerrain(x: Int, y:Int) = try {

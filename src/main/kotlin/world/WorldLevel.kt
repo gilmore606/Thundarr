@@ -1,12 +1,17 @@
 package world
 
+import App.saveFileFolder
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
 import util.ShadowCaster
 import util.XY
+import util.gzipDecompress
 import util.log
 import world.terrains.Terrain
+import java.io.File
 
 @Serializable
 class WorldLevel() : Level() {
@@ -71,9 +76,16 @@ class WorldLevel() : Level() {
         loadedChunks.firstOrNull { it.x == x && it.y == y } ?: loadChunkAt(x, y)
 
     private fun loadChunkAt(x: Int, y: Int): Chunk {
-        log.info("Creating chunk at $x $y")
-        val chunk = Chunk()
-        chunk.generateAtLocation(x, y)
+        val filename = "$saveFileFolder/chunk$x=$y.json.gz"
+        val chunk: Chunk
+        if (File(filename).exists()) {
+            log.info("Loading chunk at $x $y")
+            chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
+        } else {
+            log.info("Creating chunk at $x $y")
+            chunk = Chunk()
+            chunk.generateAtLocation(x, y)
+        }
         loadedChunks.add(chunk)
         return chunk
     }
