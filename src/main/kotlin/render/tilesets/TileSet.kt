@@ -3,7 +3,6 @@ package render.tilesets
 import com.badlogic.gdx.graphics.Texture
 import world.Level
 import render.tileholders.TileHolder
-import util.Glyph
 import util.log
 
 

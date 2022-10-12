@@ -2,7 +2,7 @@ package render.tileholders
 
 import world.Level
 import render.tilesets.TileSet
-import util.Glyph
+import render.tilesets.Glyph
 
 class WallTile(
     set: TileSet,

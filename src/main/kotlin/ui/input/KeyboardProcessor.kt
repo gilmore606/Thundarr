@@ -26,6 +26,8 @@ object KeyboardProcessor : KtxInputAdapter {
 
                 Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
 
+                Input.Keys.F1 -> { App.level.DEBUG_VISIBLE = !App.level.DEBUG_VISIBLE }
+
                 else -> return super.keyDown(keycode)
             }
         }

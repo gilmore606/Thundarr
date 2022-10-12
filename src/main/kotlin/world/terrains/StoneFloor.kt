@@ -1,6 +1,6 @@
 package world.terrains
 
-import util.Glyph.*
+import render.tilesets.Glyph.*
 
 object StoneFloor : Terrain(
     FLOOR,

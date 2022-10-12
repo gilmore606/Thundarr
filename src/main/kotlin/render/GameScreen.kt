@@ -17,7 +17,7 @@ import render.tilesets.MobTileSet
 import render.tilesets.UITileSet
 import ui.panels.Panel
 import ui.modals.Modal
-import util.Glyph
+import render.tilesets.Glyph
 import util.XY
 import util.log
 import java.lang.Double.max

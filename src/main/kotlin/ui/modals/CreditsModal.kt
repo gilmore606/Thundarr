@@ -1,6 +1,6 @@
 package ui.modals
 
-import util.Glyph
+import render.tilesets.Glyph
 
 class CreditsModal : Modal(450, 180, "THUNDARR the BARBARIAN") {
 

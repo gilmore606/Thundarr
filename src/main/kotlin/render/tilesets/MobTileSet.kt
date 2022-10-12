@@ -1,7 +1,6 @@
 package render.tilesets
 
 import render.tileholders.SimpleTile
-import util.Glyph
 
 fun MobTileSet() =
     TileSet("tiles_mob.png", 7, 4).apply {

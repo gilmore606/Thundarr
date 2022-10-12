@@ -2,24 +2,25 @@ package util
 
 import java.lang.RuntimeException
 
-const val MAX_SHADOWS_PER_LINE = 30
 
 class ShadowCaster(
     val isOpaqueAt: (x: Int, y: Int) -> Boolean,
     val setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
 ) {
 
-    class Shadow() {
+
+    class Shadow {
         var start = 0f
         var end = 1f
         fun contains(other: Shadow) = (start <= other.start && end >= other.end)
     }
 
-    class ShadowLine(val octant: Int) {
+    class ShadowLine(private val octant: Int) {
         val transform = XY(0,0)
+        private val maxShadows = 30
         private val shadows = mutableListOf<Shadow>()
         private val shadowCache = mutableListOf<Shadow>().apply {
-            repeat (MAX_SHADOWS_PER_LINE) { add(Shadow()) }
+            repeat (maxShadows) { add(Shadow()) }
         }
 
         fun reset() {

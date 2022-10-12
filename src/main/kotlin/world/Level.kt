@@ -3,11 +3,14 @@ package world
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
+import render.tilesets.Glyph
 import util.*
 import world.terrains.Terrain
 
 @Serializable
 class Level(val width: Int, val height: Int) {
+
+    var DEBUG_VISIBLE = false
 
     val seen = Array(width) { Array(height) { false } }
     val visible = Array(width) { Array(height) { false } }
@@ -87,16 +90,18 @@ class Level(val width: Int, val height: Int) {
 
     fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
-    fun visibilityAt(x: Int, y: Int): Float = try {
+    fun visibilityAt(x: Int, y: Int): Float = if (DEBUG_VISIBLE) 1f else try {
         (if (seen[x][y]) 0.6f else 0f) + (if (visible[x][y]) 0.4f else 0f)
     } catch (e: ArrayIndexOutOfBoundsException) { 0f }
 
     fun tempPlayerStart(): XY {
-        var xy: XY? = null
-        forEachCell { x, y ->
-            if (isWalkableAt(x, y)) xy = XY(x, y)
+        var tries = 5000
+        while (tries > 0) {
+            val x = Dice.zeroTil(width)
+            val y = Dice.zeroTil(height)
+            if (isWalkableAt(x, y)) return XY(x,y)
+            tries--
         }
-        xy?.also { return it }
         throw RuntimeException("No space to put player in level!")
     }
 

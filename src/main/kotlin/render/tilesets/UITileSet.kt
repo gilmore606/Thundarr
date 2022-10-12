@@ -1,7 +1,6 @@
 package render.tilesets
 
 import render.tileholders.SimpleTile
-import util.Glyph
 
 fun UITileSet() =
     TileSet("tiles_ui.png", 3, 2).apply {

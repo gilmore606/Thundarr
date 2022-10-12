@@ -1,5 +1,6 @@
 package world.cartos
 
+import render.tilesets.Glyph
 import util.*
 import kotlin.random.Random
 

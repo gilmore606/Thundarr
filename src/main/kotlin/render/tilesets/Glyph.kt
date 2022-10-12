@@ -1,4 +1,4 @@
-package util
+package render.tilesets
 
 import kotlinx.serialization.Serializable
 

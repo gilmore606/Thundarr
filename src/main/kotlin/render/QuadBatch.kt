@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 import render.tilesets.TileSet
-import util.Glyph
+import render.tilesets.Glyph
 import world.Level
 
 class QuadBatch(

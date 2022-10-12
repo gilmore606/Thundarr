@@ -3,7 +3,7 @@ package ui.modals
 import com.badlogic.gdx.Input
 import render.GameScreen
 import ui.panels.Panel
-import util.Glyph
+import render.tilesets.Glyph
 
 abstract class Modal(
     width: Int,

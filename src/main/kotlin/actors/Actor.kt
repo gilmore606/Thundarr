@@ -2,7 +2,7 @@ package actors
 
 import actors.actions.Action
 import kotlinx.serialization.Serializable
-import util.Glyph
+import render.tilesets.Glyph
 import util.XY
 
 @Serializable

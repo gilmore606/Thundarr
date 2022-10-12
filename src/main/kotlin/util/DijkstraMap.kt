@@ -18,12 +18,14 @@ class DijkstraMap(val level: Level) {
             level.forEachCell { x, y ->
                 if (map[x][y] == step) {
                     DIRECTIONS.forEach { dir ->
-                        if (map[x + dir.x][y + dir.y] < 0) {
-                            if (level.isWalkableAt(x + dir.x, y + dir.y)) {
-                                map[x + dir.x][y + dir.y] = step + 1
-                                dirty = true
+                        try {
+                            if (map[x + dir.x][y + dir.y] < 0) {
+                                if (level.isWalkableAt(x + dir.x, y + dir.y)) {
+                                    map[x + dir.x][y + dir.y] = step + 1
+                                    dirty = true
+                                }
                             }
-                        }
+                        } catch (_: ArrayIndexOutOfBoundsException) { }
                     }
                 }
             }
@@ -38,7 +40,9 @@ class DijkstraMap(val level: Level) {
             -1 -> null
             0 -> NO_DIRECTION
             else -> DIRECTIONS.firstOrNull { dir ->
-                map[feet.x + dir.x][feet.y + dir.y] == step - 1
+                try {
+                    map[feet.x + dir.x][feet.y + dir.y] == step - 1
+                } catch (_: ArrayIndexOutOfBoundsException) { false }
             }
         }
     }

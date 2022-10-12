@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.GameScreen
 import render.QuadBatch
-import util.Glyph
+import render.tilesets.Glyph
 
 abstract class Panel {
 

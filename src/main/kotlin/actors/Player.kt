@@ -3,7 +3,7 @@ package actors
 import App
 import actors.actions.Action
 import kotlinx.serialization.Serializable
-import util.Glyph
+import render.tilesets.Glyph
 
 @Serializable
 class Player : Actor(

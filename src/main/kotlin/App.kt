@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen
 import ui.input.KeyboardProcessor
 import ui.input.MouseProcessor
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -19,10 +20,19 @@ import util.gzipDecompress
 import util.log
 import world.cartos.RoomyMaze
 import world.Level
+import world.cartos.PerlinCarto
 import java.io.File
 import kotlin.system.exitProcess
 
 object App : KtxGame<Screen>() {
+
+    @Serializable
+    data class SaveState(
+        val level: Level,
+        val turnTime: Float
+    )
+    const val saveFileName = "worldstate"
+    const val saveFileFolder = "savegame"
 
     lateinit var player: Player
     lateinit var level: Level
@@ -37,24 +47,16 @@ object App : KtxGame<Screen>() {
             restoreState()
         } else {
             log.info("No saved state found, creating new world...")
-            level = RoomyMaze.makeLevel()
-            player = Player()
-            val playerStart = level.tempPlayerStart()
-            level.director.add(player, playerStart.x, playerStart.y)
+            createNewWorld()
         }
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
-
-        buildUI()
-
-        Console.say("The moon is broken in god-damned half!")
-    }
-
-    private fun buildUI() {
         GameScreen.addPanel(Console)
 
         Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
+
+        Console.say("The moon is broken in god-damned half!")
     }
 
     private fun setupLog() {
@@ -71,18 +73,31 @@ object App : KtxGame<Screen>() {
         GameScreen.dispose()
     }
 
-    private fun hasSavedState(): Boolean = File("savegame/level.json.gz").exists()
+    private fun hasSavedState(): Boolean = File("$saveFileFolder/$saveFileName.json.gz").exists()
 
     private fun saveState() {
         KtxAsync.launch {
-            File("savegame/level.json.gz").writeBytes(Json.encodeToString(level).gzipCompress())
+            val state = SaveState(level, turnTime)
+            File("$saveFileFolder/$saveFileName.json.gz").writeBytes(Json.encodeToString(state).gzipCompress())
             log.info("Saved state.")
         }
     }
 
     private fun restoreState() {
-        level = Json.decodeFromString(File("savegame/level.json.gz").readBytes().gzipDecompress())
+        val state = Json.decodeFromString<SaveState>(File("$saveFileFolder/$saveFileName.json.gz").readBytes().gzipDecompress())
+        level = state.level
+        turnTime = state.turnTime
         player = level.director.getPlayer()
+        log.info("Restored state.")
+    }
+
+    private fun createNewWorld() {
+        level = PerlinCarto.makeLevel()
+        player = Player()
+        val playerStart = level.tempPlayerStart()
+        level.director.add(player, playerStart.x, playerStart.y)
+        turnTime = 0f
+        Console.say("You step tentatively into the apocalypse...")
     }
 
     fun restartWorld() {
@@ -95,6 +110,7 @@ object App : KtxGame<Screen>() {
             ) { yes ->
                 if (yes) {
                     Console.say("You abandon the world.")
+                    createNewWorld()
                 } else {
                     Console.say("You gather your resolve and carry on.")
                 }

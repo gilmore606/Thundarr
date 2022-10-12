@@ -2,7 +2,7 @@ package world.cartos
 
 import util.CARDINALS
 import kotlin.random.Random
-import util.Glyph
+import render.tilesets.Glyph
 import util.XY
 import world.Level
 import util.Rect

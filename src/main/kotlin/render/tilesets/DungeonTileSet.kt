@@ -3,7 +3,6 @@ package render.tilesets
 import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 import render.tileholders.WallTile
-import util.Glyph
 
 fun DungeonTileSet() =
     TileSet("tiles_dungeon.png", 10, 10).apply {

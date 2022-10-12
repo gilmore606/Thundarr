@@ -2,8 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Wait
-import kotlinx.serialization.Serializable
-import util.Glyph
+import render.tilesets.Glyph
 
 sealed class NPC(
     override val glyph: Glyph,
