@@ -20,7 +20,9 @@ class EnclosedLevel(
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
 
     @Transient
-    private val stepMap = DijkstraMap(this)
+    private val stepMap = DijkstraMap(width, height) { x, y ->
+        isWalkableAt(x, y)
+    }
 
     @Transient
     private val shadowCaster = ShadowCaster(
@@ -79,7 +81,7 @@ class EnclosedLevel(
         Terrain.get(terrains[x][y]).isWalkable()
     } catch (e: ArrayIndexOutOfBoundsException) { false }
 
-    override fun visibilityAt(x: Int, y: Int): Float = if (DEBUG_VISIBLE) 1f else try {
+    override fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else try {
         (if (seen[x][y]) 0.6f else 0f) + (if (visible[x][y]) 0.4f else 0f)
     } catch (e: ArrayIndexOutOfBoundsException) { 0f }
 

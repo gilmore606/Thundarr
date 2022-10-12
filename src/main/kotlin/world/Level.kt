@@ -10,17 +10,17 @@ import world.terrains.Terrain
 @Serializable
 sealed class Level {
 
-    var DEBUG_VISIBLE = false
-
     val pov = XY(0, 0)
 
     val director = Director()
 
 
+    // DoThis for all cells relevant to rendering the frame around the POV.
     abstract fun forEachCellToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     )
 
+    // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
         val x = actor.xy.x
         val y = actor.xy.y
@@ -33,7 +33,8 @@ sealed class Level {
         }
     }
 
-    fun setPov(x: Int, y: Int) {
+    // Move the POV.
+    open fun setPov(x: Int, y: Int) {
         pov.x = x
         pov.y = y
         updateVisibility()

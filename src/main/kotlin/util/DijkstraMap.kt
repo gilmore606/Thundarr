@@ -4,9 +4,10 @@ import world.EnclosedLevel
 import world.Level
 
 
-class DijkstraMap(val level: EnclosedLevel) {
+class DijkstraMap(val width: Int, val height: Int,
+                    val isWalkableAt: (Int,Int)->Boolean) {
 
-    private val map = Array(level.width) { Array(level.height) { -1 } }
+    private val map = Array(width) { Array(height) { -1 } }
 
 
     fun update(pov: XY) {
@@ -16,17 +17,19 @@ class DijkstraMap(val level: EnclosedLevel) {
         var dirty = true
         while (dirty) {
             dirty = false
-            level.forEachCell { x, y ->
-                if (map[x][y] == step) {
-                    DIRECTIONS.forEach { dir ->
-                        try {
-                            if (map[x + dir.x][y + dir.y] < 0) {
-                                if (level.isWalkableAt(x + dir.x, y + dir.y)) {
-                                    map[x + dir.x][y + dir.y] = step + 1
-                                    dirty = true
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    if (map[x][y] == step) {
+                        DIRECTIONS.forEach { dir ->
+                            try {
+                                if (map[x + dir.x][y + dir.y] < 0) {
+                                    if (isWalkableAt(x + dir.x, y + dir.y)) {
+                                        map[x + dir.x][y + dir.y] = step + 1
+                                        dirty = true
+                                    }
                                 }
-                            }
-                        } catch (_: ArrayIndexOutOfBoundsException) { }
+                            } catch (_: ArrayIndexOutOfBoundsException) { }
+                        }
                     }
                 }
             }
@@ -66,6 +69,10 @@ class DijkstraMap(val level: EnclosedLevel) {
     }
 
     private fun clear() {
-        level.forEachCell { x, y -> map[x][y] = -1 }
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                map[x][y] = -1
+            }
+        }
     }
 }

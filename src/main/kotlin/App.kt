@@ -40,6 +40,8 @@ object App : KtxGame<Screen>() {
     lateinit var level: EnclosedLevel
     var turnTime = 0f
 
+    var DEBUG_VISIBLE = false
+
     override fun create() {
         setupLog()
         KtxAsync.initiate()
