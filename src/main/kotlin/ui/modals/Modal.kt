@@ -37,6 +37,10 @@ abstract class Modal(
         }
     }
 
+    open fun keyUp(keycode: Int) {
+
+    }
+
     open fun mouseMovedTo(screenX: Int, screenY: Int) {
 
     }
