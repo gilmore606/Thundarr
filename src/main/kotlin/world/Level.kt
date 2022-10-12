@@ -41,6 +41,8 @@ sealed class Level {
         if (this == App.level) GameScreen.povMoved()
     }
 
+    abstract fun getTerrain(x: Int, y: Int): Terrain.Type
+
     abstract fun setTerrain(x: Int, y: Int, type: Terrain.Type)
 
     abstract fun getGlyph(x: Int, y: Int): Glyph

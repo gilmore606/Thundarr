@@ -22,6 +22,7 @@ import world.EnclosedLevel
 import world.cartos.RoomyMaze
 import world.Level
 import world.cartos.PerlinCarto
+import world.cartos.TestCarto
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -93,11 +94,18 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        level = PerlinCarto.makeLevel()
+        level = EnclosedLevel(70,70)
+        RoomyMaze.carveLevel(0, 0, 69, 69, { x, y ->
+            level.getTerrain(x,y)
+        }, { x, y, type ->
+            level.setTerrain(x,y,type)
+        })
+
         player = Player()
         val playerStart = level.tempPlayerStart()
         level.director.add(player, playerStart.x, playerStart.y)
         turnTime = 0f
+
         Console.say("You step tentatively into the apocalypse...")
     }
 

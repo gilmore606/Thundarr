@@ -41,16 +41,24 @@ class EnclosedLevel(
     ) {
         for (x in pov.x - 50 until pov.x + 50) {
             for (y in pov.y - 50 until pov.y + 50) {
-                val vis = visibilityAt(x, y)
-                if (vis > 0f) {
-                    doThis(
-                        x, y,
-                        visibilityAt(x, y),
-                        Terrain.get(terrains[x][y]).glyph()
-                    )
+                if (x in 0 until width && y in 0 until height) {
+                    val vis = visibilityAt(x, y)
+                    if (vis > 0f) {
+                        doThis(
+                            x, y,
+                            visibilityAt(x, y),
+                            Terrain.get(terrains[x][y]).glyph()
+                        )
+                    }
                 }
             }
         }
+    }
+
+    override fun getTerrain(x: Int, y:Int) = try {
+        terrains[x][y]
+    } catch (e: ArrayIndexOutOfBoundsException) {
+        Terrain.Type.TERRAIN_BRICKWALL
     }
 
     override fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
