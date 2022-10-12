@@ -1,9 +1,10 @@
 package util
 
+import world.EnclosedLevel
 import world.Level
 
 
-class DijkstraMap(val level: Level) {
+class DijkstraMap(val level: EnclosedLevel) {
 
     private val map = Array(level.width) { Array(level.height) { -1 } }
 

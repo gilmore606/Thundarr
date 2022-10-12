@@ -6,10 +6,11 @@ import actors.actions.Move
 import util.DijkstraMap
 import util.XY
 import util.log
+import world.EnclosedLevel
 import world.Level
 
 class WalkTo(
-    level: Level,
+    level: EnclosedLevel,
     val x: Int,
     val y: Int
 ) : Action(1f) {

@@ -6,19 +6,20 @@ import render.tilesets.Glyph
 import util.XY
 import world.Level
 import util.Rect
+import world.EnclosedLevel
 import world.terrains.Terrain
 
 abstract class Carto {
 
-    protected lateinit var level: Level
+    protected lateinit var level: EnclosedLevel
     protected lateinit var regions: Array<Array<Int?>>
 
     abstract fun carveLevel()
 
-    fun makeLevel(): Level {
+    fun makeLevel(): EnclosedLevel {
         val width = 81
         val height = 81
-        level = Level(width, height)
+        level = EnclosedLevel(width, height)
         regions = Array(width) { Array(height) { null } }
         carveLevel()
         return level

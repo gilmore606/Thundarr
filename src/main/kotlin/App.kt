@@ -18,6 +18,7 @@ import ui.modals.CreditsModal
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
+import world.EnclosedLevel
 import world.cartos.RoomyMaze
 import world.Level
 import world.cartos.PerlinCarto
@@ -28,14 +29,14 @@ object App : KtxGame<Screen>() {
 
     @Serializable
     data class SaveState(
-        val level: Level,
+        val level: EnclosedLevel,
         val turnTime: Float
     )
     const val saveFileName = "worldstate"
     const val saveFileFolder = "savegame"
 
     lateinit var player: Player
-    lateinit var level: Level
+    lateinit var level: EnclosedLevel
     var turnTime = 0f
 
     override fun create() {
