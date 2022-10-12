@@ -14,6 +14,8 @@ sealed class Level {
 
     val director = Director()
 
+    // Temporary
+    abstract fun tempPlayerStart(): XY
 
     // DoThis for all cells relevant to rendering the frame around the POV.
     abstract fun forEachCellToRender(
@@ -22,25 +24,32 @@ sealed class Level {
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
-        val x = actor.xy.x
-        val y = actor.xy.y
-        val vis = visibilityAt(x, y)
-        if (vis == 1f) {
-            doThis(
-                x, y,
-                actor.glyph
-            )
+        if (actor.renderable) {
+            val x = actor.xy.x
+            val y = actor.xy.y
+            val vis = visibilityAt(x, y)
+            if (vis == 1f) {
+                doThis(
+                    x, y,
+                    actor.glyph
+                )
+            }
         }
     }
 
     // Move the POV.
-    open fun setPov(x: Int, y: Int) {
+    fun setPov(x: Int, y: Int) {
         pov.x = x
         pov.y = y
+        onSetPov()
         updateVisibility()
         updateStepMaps()
         if (this == App.level) GameScreen.povMoved()
     }
+
+    protected open fun onSetPov() { }
+
+    open fun onRestore() { }
 
     abstract fun getTerrain(x: Int, y: Int): Terrain.Type
 

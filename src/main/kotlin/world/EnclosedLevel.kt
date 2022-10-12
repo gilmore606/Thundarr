@@ -47,8 +47,7 @@ class EnclosedLevel(
                     val vis = visibilityAt(x, y)
                     if (vis > 0f) {
                         doThis(
-                            x, y,
-                            visibilityAt(x, y),
+                            x, y, vis,
                             Terrain.get(terrains[x][y]).glyph()
                         )
                     }
@@ -97,14 +96,13 @@ class EnclosedLevel(
     }
 
     override fun updateVisibility() {
-        val distance = 12f
         for (y in 0 until height) {
             for (x in 0 until width) {
                 visible[x][y] = false
             }
         }
 
-        shadowCaster.cast(pov, distance)
+        shadowCaster.cast(pov, 12f)
     }
 
     override fun updateStepMaps() {
@@ -113,7 +111,7 @@ class EnclosedLevel(
 
     override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
-    fun tempPlayerStart(): XY {
+    override fun tempPlayerStart(): XY {
         var tries = 5000
         while (tries > 0) {
             val x = Dice.zeroTil(width)

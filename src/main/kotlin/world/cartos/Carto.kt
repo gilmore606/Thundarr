@@ -42,7 +42,7 @@ abstract class Carto {
         doCarveLevel()
     }
 
-    abstract fun doCarveLevel()
+    protected abstract fun doCarveLevel()
 
     protected fun regionAt(x: Int, y: Int): Int? = try {
         regions[x - x0][y - y0]

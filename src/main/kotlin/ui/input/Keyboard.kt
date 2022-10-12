@@ -11,7 +11,7 @@ import render.GameScreen
 import ui.modals.EscMenu
 import util.*
 
-object KeyboardProcessor : KtxInputAdapter {
+object Keyboard : KtxInputAdapter {
 
     var lastKey = -1
     var lastKeyTime = System.currentTimeMillis()
