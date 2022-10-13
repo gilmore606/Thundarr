@@ -14,9 +14,14 @@ class Director {
 
     // Place actor into the level.
     fun add(actor: Actor, x: Int, y: Int) {
+        attachActor(actor)
+        actor.moveTo(x, y)
+    }
+
+    // Attach already-positioned actor in the level.  Used externally by loaded chunks.
+    fun attachActor(actor: Actor) {
         actor.juice = 0f
         addOrdered(actor)
-        actor.moveTo(x, y)
     }
 
     fun remove(actor: Actor) {
@@ -42,6 +47,10 @@ class Director {
     }
 
     fun getPlayer(): Player = actors.firstOrNull { it is Player } as Player
+
+    fun removeActorsInArea(x0: Int, x1: Int, y0: Int, y1: Int): Set<Actor> = actors.filter {
+        it.real && it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
+    }.map { remove(it) ; it }.toSet()
 
     // Execute actors' actions until it's the player's turn.
     fun runQueue(level: Level) {

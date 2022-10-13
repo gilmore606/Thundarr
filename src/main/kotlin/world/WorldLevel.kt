@@ -94,10 +94,13 @@ class WorldLevel() : Level() {
         val filename = "$saveFileFolder/chunk$x=$y.json.gz"
         val chunk: Chunk
         if (File(filename).exists()) {
-            log.info("Loading chunk at $x $y")
+            //log.info("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
+            chunk.getSavedActors().forEach {
+                director.attachActor(it)
+            }
         } else {
-            log.info("Creating chunk at $x $y")
+            //log.info("Creating chunk at $x $y")
             chunk = Chunk()
             chunk.generateAtLocation(x, y)
         }
@@ -106,8 +109,10 @@ class WorldLevel() : Level() {
     }
 
     private fun unloadChunk(chunk: Chunk) {
-        log.info("Unloading chunk at ${chunk.x} ${chunk.y}")
-        chunk.unload()
+        // log.info("Unloading chunk at ${chunk.x} ${chunk.y}")
+        chunk.unload(
+            director.removeActorsInArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+        )
         loadedChunks.remove(chunk)
     }
 

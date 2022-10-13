@@ -8,7 +8,7 @@ import render.tilesets.Glyph
 @Serializable
 class WorldActor : Actor( Glyph.CURSOR, 1f) {
     init {
-        renderable = false
+        real = false
     }
 
     override fun defaultAction(): Action = WorldAction()

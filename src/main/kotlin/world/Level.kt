@@ -1,7 +1,6 @@
 package world
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import render.GameScreen
 import render.tilesets.Glyph
 import util.*
@@ -26,7 +25,7 @@ sealed class Level {
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
-        if (actor.renderable) {
+        if (actor.real) {
             val x = actor.xy.x
             val y = actor.xy.y
             val vis = visibilityAt(x, y)

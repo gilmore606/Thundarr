@@ -1,6 +1,7 @@
 package world
 
 import App.saveFileFolder
+import actors.Actor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -27,6 +28,8 @@ class Chunk {
     private val visible = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
     private val terrains = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { Terrain.Type.TERRAIN_BRICKWALL } }
 
+    private val savedActors: MutableSet<Actor> = mutableSetOf()
+
     fun tempPlayerStart(): XY {
         var tries = 5000
         while (tries > 0) {
@@ -51,13 +54,16 @@ class Chunk {
         })
     }
 
-    fun unload() {
+    fun unload(saveActors: Set<Actor>) {
+        savedActors.addAll(saveActors)
         KtxAsync.launch {
             File("$saveFileFolder/chunk$x=$y.json.gz").writeBytes(
                 Json.encodeToString(this@Chunk).gzipCompress()
             )
         }
     }
+
+    fun getSavedActors() = savedActors
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 

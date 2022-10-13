@@ -12,7 +12,8 @@ sealed class Actor(
 ) {
     val xy = XY(0,0)  // position in current level
 
-    var renderable = true
+    // Set false for system actors.
+    var real = true
 
     val queuedActions: MutableList<Action> = mutableListOf()
 
