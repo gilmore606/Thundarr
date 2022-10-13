@@ -17,12 +17,16 @@ class WalkTo(
 
     private var done = false
 
+    private var lastStepTime = System.currentTimeMillis()
 
     override fun shouldContinueFor(actor: Actor): Boolean = !done && (actor.xy.x != x || actor.xy.y != y)
 
     override fun execute(actor: Actor, level: Level) {
         stepMap.stepFrom(actor.xy)?.also { dir ->
             Move(dir).execute(actor, level)
+            val steptime = System.currentTimeMillis() - lastStepTime
+            lastStepTime = System.currentTimeMillis()
+            log.info("step time $steptime ms")
         } ?: run {
             log.debug("Pathing failed for $actor to $x,$y.")
             done = true

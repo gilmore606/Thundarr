@@ -4,8 +4,8 @@ import util.Perlin
 
 object PerlinCarto : Carto() {
 
-    val scale = 0.06
-    val fullness = 0.04
+    val scale = 0.05
+    val fullness = 0.02
 
     override fun doCarveLevel() {
         forEachCell { x, y ->

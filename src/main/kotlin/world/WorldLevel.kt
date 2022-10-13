@@ -15,25 +15,23 @@ const val CHUNKS_AHEAD = 2
 @Serializable
 class WorldLevel() : Level() {
 
-    @Transient
-    val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
+    @Transient val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
+    @Transient val STEP_CHUNKS_AHEAD = 1
+    @Transient val STEP_CHUNKS_WIDE = STEP_CHUNKS_AHEAD * 2 + 1
 
-    @Transient
-    val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk() } }
+    @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk() } }
 
     private val loadedChunks = mutableSetOf<Chunk>()
 
-    @Transient
-    override val stepMap = makeStepMap()
+    @Transient override val stepMap = makeStepMap()
 
-    @Transient
-    private val shadowCaster = ShadowCaster(
+    @Transient private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
-    @Transient
-    private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
+    @Transient private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
+
 
     // Temporary
     override fun tempPlayerStart(): XY {
@@ -86,7 +84,7 @@ class WorldLevel() : Level() {
         loadedChunks.filter { !activeChunks.contains(it) }
             .map { unloadChunk(it) }
 
-        stepMap.setOrigin(chunks[0][0].x, chunks[0][0].y)
+        updateStepMapOrigin(stepMap)
     }
 
     private fun getChunkAt(x: Int, y: Int): Chunk =
@@ -119,7 +117,7 @@ class WorldLevel() : Level() {
     }
 
     override fun forEachCellToRender(doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit) {
-        for (x in pov.x - 80 until pov.x + 80) {
+        for (x in pov.x - 120 until pov.x + 120) {
             for (y in pov.y - 80 until pov.y + 80) {
                 val vis = visibilityAt(x, y)
                 if (vis > 0f) {
@@ -153,10 +151,13 @@ class WorldLevel() : Level() {
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun makeStepMap() = StepMap(CHUNK_SIZE * CHUNKS_WIDE, CHUNK_SIZE * CHUNKS_WIDE) { x, y ->
+    override fun makeStepMap() = StepMap(CHUNK_SIZE * STEP_CHUNKS_WIDE, CHUNK_SIZE * STEP_CHUNKS_WIDE) { x, y ->
         isWalkableAt(x, y)
-    }.apply {
-        setOrigin(chunks[0][0].x, chunks[0][0].y)
+    }.also { updateStepMapOrigin(it) }
+
+    private fun updateStepMapOrigin(map: StepMap) {
+        val offset = CHUNKS_AHEAD - STEP_CHUNKS_AHEAD
+        map.setOrigin(chunks[offset][offset].x, chunks[offset][offset].y)
     }
 
     override fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
