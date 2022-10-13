@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import util.XY
 import world.Level
-import ui.panels.Console
+import ui.panels.ConsolePanel
 
 class Move(
     private val dir: XY
@@ -14,7 +14,7 @@ class Move(
         if (level.isWalkableAt(actor.xy, dir)) {
             actor.moveTo(actor.xy.x + dir.x, actor.xy.y + dir.y)
         } else {
-            if (actor is Player) Console.say("You bump into a wall.")
+            if (actor is Player) ConsolePanel.say("You bump into a wall.")
         }
     }
 

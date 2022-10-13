@@ -8,6 +8,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
+import things.Thing
 import util.Dice
 import util.XY
 import util.gzipCompress
@@ -27,8 +28,12 @@ class Chunk {
     private val seen = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
     private val visible = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
     private val terrains = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { Terrain.Type.TERRAIN_BRICKWALL } }
+    private val things = Array(CHUNK_SIZE) { Array<MutableList<Thing>>(CHUNK_SIZE) { mutableListOf() } }
+
+    private val noThing = ArrayList<Thing>()
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
+
 
     fun tempPlayerStart(): XY {
         var tries = 5000
@@ -52,6 +57,14 @@ class Chunk {
         }, { ix, iy, type ->
             setTerrain(ix, iy, type)
         })
+
+        repeat (20) {
+            things[Dice.zeroTil(CHUNK_SIZE)][Dice.zeroTil(CHUNK_SIZE)].add(
+                Thing(
+                    Glyph.TREE, true, true
+                )
+            )
+        }
     }
 
     fun unload(saveActors: Set<Actor>) {
@@ -66,6 +79,10 @@ class Chunk {
     fun getSavedActors() = savedActors
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
+
+    fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        things[x - this.x][y - this.y]
+    } else { noThing }
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
@@ -107,6 +124,14 @@ class Chunk {
         for (x in 0 until CHUNK_SIZE) {
             for (y in 0 until CHUNK_SIZE) {
                 visible[x][y] = false
+            }
+        }
+    }
+
+    fun clearSeen() {
+        for (x in 0 until CHUNK_SIZE) {
+            for (y in 0 until CHUNK_SIZE) {
+                seen[x][y] = false
             }
         }
     }

@@ -2,7 +2,10 @@ package world
 
 import kotlinx.serialization.Serializable
 import render.GameScreen
+import render.RENDER_HEIGHT
+import render.RENDER_WIDTH
 import render.tilesets.Glyph
+import things.Thing
 import util.*
 import world.terrains.Terrain
 
@@ -19,9 +22,37 @@ sealed class Level {
     abstract fun tempPlayerStart(): XY
 
     // DoThis for all cells relevant to rendering the frame around the POV.
-    abstract fun forEachCellToRender(
+    fun forEachCellToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
-    )
+    ) {
+        for (x in pov.x - RENDER_WIDTH /2 until pov.x + RENDER_WIDTH /2) {
+            for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
+                val vis = visibilityAt(x, y)
+                if (vis > 0f) {
+                    doThis(
+                        x, y, vis,
+                        Terrain.get(getTerrain(x,y)).glyph()
+                    )
+                }
+            }
+        }
+    }
+
+    fun forEachThingToRender(
+        doThis: (x: Int, y: Int, glyph: Glyph) -> Unit
+    ) {
+        for (x in pov.x - RENDER_WIDTH/2 until pov.x + RENDER_WIDTH/2) {
+            for (y in pov.y - RENDER_HEIGHT/2 until pov.y + RENDER_HEIGHT/2) {
+                val thingsAt = getThingsAt(x,y)
+                if (thingsAt.isNotEmpty() && visibilityAt(x,y) == 1f) {
+                    doThis(
+                        x, y,
+                        thingsAt[0].glyph()
+                    )
+                }
+            }
+        }
+    }
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
@@ -55,6 +86,8 @@ sealed class Level {
     protected open fun onSetPov() { }
 
     open fun onRestore() { }
+
+    abstract fun getThingsAt(x: Int, y: Int): List<Thing>
 
     abstract fun getTerrain(x: Int, y: Int): Terrain.Type
 

@@ -13,8 +13,9 @@ import ktx.app.KtxGame
 import ktx.async.KtxAsync
 import render.GameScreen
 import ui.modals.ConfirmModal
-import ui.panels.Console
+import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
+import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
@@ -56,11 +57,12 @@ object App : KtxGame<Screen>() {
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
-        GameScreen.addPanel(Console)
+        GameScreen.addPanel(ConsolePanel)
+        GameScreen.addPanel(StatusPanel)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
-        Console.say("The moon is broken in god-damned half!")
+        ConsolePanel.say("The moon is broken in god-damned half!")
     }
 
     private fun setupLog() {
@@ -117,7 +119,7 @@ object App : KtxGame<Screen>() {
         level.director.add(player, playerStart.x, playerStart.y)
         turnTime = 0f
 
-        Console.say("You step tentatively into the apocalypse...")
+        ConsolePanel.say("You step tentatively into the apocalypse...")
     }
 
     fun restartWorld() {
@@ -129,10 +131,10 @@ object App : KtxGame<Screen>() {
                 "Abandon", "Cancel"
             ) { yes ->
                 if (yes) {
-                    Console.say("You abandon the world.")
+                    ConsolePanel.say("You abandon the world.")
                     createNewWorld()
                 } else {
-                    Console.say("You gather your resolve and carry on.")
+                    ConsolePanel.say("You gather your resolve and carry on.")
                 }
             }
         )
@@ -161,7 +163,7 @@ object App : KtxGame<Screen>() {
                     dispose()
                     exitProcess(0)
                 } else {
-                    Console.say("You remember that one thing you needed to do...")
+                    ConsolePanel.say("You remember that one thing you needed to do...")
                 }
             }
         )

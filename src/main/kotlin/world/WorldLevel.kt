@@ -6,6 +6,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
+import things.Thing
 import util.*
 import world.terrains.Terrain
 import java.io.File
@@ -32,10 +33,13 @@ class WorldLevel() : Level() {
 
     @Transient private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
+    private val noThing = ArrayList<Thing>()
+
 
     // Temporary
     override fun tempPlayerStart(): XY {
         setPov(200, 200)
+        loadedChunks.forEach { it.clearSeen() }
         return chunks[CHUNKS_AHEAD][CHUNKS_AHEAD].tempPlayerStart()
     }
 
@@ -116,19 +120,7 @@ class WorldLevel() : Level() {
         loadedChunks.remove(chunk)
     }
 
-    override fun forEachCellToRender(doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit) {
-        for (x in pov.x - 120 until pov.x + 120) {
-            for (y in pov.y - 80 until pov.y + 80) {
-                val vis = visibilityAt(x, y)
-                if (vis > 0f) {
-                    doThis(
-                        x, y, vis,
-                        Terrain.get(getTerrain(x,y)).glyph()
-                    )
-                }
-            }
-        }
-    }
+    override fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
 
     override fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 

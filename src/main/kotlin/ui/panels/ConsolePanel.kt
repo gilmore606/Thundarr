@@ -3,7 +3,7 @@ package ui.panels
 import render.GameScreen
 
 
-object Console : Panel() {
+object ConsolePanel : Panel() {
 
     private val maxLines = 6
     private val lineSpacing = 3

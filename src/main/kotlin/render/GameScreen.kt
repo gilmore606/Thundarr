@@ -12,17 +12,16 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ktx.app.KtxScreen
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
-import render.tilesets.DungeonTileSet
-import render.tilesets.MobTileSet
-import render.tilesets.UITileSet
+import render.tilesets.*
 import ui.panels.Panel
 import ui.modals.Modal
-import render.tilesets.Glyph
 import util.XY
 import util.log
 import java.lang.Double.max
 import java.lang.Double.min
 
+const val RENDER_WIDTH = 160
+const val RENDER_HEIGHT = 100
 
 object GameScreen : KtxScreen {
 
@@ -42,6 +41,7 @@ object GameScreen : KtxScreen {
     private val dungeonBatch = QuadBatch(tileVertShader(), tileFragShader(), DungeonTileSet())
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
+    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
 
@@ -188,6 +188,16 @@ object GameScreen : KtxScreen {
         mobBatch.apply {
             clear()
             App.level.forEachActorToRender { tx, ty, glyph ->
+                addTileQuad(
+                    tx - pov.x, ty - pov.y, tileStride,
+                    getTextureIndex(glyph), 1f, aspectRatio)
+            }
+            draw()
+        }
+
+        thingBatch.apply {
+            clear()
+            App.level.forEachThingToRender { tx, ty, glyph ->
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
                     getTextureIndex(glyph), 1f, aspectRatio)

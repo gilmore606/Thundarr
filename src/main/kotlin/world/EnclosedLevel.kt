@@ -3,6 +3,7 @@ package world
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
+import things.Thing
 import util.Dice
 import util.StepMap
 import util.ShadowCaster
@@ -18,6 +19,9 @@ class EnclosedLevel(
     private val seen = Array(width) { Array(height) { false } }
     private val visible = Array(width) { Array(height) { false } }
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
+    private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
+
+    private val noThing = ArrayList<Thing>()
 
     @Transient override val stepMap = makeStepMap()
 
@@ -26,25 +30,12 @@ class EnclosedLevel(
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
-    override fun forEachCellToRender(
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
-    ) {
-        for (x in pov.x - 50 until pov.x + 50) {
-            for (y in pov.y - 50 until pov.y + 50) {
-                if (x in 0 until width && y in 0 until height) {
-                    val vis = visibilityAt(x, y)
-                    if (vis > 0f) {
-                        doThis(
-                            x, y, vis,
-                            Terrain.get(terrains[x][y]).glyph()
-                        )
-                    }
-                }
-            }
-        }
-    }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < 0 || y < 0 || x >= width || y >= height)
+
+    override fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        things[x][y]
+    } else { noThing }
 
     override fun getTerrain(x: Int, y:Int) = if (boundsCheck(x, y)) {
         terrains[x][y]

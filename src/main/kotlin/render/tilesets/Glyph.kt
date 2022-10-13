@@ -18,5 +18,7 @@ enum class Glyph {
 
     PLAYER,
     SKELETON,
-    SKULL
+    SKULL,
+
+    TREE
 }
