@@ -109,6 +109,9 @@ object App : KtxGame<Screen>() {
             level = WorldLevel()
         }
 
+        File("$saveFileFolder/$saveFileName.json.gz").delete()
+        File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }?.forEach { it.delete() }
+
         player = Player()
         val playerStart = level.tempPlayerStart()
         level.director.add(player, playerStart.x, playerStart.y)

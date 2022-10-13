@@ -10,11 +10,16 @@ import util.*
 import world.terrains.Terrain
 import java.io.File
 
+const val CHUNKS_AHEAD = 2
+
 @Serializable
 class WorldLevel() : Level() {
 
     @Transient
-    val chunks = Array(3) { Array(3) { Chunk() } }
+    val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
+
+    @Transient
+    val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk() } }
 
     private val loadedChunks = mutableSetOf<Chunk>()
 
@@ -33,7 +38,7 @@ class WorldLevel() : Level() {
     // Temporary
     override fun tempPlayerStart(): XY {
         setPov(200, 200)
-        return chunks[1][1].tempPlayerStart()
+        return chunks[CHUNKS_AHEAD][CHUNKS_AHEAD].tempPlayerStart()
     }
 
     override fun onSetPov() {
@@ -62,11 +67,11 @@ class WorldLevel() : Level() {
         log.info("Populating chunks...")
 
         val activeChunks = mutableSetOf<Chunk>()
-        for (cx in -1..1) {
-            for (cy in -1..1) {
+        for (cx in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
+            for (cy in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
                 val chunk = getChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)
                 activeChunks.add(chunk)
-                chunks[cx+1][cy+1] = chunk
+                chunks[cx+ CHUNKS_AHEAD][cy+ CHUNKS_AHEAD] = chunk
             }
         }
         loadedChunks.filter { !activeChunks.contains(it) }
@@ -144,7 +149,7 @@ class WorldLevel() : Level() {
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun makeStepMap() = StepMap(CHUNK_SIZE * 3, CHUNK_SIZE * 3) { x, y ->
+    override fun makeStepMap() = StepMap(CHUNK_SIZE * CHUNKS_WIDE, CHUNK_SIZE * CHUNKS_WIDE) { x, y ->
         isWalkableAt(x, y)
     }.apply {
         setOrigin(chunks[0][0].x, chunks[0][0].y)
