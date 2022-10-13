@@ -50,14 +50,16 @@ class WorldLevel() : Level() {
         updateStepMap()
     }
 
-    private inline fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE
-    private inline fun yToChunkY(y: Int) = (y / CHUNK_SIZE) * CHUNK_SIZE
+    private inline fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE + if (x < 0) -CHUNK_SIZE else 0
+    private inline fun yToChunkY(y: Int) = (y / CHUNK_SIZE) * CHUNK_SIZE + if (y < 0) -CHUNK_SIZE else 0
 
     private inline fun chunkAt(x: Int, y: Int): Chunk? {
-        val cx = (x - chunks[0][0].x) / CHUNK_SIZE
-        val cy = (y - chunks[0][0].y) / CHUNK_SIZE
-        if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
-            return chunks[cx][cy]
+        if (x >= chunks[0][0].x && y >= chunks[0][0].y) {
+            val cx = (x - chunks[0][0].x) / CHUNK_SIZE
+            val cy = (y - chunks[0][0].y) / CHUNK_SIZE
+            if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
+                return chunks[cx][cy]
+            }
         }
         return null
     }
@@ -100,7 +102,7 @@ class WorldLevel() : Level() {
                 director.attachActor(it)
             }
         } else {
-            //log.info("Creating chunk at $x $y")
+            log.info("Creating chunk at $x $y")
             chunk = Chunk()
             chunk.generateAtLocation(x, y)
         }
