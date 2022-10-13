@@ -27,14 +27,16 @@ class StepMap(
                 for (y in 0 until height) {
                     if (map[x][y] == step) {
                         DIRECTIONS.forEach { dir ->
-                            try {
+                            val tx = x + dir.x
+                            val ty = y + dir.y
+                            if (tx >= 0 && ty >= 0 && tx < width && ty < height) {
                                 if (map[x + dir.x][y + dir.y] < 0) {
                                     if (isWalkableAt(x + dir.x + x0, y + dir.y + y0)) {
                                         map[x + dir.x][y + dir.y] = step + 1
                                         dirty = true
                                     }
                                 }
-                            } catch (_: ArrayIndexOutOfBoundsException) { }
+                            }
                         }
                     }
                 }
@@ -50,9 +52,11 @@ class StepMap(
             -1 -> null
             0 -> NO_DIRECTION
             else -> DIRECTIONS.firstOrNull { dir ->
-                try {
-                    map[feet.x + dir.x - x0][feet.y + dir.y - y0] == step - 1
-                } catch (_: ArrayIndexOutOfBoundsException) { false }
+                val tx = feet.x + dir.x - x0
+                val ty = feet.y + dir.y - y0
+                if (tx >= 0 && ty >= 0 && tx < width && ty < height) {
+                    map[tx][ty] == step - 1
+                } else false
             }
         }
     }

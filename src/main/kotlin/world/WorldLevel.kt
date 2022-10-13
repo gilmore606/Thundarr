@@ -52,8 +52,15 @@ class WorldLevel() : Level() {
 
     private inline fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE
     private inline fun yToChunkY(y: Int) = (y / CHUNK_SIZE) * CHUNK_SIZE
-    private inline fun chunkAt(x: Int, y: Int) =
-        chunks[(x - chunks[0][0].x) / CHUNK_SIZE][(y - chunks[0][0].y) / CHUNK_SIZE]
+
+    private inline fun chunkAt(x: Int, y: Int): Chunk? {
+        val cx = (x - chunks[0][0].x) / CHUNK_SIZE
+        val cy = (y - chunks[0][0].y) / CHUNK_SIZE
+        if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
+            return chunks[cx][cy]
+        }
+        return null
+    }
 
     private fun populateChunks() {
         val chunkX = xToChunkX(pov.x)
@@ -118,31 +125,21 @@ class WorldLevel() : Level() {
         }
     }
 
-    override fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y).getTerrain(x,y)
+    override fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
-    override fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y).setTerrain(x,y,type)
+    override fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
-    override fun getGlyph(x: Int, y: Int): Glyph = try {
-        chunkAt(x,y).getGlyph(x,y)
-    } catch (e: ArrayIndexOutOfBoundsException) { Glyph.FLOOR }
+    override fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.FLOOR
 
     override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
-    override fun isSeenAt(x: Int, y: Int): Boolean = try {
-        chunkAt(x,y).isSeenAt(x,y)
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    override fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
 
-    override fun isWalkableAt(x: Int, y: Int): Boolean = try {
-        chunkAt(x,y).isWalkableAt(x,y)
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    override fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
-    override fun visibilityAt(x: Int, y: Int): Float = try {
-        chunkAt(x,y).visibilityAt(x,y)
-    } catch (e: ArrayIndexOutOfBoundsException) { 0f }
+    override fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
-    override fun isOpaqueAt(x: Int, y: Int): Boolean = try {
-        chunkAt(x,y).isOpaqueAt(x,y)
-    }catch (e: ArrayIndexOutOfBoundsException) { true }
+    override fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     override fun updateVisibility() {
         loadedChunks.forEach { it.clearVisibility() }
@@ -155,6 +152,6 @@ class WorldLevel() : Level() {
         setOrigin(chunks[0][0].x, chunks[0][0].y)
     }
 
-    override fun setTileVisibility(x: Int, y: Int, vis: Boolean)  = chunkAt(x,y).setTileVisibility(x,y,vis)
+    override fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 
 }

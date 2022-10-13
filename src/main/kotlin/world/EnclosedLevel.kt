@@ -46,43 +46,41 @@ class EnclosedLevel(
         }
     }
 
-    override fun getTerrain(x: Int, y:Int) = try {
+    private inline fun boundsCheck(x: Int, y: Int) = !(x < 0 || y < 0 || x >= width || y >= height)
+
+    override fun getTerrain(x: Int, y:Int) = if (boundsCheck(x, y)) {
         terrains[x][y]
-    } catch (e: ArrayIndexOutOfBoundsException) {
-        Terrain.Type.TERRAIN_BRICKWALL
-    }
+    } else { Terrain.Type.TERRAIN_BRICKWALL }
 
     override fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
         terrains[x][y] = type
     }
 
-    override fun getGlyph(x: Int, y: Int) = try {
+    override fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x][y]).glyph()
-    } catch (e: ArrayIndexOutOfBoundsException) {
-        Glyph.FLOOR
-    }
+    } else { Glyph.FLOOR }
 
-    override fun isSeenAt(x: Int, y: Int): Boolean = try {
+    override fun isSeenAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         seen[x][y]
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    } else { false }
 
-    override fun isWalkableAt(x: Int, y: Int): Boolean = try {
+    override fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x][y]).isWalkable()
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    } else { false }
 
-    override fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else try {
+    override fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
         (if (seen[x][y]) 0.6f else 0f) + (if (visible[x][y]) 0.4f else 0f)
-    } catch (e: ArrayIndexOutOfBoundsException) { 0f }
+    } else { 0f }
 
-    override fun isOpaqueAt(x: Int, y: Int): Boolean = try {
+    override fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x][y]).isOpaque()
-    } catch (e: ArrayIndexOutOfBoundsException) { true }
+    } else { true }
 
     override fun setTileVisibility(x: Int, y: Int, vis: Boolean) {
-        try {
+        if (boundsCheck(x, y)) {
             visible[x][y] = vis
             if (vis) seen[x][y] = true
-        } catch (_: ArrayIndexOutOfBoundsException) { }
+        }
     }
 
     override fun updateVisibility() {

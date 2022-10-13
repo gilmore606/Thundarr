@@ -20,6 +20,8 @@ const val CHUNK_SIZE = 50
 class Chunk {
     var x: Int = -999
     var y: Int = -999
+    private var x1: Int = -998
+    private var y1: Int = -998
 
     private val seen = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
     private val visible = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
@@ -39,6 +41,9 @@ class Chunk {
     fun generateAtLocation(x: Int, y: Int) {
         this.x = x
         this.y = y
+        this.x1 = x + CHUNK_SIZE - 1
+        this.y1 = y + CHUNK_SIZE - 1
+
         PerlinCarto.carveLevel(x, y, x + CHUNK_SIZE - 1, y + CHUNK_SIZE - 1, { ix, iy ->
             getTerrain(ix, iy)
         }, { ix, iy, type ->
@@ -54,44 +59,42 @@ class Chunk {
         }
     }
 
-    fun getTerrain(x: Int, y:Int) = try {
+    private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
+
+    fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
-    } catch (e: ArrayIndexOutOfBoundsException) {
-        Terrain.Type.TERRAIN_BRICKWALL
-    }
+    } else { Terrain.Type.TERRAIN_BRICKWALL }
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
         terrains[x - this.x][y - this.y] = type
     }
 
-    fun getGlyph(x: Int, y: Int) = try {
+    fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x - this.x][y - this.y]).glyph()
-    } catch (e: ArrayIndexOutOfBoundsException) {
-        Glyph.FLOOR
-    }
+    } else { Glyph.FLOOR }
 
-    fun isSeenAt(x: Int, y: Int): Boolean = try {
+    fun isSeenAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         seen[x - this.x][y - this.y]
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    } else { false }
 
-    fun isWalkableAt(x: Int, y: Int): Boolean = try {
+    fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x - this.x][y - this.y]).isWalkable()
-    } catch (e: ArrayIndexOutOfBoundsException) { false }
+    } else { false }
 
-    fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else try {
+    fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
         (if (seen[x - this.x][y - this.y]) 0.6f else 0f) +
                 (if (visible[x - this.x][y - this.y]) 0.4f else 0f)
-    } catch (e: ArrayIndexOutOfBoundsException) { 0f }
+    } else { 0f }
 
-    fun isOpaqueAt(x: Int, y: Int): Boolean = try {
+    fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x - this.x][y - this.y]).isOpaque()
-    } catch (e: ArrayIndexOutOfBoundsException) { true }
+    } else { true }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) {
-        try {
+        if (boundsCheck(x, y)) {
             visible[x - this.x][y - this.y] = vis
             if (vis) seen[x - this.x][y - this.y] = true
-        } catch (_: ArrayIndexOutOfBoundsException) { }
+        }
     }
 
     fun clearVisibility() {

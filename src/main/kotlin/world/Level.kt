@@ -14,7 +14,6 @@ sealed class Level {
 
     val director = Director()
 
-    @Transient
     abstract val stepMap: StepMap
 
     // Temporary
