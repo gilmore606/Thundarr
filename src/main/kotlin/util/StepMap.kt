@@ -1,6 +1,8 @@
 package util
 
-class DijkstraMap(
+// This should be DijkstraMap but who wants to type that guy's name all the time?
+
+class StepMap(
     val width: Int, val height: Int,
     val isWalkableAt: (Int,Int)->Boolean) {
 
@@ -14,10 +16,10 @@ class DijkstraMap(
         y0 = y
     }
 
-    fun update(pov: XY) {
+    fun update(povX: Int, povY: Int) {
         clear()
         var step = 0
-        map[pov.x - x0][pov.y - y0] = step
+        map[povX - x0][povY - y0] = step
         var dirty = true
         while (dirty) {
             dirty = false

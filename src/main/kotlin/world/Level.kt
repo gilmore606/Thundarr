@@ -15,7 +15,7 @@ sealed class Level {
     val director = Director()
 
     @Transient
-    abstract val stepMap: DijkstraMap
+    abstract val stepMap: StepMap
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -50,7 +50,9 @@ sealed class Level {
         if (this == App.level) GameScreen.povMoved()
     }
 
-    open fun updateStepMap() { stepMap.update(this.pov) }
+    abstract fun makeStepMap(): StepMap
+
+    open fun updateStepMap() { stepMap.update(this.pov.x, this.pov.y) }
 
     protected open fun onSetPov() { }
 

@@ -19,12 +19,7 @@ class WorldLevel() : Level() {
     private val loadedChunks = mutableSetOf<Chunk>()
 
     @Transient
-    override val stepMap = DijkstraMap(
-        CHUNK_SIZE * 3, CHUNK_SIZE * 3) { x, y ->
-        isWalkableAt(x, y)
-    }.apply {
-        setOrigin(chunks[0][0].x, chunks[0][0].y)
-    }
+    override val stepMap = makeStepMap()
 
     @Transient
     private val shadowCaster = ShadowCaster(
@@ -47,6 +42,7 @@ class WorldLevel() : Level() {
 
     override fun onRestore() {
         populateChunks()
+        updateStepMap()
     }
 
     private inline fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE
@@ -148,8 +144,10 @@ class WorldLevel() : Level() {
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun updateStepMap() {
-        super.updateStepMap()
+    override fun makeStepMap() = StepMap(CHUNK_SIZE * 3, CHUNK_SIZE * 3) { x, y ->
+        isWalkableAt(x, y)
+    }.apply {
+        setOrigin(chunks[0][0].x, chunks[0][0].y)
     }
 
     override fun setTileVisibility(x: Int, y: Int, vis: Boolean)  = chunkAt(x,y).setTileVisibility(x,y,vis)

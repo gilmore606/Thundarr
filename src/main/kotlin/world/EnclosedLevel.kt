@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
 import util.Dice
-import util.DijkstraMap
+import util.StepMap
 import util.ShadowCaster
 import util.XY
 import world.terrains.Terrain
@@ -20,23 +20,13 @@ class EnclosedLevel(
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
 
     @Transient
-    override val stepMap = DijkstraMap(width, height) { x, y ->
-        isWalkableAt(x, y)
-    }
+    override val stepMap = makeStepMap()
 
     @Transient
     private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
-
-    fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                doThis(x, y)
-            }
-        }
-    }
 
     override fun forEachCellToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
@@ -103,6 +93,10 @@ class EnclosedLevel(
         }
 
         shadowCaster.cast(pov, 12f)
+    }
+
+    override fun makeStepMap() = StepMap(width, height) { x, y ->
+        isWalkableAt(x, y)
     }
 
     override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
