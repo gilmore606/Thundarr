@@ -1,19 +1,23 @@
 package util
 
-import world.EnclosedLevel
-import world.Level
-
-
-class DijkstraMap(val width: Int, val height: Int,
-                    val isWalkableAt: (Int,Int)->Boolean) {
+class DijkstraMap(
+    val width: Int, val height: Int,
+    val isWalkableAt: (Int,Int)->Boolean) {
 
     private val map = Array(width) { Array(height) { -1 } }
 
+    private var x0 = 0
+    private var y0 = 0
+
+    fun setOrigin(x: Int, y: Int) {
+        x0 = x
+        y0 = y
+    }
 
     fun update(pov: XY) {
         clear()
         var step = 0
-        map[pov.x][pov.y] = step
+        map[pov.x - x0][pov.y - y0] = step
         var dirty = true
         while (dirty) {
             dirty = false
@@ -23,7 +27,7 @@ class DijkstraMap(val width: Int, val height: Int,
                         DIRECTIONS.forEach { dir ->
                             try {
                                 if (map[x + dir.x][y + dir.y] < 0) {
-                                    if (isWalkableAt(x + dir.x, y + dir.y)) {
+                                    if (isWalkableAt(x + dir.x + x0, y + dir.y + y0)) {
                                         map[x + dir.x][y + dir.y] = step + 1
                                         dirty = true
                                     }
@@ -39,13 +43,13 @@ class DijkstraMap(val width: Int, val height: Int,
 
     fun stepFrom(from: XY): XY? {
         val feet = XY(from.x, from.y)
-        val step = map[feet.x][feet.y]
+        val step = map[feet.x - x0][feet.y - y0]
         return when (step) {
             -1 -> null
             0 -> NO_DIRECTION
             else -> DIRECTIONS.firstOrNull { dir ->
                 try {
-                    map[feet.x + dir.x][feet.y + dir.y] == step - 1
+                    map[feet.x + dir.x - x0][feet.y + dir.y - y0] == step - 1
                 } catch (_: ArrayIndexOutOfBoundsException) { false }
             }
         }
@@ -54,7 +58,7 @@ class DijkstraMap(val width: Int, val height: Int,
     fun pathFrom(from: XY): List<XY> {
         val path = ArrayList<XY>()
         var feet = XY(from.x, from.y)
-        var stepNum = map[feet.x][feet.y]
+        var stepNum = map[feet.x - x0][feet.y - y0]
         while (stepNum >= 0) {
             path.add(XY(feet.x, feet.y))
             stepFrom(feet)?.also { step ->

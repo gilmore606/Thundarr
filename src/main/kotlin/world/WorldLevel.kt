@@ -6,10 +6,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
-import util.ShadowCaster
-import util.XY
-import util.gzipDecompress
-import util.log
+import util.*
 import world.terrains.Terrain
 import java.io.File
 
@@ -20,6 +17,14 @@ class WorldLevel() : Level() {
     val chunks = Array(3) { Array(3) { Chunk() } }
 
     private val loadedChunks = mutableSetOf<Chunk>()
+
+    @Transient
+    override val stepMap = DijkstraMap(
+        CHUNK_SIZE * 3, CHUNK_SIZE * 3) { x, y ->
+        isWalkableAt(x, y)
+    }.apply {
+        setOrigin(chunks[0][0].x, chunks[0][0].y)
+    }
 
     @Transient
     private val shadowCaster = ShadowCaster(
@@ -70,6 +75,8 @@ class WorldLevel() : Level() {
         }
         loadedChunks.filter { !activeChunks.contains(it) }
             .map { unloadChunk(it) }
+
+        stepMap.setOrigin(chunks[0][0].x, chunks[0][0].y)
     }
 
     private fun getChunkAt(x: Int, y: Int): Chunk =
@@ -118,10 +125,7 @@ class WorldLevel() : Level() {
         chunkAt(x,y).getGlyph(x,y)
     } catch (e: ArrayIndexOutOfBoundsException) { Glyph.FLOOR }
 
-    override fun getPathToPOV(from: XY): List<XY> {
-        // TODO: actually write this
-        return listOf(XY(0,0))
-    }
+    override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
     override fun isSeenAt(x: Int, y: Int): Boolean = try {
         chunkAt(x,y).isSeenAt(x,y)
@@ -144,8 +148,8 @@ class WorldLevel() : Level() {
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun updateStepMaps() {
-        // TODO: actually write this
+    override fun updateStepMap() {
+        super.updateStepMap()
     }
 
     override fun setTileVisibility(x: Int, y: Int, vis: Boolean)  = chunkAt(x,y).setTileVisibility(x,y,vis)

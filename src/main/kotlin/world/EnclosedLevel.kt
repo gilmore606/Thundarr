@@ -20,7 +20,7 @@ class EnclosedLevel(
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
 
     @Transient
-    private val stepMap = DijkstraMap(width, height) { x, y ->
+    override val stepMap = DijkstraMap(width, height) { x, y ->
         isWalkableAt(x, y)
     }
 
@@ -103,10 +103,6 @@ class EnclosedLevel(
         }
 
         shadowCaster.cast(pov, 12f)
-    }
-
-    override fun updateStepMaps() {
-        stepMap.update(this.pov)
     }
 
     override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)

@@ -14,6 +14,9 @@ sealed class Level {
 
     val director = Director()
 
+    @Transient
+    abstract val stepMap: DijkstraMap
+
     // Temporary
     abstract fun tempPlayerStart(): XY
 
@@ -43,9 +46,11 @@ sealed class Level {
         pov.y = y
         onSetPov()
         updateVisibility()
-        updateStepMaps()
+        updateStepMap()
         if (this == App.level) GameScreen.povMoved()
     }
+
+    open fun updateStepMap() { stepMap.update(this.pov) }
 
     protected open fun onSetPov() { }
 
@@ -70,8 +75,6 @@ sealed class Level {
     abstract fun isOpaqueAt(x: Int, y: Int): Boolean
 
     abstract fun updateVisibility()
-
-    abstract fun updateStepMaps()
 
     abstract fun setTileVisibility(x: Int, y: Int, vis: Boolean)
 }
