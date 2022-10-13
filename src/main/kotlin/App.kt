@@ -2,8 +2,8 @@ import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
-import ui.input.KeyboardProcessor
-import ui.input.MouseProcessor
+import ui.input.Keyboard
+import ui.input.Mouse
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -18,9 +18,10 @@ import ui.modals.CreditsModal
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
-import world.cartos.RoomyMaze
+import world.EnclosedLevel
 import world.Level
-import world.cartos.PerlinCarto
+import world.WorldLevel
+import world.cartos.RoomyMaze
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -29,7 +30,8 @@ object App : KtxGame<Screen>() {
     @Serializable
     data class SaveState(
         val level: Level,
-        val turnTime: Float
+        val turnTime: Float,
+        val zoom: Double,
     )
     const val saveFileName = "worldstate"
     const val saveFileFolder = "savegame"
@@ -37,6 +39,8 @@ object App : KtxGame<Screen>() {
     lateinit var player: Player
     lateinit var level: Level
     var turnTime = 0f
+
+    var DEBUG_VISIBLE = false
 
     override fun create() {
         setupLog()
@@ -54,7 +58,7 @@ object App : KtxGame<Screen>() {
         setScreen<GameScreen>()
         GameScreen.addPanel(Console)
 
-        Gdx.input.inputProcessor = InputMultiplexer(KeyboardProcessor, MouseProcessor)
+        Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
         Console.say("The moon is broken in god-damned half!")
     }
@@ -77,7 +81,7 @@ object App : KtxGame<Screen>() {
 
     private fun saveState() {
         KtxAsync.launch {
-            val state = SaveState(level, turnTime)
+            val state = SaveState(level, turnTime, GameScreen.zoom)
             File("$saveFileFolder/$saveFileName.json.gz").writeBytes(Json.encodeToString(state).gzipCompress())
             log.info("Saved state.")
         }
@@ -87,16 +91,32 @@ object App : KtxGame<Screen>() {
         val state = Json.decodeFromString<SaveState>(File("$saveFileFolder/$saveFileName.json.gz").readBytes().gzipDecompress())
         level = state.level
         turnTime = state.turnTime
+        GameScreen.zoom = state.zoom
         player = level.director.getPlayer()
-        log.info("Restored state.")
+        level.onRestore()
+        log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
 
     private fun createNewWorld() {
-        level = PerlinCarto.makeLevel()
+        if (false) {
+            level = EnclosedLevel(70, 70)
+            RoomyMaze.carveLevel(0, 0, 69, 69, { x, y ->
+                level.getTerrain(x, y)
+            }, { x, y, type ->
+                level.setTerrain(x, y, type)
+            })
+        } else {
+            level = WorldLevel()
+        }
+
+        File("$saveFileFolder/$saveFileName.json.gz").delete()
+        File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }?.forEach { it.delete() }
+
         player = Player()
         val playerStart = level.tempPlayerStart()
         level.director.add(player, playerStart.x, playerStart.y)
         turnTime = 0f
+
         Console.say("You step tentatively into the apocalypse...")
     }
 

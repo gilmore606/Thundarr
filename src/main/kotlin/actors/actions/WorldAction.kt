@@ -7,6 +7,5 @@ import world.Level
 class WorldAction : Action(1f) {
     override fun execute(actor: Actor, level: Level) {
         App.turnTime += 1f
-        log.info("Turn ${App.turnTime}.")
     }
 }

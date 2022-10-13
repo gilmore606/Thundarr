@@ -66,7 +66,7 @@ object GameScreen : KtxScreen {
     private val panels: MutableList<Panel> = mutableListOf()
     var topModal: Modal? = null
 
-    private var cursorPosition: XY = XY(-1,-1)
+    private var cursorPosition: XY? = null
     private var cursorLine: MutableList<XY> = mutableListOf()
 
     private val pov get() = App.level.pov
@@ -102,20 +102,23 @@ object GameScreen : KtxScreen {
         } ?: run {
             val col = screenXtoTileX(screenX)
             val row = screenYtoTileY(screenY)
-            if (col != cursorPosition.x || row != cursorPosition.y) {
+            if (col != cursorPosition?.x || row != cursorPosition?.y) {
                 if (App.level.isSeenAt(col, row)) {
                     if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
-                        cursorPosition.x = col
-                        cursorPosition.y = row
-                        cursorLine = App.level.getPathToPOV(cursorPosition).toMutableList()
+                        val newCursor = XY(col, row)
+                        cursorPosition = newCursor
+                        cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
                     } else {
-                        cursorPosition.x = -1
-                        cursorPosition.y = -1
-                        cursorLine.clear()
+                        clearCursor()
                     }
                 }
             }
         }
+    }
+
+    private fun clearCursor() {
+        cursorPosition = null
+        cursorLine.clear()
     }
 
     fun mouseScrolled(amount: Float) {
@@ -136,9 +139,7 @@ object GameScreen : KtxScreen {
     }
 
     fun povMoved() {
-        cursorPosition.x = -1
-        cursorPosition.y = -1
-        cursorLine.clear()
+        clearCursor()
     }
 
     fun addPanel(panel: Panel) {
@@ -146,9 +147,7 @@ object GameScreen : KtxScreen {
     }
 
     fun addModal(modal: Modal) {
-        cursorPosition.x = -1
-        cursorPosition.y = -1
-        cursorLine.clear()
+        clearCursor()
         modal.onResize(this.width, this.height)
         addPanel(modal)
         topModal = modal
@@ -195,7 +194,7 @@ object GameScreen : KtxScreen {
 
         uiBatch.apply {
             clear()
-            if (cursorPosition.x >= 0 && cursorPosition.y >= 0) {
+            cursorPosition?.also { cursorPosition ->
                 addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
                     getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
                 cursorLine.forEach { xy ->

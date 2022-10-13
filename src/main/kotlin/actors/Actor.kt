@@ -12,6 +12,9 @@ sealed class Actor(
 ) {
     val xy = XY(0,0)  // position in current level
 
+    // Set false for system actors.
+    var real = true
+
     val queuedActions: MutableList<Action> = mutableListOf()
 
     // How many turns am I owed?

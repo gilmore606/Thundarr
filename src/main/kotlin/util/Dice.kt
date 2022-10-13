@@ -15,4 +15,6 @@ object Dice {
     fun zeroTo(max: Int) = Random.nextInt(max+1)
 
     fun oneTo(max: Int) = Random.nextInt(max) + 1
+
+    fun range(min: Int, max: Int) = Random.nextInt(max - min) + min
 }

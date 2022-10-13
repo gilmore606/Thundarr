@@ -5,7 +5,7 @@ import world.terrains.Terrain
 
 object TestCarto : Carto() {
 
-    override fun carveLevel() {
+    override fun doCarveLevel() {
         carveRoom(Rect(5, 5, 11, 9), 0)
         carveRoom(Rect(8, 12, 17, 18), 1)
         carveRoom(Rect(11, 9, 11, 12), 2)

@@ -2,13 +2,14 @@ package world.cartos
 
 import render.tilesets.Glyph
 import util.*
+import world.terrains.Terrain
 import kotlin.random.Random
 
 // algorithm adapted from Bob Nystrom
 
 object RoomyMaze : Carto() {
 
-    override fun carveLevel() {
+    override fun doCarveLevel() {
         val rooms = ArrayList<Rect>()
 
         val roomTries = Random.nextInt(30, 500)
@@ -26,7 +27,7 @@ object RoomyMaze : Carto() {
 
         forEachCell { x, y ->
             if (isRock(x, y)) {
-                if (neighborCount(x, y, Glyph.FLOOR) == 0) {
+                if (neighborCount(x, y, Terrain.Type.TERRAIN_STONEFLOOR) == 0) {
                     growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
                     nextRegion++
                 }
@@ -86,24 +87,27 @@ object RoomyMaze : Carto() {
         // Cut connections between regions, until all are one.
         while (openRegions.size > 1) {
             val connections = findConnectorWalls()
-            val connector = connections.random()
+            if (connections.isNotEmpty()) {
+                val connector = connections.random()
+                // Merge all regions this connector touches.
+                val regions = regionsTouching(connector).toList()
+                val mergedRegion = regions[0]
+                mergeRegions(mergedRegion, regions)
 
-            // Merge all regions this connector touches.
-            val regions = regionsTouching(connector).toList()
-            val mergedRegion = regions[0]
-            mergeRegions(mergedRegion, regions)
+                // Remove the merged regions from use.
+                openRegions.removeAll(regions)
+                openRegions.add(mergedRegion)
 
-            // Remove the merged regions from use.
-            openRegions.removeAll(regions)
-            openRegions.add(mergedRegion)
+                // Dig the connection.
+                // TODO: doors and shit.
+                carve(connector, mergedRegion)
 
-            // Dig the connection.
-            // TODO: doors and shit.
-            carve(connector, mergedRegion)
-
-            if (Dice.chance(extraConnectionChance)) {
-                val extraConnector = connections.random()
-                carve(extraConnector, mergedRegion)
+                if (Dice.chance(extraConnectionChance)) {
+                    val extraConnector = connections.random()
+                    carve(extraConnector, mergedRegion)
+                }
+            } else {
+                return
             }
         }
     }
