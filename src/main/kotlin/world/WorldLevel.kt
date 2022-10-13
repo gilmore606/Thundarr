@@ -10,7 +10,7 @@ import util.*
 import world.terrains.Terrain
 import java.io.File
 
-const val CHUNKS_AHEAD = 2
+const val CHUNKS_AHEAD = 3
 
 @Serializable
 class WorldLevel() : Level() {

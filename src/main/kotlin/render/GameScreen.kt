@@ -31,6 +31,8 @@ object GameScreen : KtxScreen {
             field = value
             updateSurfaceParams()
         }
+    private val zoomLevels = listOf(0.15, 0.17, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7)
+    private var zoomIndex = 3.0
 
     var width = 0
     var height = 0
@@ -122,7 +124,8 @@ object GameScreen : KtxScreen {
     }
 
     fun mouseScrolled(amount: Float) {
-        zoom = max(0.2, min(2.0, zoom - amount.toDouble() * 0.15))
+        zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.6))
+        zoom = zoomLevels[zoomIndex.toInt()]
     }
 
     fun mouseClicked(screenX: Int, screenY: Int): Boolean {

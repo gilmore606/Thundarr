@@ -19,11 +19,9 @@ class EnclosedLevel(
     private val visible = Array(width) { Array(height) { false } }
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
 
-    @Transient
-    override val stepMap = makeStepMap()
+    @Transient override val stepMap = makeStepMap()
 
-    @Transient
-    private val shadowCaster = ShadowCaster(
+    @Transient private val shadowCaster = ShadowCaster(
         { x, y -> isOpaqueAt(x, y) },
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )

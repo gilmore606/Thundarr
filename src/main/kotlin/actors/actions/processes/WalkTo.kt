@@ -13,6 +13,7 @@ class WalkTo(
     val y: Int
 ) : Action(1f) {
 
+    // TODO: use the level's step map, this is stupid
     private val stepMap = level.makeStepMap().apply { update(x, y) }
 
     private var done = false
