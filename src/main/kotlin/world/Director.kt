@@ -13,9 +13,9 @@ class Director {
     val actors: MutableList<Actor> = mutableListOf(WorldActor())
 
     // Place actor into the level.
-    fun add(actor: Actor, x: Int, y: Int) {
+    fun add(actor: Actor, x: Int, y: Int, level: Level) {
         attachActor(actor)
-        actor.moveTo(x, y)
+        actor.moveTo(level, x, y)
     }
 
     // Attach already-positioned actor in the level.  Used externally by loaded chunks.

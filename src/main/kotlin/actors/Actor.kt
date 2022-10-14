@@ -4,6 +4,7 @@ import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
+import world.Level
 
 @Serializable
 sealed class Actor(
@@ -20,9 +21,10 @@ sealed class Actor(
     // How many turns am I owed?
     var juice = 0f
 
-    open fun moveTo(x: Int, y: Int) {
+    open fun moveTo(level: Level, x: Int, y: Int) {
         this.xy.x = x
         this.xy.y = y
+        level.onActorMovedTo(this, x, y)
     }
 
     // What's my divider for action durations?

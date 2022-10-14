@@ -1,5 +1,6 @@
 package world
 
+import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
@@ -24,6 +25,7 @@ sealed class Level {
 
     @Transient protected lateinit var stepMap: StepMap
 
+    @Transient private val noThing = ArrayList<Thing>()
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -54,7 +56,7 @@ sealed class Level {
     ) {
         for (x in pov.x - RENDER_WIDTH/2 until pov.x + RENDER_WIDTH/2) {
             for (y in pov.y - RENDER_HEIGHT/2 until pov.y + RENDER_HEIGHT/2) {
-                val thingsAt = getThingsAt(x,y)
+                val thingsAt = thingsAt(x,y)
                 val vis = visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
@@ -91,6 +93,10 @@ sealed class Level {
         if (this == App.level) GameScreen.povMoved()
     }
 
+    fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
+        thingsAt(x, y).forEach { it.onWalkedOnBy(actor) }
+    }
+
     abstract fun makeStepMap(): StepMap
 
     open fun updateStepMap() { stepMap.update(this.pov.x, this.pov.y) }
@@ -99,7 +105,7 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: ArrayList()
+    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 

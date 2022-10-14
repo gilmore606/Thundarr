@@ -112,7 +112,7 @@ object App : KtxGame<Screen>() {
 
         player = Player()
         val playerStart = level.tempPlayerStart()
-        level.director.add(player, playerStart.x, playerStart.y)
+        level.director.add(player, playerStart.x, playerStart.y, level)
         turnTime = 0f
 
         ConsolePanel.say("You step tentatively into the apocalypse...")

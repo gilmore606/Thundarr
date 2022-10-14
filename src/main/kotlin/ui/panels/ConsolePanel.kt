@@ -13,6 +13,7 @@ object ConsolePanel : Panel() {
     }
 
     fun say(text: String) {
+        if (text == lines.last()) return
         lines.add(text)
         if (lines.size > maxLines) {
             lines.removeFirst()

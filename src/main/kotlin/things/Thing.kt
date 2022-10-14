@@ -1,7 +1,10 @@
 package things
 
+import actors.Actor
+import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.panels.ConsolePanel
 
 @Serializable
 class Thing(
@@ -12,4 +15,9 @@ class Thing(
 
     fun glyph() = glyph
 
+    fun onWalkedOnBy(actor: Actor) {
+        if (actor is Player) {
+            ConsolePanel.say("You hack through the underbrush.")
+        }
+    }
 }

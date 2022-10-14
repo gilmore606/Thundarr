@@ -36,7 +36,7 @@ class ConfirmModal(
     override fun drawText() {
         var iy = 24
         text.forEach { line ->
-            drawString(line, 24, iy)
+            drawString(line, 24, iy, GameScreen.fontColorBold)
             iy += 24
         }
         iy += 20

@@ -4,6 +4,7 @@ import App
 import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import world.Level
 
 @Serializable
 class Player : Actor(
@@ -12,8 +13,8 @@ class Player : Actor(
 ) {
     override fun defaultAction(): Action? = null
 
-    override fun moveTo(x: Int, y: Int) {
-        super.moveTo(x, y)
+    override fun moveTo( level: Level, x: Int, y: Int,) {
+        super.moveTo(level, x, y)
         App.level.setPov(x, y)
     }
 }

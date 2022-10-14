@@ -112,7 +112,7 @@ class WorldLevel() : Level() {
 
     override fun updateVisibility() {
         loadedChunks.forEach { it.clearVisibility() }
-        shadowCaster.cast(pov, 16f)
+        shadowCaster.cast(pov, 18f)
     }
 
     override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),

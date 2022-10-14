@@ -17,7 +17,7 @@ abstract class Panel {
     protected var width = 500
     protected var height = 500
 
-    private val shadowOffset = 8
+    private val shadowOffset = 10
     private val borderWidth = 2
 
     open fun onResize(width: Int, height: Int) { }
@@ -48,7 +48,7 @@ abstract class Panel {
     }
 
     protected fun drawBox(x: Int, y: Int, width: Int, height: Int) {
-        boxBatch.addPixelQuad(x+ shadowOffset, y + shadowOffset, x + width + shadowOffset, y + height + shadowOffset,
+        boxBatch.addPixelQuad(x+ shadowOffset, y + (shadowOffset * 1.2).toInt(), x + width + shadowOffset, y + height + shadowOffset,
             boxBatch.getTextureIndex(Glyph.BOX_SHADOW))
         boxBatch.addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
             boxBatch.getTextureIndex(Glyph.BOX_BORDER))

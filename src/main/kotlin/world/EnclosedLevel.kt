@@ -32,7 +32,7 @@ class EnclosedLevel(
 
     override fun updateVisibility() {
         chunk.clearVisibility()
-        shadowCaster.cast(pov, 12f)
+        shadowCaster.cast(pov, 14f)
     }
 
     override fun makeStepMap() = StepMap(width, height,
