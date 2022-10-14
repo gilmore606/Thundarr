@@ -4,6 +4,7 @@ import App.saveFileFolder
 import actors.Actor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
@@ -28,6 +29,11 @@ class Chunk(
     private val visible = Array(width) { Array(height) { false } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
+
+    @Transient
+    private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
+    @Transient
+    private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
 
     private val noThing = ArrayList<Thing>()
 
@@ -121,8 +127,14 @@ class Chunk(
     } else { false }
 
     fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
-        Terrain.get(terrains[x - this.x][y - this.y]).isWalkable()
+        walkableCache[x - this.x][y - this.y] ?: updateWalkable(x - this.x, y - this.y)
     } else { false }
+
+    private fun updateWalkable(x: Int, y: Int): Boolean {
+        val v = Terrain.get(terrains[x][y]).isWalkable()
+        walkableCache[x][y] = v
+        return v
+    }
 
     fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
         (if (seen[x - this.x][y - this.y]) 0.5f else 0f) +
@@ -130,8 +142,14 @@ class Chunk(
     } else { 0f }
 
     fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
-        Terrain.get(terrains[x - this.x][y - this.y]).isOpaque()
+        opaqueCache[x - this.x][y - this.y] ?: updateOpaque(x - this.x, y - this.y)
     } else { true }
+
+    private fun updateOpaque(x: Int, y: Int): Boolean {
+        val v = Terrain.get(terrains[x][y]).isOpaque()
+        opaqueCache[x][y] = v
+        return v
+    }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) {
         if (boundsCheck(x, y)) {

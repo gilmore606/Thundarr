@@ -101,8 +101,8 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        if (true) {
-            level = EnclosedLevel(70, 70)
+        if (false) {
+            level = EnclosedLevel(200, 200)
         } else {
             level = WorldLevel()
         }

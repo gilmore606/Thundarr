@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import util.StepMap
 import util.XY
 import world.cartos.RoomyMaze
-import world.cartos.TestCarto
 
 @Serializable
 class EnclosedLevel(
