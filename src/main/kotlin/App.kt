@@ -19,6 +19,7 @@ import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
+import world.Chunk
 import world.EnclosedLevel
 import world.Level
 import world.WorldLevel
@@ -112,7 +113,7 @@ object App : KtxGame<Screen>() {
         }
 
         File("$saveFileFolder/$saveFileName.json.gz").delete()
-        File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }?.forEach { it.delete() }
+        Chunk.allFiles()?.forEach { it.delete() }
 
         player = Player()
         val playerStart = level.tempPlayerStart()

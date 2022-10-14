@@ -21,6 +21,7 @@ class EnclosedLevel(
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
 
+
     private inline fun boundsCheck(x: Int, y: Int) = !(x < 0 || y < 0 || x >= width || y >= height)
 
     override fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -72,9 +73,11 @@ class EnclosedLevel(
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun makeStepMap() = StepMap(width, height) { x, y ->
-        isWalkableAt(x, y)
-    }
+    override fun makeStepMap() = StepMap(width, height,
+        { x, y -> isWalkableAt(x, y) },
+        { 0 },
+        { 0 }
+    )
 
     override fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 

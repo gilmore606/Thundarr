@@ -33,6 +33,12 @@ class Chunk(
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
 
+    companion object {
+        fun filepathAt(x: Int, y: Int) = saveFileFolder + "/chunk" + x.toString() + "x" + y.toString() + ".json.gz"
+        fun allFiles() = File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }
+    }
+
+    private fun filepath() = filepathAt(x, y)
 
     fun tempPlayerStart(): XY {
         var tries = 5000
@@ -75,7 +81,7 @@ class Chunk(
     fun unload(saveActors: Set<Actor>) {
         savedActors.addAll(saveActors)
         KtxAsync.launch {
-            File("$saveFileFolder/chunk$x=$y.json.gz").writeBytes(
+            File(filepath()).writeBytes(
                 Json.encodeToString(this@Chunk).gzipCompress()
             )
         }

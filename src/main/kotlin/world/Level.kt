@@ -29,6 +29,8 @@ sealed class Level {
     // Temporary
     abstract fun tempPlayerStart(): XY
 
+    open fun debugText(): String = ""
+
     // DoThis for all cells relevant to rendering the frame around the POV.
     fun forEachCellToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
@@ -110,7 +112,7 @@ sealed class Level {
 
     abstract fun isWalkableAt(x: Int, y: Int): Boolean
 
-    fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
+    fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
     abstract fun visibilityAt(x: Int, y: Int): Float
 

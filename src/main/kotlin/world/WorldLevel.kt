@@ -1,6 +1,5 @@
 package world
 
-import App.saveFileFolder
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
@@ -19,7 +18,6 @@ const val STEP_CHUNKS_AHEAD = 1
 class WorldLevel() : Level() {
 
     @Transient val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
-    @Transient val STEP_CHUNKS_WIDE = STEP_CHUNKS_AHEAD * 2 + 1
 
     @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk(1, 1) } }
 
@@ -33,6 +31,11 @@ class WorldLevel() : Level() {
         setPov(200, 200)
         loadedChunks.forEach { it.clearSeen() }
         return chunks[CHUNKS_AHEAD][CHUNKS_AHEAD].tempPlayerStart()
+    }
+
+    override fun debugText(): String {
+        val ourChunk = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]
+        return "chunk ${ourChunk.x}x${ourChunk.y}"
     }
 
     override fun onSetPov() {
@@ -79,18 +82,15 @@ class WorldLevel() : Level() {
         }
         loadedChunks.filter { !activeChunks.contains(it) }
             .map { unloadChunk(it) }
-
-        updateStepMapOrigin(stepMap)
     }
 
     private fun getChunkAt(x: Int, y: Int): Chunk =
         loadedChunks.firstOrNull { it.x == x && it.y == y } ?: loadChunkAt(x, y)
 
     private fun loadChunkAt(x: Int, y: Int): Chunk {
-        val filename = "$saveFileFolder/chunk$x=$y.json.gz"
+        val filename = Chunk.filepathAt(x, y)
         val chunk: Chunk
         if (File(filename).exists()) {
-            //log.info("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
             chunk.getSavedActors().forEach {
                 director.attachActor(it)
@@ -105,7 +105,6 @@ class WorldLevel() : Level() {
     }
 
     private fun unloadChunk(chunk: Chunk) {
-        // log.info("Unloading chunk at ${chunk.x} ${chunk.y}")
         chunk.unload(
             director.removeActorsInArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
         )
@@ -135,14 +134,11 @@ class WorldLevel() : Level() {
         shadowCaster.cast(pov, 12f)
     }
 
-    override fun makeStepMap() = StepMap(CHUNK_SIZE * STEP_CHUNKS_WIDE, CHUNK_SIZE * STEP_CHUNKS_WIDE) { x, y ->
-        isWalkableAt(x, y)
-    }.also { updateStepMapOrigin(it) }
-
-    private fun updateStepMapOrigin(map: StepMap) {
-        val offset = CHUNKS_AHEAD - STEP_CHUNKS_AHEAD
-        map.setOrigin(chunks[offset][offset].x, chunks[offset][offset].y)
-    }
+    override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),
+        { x, y -> isWalkableAt(x, y) },
+        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD].x },
+        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD].y }
+    )
 
     override fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 

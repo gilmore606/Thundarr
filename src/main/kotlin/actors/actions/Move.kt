@@ -11,7 +11,7 @@ class Move(
 ) : Action(1.0f) {
 
     override fun execute(actor: Actor, level: Level) {
-        if (level.isWalkableAt(actor.xy, dir)) {
+        if (level.isWalkableFrom(actor.xy, dir)) {
             actor.moveTo(actor.xy.x + dir.x, actor.xy.y + dir.y)
         } else {
             if (actor is Player) ConsolePanel.say("You bump into a wall.")
