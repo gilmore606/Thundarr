@@ -4,73 +4,97 @@ import App.saveFileFolder
 import actors.Actor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import things.Thing
-import util.Dice
-import util.XY
-import util.gzipCompress
+import util.*
 import world.cartos.PerlinCarto
 import world.terrains.Terrain
 import java.io.File
 
-const val CHUNK_SIZE = 64
 
 @Serializable
-class Chunk {
+class Chunk(
+    val width: Int, val height: Int
+) {
     var x: Int = -999
     var y: Int = -999
     private var x1: Int = -998
     private var y1: Int = -998
 
-    private val seen = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
-    private val visible = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { false } }
-    private val terrains = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { Terrain.Type.TERRAIN_BRICKWALL } }
-    private val things = Array(CHUNK_SIZE) { Array<MutableList<Thing>>(CHUNK_SIZE) { mutableListOf() } }
+    private val seen = Array(width) { Array(height) { false } }
+    private val visible = Array(width) { Array(height) { false } }
+    private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
+    private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
 
-    private val noThing = ArrayList<Thing>()
+    @Transient
+    private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
+    @Transient
+    private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
 
+    companion object {
+        fun filepathAt(x: Int, y: Int) = saveFileFolder + "/chunk" + x.toString() + "x" + y.toString() + ".json.gz"
+        fun allFiles() = File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }
+    }
+
+    private fun filepath() = filepathAt(x, y)
 
     fun tempPlayerStart(): XY {
         var tries = 5000
         while (tries > 0) {
-            val x = Dice.range(x, x + CHUNK_SIZE - 1)
-            val y = Dice.range(y, y + CHUNK_SIZE - 1)
+            val x = Dice.range(x, x + width - 1)
+            val y = Dice.range(y, y + height - 1)
             if (isWalkableAt(x, y)) return XY(x,y)
             tries--
         }
         throw RuntimeException("No space to put player in level!")
     }
 
-    fun generateAtLocation(x: Int, y: Int) {
+    fun generateWorldAt(x: Int, y: Int) {
         this.x = x
         this.y = y
-        this.x1 = x + CHUNK_SIZE - 1
-        this.y1 = y + CHUNK_SIZE - 1
+        this.x1 = x + width - 1
+        this.y1 = y + height - 1
 
-        PerlinCarto.carveLevel(x, y, x + CHUNK_SIZE - 1, y + CHUNK_SIZE - 1, { ix, iy ->
+        PerlinCarto.carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
             getTerrain(ix, iy)
         }, { ix, iy, type ->
             setTerrain(ix, iy, type)
         })
 
-        repeat (20) {
-            things[Dice.zeroTil(CHUNK_SIZE)][Dice.zeroTil(CHUNK_SIZE)].add(
-                Thing(
-                    Glyph.TREE, true, true
-                )
-            )
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                if (isWalkableAt(x + this.x, y + this.y)) {
+                    val n = Perlin.noise(x * 0.02, y * 0.02, 0.01)
+                    if (Dice.chance(n.toFloat() * 2.5f)) {
+                        things[x][y].add(Thing(
+                            Glyph.TREE,
+                            true, true
+                        ))
+                    }
+                }
+            }
         }
+    }
+
+    fun generateLevel(doGenerate: (Chunk)->Unit): Chunk {
+        this.x = 0
+        this.y = 0
+        this.x1 = width - 1
+        this.y1 = height - 1
+        doGenerate(this)
+        return this
     }
 
     fun unload(saveActors: Set<Actor>) {
         savedActors.addAll(saveActors)
         KtxAsync.launch {
-            File("$saveFileFolder/chunk$x=$y.json.gz").writeBytes(
+            File(filepath()).writeBytes(
                 Json.encodeToString(this@Chunk).gzipCompress()
             )
         }
@@ -82,7 +106,7 @@ class Chunk {
 
     fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
-    } else { noThing }
+    } else { ArrayList() }
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
@@ -101,17 +125,29 @@ class Chunk {
     } else { false }
 
     fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
-        Terrain.get(terrains[x - this.x][y - this.y]).isWalkable()
+        walkableCache[x - this.x][y - this.y] ?: updateWalkable(x - this.x, y - this.y)
     } else { false }
 
+    private fun updateWalkable(x: Int, y: Int): Boolean {
+        val v = Terrain.get(terrains[x][y]).isWalkable()
+        walkableCache[x][y] = v
+        return v
+    }
+
     fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
-        (if (seen[x - this.x][y - this.y]) 0.6f else 0f) +
-                (if (visible[x - this.x][y - this.y]) 0.4f else 0f)
+        (if (seen[x - this.x][y - this.y]) 0.5f else 0f) +
+                (if (visible[x - this.x][y - this.y]) 0.5f else 0f)
     } else { 0f }
 
     fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
-        Terrain.get(terrains[x - this.x][y - this.y]).isOpaque()
+        opaqueCache[x - this.x][y - this.y] ?: updateOpaque(x - this.x, y - this.y)
     } else { true }
+
+    private fun updateOpaque(x: Int, y: Int): Boolean {
+        val v = Terrain.get(terrains[x][y]).isOpaque()
+        opaqueCache[x][y] = v
+        return v
+    }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) {
         if (boundsCheck(x, y)) {
@@ -121,16 +157,16 @@ class Chunk {
     }
 
     fun clearVisibility() {
-        for (x in 0 until CHUNK_SIZE) {
-            for (y in 0 until CHUNK_SIZE) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
                 visible[x][y] = false
             }
         }
     }
 
     fun clearSeen() {
-        for (x in 0 until CHUNK_SIZE) {
-            for (y in 0 until CHUNK_SIZE) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
                 seen[x][y] = false
             }
         }

@@ -21,6 +21,7 @@ object StatusPanel : Panel() {
     override fun drawText() {
         drawString("x: ${App.player.xy.x} y: ${App.player.xy.y}", 0, 0)
         drawString("turn ${App.turnTime.toInt()}", 0, 20)
+        drawString(App.level.debugText(), 0, 40)
     }
 
 }

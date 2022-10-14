@@ -4,7 +4,7 @@ import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 import render.tileholders.WallTile
 
-fun DungeonTileSet() =
+fun TerrainTileSet() =
     TileSet("tiles_dungeon.png", 10, 10).apply {
 
         setTile(Glyph.FLOOR, VariantsTile(this).apply {

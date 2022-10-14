@@ -61,7 +61,7 @@ class QuadBatch(
         val y0 = row.toDouble() * stride - (stride * 0.5)
         val lightR = if (visibility < 1f) visibility else 1f
         val lightG = if (visibility < 1f) visibility else 1f
-        val lightB = if (visibility < 1f) visibility else 0f
+        val lightB = if (visibility < 1f) visibility else 1f
         addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB)
     }
 

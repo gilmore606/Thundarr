@@ -19,6 +19,7 @@ import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
+import world.Chunk
 import world.EnclosedLevel
 import world.Level
 import world.WorldLevel
@@ -66,7 +67,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun setupLog() {
-        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG")
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO")
         System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_DATE_TIME_KEY, "true")
         System.setProperty(org.slf4j.simple.SimpleLogger.DATE_TIME_FORMAT_KEY, "hh:mm:ss.SSS")
         System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_LOG_NAME_KEY, "false")
@@ -101,18 +102,13 @@ object App : KtxGame<Screen>() {
 
     private fun createNewWorld() {
         if (false) {
-            level = EnclosedLevel(70, 70)
-            RoomyMaze.carveLevel(0, 0, 69, 69, { x, y ->
-                level.getTerrain(x, y)
-            }, { x, y, type ->
-                level.setTerrain(x, y, type)
-            })
+            level = EnclosedLevel(200, 200)
         } else {
             level = WorldLevel()
         }
 
         File("$saveFileFolder/$saveFileName.json.gz").delete()
-        File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }?.forEach { it.delete() }
+        Chunk.allFiles()?.forEach { it.delete() }
 
         player = Player()
         val playerStart = level.tempPlayerStart()

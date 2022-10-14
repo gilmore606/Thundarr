@@ -1,6 +1,7 @@
 package world
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
@@ -16,10 +17,20 @@ sealed class Level {
 
     val director = Director()
 
-    abstract val stepMap: StepMap
+    @Transient protected val shadowCaster = ShadowCaster(
+        { x, y -> isOpaqueAt(x, y) },
+        { x, y, vis -> setTileVisibility(x, y, vis) }
+    )
+
+    @Transient protected lateinit var stepMap: StepMap
+
 
     // Temporary
     abstract fun tempPlayerStart(): XY
+
+    open fun debugText(): String = ""
+
+    abstract fun chunkAt(x: Int, y: Int): Chunk?
 
     // DoThis for all cells relevant to rendering the frame around the POV.
     fun forEachCellToRender(
@@ -39,14 +50,15 @@ sealed class Level {
     }
 
     fun forEachThingToRender(
-        doThis: (x: Int, y: Int, glyph: Glyph) -> Unit
+        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     ) {
         for (x in pov.x - RENDER_WIDTH/2 until pov.x + RENDER_WIDTH/2) {
             for (y in pov.y - RENDER_HEIGHT/2 until pov.y + RENDER_HEIGHT/2) {
                 val thingsAt = getThingsAt(x,y)
-                if (thingsAt.isNotEmpty() && visibilityAt(x,y) == 1f) {
+                val vis = visibilityAt(x, y)
+                if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
-                        x, y,
+                        x, y, vis,
                         thingsAt[0].glyph()
                     )
                 }
@@ -87,27 +99,27 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    abstract fun getThingsAt(x: Int, y: Int): List<Thing>
+    fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: ArrayList()
 
-    abstract fun getTerrain(x: Int, y: Int): Terrain.Type
+    fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
-    abstract fun setTerrain(x: Int, y: Int, type: Terrain.Type)
+    fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
-    abstract fun getGlyph(x: Int, y: Int): Glyph
+    fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.FLOOR
 
-    abstract fun getPathToPOV(from: XY): List<XY>
+    fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
-    abstract fun isSeenAt(x: Int, y: Int): Boolean
+    fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
 
-    abstract fun isWalkableAt(x: Int, y: Int): Boolean
+    fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
-    fun isWalkableAt(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
+    fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
-    abstract fun visibilityAt(x: Int, y: Int): Float
+    fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
-    abstract fun isOpaqueAt(x: Int, y: Int): Boolean
+    fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     abstract fun updateVisibility()
 
-    abstract fun setTileVisibility(x: Int, y: Int, vis: Boolean)
+    fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 }
