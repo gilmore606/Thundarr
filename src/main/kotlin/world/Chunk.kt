@@ -72,9 +72,9 @@ class Chunk(
                 if (isWalkableAt(x + this.x, y + this.y)) {
                     val n = Perlin.noise(x * 0.02, y * 0.02, 0.01)
                     if (Dice.chance(n.toFloat() * 2.5f)) {
-                        things[x][y].add(Thing(
+                        addThingAt(x, y, Thing(
                             Glyph.TREE,
-                            true, true
+                            true, false
                         ))
                     }
                 }
@@ -104,6 +104,12 @@ class Chunk(
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
+    fun addThingAt(x: Int, y: Int, thing: Thing) {
+        things[x][y].add(thing)
+        updateOpaque(x, y)
+        updateWalkable(x, y)
+    }
+
     fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
     } else { ArrayList() }
@@ -129,7 +135,14 @@ class Chunk(
     } else { false }
 
     private fun updateWalkable(x: Int, y: Int): Boolean {
-        val v = Terrain.get(terrains[x][y]).isWalkable()
+        var v = Terrain.get(terrains[x][y]).isWalkable()
+        if (!v) {
+            var thingBlocking = false
+            things[x][y].forEach { thing ->
+                thingBlocking = thingBlocking || thing.isBlocking
+            }
+            v = thingBlocking
+        }
         walkableCache[x][y] = v
         return v
     }
@@ -144,7 +157,14 @@ class Chunk(
     } else { true }
 
     private fun updateOpaque(x: Int, y: Int): Boolean {
-        val v = Terrain.get(terrains[x][y]).isOpaque()
+        var v = Terrain.get(terrains[x][y]).isOpaque()
+        if (!v) {
+            var thingBlocking = false
+            things[x][y].forEach { thing ->
+                thingBlocking = thingBlocking || thing.isOpaque
+            }
+            v = thingBlocking
+        }
         opaqueCache[x][y] = v
         return v
     }
