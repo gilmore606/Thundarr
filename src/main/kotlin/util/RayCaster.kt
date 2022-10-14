@@ -3,7 +3,7 @@ package util
 import java.lang.RuntimeException
 
 
-class ShadowCaster() {
+class RayCaster() {
 
     class Shadow {
         var start = 0f

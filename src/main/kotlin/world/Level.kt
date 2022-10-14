@@ -19,7 +19,7 @@ sealed class Level {
 
     val director = Director()
 
-    @Transient protected val shadowCaster = ShadowCaster()
+    @Transient protected val shadowCaster = RayCaster()
 
     @Transient protected lateinit var stepMap: StepMap
 
@@ -108,6 +108,8 @@ sealed class Level {
     open fun onRestore() { }
 
     fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
+
+    fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 

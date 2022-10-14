@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import ktx.app.KtxInputAdapter
 import ktx.async.KtxAsync
 import render.GameScreen
+import render.tilesets.Glyph
+import things.Thing
 import ui.modals.EscMenu
 import util.*
 
@@ -64,6 +66,10 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
 
             Input.Keys.F1 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
+            Input.Keys.F2 -> { App.level.addThingAt(App.player.xy.x, App.player.xy.y, Thing(
+                    Glyph.LIGHTBULB, false, false
+                ).apply { light = LightColor(1f, 1f, 0.4f) }
+            )}
         }
     }
 }

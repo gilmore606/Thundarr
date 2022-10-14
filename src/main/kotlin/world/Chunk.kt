@@ -15,6 +15,7 @@ import util.*
 import world.cartos.PerlinCarto
 import world.terrains.Terrain
 import java.io.File
+import java.lang.Float.min
 
 
 @Serializable
@@ -44,7 +45,7 @@ class Chunk(
     @Transient
     private val lightDirty = Array(width) { Array(height) { true } }
     @Transient
-    private val lightCaster = ShadowCaster()
+    private val lightCaster = RayCaster()
 
     @Transient
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
@@ -97,7 +98,7 @@ class Chunk(
                 if (isWalkableAt(x + this.x, y + this.y)) {
                     val n = Perlin.noise(x * 0.02, y * 0.02, 0.01)
                     if (Dice.chance(n.toFloat() * 2.5f)) {
-                        addThingAt(x, y, Thing(
+                        addThingAt(x + this.x, y + this.y, Thing(
                             Glyph.TREE,
                             true, false
                         ))
@@ -131,14 +132,14 @@ class Chunk(
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
     fun addThingAt(x: Int, y: Int, thing: Thing) {
-        things[x][y].add(thing)
-        updateOpaque(x, y)
-        updateWalkable(x, y)
-        thing.light()?.also { addLightSource(XY(x,y), thing) }
+        things[x - this.x][y - this.y].add(thing)
+        updateOpaque(x - this.x, y - this.y)
+        updateWalkable(x - this.x, y - this.y)
+        thing.light()?.also { addLightSource(XY(x, y), thing) }
     }
 
     fun removeThingAt(x: Int, y: Int, thing: Thing) {
-        things[x][y].remove(thing)
+        things[x - this.x][y - this.y].remove(thing)
         updateOpaque(x, y)
         updateWalkable(x, y)
         thing.light()?.also { removeLightSource(thing) }
@@ -267,10 +268,10 @@ class Chunk(
         light[x][y].r = ambient.r
         light[x][y].g = ambient.g
         light[x][y].b = ambient.b
-        lights[x][y].forEach { (lightSource, color) ->
-            light[x][y].r += color.r
-            light[x][y].g += color.g
-            light[x][y].b += color.b
+        lights[x][y].forEach { (_, color) ->
+            light[x][y].r = min(1f, light[x][y].r + color.r)
+            light[x][y].g = min(1f, light[x][y].g + color.g)
+            light[x][y].b = min(1f, light[x][y].b + color.b)
         }
         lightDirty[x][y] = false
     }

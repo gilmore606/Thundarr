@@ -251,7 +251,7 @@ object GameScreen : KtxScreen {
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
         tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01f) * zoom
-        log.info("Surface params updated to $width x $height (ratio $aspectRatio tileStride $tileStride)")
+        log.debug("Surface params updated to $width x $height (ratio $aspectRatio tileStride $tileStride)")
     }
 
     override fun dispose() {
