@@ -18,10 +18,7 @@ sealed class Level {
 
     val director = Director()
 
-    @Transient protected val shadowCaster = ShadowCaster(
-        { x, y -> isOpaqueAt(x, y) },
-        { x, y, vis -> setTileVisibility(x, y, vis) }
-    )
+    @Transient protected val shadowCaster = ShadowCaster()
 
     @Transient protected lateinit var stepMap: StepMap
 
@@ -33,6 +30,8 @@ sealed class Level {
     open fun debugText(): String = ""
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
+
+    private val ambientLight = LightColor(0.1f, 0.1f, 0.7f)
 
     // DoThis for all cells relevant to rendering the frame around the POV.
     fun forEachCellToRender(
@@ -125,7 +124,24 @@ sealed class Level {
 
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
-    abstract fun updateVisibility()
+    fun updateVisibility() {
+        clearVisibility()
+        shadowCaster.castVisibility(pov, 18f, { x, y ->
+            isOpaqueAt(x, y)
+        }, { x, y, vis ->
+            setTileVisibility(x, y, vis)
+        })
+    }
+
+    abstract fun clearVisibility()
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
+
+    fun receiveLight(x: Int, y: Int, thing: Thing, r: Float, g: Float, b: Float) =
+        chunkAt(x,y)?.receiveLight(x, y, thing, r, g, b)
+
+    fun ambientLight() = ambientLight
+
+    fun lightAt(x: Int, y: Int) = chunkAt(x,y)?.lightAt(x,y) ?: ambientLight
+
 }

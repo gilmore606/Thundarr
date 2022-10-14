@@ -12,6 +12,7 @@ class EnclosedLevel(
     ) : Level() {
 
     private val chunk = Chunk(width, height).generateLevel {
+        it.level = this
         RoomyMaze.carveLevel(0, 0, width - 1, height - 1, { x, y ->
             it.getTerrain(x, y)
         }, { x, y, type ->
@@ -30,9 +31,8 @@ class EnclosedLevel(
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null
 
-    override fun updateVisibility() {
+    override fun clearVisibility() {
         chunk.clearVisibility()
-        shadowCaster.cast(pov, 14f)
     }
 
     override fun makeStepMap() = StepMap(width, height,

@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 inline fun <T> Iterable<T>.hasOneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return true
@@ -27,6 +29,9 @@ fun ByteArray.gzipDecompress(): String {
     lateinit var string: String
     GZIPInputStream(bais).bufferedReader(Charsets.UTF_8).use { return it.readText() }
 }
+
+fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
+    sqrt((x1-x0).toFloat().pow(2) + (y1-y0).toFloat().pow(2))
 
 val log = KotlinLogging.logger {}
 

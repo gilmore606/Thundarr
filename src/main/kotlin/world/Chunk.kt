@@ -30,12 +30,25 @@ class Chunk(
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
 
+    private val savedActors: MutableSet<Actor> = mutableSetOf()
+
+    @Transient
+    lateinit var level: Level
+
+    @Transient
+    private val lights = Array(width) { Array(height) { mutableMapOf<Thing, LightColor>() } }
+    @Transient
+    private val light = Array(width) { Array(height) { LightColor(0f, 0f, 0f) } }
+    @Transient
+    private val lightDirty = Array(width) { Array(height) { true } }
+    @Transient
+    private val lightCaster = ShadowCaster()
+
     @Transient
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
     @Transient
     private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
 
-    private val savedActors: MutableSet<Actor> = mutableSetOf()
 
     companion object {
         fun filepathAt(x: Int, y: Int) = saveFileFolder + "/chunk" + x.toString() + "x" + y.toString() + ".json.gz"
@@ -108,6 +121,7 @@ class Chunk(
         things[x][y].add(thing)
         updateOpaque(x, y)
         updateWalkable(x, y)
+        thing.light()?.also { addLight(x, y, thing) }
     }
 
     fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -190,5 +204,53 @@ class Chunk(
                 seen[x][y] = false
             }
         }
+    }
+
+    // Project light from location into all nearby cells.
+    fun addLight(x: Int, y: Int, thing: Thing) {
+        thing.light()?.also { lightColor ->
+            lightCaster.castLight(x, y, lightColor, { x, y ->
+                level.isOpaqueAt(x, y)
+            }, { x, y, r, g, b ->
+                level.receiveLight(x, y, thing, r, g, b)
+            })
+        }
+    }
+
+    // Receive projected light from a source and save it in cache.
+    fun receiveLight(x: Int, y: Int, thing: Thing, r: Float, g: Float, b: Float) {
+        if (boundsCheck(x, y)) {
+            lightDirty[x - this.x][y - this.y] = true
+            if (lights[x - this.x][y - this.y].contains(thing)) {
+                lights[x - this.x][y - this.y][thing]?.r = r
+                lights[x - this.x][y - this.y][thing]?.g = g
+                lights[x - this.x][y - this.y][thing]?.b = b
+            } else {
+                lights[x - this.x][y - this.y][thing] = LightColor(r, g, b)
+            }
+        }
+    }
+
+    fun lightAt(x: Int, y: Int): LightColor {
+        if (boundsCheck(x, y)) {
+            if (lightDirty[x - this.x][y - this.y]) {
+                refreshLightAt(x - this.x, y - this.y)
+            }
+            return light[x - this.x][y - this.y]
+        }
+        return level.ambientLight()
+    }
+
+    private fun refreshLightAt(x: Int, y: Int) {
+        val ambient = level.ambientLight()
+        light[x][y].r = ambient.r
+        light[x][y].g = ambient.g
+        light[x][y].b = ambient.b
+        lights[x][y].forEach { lightObject, color ->
+            light[x][y].r += color.r
+            light[x][y].g += color.g
+            light[x][y].b += color.b
+        }
+        lightDirty[x][y] = false
     }
 }

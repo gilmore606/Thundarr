@@ -43,6 +43,7 @@ class WorldLevel() : Level() {
     }
 
     override fun onRestore() {
+        loadedChunks.forEach { it.level = this }
         populateChunks()
         updateStepMap()
     }
@@ -91,12 +92,14 @@ class WorldLevel() : Level() {
         if (File(filename).exists()) {
             log.debug("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
+            chunk.level = this
             chunk.getSavedActors().forEach {
                 director.attachActor(it)
             }
         } else {
             log.debug("Creating chunk at $x $y")
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
+            chunk.level = this
             chunk.generateWorldAt(x, y)
         }
         loadedChunks.add(chunk)
@@ -110,9 +113,8 @@ class WorldLevel() : Level() {
         loadedChunks.remove(chunk)
     }
 
-    override fun updateVisibility() {
+    override fun clearVisibility() {
         loadedChunks.forEach { it.clearVisibility() }
-        shadowCaster.cast(pov, 18f)
     }
 
     override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),
