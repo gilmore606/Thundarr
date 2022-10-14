@@ -101,13 +101,8 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        if (false) {
+        if (true) {
             level = EnclosedLevel(70, 70)
-            RoomyMaze.carveLevel(0, 0, 69, 69, { x, y ->
-                level.getTerrain(x, y)
-            }, { x, y, type ->
-                level.setTerrain(x, y, type)
-            })
         } else {
             level = WorldLevel()
         }

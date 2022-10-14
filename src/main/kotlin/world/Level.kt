@@ -22,7 +22,7 @@ sealed class Level {
         { x, y, vis -> setTileVisibility(x, y, vis) }
     )
 
-    @Transient protected val stepMap = makeStepMap()
+    @Transient protected lateinit var stepMap: StepMap
 
     protected val noThing = ArrayList<Thing>()
 
@@ -30,6 +30,8 @@ sealed class Level {
     abstract fun tempPlayerStart(): XY
 
     open fun debugText(): String = ""
+
+    abstract fun chunkAt(x: Int, y: Int): Chunk?
 
     // DoThis for all cells relevant to rendering the frame around the POV.
     fun forEachCellToRender(
@@ -98,27 +100,27 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    abstract fun getThingsAt(x: Int, y: Int): List<Thing>
+    fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
 
-    abstract fun getTerrain(x: Int, y: Int): Terrain.Type
+    fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
-    abstract fun setTerrain(x: Int, y: Int, type: Terrain.Type)
+    fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
-    abstract fun getGlyph(x: Int, y: Int): Glyph
+    fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.FLOOR
 
-    abstract fun getPathToPOV(from: XY): List<XY>
+    fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
-    abstract fun isSeenAt(x: Int, y: Int): Boolean
+    fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
 
-    abstract fun isWalkableAt(x: Int, y: Int): Boolean
+    fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
     fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
 
-    abstract fun visibilityAt(x: Int, y: Int): Float
+    fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
-    abstract fun isOpaqueAt(x: Int, y: Int): Boolean
+    fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     abstract fun updateVisibility()
 
-    abstract fun setTileVisibility(x: Int, y: Int, vis: Boolean)
+    fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 }

@@ -51,7 +51,7 @@ class Chunk(
         throw RuntimeException("No space to put player in level!")
     }
 
-    fun generateAtLocation(x: Int, y: Int) {
+    fun generateWorldAt(x: Int, y: Int) {
         this.x = x
         this.y = y
         this.x1 = x + width - 1
@@ -76,6 +76,15 @@ class Chunk(
                 }
             }
         }
+    }
+
+    fun generateLevel(doGenerate: (Chunk)->Unit): Chunk {
+        this.x = 0
+        this.y = 0
+        this.x1 = width - 1
+        this.y1 = height - 1
+        doGenerate(this)
+        return this
     }
 
     fun unload(saveActors: Set<Actor>) {
