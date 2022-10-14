@@ -35,8 +35,6 @@ class Chunk(
     @Transient
     private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
 
-    private val noThing = ArrayList<Thing>()
-
     private val savedActors: MutableSet<Actor> = mutableSetOf()
 
     companion object {
@@ -108,7 +106,7 @@ class Chunk(
 
     fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
-    } else { noThing }
+    } else { ArrayList() }
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]

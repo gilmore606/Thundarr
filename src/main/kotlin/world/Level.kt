@@ -24,7 +24,6 @@ sealed class Level {
 
     @Transient protected lateinit var stepMap: StepMap
 
-    protected val noThing = ArrayList<Thing>()
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -100,7 +99,7 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
+    fun getThingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: ArrayList()
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
