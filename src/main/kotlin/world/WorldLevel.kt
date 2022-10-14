@@ -11,29 +11,21 @@ import util.*
 import world.terrains.Terrain
 import java.io.File
 
+const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
+const val STEP_CHUNKS_AHEAD = 1
 
 @Serializable
 class WorldLevel() : Level() {
 
     @Transient val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
-    @Transient val STEP_CHUNKS_AHEAD = 1
     @Transient val STEP_CHUNKS_WIDE = STEP_CHUNKS_AHEAD * 2 + 1
 
-    @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk() } }
+    @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk(1, 1) } }
 
     private val loadedChunks = mutableSetOf<Chunk>()
 
-    @Transient override val stepMap = makeStepMap()
-
-    @Transient private val shadowCaster = ShadowCaster(
-        { x, y -> isOpaqueAt(x, y) },
-        { x, y, vis -> setTileVisibility(x, y, vis) }
-    )
-
     @Transient private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
-
-    private val noThing = ArrayList<Thing>()
 
 
     // Temporary
@@ -105,7 +97,7 @@ class WorldLevel() : Level() {
             }
         } else {
             log.info("Creating chunk at $x $y")
-            chunk = Chunk()
+            chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
             chunk.generateAtLocation(x, y)
         }
         loadedChunks.add(chunk)

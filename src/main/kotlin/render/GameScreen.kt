@@ -38,7 +38,7 @@ object GameScreen : KtxScreen {
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
 
-    private val dungeonBatch = QuadBatch(tileVertShader(), tileFragShader(), DungeonTileSet())
+    private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), TerrainTileSet())
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
     private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
@@ -173,7 +173,7 @@ object GameScreen : KtxScreen {
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL_BLEND)
 
-        dungeonBatch.apply {
+        terrainBatch.apply {
             clear()
             App.level.forEachCellToRender { tx, ty, vis, glyph ->
                 val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
@@ -185,19 +185,19 @@ object GameScreen : KtxScreen {
             draw()
         }
 
-        mobBatch.apply {
+        thingBatch.apply {
             clear()
-            App.level.forEachActorToRender { tx, ty, glyph ->
+            App.level.forEachThingToRender { tx, ty, vis, glyph ->
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
-                    getTextureIndex(glyph), 1f, aspectRatio)
+                    getTextureIndex(glyph), vis, aspectRatio)
             }
             draw()
         }
 
-        thingBatch.apply {
+        mobBatch.apply {
             clear()
-            App.level.forEachThingToRender { tx, ty, glyph ->
+            App.level.forEachActorToRender { tx, ty, glyph ->
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
                     getTextureIndex(glyph), 1f, aspectRatio)
@@ -243,7 +243,7 @@ object GameScreen : KtxScreen {
     }
 
     override fun dispose() {
-        dungeonBatch.dispose()
+        terrainBatch.dispose()
         mobBatch.dispose()
         uiBatch.dispose()
     }

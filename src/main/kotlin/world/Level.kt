@@ -1,6 +1,7 @@
 package world
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
@@ -16,7 +17,14 @@ sealed class Level {
 
     val director = Director()
 
-    abstract val stepMap: StepMap
+    @Transient protected val shadowCaster = ShadowCaster(
+        { x, y -> isOpaqueAt(x, y) },
+        { x, y, vis -> setTileVisibility(x, y, vis) }
+    )
+
+    @Transient protected val stepMap = makeStepMap()
+
+    protected val noThing = ArrayList<Thing>()
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -39,14 +47,15 @@ sealed class Level {
     }
 
     fun forEachThingToRender(
-        doThis: (x: Int, y: Int, glyph: Glyph) -> Unit
+        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     ) {
         for (x in pov.x - RENDER_WIDTH/2 until pov.x + RENDER_WIDTH/2) {
             for (y in pov.y - RENDER_HEIGHT/2 until pov.y + RENDER_HEIGHT/2) {
                 val thingsAt = getThingsAt(x,y)
-                if (thingsAt.isNotEmpty() && visibilityAt(x,y) == 1f) {
+                val vis = visibilityAt(x, y)
+                if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
-                        x, y,
+                        x, y, vis,
                         thingsAt[0].glyph()
                     )
                 }

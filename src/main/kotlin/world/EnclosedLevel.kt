@@ -21,16 +21,6 @@ class EnclosedLevel(
     private val terrains: Array<Array<Terrain.Type>> = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
 
-    private val noThing = ArrayList<Thing>()
-
-    @Transient override val stepMap = makeStepMap()
-
-    @Transient private val shadowCaster = ShadowCaster(
-        { x, y -> isOpaqueAt(x, y) },
-        { x, y, vis -> setTileVisibility(x, y, vis) }
-    )
-
-
     private inline fun boundsCheck(x: Int, y: Int) = !(x < 0 || y < 0 || x >= width || y >= height)
 
     override fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
