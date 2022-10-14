@@ -15,6 +15,7 @@ import render.shaders.tileVertShader
 import render.tilesets.*
 import ui.panels.Panel
 import ui.modals.Modal
+import util.LightColor
 import util.XY
 import util.log
 import java.lang.Double.max
@@ -44,6 +45,8 @@ object GameScreen : KtxScreen {
     private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
+    private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
+    private val fullLight = LightColor(1f, 1f, 1f)
 
     const val fontSize = 16
     const val titleFontSize = 24
@@ -175,12 +178,17 @@ object GameScreen : KtxScreen {
 
         terrainBatch.apply {
             clear()
-            App.level.forEachCellToRender { tx, ty, vis, glyph ->
+            App.level.forEachCellToRender { tx, ty, vis, glyph, light ->
                 val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
-                    textureIndex, vis, aspectRatio
+                    textureIndex, vis, light, aspectRatio
                 )
+                val lx = tx - pov.x + RENDER_WIDTH
+                val ly = ty - pov.y + RENDER_HEIGHT
+                lightCache[lx][ly].r = light.r
+                lightCache[lx][ly].g = light.g
+                lightCache[lx][ly].b = light.b
             }
             draw()
         }
@@ -188,9 +196,11 @@ object GameScreen : KtxScreen {
         thingBatch.apply {
             clear()
             App.level.forEachThingToRender { tx, ty, vis, glyph ->
+                val lx = tx - pov.x + RENDER_WIDTH
+                val ly = ty - pov.y + RENDER_HEIGHT
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
-                    getTextureIndex(glyph), vis, aspectRatio)
+                    getTextureIndex(glyph), vis, lightCache[lx][ly], aspectRatio)
             }
             draw()
         }
@@ -198,9 +208,11 @@ object GameScreen : KtxScreen {
         mobBatch.apply {
             clear()
             App.level.forEachActorToRender { tx, ty, glyph ->
+                val lx = tx - pov.x + RENDER_WIDTH
+                val ly = ty - pov.y + RENDER_HEIGHT
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
-                    getTextureIndex(glyph), 1f, aspectRatio)
+                    getTextureIndex(glyph), 1f, lightCache[lx][ly], aspectRatio)
             }
             draw()
         }
@@ -209,10 +221,10 @@ object GameScreen : KtxScreen {
             clear()
             cursorPosition?.also { cursorPosition ->
                 addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
-                    getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
+                    getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
                 cursorLine.forEach { xy ->
                     addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
-                        getTextureIndex(Glyph.CURSOR), 1f, aspectRatio)
+                        getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
                 }
             }
             panels.forEach { panel ->

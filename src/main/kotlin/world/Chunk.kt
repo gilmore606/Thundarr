@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
+import things.LightSource
 import things.Thing
 import util.*
 import world.cartos.PerlinCarto
@@ -31,12 +32,13 @@ class Chunk(
     private val things = Array(width) { Array<MutableList<Thing>>(height) { mutableListOf() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
+    private val lightSources = mutableMapOf<LightSource,XY>()
 
     @Transient
     lateinit var level: Level
 
     @Transient
-    private val lights = Array(width) { Array(height) { mutableMapOf<Thing, LightColor>() } }
+    private val lights = Array(width) { Array(height) { mutableMapOf<LightSource, LightColor>() } }
     @Transient
     private val light = Array(width) { Array(height) { LightColor(0f, 0f, 0f) } }
     @Transient
@@ -57,6 +59,15 @@ class Chunk(
 
     private fun filepath() = filepathAt(x, y)
 
+    fun onCreate(level: Level, x: Int, y: Int) {
+        this.level = level
+        this.x = x
+        this.y = y
+        this.x1 = x + width - 1
+        this.y1 = y + height - 1
+        generateWorld()
+    }
+
     fun tempPlayerStart(): XY {
         var tries = 5000
         while (tries > 0) {
@@ -68,12 +79,13 @@ class Chunk(
         throw RuntimeException("No space to put player in level!")
     }
 
-    fun generateWorldAt(x: Int, y: Int) {
-        this.x = x
-        this.y = y
-        this.x1 = x + width - 1
-        this.y1 = y + height - 1
+    fun onReload(level: Level) {
+        this.level = level
+        savedActors.forEach { actor -> level.director.attachActor(actor) }
+        lightSources.forEach { (lightSource, xy) -> addLightSource(xy, lightSource) }
+    }
 
+    private fun generateWorld() {
         PerlinCarto.carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
             getTerrain(ix, iy)
         }, { ix, iy, type ->
@@ -106,6 +118,9 @@ class Chunk(
 
     fun unload(saveActors: Set<Actor>) {
         savedActors.addAll(saveActors)
+
+        lightSources.forEach { (lightSource, xy) -> level.removeLightSource(lightSource) }
+
         KtxAsync.launch {
             File(filepath()).writeBytes(
                 Json.encodeToString(this@Chunk).gzipCompress()
@@ -113,15 +128,20 @@ class Chunk(
         }
     }
 
-    fun getSavedActors() = savedActors
-
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
     fun addThingAt(x: Int, y: Int, thing: Thing) {
         things[x][y].add(thing)
         updateOpaque(x, y)
         updateWalkable(x, y)
-        thing.light()?.also { addLight(x, y, thing) }
+        thing.light()?.also { addLightSource(XY(x,y), thing) }
+    }
+
+    fun removeThingAt(x: Int, y: Int, thing: Thing) {
+        things[x][y].remove(thing)
+        updateOpaque(x, y)
+        updateWalkable(x, y)
+        thing.light()?.also { removeLightSource(thing) }
     }
 
     fun getThingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -207,26 +227,27 @@ class Chunk(
     }
 
     // Project light from location into all nearby cells.
-    fun addLight(x: Int, y: Int, thing: Thing) {
-        thing.light()?.also { lightColor ->
-            lightCaster.castLight(x, y, lightColor, { x, y ->
+    private fun addLightSource(xy: XY, lightSource: LightSource) {
+        lightSource.light()?.also { lightColor ->
+            lightSources[lightSource] = xy
+            lightCaster.castLight(xy.x, xy.y, lightColor, { x, y ->
                 level.isOpaqueAt(x, y)
             }, { x, y, r, g, b ->
-                level.receiveLight(x, y, thing, r, g, b)
+                level.receiveLight(x, y, lightSource, r, g, b)
             })
         }
     }
 
     // Receive projected light from a source and save it in cache.
-    fun receiveLight(x: Int, y: Int, thing: Thing, r: Float, g: Float, b: Float) {
+    fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) {
         if (boundsCheck(x, y)) {
             lightDirty[x - this.x][y - this.y] = true
-            if (lights[x - this.x][y - this.y].contains(thing)) {
-                lights[x - this.x][y - this.y][thing]?.r = r
-                lights[x - this.x][y - this.y][thing]?.g = g
-                lights[x - this.x][y - this.y][thing]?.b = b
+            if (lights[x - this.x][y - this.y].contains(lightSource)) {
+                lights[x - this.x][y - this.y][lightSource]?.r = r
+                lights[x - this.x][y - this.y][lightSource]?.g = g
+                lights[x - this.x][y - this.y][lightSource]?.b = b
             } else {
-                lights[x - this.x][y - this.y][thing] = LightColor(r, g, b)
+                lights[x - this.x][y - this.y][lightSource] = LightColor(r, g, b)
             }
         }
     }
@@ -246,11 +267,22 @@ class Chunk(
         light[x][y].r = ambient.r
         light[x][y].g = ambient.g
         light[x][y].b = ambient.b
-        lights[x][y].forEach { lightObject, color ->
+        lights[x][y].forEach { (lightSource, color) ->
             light[x][y].r += color.r
             light[x][y].g += color.g
             light[x][y].b += color.b
         }
         lightDirty[x][y] = false
+    }
+
+    fun removeLightSource(lightSource: LightSource) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                if (lights[x][y].remove(lightSource) != null) {
+                    lightDirty[x][y] = true
+                }
+            }
+        }
+        lightSources.remove(lightSource)
     }
 }

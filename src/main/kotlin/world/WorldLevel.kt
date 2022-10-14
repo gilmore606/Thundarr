@@ -26,6 +26,8 @@ class WorldLevel() : Level() {
         stepMap = makeStepMap()
     }
 
+    override fun allChunks() = loadedChunks
+
     // Temporary
     override fun tempPlayerStart(): XY {
         setPov(200, 200)
@@ -92,15 +94,11 @@ class WorldLevel() : Level() {
         if (File(filename).exists()) {
             log.debug("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
-            chunk.level = this
-            chunk.getSavedActors().forEach {
-                director.attachActor(it)
-            }
+            chunk.onReload(this)
         } else {
             log.debug("Creating chunk at $x $y")
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
-            chunk.level = this
-            chunk.generateWorldAt(x, y)
+            chunk.onCreate(this, x, y)
         }
         loadedChunks.add(chunk)
         return chunk
@@ -111,10 +109,6 @@ class WorldLevel() : Level() {
             director.removeActorsInArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
         )
         loadedChunks.remove(chunk)
-    }
-
-    override fun clearVisibility() {
-        loadedChunks.forEach { it.clearVisibility() }
     }
 
     override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),

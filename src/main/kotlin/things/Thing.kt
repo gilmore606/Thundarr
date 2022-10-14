@@ -12,7 +12,7 @@ class Thing(
     val glyph: Glyph,
     val isOpaque: Boolean = false,
     val isBlocking: Boolean = false
-) {
+): LightSource {
     var light: LightColor? = null
 
     fun glyph() = glyph
@@ -23,5 +23,5 @@ class Thing(
         }
     }
 
-    fun light() = light
+    override fun light() = light
 }

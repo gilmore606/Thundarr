@@ -7,6 +7,7 @@ import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
 import render.tilesets.Glyph
+import things.LightSource
 import things.Thing
 import util.*
 import world.terrains.Terrain
@@ -31,11 +32,12 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    private val ambientLight = LightColor(0.1f, 0.1f, 0.7f)
+    private val ambientLight = LightColor(0.2f, 0.2f, 0.9f)
 
-    // DoThis for all cells relevant to rendering the frame around the POV.
+    abstract fun allChunks(): Set<Chunk>
+
     fun forEachCellToRender(
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
+        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit
     ) {
         for (x in pov.x - RENDER_WIDTH /2 until pov.x + RENDER_WIDTH /2) {
             for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
@@ -43,7 +45,8 @@ sealed class Level {
                 if (vis > 0f) {
                     doThis(
                         x, y, vis,
-                        Terrain.get(getTerrain(x,y)).glyph()
+                        Terrain.get(getTerrain(x,y)).glyph(),
+                        lightAt(x, y)
                     )
                 }
             }
@@ -133,15 +136,20 @@ sealed class Level {
         })
     }
 
-    abstract fun clearVisibility()
+    private fun clearVisibility() {
+        allChunks().forEach { it.clearVisibility() }
+    }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 
-    fun receiveLight(x: Int, y: Int, thing: Thing, r: Float, g: Float, b: Float) =
-        chunkAt(x,y)?.receiveLight(x, y, thing, r, g, b)
+    fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) =
+        chunkAt(x,y)?.receiveLight(x, y, lightSource, r, g, b)
 
     fun ambientLight() = ambientLight
 
     fun lightAt(x: Int, y: Int) = chunkAt(x,y)?.lightAt(x,y) ?: ambientLight
 
+    fun removeLightSource(lightSource: LightSource) {
+        allChunks().forEach { it.removeLightSource(lightSource) }
+    }
 }

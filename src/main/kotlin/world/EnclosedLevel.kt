@@ -19,10 +19,13 @@ class EnclosedLevel(
             it.setTerrain(x, y, type)
         })
     }
+    private val allChunks = setOf(chunk)
 
     init {
         stepMap = makeStepMap()
     }
+
+    override fun allChunks() = allChunks
 
     // Temporary!
     override fun tempPlayerStart(): XY = chunk.tempPlayerStart()
@@ -30,10 +33,6 @@ class EnclosedLevel(
 
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null
-
-    override fun clearVisibility() {
-        chunk.clearVisibility()
-    }
 
     override fun makeStepMap() = StepMap(width, height,
         { x, y -> chunk.isWalkableAt(x, y) },

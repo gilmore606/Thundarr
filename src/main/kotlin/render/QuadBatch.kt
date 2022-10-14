@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 import render.tilesets.TileSet
 import render.tilesets.Glyph
+import util.LightColor
 import world.Level
+import java.lang.Float.min
 
 class QuadBatch(
     vertexShaderSource: String,
@@ -56,12 +58,12 @@ class QuadBatch(
     }
 
     fun addTileQuad(col: Int, row: Int, stride: Double,
-                    textureIndex: Int, visibility: Float, aspectRatio: Double) {
+                    textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double) {
         val x0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
         val y0 = row.toDouble() * stride - (stride * 0.5)
-        val lightR = if (visibility < 1f) visibility else 1f
-        val lightG = if (visibility < 1f) visibility else 1f
-        val lightB = if (visibility < 1f) visibility else 1f
+        val lightR = min(visibility, light.r)
+        val lightG = min(visibility, light.g)
+        val lightB = min(visibility, light.b)
         addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB)
     }
 
