@@ -245,6 +245,7 @@ object GameScreen : KtxScreen {
     override fun dispose() {
         terrainBatch.dispose()
         mobBatch.dispose()
+        thingBatch.dispose()
         uiBatch.dispose()
     }
 }

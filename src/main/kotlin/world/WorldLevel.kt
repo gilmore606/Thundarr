@@ -89,12 +89,13 @@ class WorldLevel() : Level() {
         val filename = Chunk.filepathAt(x, y)
         val chunk: Chunk
         if (File(filename).exists()) {
+            log.debug("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
             chunk.getSavedActors().forEach {
                 director.attachActor(it)
             }
         } else {
-            log.info("Creating chunk at $x $y")
+            log.debug("Creating chunk at $x $y")
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
             chunk.generateWorldAt(x, y)
         }
