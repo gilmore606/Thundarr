@@ -148,6 +148,7 @@ sealed class Level {
             removeLightSource(lightSource)
             chunkAt(location.x,location.y)?.projectLightSource(location, lightSource)
         }
+        dirtyLights.clear()
     }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
