@@ -24,7 +24,9 @@ sealed class Level {
 
     @Transient protected lateinit var stepMap: StepMap
 
-    @Transient private val noThing = ArrayList<Thing>()
+    @Transient private val noThing = mutableListOf<Thing>()
+
+    @Transient val dirtyLights = mutableMapOf<LightSource,XY>()
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -132,19 +134,20 @@ sealed class Level {
 
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
-    fun updateVisibility() {
-        if (!shadowDirty) return
-        clearVisibility()
-        shadowCaster.castVisibility(pov, 18f, { x, y ->
-            isOpaqueAt(x, y)
-        }, { x, y, vis ->
-            setTileVisibility(x, y, vis)
-        })
-        shadowDirty = false
-    }
-
-    private fun clearVisibility() {
-        allChunks().forEach { it.clearVisibility() }
+    fun updateForRender() {
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            shadowCaster.castVisibility(pov, 18f, { x, y ->
+                isOpaqueAt(x, y)
+            }, { x, y, vis ->
+                setTileVisibility(x, y, vis)
+            })
+            shadowDirty = false
+        }
+        dirtyLights.forEach { (lightSource, location) ->
+            removeLightSource(lightSource)
+            chunkAt(location.x,location.y)?.projectLightSource(location, lightSource)
+        }
     }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit

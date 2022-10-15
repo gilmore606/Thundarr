@@ -89,11 +89,12 @@ class Chunk(
 
         savedActors.forEach { actor -> level.director.attachActor(actor) }
 
+        // Find and reproject all lights.
         for (x in 0 until width) {
             for (y in 0 until height) {
                 things[x][y].forEach { thing ->
                     if (thing.light() != null) {
-                        addLightSource(XY(x + this.x,y + this.y), thing)
+                        projectLightSource(XY(x + this.x,y + this.y), thing)
                     }
                 }
             }
@@ -151,7 +152,7 @@ class Chunk(
         things[x - this.x][y - this.y].add(thing)
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
-        thing.light()?.also { addLightSource(XY(x, y), thing) }
+        thing.light()?.also { projectLightSource(XY(x, y), thing) }
     }
 
     fun removeThingAt(x: Int, y: Int, thing: Thing) {
@@ -246,29 +247,22 @@ class Chunk(
         val oldValue = opaqueCache[x][y]
         opaqueCache[x][y] = v
         if (oldValue != null && oldValue != v) {
-            reprojectLightsTouching(x, y)
+            dirtyLightsTouching(x, y)
             level.shadowDirty = true
         }
         return v
     }
 
-    // TODO: don't remove/add these right now.  Add them to a list to-be-reprojected
-    // Process that list before a render/redraw? and then clear it
-    private fun reprojectLightsTouching(x: Int, y: Int) {
-        val workList = mutableMapOf<LightSource,XY>()
+    private fun dirtyLightsTouching(x: Int, y: Int) {
         lights[x][y].forEach { (lightSource, _) ->
             lightSourceLocations[lightSource]?.also { location ->
-                workList[lightSource] = location
+                level.dirtyLights[lightSource] = location
             }
-        }
-        workList.forEach { (lightSource, location) ->
-            level.removeLightSource(lightSource)
-            addLightSource(location, lightSource)
         }
     }
 
     // Project light from location into all nearby cells.
-    private fun addLightSource(xy: XY, lightSource: LightSource) {
+    fun projectLightSource(xy: XY, lightSource: LightSource) {
         lightSource.light()?.also { lightColor ->
             lightSourceLocations[lightSource] = XY(xy.x,xy.y)
             lightCaster.castLight(xy.x, xy.y, lightColor, { x, y ->

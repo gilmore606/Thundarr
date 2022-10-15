@@ -12,7 +12,7 @@ object StatusPanel : Panel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = width - this.width - padding
+        x = padding
         y = padding
     }
 
