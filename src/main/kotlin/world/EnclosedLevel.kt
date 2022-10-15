@@ -12,16 +12,20 @@ class EnclosedLevel(
     ) : Level() {
 
     private val chunk = Chunk(width, height).generateLevel {
+        it.onCreate(this, 0, 0, forWorld = false)
         RoomyMaze.carveLevel(0, 0, width - 1, height - 1, { x, y ->
             it.getTerrain(x, y)
         }, { x, y, type ->
             it.setTerrain(x, y, type)
         })
     }
+    private val allChunks = setOf(chunk)
 
     init {
         stepMap = makeStepMap()
     }
+
+    override fun allChunks() = allChunks
 
     // Temporary!
     override fun tempPlayerStart(): XY = chunk.tempPlayerStart()
@@ -29,11 +33,6 @@ class EnclosedLevel(
 
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null
-
-    override fun updateVisibility() {
-        chunk.clearVisibility()
-        shadowCaster.cast(pov, 14f)
-    }
 
     override fun makeStepMap() = StepMap(width, height,
         { x, y -> chunk.isWalkableAt(x, y) },

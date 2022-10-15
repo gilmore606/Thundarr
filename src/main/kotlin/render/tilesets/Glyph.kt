@@ -20,5 +20,6 @@ enum class Glyph {
     SKELETON,
     SKULL,
 
-    TREE
+    TREE,
+    LIGHTBULB
 }

@@ -7,6 +7,7 @@ import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
 import render.tilesets.Glyph
+import things.LightSource
 import things.Thing
 import util.*
 import world.terrains.Terrain
@@ -18,14 +19,14 @@ sealed class Level {
 
     val director = Director()
 
-    @Transient protected val shadowCaster = ShadowCaster(
-        { x, y -> isOpaqueAt(x, y) },
-        { x, y, vis -> setTileVisibility(x, y, vis) }
-    )
+    @Transient protected val shadowCaster = RayCaster()
+    @Transient var shadowDirty = true
 
     @Transient protected lateinit var stepMap: StepMap
 
-    @Transient private val noThing = ArrayList<Thing>()
+    @Transient private val noThing = mutableListOf<Thing>()
+
+    @Transient val dirtyLights = mutableMapOf<LightSource,XY>()
 
     // Temporary
     abstract fun tempPlayerStart(): XY
@@ -34,9 +35,12 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    // DoThis for all cells relevant to rendering the frame around the POV.
+    private val ambientLight = LightColor(0.1f, 0.1f, 0.4f)
+
+    abstract fun allChunks(): Set<Chunk>
+
     fun forEachCellToRender(
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
+        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit
     ) {
         for (x in pov.x - RENDER_WIDTH /2 until pov.x + RENDER_WIDTH /2) {
             for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
@@ -44,7 +48,8 @@ sealed class Level {
                 if (vis > 0f) {
                     doThis(
                         x, y, vis,
-                        Terrain.get(getTerrain(x,y)).glyph()
+                        Terrain.get(getTerrain(x,y)).glyph(),
+                        lightAt(x, y)
                     )
                 }
             }
@@ -88,7 +93,7 @@ sealed class Level {
         pov.x = x
         pov.y = y
         onSetPov()
-        updateVisibility()
+        shadowDirty = true
         updateStepMap()
         if (this == App.level) GameScreen.povMoved()
     }
@@ -105,7 +110,11 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
+    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
+
+    fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
+
+    fun removeThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.removeThingAt(x, y, thing)
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
@@ -125,7 +134,32 @@ sealed class Level {
 
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
-    abstract fun updateVisibility()
+    fun updateForRender() {
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            shadowCaster.castVisibility(pov, 18f, { x, y ->
+                isOpaqueAt(x, y)
+            }, { x, y, vis ->
+                setTileVisibility(x, y, vis)
+            })
+            shadowDirty = false
+        }
+        dirtyLights.forEach { (lightSource, location) ->
+            removeLightSource(lightSource)
+            chunkAt(location.x,location.y)?.projectLightSource(location, lightSource)
+        }
+    }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
+
+    fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) =
+        chunkAt(x,y)?.receiveLight(x, y, lightSource, r, g, b)
+
+    fun ambientLight() = ambientLight
+
+    fun lightAt(x: Int, y: Int) = chunkAt(x,y)?.lightAt(x,y) ?: ambientLight
+
+    fun removeLightSource(lightSource: LightSource) {
+        allChunks().forEach { it.removeLightSource(lightSource) }
+    }
 }

@@ -2,12 +2,9 @@ package util
 
 import java.lang.RuntimeException
 
+const val MAX_LIGHT_RANGE = 24f
 
-class ShadowCaster(
-    val isOpaqueAt: (x: Int, y: Int) -> Boolean,
-    val setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
-) {
-
+class RayCaster() {
 
     class Shadow {
         var start = 0f
@@ -95,14 +92,29 @@ class ShadowCaster(
     private val lineCache = Array(8) { n -> ShadowLine(n) }
 
 
-    fun cast(pov: XY, distance: Float) {
+    fun castVisibility(pov: XY, distance: Float,
+                       isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                       setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
+    ) {
         setVisibility(pov.x, pov.y, true)
         lineCache.forEach { line ->
-            refreshOctant(line, pov, distance)
+            visifyOctant(line, pov.x, pov.y, distance, isOpaqueAt, setVisibility)
         }
     }
 
-    private fun refreshOctant(line: ShadowLine, pov: XY, distance: Float) {
+    fun castLight(x: Int, y: Int, lightColor: LightColor,
+                  isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                  setLight: (x: Int, y: Int, r: Float, g: Float, b: Float) -> Unit) {
+        setLight(x, y, lightColor.r, lightColor.g, lightColor.b)
+        lineCache.forEach { line ->
+            lightOctant(line, x, y, lightColor, isOpaqueAt, setLight)
+        }
+    }
+
+    private fun visifyOctant(line: ShadowLine, povX: Int, povY: Int, distance: Float,
+                             isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                             setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
+    ) {
         line.reset()
         var fullShadow = false
         var row = 0
@@ -110,18 +122,18 @@ class ShadowCaster(
         while (!done) {
             row++
             line.transformOctant(row, 0)
-            var castX = pov.x + line.transform.x
-            var castY = pov.y + line.transform.y
-            if (pov.distanceTo(castX, castY) > distance) {
+            var castX = povX + line.transform.x
+            var castY = povY + line.transform.y
+            if (distanceBetween(povX, povY, castX, castY) > distance) {
                 done = true
             } else {
                 var doneRow = false
                 var col = 0
                 while (!doneRow && col <= row) {
                     line.transformOctant(row, col)
-                    castX = pov.x + line.transform.x
-                    castY = pov.y + line.transform.y
-                    if (pov.distanceTo(castX, castY) > distance) {
+                    castX = povX + line.transform.x
+                    castY = povY + line.transform.y
+                    if (distanceBetween(povX, povY, castX, castY) > distance) {
                         doneRow = true
                     } else {
                         if (fullShadow) {
@@ -136,6 +148,52 @@ class ShadowCaster(
                             } else {
                                 line.discard(projection)
                             }
+                        }
+                    }
+                    col++
+                }
+            }
+        }
+    }
+
+    private fun lightOctant(line: ShadowLine, povX: Int, povY: Int, lightColor: LightColor,
+                            isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                            setLight: (x: Int, y: Int, r: Float, g: Float, b: Float) -> Unit
+    ) {
+        line.reset()
+        var fullShadow = false
+        var row = 0
+        var done = false
+        while (!done) {
+            row++
+            line.transformOctant(row, 0)
+            var castX = povX + line.transform.x
+            var castY = povY + line.transform.y
+            var falloff = 1f - distanceBetween(povX, povY, castX, castY) / MAX_LIGHT_RANGE
+            if (falloff <= 0.05f) {
+                done = true
+            } else {
+                var doneRow = false
+                var col = 0
+                while (!doneRow && col <= row) {
+                    line.transformOctant(row, col)
+                    castX = povX + line.transform.x
+                    castY = povY + line.transform.y
+                    falloff = 1f - distanceBetween(povX, povY, castX, castY) / MAX_LIGHT_RANGE
+                    if (falloff <= 0.05f) {
+                        doneRow = true
+                    } else if (!fullShadow) {
+                        val lightR = lightColor.r * falloff
+                        val lightG = lightColor.g * falloff
+                        val lightB = lightColor.b * falloff
+                        val projection = line.projectTile(row, col)
+                        val visible = !line.isInShadow(projection)
+                        if (visible) setLight(castX, castY, lightR, lightG, lightB)
+                        if (visible && isOpaqueAt(castX, castY)) {
+                            line.add(projection)
+                            fullShadow = line.isFullShadow()
+                        } else {
+                            line.discard(projection)
                         }
                     }
                     col++
