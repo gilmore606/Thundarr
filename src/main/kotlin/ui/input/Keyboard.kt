@@ -78,6 +78,11 @@ object Keyboard : KtxInputAdapter {
                     }
                 }
             }
+            Input.Keys.F4 -> {
+                App.level.addThingAt(App.player.xy.x, App.player.xy.y, Thing(
+                    Glyph.TREE, true, false
+                ))
+            }
         }
     }
 }

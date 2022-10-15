@@ -264,13 +264,15 @@ class Chunk(
     fun dirtyLightsTouching(x: Int, y: Int) {
         if (boundsCheck(x, y)) {
             lights[x - this.x][y - this.y].forEach { (lightSource, _) ->
-                lightSourceLocations[lightSource]?.also { location ->
+                level.lightSourceLocation(lightSource)?.also { location ->
                     log.debug("Dirtying light at $location")
                     level.dirtyLights[lightSource] = location
                 }
             }
         }
     }
+
+    fun lightSourceLocation(lightSource: LightSource) = lightSourceLocations[lightSource]
 
     // Project light from location into all nearby cells.
     fun projectLightSource(xy: XY, lightSource: LightSource) {
