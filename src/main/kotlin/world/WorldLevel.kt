@@ -81,6 +81,8 @@ class WorldLevel() : Level() {
                 chunks[cx+ CHUNKS_AHEAD][cy+ CHUNKS_AHEAD] = chunk
             }
         }
+        activeChunks.filter { !loadedChunks.contains(it) }
+            .map { dirtyLightsAroundChunk(it) ; loadedChunks.add(it) }
         loadedChunks.filter { !activeChunks.contains(it) }
             .map { unloadChunk(it) }
     }
@@ -100,7 +102,6 @@ class WorldLevel() : Level() {
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
             chunk.onCreate(this, x, y, forWorld = true)
         }
-        loadedChunks.add(chunk)
         return chunk
     }
 
@@ -109,6 +110,18 @@ class WorldLevel() : Level() {
             director.removeActorsInArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
         )
         loadedChunks.remove(chunk)
+    }
+
+    private fun dirtyLightsAroundChunk(chunk: Chunk) {
+        log.debug("Reprojecting for chunk ${chunk.x} ${chunk.y}")
+        for (x in -1 .. chunk.width) {
+            dirtyLightsTouching(x + chunk.x, chunk.y - 1)
+            dirtyLightsTouching(x + chunk.x, chunk.y + chunk.height)
+        }
+        for (y in -1 .. chunk.height) {
+            dirtyLightsTouching(chunk.x - 1, y + chunk.y)
+            dirtyLightsTouching(chunk.x + chunk.width, y + chunk.y)
+        }
     }
 
     override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),

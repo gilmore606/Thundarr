@@ -144,6 +144,7 @@ sealed class Level {
             })
             shadowDirty = false
         }
+        log.debug("Reprojecting ${dirtyLights.size} lights")
         dirtyLights.forEach { (lightSource, location) ->
             removeLightSource(lightSource)
             chunkAt(location.x,location.y)?.projectLightSource(location, lightSource)
@@ -155,6 +156,8 @@ sealed class Level {
 
     fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) =
         chunkAt(x,y)?.receiveLight(x, y, lightSource, r, g, b)
+
+    fun dirtyLightsTouching(x: Int, y: Int) = chunkAt(x,y)?.dirtyLightsTouching(x,y)
 
     fun ambientLight() = ambientLight
 

@@ -36,6 +36,7 @@ class Chunk(
     private val things = Array(width) { Array(height) { mutableListOf<Thing>() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
+    private var generating = false
 
     @Transient
     private val lights = Array(width) { Array(height) { mutableMapOf<LightSource, LightColor>() } }
@@ -69,7 +70,9 @@ class Chunk(
         this.x1 = x + width - 1
         this.y1 = y + height - 1
         if (forWorld) {
+            generating = true
             generateWorld()
+            generating = false
         }
     }
 
@@ -150,8 +153,10 @@ class Chunk(
 
     fun addThingAt(x: Int, y: Int, thing: Thing) {
         things[x - this.x][y - this.y].add(thing)
-        updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
+        if (!generating) {
+            updateOpaque(x - this.x, y - this.y)
+            updateWalkable(x - this.x, y - this.y)
+        }
         thing.light()?.also { projectLightSource(XY(x, y), thing) }
     }
 
@@ -172,8 +177,10 @@ class Chunk(
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
         terrains[x - this.x][y - this.y] = type
-        updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
+        if (!generating) {
+            updateOpaque(x - this.x, y - this.y)
+            updateWalkable(x - this.x, y - this.y)
+        }
     }
 
     fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -247,16 +254,20 @@ class Chunk(
         val oldValue = opaqueCache[x][y]
         opaqueCache[x][y] = v
         if (oldValue != null && oldValue != v) {
-            dirtyLightsTouching(x, y)
+            level.dirtyLightsTouching(x + this.x, y + this.y)
             level.shadowDirty = true
         }
         return v
     }
 
-    private fun dirtyLightsTouching(x: Int, y: Int) {
-        lights[x][y].forEach { (lightSource, _) ->
-            lightSourceLocations[lightSource]?.also { location ->
-                level.dirtyLights[lightSource] = location
+    // Dirty all lights that fall on this cell.
+    fun dirtyLightsTouching(x: Int, y: Int) {
+        if (boundsCheck(x, y)) {
+            lights[x - this.x][y - this.y].forEach { (lightSource, _) ->
+                lightSourceLocations[lightSource]?.also { location ->
+                    log.debug("Dirtying light at $location")
+                    level.dirtyLights[lightSource] = location
+                }
             }
         }
     }
