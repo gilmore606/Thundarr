@@ -70,6 +70,14 @@ object Keyboard : KtxInputAdapter {
                     Glyph.LIGHTBULB, false, false
                 ).apply { light = LightColor(1f, 1f, 0.4f) }
             )}
+            Input.Keys.F3 -> {
+                KtxAsync.launch {
+                    val things: MutableList<Thing> = mutableListOf<Thing>().apply { addAll(App.level.thingsAt(App.player.xy.x, App.player.xy.y)) }
+                    things.forEach {
+                        App.level.removeThingAt(App.player.xy.x, App.player.xy.y, it)
+                    }
+                }
+            }
         }
     }
 }

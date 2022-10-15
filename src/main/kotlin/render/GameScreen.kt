@@ -96,6 +96,7 @@ object GameScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        App.level.updateVisibility()
         drawEverything()
 
         App.level.director.runQueue(App.level)

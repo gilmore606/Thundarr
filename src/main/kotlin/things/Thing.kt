@@ -2,6 +2,7 @@ package things
 
 import actors.Actor
 import actors.Player
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.ConsolePanel

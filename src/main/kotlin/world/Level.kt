@@ -20,6 +20,7 @@ sealed class Level {
     val director = Director()
 
     @Transient protected val shadowCaster = RayCaster()
+    @Transient var shadowDirty = true
 
     @Transient protected lateinit var stepMap: StepMap
 
@@ -32,7 +33,7 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    private val ambientLight = LightColor(0.2f, 0.2f, 0.9f)
+    private val ambientLight = LightColor(0.1f, 0.1f, 0.4f)
 
     abstract fun allChunks(): Set<Chunk>
 
@@ -90,7 +91,7 @@ sealed class Level {
         pov.x = x
         pov.y = y
         onSetPov()
-        updateVisibility()
+        shadowDirty = true
         updateStepMap()
         if (this == App.level) GameScreen.povMoved()
     }
@@ -107,9 +108,11 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.getThingsAt(x,y) ?: noThing
+    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
     fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
+
+    fun removeThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.removeThingAt(x, y, thing)
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
@@ -130,12 +133,14 @@ sealed class Level {
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     fun updateVisibility() {
+        if (!shadowDirty) return
         clearVisibility()
         shadowCaster.castVisibility(pov, 18f, { x, y ->
             isOpaqueAt(x, y)
         }, { x, y, vis ->
             setTileVisibility(x, y, vis)
         })
+        shadowDirty = false
     }
 
     private fun clearVisibility() {

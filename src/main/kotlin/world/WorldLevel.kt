@@ -45,8 +45,8 @@ class WorldLevel() : Level() {
     }
 
     override fun onRestore() {
-        loadedChunks.forEach { it.level = this }
         populateChunks()
+        loadedChunks.forEach { it.onRestore(this) }
         updateStepMap()
     }
 
@@ -94,11 +94,11 @@ class WorldLevel() : Level() {
         if (File(filename).exists()) {
             log.debug("Loading chunk at $x $y")
             chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
-            chunk.onReload(this)
+            chunk.onRestore(this)
         } else {
             log.debug("Creating chunk at $x $y")
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
-            chunk.onCreate(this, x, y)
+            chunk.onCreate(this, x, y, forWorld = true)
         }
         loadedChunks.add(chunk)
         return chunk
