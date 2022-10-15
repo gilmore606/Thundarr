@@ -28,7 +28,7 @@ class QuadBatch(
     private var vertexCount = 0
 
     private fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
-                                     lightR: Float, lightG: Float, lightB: Float) {
+                                     lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
         this[floatCount] = x
         this[floatCount+1] = y
         this[floatCount+2] = tx
@@ -36,7 +36,8 @@ class QuadBatch(
         this[floatCount+4] = lightR
         this[floatCount+5] = lightG
         this[floatCount+6] = lightB
-        floatCount += 7
+        this[floatCount+7] = grayOut
+        floatCount += 8
         vertexCount++
     }
 
@@ -44,7 +45,8 @@ class QuadBatch(
         true, MAX_QUADS * 6, 0,
         VertexAttribute(Usage.Position, 2, "a_Position"),
         VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
-        VertexAttribute(Usage.ColorUnpacked, 3, "a_Light")
+        VertexAttribute(Usage.ColorUnpacked, 3, "a_Light"),
+        VertexAttribute(Usage.Generic, 1, "a_Grayout")
     )
 
     private val tileShader = ShaderProgram(vertexShaderSource, fragmentShaderSource).apply {
@@ -64,7 +66,8 @@ class QuadBatch(
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
-        addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB)
+        val grayOut = if (visibility < 1f) 1f else 0f
+        addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB, grayOut)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int,
@@ -76,8 +79,9 @@ class QuadBatch(
         addQuad(glx0, gly0, glx1, gly1, textureIndex, lightR, lightG, lightB)
     }
 
-    fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
-                textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f) {
+    private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
+                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
+                        grayOut: Float = 0f) {
         val x0 = ix0.toFloat()
         val y0 = -iy0.toFloat()
         val x1 = ix1.toFloat()
@@ -88,12 +92,12 @@ class QuadBatch(
         val ty1 = ty0 + tileSet.tileColumnStride
 
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB)
+            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
         }
     }
 
