@@ -94,7 +94,7 @@ class Chunk(
             for (y in 0 until height) {
                 things[x][y].forEach { thing ->
                     if (thing.light() != null) {
-                        projectLightSource(XY(x + this.x,y + this.y), thing)
+                        level.dirtyLights[thing] = XY(x + this.x, y + this.y)
                     }
                 }
             }
