@@ -110,6 +110,8 @@ sealed class Level {
 
     open fun onRestore() { }
 
+    open fun onSaveAndQuit() { }
+
     fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
     fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)

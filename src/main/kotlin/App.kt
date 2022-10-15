@@ -32,6 +32,7 @@ object App : KtxGame<Screen>() {
     @Serializable
     data class SaveState(
         val level: Level,
+        val player: Player,
         val turnTime: Float,
         val zoom: Double,
     )
@@ -84,7 +85,7 @@ object App : KtxGame<Screen>() {
 
     private fun saveState() {
         KtxAsync.launch {
-            val state = SaveState(level, turnTime, GameScreen.zoom)
+            val state = SaveState(level, player, turnTime, GameScreen.zoom)
             File("$saveFileFolder/$saveFileName.json.gz").writeBytes(Json.encodeToString(state).gzipCompress())
             log.info("Saved state.")
         }
@@ -93,9 +94,10 @@ object App : KtxGame<Screen>() {
     private fun restoreState() {
         val state = Json.decodeFromString<SaveState>(File("$saveFileFolder/$saveFileName.json.gz").readBytes().gzipDecompress())
         level = state.level
+        player = state.player
         turnTime = state.turnTime
         GameScreen.zoom = state.zoom
-        player = level.director.getPlayer()
+        level.director.add(player, player.xy.x, player.xy.y, level)
         level.onRestore()
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
@@ -155,6 +157,7 @@ object App : KtxGame<Screen>() {
                 "Save and exit", "Cancel"
             ) { yes ->
                 if (yes) {
+                    level.onSaveAndQuit()
                     saveState()
                     dispose()
                     exitProcess(0)

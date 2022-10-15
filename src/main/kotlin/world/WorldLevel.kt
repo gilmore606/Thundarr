@@ -18,7 +18,7 @@ class WorldLevel() : Level() {
 
     @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk(1, 1) } }
 
-    private val loadedChunks = mutableSetOf<Chunk>()
+    @Transient private val loadedChunks = mutableSetOf<Chunk>()
 
     @Transient private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
@@ -44,9 +44,12 @@ class WorldLevel() : Level() {
         populateChunks()
     }
 
+    override fun onSaveAndQuit() {
+        mutableSetOf<Chunk>().apply { addAll(loadedChunks) }.forEach { unloadChunk(it) }
+    }
+
     override fun onRestore() {
         populateChunks()
-        loadedChunks.forEach { it.onRestore(this) }
         updateStepMap()
     }
 
@@ -107,7 +110,7 @@ class WorldLevel() : Level() {
 
     private fun unloadChunk(chunk: Chunk) {
         chunk.unload(
-            director.removeActorsInArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+            director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
         )
         loadedChunks.remove(chunk)
     }
