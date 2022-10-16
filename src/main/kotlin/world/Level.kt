@@ -4,7 +4,9 @@ import actors.Actor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -26,10 +28,6 @@ sealed class Level {
 
     val director = Director()
 
-    @Transient val chunkRequests = MutableStateFlow<ChunkLoader.Request?>(null)
-    @Transient val chunkResults = ChunkLoader.linkLevel(this)
-    @Transient var chunkListener: Job? = null
-
     @Transient protected val shadowCaster = RayCaster()
     @Transient var shadowDirty = true
 
@@ -39,14 +37,6 @@ sealed class Level {
 
     @Transient val dirtyLights = mutableMapOf<LightSource,XY>()
 
-    init {
-        chunkListener = KtxAsync.launch {
-            chunkResults.collect { it?.also { chunk ->
-                log.info("level got chunk ${chunk.x} ${chunk.y}")
-                receiveChunk(chunk)
-            }}
-        }
-    }
 
     abstract fun receiveChunk(chunk: Chunk)
 
@@ -136,10 +126,7 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    open fun unload() {
-        chunkListener?.cancel()
-        ChunkLoader.unlinkLevel(this)
-    }
+    open fun unload() { }
 
     fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 

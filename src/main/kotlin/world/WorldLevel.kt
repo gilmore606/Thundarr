@@ -101,10 +101,8 @@ class WorldLevel() : Level() {
         loadedChunks.firstOrNull { it.x == x && it.y == y }
 
     private fun loadChunkAt(x: Int, y: Int) {
-        KtxAsync.launch {
-            log.info("World requesting chunk $x $y")
-            //chunkRequests.emit(ChunkLoader.Request(worldXY = XY(x, y)))
-            chunkRequests.value = ChunkLoader.Request(worldXY = XY(x, y))
+        ChunkLoader.getChunkAt(this, x, y) { chunk ->
+            receiveChunk(chunk)
         }
     }
 
