@@ -2,10 +2,10 @@ package world.cartos
 
 import util.Perlin
 
-class PerlinCarto : Carto() {
+class WorldCarto : Carto() {
 
-    val scale = 0.05
-    val fullness = 0.02
+    val scale = 0.02
+    val fullness = 0.002
 
     override fun doCarveLevel() {
         forEachCell { x, y ->

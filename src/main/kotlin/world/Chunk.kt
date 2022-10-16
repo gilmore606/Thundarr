@@ -12,7 +12,7 @@ import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
-import world.cartos.PerlinCarto
+import world.cartos.WorldCarto
 import world.terrains.Terrain
 import java.io.File
 import java.lang.Float.min
@@ -107,7 +107,7 @@ class Chunk(
     }
 
     private fun generateWorld() {
-        PerlinCarto().carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
+        WorldCarto().carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
             getTerrain(ix, iy)
         }, { ix, iy, type ->
             setTerrain(ix, iy, type)
@@ -116,7 +116,7 @@ class Chunk(
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x, y + this.y)) {
-                    val n = Perlin.noise(x * 0.02, y * 0.02, 0.01)
+                    val n = Perlin.noise(x * 0.04, y * 0.04, 0.01)
                     if (Dice.chance(n.toFloat() * 2.5f)) {
                         addThingAt(x + this.x, y + this.y, Thing(
                             Glyph.TREE,
