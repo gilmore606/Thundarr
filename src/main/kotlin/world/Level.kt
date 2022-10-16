@@ -1,17 +1,8 @@
 package world
 
 import actors.Actor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import ktx.async.KtxAsync
 import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
@@ -162,12 +153,17 @@ sealed class Level {
             })
             shadowDirty = false
         }
-        if (dirtyLights.isNotEmpty()) log.debug("Reprojecting ${dirtyLights.size} lights")
-        dirtyLights.forEach { (lightSource, location) ->
-            removeLightSource(lightSource)
-            chunkAt(location.x,location.y)?.projectLightSource(location, lightSource)
+        if (dirtyLights.isNotEmpty()) {
+            log.debug("Reprojecting ${dirtyLights.size} lights")
+            mutableMapOf<LightSource,XY>().apply {
+                putAll(dirtyLights)
+                forEach { (lightSource, location) ->
+                    removeLightSource(lightSource)
+                    chunkAt(location.x, location.y)?.projectLightSource(location, lightSource)
+                }
+            }
+            dirtyLights.clear()
         }
-        dirtyLights.clear()
     }
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit

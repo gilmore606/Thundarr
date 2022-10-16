@@ -125,11 +125,14 @@ object App : KtxGame<Screen>() {
         level.setPov(200, 200)
         pendingJob = KtxAsync.launch {
             var playerStart = level.tempPlayerStart()
+            var waitMs = 0
             while (playerStart == null) {
-                log.info("waiting...")
-                delay(1000)
+                log.debug("Waiting for chunks...")
+                delay(20)
+                waitMs += 20
                 playerStart = level.tempPlayerStart()
             }
+            log.info("Waited $waitMs ms for start chunk.")
             level.director.add(player, playerStart.x, playerStart.y, level)
             turnTime = 0f
             ConsolePanel.say("You step tentatively into the apocalypse...")
