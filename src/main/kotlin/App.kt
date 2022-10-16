@@ -46,6 +46,14 @@ object App : KtxGame<Screen>() {
     private var pendingJob: Job? = null
 
     var DEBUG_VISIBLE = false
+        set(value) {
+            field = value
+            if (value) {
+                GameScreen.addPanel(StatusPanel)
+            } else {
+                GameScreen.removePanel(StatusPanel)
+            }
+        }
 
     override fun create() {
         KtxAsync.initiate()
@@ -62,11 +70,11 @@ object App : KtxGame<Screen>() {
         addScreen(GameScreen)
         setScreen<GameScreen>()
         GameScreen.addPanel(ConsolePanel)
-        GameScreen.addPanel(StatusPanel)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
         ConsolePanel.say("The moon is broken in god-damned half!")
+        ConsolePanel.say("\"Demon dogs!\"")
     }
 
     private fun setupLog() {

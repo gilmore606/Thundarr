@@ -153,6 +153,10 @@ object GameScreen : KtxScreen {
         panels.add(panel)
     }
 
+    fun removePanel(panel: Panel) {
+        panels.remove(panel)
+    }
+
     fun addModal(modal: Modal) {
         clearCursor()
         modal.onResize(this.width, this.height)

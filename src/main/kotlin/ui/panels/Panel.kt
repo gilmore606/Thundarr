@@ -43,7 +43,7 @@ abstract class Panel {
 
     protected fun drawTitle(text: String) {
         val xOffset = (width - GlyphLayout(GameScreen.titleFont, text).width) / 2f
-        val yOffset = 16f
+        val yOffset = 24f
         GameScreen.titleFont.draw(textBatch, text, ((this.x + xOffset) - (GameScreen.width / 2f)), 0f - ((this.y + yOffset) - (GameScreen.height / 2f)))
     }
 

@@ -14,7 +14,7 @@ class EscMenu : Modal(270, 230, "- THUNDARR -") {
     }
     var selection: Int = 0
     private val optionSpacing = GameScreen.fontSize + 12
-    private val headerSpacing = 64
+    private val headerSpacing = 72
 
     override fun drawText() {
         super.drawText()

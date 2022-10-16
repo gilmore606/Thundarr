@@ -115,7 +115,7 @@ class WorldLevel() : Level() {
             log.error("Received outdated chunk intended for cx $cx cy $cy !")
             return
         }
-        log.info("Received hot chunk $cx $cy !")
+        log.debug("Received hot chunk $cx $cy !")
         val oldChunk = chunks[cx][cy]
         chunks[cx][cy] = chunk
         loadedChunks.add(chunk)

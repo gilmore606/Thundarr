@@ -39,6 +39,11 @@ abstract class Carto {
         this.getTerrain = getTerrain
         this.setTerrain = setTerrain
         regions = Array(1+x1-x0) { Array(1+y1-y0) { null } }
+        for (x in x0 .. x1) {
+            for (y in y0 .. y1) {
+                setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
+            }
+        }
         doCarveLevel()
     }
 

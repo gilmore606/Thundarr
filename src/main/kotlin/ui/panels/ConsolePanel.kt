@@ -5,8 +5,8 @@ import render.GameScreen
 
 object ConsolePanel : Panel() {
 
-    private val maxLines = 6
-    private val lineSpacing = 3
+    private val maxLines = 7
+    private val lineSpacing = 5
     private val padding = 12
     private val lines: MutableList<String> = mutableListOf<String>().apply {
         repeat(maxLines) { add("") }
@@ -21,9 +21,10 @@ object ConsolePanel : Panel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = padding
-        y = height - (maxLines * (lineSpacing + GameScreen.fontSize)) - padding
-        this.width = width - (padding * 2)
+        val paddingScaled = padding + (width - 800) / 100
+        x = paddingScaled
+        y = height - (maxLines * (lineSpacing + GameScreen.fontSize)) - paddingScaled
+        this.width = width - (paddingScaled * 2)
         this.height = (maxLines * (lineSpacing + GameScreen.fontSize))
     }
 
