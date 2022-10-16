@@ -31,7 +31,9 @@ class EnclosedLevel(
 
     }
 
-    override fun tempPlayerStart(): XY = chunk.tempPlayerStart()
+    override fun isReady() = true
+
+    override fun tempPlayerStart(): XY? = chunk.tempPlayerStart()
     override fun debugText() = "enclosed level"
 
     override fun chunkAt(x: Int, y: Int) =

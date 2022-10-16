@@ -2,7 +2,7 @@ package world.cartos
 
 import util.Perlin
 
-object PerlinCarto : Carto() {
+class PerlinCarto : Carto() {
 
     val scale = 0.05
     val fullness = 0.02

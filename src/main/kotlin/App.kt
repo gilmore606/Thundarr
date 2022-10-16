@@ -2,6 +2,9 @@ import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import ui.input.Keyboard
 import ui.input.Mouse
 import kotlinx.coroutines.launch
@@ -10,6 +13,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
+import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.GameScreen
 import ui.modals.ConfirmModal
@@ -42,11 +46,13 @@ object App : KtxGame<Screen>() {
     lateinit var level: Level
     var turnTime = 0f
 
+    private var pendingJob: Job? = null
+
     var DEBUG_VISIBLE = false
 
     override fun create() {
-        setupLog()
         KtxAsync.initiate()
+        setupLog()
 
         if (hasSavedState()) {
             log.info("Loading saved state...")
@@ -67,6 +73,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun setupLog() {
+        Dispatchers.KTX.mainThread.name = "main"
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO")
         System.setProperty(org.slf4j.simple.SimpleLogger.SHOW_DATE_TIME_KEY, "true")
         System.setProperty(org.slf4j.simple.SimpleLogger.DATE_TIME_FORMAT_KEY, "hh:mm:ss.SSS")
@@ -101,22 +108,28 @@ object App : KtxGame<Screen>() {
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
 
-    private fun createNewWorld() {
-        if (false) {
-            level = EnclosedLevel(200, 200)
-        } else {
-            level = WorldLevel()
-        }
-
+    private fun eraseState() {
         File("$saveFileFolder/$saveFileName.json.gz").delete()
         Chunk.allFiles()?.forEach { it.delete() }
+    }
 
+    private fun createNewWorld() {
+        eraseState()
+        level = WorldLevel()
         player = Player()
-        val playerStart = level.tempPlayerStart()
-        level.director.add(player, playerStart.x, playerStart.y, level)
-        turnTime = 0f
-
-        ConsolePanel.say("You step tentatively into the apocalypse...")
+        level.setPov(200, 200)
+        pendingJob = KtxAsync.launch {
+            var playerStart = level.tempPlayerStart()
+            while (playerStart == null) {
+                log.info("waiting...")
+                delay(1000)
+                playerStart = level.tempPlayerStart()
+            }
+            level.director.add(player, playerStart.x, playerStart.y, level)
+            level.setPov(playerStart.x, playerStart.y)
+            turnTime = 0f
+            ConsolePanel.say("You step tentatively into the apocalypse...")
+        }
     }
 
     fun restartWorld() {
@@ -129,6 +142,7 @@ object App : KtxGame<Screen>() {
             ) { yes ->
                 if (yes) {
                     ConsolePanel.say("You abandon the world.")
+                    pendingJob?.cancel()
                     createNewWorld()
                 } else {
                     ConsolePanel.say("You gather your resolve and carry on.")

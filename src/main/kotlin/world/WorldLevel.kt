@@ -1,9 +1,13 @@
 package world
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
 import util.*
 import java.io.File
 
@@ -16,7 +20,7 @@ class WorldLevel() : Level() {
 
     @Transient val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
 
-    @Transient val chunks = Array(CHUNKS_WIDE) { Array(CHUNKS_WIDE) { Chunk(1, 1) } }
+    @Transient val chunks = Array(CHUNKS_WIDE) { Array<Chunk?>(CHUNKS_WIDE) { null } }
 
     @Transient private val loadedChunks = mutableSetOf<Chunk>()
 
@@ -28,20 +32,18 @@ class WorldLevel() : Level() {
 
     override fun allChunks() = loadedChunks
 
-    override fun receiveChunk(chunk: Chunk) {
+    override fun isReady() = loadedChunks.size >= CHUNKS_WIDE * CHUNKS_WIDE
 
+    override fun tempPlayerStart(): XY? {
+        val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.tempPlayerStart()
+        if (start != null) {
+            loadedChunks.forEach { it.clearSeen() }
+            return start
+        }
+        return null
     }
 
-    override fun tempPlayerStart(): XY {
-        setPov(200, 200)
-        loadedChunks.forEach { it.clearSeen() }
-        return chunks[CHUNKS_AHEAD][CHUNKS_AHEAD].tempPlayerStart()
-    }
-
-    override fun debugText(): String {
-        val ourChunk = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]
-        return "chunk ${ourChunk.x}x${ourChunk.y}"
-    }
+    override fun debugText(): String = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.let { "chunk ${it.x}x${it.y}" } ?: "???"
 
     override fun onSetPov() {
         populateChunks()
@@ -53,6 +55,7 @@ class WorldLevel() : Level() {
     }
 
     override fun onRestore() {
+        log.info("Restored level")
         populateChunks()
         updateStepMap()
     }
@@ -61,11 +64,13 @@ class WorldLevel() : Level() {
     private fun yToChunkY(y: Int) = (y / CHUNK_SIZE) * CHUNK_SIZE + if (y < 0) -CHUNK_SIZE else 0
 
     override fun chunkAt(x: Int, y: Int): Chunk? {
-        if (x >= chunks[0][0].x && y >= chunks[0][0].y) {
-            val cx = (x - chunks[0][0].x) / CHUNK_SIZE
-            val cy = (y - chunks[0][0].y) / CHUNK_SIZE
-            if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
-                return chunks[cx][cy]
+        chunks[0][0]?.also { originChunk ->
+            if (x >= originChunk.x && y >= originChunk.y) {
+                val cx = (x - originChunk.x) / CHUNK_SIZE
+                val cy = (y - originChunk.y) / CHUNK_SIZE
+                if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
+                    return chunks[cx][cy]
+                }
             }
         }
         return null
@@ -80,36 +85,42 @@ class WorldLevel() : Level() {
         lastPovChunk.x = chunkX
         lastPovChunk.y = chunkY
 
-        val activeChunks = mutableSetOf<Chunk>()
         for (cx in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
             for (cy in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
-                val chunk = getChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)
-                activeChunks.add(chunk)
-                chunks[cx+ CHUNKS_AHEAD][cy+ CHUNKS_AHEAD] = chunk
+                getExistingChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)?.also { existing ->
+                    chunks[cx + CHUNKS_AHEAD][cy + CHUNKS_AHEAD] = existing
+                } ?: run {
+                    loadChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)
+                }
             }
         }
-        activeChunks.filter { !loadedChunks.contains(it) }
-            .map { dirtyLightsAroundChunk(it) ; loadedChunks.add(it) }
-        loadedChunks.filter { !activeChunks.contains(it) }
-            .map { unloadChunk(it) }
     }
 
-    private fun getChunkAt(x: Int, y: Int): Chunk =
-        loadedChunks.firstOrNull { it.x == x && it.y == y } ?: loadChunkAt(x, y)
+    private fun getExistingChunkAt(x: Int, y: Int): Chunk? =
+        loadedChunks.firstOrNull { it.x == x && it.y == y }
 
-    private fun loadChunkAt(x: Int, y: Int): Chunk {
-        val filename = Chunk.filepathAt(x, y)
-        val chunk: Chunk
-        if (File(filename).exists()) {
-            log.debug("Loading chunk at $x $y")
-            chunk = Json.decodeFromString(File(filename).readBytes().gzipDecompress())
-            chunk.onRestore(this)
-        } else {
-            log.debug("Creating chunk at $x $y")
-            chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
-            chunk.onCreate(this, x, y, forWorld = true)
+    private fun loadChunkAt(x: Int, y: Int) {
+        log.info("Requesting chunk $x $y")
+        KtxAsync.launch {
+            chunkRequests.emit(ChunkLoader.Request(worldXY = XY(x, y)))
         }
-        return chunk
+    }
+
+    override fun receiveChunk(chunk: Chunk) {
+        val originCx = xToChunkX(pov.x) - CHUNK_SIZE * CHUNKS_AHEAD
+        val originCy = yToChunkY(pov.y) - CHUNK_SIZE * CHUNKS_AHEAD
+        val cx = (chunk.x - originCx) / CHUNK_SIZE
+        val cy = (chunk.y - originCy) / CHUNK_SIZE
+        if (cx < 0 || cy < 0 || cx >= CHUNKS_WIDE || cy >= CHUNKS_WIDE) {
+            log.error("Received outdated chunk intended for cx $cx cy $cy !")
+            return
+        }
+        log.info("Received hot chunk $cx $cy !")
+        val oldChunk = chunks[cx][cy]
+        chunks[cx][cy] = chunk
+        loadedChunks.add(chunk)
+        dirtyLightsAroundChunk(chunk)
+        oldChunk?.also { unloadChunk(it) }
     }
 
     private fun unloadChunk(chunk: Chunk) {
@@ -133,8 +144,8 @@ class WorldLevel() : Level() {
 
     override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),
         { x, y -> isWalkableAt(x, y) },
-        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD].x },
-        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD].y }
+        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD]?.x ?: 0 },
+        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD]?.y ?: 0 }
     )
 
 }

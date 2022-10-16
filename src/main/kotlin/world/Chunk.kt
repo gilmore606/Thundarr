@@ -105,7 +105,7 @@ class Chunk(
     }
 
     private fun generateWorld() {
-        PerlinCarto.carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
+        PerlinCarto().carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
             getTerrain(ix, iy)
         }, { ix, iy, type ->
             setTerrain(ix, iy, type)

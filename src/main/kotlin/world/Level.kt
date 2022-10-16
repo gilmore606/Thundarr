@@ -1,8 +1,11 @@
 package world
 
 import actors.Actor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -46,13 +49,13 @@ sealed class Level {
 
     abstract fun receiveChunk(chunk: Chunk)
 
-    abstract fun tempPlayerStart(): XY
+    abstract fun tempPlayerStart(): XY?
 
     open fun debugText(): String = ""
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    private val ambientLight = LightColor(0.1f, 0.1f, 0.4f)
+    private val ambientLight = LightColor(1.0f, 1.0f, 1.0f)
 
     abstract fun allChunks(): Set<Chunk>
 
@@ -122,7 +125,11 @@ sealed class Level {
 
     abstract fun makeStepMap(): StepMap
 
-    open fun updateStepMap() { stepMap.update(this.pov.x, this.pov.y) }
+    abstract fun isReady(): Boolean
+
+    open fun updateStepMap() {
+        //stepMap.update(this.pov.x, this.pov.y)
+    }
 
     protected open fun onSetPov() { }
 

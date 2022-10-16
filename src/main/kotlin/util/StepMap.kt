@@ -64,6 +64,7 @@ class StepMap(
 
     fun pathFrom(from: XY): List<XY> {
         val path = ArrayList<XY>()
+        return path
         val localFrom = XY(from.x - xOffset(), from.y - yOffset())
         var feet = XY(localFrom.x, localFrom.y)
         var stepNum = map[feet.x][feet.y]
