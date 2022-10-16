@@ -12,17 +12,8 @@ import java.io.File
 
 object ChunkLoader {
 
-    class ChunkInProgress(
-        val worldXY: XY? = null,
-        val levelID: String? = null,
-        val job: Job
-    )
-
-    private val inProgress = mutableMapOf<Level, MutableSet<ChunkInProgress>>()
-
-    val coroutineContext = newSingleThreadAsyncContext("chunkLoader")
-    val coroutineScope = CoroutineScope(coroutineContext)
-
+    private val coroutineContext = newSingleThreadAsyncContext("chunkLoader")
+    private val coroutineScope = CoroutineScope(coroutineContext)
 
     fun getChunkAt(level: Level, x: Int, y: Int, callback: (chunk: Chunk)->Unit ) {
         coroutineScope.launch {
@@ -45,7 +36,6 @@ object ChunkLoader {
             chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE)
             chunk.onCreate(level, xy.x, xy.y, forWorld = true)
         }
-            //inProgress[level]?.removeIf { it.worldXY == xy }
         return chunk
     }
 

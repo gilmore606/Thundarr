@@ -56,7 +56,6 @@ class WorldLevel() : Level() {
     }
 
     override fun onRestore() {
-        log.info("Restored level")
         populateChunks()
         updateStepMap()
     }
@@ -120,17 +119,19 @@ class WorldLevel() : Level() {
         chunks[cx][cy] = chunk
         loadedChunks.add(chunk)
         dirtyLightsAroundChunk(chunk)
-        oldChunk?.also {
-            var inUse = false
-            for (x in 0 until CHUNKS_WIDE) {
-                for (y in 0 until CHUNKS_WIDE) {
-                    if (chunks[x][y] == it) {
-                        inUse = true
-                    }
+        oldChunk?.also { if (!hasAttachedChunk(it)) unloadChunk(it) }
+    }
+
+    private fun hasAttachedChunk(chunk: Chunk): Boolean {
+        var inUse = false
+        for (x in 0 until CHUNKS_WIDE) {
+            for (y in 0 until CHUNKS_WIDE) {
+                if (chunks[x][y] == chunk) {
+                    inUse = true
                 }
             }
-            if (!inUse) unloadChunk(it)
         }
+        return inUse
     }
 
     private fun unloadChunk(chunk: Chunk) {
@@ -141,7 +142,6 @@ class WorldLevel() : Level() {
     }
 
     private fun dirtyLightsAroundChunk(chunk: Chunk) {
-        log.debug("Reprojecting for chunk ${chunk.x} ${chunk.y}")
         for (x in -1 .. chunk.width) {
             dirtyLightsTouching(x + chunk.x, chunk.y - 1)
             dirtyLightsTouching(x + chunk.x, chunk.y + chunk.height)

@@ -48,6 +48,8 @@ class Chunk(
     private val lightSourceLocations = mutableMapOf<LightSource, XY>()
     @Transient
     private val lightCaster = RayCaster()
+    @Transient
+    private val debugLight = LightColor(1f, 1f, 1f)
 
     @Transient
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
@@ -302,6 +304,7 @@ class Chunk(
     }
 
     fun lightAt(x: Int, y: Int): LightColor {
+        if (App.DEBUG_VISIBLE) return debugLight
         if (boundsCheck(x, y)) {
             if (lightCacheDirty[x - this.x][y - this.y]) {
                 refreshLightCacheAt(x - this.x, y - this.y)
