@@ -27,7 +27,10 @@ class EnclosedLevel(
 
     override fun allChunks() = allChunks
 
-    // Temporary!
+    override fun receiveChunk(chunk: Chunk) {
+
+    }
+
     override fun tempPlayerStart(): XY = chunk.tempPlayerStart()
     override fun debugText() = "enclosed level"
 

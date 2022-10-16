@@ -1,8 +1,12 @@
 package world
 
 import actors.Actor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import ktx.async.KtxAsync
 import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
@@ -19,6 +23,10 @@ sealed class Level {
 
     val director = Director()
 
+    @Transient val chunkRequests = MutableStateFlow<ChunkLoader.Request?>(null)
+    @Transient val chunkResults = ChunkLoader.linkLevel(this)
+    @Transient var chunkListener: Job? = null
+
     @Transient protected val shadowCaster = RayCaster()
     @Transient var shadowDirty = true
 
@@ -28,7 +36,16 @@ sealed class Level {
 
     @Transient val dirtyLights = mutableMapOf<LightSource,XY>()
 
-    // Temporary
+    init {
+        chunkListener = KtxAsync.launch {
+            chunkResults.collect { it?.also { chunk ->
+                receiveChunk(chunk)
+            }}
+        }
+    }
+
+    abstract fun receiveChunk(chunk: Chunk)
+
     abstract fun tempPlayerStart(): XY
 
     open fun debugText(): String = ""
@@ -38,6 +55,7 @@ sealed class Level {
     private val ambientLight = LightColor(0.1f, 0.1f, 0.4f)
 
     abstract fun allChunks(): Set<Chunk>
+
 
     fun forEachCellToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit
@@ -110,7 +128,10 @@ sealed class Level {
 
     open fun onRestore() { }
 
-    open fun onSaveAndQuit() { }
+    open fun unload() {
+        chunkListener?.cancel()
+        ChunkLoader.unlinkLevel(this)
+    }
 
     fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 

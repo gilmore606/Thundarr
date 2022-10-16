@@ -23,7 +23,6 @@ import world.Chunk
 import world.EnclosedLevel
 import world.Level
 import world.WorldLevel
-import world.cartos.RoomyMaze
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -157,7 +156,7 @@ object App : KtxGame<Screen>() {
                 "Save and exit", "Cancel"
             ) { yes ->
                 if (yes) {
-                    level.onSaveAndQuit()
+                    level.unload()
                     saveState()
                     dispose()
                     exitProcess(0)

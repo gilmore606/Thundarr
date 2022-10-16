@@ -28,7 +28,10 @@ class WorldLevel() : Level() {
 
     override fun allChunks() = loadedChunks
 
-    // Temporary
+    override fun receiveChunk(chunk: Chunk) {
+
+    }
+
     override fun tempPlayerStart(): XY {
         setPov(200, 200)
         loadedChunks.forEach { it.clearSeen() }
@@ -44,7 +47,8 @@ class WorldLevel() : Level() {
         populateChunks()
     }
 
-    override fun onSaveAndQuit() {
+    override fun unload() {
+        super.unload()
         mutableSetOf<Chunk>().apply { addAll(loadedChunks) }.forEach { unloadChunk(it) }
     }
 
