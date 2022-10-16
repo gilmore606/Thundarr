@@ -23,10 +23,7 @@ import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
-import world.Chunk
-import world.EnclosedLevel
-import world.Level
-import world.WorldLevel
+import world.*
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -126,7 +123,6 @@ object App : KtxGame<Screen>() {
                 playerStart = level.tempPlayerStart()
             }
             level.director.add(player, playerStart.x, playerStart.y, level)
-            level.setPov(playerStart.x, playerStart.y)
             turnTime = 0f
             ConsolePanel.say("You step tentatively into the apocalypse...")
         }

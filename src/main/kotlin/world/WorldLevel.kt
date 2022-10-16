@@ -9,6 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
 import util.*
+import util.hasOneWhere
 import java.io.File
 
 const val CHUNK_SIZE = 64
@@ -100,9 +101,10 @@ class WorldLevel() : Level() {
         loadedChunks.firstOrNull { it.x == x && it.y == y }
 
     private fun loadChunkAt(x: Int, y: Int) {
-        log.info("Requesting chunk $x $y")
         KtxAsync.launch {
-            chunkRequests.emit(ChunkLoader.Request(worldXY = XY(x, y)))
+            log.info("World requesting chunk $x $y")
+            //chunkRequests.emit(ChunkLoader.Request(worldXY = XY(x, y)))
+            chunkRequests.value = ChunkLoader.Request(worldXY = XY(x, y))
         }
     }
 
@@ -120,7 +122,17 @@ class WorldLevel() : Level() {
         chunks[cx][cy] = chunk
         loadedChunks.add(chunk)
         dirtyLightsAroundChunk(chunk)
-        oldChunk?.also { unloadChunk(it) }
+        oldChunk?.also {
+            var inUse = false
+            for (x in 0 until CHUNKS_WIDE) {
+                for (y in 0 until CHUNKS_WIDE) {
+                    if (chunks[x][y] == it) {
+                        inUse = true
+                    }
+                }
+            }
+            if (!inUse) unloadChunk(it)
+        }
     }
 
     private fun unloadChunk(chunk: Chunk) {

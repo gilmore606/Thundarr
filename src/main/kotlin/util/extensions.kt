@@ -1,6 +1,7 @@
 package util
 
 import mu.KotlinLogging
+import world.Chunk
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream

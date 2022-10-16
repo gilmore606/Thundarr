@@ -42,6 +42,7 @@ sealed class Level {
     init {
         chunkListener = KtxAsync.launch {
             chunkResults.collect { it?.also { chunk ->
+                log.info("level got chunk ${chunk.x} ${chunk.y}")
                 receiveChunk(chunk)
             }}
         }
@@ -55,7 +56,7 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    private val ambientLight = LightColor(1.0f, 1.0f, 1.0f)
+    private val ambientLight = LightColor(0.3f, 0.3f, 0.8f)
 
     abstract fun allChunks(): Set<Chunk>
 
