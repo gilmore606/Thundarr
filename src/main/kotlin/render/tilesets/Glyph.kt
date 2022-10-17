@@ -4,10 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Glyph {
-    WALL,
-    FLOOR,
-    OPEN_DOOR,
-    CLOSED_DOOR,
+    BLANK,
+
+    BRICK_WALL,
+    STONE_FLOOR,
+    DIRT,
+    GRASS,
+    PORTAL_DOOR,
 
     CURSOR,
     BOX_BG,

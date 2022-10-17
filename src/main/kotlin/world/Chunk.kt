@@ -107,25 +107,7 @@ class Chunk(
     }
 
     private fun generateWorld() {
-        WorldCarto().carveLevel(x, y, x + width - 1, y + height - 1, { ix, iy ->
-            getTerrain(ix, iy)
-        }, { ix, iy, type ->
-            setTerrain(ix, iy, type)
-        })
-
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                if (isWalkableAt(x + this.x, y + this.y)) {
-                    val n = Perlin.noise(x * 0.04, y * 0.04, 0.01)
-                    if (Dice.chance(n.toFloat() * 2.5f)) {
-                        addThingAt(x + this.x, y + this.y, Thing(
-                            Glyph.TREE,
-                            true, false
-                        ))
-                    }
-                }
-            }
-        }
+        WorldCarto().carveLevel(x, y, x + width - 1, y + height - 1, this)
     }
 
     fun generateLevel(doGenerate: (Chunk)->Unit): Chunk {
@@ -187,7 +169,7 @@ class Chunk(
 
     fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {
         Terrain.get(terrains[x - this.x][y - this.y]).glyph()
-    } else { Glyph.FLOOR }
+    } else { Glyph.BLANK }
 
     fun isSeenAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         seen[x - this.x][y - this.y]

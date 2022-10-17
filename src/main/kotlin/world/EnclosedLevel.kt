@@ -13,11 +13,7 @@ class EnclosedLevel(
 
     private val chunk = Chunk(width, height).generateLevel {
         it.onCreate(this, 0, 0, forWorld = false)
-        RoomyMaze.carveLevel(0, 0, width - 1, height - 1, { x, y ->
-            it.getTerrain(x, y)
-        }, { x, y, type ->
-            it.setTerrain(x, y, type)
-        })
+        RoomyMaze.carveLevel(0, 0, width - 1, height - 1, it)
     }
     private val allChunks = setOf(chunk)
 

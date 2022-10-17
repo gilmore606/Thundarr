@@ -1,33 +1,34 @@
 package world.cartos
 
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import util.CARDINALS
 import kotlin.random.Random
-import render.tilesets.Glyph
+import things.Thing
 import util.XY
-import world.Level
 import util.Rect
-import util.log
-import world.EnclosedLevel
+import world.Chunk
+import world.cartos.prefabs.Prefab
+import world.cartos.prefabs.TiledFile
 import world.terrains.Terrain
+import java.io.File
 
 abstract class Carto {
 
     protected lateinit var regions: Array<Array<Int?>>
 
-    private var x0 = 0
-    private var y0 = 0
-    private var x1 = 0
-    private var y1 = 0
-    private var bounds = Rect(x0,y0,x1,y1)
-    private var innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
-    private var width = 0
-    private var height = 0
-    private lateinit var getTerrain: (Int, Int)->Terrain.Type
-    private lateinit var setTerrain: (Int, Int, Terrain.Type)->Unit
+    protected var x0 = 0
+    protected var y0 = 0
+    protected var x1 = 0
+    protected var y1 = 0
+    protected var bounds = Rect(x0,y0,x1,y1)
+    protected var innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
+    protected var width = 0
+    protected var height = 0
+    protected lateinit var chunk: Chunk
 
-    fun carveLevel(x0: Int, y0: Int, x1: Int, y1: Int,
-                            getTerrain: (Int,Int)->Terrain.Type,
-                            setTerrain: (Int,Int,Terrain.Type)->Unit) {
+    fun carveLevel(x0: Int, y0: Int, x1: Int, y1: Int, chunk: Chunk) {
+        this.chunk = chunk
         this.x0 = x0
         this.y0 = y0
         this.x1 = x1
@@ -36,16 +37,19 @@ abstract class Carto {
         this.innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
         this.width = x1 - x0
         this.height = y1 - y0
-        this.getTerrain = getTerrain
-        this.setTerrain = setTerrain
         regions = Array(1+x1-x0) { Array(1+y1-y0) { null } }
         for (x in x0 .. x1) {
             for (y in y0 .. y1) {
-                setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
+                chunk.setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
             }
         }
         doCarveLevel()
     }
+
+    protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
+    protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type)
+    protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
+    protected fun addThingAt(x: Int, y: Int, thing: Thing) = chunk.addThingAt(x, y, thing)
 
     protected abstract fun doCarveLevel()
 
@@ -60,7 +64,7 @@ abstract class Carto {
 
     // Can the given tile be carved into?
     protected fun isRock(x: Int, y: Int): Boolean {
-        return !Terrain.get(getTerrain(x, y)).isWalkable()
+        return !Terrain.get(chunk.getTerrain(x, y)).isWalkable()
     }
     protected fun isRock(xy: XY): Boolean = isRock(xy.x, xy.y)
 
@@ -183,5 +187,11 @@ abstract class Carto {
             }
         }
         return removed
+    }
+
+    protected fun getPrefab(): Prefab {
+        val tiledFile = Json.decodeFromString<TiledFile>(File("resources/prefabs/building1.json").readText(Charsets.UTF_8))
+        val prefab = Prefab(tiledFile)
+        return prefab
     }
 }
