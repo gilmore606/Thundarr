@@ -142,8 +142,7 @@ object App : KtxGame<Screen>() {
     }
 
     fun restartWorld() {
-        GameScreen.addModal(
-            ConfirmModal(
+        GameScreen.addModal(ConfirmModal(
                 listOf(
                     "Are you sure you want to abandon this world?",
                     "All your progress, such as it is, will be lost."),

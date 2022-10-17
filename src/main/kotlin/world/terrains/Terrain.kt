@@ -1,13 +1,17 @@
 package world.terrains
 
+import actors.Actor
+import actors.Player
+import render.GameScreen
 import render.tilesets.Glyph
+import ui.modals.ConfirmModal
+import ui.panels.ConsolePanel
 
 sealed class Terrain(
     private val glyph: Glyph,
     private val walkable: Boolean,
     private val flyable: Boolean,
     private val opaque: Boolean,
-    private val msgWalkOn: String = ""
 ) {
 
     companion object {
@@ -42,6 +46,8 @@ sealed class Terrain(
     open fun isWalkable() = this.walkable
 
     open fun isOpaque() = this.opaque
+
+    open fun onBump(actor: Actor) { }
 }
 
 
@@ -57,8 +63,11 @@ object BrickWall : Terrain(
     false,
     false,
     true,
-    "You bump into a brick wall."
-)
+){
+    override fun onBump(actor: Actor) {
+        if (actor is Player) ConsolePanel.say("You bump into a brick wall.")
+    }
+}
 
 object Dirt : Terrain(
     Glyph.DIRT,
@@ -79,4 +88,12 @@ object PortalDoor : Terrain(
     false,
     false,
     true
-)
+) {
+    override fun onBump(actor: Actor) {
+        GameScreen.addModal(ConfirmModal(
+            listOf("Enter the abandoned building?"), "Enter", "Cancel"
+        ) { yes ->
+
+        })
+    }
+}

@@ -5,6 +5,7 @@ import actors.Player
 import util.XY
 import world.Level
 import ui.panels.ConsolePanel
+import world.terrains.Terrain
 
 class Move(
     private val dir: XY
@@ -14,7 +15,7 @@ class Move(
         if (level.isWalkableFrom(actor.xy, dir)) {
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
         } else {
-            if (actor is Player) ConsolePanel.say("You bump into a wall.")
+            Terrain.get(level.getTerrain(actor.xy.x + dir.x, actor.xy.y + dir.y)).onBump(actor)
         }
     }
 
