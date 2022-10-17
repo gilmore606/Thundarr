@@ -12,16 +12,16 @@ class TileSet(
     val tilesPerColumn: Int,
 ) {
     private var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
-    var tileRowStride = 0.0f
-    var tileColumnStride = 0.0f
+    var tileRowStride = 0.0
+    var tileColumnStride = 0.0
 
     val texture: Texture
 
     init {
         texture = Texture(textureFileName)
         log.info("Loaded texture $textureFileName (${texture.width} x ${texture.height})")
-        tileRowStride = (1.0f / tilesPerRow)
-        tileColumnStride = (1.0f / tilesPerColumn)
+        tileRowStride = (1.0 / tilesPerRow)
+        tileColumnStride = (1.0 / tilesPerColumn)
     }
 
     fun setTile(glyph: Glyph, holder: TileHolder) {

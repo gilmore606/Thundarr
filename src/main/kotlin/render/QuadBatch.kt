@@ -27,6 +27,8 @@ class QuadBatch(
     private var floatCount = 0
     private var vertexCount = 0
 
+    private val tilePad = 0.0001f
+
     private fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
         this[floatCount] = x
@@ -86,10 +88,10 @@ class QuadBatch(
         val y0 = -iy0.toFloat()
         val x1 = ix1.toFloat()
         val y1 = -iy1.toFloat()
-        val tx0 = (textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride
-        val ty0 = (textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride
-        val tx1 = tx0 + tileSet.tileRowStride
-        val ty1 = ty0 + tileSet.tileColumnStride
+        val tx0 = ((textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
+        val ty0 = ((textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
+        val tx1 = (((textureIndex % tileSet.tilesPerRow) + 1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
+        val ty1 = (((textureIndex / tileSet.tilesPerRow) + 1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerColumn * tilePad)
 
         floats.apply {
             addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)

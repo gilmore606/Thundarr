@@ -5,6 +5,7 @@ import things.Thing
 import util.Dice
 import util.Perlin
 import world.terrains.Terrain
+import kotlin.random.Random
 
 class WorldCarto : Carto() {
 
@@ -27,7 +28,7 @@ class WorldCarto : Carto() {
             }
         }
 
-        carvePrefab(getPrefab(), Dice.range(x0, x1 - 20), Dice.range(y0, y1 - 20))
+        carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
 
         for (x in 0 until width) {
             for (y in 0 until height) {

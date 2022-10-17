@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 object Dice {
 
-    val random = Random(1)
+    val random = Random(Random.nextInt())
 
     fun chance(c: Float) = random.nextFloat() < c
 

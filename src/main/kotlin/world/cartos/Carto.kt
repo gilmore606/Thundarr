@@ -113,7 +113,7 @@ abstract class Carto {
         for (x in 0 until prefab.width) {
             for (y in 0 until prefab.height) {
                 prefab.terrain[x][y]?.also { type ->
-                    setTerrain(x + this.x0, y + this.y0, type)
+                    setTerrain(x + atX, y + atY, type)
                 }
             }
         }
