@@ -20,6 +20,7 @@ import util.XY
 import util.log
 import java.lang.Double.max
 import java.lang.Double.min
+import kotlin.math.abs
 import kotlin.random.Random
 
 const val RENDER_WIDTH = 160
@@ -43,7 +44,7 @@ object GameScreen : KtxScreen {
 
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), TerrainTileSet())
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
-    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
+    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
     private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
@@ -65,9 +66,10 @@ object GameScreen : KtxScreen {
     val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/worldOfWater.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = titleFontSize
-            borderWidth = 2f
-            color = Color(1f, 1f, 1f, 1f)
-            borderColor = Color(0f, 0f, 0f, 0.5f)
+            borderWidth = 3f
+            spaceX = -2
+            color = Color(1f, 0.9f, 0.2f, 1f)
+            borderColor = Color(0f, 0f, 0f, 0.8f)
         })
 
     private val panels: MutableList<Panel> = mutableListOf()
@@ -76,7 +78,12 @@ object GameScreen : KtxScreen {
     private var cursorPosition: XY? = null
     private var cursorLine: MutableList<XY> = mutableListOf()
 
-    private val pov get() = App.level.pov
+    private val pov
+        get() = App.level.pov
+    val lastPov = XY(0,0)
+
+    var scrollX = 0f
+    var scrollY = 0f
 
     override fun show() {
         super.show()
@@ -99,6 +106,7 @@ object GameScreen : KtxScreen {
 
     override fun render(delta: Float) {
         animateZoom(delta)
+        animateCamera(delta)
         App.level.updateForRender()
         drawEverything()
 
@@ -110,6 +118,30 @@ object GameScreen : KtxScreen {
             zoom = min(zoomTarget, zoom + 1.8 * delta * zoom)
         } else if (zoom > zoomTarget) {
             zoom = max(zoomTarget, zoom - 1.8 * delta * zoom)
+        }
+    }
+
+    private fun animateCamera(delta: Float) {
+        val step = 0.1f
+        val pull = 0.4f
+        val acc = 12f
+        if (pov.x != lastPov.x || pov.y != lastPov.y) {
+            scrollX += ((lastPov.x - pov.x) * step * zoom / aspectRatio).toFloat()
+            scrollY += ((lastPov.y - pov.y) * step * zoom).toFloat()
+            lastPov.x = pov.x
+            lastPov.y = pov.y
+        }
+        val accX = 1f + abs(scrollX) * acc
+        val accY = 1f + abs(scrollY) * acc
+        scrollX = if (scrollX > 0) {
+            kotlin.math.max(0f,(scrollX - pull * delta * accX * zoom.toFloat() ))
+        } else {
+            kotlin.math.min(0f,(scrollX + pull * delta * accX * zoom.toFloat() ))
+        }
+        scrollY = if (scrollY > 0) {
+            kotlin.math.max(0f,(scrollY - pull * delta * accY * zoom.toFloat() ))
+        } else {
+            kotlin.math.min(0f,(scrollY + pull * delta * accY * zoom.toFloat() ))
         }
     }
 

@@ -2,7 +2,7 @@ package ui.modals
 
 import render.tilesets.Glyph
 
-class CreditsModal : Modal(450, 180, "THUNDARR the BARBARIAN") {
+class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
 
     override fun drawBackground() {
         super.drawBackground()

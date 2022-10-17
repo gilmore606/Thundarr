@@ -3,7 +3,7 @@ package ui.modals
 import com.badlogic.gdx.Input
 import render.GameScreen
 
-class EscMenu : Modal(270, 230, "- THUNDARR -") {
+class EscMenu : Modal(270, 230, "- ThUNdARR -") {
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Restart world") { App.restartWorld() }

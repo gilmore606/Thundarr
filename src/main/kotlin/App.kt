@@ -108,6 +108,8 @@ object App : KtxGame<Screen>() {
         player = state.player
         turnTime = state.turnTime
         GameScreen.zoom = state.zoom
+        GameScreen.lastPov.x = player.xy.y
+        GameScreen.lastPov.y = player.xy.y
         level.director.add(player, player.xy.x, player.xy.y, level)
         level.onRestore()
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")

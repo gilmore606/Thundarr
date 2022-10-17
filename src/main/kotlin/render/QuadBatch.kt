@@ -1,5 +1,6 @@
 package render
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
@@ -17,7 +18,8 @@ import java.lang.Float.min
 class QuadBatch(
     vertexShaderSource: String,
     fragmentShaderSource: String,
-    private val tileSet: TileSet
+    private val tileSet: TileSet,
+    val isScrolling: Boolean = true
 ) {
 
     private val FLOATS_PER_VERTEX = 8
@@ -84,10 +86,10 @@ class QuadBatch(
     private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
                         grayOut: Float = 0f) {
-        val x0 = ix0.toFloat()
-        val y0 = -iy0.toFloat()
-        val x1 = ix1.toFloat()
-        val y1 = -iy1.toFloat()
+        val x0 = ix0.toFloat() - GameScreen.scrollX
+        val y0 = -iy0.toFloat() + GameScreen.scrollY
+        val x1 = ix1.toFloat() - GameScreen.scrollX
+        val y1 = -iy1.toFloat() + GameScreen.scrollY
         val tx0 = ((textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
         val ty0 = ((textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + 1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
