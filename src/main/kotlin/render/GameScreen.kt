@@ -20,6 +20,7 @@ import util.XY
 import util.log
 import java.lang.Double.max
 import java.lang.Double.min
+import kotlin.random.Random
 
 const val RENDER_WIDTH = 160
 const val RENDER_HEIGHT = 100
@@ -32,7 +33,7 @@ object GameScreen : KtxScreen {
             updateSurfaceParams()
         }
     private var zoomTarget = 0.4
-    private val zoomLevels = listOf(0.15, 0.17, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.73, 0.85, 1.0)
+    private val zoomLevels = listOf(0.15, 0.17, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.73, 0.85, 1.0, 1.5)
     private var zoomIndex = 3.0
 
     var width = 0
@@ -215,7 +216,7 @@ object GameScreen : KtxScreen {
                 val ly = ty - pov.y + RENDER_HEIGHT
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
-                    getTextureIndex(glyph), vis, lightCache[lx][ly], aspectRatio)
+                    getTextureIndex(glyph, null, tx, ty), vis, lightCache[lx][ly], aspectRatio)
             }
             draw()
         }

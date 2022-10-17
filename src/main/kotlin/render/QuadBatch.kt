@@ -27,7 +27,7 @@ class QuadBatch(
     private var floatCount = 0
     private var vertexCount = 0
 
-    private val tilePad = 0.0001f
+    private val tilePad = 0.00001f
 
     private fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
