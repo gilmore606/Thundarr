@@ -128,7 +128,7 @@ object GameScreen : KtxScreen {
         if (scrollLatch) return
         val step = 0.1f
         val pull = 0.4f
-        val acc = 18f
+        val acc = 24f
         if (pov.x != lastPov.x || pov.y != lastPov.y) {
             scrollX += ((lastPov.x - pov.x) * step * zoom / aspectRatio).toFloat()
             scrollY += ((lastPov.y - pov.y) * step * zoom).toFloat()
@@ -154,8 +154,8 @@ object GameScreen : KtxScreen {
             modal.mouseMovedTo(screenX, screenY)
         } ?: run {
             if (scrollDragging) {
-                scrollX = (dragOrigin.x - screenX) * zoom.toFloat() / 192f / aspectRatio.toFloat()
-                scrollY = (dragOrigin.y - screenY) * zoom.toFloat() / 192f
+                scrollX = (dragOrigin.x - screenX) / 435f / aspectRatio.toFloat()
+                scrollY = (dragOrigin.y - screenY) / 435f
             } else {
                 val col = screenXtoTileX(screenX)
                 val row = screenYtoTileY(screenY)
@@ -192,6 +192,8 @@ object GameScreen : KtxScreen {
                 Mouse.Button.LEFT -> {
                     scrollDragging = true
                     scrollLatch = true
+                    dragOrigin.x = screenX
+                    dragOrigin.y = screenY
                 }
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
