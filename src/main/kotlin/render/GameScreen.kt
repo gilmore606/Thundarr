@@ -124,7 +124,7 @@ object GameScreen : KtxScreen {
     private fun animateCamera(delta: Float) {
         val step = 0.1f
         val pull = 0.4f
-        val acc = 12f
+        val acc = 18f
         if (pov.x != lastPov.x || pov.y != lastPov.y) {
             scrollX += ((lastPov.x - pov.x) * step * zoom / aspectRatio).toFloat()
             scrollY += ((lastPov.y - pov.y) * step * zoom).toFloat()
