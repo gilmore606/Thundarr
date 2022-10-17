@@ -45,6 +45,7 @@ object GameScreen : KtxScreen {
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), TerrainTileSet())
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
+    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = true)
     private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
@@ -308,6 +309,14 @@ object GameScreen : KtxScreen {
 
         uiBatch.apply {
             clear()
+            panels.forEach { panel ->
+                panel.renderBackground(this)
+            }
+            draw()
+        }
+
+        uiWorldBatch.apply {
+            clear()
             cursorPosition?.also { cursorPosition ->
                 addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
                     getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
@@ -315,9 +324,6 @@ object GameScreen : KtxScreen {
                     addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
                         getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
                 }
-            }
-            panels.forEach { panel ->
-                panel.renderBackground(this)
             }
             draw()
         }
