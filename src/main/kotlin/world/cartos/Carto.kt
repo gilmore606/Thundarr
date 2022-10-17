@@ -27,6 +27,8 @@ abstract class Carto {
     protected var height = 0
     protected lateinit var chunk: Chunk
 
+    protected val json = Json { ignoreUnknownKeys = true }
+
     fun carveLevel(x0: Int, y0: Int, x1: Int, y1: Int, chunk: Chunk) {
         this.chunk = chunk
         this.x0 = x0
@@ -107,6 +109,16 @@ abstract class Carto {
         }
     }
 
+    protected fun carvePrefab(prefab: Prefab, atX: Int, atY: Int) {
+        for (x in 0 until prefab.width) {
+            for (y in 0 until prefab.height) {
+                prefab.terrain[x][y]?.also { type ->
+                    setTerrain(x + this.x0, y + this.y0, type)
+                }
+            }
+        }
+    }
+
     protected fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
         for (x in x0..x1) {
             for (y in y0..y1) {
@@ -128,12 +140,12 @@ abstract class Carto {
         return c
     }
 
-    protected fun cardinalCount(x: Int, y: Int, type: Terrain.Type): Int {
+    protected fun cardinalBlockerCount(x: Int, y: Int): Int {
         var c = 0
-        if (getTerrain(x-1,y) == type) c++
-        if (getTerrain(x+1,y) == type) c++
-        if (getTerrain(x,y-1) == type) c++
-        if (getTerrain(x,y+1) == type) c++
+        if (!isWalkableAt(x-1,y)) c++
+        if (!isWalkableAt(x+1,y)) c++
+        if (!isWalkableAt(x,y-1)) c++
+        if (!isWalkableAt(x,y+1)) c++
         return c
     }
 
@@ -180,7 +192,7 @@ abstract class Carto {
         var removed = false
         forEachCell { x, y ->
             if (!isRock(x, y)) {
-                if (cardinalCount(x, y, Terrain.Type.TERRAIN_BRICKWALL) == 3) {
+                if (cardinalBlockerCount(x, y) == 3) {
                     setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
                     removed = true
                 }
@@ -190,7 +202,9 @@ abstract class Carto {
     }
 
     protected fun getPrefab(): Prefab {
-        val tiledFile = Json.decodeFromString<TiledFile>(File("resources/prefabs/building1.json").readText(Charsets.UTF_8))
+        val tiledFile = json.decodeFromString<TiledFile>(
+            File("src/main/resources/prefabs/building1.json").readText(Charsets.UTF_8)
+        )
         val prefab = Prefab(tiledFile)
         return prefab
     }

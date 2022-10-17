@@ -4,6 +4,7 @@ import render.tilesets.Glyph
 import things.Thing
 import util.Dice
 import util.Perlin
+import world.terrains.Terrain
 
 class WorldCarto : Carto() {
 
@@ -12,16 +13,27 @@ class WorldCarto : Carto() {
 
     override fun doCarveLevel() {
         forEachCell { x, y ->
-            val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0)
-            if (n > fullness * scale) {
-                carve(x, y, 0)
+            val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0) +
+                    Perlin.noise(x.toDouble() * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
+            if (n > fullness * scale + Dice.float(0f,0.06f).toDouble()) {
+                carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
+            } else {
+                carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
+            }
+            val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
+                    Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
+            if (n2 > 0.01) {
+                carve(x, y, 0, Terrain.Type.TERRAIN_BRICKWALL)
             }
         }
+
+        carvePrefab(getPrefab(), Dice.range(x0, x1 - 20), Dice.range(y0, y1 - 20))
 
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
-                    val n = Perlin.noise(x * 0.04, y * 0.04, 0.01)
+                    val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
+                            Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 2.5f)) {
                         addThingAt(x + this.x0, y + this.y0, Thing(
                             Glyph.TREE,

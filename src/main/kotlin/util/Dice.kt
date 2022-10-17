@@ -4,17 +4,19 @@ import kotlin.random.Random
 
 object Dice {
 
-    fun chance(c: Float) = Random.nextFloat() < c
+    val random = Random(1)
 
-    fun float(f0: Float, f1: Float) = Random.nextFloat() * (f1 - f0) + f0
+    fun chance(c: Float) = random.nextFloat() < c
 
-    fun zeroTil(max: Int) = Random.nextInt(max)
+    fun float(f0: Float, f1: Float) = random.nextFloat() * (f1 - f0) + f0
 
-    fun oneTil(max: Int) = Random.nextInt(max-1) + 1
+    fun zeroTil(max: Int) = random.nextInt(max)
 
-    fun zeroTo(max: Int) = Random.nextInt(max+1)
+    fun oneTil(max: Int) = random.nextInt(max-1) + 1
 
-    fun oneTo(max: Int) = Random.nextInt(max) + 1
+    fun zeroTo(max: Int) = random.nextInt(max+1)
 
-    fun range(min: Int, max: Int) = Random.nextInt(max - min) + min
+    fun oneTo(max: Int) = random.nextInt(max) + 1
+
+    fun range(min: Int, max: Int) = random.nextInt(max - min) + min
 }
