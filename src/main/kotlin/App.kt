@@ -17,6 +17,7 @@ import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.GameScreen
 import ui.modals.ConfirmModal
+import ui.modals.ControlsModal
 import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
 import ui.panels.StatusPanel
@@ -164,7 +165,7 @@ object App : KtxGame<Screen>() {
     }
 
     fun openControls() {
-
+        GameScreen.addModal(ControlsModal())
     }
 
     fun openCredits() {
