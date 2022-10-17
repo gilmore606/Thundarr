@@ -82,11 +82,14 @@ object GameScreen : KtxScreen {
         get() = App.level.pov
     val lastPov = XY(0,0)
 
+    private const val cameraPull = 0.4f
+    private const val cameraAccel = 32f
+
     var scrollX = 0f
     var scrollY = 0f
     var scrollLatch = false
     var scrollDragging = false
-    val dragOrigin = XY(0, 0)
+    private val dragOrigin = XY(0, 0)
 
     override fun show() {
         super.show()
@@ -127,25 +130,23 @@ object GameScreen : KtxScreen {
     private fun animateCamera(delta: Float) {
         if (scrollLatch) return
         val step = 0.1f
-        val pull = 0.4f
-        val acc = 24f
         if (pov.x != lastPov.x || pov.y != lastPov.y) {
             scrollX += ((lastPov.x - pov.x) * step / aspectRatio).toFloat()
             scrollY += ((lastPov.y - pov.y) * step).toFloat()
             lastPov.x = pov.x
             lastPov.y = pov.y
         }
-        val accX = 1f + abs(scrollX) * acc
-        val accY = 1f + abs(scrollY) * acc
+        val accX = 1f + abs(scrollX) * cameraAccel
+        val accY = 1f + abs(scrollY) * cameraAccel
         scrollX = if (scrollX > 0) {
-            kotlin.math.max(0f,(scrollX - pull * delta * accX * zoom.toFloat() ))
+            kotlin.math.max(0f,(scrollX - cameraPull * delta * accX * zoom.toFloat() ))
         } else {
-            kotlin.math.min(0f,(scrollX + pull * delta * accX * zoom.toFloat() ))
+            kotlin.math.min(0f,(scrollX + cameraPull * delta * accX * zoom.toFloat() ))
         }
         scrollY = if (scrollY > 0) {
-            kotlin.math.max(0f,(scrollY - pull * delta * accY * zoom.toFloat() ))
+            kotlin.math.max(0f,(scrollY - cameraPull * delta * accY * zoom.toFloat() ))
         } else {
-            kotlin.math.min(0f,(scrollY + pull * delta * accY * zoom.toFloat() ))
+            kotlin.math.min(0f,(scrollY + cameraPull * delta * accY * zoom.toFloat() ))
         }
     }
 
@@ -208,7 +209,7 @@ object GameScreen : KtxScreen {
         return true
     }
 
-    private const val scrollScale = 450.0
+    private const val scrollScale = 450.0  // magic from experimentation, should figure out how this is derived, i'm so dumb
     private fun pixelToScrollX(px: Int) = ((px.toDouble() / zoom) / scrollScale / aspectRatio).toFloat()
     private fun pixelToScrollY(py: Int) = ((py.toDouble() / zoom) / scrollScale).toFloat()
     private fun pixelScrollX() = ((scrollX * zoom.toFloat()) * scrollScale * aspectRatio.toFloat()).toInt()
