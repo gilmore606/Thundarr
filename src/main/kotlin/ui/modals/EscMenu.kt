@@ -17,8 +17,7 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
     private val optionSpacing = GameScreen.fontSize + 12
     private val headerSpacing = 72
 
-    override fun drawText() {
-        super.drawText()
+    override fun drawModalText() {
         options.keys.forEachIndexed { n, optionText ->
             drawString(optionText, 56, headerSpacing + n * optionSpacing,
                 if (n == selection) GameScreen.fontColorBold else GameScreen.fontColor)
@@ -27,7 +26,7 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
 
     override fun drawBackground() {
         super.drawBackground()
-        if (selection >= 0) {
+        if (!isAnimating() && selection >= 0) {
             drawSelectionBox(56, headerSpacing + selection * optionSpacing, width - 112, optionSpacing)
         }
     }

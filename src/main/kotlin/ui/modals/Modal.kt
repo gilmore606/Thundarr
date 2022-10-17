@@ -5,12 +5,17 @@ import render.GameScreen
 import ui.panels.Panel
 import render.tilesets.Glyph
 import ui.input.Mouse
+import java.lang.Float.min
 
 abstract class Modal(
     width: Int,
     height: Int,
     val title: String? = null
 ) : Panel() {
+
+    private val launchTimeMs = System.currentTimeMillis()
+    private val animTime = 80f
+    protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
 
     init {
         this.width = width
@@ -23,14 +28,22 @@ abstract class Modal(
     }
 
     override fun drawBackground() {
-        drawBox(x, y, width, height)
+        val anim = min(1f, (System.currentTimeMillis() - launchTimeMs) / animTime)
+        val xSquish = ((1f - anim) * width / 2f).toInt()
+        val ySquish = ((1f - anim) * height / 2f).toInt()
+        drawBox(x + xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)
     }
 
     override fun drawText() {
-        title?.also { title ->
-            drawTitle(title)
+        if (!isAnimating()) {
+            title?.also { title ->
+                drawTitle(title)
+            }
+            drawModalText()
         }
     }
+
+    open fun drawModalText() { }
 
     open fun keyDown(keycode: Int) {
         if (keycode == Input.Keys.ESCAPE) {

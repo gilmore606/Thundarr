@@ -34,7 +34,7 @@ class ConfirmModal(
         noOffset = yesOffset + yesWidth + spaceWidth / 3
     }
 
-    override fun drawText() {
+    override fun drawModalText() {
         var iy = 24
         text.forEach { line ->
             drawString(line, 24, iy, GameScreen.fontColorBold)
@@ -49,6 +49,7 @@ class ConfirmModal(
 
     override fun drawBackground() {
         super.drawBackground()
+        if (isAnimating()) return
         val iy = 24 + text.size * 24 + 20
         if (selection) {
             drawSelectionBox(24 + yesOffset, iy, yesWidth, 28)

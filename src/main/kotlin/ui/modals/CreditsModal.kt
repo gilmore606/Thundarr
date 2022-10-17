@@ -7,6 +7,7 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
 
     override fun drawBackground() {
         super.drawBackground()
+        if (isAnimating()) return
         boxBatch.addPixelQuad(x + 24 - 1, y + 56 - 1, x + 24 + 64 + 1, y + 56 + 64 + 1,
             boxBatch.getTextureIndex(Glyph.BOX_SHADOW))
         boxBatch.addPixelQuad(x + 24, y + 56, x + 24 + 64, y + 56 + 64,
@@ -17,8 +18,7 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
             boxBatch.getTextureIndex(Glyph.LOGO_OOKLA))
     }
 
-    override fun drawText() {
-        super.drawText()
+    override fun drawModalText() {
         drawString("a homofagge production", 132, 70)
     }
 
