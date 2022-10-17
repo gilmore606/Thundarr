@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import render.GameScreen
 import ui.panels.Panel
 import render.tilesets.Glyph
+import ui.input.Mouse
 
 abstract class Modal(
     width: Int,
@@ -45,7 +46,7 @@ abstract class Modal(
 
     }
 
-    open fun mouseClicked(screenX: Int, screenY: Int) {
+    open fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
 
     }
 

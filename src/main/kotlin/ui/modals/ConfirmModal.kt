@@ -3,6 +3,7 @@ package ui.modals
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.GameScreen
+import ui.input.Mouse
 
 class ConfirmModal(
     val text: List<String>,
@@ -77,7 +78,7 @@ class ConfirmModal(
         }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         mouseToOption(screenX, screenY)?.also { selected ->
             selection = selected
             selectCurrentOption()

@@ -34,6 +34,7 @@ object Keyboard : KtxInputAdapter {
     }
 
     override fun keyDown(keycode: Int): Boolean {
+        GameScreen.scrollLatch = false
         GameScreen.topModal?.also { modal ->
             modal.keyDown(keycode)
         } ?: run {

@@ -2,6 +2,7 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import render.GameScreen
+import ui.input.Mouse
 
 class EscMenu : Modal(270, 230, "- ThUNdARR -") {
 
@@ -57,7 +58,7 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
         }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         if (mouseToOption(screenX, screenY) >= 0) {
             selectCurrentOption()
         }

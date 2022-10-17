@@ -1,6 +1,7 @@
 package ui.modals
 
 import render.tilesets.Glyph
+import ui.input.Mouse
 
 class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
 
@@ -21,7 +22,7 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
         drawString("a homofagge production", 132, 70)
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         dismiss()
     }
 

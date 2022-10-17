@@ -13,6 +13,7 @@ import ktx.app.KtxScreen
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.*
+import ui.input.Mouse
 import ui.panels.Panel
 import ui.modals.Modal
 import util.LightColor
@@ -21,7 +22,6 @@ import util.log
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
-import kotlin.random.Random
 
 const val RENDER_WIDTH = 160
 const val RENDER_HEIGHT = 100
@@ -84,6 +84,9 @@ object GameScreen : KtxScreen {
 
     var scrollX = 0f
     var scrollY = 0f
+    var scrollLatch = false
+    var scrollDragging = false
+    val dragOrigin = XY(0, 0)
 
     override fun show() {
         super.show()
@@ -122,6 +125,7 @@ object GameScreen : KtxScreen {
     }
 
     private fun animateCamera(delta: Float) {
+        if (scrollLatch) return
         val step = 0.1f
         val pull = 0.4f
         val acc = 18f
@@ -149,16 +153,21 @@ object GameScreen : KtxScreen {
         topModal?.also { modal ->
             modal.mouseMovedTo(screenX, screenY)
         } ?: run {
-            val col = screenXtoTileX(screenX)
-            val row = screenYtoTileY(screenY)
-            if (col != cursorPosition?.x || row != cursorPosition?.y) {
-                if (App.level.isSeenAt(col, row)) {
-                    if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
-                        val newCursor = XY(col, row)
-                        cursorPosition = newCursor
-                        cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
-                    } else {
-                        clearCursor()
+            if (scrollDragging) {
+                scrollX = (dragOrigin.x - screenX) * zoom.toFloat() / 192f / aspectRatio.toFloat()
+                scrollY = (dragOrigin.y - screenY) * zoom.toFloat() / 192f
+            } else {
+                val col = screenXtoTileX(screenX)
+                val row = screenYtoTileY(screenY)
+                if (col != cursorPosition?.x || row != cursorPosition?.y) {
+                    if (App.level.isSeenAt(col, row)) {
+                        if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
+                            val newCursor = XY(col, row)
+                            cursorPosition = newCursor
+                            cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
+                        } else {
+                            clearCursor()
+                        }
                     }
                 }
             }
@@ -175,17 +184,40 @@ object GameScreen : KtxScreen {
         zoomTarget = zoomLevels[zoomIndex.toInt()]
     }
 
-    fun mouseClicked(screenX: Int, screenY: Int): Boolean {
+    fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         topModal?.also { modal ->
-            modal.mouseClicked(screenX, screenY)
+            modal.mouseClicked(screenX, screenY, button)
         } ?: run {
-            val x = screenXtoTileX(screenX)
-            val y = screenYtoTileY(screenY)
-            if (App.level.isWalkableAt(x, y)) {
-                App.player.queue(WalkTo(App.level, x, y))
+            when (button) {
+                Mouse.Button.LEFT -> {
+                    scrollDragging = true
+                    scrollLatch = true
+                }
+                Mouse.Button.RIGHT -> {
+                    val x = screenXtoTileX(screenX)
+                    val y = screenYtoTileY(screenY)
+                    if (App.level.isWalkableAt(x, y)) {
+                        App.player.queue(WalkTo(App.level, x, y))
+                    }
+                }
+                else -> { return false }
             }
         }
         return true
+    }
+
+    fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        when (button) {
+            Mouse.Button.LEFT -> {
+                scrollDragging = false
+                return true
+            }
+            Mouse.Button.RIGHT -> {
+
+            }
+            else -> { return false }
+        }
+        return false
     }
 
     fun povMoved() {
