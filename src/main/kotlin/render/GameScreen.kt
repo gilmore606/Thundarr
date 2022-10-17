@@ -154,11 +154,11 @@ object GameScreen : KtxScreen {
             modal.mouseMovedTo(screenX, screenY)
         } ?: run {
             if (scrollDragging) {
-                scrollX = (dragOrigin.x - screenX) / zoom.toFloat() / 435f / aspectRatio.toFloat()
-                scrollY = (dragOrigin.y - screenY) / zoom.toFloat() / 435f
+                scrollX = pixelToScrollX(dragOrigin.x - screenX)
+                scrollY = pixelToScrollY(dragOrigin.y - screenY)
             } else {
-                val col = screenXtoTileX(screenX)
-                val row = screenYtoTileY(screenY)
+                val col = screenXtoTileX(screenX + pixelScrollX())
+                val row = screenYtoTileY(screenY + pixelScrollY())
                 if (col != cursorPosition?.x || row != cursorPosition?.y) {
                     if (App.level.isSeenAt(col, row)) {
                         if (App.level.isWalkableAt(col, row) && App.player.queuedActions.isEmpty()) {
@@ -192,8 +192,8 @@ object GameScreen : KtxScreen {
                 Mouse.Button.LEFT -> {
                     scrollDragging = true
                     scrollLatch = true
-                    dragOrigin.x = screenX
-                    dragOrigin.y = screenY
+                    dragOrigin.x = screenX + pixelScrollX()
+                    dragOrigin.y = screenY + pixelScrollY()
                 }
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
@@ -207,6 +207,12 @@ object GameScreen : KtxScreen {
         }
         return true
     }
+
+    private const val scrollScale = 450.0
+    private fun pixelToScrollX(px: Int) = ((px.toDouble() / zoom) / scrollScale / aspectRatio).toFloat()
+    private fun pixelToScrollY(py: Int) = ((py.toDouble() / zoom) / scrollScale).toFloat()
+    private fun pixelScrollX() = ((scrollX * zoom.toFloat()) * scrollScale * aspectRatio.toFloat()).toInt()
+    private fun pixelScrollY() = ((scrollY * zoom.toFloat()) * scrollScale).toInt()
 
     fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         when (button) {
