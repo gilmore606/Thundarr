@@ -86,10 +86,10 @@ class QuadBatch(
     private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
                         grayOut: Float = 0f) {
-        val x0 = ix0.toFloat() - GameScreen.scrollX
-        val y0 = -iy0.toFloat() + GameScreen.scrollY
-        val x1 = ix1.toFloat() - GameScreen.scrollX
-        val y1 = -iy1.toFloat() + GameScreen.scrollY
+        val x0 = ix0.toFloat() - GameScreen.scrollX * GameScreen.zoom.toFloat()
+        val y0 = -iy0.toFloat() + GameScreen.scrollY * GameScreen.zoom.toFloat()
+        val x1 = ix1.toFloat() - GameScreen.scrollX * GameScreen.zoom.toFloat()
+        val y1 = -iy1.toFloat() + GameScreen.scrollY * GameScreen.zoom.toFloat()
         val tx0 = ((textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
         val ty0 = ((textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + 1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
