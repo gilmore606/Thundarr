@@ -38,8 +38,6 @@ object App : KtxGame<Screen>() {
         val turnTime: Float,
         val zoom: Double,
     )
-    const val saveFileName = "worldstate"
-    const val saveFileFolder = "savegame"
 
     lateinit var player: Player
     lateinit var level: Level

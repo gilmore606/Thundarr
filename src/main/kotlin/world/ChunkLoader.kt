@@ -15,7 +15,7 @@ object ChunkLoader {
 
     fun getChunkAt(level: Level, x: Int, y: Int, callback: (chunk: Chunk)->Unit ) {
         coroutineScope.launch {
-            val chunk = App.saveState.getWorldChunk(XY(x, y), level)
+            val chunk = App.saveState.getWorldChunk(x, y, level)
             KtxAsync.launch {
                 callback(chunk)
             }
