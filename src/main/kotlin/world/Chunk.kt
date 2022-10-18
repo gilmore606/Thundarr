@@ -32,6 +32,7 @@ class Chunk(
     private val seen = Array(width) { Array(height) { false } }
     private val visible = Array(width) { Array(height) { false } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
+    private val terrainData = Array(width) { Array(height) { "" } }
     private val things = Array(width) { Array(height) { mutableListOf<Thing>() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
@@ -155,6 +156,14 @@ class Chunk(
             updateOpaque(x - this.x, y - this.y)
             updateWalkable(x - this.x, y - this.y)
         }
+    }
+
+    fun getTerrainData(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        terrainData[x - this.x][y - this.y]
+    } else { "" }
+
+    fun setTerrainData(x: Int, y: Int, data: String) {
+        terrainData[x - this.x][y - this.y] = data
     }
 
     fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {

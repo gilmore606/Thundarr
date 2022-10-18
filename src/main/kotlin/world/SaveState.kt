@@ -18,15 +18,21 @@ import java.util.Base64
 class SaveState(
     private val id: String
 ) {
+    object WorldStateTable : Table() {
+        val state = text("state")
+    }
+
     object WorldChunksTable : Table() {
         val x = integer("x")
         val y = integer("y")
         val data = text("data")
     }
 
-    object WorldStateTable : Table() {
-        val state = text("state")
+    object LevelChunksTable : Table() {
+        val id = varchar("id", 80)
+        val data = text("data")
     }
+
 
     // TODO: figure out why we have to know the full path?
     private val saveFileFolder = "/githome/Thundarr/savegame"
@@ -37,7 +43,7 @@ class SaveState(
         Database.connect("jdbc:sqlite:$saveFileFolder/${id}.thundarr", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            SchemaUtils.create(WorldChunksTable, WorldStateTable)
+            SchemaUtils.create(WorldStateTable, WorldChunksTable, LevelChunksTable)
         }
     }
 
@@ -107,7 +113,7 @@ class SaveState(
     fun putWorldChunk(chunk: Chunk) {
         transaction {
             WorldChunksTable.deleteWhere {
-                (WorldChunksTable.x eq chunk.x) and (WorldChunksTable.y eq chunk.y)
+                (x eq chunk.x) and (y eq chunk.y)
             }
             WorldChunksTable.insert {
                 it[x] = chunk.x
@@ -137,5 +143,40 @@ class SaveState(
             }
         }
         log.info("Saved world state.")
+    }
+
+    private fun hasLevelChunk(levelId: String): Boolean {
+        var result = 0
+        transaction {
+            result = LevelChunksTable.select {
+                LevelChunksTable.id eq levelId
+            }.count().toInt()
+        }
+        return result > 0
+    }
+
+    fun getLevelChunk(levelId: String): Chunk {
+        log.debug("Loading level chunk $levelId")
+        var chunk: Chunk? = null
+        transaction {
+            LevelChunksTable.select {
+                LevelChunksTable.id eq levelId
+            }.singleOrNull()?.let {
+                chunk = fromCompressed(it[LevelChunksTable.data])
+            }
+        }
+        return chunk ?: run { throw RuntimeException("Could not find level chunk $levelId in db!") }
+    }
+
+    fun putLevelChunk(chunk: Chunk, levelId: String) {
+        transaction {
+            LevelChunksTable.deleteWhere {
+                id eq levelId
+            }
+            LevelChunksTable.insert {
+                it[id] = levelId
+                it[data] = toCompressed(chunk)
+            }
+        }
     }
 }

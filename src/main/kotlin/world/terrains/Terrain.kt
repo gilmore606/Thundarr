@@ -2,6 +2,9 @@ package world.terrains
 
 import actors.Actor
 import actors.Player
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import render.GameScreen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
@@ -47,7 +50,7 @@ sealed class Terrain(
 
     open fun isOpaque() = this.opaque
 
-    open fun onBump(actor: Actor) { }
+    open fun onBump(actor: Actor, data: String) { }
 }
 
 
@@ -64,7 +67,7 @@ object BrickWall : Terrain(
     false,
     true,
 ){
-    override fun onBump(actor: Actor) {
+    override fun onBump(actor: Actor, data: String) {
         if (actor is Player) ConsolePanel.say("You bump into a brick wall.")
     }
 }
@@ -89,11 +92,21 @@ object PortalDoor : Terrain(
     false,
     true
 ) {
-    override fun onBump(actor: Actor) {
-        GameScreen.addModal(ConfirmModal(
-            listOf("Enter the abandoned building?"), "Enter", "Cancel"
-        ) { yes ->
+    @Serializable class Data(
+        val enterMsg: String,
+        val levelId: String
+    )
 
+    override fun onBump(actor: Actor, data: String) {
+        val terrainData = Json.decodeFromString<Data>(data)
+        GameScreen.addModal(ConfirmModal(
+            terrainData.enterMsg.split('\n'), "Enter", "Cancel"
+        ) { yes ->
+            if (yes) {
+                App.moveToLevel(terrainData.levelId)
+            } else {
+                ConsolePanel.say("You reconsider and step away.")
+            }
         })
     }
 }

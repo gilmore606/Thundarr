@@ -195,4 +195,8 @@ object App : KtxGame<Screen>() {
         )
     }
 
+    fun moveToLevel(levelId: String) {
+
+    }
+
 }

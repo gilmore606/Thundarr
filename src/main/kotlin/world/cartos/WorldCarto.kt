@@ -1,9 +1,12 @@
 package world.cartos
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
 import things.Thing
 import util.Dice
 import util.Perlin
+import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.random.Random
 
@@ -30,12 +33,14 @@ class WorldCarto : Carto() {
 
         carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
 
+        assignDoors()
+
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
-                    if (Dice.chance(n.toFloat() * 2.5f)) {
+                    if (Dice.chance(n.toFloat() * 2.0f)) {
                         addThingAt(x + this.x0, y + this.y0, Thing(
                             Glyph.TREE,
                             true, false
@@ -43,6 +48,18 @@ class WorldCarto : Carto() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun assignDoors() {
+        forEachCell { x, y ->
+            if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
+                val doorId = Random.nextInt(100000).toString()
+                setTerrainData(x, y, Json.encodeToString(PortalDoor.Data(
+                    enterMsg = "A rusty metal door with the embossed number '$doorId'.\nOpen it and go inside?",
+                    levelId = "building" + Random.nextInt(100000).toString()
+                )))
             }
         }
     }

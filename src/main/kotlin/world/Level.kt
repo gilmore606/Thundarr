@@ -127,6 +127,8 @@ sealed class Level {
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
+    fun getTerrainData(x: Int, y: Int): String = chunkAt(x,y)?.getTerrainData(x,y) ?: ""
+
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
     fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.BLANK
@@ -159,10 +161,12 @@ sealed class Level {
                 putAll(dirtyLights)
                 forEach { (lightSource, location) ->
                     removeLightSource(lightSource)
-                    chunkAt(location.x, location.y)?.projectLightSource(location, lightSource)
+                    chunkAt(location.x, location.y)?.apply {
+                        projectLightSource(location, lightSource)
+                        dirtyLights.remove(lightSource)
+                    }
                 }
             }
-            dirtyLights.clear()
         }
     }
 
