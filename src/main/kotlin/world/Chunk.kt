@@ -1,6 +1,5 @@
 package world
 
-import App.saveFileFolder
 import actors.Actor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -58,12 +57,6 @@ class Chunk(
 
     @Transient private val noThing = ArrayList<Thing>()
 
-    companion object {
-        fun filepathAt(x: Int, y: Int) = saveFileFolder + "/chunk" + x.toString() + "x" + y.toString() + ".json.gz"
-        fun allFiles() = File(saveFileFolder).listFiles()?.filter { it.name.startsWith("chunk") }
-    }
-
-    private fun filepath() = filepathAt(x, y)
 
     fun onCreate(level: Level, x: Int, y: Int, forWorld: Boolean) {
         this.level = level
@@ -120,17 +113,14 @@ class Chunk(
     }
 
     fun unload(saveActors: Set<Actor>) {
+        log.info("Unloading chunk ${x}x${y}")
         savedActors.addAll(saveActors)
 
         val lightsToDispose = mutableSetOf<LightSource>()
         lightSourceLocations.forEach { (it, _) -> lightsToDispose.add(it) }
         lightsToDispose.forEach { level.removeLightSource(it) }
 
-        KtxAsync.launch {
-            File(filepath()).writeBytes(
-                Json.encodeToString(this@Chunk).gzipCompress()
-            )
-        }
+        ChunkLoader.saveChunk(this)
     }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)

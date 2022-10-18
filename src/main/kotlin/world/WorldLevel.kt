@@ -52,6 +52,7 @@ class WorldLevel() : Level() {
 
     override fun unload() {
         super.unload()
+        log.info("Unloading ${loadedChunks.size} chunks")
         mutableSetOf<Chunk>().apply { addAll(loadedChunks) }.forEach { unloadChunk(it) }
     }
 
@@ -82,6 +83,7 @@ class WorldLevel() : Level() {
         if (chunkX == lastPovChunk.x && chunkY == lastPovChunk.y) {
             return
         }
+        log.info("Entered chunk $chunkX $chunkY")
         lastPovChunk.x = chunkX
         lastPovChunk.y = chunkY
 
