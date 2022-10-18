@@ -131,6 +131,7 @@ class SaveState(
 
     fun putWorldState(state: App.WorldState) {
         transaction {
+            WorldStateTable.deleteAll()
             WorldStateTable.insert {
                 it[WorldStateTable.state] = toCompressed(state)
             }
