@@ -13,6 +13,7 @@ abstract class Modal(
     val title: String? = null
 ) : Panel() {
 
+    private var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
     private val animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
@@ -46,7 +47,7 @@ abstract class Modal(
     open fun drawModalText() { }
 
     open fun keyDown(keycode: Int) {
-        if (keycode == Input.Keys.ESCAPE) {
+        if (dismissible && keycode == Input.Keys.ESCAPE) {
             dismiss()
         }
     }

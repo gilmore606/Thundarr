@@ -20,6 +20,7 @@ import ui.modals.ConfirmModal
 import ui.modals.ControlsModal
 import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
+import ui.modals.SavingModal
 import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
@@ -31,17 +32,16 @@ import kotlin.system.exitProcess
 object App : KtxGame<Screen>() {
 
     @Serializable
-    data class SaveState(
+    data class WorldState(
         val level: Level,
         val player: Player,
         val turnTime: Float,
         val zoom: Double,
     )
-    const val saveFileName = "worldstate"
-    const val saveFileFolder = "savegame"
 
     lateinit var player: Player
     lateinit var level: Level
+    lateinit var saveState: SaveState
     var turnTime = 0f
 
     private var pendingJob: Job? = null
@@ -60,7 +60,9 @@ object App : KtxGame<Screen>() {
         KtxAsync.initiate()
         setupLog()
 
-        if (hasSavedState()) {
+        saveState = SaveState("myworld")
+
+        if (saveState.worldExists()) {
             log.info("Loading saved state...")
             restoreState()
         } else {
@@ -93,18 +95,21 @@ object App : KtxGame<Screen>() {
         GameScreen.dispose()
     }
 
-    private fun hasSavedState(): Boolean = File("$saveFileFolder/$saveFileName.json.gz").exists()
-
     private fun saveState() {
-        KtxAsync.launch {
-            val state = SaveState(level, player, turnTime, GameScreen.zoom)
-            File("$saveFileFolder/$saveFileName.json.gz").writeBytes(Json.encodeToString(state).gzipCompress())
-            log.info("Saved state.")
-        }
+        level.unload()
+
+        saveState.putWorldState(
+            WorldState(
+                level = level,
+                player = player,
+                turnTime = turnTime,
+                zoom = GameScreen.zoom
+            )
+        )
     }
 
     private fun restoreState() {
-        val state = Json.decodeFromString<SaveState>(File("$saveFileFolder/$saveFileName.json.gz").readBytes().gzipDecompress())
+        val state = saveState.getWorldState()
         level = state.level
         player = state.player
         turnTime = state.turnTime
@@ -116,13 +121,8 @@ object App : KtxGame<Screen>() {
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
 
-    private fun eraseState() {
-        File("$saveFileFolder/$saveFileName.json.gz").delete()
-        Chunk.allFiles()?.forEach { it.delete() }
-    }
-
     private fun createNewWorld() {
-        eraseState()
+        saveState.eraseAll()
         level = WorldLevel()
         player = Player()
         level.setPov(200, 200)
@@ -179,10 +179,16 @@ object App : KtxGame<Screen>() {
                 "Save and exit", "Cancel"
             ) { yes ->
                 if (yes) {
-                    level.unload()
-                    saveState()
-                    dispose()
-                    exitProcess(0)
+                    GameScreen.addModal(SavingModal())
+                    KtxAsync.launch {
+                        saveState()
+                        log.info("Waiting for ChunkLoader to finish...")
+                        // TODO: actually wait for loader to finish.  why doesn't that work?
+                        delay(500)
+                        log.info("State saved.")
+                        dispose()
+                        exitProcess(0)
+                    }
                 } else {
                     ConsolePanel.say("You remember that one thing you needed to do...")
                 }
