@@ -196,7 +196,21 @@ object App : KtxGame<Screen>() {
     }
 
     fun moveToLevel(levelId: String) {
+        // do something with current this.level to save/unload it?
+        level.director.remove(player)
 
+        level = EnclosedLevel(levelId)
+
+        KtxAsync.launch {
+            var playerStart = level.tempPlayerStart()
+            while (playerStart == null) {
+                log.debug("Waiting for level...")
+                delay(50)
+                playerStart = level.tempPlayerStart()
+            }
+            level.director.add(player, playerStart.x, playerStart.y, level)
+            ConsolePanel.say("You cautiously step inside...")
+        }
     }
 
 }

@@ -6,11 +6,11 @@ import ui.input.Mouse
 import java.lang.Integer.min
 
 class ContextMenu(
-    val screenX: Int,
-    val screenY: Int
+    screenX: Int,
+    screenY: Int
 ): Modal(100, 50) {
 
-    val options = mutableMapOf<String,()->Unit>()
+    private val options = mutableMapOf<String,()->Unit>()
     private var selection = -1
     private var maxOptionWidth = 0
     private val padding = 9

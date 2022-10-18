@@ -201,7 +201,7 @@ object GameScreen : KtxScreen {
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
                     val y = screenYtoTileY(screenY)
-                    addModal(ContextMenu(screenX, screenY).apply {
+                    addModal(ContextMenu(screenX + 4, screenY + 4).apply {
                         App.level.makeContextMenu(x, y, this)
                     })
                 }
@@ -244,7 +244,7 @@ object GameScreen : KtxScreen {
     }
 
     fun addModal(modal: Modal) {
-        clearCursor()
+        if (modal !is ContextMenu) clearCursor()
         modal.onResize(this.width, this.height)
         addPanel(modal)
         topModal = modal
