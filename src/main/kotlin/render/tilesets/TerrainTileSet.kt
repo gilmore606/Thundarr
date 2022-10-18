@@ -40,6 +40,7 @@ fun TerrainTileSet() =
             add(WallTile.Slot.BOTTOM, 0.33f, 3, 1)
             add(WallTile.Slot.BOTTOM, 0.34f, 4, 1)
             add(WallTile.Slot.RIGHTBOTTOM, 1f, 7, 1)
+            add(WallTile.Slot.FULL, 1f, 4, 2)
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))

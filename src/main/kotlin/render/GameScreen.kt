@@ -308,14 +308,6 @@ object GameScreen : KtxScreen {
             draw()
         }
 
-        uiBatch.apply {
-            clear()
-            panels.forEach { panel ->
-                panel.renderBackground(this)
-            }
-            draw()
-        }
-
         uiWorldBatch.apply {
             clear()
             cursorPosition?.also { cursorPosition ->
@@ -325,6 +317,14 @@ object GameScreen : KtxScreen {
                     addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
                         getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
                 }
+            }
+            draw()
+        }
+
+        uiBatch.apply {
+            clear()
+            panels.forEach { panel ->
+                panel.renderBackground(this)
             }
             draw()
         }
