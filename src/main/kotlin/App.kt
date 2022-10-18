@@ -20,6 +20,7 @@ import ui.modals.ConfirmModal
 import ui.modals.ControlsModal
 import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
+import ui.modals.SavingModal
 import ui.panels.StatusPanel
 import util.gzipCompress
 import util.gzipDecompress
@@ -180,6 +181,7 @@ object App : KtxGame<Screen>() {
                 "Save and exit", "Cancel"
             ) { yes ->
                 if (yes) {
+                    GameScreen.addModal(SavingModal())
                     KtxAsync.launch {
                         saveState()
                         log.info("Waiting for ChunkLoader to finish...")

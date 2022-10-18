@@ -87,15 +87,18 @@ class WorldLevel() : Level() {
         lastPovChunk.x = chunkX
         lastPovChunk.y = chunkY
 
+        val oldChunks = mutableSetOf<Chunk>().apply { addAll(loadedChunks) }
         for (cx in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
             for (cy in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
                 getExistingChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)?.also { existing ->
+                    oldChunks.remove(existing)
                     chunks[cx + CHUNKS_AHEAD][cy + CHUNKS_AHEAD] = existing
                 } ?: run {
                     loadChunkAt(chunkX + cx * CHUNK_SIZE, chunkY + cy * CHUNK_SIZE)
                 }
             }
         }
+        oldChunks.forEach { unloadChunk(it) }
     }
 
     private fun getExistingChunkAt(x: Int, y: Int): Chunk? =

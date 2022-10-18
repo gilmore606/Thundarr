@@ -113,7 +113,7 @@ class Chunk(
     }
 
     fun unload(saveActors: Set<Actor>) {
-        log.info("Unloading chunk ${x}x${y}")
+        log.debug("Chunk ${x}x${y} unloading")
         savedActors.addAll(saveActors)
 
         val lightsToDispose = mutableSetOf<LightSource>()

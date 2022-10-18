@@ -24,7 +24,7 @@ object ChunkLoader {
 
     fun saveChunk(chunk: Chunk) {
         coroutineScope.launch {
-            log.info("ChunkLoader saving chunk ${chunk.x} ${chunk.y}")
+            log.debug("ChunkLoader saving chunk ${chunk.x} ${chunk.y}")
             App.saveState.putWorldChunk(chunk)
         }
     }
