@@ -1,6 +1,7 @@
 package world
 
 import actors.Actor
+import actors.actions.processes.WalkTo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
@@ -9,6 +10,7 @@ import render.RENDER_WIDTH
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
+import ui.modals.ContextMenu
 import util.*
 import world.terrains.Terrain
 
@@ -187,5 +189,16 @@ sealed class Level {
 
     fun removeLightSource(lightSource: LightSource) {
         allChunks().forEach { it.removeLightSource(lightSource) }
+    }
+
+    fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
+        menu.addOption("Examine") {
+
+        }
+        if (isWalkableAt(x, y)) {
+            menu.addOption("Walk to") {
+                App.player.queue(WalkTo(this, x, y))
+            }
+        }
     }
 }

@@ -17,8 +17,8 @@ abstract class Panel {
     protected var width = 500
     protected var height = 500
 
-    private val shadowOffset = 10
-    private val borderWidth = 2
+    protected var shadowOffset = 10
+    protected var borderWidth = 2
 
     open fun onResize(width: Int, height: Int) { }
 

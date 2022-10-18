@@ -14,6 +14,7 @@ import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.*
 import ui.input.Mouse
+import ui.modals.ContextMenu
 import ui.panels.Panel
 import ui.modals.Modal
 import util.LightColor
@@ -200,9 +201,9 @@ object GameScreen : KtxScreen {
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
                     val y = screenYtoTileY(screenY)
-                    if (App.level.isWalkableAt(x, y)) {
-                        App.player.queue(WalkTo(App.level, x, y))
-                    }
+                    addModal(ContextMenu(screenX, screenY).apply {
+                        App.level.makeContextMenu(x, y, this)
+                    })
                 }
                 else -> { return false }
             }

@@ -74,9 +74,7 @@ class ConfirmModal(
     }
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
-        mouseToOption(screenX, screenY)?.also { selected ->
-            selection = selected
-        }
+        mouseToOption(screenX, screenY)?.also { selection = it }
     }
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
