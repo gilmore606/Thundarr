@@ -3,7 +3,7 @@ package render.tileholders
 import world.Level
 import render.tilesets.TileSet
 
-class VariantsTile(
+open class VariantsTile(
     set: TileSet
 ): TileHolder(set) {
 
