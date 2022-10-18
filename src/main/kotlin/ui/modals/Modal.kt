@@ -15,7 +15,7 @@ abstract class Modal(
 
     private var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
-    private val animTime = 80f
+    private val animTime = 60f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
 
     init {

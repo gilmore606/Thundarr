@@ -2,12 +2,9 @@ import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import ui.input.Keyboard
 import ui.input.Mouse
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -181,10 +178,12 @@ object App : KtxGame<Screen>() {
                 if (yes) {
                     GameScreen.addModal(SavingModal())
                     KtxAsync.launch {
+                        delay(200)
                         saveState()
-                        log.info("Waiting for ChunkLoader to finish...")
-                        // TODO: actually wait for loader to finish.  why doesn't that work?
-                        delay(500)
+                        while (ChunkLoader.isWorking()) {
+                            log.info("Waiting for ChunkLoader to finish...")
+                            delay(100)
+                        }
                         log.info("State saved.")
                         dispose()
                         exitProcess(0)
