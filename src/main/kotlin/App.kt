@@ -27,7 +27,7 @@ object App : KtxGame<Screen>() {
     data class WorldState(
         val level: Level,
         val player: Player,
-        val turnTime: Float,
+        val time: Double,
         val zoomIndex: Double,
     )
 
@@ -35,7 +35,10 @@ object App : KtxGame<Screen>() {
     lateinit var level: Level
     lateinit var worldLevel: WorldLevel
     lateinit var save: SaveState
-    var turnTime = 0f
+    var time: Double = 0.0
+    var lastHour = -1
+    var timeString: String = "???"
+    var dateString: String = "???"
 
     private var pendingJob: Job? = null
 
@@ -96,7 +99,7 @@ object App : KtxGame<Screen>() {
             WorldState(
                 level = level,
                 player = player,
-                turnTime = turnTime,
+                time = time,
                 zoomIndex = GameScreen.zoomIndex
             )
         )
@@ -107,11 +110,12 @@ object App : KtxGame<Screen>() {
         level = state.level
         if (level is WorldLevel) worldLevel = level as WorldLevel
         player = state.player
-        turnTime = state.turnTime
+        updateTime(state.time)
         GameScreen.restoreZoomIndex(state.zoomIndex)
         GameScreen.lastPov.x = player.xy.y
         GameScreen.lastPov.y = player.xy.y
         level.director.add(player, player.xy.x, player.xy.y, level)
+        updateTime(time, true)
         level.onRestore()
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
@@ -133,7 +137,7 @@ object App : KtxGame<Screen>() {
             }
             log.info("Waited $waitMs ms for start chunk.")
             level.director.add(player, playerStart.x, playerStart.y, level)
-            turnTime = 0f
+            updateTime(0.0)
             ConsolePanel.say("You step tentatively into the apocalypse...")
         }
     }
@@ -208,8 +212,50 @@ object App : KtxGame<Screen>() {
                 playerStart = level.tempPlayerStart()
             }
             level.director.add(player, playerStart.x, playerStart.y, level)
+            updateTime(time, true)
             ConsolePanel.say("You cautiously step inside...")
         }
     }
 
+    fun passTime(passed: Float) {
+        updateTime(time + passed.toDouble())
+    }
+
+    private fun updateTime(newTime: Double, force: Boolean = false) {
+        val dayLength = 1000.0
+        val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+        val yearZero = 2994
+
+        time = newTime
+        val day = (time / dayLength).toInt()
+        val timeOfDay = time - (day * dayLength)
+        val minutes = (timeOfDay / dayLength) * 1440.0
+        val hour = (minutes / 60).toInt()
+        val minute = minutes.toInt() - (hour * 60)
+        var ampm = "am"
+        var amhour = hour
+        if (hour >= 11) {
+            ampm = "pm"
+            if (hour >= 12) {
+                amhour -= 12
+            }
+        }
+        amhour += 1
+        val minstr = if (minute < 10) "0$minute" else "$minute"
+
+        val year = (day / 360)
+        val yearDay = day - (year * 360)
+        val month = yearDay / 30
+        val monthDay = (yearDay - month * 30) + 1
+        val monthName = monthNames[month]
+        val realYear = yearZero + year
+
+        timeString = "$amhour:$minstr $ampm"
+        dateString = "$monthName $monthDay, $realYear"
+
+        if (lastHour != hour || force) {
+            lastHour = hour
+            App.level.updateAmbientLight(hour)
+        }
+    }
 }

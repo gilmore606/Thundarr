@@ -1,6 +1,8 @@
 package world
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import util.LightColor
 import util.StepMap
 import util.XY
 import world.cartos.RoomyMaze
@@ -19,6 +21,10 @@ class EnclosedLevel(
     private val height: Int
         get() = chunk?.height ?: 1
 
+    @Transient
+    override val sunLightSteps = mutableMapOf<Int, LightColor>().apply {
+        repeat (24) { n -> this[n] = LightColor(0.1f, 0.1f, 0.1f) }
+    }
 
     init {
         ChunkLoader.getLevelChunk(this, levelId) { receiveChunk(it) }

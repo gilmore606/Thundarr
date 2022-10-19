@@ -18,7 +18,7 @@ object DebugPanel : Panel() {
 
     override fun drawText() {
         drawString("x: ${App.player.xy.x} y: ${App.player.xy.y}", 0, 0)
-        drawString("turn ${App.turnTime.toInt()}", 0, 20)
+        drawString("turn ${App.time.toInt()}", 0, 20)
         drawString(App.level.debugText(), 0, 40)
         val l = App.level.lightAt(App.player.xy.x, App.player.xy.y)
         val lr = (l.r * 100).toInt()

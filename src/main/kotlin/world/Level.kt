@@ -43,6 +43,34 @@ sealed class Level {
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    open fun timeScale() = 1.0f
+    @Transient
+    open val sunLightSteps = mutableMapOf<Int,LightColor>().apply {
+        this[0] = LightColor(0.2f, 0.2f, 0.5f)
+        this[1] = LightColor(0.15f, 0.15f, 0.5f)
+        this[2] = LightColor(0.13f, 0.13f, 0.5f)
+        this[3] = LightColor(0.1f, 0.1f, 0.4f)
+        this[4] = LightColor(0.2f, 0.25f, 0.4f)
+        this[5] = LightColor(0.4f, 0.4f, 0.5f)
+        this[6] = LightColor(0.7f, 0.5f, 0.5f)
+        this[7] = LightColor(1f, 0.6f, 0.6f)
+        this[8] = LightColor(1f, 0.8f, 0.8f)
+        this[9] = LightColor(1f, 0.9f, 0.8f)
+        this[10] = LightColor(1f, 0.9f, 0.8f)
+        this[11] = LightColor(1f, 1f, 0.9f)
+        this[12] = LightColor(1f, 1f, 1f)
+        this[13] = LightColor(1f, 1f, 1f)
+        this[14] = LightColor(1f, 1f, 1f)
+        this[15] = LightColor(1f, 1f, 1f)
+        this[16] = LightColor(1f, 1f, 1f)
+        this[17] = LightColor(1f, 1f, 0.9f)
+        this[18] = LightColor(1f, 1f, 0.8f)
+        this[19] = LightColor(0.8f, 0.7f, 0.6f)
+        this[20] = LightColor(0.8f, 0.6f, 0.5f)
+        this[21] = LightColor(0.6f, 0.5f, 0.5f)
+        this[22] = LightColor(0.4f, 0.35f, 0.5f)
+        this[23] = LightColor(0.2f, 0.2f, 0.5f)
+    }
 
     abstract fun allChunks(): Set<Chunk>
 
@@ -202,6 +230,13 @@ sealed class Level {
 
     fun removeLightSource(lightSource: LightSource) {
         allChunks().forEach { it.removeLightSource(lightSource) }
+    }
+
+    fun updateAmbientLight(hour: Int) {
+        ambientLight.r = sunLightSteps[hour]?.r ?: 0f
+        ambientLight.g = sunLightSteps[hour]?.g ?: 0f
+        ambientLight.b = sunLightSteps[hour]?.b ?: 0f
+        allChunks().forEach { it.refreshLight() }
     }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {

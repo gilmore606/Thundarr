@@ -16,6 +16,7 @@ object StatusPanel : Panel() {
 
     override fun drawText() {
         drawString(App.level.statusText(), 0, 0)
-        drawString("12:14pm", 0, 20)
+        drawString(App.timeString, 0, 20)
+        drawString(App.dateString, 0, 40)
     }
 }
