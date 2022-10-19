@@ -7,7 +7,9 @@ import kotlinx.serialization.Transient
 import render.GameScreen
 import render.RENDER_HEIGHT
 import render.RENDER_WIDTH
+import render.tileholders.OverlapTile
 import render.tilesets.Glyph
+import render.tilesets.TileSet
 import things.LightSource
 import things.Thing
 import ui.modals.ContextMenu
@@ -45,17 +47,27 @@ sealed class Level {
 
 
     fun forEachCellToRender(
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit
+        tileSet: TileSet,
+        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
+        doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit
     ) {
         for (x in pov.x - RENDER_WIDTH /2 until pov.x + RENDER_WIDTH /2) {
             for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
                 val vis = visibilityAt(x, y)
+                val glyph = Terrain.get(getTerrain(x,y)).glyph()
                 if (vis > 0f) {
                     doThis(
-                        x, y, vis,
-                        Terrain.get(getTerrain(x,y)).glyph(),
-                        lightAt(x, y)
+                        x, y, vis, glyph, lightAt(x, y)
                     )
+                    if (tileSet.tileHolders[glyph] is OverlapTile) {
+                        CARDINALS.forEach { edge ->
+                            if ((tileSet.tileHolders[glyph] as OverlapTile).overlapsIn(this, x, y, edge)) {
+                                doOverlap(
+                                    x, y, vis, glyph, edge, lightAt(x - edge.x, y - edge.y)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -70,8 +82,7 @@ sealed class Level {
                 val vis = visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
-                        x, y, vis,
-                        thingsAt[0].glyph()
+                        x, y, vis, thingsAt[0].glyph()
                     )
                 }
             }
@@ -86,8 +97,7 @@ sealed class Level {
             val vis = visibilityAt(x, y)
             if (vis == 1f) {
                 doThis(
-                    x, y,
-                    actor.glyph
+                    x, y, actor.glyph
                 )
             }
         }

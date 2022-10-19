@@ -1,5 +1,6 @@
 package render.tilesets
 
+import render.tileholders.OverlapTile
 import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 import render.tileholders.WallTile
@@ -21,7 +22,8 @@ fun TerrainTileSet() =
             add(0.5f, 1, 2)
         })
 
-        setTile(Glyph.GRASS, VariantsTile(this).apply {
+        setTile(Glyph.GRASS, OverlapTile(this).apply {
+            addOverlap(Glyph.DIRT)
             add(0.4f, 8, 0)
             add(0.4f, 8, 1)
             add(0.2f, 8, 2)
