@@ -43,6 +43,7 @@ sealed class Level {
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    open fun timeScale() = 1.0f
 
     abstract fun allChunks(): Set<Chunk>
 
