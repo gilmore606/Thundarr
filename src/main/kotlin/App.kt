@@ -27,7 +27,7 @@ object App : KtxGame<Screen>() {
         val level: Level,
         val player: Player,
         val turnTime: Float,
-        val zoom: Double,
+        val zoomIndex: Double,
     )
 
     lateinit var player: Player
@@ -95,7 +95,7 @@ object App : KtxGame<Screen>() {
                 level = level,
                 player = player,
                 turnTime = turnTime,
-                zoom = GameScreen.zoom
+                zoomIndex = GameScreen.zoomIndex
             )
         )
     }
@@ -106,7 +106,7 @@ object App : KtxGame<Screen>() {
         if (level is WorldLevel) worldLevel = level as WorldLevel
         player = state.player
         turnTime = state.turnTime
-        GameScreen.zoom = state.zoom
+        GameScreen.restoreZoomIndex(state.zoomIndex)
         GameScreen.lastPov.x = player.xy.y
         GameScreen.lastPov.y = player.xy.y
         level.director.add(player, player.xy.x, player.xy.y, level)

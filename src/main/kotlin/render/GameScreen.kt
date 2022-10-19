@@ -36,7 +36,7 @@ object GameScreen : KtxScreen {
         }
     private var zoomTarget = 0.4
     private val zoomLevels = listOf(0.15, 0.17, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.73, 0.85, 1.0, 1.5)
-    private var zoomIndex = 3.0
+    var zoomIndex = 5.0
 
     var width = 0
     var height = 0
@@ -131,6 +131,11 @@ object GameScreen : KtxScreen {
         } else if (zoom > zoomTarget) {
             zoom = max(zoomTarget, zoom - 1.8 * delta * zoom)
         }
+    }
+
+    fun restoreZoomIndex(index: Double) {
+        zoomIndex = index
+        zoomTarget = zoomLevels[zoomIndex.toInt()]
     }
 
     private fun animateCamera(delta: Float) {
