@@ -37,6 +37,7 @@ class WorldLevel() : Level() {
     }
 
     override fun debugText(): String = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.let { "chunk ${it.x}x${it.y}" } ?: "???"
+    override fun statusText(): String = "the wilderness"
 
     override fun onSetPov() {
         populateChunks()

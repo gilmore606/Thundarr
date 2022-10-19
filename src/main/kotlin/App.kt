@@ -15,6 +15,7 @@ import ui.modals.ControlsModal
 import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
 import ui.modals.SavingModal
+import ui.panels.DebugPanel
 import ui.panels.StatusPanel
 import util.log
 import world.*
@@ -42,9 +43,9 @@ object App : KtxGame<Screen>() {
         set(value) {
             field = value
             if (value) {
-                GameScreen.addPanel(StatusPanel)
+                GameScreen.addPanel(DebugPanel)
             } else {
-                GameScreen.removePanel(StatusPanel)
+                GameScreen.removePanel(DebugPanel)
             }
         }
 
@@ -65,6 +66,7 @@ object App : KtxGame<Screen>() {
         addScreen(GameScreen)
         setScreen<GameScreen>()
         GameScreen.addPanel(ConsolePanel)
+        GameScreen.addPanel(StatusPanel)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 

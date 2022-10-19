@@ -22,6 +22,8 @@ abstract class Panel {
 
     open fun onResize(width: Int, height: Int) { }
 
+    open fun onRender(delta: Float) { }
+
     fun renderText(batch: SpriteBatch) {
         this.textBatch = batch
         this.drawText()
@@ -32,7 +34,7 @@ abstract class Panel {
         this.drawBackground()
     }
 
-    abstract fun drawBackground()
+    open fun drawBackground() { }
 
     abstract fun drawText()
 

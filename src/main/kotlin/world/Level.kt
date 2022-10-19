@@ -38,6 +38,7 @@ sealed class Level {
     abstract fun tempPlayerStart(): XY?
 
     open fun debugText(): String = ""
+    open fun statusText(): String = ""
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 

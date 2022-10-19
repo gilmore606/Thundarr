@@ -120,6 +120,7 @@ object GameScreen : KtxScreen {
         animateZoom(delta)
         animateCamera(delta)
         App.level.updateForRender()
+        panels.forEach { it.onRender(delta) }
         drawEverything()
 
         App.level.director.runQueue(App.level)
