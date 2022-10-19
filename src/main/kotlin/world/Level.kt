@@ -44,6 +44,7 @@ sealed class Level {
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     open fun timeScale() = 1.0f
+    @Transient
     open val sunLightSteps = mutableMapOf<Int,LightColor>().apply {
         this[0] = LightColor(0.2f, 0.2f, 0.5f)
         this[1] = LightColor(0.15f, 0.15f, 0.5f)

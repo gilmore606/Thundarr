@@ -115,6 +115,7 @@ object App : KtxGame<Screen>() {
         GameScreen.lastPov.x = player.xy.y
         GameScreen.lastPov.y = player.xy.y
         level.director.add(player, player.xy.x, player.xy.y, level)
+        updateTime(time, true)
         level.onRestore()
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
@@ -211,6 +212,7 @@ object App : KtxGame<Screen>() {
                 playerStart = level.tempPlayerStart()
             }
             level.director.add(player, playerStart.x, playerStart.y, level)
+            updateTime(time, true)
             ConsolePanel.say("You cautiously step inside...")
         }
     }
@@ -219,7 +221,7 @@ object App : KtxGame<Screen>() {
         updateTime(time + passed.toDouble())
     }
 
-    private fun updateTime(newTime: Double) {
+    private fun updateTime(newTime: Double, force: Boolean = false) {
         val dayLength = 1000.0
         val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
         val yearZero = 2994
@@ -251,7 +253,7 @@ object App : KtxGame<Screen>() {
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $realYear"
 
-        if (lastHour != hour) {
+        if (lastHour != hour || force) {
             lastHour = hour
             App.level.updateAmbientLight(hour)
         }
