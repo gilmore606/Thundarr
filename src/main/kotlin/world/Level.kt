@@ -55,16 +55,15 @@ sealed class Level {
             for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
                 val vis = visibilityAt(x, y)
                 val glyph = Terrain.get(getTerrain(x,y)).glyph()
-                val light = lightAt(x, y)
                 if (vis > 0f) {
                     doThis(
-                        x, y, vis, glyph, light
+                        x, y, vis, glyph, lightAt(x, y)
                     )
                     if (tileSet.tileHolders[glyph] is OverlapTile) {
                         CARDINALS.forEach { edge ->
                             if ((tileSet.tileHolders[glyph] as OverlapTile).overlapsIn(this, x, y, edge)) {
                                 doOverlap(
-                                    x, y, vis, glyph, edge, light
+                                    x, y, vis, glyph, edge, lightAt(x - edge.x, y - edge.y)
                                 )
                             }
                         }
