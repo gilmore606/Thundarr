@@ -11,6 +11,7 @@ import render.GameScreen
 import render.tilesets.Glyph
 import things.Thing
 import ui.modals.EscMenu
+import ui.panels.DebugPanel
 import util.*
 
 object Keyboard : KtxInputAdapter {
@@ -85,6 +86,14 @@ object Keyboard : KtxInputAdapter {
                 App.level.addThingAt(App.player.xy.x, App.player.xy.y, Thing(
                     Glyph.TREE, true, false
                 ))
+            }
+            Input.Keys.F5 -> {
+                App.DEBUG_PANEL = !App.DEBUG_PANEL
+                if (App.DEBUG_PANEL) {
+                    GameScreen.addPanel(DebugPanel)
+                } else {
+                    GameScreen.removePanel(DebugPanel)
+                }
             }
         }
     }

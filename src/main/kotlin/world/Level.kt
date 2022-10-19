@@ -5,8 +5,7 @@ import actors.actions.processes.WalkTo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
-import render.RENDER_HEIGHT
-import render.RENDER_WIDTH
+import render.sunLights
 import render.tileholders.OverlapTile
 import render.tilesets.Glyph
 import render.tilesets.TileSet
@@ -44,48 +43,24 @@ sealed class Level {
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     open fun timeScale() = 1.0f
-    @Transient
-    open val sunLightSteps = mutableMapOf<Int,LightColor>().apply {
-        this[0] = LightColor(0.2f, 0.2f, 0.5f)
-        this[1] = LightColor(0.15f, 0.15f, 0.5f)
-        this[2] = LightColor(0.13f, 0.13f, 0.5f)
-        this[3] = LightColor(0.1f, 0.1f, 0.4f)
-        this[4] = LightColor(0.2f, 0.25f, 0.4f)
-        this[5] = LightColor(0.4f, 0.4f, 0.5f)
-        this[6] = LightColor(0.7f, 0.5f, 0.5f)
-        this[7] = LightColor(1f, 0.6f, 0.6f)
-        this[8] = LightColor(1f, 0.8f, 0.8f)
-        this[9] = LightColor(1f, 0.9f, 0.8f)
-        this[10] = LightColor(1f, 0.9f, 0.8f)
-        this[11] = LightColor(1f, 1f, 0.9f)
-        this[12] = LightColor(1f, 1f, 1f)
-        this[13] = LightColor(1f, 1f, 1f)
-        this[14] = LightColor(1f, 1f, 1f)
-        this[15] = LightColor(1f, 1f, 1f)
-        this[16] = LightColor(1f, 1f, 1f)
-        this[17] = LightColor(1f, 1f, 0.9f)
-        this[18] = LightColor(1f, 1f, 0.8f)
-        this[19] = LightColor(0.8f, 0.7f, 0.6f)
-        this[20] = LightColor(0.8f, 0.6f, 0.5f)
-        this[21] = LightColor(0.6f, 0.5f, 0.5f)
-        this[22] = LightColor(0.4f, 0.35f, 0.5f)
-        this[23] = LightColor(0.2f, 0.2f, 0.5f)
-    }
+    @Transient open val sunLightSteps = sunLights()
 
     abstract fun allChunks(): Set<Chunk>
 
 
     fun forEachCellToRender(
         tileSet: TileSet,
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
-        doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit
+        doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
+        doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit,
+        doOcclude: (x: Int, y: Int, edge: XY) -> Unit
     ) {
-        for (x in pov.x - RENDER_WIDTH /2 until pov.x + RENDER_WIDTH /2) {
-            for (y in pov.y - RENDER_HEIGHT /2 until pov.y + RENDER_HEIGHT /2) {
+        for (x in pov.x - GameScreen.RENDER_WIDTH /2 until pov.x + GameScreen.RENDER_WIDTH /2) {
+            for (y in pov.y - GameScreen.RENDER_HEIGHT /2 until pov.y + GameScreen.RENDER_HEIGHT /2) {
                 val vis = visibilityAt(x, y)
-                val glyph = Terrain.get(getTerrain(x,y)).glyph()
+                val terrain = Terrain.get(getTerrain(x,y))
+                val glyph = terrain.glyph()
                 if (vis > 0f) {
-                    doThis(
+                    doTile(
                         x, y, vis, glyph, lightAt(x, y)
                     )
                     if (tileSet.tileHolders[glyph] is OverlapTile) {
@@ -97,6 +72,35 @@ sealed class Level {
                             }
                         }
                     }
+                    if (vis == 1f && terrain.isWalkable()) {
+                        var okNE = true
+                        var okSE = true
+                        var okNW = true
+                        var okSW = true
+                        CARDINALS.forEach { edge ->
+                            if (Terrain.get(getTerrain(x + edge.x, y + edge.y)).isOpaque()) {
+                                doOcclude(
+                                    x, y, edge
+                                )
+                                when (edge) {
+                                    NORTH -> { okNE = false ; okNW = false }
+                                    SOUTH -> { okSE = false ; okSW = false }
+                                    EAST -> { okNE = false ; okSE = false}
+                                    WEST -> { okNW = false ; okSW = false }
+                                }
+                            }
+                        }
+                        CORNERS.forEach { corner ->
+                            if (Terrain.get(getTerrain(x + corner.x, y + corner.y)).isOpaque()) {
+                                when {
+                                    corner == NORTHEAST && okNE -> { doOcclude(x, y, corner) }
+                                    corner == NORTHWEST && okNW -> { doOcclude(x, y, corner) }
+                                    corner == SOUTHEAST && okSE -> { doOcclude(x, y, corner) }
+                                    corner == SOUTHWEST && okSW -> { doOcclude(x, y, corner) }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -105,8 +109,8 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     ) {
-        for (x in pov.x - RENDER_WIDTH/2 until pov.x + RENDER_WIDTH/2) {
-            for (y in pov.y - RENDER_HEIGHT/2 until pov.y + RENDER_HEIGHT/2) {
+        for (x in pov.x - GameScreen.RENDER_WIDTH/2 until pov.x + GameScreen.RENDER_WIDTH/2) {
+            for (y in pov.y - GameScreen.RENDER_HEIGHT/2 until pov.y + GameScreen.RENDER_HEIGHT/2) {
                 val thingsAt = thingsAt(x,y)
                 val vis = visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {

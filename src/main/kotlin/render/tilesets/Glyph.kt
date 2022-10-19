@@ -18,6 +18,8 @@ enum class Glyph {
     BOX_SHADOW,
     LOGO_MOON,
     LOGO_OOKLA,
+    OCCLUSION_SHADOWS_V,
+    OCCLUSION_SHADOWS_H,
 
     PLAYER,
     SKELETON,

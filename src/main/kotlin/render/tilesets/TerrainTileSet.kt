@@ -10,6 +10,9 @@ fun TerrainTileSet() =
 
         setTile(Glyph.BLANK, SimpleTile(this, 2, 2))
 
+        setTile(Glyph.OCCLUSION_SHADOWS_V, SimpleTile(this, 6, 2))
+        setTile(Glyph.OCCLUSION_SHADOWS_H, SimpleTile(this, 7, 2))
+
         setTile(Glyph.STONE_FLOOR, VariantsTile(this).apply {
             add(0.3f, 0, 0)
             add(0.3f, 0, 1)

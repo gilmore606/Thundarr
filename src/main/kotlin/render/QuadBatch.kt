@@ -30,6 +30,7 @@ class QuadBatch(
     private var vertexCount = 0
 
     private val tilePad = 0.00001f
+    private val shadowPad = 0.001f
 
     private fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
@@ -108,10 +109,10 @@ class QuadBatch(
         val y0 = -iy0.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
         val x1 = ix1.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
         val y1 = -iy1.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        tx0 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        ty0 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
-        ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad)
+        tx0 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad * 2)
+        ty0 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerRow * tilePad * 2)
+        tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad * 2)
+        ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad * 2)
 
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
@@ -125,6 +126,91 @@ class QuadBatch(
             addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
             addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
             addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
+        }
+    }
+
+    fun addOccludeQuad(col: Int, row: Int, stride: Double, edge: XY,
+                        textureIndex: Int, aspectRatio: Double) {
+        var ix0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
+        var iy0 = row.toDouble() * stride - (stride * 0.5)
+        var ix1 = ix0 + stride / aspectRatio
+        var iy1 = iy0 + stride * 0.25
+        var tx0 = 0f
+        var ty0 = 0.5f
+        var tx1 = 1f
+        var ty1 = 0.75f
+        when (edge) {
+            SOUTH -> {
+                iy0 += stride * 0.75
+                iy1 = iy0 + stride * 0.25
+                ty0 = 0.75f
+                ty1 = 0.5f
+            }
+            EAST -> {
+                ix0 += stride * 0.75 / aspectRatio
+                iy1 = iy0 + stride
+                tx0 = 0.75f
+                tx1 = 0.5f
+                ty0 = 0f
+                ty1 = 1f
+            }
+            WEST -> {
+                ix1 = ix0 + stride * 0.25 / aspectRatio
+                iy1 = iy0 + stride
+                tx0 = 0.5f
+                tx1 = 0.75f
+                ty0 = 0f
+                ty1 = 1f
+            }
+            NORTHEAST -> {
+                ix0 += stride * 0.75 / aspectRatio
+                tx0 = 1f
+                tx1 = 0.75f
+                ty0 = 0.25f
+                ty1 = 0f
+            }
+            NORTHWEST -> {
+                ix1 -= stride * 0.75 / aspectRatio
+                tx0 = 0.75f
+                tx1 = 1f
+                ty0 = 0.25f
+                ty1 = 0f
+            }
+            SOUTHEAST -> {
+                ix0 += stride * 0.75 / aspectRatio
+                iy0 += stride * 0.75
+                iy1 += stride * 0.75
+                tx0 = 1f
+                tx1 = 0.75f
+                ty0 = 0f
+                ty1 = 0.25f
+            }
+            SOUTHWEST -> {
+                iy0 += stride * 0.75
+                iy1 += stride * 0.75
+                ix1 -= stride * 0.75 / aspectRatio
+                tx0 = 0.75f
+                tx1 = 1f
+                ty0 = 0f
+                ty1 = 0.25f
+            }
+        }
+        val x0 = ix0.toFloat() - shadowPad - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
+        val y0 = -iy0.toFloat() + shadowPad + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
+        val x1 = ix1.toFloat() + shadowPad - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
+        val y1 = -iy1.toFloat() - shadowPad + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
+        tx0 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
+        ty0 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerRow * tilePad)
+        tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
+        ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad)
+
+        floats.apply {
+            addVertex(x0, y0, tx0, ty0, 1f, 1f, 1f, 0f)
+            addVertex(x0, y1, tx0, ty1, 1f, 1f, 1f, 0f)
+            addVertex(x1, y0, tx1, ty0, 1f, 1f, 1f, 0f)
+            addVertex(x1, y0, tx1, ty0, 1f, 1f, 1f, 0f)
+            addVertex(x0, y1, tx0, ty1, 1f, 1f, 1f, 0f)
+            addVertex(x1, y1, tx1, ty1, 1f, 1f, 1f, 0f)
         }
     }
 
