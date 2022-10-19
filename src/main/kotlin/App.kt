@@ -36,6 +36,7 @@ object App : KtxGame<Screen>() {
     lateinit var worldLevel: WorldLevel
     lateinit var save: SaveState
     var time: Double = 0.0
+    var lastHour = -1
     var timeString: String = "???"
     var dateString: String = "???"
 
@@ -219,7 +220,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun updateTime(newTime: Double) {
-        val dayLength = 500.0
+        val dayLength = 1000.0
         val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
         val yearZero = 2994
 
@@ -227,16 +228,17 @@ object App : KtxGame<Screen>() {
         val day = (time / dayLength).toInt()
         val timeOfDay = time - (day * dayLength)
         val minutes = (timeOfDay / dayLength) * 1440.0
-        var hour = (minutes / 60).toInt()
+        val hour = (minutes / 60).toInt()
         val minute = minutes.toInt() - (hour * 60)
         var ampm = "am"
+        var amhour = hour
         if (hour >= 11) {
             ampm = "pm"
             if (hour >= 12) {
-                hour -= 12
+                amhour -= 12
             }
         }
-        hour += 1
+        amhour += 1
         val minstr = if (minute < 10) "0$minute" else "$minute"
 
         val year = (day / 360)
@@ -246,7 +248,12 @@ object App : KtxGame<Screen>() {
         val monthName = monthNames[month]
         val realYear = yearZero + year
 
-        timeString = "$hour:$minstr $ampm"
+        timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $realYear"
+
+        if (lastHour != hour) {
+            lastHour = hour
+            App.level.updateAmbientLight(hour)
+        }
     }
 }

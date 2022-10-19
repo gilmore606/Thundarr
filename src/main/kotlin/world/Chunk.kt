@@ -301,6 +301,14 @@ class Chunk(
         lightCacheDirty[x][y] = false
     }
 
+    fun refreshLight() {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                lightCacheDirty[x][y] = true
+            }
+        }
+    }
+
     fun removeLightSource(lightSource: LightSource) {
         for (x in 0 until width) {
             for (y in 0 until height) {
