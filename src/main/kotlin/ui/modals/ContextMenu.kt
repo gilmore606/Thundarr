@@ -8,7 +8,7 @@ import java.lang.Integer.min
 class ContextMenu(
     screenX: Int,
     screenY: Int
-): Modal(100, 50) {
+): Modal(100, 50, null, Position.CURSOR) {
 
     private val options = mutableMapOf<String,()->Unit>()
     private var selection = -1
@@ -17,6 +17,7 @@ class ContextMenu(
     private val spacing = 26
 
     init {
+        this.animTime = 1f
         this.x = screenX
         this.y = screenY
         this.shadowOffset = 6

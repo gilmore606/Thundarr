@@ -13,11 +13,11 @@ abstract class Modal(
     val title: String? = null,
     val position: Position = Position.LEFT
 ) : Panel() {
-    enum class Position { LEFT, CENTER_LOW }
+    enum class Position { LEFT, CENTER_LOW, CURSOR }
 
     private var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
-    private val animTime = 80f
+    protected var animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
 
     init {
