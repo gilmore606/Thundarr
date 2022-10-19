@@ -10,12 +10,14 @@ import java.lang.Float.min
 abstract class Modal(
     width: Int,
     height: Int,
-    val title: String? = null
+    val title: String? = null,
+    val position: Position = Position.LEFT
 ) : Panel() {
+    enum class Position { LEFT, CENTER_LOW }
 
     private var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
-    private val animTime = 60f
+    private val animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
 
     init {
@@ -24,7 +26,7 @@ abstract class Modal(
     }
 
     override fun onResize(width: Int, height: Int) {
-        this.x = (width - this.width) / 2
+        this.x = 40
         this.y = (height - this.height) / 2
     }
 
@@ -32,7 +34,7 @@ abstract class Modal(
         val anim = min(1f, (System.currentTimeMillis() - launchTimeMs) / animTime)
         val xSquish = ((1f - anim) * width / 2f).toInt()
         val ySquish = ((1f - anim) * height / 2f).toInt()
-        drawBox(x + xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)
+        drawBox(x - xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)
     }
 
     override fun drawText() {

@@ -103,6 +103,7 @@ object App : KtxGame<Screen>() {
     private fun restoreState() {
         val state = save.getWorldState()
         level = state.level
+        if (level is WorldLevel) worldLevel = level as WorldLevel
         player = state.player
         turnTime = state.turnTime
         GameScreen.zoom = state.zoom
@@ -138,8 +139,8 @@ object App : KtxGame<Screen>() {
     fun restartWorld() {
         GameScreen.addModal(ConfirmModal(
                 listOf(
-                    "Are you sure you want to abandon this world?",
-                    "All your progress, such as it is, will be lost."),
+                    "Abandon this world?",
+                    "All your progress will be lost."),
                 "Abandon", "Cancel"
             ) { yes ->
                 if (yes) {
@@ -168,8 +169,8 @@ object App : KtxGame<Screen>() {
     fun saveAndQuit() {
         GameScreen.addModal(
             ConfirmModal(
-                listOf("Are you sure you want to save and exit the game?"),
-                "Save and exit", "Cancel"
+                listOf("Quit the game?", "Your progress will be saved."),
+                "Quit", "Cancel"
             ) { yes ->
                 if (yes) {
                     GameScreen.addModal(SavingModal())

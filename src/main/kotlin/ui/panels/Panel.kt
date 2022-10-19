@@ -14,8 +14,8 @@ abstract class Panel {
 
     protected var x = 0
     protected var y = 0
-    protected var width = 500
-    protected var height = 500
+    var width = 500
+    var height = 500
 
     protected var shadowOffset = 10
     protected var borderWidth = 2

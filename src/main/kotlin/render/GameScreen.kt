@@ -86,11 +86,13 @@ object GameScreen : KtxScreen {
         get() = App.level.pov
     val lastPov = XY(0,0)
 
-    private const val cameraPull = 0.4f
-    private const val cameraAccel = 32f
+    private const val cameraPull = 0.35f
+    private const val cameraAccel = 20f
 
     var scrollX = 0f
     var scrollY = 0f
+    var scrollXtarget = 0f
+    var scrollYtarget = 0f
     var scrollLatch = false
     var scrollDragging = false
     private val dragOrigin = XY(0, 0)
@@ -140,17 +142,17 @@ object GameScreen : KtxScreen {
             lastPov.x = pov.x
             lastPov.y = pov.y
         }
-        val accX = 1f + abs(scrollX) * cameraAccel
-        val accY = 1f + abs(scrollY) * cameraAccel
-        scrollX = if (scrollX > 0) {
-            kotlin.math.max(0f,(scrollX - cameraPull * delta * accX * zoom.toFloat() ))
+        val accX = 1f + abs(scrollX - scrollXtarget) * cameraAccel / zoom.toFloat()
+        val accY = 1f + abs(scrollY - scrollYtarget) * cameraAccel / zoom.toFloat()
+        scrollX = if (scrollX > scrollXtarget) {
+            kotlin.math.max(scrollXtarget,(scrollX - cameraPull * delta * accX * zoom.toFloat() ))
         } else {
-            kotlin.math.min(0f,(scrollX + cameraPull * delta * accX * zoom.toFloat() ))
+            kotlin.math.min(scrollXtarget,(scrollX + cameraPull * delta * accX * zoom.toFloat() ))
         }
-        scrollY = if (scrollY > 0) {
-            kotlin.math.max(0f,(scrollY - cameraPull * delta * accY * zoom.toFloat() ))
+        scrollY = if (scrollY > scrollYtarget) {
+            kotlin.math.max(scrollYtarget,(scrollY - cameraPull * delta * accY * zoom.toFloat() ))
         } else {
-            kotlin.math.min(0f,(scrollY + cameraPull * delta * accY * zoom.toFloat() ))
+            kotlin.math.min(scrollYtarget,(scrollY + cameraPull * delta * accY * zoom.toFloat() ))
         }
     }
 
@@ -249,6 +251,9 @@ object GameScreen : KtxScreen {
         if (modal !is ContextMenu) clearCursor()
         modal.onResize(this.width, this.height)
         addPanel(modal)
+        if (modal.position == Modal.Position.LEFT) {
+            this.scrollXtarget = 0f - (modal.width / 1000f / zoom).toFloat()
+        }
         topModal = modal
     }
 
@@ -261,6 +266,9 @@ object GameScreen : KtxScreen {
                     topModal = panel
                 }
             }
+        }
+        if (topModal == null) {
+            this.scrollXtarget = 0f
         }
     }
 
