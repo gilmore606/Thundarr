@@ -143,6 +143,8 @@ sealed class Level {
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
+    fun setTerrainData(x: Int, y: Int, data: String) = chunkAt(x,y)?.setTerrainData(x,y,data)
+
     fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.BLANK
 
     fun getPathToPOV(from: XY) = stepMap.pathFrom(from)

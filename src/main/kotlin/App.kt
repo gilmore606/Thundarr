@@ -6,9 +6,6 @@ import kotlinx.coroutines.*
 import ui.input.Keyboard
 import ui.input.Mouse
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
@@ -19,11 +16,8 @@ import ui.panels.ConsolePanel
 import ui.modals.CreditsModal
 import ui.modals.SavingModal
 import ui.panels.StatusPanel
-import util.gzipCompress
-import util.gzipDecompress
 import util.log
 import world.*
-import java.io.File
 import kotlin.system.exitProcess
 
 object App : KtxGame<Screen>() {
@@ -38,7 +32,8 @@ object App : KtxGame<Screen>() {
 
     lateinit var player: Player
     lateinit var level: Level
-    lateinit var saveState: SaveState
+    lateinit var worldLevel: WorldLevel
+    lateinit var save: SaveState
     var turnTime = 0f
 
     private var pendingJob: Job? = null
@@ -57,9 +52,9 @@ object App : KtxGame<Screen>() {
         KtxAsync.initiate()
         setupLog()
 
-        saveState = SaveState("myworld")
+        save = SaveState("myworld")
 
-        if (saveState.worldExists()) {
+        if (save.worldExists()) {
             log.info("Loading saved state...")
             restoreState()
         } else {
@@ -95,7 +90,7 @@ object App : KtxGame<Screen>() {
     private fun saveState() {
         level.unload()
 
-        saveState.putWorldState(
+        save.putWorldState(
             WorldState(
                 level = level,
                 player = player,
@@ -106,7 +101,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun restoreState() {
-        val state = saveState.getWorldState()
+        val state = save.getWorldState()
         level = state.level
         player = state.player
         turnTime = state.turnTime
@@ -119,8 +114,9 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        saveState.eraseAll()
+        save.eraseAll()
         level = WorldLevel()
+        worldLevel = level as WorldLevel
         player = Player()
         level.setPov(200, 200)
         pendingJob = KtxAsync.launch {

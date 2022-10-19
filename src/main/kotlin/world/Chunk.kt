@@ -1,19 +1,15 @@
 package world
 
 import actors.Actor
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
+import world.cartos.RoomyMaze
 import world.cartos.WorldCarto
 import world.terrains.Terrain
-import java.io.File
 import java.lang.Float.min
 
 
@@ -36,7 +32,7 @@ class Chunk(
     private val things = Array(width) { Array(height) { mutableListOf<Thing>() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
-    private var generating = false
+    var generating = false
 
     @Transient
     private val lights = Array(width) { Array(height) { mutableMapOf<LightSource, LightColor>() } }
@@ -59,17 +55,15 @@ class Chunk(
     @Transient private val noThing = ArrayList<Thing>()
 
 
-    fun onCreate(level: Level, x: Int, y: Int, forWorld: Boolean) {
-        this.level = level
+    fun onCreate(x: Int, y: Int) {
         this.x = x
         this.y = y
         this.x1 = x + width - 1
         this.y1 = y + height - 1
-        if (forWorld) {
-            generating = true
-            generateWorld()
-            generating = false
-        }
+    }
+
+    fun connectLevel(level: Level) {
+        this.level = level
     }
 
     fun tempPlayerStart(): XY {
@@ -100,17 +94,16 @@ class Chunk(
         }
     }
 
-    private fun generateWorld() {
+    fun generateWorld() {
+        generating = true
         WorldCarto().carveLevel(x, y, x + width - 1, y + height - 1, this)
+        generating = false
     }
 
-    fun generateLevel(doGenerate: (Chunk)->Unit): Chunk {
-        this.x = 0
-        this.y = 0
-        this.x1 = width - 1
-        this.y1 = height - 1
-        doGenerate(this)
-        return this
+    fun generateLevel(building: Building) {
+        generating = true
+        RoomyMaze().carveLevel(0, 0, building.floorWidth - 1, building.floorHeight - 1, this)
+        generating = false
     }
 
     fun unload(saveActors: Set<Actor>) {
@@ -121,7 +114,7 @@ class Chunk(
         lightSourceLocations.forEach { (it, _) -> lightsToDispose.add(it) }
         lightsToDispose.forEach { level.removeLightSource(it) }
 
-        ChunkLoader.saveChunk(this)
+        ChunkLoader.saveWorldChunk(this)
     }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)

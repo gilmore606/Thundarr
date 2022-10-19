@@ -1,16 +1,8 @@
 package world
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import ktx.async.KtxAsync
 import util.*
-import util.hasOneWhere
-import java.io.File
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
@@ -105,7 +97,7 @@ class WorldLevel() : Level() {
         loadedChunks.firstOrNull { it.x == x && it.y == y }
 
     private fun loadChunkAt(x: Int, y: Int) {
-        ChunkLoader.getChunkAt(this, x, y) { chunk ->
+        ChunkLoader.getWorldChunkAt(this, x, y) { chunk ->
             receiveChunk(chunk)
         }
     }

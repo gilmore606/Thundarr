@@ -7,13 +7,13 @@ import kotlin.random.Random
 
 // algorithm adapted from Bob Nystrom
 
-object RoomyMaze : Carto() {
+class RoomyMaze : Carto() {
 
     override fun doCarveLevel() {
         val rooms = ArrayList<Rect>()
 
         val roomTries = Random.nextInt(30, 500)
-        val roomBigness = Random.nextInt(2, 5)
+        val roomBigness = Random.nextInt(1, 4)
 
         var nextRegion = 0
         repeat (roomTries) {

@@ -6,6 +6,9 @@ import render.tilesets.Glyph
 import things.Thing
 import util.Dice
 import util.Perlin
+import util.UUID
+import world.Building
+import world.ChunkLoader
 import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.random.Random
@@ -19,7 +22,7 @@ class WorldCarto : Carto() {
         forEachCell { x, y ->
             val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0) +
                     Perlin.noise(x.toDouble() * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
-            if (n > fullness * scale + Dice.float(0f,0.06f).toDouble()) {
+            if (n > fullness * scale - Dice.float(0f,0.18f).toDouble()) {
                 carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
             } else {
                 carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
@@ -31,21 +34,21 @@ class WorldCarto : Carto() {
             }
         }
 
-        carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
-
-        assignDoors()
+        if (Dice.chance(0.2f)) {
+            carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
+            assignDoors()
+        }
 
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
-                    if (Dice.chance(n.toFloat() * 2.0f)) {
+                    if (Dice.chance(n.toFloat() * 1.6f)) {
                         addThingAt(x + this.x0, y + this.y0, Thing(
                             Glyph.TREE,
                             true, false
-                        )
-                        )
+                        ))
                     }
                 }
             }
@@ -55,12 +58,20 @@ class WorldCarto : Carto() {
     private fun assignDoors() {
         forEachCell { x, y ->
             if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-                val doorId = Random.nextInt(100000).toString()
-                setTerrainData(x, y, Json.encodeToString(PortalDoor.Data(
-                    enterMsg = "A rusty metal door with the embossed number '$doorId'.\nOpen it and go inside?",
-                    levelId = "building" + Random.nextInt(100000).toString()
-                )))
+                val buildingId = UUID()
+                val building = Building(
+                    id = buildingId,
+                    x = x,
+                    y = y,
+                    floorCount = Random.nextInt(1, 6),
+                    floorWidth = 30 + Random.nextInt(0, 40),
+                    floorHeight = 30 + Random.nextInt(0, 40),
+                    firstLevelId = UUID(),
+                    doorMsg = "A door labelled $buildingId.\nOpen it and step inside?"
+                )
+                ChunkLoader.makeBuilding(building)
             }
         }
     }
+
 }

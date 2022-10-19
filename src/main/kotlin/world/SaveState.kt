@@ -30,9 +30,16 @@ class SaveState(
 
     object LevelChunksTable : Table() {
         val id = varchar("id", 80)
+        val building = varchar("building", 80)
         val data = text("data")
     }
 
+    object BuildingsTable: Table() {
+        val id = varchar("id", 80)
+        val x = integer("x")
+        val y = integer("y")
+        val data = text("data")
+    }
 
     // TODO: figure out why we have to know the full path?
     private val saveFileFolder = "/githome/Thundarr/savegame"
@@ -43,17 +50,11 @@ class SaveState(
         Database.connect("jdbc:sqlite:$saveFileFolder/${id}.thundarr", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            SchemaUtils.create(WorldStateTable, WorldChunksTable, LevelChunksTable)
+            SchemaUtils.create(WorldStateTable, WorldChunksTable, LevelChunksTable, BuildingsTable)
         }
     }
 
-    fun worldExists(): Boolean {
-        var result = 0
-        transaction {
-            result = WorldStateTable.selectAll().count().toInt()
-        }
-        return result > 0
-    }
+    fun worldExists() = transaction { WorldStateTable.selectAll().count().toInt() } > 0
 
     fun eraseAll() {
         transaction {
@@ -78,43 +79,25 @@ class SaveState(
         return Json.decodeFromString(text)
     }
 
-    private fun hasWorldChunk(x: Int, y: Int): Boolean {
-        var result = 0
-        transaction {
-            result = WorldChunksTable.select {
+    fun hasWorldChunk(x: Int, y: Int) = transaction {
+            WorldChunksTable.select {
                 (WorldChunksTable.x eq x) and (WorldChunksTable.y eq y)
-            }.count().toInt()
-        }
-        return result > 0
-    }
+            }.count().toInt() } > 0
 
-    fun getWorldChunk(x: Int, y: Int, level: Level): Chunk {
-        var chunk: Chunk? = null
-        if (hasWorldChunk(x, y)) {
-            log.debug("Loading chunk at $x $y")
+    fun getWorldChunk(x: Int, y: Int) = if (hasWorldChunk(x, y)) {
             transaction {
                 WorldChunksTable.select {
                     (WorldChunksTable.x eq x) and (WorldChunksTable.y eq y)
                 }.singleOrNull()?.let {
-                    chunk = fromCompressed(it[WorldChunksTable.data])
+                    fromCompressed<Chunk>(it[WorldChunksTable.data])
                 }
-            }
-            chunk?.onRestore(level) ?: run { throw RuntimeException("Could not find chunk $x $y in db!") }
-        } else {
-            log.debug("Creating chunk at $x $y")
-            chunk = Chunk(CHUNK_SIZE, CHUNK_SIZE).apply {
-                onCreate(level, x, y, forWorld = true)
-            }
-        }
-        return chunk ?: run { throw RuntimeException("Could not create chunk at $x $y!") }
-    }
+            } ?: run { throw RuntimeException("Could not load chunk at $x $y!")}
+        } else throw RuntimeException("Could not find and load chunk at $x $y!")
 
 
     fun putWorldChunk(chunk: Chunk) {
         transaction {
-            WorldChunksTable.deleteWhere {
-                (x eq chunk.x) and (y eq chunk.y)
-            }
+            WorldChunksTable.deleteWhere { (x eq chunk.x) and (y eq chunk.y) }
             WorldChunksTable.insert {
                 it[x] = chunk.x
                 it[y] = chunk.y
@@ -145,37 +128,63 @@ class SaveState(
         log.info("Saved world state.")
     }
 
-    private fun hasLevelChunk(levelId: String): Boolean {
-        var result = 0
-        transaction {
-            result = LevelChunksTable.select {
-                LevelChunksTable.id eq levelId
-            }.count().toInt()
-        }
-        return result > 0
-    }
-
-    fun getLevelChunk(levelId: String): Chunk {
-        log.debug("Loading level chunk $levelId")
-        var chunk: Chunk? = null
-        transaction {
+    fun hasLevelChunk(levelId: String) = transaction {
             LevelChunksTable.select {
-                LevelChunksTable.id eq levelId
-            }.singleOrNull()?.let {
-                chunk = fromCompressed(it[LevelChunksTable.data])
-            }
-        }
-        return chunk ?: run { throw RuntimeException("Could not find level chunk $levelId in db!") }
-    }
+                (LevelChunksTable.id eq levelId) and (LevelChunksTable.data neq "")
+            }.count().toInt() } > 0
 
-    fun putLevelChunk(chunk: Chunk, levelId: String) {
+    fun getLevelChunk(levelId: String) = if (hasLevelChunk(levelId)) {
+            transaction {
+                LevelChunksTable.select {
+                    LevelChunksTable.id eq levelId
+                }.singleOrNull()?.let {
+                    fromCompressed<Chunk>(it[LevelChunksTable.data])
+                }
+            } ?: throw RuntimeException("Could not load chunk $levelId !")
+        } else throw RuntimeException("Could not find and load chunk $levelId !")
+
+    fun putLevelChunk(chunk: Chunk, levelId: String, buildingId: String) {
         transaction {
-            LevelChunksTable.deleteWhere {
-                id eq levelId
-            }
+            LevelChunksTable.deleteWhere { id eq levelId }
             LevelChunksTable.insert {
                 it[id] = levelId
+                it[building] = buildingId
                 it[data] = toCompressed(chunk)
+            }
+        }
+    }
+
+    fun getBuilding(id: String) =
+        transaction {
+            BuildingsTable.select { BuildingsTable.id eq id }.singleOrNull()?.let {
+                fromCompressed<Building>(it[BuildingsTable.data])
+            }
+        } ?: throw RuntimeException("No building $id found!")
+
+    fun getBuildingForLevel(levelId: String) = getBuilding(
+        transaction {
+            LevelChunksTable.select { LevelChunksTable.id eq levelId }.singleOrNull()?.let {
+                it[LevelChunksTable.building]
+            }
+        } ?: throw RuntimeException("No building found for level $levelId !")
+    )
+
+    fun putBuilding(building: Building) {
+        transaction {
+            BuildingsTable.deleteWhere { id eq building.id }
+            BuildingsTable.insert {
+                it[id] = building.id
+                it[x] = building.x
+                it[y] = building.y
+                it[data] = toCompressed(building)
+            }
+            // Pre-create the LevelChunks row so the building id can be found for the level.
+            if (!hasLevelChunk(building.firstLevelId)) {
+                LevelChunksTable.insert {
+                    it[id] = building.firstLevelId
+                    it[LevelChunksTable.building] = building.id
+                    it[data] = ""
+                }
             }
         }
     }
