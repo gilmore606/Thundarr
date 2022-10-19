@@ -11,7 +11,7 @@ class TileSet(
     val tilesPerRow: Int,
     val tilesPerColumn: Int,
 ) {
-    private var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
+    var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
     var tileRowStride = 0.0
     var tileColumnStride = 0.0
 

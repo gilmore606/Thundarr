@@ -43,7 +43,9 @@ object GameScreen : KtxScreen {
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
 
-    private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), TerrainTileSet())
+    private val terrainTileSet = TerrainTileSet()
+    private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
+    private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
     private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = true)
@@ -267,9 +269,10 @@ object GameScreen : KtxScreen {
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL_BLEND)
 
+        overlapBatch.clear()
         terrainBatch.apply {
             clear()
-            App.level.forEachCellToRender { tx, ty, vis, glyph, light ->
+            App.level.forEachCellToRender(tileSet, { tx, ty, vis, glyph, light ->
                 val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
                 addTileQuad(
                     tx - pov.x, ty - pov.y, tileStride,
@@ -280,7 +283,17 @@ object GameScreen : KtxScreen {
                 lightCache[lx][ly].r = light.r
                 lightCache[lx][ly].g = light.g
                 lightCache[lx][ly].b = light.b
-            }
+            }, { tx, ty, vis, glyph, edge, light ->
+                val textureIndex = getTextureIndex(glyph, App.level, tx, ty)
+                overlapBatch.addOverlapQuad(
+                    tx - pov.x - edge.x, ty - pov.y - edge.y, tileStride, edge,
+                    textureIndex, vis, light, aspectRatio
+                )
+            })
+            draw()
+        }
+
+        overlapBatch.apply {
             draw()
         }
 
@@ -352,8 +365,10 @@ object GameScreen : KtxScreen {
 
     override fun dispose() {
         terrainBatch.dispose()
+        overlapBatch.dispose()
         mobBatch.dispose()
         thingBatch.dispose()
         uiBatch.dispose()
+        uiWorldBatch.dispose()
     }
 }
