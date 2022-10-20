@@ -180,7 +180,7 @@ object GameScreen : KtxScreen {
 
         drawEverything()
 
-        App.level.director.runQueue(App.level)
+        App.runActorQueues()
     }
 
     private fun animateZoom(delta: Float) {

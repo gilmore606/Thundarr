@@ -183,7 +183,7 @@ class QuadBatch(
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(ix0 - shadowPad, iy0 + shadowPad, ix1 + shadowPad, iy1 - shadowPad,
+        addQuad(ix0 - shadowPad, iy0 - shadowPad, ix1 + shadowPad, iy1 + shadowPad,
             tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, grayOut)
     }
 

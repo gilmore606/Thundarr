@@ -42,7 +42,15 @@ sealed class Level {
     open val sunLightSteps = sunLights()
 
     abstract fun allChunks(): Set<Chunk>
+    abstract fun levelId(): String
 
+    companion object {
+        fun make(levelId: String) = if (levelId == "world") {
+            WorldLevel()
+        }  else {
+            EnclosedLevel(levelId)
+        }
+    }
 
     fun forEachCellToRender(
         tileSet: TileSet,

@@ -39,6 +39,8 @@ class EnclosedLevel(
 
     override fun allChunks() = allChunks
 
+    override fun levelId() = levelId
+
     override fun isReady() = allChunks.isNotEmpty()
 
     override fun tempPlayerStart(): XY? = if (isReady()) chunk!!.tempPlayerStart() else null

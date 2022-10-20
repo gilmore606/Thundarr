@@ -1,7 +1,5 @@
 package world
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import util.*
 
 const val CHUNK_SIZE = 64
@@ -22,6 +20,7 @@ class WorldLevel() : Level() {
     }
 
     override fun allChunks() = loadedChunks
+    override fun levelId() = "world"
 
     override fun isReady() = loadedChunks.size >= CHUNKS_WIDE * CHUNKS_WIDE
 
@@ -42,10 +41,18 @@ class WorldLevel() : Level() {
         populateChunks()
     }
 
+    // Save all live chunks and remove their actors.
     override fun unload() {
         super.unload()
         log.info("Unloading ${loadedChunks.size} chunks")
         mutableSetOf<Chunk>().apply { addAll(loadedChunks) }.forEach { unloadChunk(it) }
+    }
+
+    private fun unloadChunk(chunk: Chunk) {
+        chunk.unload(
+            director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+        )
+        loadedChunks.remove(chunk)
     }
 
     override fun onRestore() {
@@ -130,13 +137,6 @@ class WorldLevel() : Level() {
             }
         }
         return inUse
-    }
-
-    private fun unloadChunk(chunk: Chunk) {
-        chunk.unload(
-            director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
-        )
-        loadedChunks.remove(chunk)
     }
 
     private fun dirtyLightsAroundChunk(chunk: Chunk) {

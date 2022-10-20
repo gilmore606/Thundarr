@@ -34,6 +34,8 @@ object App : KtxGame<Screen>() {
     lateinit var player: Player
     lateinit var level: Level
     lateinit var save: SaveState
+    val liveLevels = mutableSetOf<Level>()
+
     var time: Double = 0.0
     var lastHour = -1
     var timeString: String = "???"
@@ -86,11 +88,11 @@ object App : KtxGame<Screen>() {
     }
 
     private fun saveState() {
-        level.unload()
+        liveLevels.forEach { it.unload() }
 
         save.putWorldState(
             WorldState(
-                levelId = if (level is EnclosedLevel) { (level as EnclosedLevel).levelId } else "world",
+                levelId = level.levelId(),
                 player = player,
                 time = time,
                 zoomIndex = GameScreen.zoomIndex
@@ -99,13 +101,12 @@ object App : KtxGame<Screen>() {
     }
 
     private fun restoreState() {
+        liveLevels.forEach { it.unload() }
+
         val state = save.getWorldState()
-        level = if (state.levelId == "world") {
-            WorldLevel()
-        } else {
-            EnclosedLevel(state.levelId)
-        }
+        level = getLevel(state.levelId)
         player = state.player
+
         updateTime(state.time)
         GameScreen.restoreZoomIndex(state.zoomIndex)
         GameScreen.lastPov.x = player.xy.y
@@ -117,10 +118,14 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
+        liveLevels.forEach { it.unload() }
         save.eraseAll()
-        level = WorldLevel()
+
+        level = getLevel("world")
+
         player = Player()
         level.setPov(200, 200)
+
         pendingJob = KtxAsync.launch {
             var playerStart = level.tempPlayerStart()
             var waitMs = 0
@@ -153,6 +158,26 @@ object App : KtxGame<Screen>() {
                 }
             }
         )
+    }
+
+    // Get the specified level from the livelist, or start it up and add it.
+    // Remove old levels if necessary.
+    private fun getLevel(levelId: String): Level {
+        liveLevels.forEach { level ->
+            if (level.levelId() == levelId) {
+                return level
+            }
+        }
+        val level = Level.make(levelId)
+        liveLevels.add(level)
+        return level
+    }
+
+    // Run action queues for all live levels.  This happens on every render.
+    fun runActorQueues() {
+        liveLevels.forEach { level ->
+            level.director.runQueue(level)
+        }
     }
 
     fun openSettings() {
@@ -195,9 +220,8 @@ object App : KtxGame<Screen>() {
 
     fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
-        level.unload()
 
-        level = EnclosedLevel(levelId)
+        level = getLevel(levelId)
 
         KtxAsync.launch {
             var playerStart = level.tempPlayerStart()
