@@ -26,7 +26,14 @@ abstract class Modal(
     }
 
     override fun onResize(width: Int, height: Int) {
-        this.x = 40
+        if (position == Position.LEFT) {
+            this.x = 40
+        } else {
+            this.x = (width - this.width) / 2
+        }
+        if (position == Position.CENTER_LOW) {
+            this.y = (height - this.height) / 2 + 100
+        }
         this.y = (height - this.height) / 2
     }
 

@@ -11,6 +11,7 @@ import render.GameScreen
 import render.tilesets.Glyph
 import things.Thing
 import ui.modals.EscMenu
+import ui.modals.MapModal
 import ui.panels.DebugPanel
 import util.*
 
@@ -66,6 +67,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.NUMPAD_9 -> { App.player.queue(Move(NORTHEAST)) }
 
             Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
+            Input.Keys.M -> { GameScreen.addModal(MapModal()) }
 
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

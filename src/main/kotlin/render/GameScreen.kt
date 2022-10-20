@@ -305,7 +305,7 @@ object GameScreen : KtxScreen {
         if (modal !is ContextMenu) clearCursor()
         addPanel(modal)
         if (modal.position == Modal.Position.LEFT) {
-            this.scrollTargetX = 0f - (modal.width / 1000f / zoom).toFloat()
+            this.scrollTargetX = 0f - (modal.width / 1200f / zoom).toFloat()
         }
         topModal = modal
     }

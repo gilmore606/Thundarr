@@ -12,7 +12,8 @@ class ConfirmModal(
     val callback: (Boolean)->Unit
 ): Modal(
     textWidth(text) + 48,
-    text.size * 24 + 90
+    text.size * 24 + 90,
+    position = Position.LEFT
 ) {
 
     companion object {

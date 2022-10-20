@@ -1,12 +1,12 @@
 package ui.panels
 
-object StatusPanel : Panel() {
+object StatusPanel : ShadedPanel() {
 
     private val padding = 12
 
     init {
-        this.width = 130
-        this.height = 100
+        this.width = 150
+        this.height = 78
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -15,8 +15,8 @@ object StatusPanel : Panel() {
     }
 
     override fun drawText() {
-        drawString(App.level.statusText(), 0, 0)
-        drawString(App.timeString, 0, 20)
-        drawString(App.dateString, 0, 40)
+        drawString(App.level.statusText(), padding, padding)
+        drawString(App.timeString, padding, padding + 20)
+        drawString(App.dateString, padding, padding + 40)
     }
 }

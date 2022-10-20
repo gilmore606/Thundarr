@@ -20,6 +20,7 @@ enum class Glyph {
     LOGO_OOKLA,
     OCCLUSION_SHADOWS_V,
     OCCLUSION_SHADOWS_H,
+    PANEL_SHADOW,
 
     PLAYER,
     SKELETON,
