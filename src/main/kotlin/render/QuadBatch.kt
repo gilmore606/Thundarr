@@ -1,6 +1,5 @@
 package render
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
@@ -29,10 +28,10 @@ class QuadBatch(
     private var floatCount = 0
     private var vertexCount = 0
 
-    private val tilePad = 0.00001f
+    private val tilePad = 0.00004f
     private val shadowPad = 0.001f
 
-    private fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
+    private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
         this[floatCount] = x
         this[floatCount+1] = y
@@ -72,7 +71,7 @@ class QuadBatch(
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, textureIndex, lightR, lightG, lightB, grayOut)
+        addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, grayOut)
     }
 
     fun addOverlapQuad(col: Int, row: Int, stride: Double, edge: XY,
@@ -105,28 +104,12 @@ class QuadBatch(
                 ty1 = 1f
             }
         }
-        val x0 = ix0.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y0 = -iy0.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        val x1 = ix1.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y1 = -iy1.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        tx0 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad * 2)
-        ty0 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerRow * tilePad * 2)
-        tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad * 2)
-        ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad * 2)
 
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-
-        floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
-        }
+        addQuad(ix0, iy0, ix1, iy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, grayOut)
     }
 
     fun addOccludeQuad(col: Int, row: Int, stride: Double, edge: XY,
@@ -195,28 +178,13 @@ class QuadBatch(
                 ty1 = 0.25f
             }
         }
-        val x0 = ix0.toFloat() - shadowPad - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y0 = -iy0.toFloat() + shadowPad + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        val x1 = ix1.toFloat() + shadowPad - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y1 = -iy1.toFloat() - shadowPad + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        tx0 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        ty0 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
-        ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad)
 
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-
-        floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
-        }
+        addQuad(ix0 - shadowPad, iy0 + shadowPad, ix1 + shadowPad, iy1 - shadowPad,
+            tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, grayOut)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int,
@@ -225,21 +193,21 @@ class QuadBatch(
         val gly0 = (y0 / GameScreen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / GameScreen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / GameScreen.height.toDouble()) * 2f - 1f
-        addQuad(glx0, gly0, glx1, gly1, textureIndex, lightR, lightG, lightB)
+        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB)
     }
 
     private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
-                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
-                        grayOut: Float = 0f) {
+                        itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
+                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, grayOut: Float = 0f
+    ) {
         val x0 = ix0.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
         val y0 = -iy0.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
         val x1 = ix1.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
         val y1 = -iy1.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        val tx0 = ((textureIndex % tileSet.tilesPerRow) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        val ty0 = ((textureIndex / tileSet.tilesPerRow) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
-        val tx1 = (((textureIndex % tileSet.tilesPerRow) + 1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
-        val ty1 = (((textureIndex / tileSet.tilesPerRow) + 1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerColumn * tilePad)
-
+        val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
+        val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
+        val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
+        val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerColumn * tilePad)
         floats.apply {
             addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
             addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
