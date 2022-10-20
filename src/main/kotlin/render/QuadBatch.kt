@@ -130,7 +130,7 @@ class QuadBatch(
     }
 
     fun addOccludeQuad(col: Int, row: Int, stride: Double, edge: XY,
-                        textureIndex: Int, aspectRatio: Double) {
+                        textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double) {
         var ix0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
         var iy0 = row.toDouble() * stride - (stride * 0.5)
         var ix1 = ix0 + stride / aspectRatio
@@ -204,13 +204,18 @@ class QuadBatch(
         tx1 = (((textureIndex % tileSet.tilesPerRow).toFloat() + tx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
         ty1 = (((textureIndex / tileSet.tilesPerRow).toFloat() + ty1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerRow * tilePad)
 
+        val lightR = min(visibility, light.r)
+        val lightG = min(visibility, light.g)
+        val lightB = min(visibility, light.b)
+        val grayOut = if (visibility < 1f) 1f else 0f
+
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, 1f, 1f, 1f, 0f)
-            addVertex(x0, y1, tx0, ty1, 1f, 1f, 1f, 0f)
-            addVertex(x1, y0, tx1, ty0, 1f, 1f, 1f, 0f)
-            addVertex(x1, y0, tx1, ty0, 1f, 1f, 1f, 0f)
-            addVertex(x0, y1, tx0, ty1, 1f, 1f, 1f, 0f)
-            addVertex(x1, y1, tx1, ty1, 1f, 1f, 1f, 0f)
+            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
+            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
         }
     }
 

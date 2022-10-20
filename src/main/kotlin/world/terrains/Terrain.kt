@@ -23,6 +23,7 @@ sealed class Terrain(
             Type.TERRAIN_STONEFLOOR -> StoneFloor
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_GRASS -> Grass
+            Type.TERRAIN_WATER -> Water
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
@@ -41,6 +42,7 @@ sealed class Terrain(
         TERRAIN_STONEFLOOR,
         TERRAIN_DIRT,
         TERRAIN_GRASS,
+        TERRAIN_WATER,
         TERRAIN_PORTAL_DOOR,
     }
 
@@ -109,4 +111,13 @@ object PortalDoor : Terrain(
             }
         })
     }
+}
+
+object Water : Terrain(
+    Glyph.WATER,
+    false,
+    true,
+    false
+) {
+
 }

@@ -7,15 +7,14 @@ import render.tilesets.TileSet
 abstract class TileHolder(
     val set: TileSet
 ) {
-
     abstract fun getTextureIndex(
         level: Level? = null,
         x: Int = 0,
         y: Int = 0
     ): Int
 
-    protected fun pickIndexFromVariants(bucket: ArrayList<Triple<Float, Int, Int>>, seed: Int): Int {
-        val dice = Random(seed).nextFloat()
+    protected fun pickIndexFromVariants(random: Int, bucket: ArrayList<Triple<Float, Int, Int>>): Int {
+        val dice = (random % 1000).toFloat() / 1000f
         var chance = 0f
         bucket.forEach { v ->
             chance += v.first

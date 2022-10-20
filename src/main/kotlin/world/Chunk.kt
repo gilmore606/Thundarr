@@ -11,6 +11,7 @@ import world.cartos.RoomyMaze
 import world.cartos.WorldCarto
 import world.terrains.Terrain
 import java.lang.Float.min
+import kotlin.random.Random
 
 
 @Serializable
@@ -51,6 +52,8 @@ class Chunk(
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
     @Transient
     private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
+    @Transient
+    private val randomCache = Array(width) { Array<Int?>(height) { null } }
 
     @Transient private val noThing = ArrayList<Thing>()
 
@@ -157,6 +160,16 @@ class Chunk(
 
     fun setTerrainData(x: Int, y: Int, data: String) {
         terrainData[x - this.x][y - this.y] = data
+    }
+
+    fun getRandom(x: Int, y: Int): Int {
+        return if (boundsCheck(x, y)) {
+            randomCache[x - this.x][y - this.y] ?: run {
+                val newRandom = Random.nextInt(100000)
+                randomCache[x - this.x][y - this.y] = newRandom
+                newRandom
+            }
+        } else 4 // chosen by fair dice roll
     }
 
     fun getGlyph(x: Int, y: Int) = if (boundsCheck(x, y)) {

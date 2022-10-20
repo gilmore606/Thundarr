@@ -1,9 +1,6 @@
 package render.tilesets
 
-import render.tileholders.OverlapTile
-import render.tileholders.SimpleTile
-import render.tileholders.VariantsTile
-import render.tileholders.WallTile
+import render.tileholders.*
 
 fun TerrainTileSet() =
     TileSet("tiles_terrain.png", 12, 4).apply {
@@ -12,6 +9,8 @@ fun TerrainTileSet() =
 
         setTile(Glyph.OCCLUSION_SHADOWS_V, SimpleTile(this, 6, 2))
         setTile(Glyph.OCCLUSION_SHADOWS_H, SimpleTile(this, 7, 2))
+        setTile(Glyph.SURF_V, SimpleTile(this, 9, 1))
+        setTile(Glyph.SURF_H, SimpleTile(this, 11, 1))
 
         setTile(Glyph.STONE_FLOOR, VariantsTile(this).apply {
             add(0.3f, 0, 0)
@@ -48,6 +47,12 @@ fun TerrainTileSet() =
             add(WallTile.Slot.RIGHTBOTTOM, 1f, 7, 1)
             add(WallTile.Slot.OUTSIDE_RIGHTBOTTOM, 1f, 2, 3)
             add(WallTile.Slot.FULL, 1f, 4, 2)
+        })
+
+        setTile(Glyph.WATER, WaterTile(this).apply {
+            add(0.3f, 9, 0)
+            add(0.4f, 11, 0)
+            add(0.3f, 10, 0)
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))

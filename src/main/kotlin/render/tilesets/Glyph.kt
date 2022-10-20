@@ -10,6 +10,7 @@ enum class Glyph {
     STONE_FLOOR,
     DIRT,
     GRASS,
+    WATER,
     PORTAL_DOOR,
 
     CURSOR,
@@ -20,6 +21,8 @@ enum class Glyph {
     LOGO_OOKLA,
     OCCLUSION_SHADOWS_V,
     OCCLUSION_SHADOWS_H,
+    SURF_V,
+    SURF_H,
     PANEL_SHADOW,
 
     PLAYER,

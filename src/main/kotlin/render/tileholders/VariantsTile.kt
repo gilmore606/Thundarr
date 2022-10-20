@@ -2,6 +2,7 @@ package render.tileholders
 
 import world.Level
 import render.tilesets.TileSet
+import kotlin.random.Random
 
 open class VariantsTile(
     set: TileSet
@@ -14,7 +15,10 @@ open class VariantsTile(
     }
 
     override fun getTextureIndex(level: Level?, x: Int, y: Int): Int {
-        return pickIndexFromVariants(variants, x * 10 + y)
+        level?.also { level ->
+            return pickIndexFromVariants(level.getRandom(x,y), variants)
+        }
+        return 0
     }
 
 }

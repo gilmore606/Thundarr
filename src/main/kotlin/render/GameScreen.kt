@@ -124,7 +124,17 @@ object GameScreen : KtxScreen {
         )
         overlapBatch.addOccludeQuad(
             tx - pov.x, ty - pov.y, tileStride, edge,
-            textureIndex, aspectRatio
+            textureIndex, 1f, fullLight, aspectRatio
+        )
+    }
+
+    private val renderSurf: (Int, Int, Float, LightColor, XY)->Unit = { tx, ty, vis, light, edge ->
+        val textureIndex = terrainBatch.getTextureIndex(
+            if (edge == NORTH || edge == SOUTH) Glyph.SURF_H else Glyph.SURF_V
+        )
+        overlapBatch.addOccludeQuad(
+            tx - pov.x, ty - pov.y, tileStride, edge,
+            textureIndex, vis, light, aspectRatio
         )
     }
 
@@ -337,7 +347,8 @@ object GameScreen : KtxScreen {
             App.level.forEachCellToRender(tileSet,
                 doTile = renderTile,
                 doOverlap = renderOverlap,
-                doOcclude = renderOcclude
+                doOcclude = renderOcclude,
+                doSurf = renderSurf
             )
             draw()
         }

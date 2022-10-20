@@ -69,7 +69,7 @@ class WallTile(
                     bucket = variants[Slot.TOP]
                 }
             }
-            return pickIndexFromVariants(bucket!!, x * 10 + y)
+            return pickIndexFromVariants(level.getRandom(x,y), bucket!!)
         }
         return 0
     }

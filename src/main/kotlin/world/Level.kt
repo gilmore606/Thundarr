@@ -7,6 +7,7 @@ import kotlinx.serialization.Transient
 import render.GameScreen
 import render.sunLights
 import render.tileholders.OverlapTile
+import render.tileholders.WaterTile
 import render.tilesets.Glyph
 import render.tilesets.TileSet
 import things.LightSource
@@ -14,6 +15,7 @@ import things.Thing
 import ui.modals.ContextMenu
 import util.*
 import world.terrains.Terrain
+import kotlin.random.Random
 
 @Serializable
 sealed class Level {
@@ -52,7 +54,8 @@ sealed class Level {
         tileSet: TileSet,
         doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
         doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit,
-        doOcclude: (x: Int, y: Int, edge: XY) -> Unit
+        doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
+        doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit
     ) {
         for (x in pov.x - GameScreen.RENDER_WIDTH /2 until pov.x + GameScreen.RENDER_WIDTH /2) {
             for (y in pov.y - GameScreen.RENDER_HEIGHT /2 until pov.y + GameScreen.RENDER_HEIGHT /2) {
@@ -63,6 +66,7 @@ sealed class Level {
                     doTile(
                         x, y, vis, glyph, lightAt(x, y)
                     )
+                    // Ground overlaps
                     if (tileSet.tileHolders[glyph] is OverlapTile) {
                         CARDINALS.forEach { edge ->
                             if ((tileSet.tileHolders[glyph] as OverlapTile).overlapsIn(this, x, y, edge)) {
@@ -72,7 +76,18 @@ sealed class Level {
                             }
                         }
                     }
-                    if (vis == 1f && terrain.isWalkable()) {
+                    // Water surf
+                    if (tileSet.tileHolders[glyph] is WaterTile) {
+                        listOf(NORTH, WEST, EAST).forEach { edge ->
+                            if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y)).glyph()] !is WaterTile) {
+                                doSurf(
+                                    x, y, vis, lightAt(x, y), edge
+                                )
+                            }
+                        }
+                    }
+                    // Occlusion shadows
+                    if (vis == 1f && !terrain.isOpaque()) {
                         var okNE = true
                         var okSE = true
                         var okNW = true
@@ -177,6 +192,8 @@ sealed class Level {
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
 
     fun setTerrainData(x: Int, y: Int, data: String) = chunkAt(x,y)?.setTerrainData(x,y,data)
+
+    fun getRandom(x: Int, y: Int): Int = chunkAt(x,y)?.getRandom(x,y) ?: 4 // chosen by fair dice roll
 
     fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.BLANK
 
