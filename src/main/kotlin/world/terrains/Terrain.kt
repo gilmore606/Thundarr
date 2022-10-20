@@ -105,7 +105,7 @@ object PortalDoor : Terrain(
             terrainData.enterMsg.split('\n'), "Enter", "Cancel"
         ) { yes ->
             if (yes) {
-                App.moveToLevel(terrainData.levelId)
+                App.enterLevelFromWorld(terrainData.levelId)
             } else {
                 ConsolePanel.say("You reconsider and step away.")
             }

@@ -25,7 +25,7 @@ object App : KtxGame<Screen>() {
 
     @Serializable
     data class WorldState(
-        val level: Level,
+        val levelId: String,
         val player: Player,
         val time: Double,
         val zoomIndex: Double,
@@ -33,7 +33,6 @@ object App : KtxGame<Screen>() {
 
     lateinit var player: Player
     lateinit var level: Level
-    lateinit var worldLevel: WorldLevel
     lateinit var save: SaveState
     var time: Double = 0.0
     var lastHour = -1
@@ -91,7 +90,7 @@ object App : KtxGame<Screen>() {
 
         save.putWorldState(
             WorldState(
-                level = level,
+                levelId = if (level is EnclosedLevel) { (level as EnclosedLevel).levelId } else "world",
                 player = player,
                 time = time,
                 zoomIndex = GameScreen.zoomIndex
@@ -101,8 +100,11 @@ object App : KtxGame<Screen>() {
 
     private fun restoreState() {
         val state = save.getWorldState()
-        level = state.level
-        if (level is WorldLevel) worldLevel = level as WorldLevel
+        level = if (state.levelId == "world") {
+            WorldLevel()
+        } else {
+            EnclosedLevel(state.levelId)
+        }
         player = state.player
         updateTime(state.time)
         GameScreen.restoreZoomIndex(state.zoomIndex)
@@ -117,7 +119,6 @@ object App : KtxGame<Screen>() {
     private fun createNewWorld() {
         save.eraseAll()
         level = WorldLevel()
-        worldLevel = level as WorldLevel
         player = Player()
         level.setPov(200, 200)
         pendingJob = KtxAsync.launch {
@@ -192,9 +193,9 @@ object App : KtxGame<Screen>() {
         )
     }
 
-    fun moveToLevel(levelId: String) {
-        // do something with current this.level to save/unload it?
+    fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
+        level.unload()
 
         level = EnclosedLevel(levelId)
 
@@ -207,6 +208,7 @@ object App : KtxGame<Screen>() {
             }
             level.director.add(player, playerStart.x, playerStart.y, level)
             updateTime(time, true)
+            level.onRestore()
             ConsolePanel.say("You cautiously step inside...")
         }
     }

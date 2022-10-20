@@ -154,6 +154,12 @@ class SaveState(
         }
     }
 
+    fun updateLevelChunk(chunk: Chunk, levelId: String) {
+        transaction {
+            LevelChunksTable.update({ LevelChunksTable.id eq levelId }) { it[data] = toCompressed(chunk) }
+        }
+    }
+
     fun getBuilding(id: String) =
         transaction {
             BuildingsTable.select { BuildingsTable.id eq id }.singleOrNull()?.let {

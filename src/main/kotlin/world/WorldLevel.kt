@@ -8,16 +8,14 @@ const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
 const val STEP_CHUNKS_AHEAD = 1
 
-@Serializable
 class WorldLevel() : Level() {
 
-    @Transient val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
+    private val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
 
-    @Transient val chunks = Array(CHUNKS_WIDE) { Array<Chunk?>(CHUNKS_WIDE) { null } }
+    private val chunks = Array(CHUNKS_WIDE) { Array<Chunk?>(CHUNKS_WIDE) { null } }
+    private val loadedChunks = mutableSetOf<Chunk>()
 
-    @Transient private val loadedChunks = mutableSetOf<Chunk>()
-
-    @Transient private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
+    private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
     init {
         stepMap = makeStepMap()

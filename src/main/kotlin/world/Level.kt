@@ -2,8 +2,6 @@ package world
 
 import actors.Actor
 import actors.actions.processes.WalkTo
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import render.GameScreen
 import render.sunLights
 import render.tileholders.OverlapTile
@@ -15,24 +13,20 @@ import things.Thing
 import ui.modals.ContextMenu
 import util.*
 import world.terrains.Terrain
-import kotlin.random.Random
 
-@Serializable
 sealed class Level {
 
     val pov = XY(0, 0)
 
     val director = Director()
 
-    @Transient protected val shadowCaster = RayCaster()
-    @Transient var shadowDirty = true
+    private val shadowCaster = RayCaster()
+    var shadowDirty = true
 
-    @Transient protected lateinit var stepMap: StepMap
+    protected lateinit var stepMap: StepMap
+    private val noThing = mutableListOf<Thing>()
 
-    @Transient private val noThing = mutableListOf<Thing>()
-
-    @Transient val dirtyLights = mutableMapOf<LightSource,XY>()
-
+    val dirtyLights = mutableMapOf<LightSource,XY>()
 
     abstract fun receiveChunk(chunk: Chunk)
 
@@ -45,7 +39,7 @@ sealed class Level {
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     open fun timeScale() = 1.0f
-    @Transient open val sunLightSteps = sunLights()
+    open val sunLightSteps = sunLights()
 
     abstract fun allChunks(): Set<Chunk>
 

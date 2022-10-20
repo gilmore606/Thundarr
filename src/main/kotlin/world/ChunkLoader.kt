@@ -63,6 +63,13 @@ object ChunkLoader {
         })
     }
 
+    fun saveLevelChunk(chunk: Chunk, levelId: String) {
+        jobs.add(coroutineScope.launch {
+            log.debug("ChunkLoader saving level chunk $levelId")
+            App.save.updateLevelChunk(chunk, levelId)
+        })
+    }
+
     private fun makeLevelChunk(levelId: String, callback: (Chunk) -> Unit) {
         log.debug("Creating level chunk $levelId")
         val building = App.save.getBuildingForLevel(levelId)
@@ -82,7 +89,8 @@ object ChunkLoader {
         jobs.add(coroutineScope.launch {
             makeLevelChunk(building.firstLevelId) { log.info("Pre-generated level chunk ${building.firstLevelId} .")}
             KtxAsync.launch {
-                App.worldLevel.setTerrainData(building.x, building.y, Json.encodeToString(PortalDoor.Data(
+                // WARNING: this assumes the player didn't duck inside a building before we could set this!
+                App.level.setTerrainData(building.x, building.y, Json.encodeToString(PortalDoor.Data(
                     enterMsg = building.doorMsg,
                     levelId = building.firstLevelId
                 )))
