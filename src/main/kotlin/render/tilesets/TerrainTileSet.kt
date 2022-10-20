@@ -6,7 +6,7 @@ import render.tileholders.VariantsTile
 import render.tileholders.WallTile
 
 fun TerrainTileSet() =
-    TileSet("tiles_terrain.png", 12, 3).apply {
+    TileSet("tiles_terrain.png", 12, 4).apply {
 
         setTile(Glyph.BLANK, SimpleTile(this, 2, 2))
 
@@ -41,10 +41,12 @@ fun TerrainTileSet() =
             add(WallTile.Slot.RIGHT, 0.5f, 6, 0)
             add(WallTile.Slot.RIGHT, 0.5f, 6, 1)
             add(WallTile.Slot.LEFTBOTTOM, 1f, 7, 0)
+            add(WallTile.Slot.OUTSIDE_LEFTBOTTOM, 1f, 3, 3)
             add(WallTile.Slot.BOTTOM, 0.33f, 2, 1)
             add(WallTile.Slot.BOTTOM, 0.33f, 3, 1)
             add(WallTile.Slot.BOTTOM, 0.34f, 4, 1)
             add(WallTile.Slot.RIGHTBOTTOM, 1f, 7, 1)
+            add(WallTile.Slot.OUTSIDE_RIGHTBOTTOM, 1f, 2, 3)
             add(WallTile.Slot.FULL, 1f, 4, 2)
         })
 
