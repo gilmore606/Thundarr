@@ -31,8 +31,8 @@ object GameScreen : KtxScreen {
             updateSurfaceParams()
         }
     private var zoomTarget = 0.4
-    private val zoomLevels = listOf(0.15, 0.17, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.73, 0.85, 1.0, 1.5)
-    var zoomIndex = 5.0
+    private val zoomLevels = listOf(0.25, 0.4, 0.5, 0.6, 0.85)
+    var zoomIndex = 2.0
 
     var width = 0
     var height = 0
