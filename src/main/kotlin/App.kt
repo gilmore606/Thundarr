@@ -34,7 +34,6 @@ object App : KtxGame<Screen>() {
     lateinit var player: Player
     lateinit var level: Level
     lateinit var save: SaveState
-    val liveLevels = mutableSetOf<Level>()
 
     var time: Double = 0.0
     var lastHour = -1
@@ -87,8 +86,8 @@ object App : KtxGame<Screen>() {
         GameScreen.dispose()
     }
 
-    private fun saveState() {
-        liveLevels.forEach { it.unload() }
+    private fun saveStateForShutdown() {
+        LevelKeeper.hibernateAll()
 
         save.putWorldState(
             WorldState(
@@ -101,10 +100,10 @@ object App : KtxGame<Screen>() {
     }
 
     private fun restoreState() {
-        liveLevels.forEach { it.unload() }
+        LevelKeeper.hibernateAll()
 
         val state = save.getWorldState()
-        level = getLevel(state.levelId)
+        level = LevelKeeper.getLevel(state.levelId)
         player = state.player
 
         updateTime(state.time)
@@ -118,10 +117,10 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        liveLevels.forEach { it.unload() }
+        LevelKeeper.hibernateAll()
         save.eraseAll()
 
-        level = getLevel("world")
+        level = LevelKeeper.getLevel("world")
 
         player = Player()
         level.setPov(200, 200)
@@ -142,43 +141,7 @@ object App : KtxGame<Screen>() {
         }
     }
 
-    fun restartWorld() {
-        GameScreen.addModal(ConfirmModal(
-                listOf(
-                    "Abandon this world?",
-                    "All your progress will be lost."),
-                "Abandon", "Cancel"
-            ) { yes ->
-                if (yes) {
-                    ConsolePanel.say("You abandon the world.")
-                    pendingJob?.cancel()
-                    createNewWorld()
-                } else {
-                    ConsolePanel.say("You gather your resolve and carry on.")
-                }
-            }
-        )
-    }
 
-    // Get the specified level from the livelist, or start it up and add it.
-    // Remove old levels if necessary.
-    private fun getLevel(levelId: String): Level {
-        liveLevels.forEach { level ->
-            if (level.levelId() == levelId) {
-                return level
-            }
-        }
-        val level = Level.make(levelId)
-        liveLevels.add(level)
-        return level
-    }
-
-    // Run action queues for all live levels.  This happens on every render.
-    fun runActorQueues() {
-        liveLevels.forEach { level ->
-            level.director.runQueue(level)
-        }
-    }
 
     fun openSettings() {
 
@@ -202,7 +165,7 @@ object App : KtxGame<Screen>() {
                     GameScreen.addModal(SavingModal())
                     KtxAsync.launch {
                         delay(200)
-                        saveState()
+                        saveStateForShutdown()
                         while (ChunkLoader.isWorking()) {
                             log.info("Waiting for ChunkLoader to finish...")
                             delay(100)
@@ -218,10 +181,28 @@ object App : KtxGame<Screen>() {
         )
     }
 
+    fun restartWorld() {
+        GameScreen.addModal(ConfirmModal(
+            listOf(
+                "Abandon this world?",
+                "All your progress will be lost."),
+            "Abandon", "Cancel"
+        ) { yes ->
+            if (yes) {
+                ConsolePanel.say("You abandon the world.")
+                pendingJob?.cancel()
+                createNewWorld()
+            } else {
+                ConsolePanel.say("You gather your resolve and carry on.")
+            }
+        }
+        )
+    }
+
     fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
 
-        level = getLevel(levelId)
+        level = LevelKeeper.getLevel(levelId)
 
         KtxAsync.launch {
             var playerStart = level.tempPlayerStart()

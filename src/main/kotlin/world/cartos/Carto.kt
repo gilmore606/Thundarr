@@ -2,16 +2,15 @@ package world.cartos
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import util.CARDINALS
 import kotlin.random.Random
 import things.Thing
-import util.XY
-import util.Rect
+import util.*
 import world.Chunk
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
 import world.terrains.Terrain
 import java.io.File
+import java.lang.Integer.max
 
 abstract class Carto {
 
@@ -208,5 +207,16 @@ abstract class Carto {
         )
         val prefab = Prefab(tiledFile)
         return prefab
+    }
+
+    protected fun findEdgeForDoor(edge: XY): XY {
+        for (y in y0 .. y1) {
+            for (x in x0..x1) {
+                if (isRock(x, y) && cardinalBlockerCount(x, y) < 4) {
+                    return XY(x ,y)
+                }
+            }
+        }
+        throw RuntimeException("Can't find edge for door!")
     }
 }

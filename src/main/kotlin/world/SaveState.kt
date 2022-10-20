@@ -60,6 +60,8 @@ class SaveState(
         transaction {
             WorldChunksTable.deleteAll()
             WorldStateTable.deleteAll()
+            LevelChunksTable.deleteAll()
+            BuildingsTable.deleteAll()
         }
     }
 

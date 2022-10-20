@@ -17,6 +17,7 @@ import ui.modals.ContextMenu
 import ui.panels.Panel
 import ui.modals.Modal
 import util.*
+import world.LevelKeeper
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
@@ -180,7 +181,7 @@ object GameScreen : KtxScreen {
 
         drawEverything()
 
-        App.runActorQueues()
+        LevelKeeper.runActorQueues()
     }
 
     private fun animateZoom(delta: Float) {

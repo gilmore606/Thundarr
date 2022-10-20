@@ -24,12 +24,13 @@ class RoomyMaze : Carto() {
                 nextRegion++
             }
         }
-
-        forEachCell { x, y ->
-            if (isRock(x, y)) {
-                if (neighborCount(x, y, Terrain.Type.TERRAIN_STONEFLOOR) == 0) {
-                    growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
-                    nextRegion++
+        for (x in x0+1 until x1) {
+            for (y in y0+1 until y1) {
+                if (isRock(x, y)) {
+                    if (neighborCount(x, y, Terrain.Type.TERRAIN_STONEFLOOR) == 0) {
+                        growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
+                        nextRegion++
+                    }
                 }
             }
         }
@@ -40,6 +41,8 @@ class RoomyMaze : Carto() {
         while (deadEnds) {
             deadEnds = removeDeadEnds()
         }
+
+        addDoor()
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {
@@ -110,6 +113,11 @@ class RoomyMaze : Carto() {
                 return
             }
         }
+    }
+
+    private fun addDoor() {
+        val door = findEdgeForDoor(NORTH)
+        carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
     }
 
 }
