@@ -10,7 +10,7 @@ object StatusPanel : ShadedPanel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = width - (this.width + padding)
+        x = width - (this.width + padding * 2)
         y = padding
     }
 

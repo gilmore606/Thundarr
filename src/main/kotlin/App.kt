@@ -10,12 +10,10 @@ import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.GameScreen
-import ui.modals.ConfirmModal
-import ui.modals.ControlsModal
+import ui.modals.*
 import ui.panels.ConsolePanel
-import ui.modals.CreditsModal
-import ui.modals.SavingModal
 import ui.panels.DebugPanel
+import ui.panels.LookPanel
 import ui.panels.StatusPanel
 import util.XY
 import util.log
@@ -49,7 +47,7 @@ object App : KtxGame<Screen>() {
     private var pendingJob: Job? = null
 
     var DEBUG_VISIBLE = false
-    var DEBUG_PANEL = true
+    var DEBUG_PANEL = false
 
     override fun create() {
         KtxAsync.initiate()
@@ -69,7 +67,7 @@ object App : KtxGame<Screen>() {
         setScreen<GameScreen>()
         GameScreen.addPanel(ConsolePanel)
         GameScreen.addPanel(StatusPanel)
-        GameScreen.addPanel(DebugPanel)
+        GameScreen.addPanel(LookPanel)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
@@ -154,50 +152,6 @@ object App : KtxGame<Screen>() {
         GameScreen.addModal(CreditsModal())
     }
 
-    fun saveAndQuit() {
-        GameScreen.addModal(
-            ConfirmModal(
-                listOf("Quit the game?", "Your progress will be saved."),
-                "Quit", "Cancel"
-            ) { yes ->
-                if (yes) {
-                    GameScreen.addModal(SavingModal())
-                    KtxAsync.launch {
-                        delay(200)
-                        saveStateForShutdown()
-                        while (ChunkLoader.isWorking()) {
-                            log.info("Waiting for ChunkLoader to finish...")
-                            delay(100)
-                        }
-                        log.info("State saved.")
-                        dispose()
-                        exitProcess(0)
-                    }
-                } else {
-                    ConsolePanel.say("You remember that one thing you needed to do...")
-                }
-            }
-        )
-    }
-
-    fun restartWorld() {
-        GameScreen.addModal(ConfirmModal(
-            listOf(
-                "Abandon this world?",
-                "All your progress will be lost."),
-            "Abandon", "Cancel"
-        ) { yes ->
-            if (yes) {
-                ConsolePanel.say("You abandon the world.")
-                pendingJob?.cancel()
-                createNewWorld()
-            } else {
-                ConsolePanel.say("You gather your resolve and carry on.")
-            }
-        }
-        )
-    }
-
     fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
         val oldLevel = level
@@ -274,4 +228,49 @@ object App : KtxGame<Screen>() {
 
         LevelKeeper.forEachLiveLevel { it.updateAmbientLight(hour, minute) }
     }
+
+    fun saveAndQuit() {
+        GameScreen.addModal(
+            ConfirmModal(
+                listOf("Quit the game?", "Your progress will be saved."),
+                "Quit", "Cancel"
+            ) { yes ->
+                if (yes) {
+                    GameScreen.addModal(SavingModal())
+                    KtxAsync.launch {
+                        delay(200)
+                        saveStateForShutdown()
+                        while (ChunkLoader.isWorking()) {
+                            log.info("Waiting for ChunkLoader to finish...")
+                            delay(100)
+                        }
+                        log.info("State saved.")
+                        dispose()
+                        exitProcess(0)
+                    }
+                } else {
+                    ConsolePanel.say("You remember that one thing you needed to do...")
+                }
+            }
+        )
+    }
+
+    fun restartWorld() {
+        GameScreen.addModal(ConfirmModal(
+            listOf(
+                "Abandon this world?",
+                "All your progress will be lost."),
+            "Abandon", "Cancel"
+        ) { yes ->
+            if (yes) {
+                ConsolePanel.say("You abandon the world.")
+                pendingJob?.cancel()
+                createNewWorld()
+            } else {
+                ConsolePanel.say("You gather your resolve and carry on.")
+            }
+        }
+        )
+    }
+
 }

@@ -12,6 +12,7 @@ import ktx.app.KtxScreen
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.*
+import ui.input.Keyboard
 import ui.input.Mouse
 import ui.modals.ContextMenu
 import ui.panels.Panel
@@ -25,7 +26,7 @@ import kotlin.math.abs
 
 object GameScreen : KtxScreen {
 
-    private const val WORLD_ZOOM = 0.8
+    private const val WORLD_ZOOM = 0.85
     private const val ZOOM_SPEED = 4.0
     var RENDER_WIDTH = 160
     var RENDER_HEIGHT = 100
@@ -76,10 +77,10 @@ object GameScreen : KtxScreen {
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
 
-    private val panels: MutableList<Panel> = mutableListOf()
+    val panels: MutableList<Panel> = mutableListOf()
     var topModal: Modal? = null
 
-    private var cursorPosition: XY? = null
+    var cursorPosition: XY? = null
     private var cursorLine: MutableList<XY> = mutableListOf()
 
     private val pov
@@ -251,9 +252,22 @@ object GameScreen : KtxScreen {
         }
     }
 
-    private fun clearCursor() {
+    fun clearCursor() {
         cursorPosition = null
         cursorLine.clear()
+        Keyboard.CURSOR_MODE = false
+    }
+
+    fun moveCursor(dir: XY) {
+        if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
+        cursorPosition?.also {
+            setCursorPosition(it.x + dir.x, it.y + dir.y)
+        }
+    }
+
+    fun setCursorPosition(x: Int, y: Int) {
+        if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
+        cursorPosition?.also { it.x = x ; it.y = y }
     }
 
     fun mouseScrolled(amount: Float) {
@@ -275,14 +289,21 @@ object GameScreen : KtxScreen {
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
                     val y = screenYtoTileY(screenY)
-                    addModal(ContextMenu(screenX + 4, screenY + 4).apply {
-                        App.level.makeContextMenu(x, y, this)
-                    })
+                    setCursorPosition(x,y)
+                    rightClickCursorTile()
                 }
                 else -> { return false }
             }
         }
         return true
+    }
+
+    fun rightClickCursorTile() {
+        if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
+        val offset = (8.0 * zoom).toInt()
+        addModal(ContextMenu(tileXtoScreenX(cursorPosition!!.x) - offset, tileYtoScreenY(cursorPosition!!.y) - offset).apply {
+            App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
+        })
     }
 
     private const val scrollScale = 450.0  // magic from experimentation, should figure out how this is derived, i'm so dumb
@@ -418,13 +439,13 @@ object GameScreen : KtxScreen {
     }
 
     private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
-
     private fun screenYtoTileY(screenY: Int) = (((screenY.toFloat() / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + pov.y).toInt()
+    private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()
+    private fun tileYtoScreenY(tileY: Int) = ((height / 2.0) + (tileY - pov.y + 0.5) * 0.5 * tileStride * height.toDouble()).toInt()
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
         tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01) * zoom
-        log.debug("Surface params updated to $width x $height (ratio $aspectRatio tileStride $tileStride)")
     }
 
     override fun dispose() {

@@ -1,5 +1,6 @@
 package ui.modals
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.GameScreen
 import ui.input.Mouse
@@ -11,7 +12,7 @@ class ContextMenu(
 ): Modal(100, 50, null, Position.CURSOR) {
 
     private val options = mutableMapOf<String,()->Unit>()
-    private var selection = -1
+    private var selection = 0
     private var maxOptionWidth = 0
     private val padding = 9
     private val spacing = 26
@@ -61,20 +62,39 @@ class ContextMenu(
         val localY = screenY - y
         if (localX in 1 until width) {
             if (localY in 1 until height) {
-                return min(options.size, (localY - padding) / spacing)
+                return min(options.size - 1, (localY - padding) / spacing)
             }
         }
         return null
     }
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
-        dismiss()
         mouseToOption(screenX, screenY)?.also { selected ->
-            options[options.keys.toList().get(selected)]?.invoke()
+            selection = selected
+            selectCurrentOption()
         }
     }
 
-    override fun keyDown(keycode: Int) {
+    private fun selectCurrentOption() {
         dismiss()
+        GameScreen.clearCursor()
+        options[options.keys.toList()[selection]]?.invoke()
+    }
+
+    override fun keyDown(keycode: Int) {
+        super.keyDown(keycode)
+        when (keycode) {
+            Input.Keys.NUMPAD_2, Input.Keys.DOWN -> {
+                selection++
+                if (selection >= options.keys.size) selection = 0
+            }
+            Input.Keys.NUMPAD_8, Input.Keys.UP -> {
+                selection--
+                if (selection < 0) selection = options.keys.size - 1
+            }
+            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
+                selectCurrentOption()
+            }
+        }
     }
 }
