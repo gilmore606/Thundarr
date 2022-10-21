@@ -26,9 +26,27 @@ enum class Glyph {
     PANEL_SHADOW,
 
     PLAYER,
-    SKELETON,
-    SKULL,
+    MOK,
+    HORSE,
+    CATTLE,
+    PEASANT,
+    CITIZEN,
+    TRIBAL,
 
     TREE,
-    LIGHTBULB
+    LIGHTBULB,
+    AXE,
+    SIGN,
+    CHEST,
+    CACTUS,
+    DEAD_TREE,
+    TOMBSTONE,
+    BIG_ROCK,
+    BLADE,
+    HILT,
+    PINE_TREE,
+    PALM_TREE,
+    BOW,
+    BOTTLE,
+    FRUIT
 }

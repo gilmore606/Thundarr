@@ -1,6 +1,5 @@
 package render.tileholders
 
-import kotlin.random.Random
 import world.Level
 import render.tilesets.TileSet
 
@@ -18,9 +17,11 @@ abstract class TileHolder(
         var chance = 0f
         bucket.forEach { v ->
             chance += v.first
-            if (dice <= chance) return v.third * set.tilesPerRow + v.second
+            if (dice <= chance) return indexFromCoords(v.second, v.third)
         }
         return 0
     }
+
+    protected fun indexFromCoords(tx: Int, ty: Int) = ty * set.tilesPerRow + tx
 
 }
