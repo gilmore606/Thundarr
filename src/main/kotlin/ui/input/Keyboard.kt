@@ -9,6 +9,9 @@ import ktx.app.KtxInputAdapter
 import ktx.async.KtxAsync
 import render.GameScreen
 import render.tilesets.Glyph
+import things.Lightbulb
+import things.PalmTree
+import things.PineTree
 import things.Thing
 import ui.modals.EscMenu
 import ui.modals.InventoryModal
@@ -108,10 +111,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
             }
-            Input.Keys.F2 -> { App.level.addThingAt(App.player.xy.x, App.player.xy.y, Thing(
-                    Glyph.LIGHTBULB, false, false
-                ).apply { light = LightColor(1f, 1f, 0.4f) }
-            )}
+            Input.Keys.F2 -> { App.level.addThingAt(App.player.xy.x, App.player.xy.y, Lightbulb()) }
             Input.Keys.F3 -> {
                 KtxAsync.launch {
                     val things: MutableList<Thing> = mutableListOf<Thing>().apply { addAll(App.level.thingsAt(App.player.xy.x, App.player.xy.y)) }
@@ -121,9 +121,7 @@ object Keyboard : KtxInputAdapter {
                 }
             }
             Input.Keys.F4 -> {
-                App.level.addThingAt(App.player.xy.x, App.player.xy.y, Thing(
-                    Glyph.TREE, true, false
-                ))
+                App.level.addThingAt(App.player.xy.x, App.player.xy.y, PalmTree())
             }
             Input.Keys.F5 -> {
                 App.DEBUG_PANEL = !App.DEBUG_PANEL

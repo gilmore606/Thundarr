@@ -90,7 +90,7 @@ class Chunk(
         for (x in 0 until width) {
             for (y in 0 until height) {
                 things[x][y].forEach { thing ->
-                    if (thing.light() != null) {
+                    if (thing is LightSource) {
                         level.dirtyLights[thing] = XY(x + this.x, y + this.y)
                     }
                 }
@@ -139,14 +139,14 @@ class Chunk(
             updateOpaque(x - this.x, y - this.y)
             updateWalkable(x - this.x, y - this.y)
         }
-        thing.light()?.also { projectLightSource(XY(x, y), thing) }
+        if (thing is LightSource) { projectLightSource(XY(x, y), thing) }
     }
 
     fun removeThingAt(x: Int, y: Int, thing: Thing) {
         things[x - this.x][y - this.y].remove(thing)
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
-        thing.light()?.also { level.removeLightSource(thing) }
+        if (thing is LightSource) { level.removeLightSource(thing) }
     }
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -200,7 +200,7 @@ class Chunk(
         if (!v) {
             var thingBlocking = false
             things[x][y].forEach { thing ->
-                thingBlocking = thingBlocking || thing.isBlocking
+                thingBlocking = thingBlocking || thing.isBlocking()
             }
             v = thingBlocking
         }
@@ -246,7 +246,7 @@ class Chunk(
         if (!v) {
             var thingBlocking = false
             things[x][y].forEach { thing ->
-                thingBlocking = thingBlocking || thing.isOpaque
+                thingBlocking = thingBlocking || thing.isOpaque()
             }
             v = thingBlocking
         }

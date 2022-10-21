@@ -19,7 +19,7 @@ abstract class TileHolder(
             chance += v.first
             if (dice <= chance) return indexFromCoords(v.second, v.third)
         }
-        return 0
+        return indexFromCoords(bucket.first().second, bucket.first().third)
     }
 
     protected fun indexFromCoords(tx: Int, ty: Int) = ty * set.tilesPerRow + tx

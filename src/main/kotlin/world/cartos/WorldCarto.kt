@@ -3,6 +3,7 @@ package world.cartos
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
+import things.OakTree
 import things.Thing
 import util.Dice
 import util.Perlin
@@ -52,10 +53,7 @@ class WorldCarto(
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
-                        addThingAt(x + this.x0, y + this.y0, Thing(
-                            Glyph.TREE,
-                            true, false
-                        ))
+                        addThingAt(x + this.x0, y + this.y0, OakTree())
                     }
                 }
             }

@@ -9,20 +9,41 @@ import ui.panels.ConsolePanel
 import util.LightColor
 
 @Serializable
-class Thing(
-    val glyph: Glyph,
-    val isOpaque: Boolean = false,
-    val isBlocking: Boolean = false
-): LightSource {
-    var light: LightColor? = null
+sealed class Thing {
+    abstract fun glyph(): Glyph
+    abstract fun isOpaque(): Boolean
+    abstract fun isBlocking(): Boolean
+    abstract fun isPortable(): Boolean
 
-    fun glyph() = glyph
+    open fun onWalkedOnBy(actor: Actor) { }
+}
 
-    fun onWalkedOnBy(actor: Actor) {
-        if (actor is Player) {
-            ConsolePanel.say("You hack through the underbrush.")
-        }
-    }
+@Serializable
+sealed class Portable : Thing() {
+    override fun isOpaque() = false
+    override fun isBlocking() = false
+    override fun isPortable() = true
+}
 
-    override fun light() = light
+interface LightSource {
+    fun light(): LightColor?
+}
+
+@Serializable
+sealed class LitThing : Portable(), LightSource {
+    abstract val lightColor: LightColor
+
+    override fun light(): LightColor? = lightColor
+}
+
+@Serializable
+class Lightbulb : LitThing() {
+    override fun glyph() = Glyph.LIGHTBULB
+    override val lightColor = LightColor(1f, 1f, 1f)
+}
+
+@Serializable
+sealed class Obstacle : Thing() {
+    override fun isBlocking() = true
+    override fun isPortable() = false
 }

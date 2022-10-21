@@ -148,7 +148,7 @@ object GameScreen : KtxScreen {
         val ly = ty - pov.y + RENDER_HEIGHT
         thingBatch.addTileQuad(
             tx - pov.x, ty - pov.y, tileStride,
-            thingBatch.getTextureIndex(glyph, null, tx, ty), vis, lightCache[lx][ly], aspectRatio)
+            thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly], aspectRatio)
     }
 
     private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
@@ -156,7 +156,7 @@ object GameScreen : KtxScreen {
         val ly = ty - pov.y + RENDER_HEIGHT
         mobBatch.addTileQuad(
             tx - pov.x, ty - pov.y, tileStride,
-            mobBatch.getTextureIndex(glyph), 1f, lightCache[lx][ly], aspectRatio)
+            mobBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, lightCache[lx][ly], aspectRatio)
     }
 
     override fun show() {
