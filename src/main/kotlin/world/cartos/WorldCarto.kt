@@ -8,17 +8,24 @@ import util.Dice
 import util.Perlin
 import util.UUID
 import world.Building
+import world.Chunk
 import world.ChunkLoader
 import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.random.Random
 
-class WorldCarto : Carto() {
+class WorldCarto(
+    x0: Int,
+    y0: Int,
+    x1: Int,
+    y1: Int,
+    chunk: Chunk
+) : Carto(x0, y0, x1, y1, chunk) {
 
     val scale = 0.02
     val fullness = 0.002
 
-    override fun doCarveLevel() {
+    fun carveWorldChunk() {
         forEachCell { x, y ->
             val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0) +
                     Perlin.noise(x.toDouble() * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
@@ -69,6 +76,10 @@ class WorldCarto : Carto() {
                     firstLevelId = UUID(),
                     doorMsg = "A door labelled $buildingId.\nOpen it and step inside?"
                 )
+                setTerrainData(x, y, Json.encodeToString(PortalDoor.Data(
+                    enterMsg = building.doorMsg,
+                    levelId = building.firstLevelId
+                )))
                 ChunkLoader.makeBuilding(building)
             }
         }

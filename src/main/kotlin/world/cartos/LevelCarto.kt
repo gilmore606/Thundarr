@@ -1,14 +1,14 @@
 package world.cartos
 
-import render.tilesets.Glyph
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import util.*
 import world.Chunk
+import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.random.Random
 
-// algorithm adapted from Bob Nystrom
-
-class RoomyMaze(
+class LevelCarto(
     x0: Int,
     y0: Int,
     x1: Int,
@@ -16,7 +16,14 @@ class RoomyMaze(
     chunk: Chunk
 ) : Carto(x0, y0, x1, y1, chunk) {
 
-    fun carveLevel() {
+    class WorldExit(
+        val edge: XY,
+        val dest: XY
+    )
+
+    fun carveLevel(
+        worldExit: WorldExit
+    ) {
         val rooms = ArrayList<Rect>()
 
         val roomTries = Random.nextInt(30, 500)
@@ -49,7 +56,7 @@ class RoomyMaze(
             deadEnds = removeDeadEnds()
         }
 
-        addDoor()
+        addDoor(worldExit)
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {
@@ -122,9 +129,16 @@ class RoomyMaze(
         }
     }
 
-    private fun addDoor() {
-        val door = findEdgeForDoor(NORTH)
+    private fun addDoor(worldExit: WorldExit) {
+        val door = findEdgeForDoor(worldExit.edge)
         carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
+        setTerrainData(door.x, door.y, Json.encodeToString(
+            PortalDoor.Data(
+                enterMsg = "The door leads outside to the wilderness.\nExit the building?",
+                levelId = "world",
+                xy = XY(worldExit.dest.x, worldExit.dest.y)
+        )))
     }
+
 
 }

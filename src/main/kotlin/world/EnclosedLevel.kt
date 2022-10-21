@@ -1,9 +1,13 @@
 package world
 
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import util.LightColor
 import util.StepMap
 import util.XY
-import world.cartos.RoomyMaze
+import util.log
+import world.terrains.PortalDoor
+import world.terrains.Terrain
 
 class EnclosedLevel(
     val levelId: String
@@ -43,7 +47,25 @@ class EnclosedLevel(
 
     override fun isReady() = allChunks.isNotEmpty()
 
-    override fun tempPlayerStart(): XY? = if (isReady()) chunk!!.tempPlayerStart() else null
+    override fun getPlayerEntranceFrom(level: Level): XY? {
+        if (isReady()) {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
+                        val doorData = Json.decodeFromString<PortalDoor.Data>(getTerrainData(x, y))
+                        if (doorData.levelId == level.levelId()) {
+                            log.debug("Found world exit at $x $y in level chunk")
+                            // TODO: this changes when doors aren't all on north edge!
+                            return XY(x, y + 1)
+                        }
+                    }
+                }
+            }
+            return chunk!!.randomPlayerStart()
+        } else {
+            return null
+        }
+    }
 
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null

@@ -44,9 +44,9 @@ object GameScreen : KtxScreen {
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
-    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
-    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = true)
     private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
+    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
+    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }

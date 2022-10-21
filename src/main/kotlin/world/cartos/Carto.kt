@@ -12,39 +12,30 @@ import world.terrains.Terrain
 import java.io.File
 import java.lang.Integer.max
 
-abstract class Carto {
+abstract class Carto(
+    val x0: Int,
+    val y0: Int,
+    val x1: Int,
+    val y1: Int,
+    val chunk: Chunk
+) {
 
     protected lateinit var regions: Array<Array<Int?>>
 
-    protected var x0 = 0
-    protected var y0 = 0
-    protected var x1 = 0
-    protected var y1 = 0
-    protected var bounds = Rect(x0,y0,x1,y1)
+    protected val bounds = Rect(x0,y0,x1,y1)
     protected var innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
-    protected var width = 0
-    protected var height = 0
-    protected lateinit var chunk: Chunk
+    protected val width = x1 - x0
+    protected val height = y1 - y0
 
     protected val json = Json { ignoreUnknownKeys = true }
 
-    fun carveLevel(x0: Int, y0: Int, x1: Int, y1: Int, chunk: Chunk) {
-        this.chunk = chunk
-        this.x0 = x0
-        this.y0 = y0
-        this.x1 = x1
-        this.y1 = y1
-        this.bounds = Rect(x0,y0,x1,y1)
-        this.innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
-        this.width = x1 - x0
-        this.height = y1 - y0
+    init {
         regions = Array(1+x1-x0) { Array(1+y1-y0) { null } }
         for (x in x0 .. x1) {
             for (y in y0 .. y1) {
                 chunk.setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
             }
         }
-        doCarveLevel()
     }
 
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
@@ -53,7 +44,6 @@ abstract class Carto {
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
     protected fun addThingAt(x: Int, y: Int, thing: Thing) = chunk.addThingAt(x, y, thing)
 
-    protected abstract fun doCarveLevel()
 
     protected fun regionAt(x: Int, y: Int): Int? = try {
         regions[x - x0][y - y0]

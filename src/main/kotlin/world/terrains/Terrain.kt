@@ -9,6 +9,7 @@ import render.GameScreen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.panels.ConsolePanel
+import util.XY
 
 sealed class Terrain(
     private val glyph: Glyph,
@@ -96,16 +97,21 @@ object PortalDoor : Terrain(
 ) {
     @Serializable class Data(
         val enterMsg: String,
-        val levelId: String
+        val levelId: String,
+        val xy: XY? = null // only for doors to world
     )
 
     override fun onBump(actor: Actor, data: String) {
         val terrainData = Json.decodeFromString<Data>(data)
         GameScreen.addModal(ConfirmModal(
-            terrainData.enterMsg.split('\n'), "Enter", "Cancel"
+            terrainData.enterMsg.split('\n'), "Travel", "Cancel"
         ) { yes ->
             if (yes) {
-                App.enterLevelFromWorld(terrainData.levelId)
+                if (terrainData.levelId == "world") {
+                    App.enterWorldFromLevel(terrainData.xy ?: throw RuntimeException("Door to world with no XY dest!"))
+                } else {
+                    App.enterLevelFromWorld(terrainData.levelId)
+                }
             } else {
                 ConsolePanel.say("You reconsider and step away.")
             }

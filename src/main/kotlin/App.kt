@@ -17,6 +17,7 @@ import ui.modals.CreditsModal
 import ui.modals.SavingModal
 import ui.panels.DebugPanel
 import ui.panels.StatusPanel
+import util.XY
 import util.log
 import world.*
 import kotlin.system.exitProcess
@@ -126,13 +127,13 @@ object App : KtxGame<Screen>() {
         level.setPov(200, 200)
 
         pendingJob = KtxAsync.launch {
-            var playerStart = level.tempPlayerStart()
+            var playerStart: XY? = null
             var waitMs = 0
             while (playerStart == null) {
                 log.debug("Waiting for chunks...")
                 delay(20)
                 waitMs += 20
-                playerStart = level.tempPlayerStart()
+                playerStart = level.getPlayerEntranceFrom(level)
             }
             log.info("Waited $waitMs ms for start chunk.")
             level.director.add(player, playerStart.x, playerStart.y, level)
@@ -202,19 +203,37 @@ object App : KtxGame<Screen>() {
     fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
 
+        val oldLevel = level
         level = LevelKeeper.getLevel(levelId)
 
         KtxAsync.launch {
-            var playerStart = level.tempPlayerStart()
+            var playerStart: XY? = null
             while (playerStart == null) {
                 log.debug("Waiting for level...")
                 delay(50)
-                playerStart = level.tempPlayerStart()
+                playerStart = level.getPlayerEntranceFrom(oldLevel)
             }
             level.director.add(player, playerStart.x, playerStart.y, level)
             updateTime(time)
             level.onRestore()
             ConsolePanel.say("You cautiously step inside...")
+        }
+    }
+
+    fun enterWorldFromLevel(dest: XY) {
+        level.director.remove(player)
+
+        level = LevelKeeper.getLevel("world")
+
+        KtxAsync.launch {
+            while (!level.isReady()) {
+                log.debug("Waiting for world...")
+                delay(50)
+            }
+            level.director.add(player, dest.x, dest.y, level)
+            updateTime(time)
+            level.onRestore()
+            ConsolePanel.say("You step back outside to face the wilderness once again.")
         }
     }
 
@@ -253,8 +272,8 @@ object App : KtxGame<Screen>() {
 
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $realYear"
-
         lastHour = hour
+
         LevelKeeper.forEachLiveLevel { it.updateAmbientLight(hour, minute) }
     }
 }

@@ -30,7 +30,7 @@ sealed class Level {
 
     abstract fun receiveChunk(chunk: Chunk)
 
-    abstract fun tempPlayerStart(): XY?
+    abstract fun getPlayerEntranceFrom(level: Level): XY?
 
     open fun debugText(): String = ""
     open fun statusText(): String = ""
@@ -214,7 +214,7 @@ sealed class Level {
     fun updateForRender() {
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }
-            shadowCaster.castVisibility(pov, 18f, { x, y ->
+            shadowCaster.castVisibility(pov, App.player.visualRange(), { x, y ->
                 isOpaqueAt(x, y)
             }, { x, y, vis ->
                 setTileVisibility(x, y, vis)

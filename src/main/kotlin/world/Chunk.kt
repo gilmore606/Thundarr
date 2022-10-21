@@ -7,6 +7,7 @@ import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
+import world.cartos.LevelCarto
 import world.cartos.RoomyMaze
 import world.cartos.WorldCarto
 import world.terrains.Terrain
@@ -69,7 +70,7 @@ class Chunk(
         this.level = level
     }
 
-    fun tempPlayerStart(): XY {
+    fun randomPlayerStart(): XY {
         var tries = 5000
         while (tries > 0) {
             val x = Dice.range(x, x + width - 1)
@@ -97,15 +98,25 @@ class Chunk(
         }
     }
 
+    // Carve myself into a chunk for the world.
     fun generateWorld() {
         generating = true
-        WorldCarto().carveLevel(x, y, x + width - 1, y + height - 1, this)
+
+        WorldCarto(x, y, x+width-1,y+height-1,this)
+            .carveWorldChunk()
+
         generating = false
     }
 
+    // Carve myself into a chunk for a building level.
     fun generateLevel(building: Building) {
         generating = true
-        RoomyMaze().carveLevel(0, 0, building.floorWidth - 1, building.floorHeight - 1, this)
+
+        LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this)
+            .carveLevel(
+                worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
+            )
+
         generating = false
     }
 

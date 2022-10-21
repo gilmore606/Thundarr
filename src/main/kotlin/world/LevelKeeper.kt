@@ -7,7 +7,7 @@ object LevelKeeper {
     class LiveLevel(
         val level: Level,
         val addedAtMs: Long,
-        val lastEnteredAtMs: Long
+        var lastAccessedAt: Long
     )
 
     private const val maxLevelsToKeep = 6
@@ -25,6 +25,7 @@ object LevelKeeper {
     fun getLevel(levelId: String): Level {
         liveLevels.forEach { liveLevel ->
             if (liveLevel.level.levelId() == levelId) {
+                liveLevel.lastAccessedAt = System.currentTimeMillis()
                 return liveLevel.level
             }
         }
@@ -33,8 +34,9 @@ object LevelKeeper {
         liveLevels.add(LiveLevel(
             level = level,
             addedAtMs = System.currentTimeMillis(),
-            lastEnteredAtMs = 0
+            lastAccessedAt = System.currentTimeMillis()
         ))
+
         pruneLevels()
         return level
     }
@@ -42,7 +44,7 @@ object LevelKeeper {
     // Discard old levels if we're holding too many active.
     private fun pruneLevels() {
         if (liveLevels.size > maxLevelsToKeep) {
-            liveLevels.sortedByDescending { it.lastEnteredAtMs }.forEach {
+            liveLevels.sortedBy { it.lastAccessedAt }.forEach {
                 if (liveLevels.size > maxLevelsToKeep) {
                     hibernateLevel(it.level)
                 }

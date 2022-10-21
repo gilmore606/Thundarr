@@ -29,6 +29,8 @@ sealed class Actor(
 
     // What's my divider for action durations?
     fun speed() = this.speed
+    // How far in tiles can I see things?
+    fun visualRange() = 24f
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
