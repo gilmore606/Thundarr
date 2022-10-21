@@ -178,7 +178,6 @@ object GameScreen : KtxScreen {
         animateCamera(delta)
         App.level.updateForRender()
         panels.forEach { it.onRender(delta) }
-
         drawEverything()
 
         LevelKeeper.runActorQueues()

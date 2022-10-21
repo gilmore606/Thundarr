@@ -301,6 +301,15 @@ class Chunk(
         return level.ambientLight()
     }
 
+    // Force all cells to re-sum light on next frame.
+    fun dirtyAllLightCacheCells() {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                lightCacheDirty[x][y] = true
+            }
+        }
+    }
+
     private fun refreshLightCacheAt(x: Int, y: Int) {
         val ambient = level.ambientLight()
         lightCache[x][y].r = ambient.r
@@ -312,14 +321,6 @@ class Chunk(
             lightCache[x][y].b = min(1f, lightCache[x][y].b + color.b)
         }
         lightCacheDirty[x][y] = false
-    }
-
-    fun refreshLight() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                lightCacheDirty[x][y] = true
-            }
-        }
     }
 
     fun removeLightSource(lightSource: LightSource) {

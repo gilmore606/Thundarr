@@ -14,6 +14,12 @@ object LevelKeeper {
 
     val liveLevels = mutableSetOf<LiveLevel>()
 
+    fun forEachLiveLevel(doThis: (Level)->Unit) {
+        liveLevels.forEach { liveLevel ->
+            doThis(liveLevel.level)
+        }
+    }
+
     // Get the specified level from the live list, or start it up and add it.
     // Remove old levels if necessary.
     fun getLevel(levelId: String): Level {

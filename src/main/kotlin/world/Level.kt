@@ -234,9 +234,10 @@ sealed class Level {
                 }
             }
         }
+        allChunks().forEach { it.dirtyAllLightCacheCells() }
     }
 
-    fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
+    private fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 
     fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) =
         chunkAt(x,y)?.receiveLight(x, y, lightSource, r, g, b)
@@ -255,11 +256,27 @@ sealed class Level {
         allChunks().forEach { it.removeLightSource(lightSource) }
     }
 
-    fun updateAmbientLight(hour: Int) {
-        ambientLight.r = sunLightSteps[hour]?.r ?: 0f
-        ambientLight.g = sunLightSteps[hour]?.g ?: 0f
-        ambientLight.b = sunLightSteps[hour]?.b ?: 0f
-        allChunks().forEach { it.refreshLight() }
+    fun updateAmbientLight(hour: Int, minute: Int) {
+        val stepHours = sunLightSteps.keys
+        var hour1 = 0
+        var hour2 = 0
+        for (stepHour in stepHours) {
+            if (stepHour <= hour) {
+                hour1 = stepHour
+            } else if (hour2 == 0) {
+                hour2 = stepHour
+            }
+        }
+        if (hour2 == 0) hour2 = stepHours.first()
+        val c1 = sunLightSteps[hour1]
+        val c2 = sunLightSteps[hour2]
+        val gap = (hour2 * 60) - ((if (hour2 > hour1) hour1 else hour1 - 24) * 60)
+        val progress = (hour - hour1) * 60 + minute
+        val fraction = (progress.toFloat() / gap.toFloat())
+
+        ambientLight.r = c1!!.r + (c2!!.r - c1.r) * fraction
+        ambientLight.g = c1!!.g + (c2!!.g - c1.g) * fraction
+        ambientLight.b = c1!!.b + (c2!!.b - c1.b) * fraction
     }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
