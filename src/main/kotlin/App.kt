@@ -22,6 +22,8 @@ import util.log
 import world.*
 import kotlin.system.exitProcess
 
+const val RESOURCE_FILE_DIR = "src/main/resources/"
+
 object App : KtxGame<Screen>() {
 
     @Serializable
@@ -31,6 +33,9 @@ object App : KtxGame<Screen>() {
         val time: Double,
         val zoomIndex: Double,
     )
+
+    private const val TURNS_PER_DAY = 2000.0
+    private const val YEAR_ZERO = 2994
 
     lateinit var player: Player
     lateinit var level: Level
@@ -109,11 +114,7 @@ object App : KtxGame<Screen>() {
 
         updateTime(state.time)
         GameScreen.restoreZoomIndex(state.zoomIndex)
-        GameScreen.lastPov.x = player.xy.y
-        GameScreen.lastPov.y = player.xy.y
-        level.director.add(player, player.xy.x, player.xy.y, level)
-        updateTime(time)
-        level.onRestore()
+        movePlayerIntoLevel(player.xy.x, player.xy.y)
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
 
@@ -128,15 +129,12 @@ object App : KtxGame<Screen>() {
 
         pendingJob = KtxAsync.launch {
             var playerStart: XY? = null
-            var waitMs = 0
             while (playerStart == null) {
                 log.debug("Waiting for chunks...")
-                delay(20)
-                waitMs += 20
+                delay(50)
                 playerStart = level.getPlayerEntranceFrom(level)
             }
-            log.info("Waited $waitMs ms for start chunk.")
-            level.director.add(player, playerStart.x, playerStart.y, level)
+            movePlayerIntoLevel(playerStart.x, playerStart.y)
             updateTime(0.0)
             ConsolePanel.say("You step tentatively into the apocalypse...")
         }
@@ -202,27 +200,23 @@ object App : KtxGame<Screen>() {
 
     fun enterLevelFromWorld(levelId: String) {
         level.director.remove(player)
-
         val oldLevel = level
         level = LevelKeeper.getLevel(levelId)
 
         KtxAsync.launch {
-            var playerStart: XY? = null
-            while (playerStart == null) {
+            var entrance: XY? = null
+            while (entrance == null) {
                 log.debug("Waiting for level...")
                 delay(50)
-                playerStart = level.getPlayerEntranceFrom(oldLevel)
+                entrance = level.getPlayerEntranceFrom(oldLevel)
             }
-            level.director.add(player, playerStart.x, playerStart.y, level)
-            updateTime(time)
-            level.onRestore()
+            movePlayerIntoLevel(entrance.x, entrance.y)
             ConsolePanel.say("You cautiously step inside...")
         }
     }
 
     fun enterWorldFromLevel(dest: XY) {
         level.director.remove(player)
-
         level = LevelKeeper.getLevel("world")
 
         KtxAsync.launch {
@@ -230,11 +224,17 @@ object App : KtxGame<Screen>() {
                 log.debug("Waiting for world...")
                 delay(50)
             }
-            level.director.add(player, dest.x, dest.y, level)
-            updateTime(time)
-            level.onRestore()
+            movePlayerIntoLevel(dest.x, dest.y)
             ConsolePanel.say("You step back outside to face the wilderness once again.")
         }
+    }
+
+    private fun movePlayerIntoLevel(x: Int, y: Int) {
+        level.director.add(player, x, y, level)
+        updateTime(time)
+        level.onRestore()
+        GameScreen.mouseScrolled(0f)
+        GameScreen.recenterCamera()
     }
 
     fun passTime(passed: Float) {
@@ -242,14 +242,12 @@ object App : KtxGame<Screen>() {
     }
 
     private fun updateTime(newTime: Double) {
-        val dayLength = 1000.0
         val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-        val yearZero = 2994
 
         time = newTime
-        val day = (time / dayLength).toInt()
-        val timeOfDay = time - (day * dayLength)
-        val minutes = (timeOfDay / dayLength) * 1440.0
+        val day = (time / TURNS_PER_DAY).toInt()
+        val timeOfDay = time - (day * TURNS_PER_DAY)
+        val minutes = (timeOfDay / TURNS_PER_DAY) * 1440.0
         val hour = (minutes / 60).toInt()
         val minute = minutes.toInt() - (hour * 60)
         var ampm = "am"
@@ -268,7 +266,7 @@ object App : KtxGame<Screen>() {
         val month = yearDay / 30
         val monthDay = (yearDay - month * 30) + 1
         val monthName = monthNames[month]
-        val realYear = yearZero + year
+        val realYear = YEAR_ZERO + year
 
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $realYear"

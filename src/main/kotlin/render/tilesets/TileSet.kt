@@ -1,15 +1,19 @@
 package render.tilesets
 
+import RESOURCE_FILE_DIR
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Texture
 import world.Level
 import render.tileholders.TileHolder
 import util.log
+import java.io.File
 
 
 class TileSet(
     textureFileName: String,
     val tilesPerRow: Int,
     val tilesPerColumn: Int,
+    filter: Texture.TextureFilter = Texture.TextureFilter.Nearest
 ) {
     var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
     var tileRowStride = 0.0
@@ -18,7 +22,9 @@ class TileSet(
     val texture: Texture
 
     init {
-        texture = Texture(textureFileName)
+        texture = Texture(FileHandle("${RESOURCE_FILE_DIR}$textureFileName"), true).apply {
+            setFilter(filter, filter)
+        }
         log.info("Loaded texture $textureFileName (${texture.width} x ${texture.height})")
         tileRowStride = (1.0 / tilesPerRow)
         tileColumnStride = (1.0 / tilesPerColumn)

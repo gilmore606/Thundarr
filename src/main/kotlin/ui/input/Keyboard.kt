@@ -66,6 +66,9 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.NUMPAD_6 -> { App.player.queue(Move(EAST)) }
             Input.Keys.NUMPAD_9 -> { App.player.queue(Move(NORTHEAST)) }
 
+            Input.Keys.EQUALS -> { GameScreen.mouseScrolled(-1.43f) }
+            Input.Keys.MINUS -> { GameScreen.mouseScrolled(1.43f) }
+
             Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
             Input.Keys.M -> { GameScreen.addModal(MapModal()) }
 

@@ -18,22 +18,25 @@ import ui.panels.Panel
 import ui.modals.Modal
 import util.*
 import world.LevelKeeper
+import world.WorldLevel
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
 
 object GameScreen : KtxScreen {
 
+    private const val WORLD_ZOOM = 0.8
+    private const val ZOOM_SPEED = 4.0
     var RENDER_WIDTH = 160
     var RENDER_HEIGHT = 100
-    var zoom = 0.4
+    var zoom = 0.5
         set(value) {
             field = value
             updateSurfaceParams()
         }
-    private var zoomTarget = 0.4
-    private val zoomLevels = listOf(0.25, 0.4, 0.5, 0.6, 0.85)
-    var zoomIndex = 2.0
+    private var zoomTarget = 0.6
+    private val zoomLevels = listOf(0.42, 0.51, 0.6, 0.73, 0.85)
+    var zoomIndex = 3.0
 
     var width = 0
     var height = 0
@@ -174,7 +177,6 @@ object GameScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        animateZoom(delta)
         animateCamera(delta)
         App.level.updateForRender()
         panels.forEach { it.onRender(delta) }
@@ -183,20 +185,18 @@ object GameScreen : KtxScreen {
         LevelKeeper.runActorQueues()
     }
 
-    private fun animateZoom(delta: Float) {
-        if (zoom < zoomTarget) {
-            zoom = min(zoomTarget, zoom + 1.8 * delta * zoom)
-        } else if (zoom > zoomTarget) {
-            zoom = max(zoomTarget, zoom - 1.8 * delta * zoom)
-        }
-    }
-
     fun restoreZoomIndex(index: Double) {
         zoomIndex = index
         zoomTarget = zoomLevels[zoomIndex.toInt()]
     }
 
     private fun animateCamera(delta: Float) {
+        val diff = min(3.0, max(0.04, abs(zoom - zoomTarget)))
+        if (zoom < zoomTarget) {
+            zoom = min(zoomTarget, zoom + diff * delta * ZOOM_SPEED)
+        } else if (zoom > zoomTarget) {
+            zoom = max(zoomTarget, zoom - diff * delta * ZOOM_SPEED)
+        }
         if (scrollLatch) return
         val step = 0.1f
         if (pov.x != lastPov.x || pov.y != lastPov.y) {
@@ -217,6 +217,13 @@ object GameScreen : KtxScreen {
         } else {
             kotlin.math.min(scrollTargetY,(scrollY + cameraPull * delta * accY * zoom.toFloat() ))
         }
+    }
+
+    fun recenterCamera() {
+        lastPov.x = pov.x
+        lastPov.y = pov.y
+        scrollX = 0f
+        scrollY = 0f
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
@@ -250,8 +257,8 @@ object GameScreen : KtxScreen {
     }
 
     fun mouseScrolled(amount: Float) {
-        zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.6))
-        zoomTarget = zoomLevels[zoomIndex.toInt()]
+        zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
+        zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) WORLD_ZOOM else 1.0)
     }
 
     fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
@@ -416,7 +423,7 @@ object GameScreen : KtxScreen {
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
-        tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01f) * zoom
+        tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01) * zoom
         log.debug("Surface params updated to $width x $height (ratio $aspectRatio tileStride $tileStride)")
     }
 

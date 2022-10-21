@@ -1,10 +1,13 @@
 package render.tilesets
 
+import RESOURCE_FILE_DIR
+import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 
 fun ThingTileSet() =
-    TileSet("tiles_thing.png", 2, 2).apply {
+    TileSet("tiles_thing.png", 2, 2,
+            Texture.TextureFilter.MipMap).apply {
 
         setTile(Glyph.TREE, VariantsTile(this).apply {
             add(0.4f, 0, 1)

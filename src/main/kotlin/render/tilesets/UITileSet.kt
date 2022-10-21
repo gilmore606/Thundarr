@@ -1,5 +1,6 @@
 package render.tilesets
 
+import RESOURCE_FILE_DIR
 import render.tileholders.SimpleTile
 
 fun UITileSet() =

@@ -26,7 +26,7 @@ class QuadBatch(
 
     private val floats: FloatArray = FloatArray(MAX_QUADS * FLOATS_PER_VERTEX * 4 * 4)
     private var floatCount = 0
-    private var vertexCount = 0
+    var vertexCount = 0
 
     private val tilePad = 0.00004f
     private val shadowPad = 0.001f
