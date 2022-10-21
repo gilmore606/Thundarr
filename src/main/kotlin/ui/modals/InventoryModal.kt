@@ -2,9 +2,9 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import things.ThingHolder
-import ui.input.Mouse
 import util.aOrAn
 import util.plural
+import java.lang.Integer.max
 
 class InventoryModal(
     private val thingHolder: ThingHolder
@@ -15,11 +15,15 @@ class InventoryModal(
     }
 
     private fun adjustHeight() {
-        height = headerPad + thingHolder.byKind().size * 20 + padding
+        height = headerPad + max(1, thingHolder.byKind().size) * 20 + padding
         maxSelection = thingHolder.byKind().size - 1
     }
 
     override fun drawModalText() {
+        if (maxSelection < 0) {
+            drawOptionText("Your backpack is empty.", 0)
+            return
+        }
         var n = 0
         thingHolder.byKind().forEach {
             var text = ""
@@ -31,6 +35,11 @@ class InventoryModal(
             drawOptionText(text, n)
             n++
         }
+    }
+
+    override fun drawBackground() {
+        super.drawBackground()
+        if (selection > -1) drawOptionShade()
     }
 
     override fun doSelect() {

@@ -19,6 +19,7 @@ abstract class Modal(
     private val launchTimeMs = System.currentTimeMillis()
     protected var animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
+    protected var dismissOnClickOutside = true
 
     init {
         this.width = width
@@ -70,7 +71,9 @@ abstract class Modal(
     }
 
     open fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
-
+        if (screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height) {
+            if (dismissOnClickOutside) dismiss()
+        }
     }
 
     protected fun dismiss() {
@@ -78,8 +81,8 @@ abstract class Modal(
     }
 
     protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
-        boxBatch.addPixelQuad(this.x + x0 - 9, this.y + y0 - 9,
-            this.x + x0 + width + 9, this.y + y0 + height - 8,
+        boxBatch.addPixelQuad(this.x + x0 - 6, this.y + y0 - (7 + height / 4),
+            this.x + x0 + width + 12, this.y + y0 + height,
             boxBatch.getTextureIndex(Glyph.BOX_SHADOW))
     }
 }

@@ -26,6 +26,7 @@ class ConfirmModal(
     val noWidth: Int
 
     init {
+        mouseSelection = false
         yesWidth = GlyphLayout(GameScreen.font, yesText).width.toInt()
         noWidth = GlyphLayout(GameScreen.font, noText).width.toInt()
         val spaceWidth = (width - 48) - (yesWidth + noWidth)
@@ -73,11 +74,11 @@ class ConfirmModal(
     }
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
-        mouseToOption(screenX, screenY)?.also { selection = it }
+        mouseToYesOrNo(screenX, screenY)?.also { selection = it }
     }
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
-        mouseToOption(screenX, screenY)?.also { selected ->
+        mouseToYesOrNo(screenX, screenY)?.also { selected ->
             selection = selected
             doSelect()
         }
@@ -88,7 +89,7 @@ class ConfirmModal(
         callback.invoke(selection == 0)
     }
 
-    private fun mouseToOption(screenX: Int, screenY: Int): Int? {
+    private fun mouseToYesOrNo(screenX: Int, screenY: Int): Int? {
         val localX = screenX - x
         val localY = screenY - y
         if (localX in 1 until width) {
