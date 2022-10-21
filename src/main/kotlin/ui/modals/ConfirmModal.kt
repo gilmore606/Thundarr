@@ -10,7 +10,7 @@ class ConfirmModal(
     val yesText: String = "OK",
     val noText: String = "Cancel",
     val callback: (Boolean)->Unit
-): Modal(
+): SelectionModal(
     textWidth(text) + 48,
     text.size * 24 + 90,
     position = Position.LEFT
@@ -19,8 +19,6 @@ class ConfirmModal(
     companion object {
         fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(GameScreen.font, it).width }.toInt()
     }
-
-    var selection: Boolean = false
 
     val yesOffset: Int
     val noOffset: Int
@@ -43,16 +41,16 @@ class ConfirmModal(
         }
         iy += 20
         drawString(yesText, 24 + yesOffset, iy,
-            if (selection) GameScreen.fontColorBold else GameScreen.fontColor)
+            if (selection == 0) GameScreen.fontColorBold else GameScreen.fontColor)
         drawString(noText, 24 + noOffset, iy,
-            if (!selection) GameScreen.fontColorBold else GameScreen.fontColor)
+            if (selection == 1) GameScreen.fontColorBold else GameScreen.fontColor)
     }
 
     override fun drawBackground() {
         super.drawBackground()
         if (isAnimating()) return
         val iy = 24 + text.size * 24 + 20
-        if (selection) {
+        if (selection == 0) {
             drawSelectionBox(24 + yesOffset, iy, yesWidth, 28)
         } else {
             drawSelectionBox(24 + noOffset, iy, noWidth, 28)
@@ -64,12 +62,12 @@ class ConfirmModal(
         when (keycode) {
             Input.Keys.NUMPAD_8, Input.Keys.NUMPAD_2, Input.Keys.NUMPAD_4, Input.Keys.NUMPAD_6, Input.Keys.DOWN,
             Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB -> {
-                selection = !selection
+                selectNext()
             }
-            Input.Keys.Y -> { selection = true }
-            Input.Keys.N -> { selection = false }
+            Input.Keys.Y -> { selection = 1 }
+            Input.Keys.N -> { selection = 0 }
             Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
-                selectCurrentOption()
+                doSelect()
             }
         }
     }
@@ -81,25 +79,25 @@ class ConfirmModal(
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         mouseToOption(screenX, screenY)?.also { selected ->
             selection = selected
-            selectCurrentOption()
+            doSelect()
         }
     }
 
-    private fun selectCurrentOption() {
+    override fun doSelect() {
         dismiss()
-        callback.invoke(selection)
+        callback.invoke(selection == 0)
     }
 
-    private fun mouseToOption(screenX: Int, screenY: Int): Boolean? {
+    private fun mouseToOption(screenX: Int, screenY: Int): Int? {
         val localX = screenX - x
         val localY = screenY - y
         if (localX in 1 until width) {
             if (localY in 1 until height) {
                 if (localX in yesOffset until noOffset) {
-                    return true
+                    return 0
                 }
                 if (localX >= noOffset) {
-                    return false
+                    return 1
                 }
             }
         }

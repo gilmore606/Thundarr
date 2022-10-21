@@ -104,7 +104,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.EQUALS -> { GameScreen.mouseScrolled(-1.43f) }
             Input.Keys.MINUS -> { GameScreen.mouseScrolled(1.43f) }
 
-            Input.Keys.TAB -> { GameScreen.addModal(InventoryModal()) }
+            Input.Keys.TAB -> { GameScreen.addModal(InventoryModal(App.player)) }
             Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
             Input.Keys.M -> { GameScreen.addModal(MapModal()) }
 

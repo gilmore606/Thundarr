@@ -9,15 +9,14 @@ import java.lang.Integer.min
 class ContextMenu(
     screenX: Int,
     screenY: Int
-): Modal(100, 50, null, Position.CURSOR) {
+): SelectionModal(100, 50, null, Position.CURSOR, 0) {
 
     private val options = mutableMapOf<String,()->Unit>()
-    private var selection = 0
     private var maxOptionWidth = 0
-    private val padding = 9
-    private val spacing = 26
 
     init {
+        this.padding = 10
+        this.spacing = 26
         this.animTime = 1f
         this.x = screenX
         this.y = screenY
@@ -33,6 +32,7 @@ class ContextMenu(
             width = optionWidth + padding * 2
         }
         height = options.size * spacing + padding * 2 - 6
+        this.maxSelection = options.size - 1
         return this
     }
 
@@ -71,30 +71,13 @@ class ContextMenu(
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         mouseToOption(screenX, screenY)?.also { selected ->
             selection = selected
-            selectCurrentOption()
+            doSelect()
         }
     }
 
-    private fun selectCurrentOption() {
+    override  fun doSelect() {
         dismiss()
         GameScreen.clearCursor()
         options[options.keys.toList()[selection]]?.invoke()
-    }
-
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
-        when (keycode) {
-            Input.Keys.NUMPAD_2, Input.Keys.DOWN -> {
-                selection++
-                if (selection >= options.keys.size) selection = 0
-            }
-            Input.Keys.NUMPAD_8, Input.Keys.UP -> {
-                selection--
-                if (selection < 0) selection = options.keys.size - 1
-            }
-            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
-                selectCurrentOption()
-            }
-        }
     }
 }

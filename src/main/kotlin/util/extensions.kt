@@ -46,6 +46,15 @@ fun String.aOrAn(): String {
     return "a " + this
 }
 
+fun String.plural(): String {
+    if (isNotEmpty()) {
+        if (get(lastIndex) == 's') {
+            return this + "es"
+        }
+    }
+    return this + "s"
+}
+
 val log = KotlinLogging.logger {}
 
 val NORTH = XY(0, -1)

@@ -11,4 +11,5 @@ sealed class Food : Portable() { }
 class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
+    override val kind = Kind.APPLE
 }

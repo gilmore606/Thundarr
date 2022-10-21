@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input
 import render.GameScreen
 import ui.input.Mouse
 
-class EscMenu : Modal(270, 230, "- ThUNdARR -") {
+class EscMenu : SelectionModal(270, 230, "- ThUNdARR -") {
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Restart world") { App.restartWorld() }
@@ -13,7 +13,6 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
         put("Credits") { App.openCredits() }
         put("Save and quit") { App.saveAndQuit() }
     }
-    var selection: Int = 0
     private val optionSpacing = GameScreen.fontSize + 12
     private val headerSpacing = 72
 
@@ -31,23 +30,6 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
         }
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
-        when (keycode) {
-            Input.Keys.NUMPAD_2, Input.Keys.DOWN -> {
-                selection++
-                if (selection >= options.keys.size) selection = 0
-            }
-            Input.Keys.NUMPAD_8, Input.Keys.UP -> {
-                selection--
-                if (selection < 0) selection = options.keys.size - 1
-            }
-            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
-                selectCurrentOption()
-            }
-        }
-    }
-
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         val hoverOption = mouseToOption(screenX, screenY)
         if (hoverOption >= 0) {
@@ -59,11 +41,11 @@ class EscMenu : Modal(270, 230, "- ThUNdARR -") {
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
         if (mouseToOption(screenX, screenY) >= 0) {
-            selectCurrentOption()
+            doSelect()
         }
     }
 
-    private fun selectCurrentOption() {
+    override fun doSelect() {
         if (selection >= 0 && selection < options.keys.size) {
             dismiss()
             options[options.keys.toList()[selection]]?.invoke()

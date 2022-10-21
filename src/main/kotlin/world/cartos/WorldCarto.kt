@@ -3,9 +3,7 @@ package world.cartos
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
-import things.Apple
-import things.OakTree
-import things.Thing
+import things.*
 import util.CARDINALS
 import util.Dice
 import util.Perlin
@@ -57,7 +55,7 @@ class WorldCarto(
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
                         addThingAt(x + this.x0, y + this.y0, OakTree())
-                        if (Dice.chance(0.1f)) {
+                        if (Dice.chance(0.2f)) {
                             var clear = true
                             CARDINALS.forEach { dir ->
                                 if (chunk.thingsAt(x + dir.x + this.x0,y + dir.y + this.y0).size > 0) {
@@ -67,7 +65,11 @@ class WorldCarto(
                             if (clear) {
                                 val dir = CARDINALS.random()
                                 try {
-                                    addThingAt(x + this.x0 + dir.x, y + this.y0 + dir.y, Apple())
+                                    addThingAt(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(3)) {
+                                        0 -> Apple()
+                                        1 -> Axe()
+                                        else -> EnergyDrink()
+                                    })
                                 } catch (_: Exception) { }
                             }
                         }
