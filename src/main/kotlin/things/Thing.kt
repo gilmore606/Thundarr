@@ -14,6 +14,7 @@ sealed class Thing {
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
+    abstract fun name(): String
 
     open fun onWalkedOnBy(actor: Actor) { }
 }
@@ -39,6 +40,7 @@ sealed class LitThing : Portable(), LightSource {
 @Serializable
 class Lightbulb : LitThing() {
     override fun glyph() = Glyph.LIGHTBULB
+    override fun name() = "lightbulb"
     override val lightColor = LightColor(1f, 1f, 1f)
 }
 

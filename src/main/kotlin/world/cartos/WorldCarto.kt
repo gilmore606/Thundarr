@@ -3,8 +3,10 @@ package world.cartos
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
+import things.Apple
 import things.OakTree
 import things.Thing
+import util.CARDINALS
 import util.Dice
 import util.Perlin
 import util.UUID
@@ -13,6 +15,7 @@ import world.Chunk
 import world.ChunkLoader
 import world.terrains.PortalDoor
 import world.terrains.Terrain
+import kotlin.Exception
 import kotlin.random.Random
 
 class WorldCarto(
@@ -54,6 +57,20 @@ class WorldCarto(
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
                         addThingAt(x + this.x0, y + this.y0, OakTree())
+                        if (Dice.chance(0.1f)) {
+                            var clear = true
+                            CARDINALS.forEach { dir ->
+                                if (chunk.thingsAt(x + dir.x + this.x0,y + dir.y + this.y0).size > 0) {
+                                    clear = false
+                                }
+                            }
+                            if (clear) {
+                                val dir = CARDINALS.random()
+                                try {
+                                    addThingAt(x + this.x0 + dir.x, y + this.y0 + dir.y, Apple())
+                                } catch (_: Exception) { }
+                            }
+                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package world
 
 import actors.Actor
+import actors.Player
 import actors.actions.processes.WalkTo
 import render.GameScreen
 import render.sunLights
@@ -9,8 +10,10 @@ import render.tileholders.WaterTile
 import render.tilesets.Glyph
 import render.tilesets.TileSet
 import things.LightSource
+import things.Portable
 import things.Thing
 import ui.modals.ContextMenu
+import ui.panels.ConsolePanel
 import util.*
 import world.terrains.Terrain
 
@@ -164,7 +167,21 @@ sealed class Level {
     }
 
     fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
-        thingsAt(x, y).forEach { it.onWalkedOnBy(actor) }
+        thingsAt(x, y).apply {
+            if (isNotEmpty()) {
+                val thingList = mutableListOf<String>()
+                forEach {
+                    it.onWalkedOnBy(actor)
+                    if (it is Portable) {
+                        thingList.add(it.name().aOrAn())
+                    }
+                }
+                if (actor is Player && thingList.isNotEmpty()) {
+                    val things = thingList.joinToString(", ")
+                    ConsolePanel.say("You see $things here.")
+                }
+            }
+        }
     }
 
     abstract fun makeStepMap(): StepMap

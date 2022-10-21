@@ -37,6 +37,15 @@ fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
 
 fun UUID() = UUID.randomUUID().toString()
 
+fun String.aOrAn(): String {
+    if (isNotEmpty()) {
+        if (get(0) in listOf('a','e','i','o','u')) {
+            return "an " + this
+        }
+    }
+    return "a " + this
+}
+
 val log = KotlinLogging.logger {}
 
 val NORTH = XY(0, -1)

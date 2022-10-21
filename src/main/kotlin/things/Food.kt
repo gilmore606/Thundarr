@@ -10,4 +10,5 @@ sealed class Food : Portable() { }
 @Serializable
 class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
+    override fun name() = "apple"
 }
