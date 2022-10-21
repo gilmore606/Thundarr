@@ -198,7 +198,9 @@ sealed class Level {
 
     open fun unload() { }
 
-    fun thingsAt(x: Int, y: Int): List<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
+    fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
+
+    fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: CellContainer()
 
     fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
 
@@ -297,13 +299,21 @@ sealed class Level {
     }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
-        menu.addOption("Examine") {
-
-        }
-        if (isWalkableAt(x, y)) {
-            menu.addOption("Walk to") {
-                App.player.queue(WalkTo(this, x, y))
+        if (App.player.xy.x == x && App.player.xy.y == y) {
+            thingsAt(x,y).forEach {
+                if (it.isPortable()) {
+                    menu.addOption("Take " + it.name()) {
+                        App.player.takeThing(it, cellContainerAt(x, y))
+                    }
+                }
+            }
+        } else {
+            if (isWalkableAt(x, y)) {
+                menu.addOption("Walk to") {
+                    App.player.queue(WalkTo(this, x, y))
+                }
             }
         }
+        menu.addOption("Examine") { }
     }
 }

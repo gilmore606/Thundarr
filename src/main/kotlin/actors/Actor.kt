@@ -3,14 +3,18 @@ package actors
 import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Thing
+import things.ThingHolder
+import ui.panels.ConsolePanel
 import util.XY
+import util.aOrAn
 import world.Level
 
 @Serializable
 sealed class Actor(
     open val glyph: Glyph,
     open val speed: Float
-) {
+) : ThingHolder {
     val xy = XY(0,0)  // position in current level
 
     // Set false for system actors.
@@ -47,5 +51,17 @@ sealed class Actor(
     // Queue an action to be executed next.
     open fun queue(action: Action) {
         queuedActions.add(action)
+    }
+
+    override val contents = mutableListOf<Thing>()
+    override fun remove(thing: Thing) { contents.remove(thing) }
+    override fun add(thing: Thing) { contents.add(thing) }
+
+    fun takeThing(thing: Thing, from: ThingHolder) {
+        from.remove(thing)
+        add(thing)
+        if (this is Player) {
+            ConsolePanel.say("You pick up " + thing.name().aOrAn() + ".")
+        }
     }
 }

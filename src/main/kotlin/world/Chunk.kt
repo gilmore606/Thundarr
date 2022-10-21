@@ -31,7 +31,7 @@ class Chunk(
     private val visible = Array(width) { Array(height) { false } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array(height) { "" } }
-    private val things = Array(width) { Array(height) { mutableListOf<Thing>() } }
+    private val things = Array(width) { Array(height) { CellContainer() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
     var generating = false
@@ -89,7 +89,7 @@ class Chunk(
         // Find and reproject all lights.
         for (x in 0 until width) {
             for (y in 0 until height) {
-                things[x][y].forEach { thing ->
+                things[x][y].contents.forEach { thing ->
                     if (thing is LightSource) {
                         level.dirtyLights[thing] = XY(x + this.x, y + this.y)
                     }
@@ -150,8 +150,12 @@ class Chunk(
     }
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
-        things[x - this.x][y - this.y]
+        things[x - this.x][y - this.y].contents
     } else { noThing }
+
+    fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        things[x - this.x][y - this.y]
+    } else { CellContainer() }
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
@@ -199,7 +203,7 @@ class Chunk(
         var v = Terrain.get(terrains[x][y]).isWalkable()
         if (!v) {
             var thingBlocking = false
-            things[x][y].forEach { thing ->
+            things[x][y].contents.forEach { thing ->
                 thingBlocking = thingBlocking || thing.isBlocking()
             }
             v = thingBlocking
@@ -245,7 +249,7 @@ class Chunk(
         var v = Terrain.get(terrains[x][y]).isOpaque()
         if (!v) {
             var thingBlocking = false
-            things[x][y].forEach { thing ->
+            things[x][y].contents.forEach { thing ->
                 thingBlocking = thingBlocking || thing.isOpaque()
             }
             v = thingBlocking
