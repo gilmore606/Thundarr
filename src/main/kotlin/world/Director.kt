@@ -4,71 +4,83 @@ import actors.Actor
 import actors.Player
 import actors.WorldActor
 import kotlinx.serialization.Serializable
+import util.log
 
 // A delegate class for Level to manage actors in time and space.
 
 @Serializable
 class Director {
 
-    val actors: MutableList<Actor> = mutableListOf(WorldActor())
+    val actors = mutableListOf<Actor>()
+    val actorQueue = mutableListOf<Actor>()
 
-    // Place actor into the level.
-    fun add(actor: Actor, x: Int, y: Int, level: Level) {
-        attachActor(actor)
-        actor.moveTo(level, x, y)
-    }
-
-    // Attach already-positioned actor in the level.  Used externally by loaded chunks.
+    // Attach already-positioned actor in the level.
     fun attachActor(actor: Actor) {
+        if (actor is Player && actor != App.player) {
+            throw RuntimeException("Duplicate player attached!")
+        } else if (actor in actors) {
+            throw RuntimeException("Attaching already-attached actor!")
+        }
         actor.juice = 0f
-        addOrdered(actor)
+        addOrdered(actor, actors)
+        if (actor is Player && WorldActor !in actors) {
+            attachActor(WorldActor)
+        }
     }
 
-    fun remove(actor: Actor) {
+    fun detachActor(actor: Actor) {
         actors.remove(actor)
+        if (actor is Player && WorldActor in actors) {
+            detachActor(WorldActor)
+        }
     }
 
     // Insert actor into the queue in the correct order based on juice and speed.
-    private fun addOrdered(actor: Actor) {
+    private fun addOrdered(actor: Actor, toQueue: MutableList<Actor>) {
         var i = 0
         val actorSpeed = actor.speed()
-        while (i < actors.size) {
+        while (i < toQueue.size) {
             if (
-                (actors[i].juice < actor.juice) ||
-                (actors[i].juice == actor.juice && actor is Player) ||
-                (actors[i].juice == actor.juice && actors[i].speed() < actorSpeed)
+                (toQueue[i].juice < actor.juice) ||
+                (toQueue[i].juice == actor.juice && actor is Player) ||
+                (toQueue[i].juice == actor.juice && actors[i].speed() < actorSpeed)
             ) {
-                actors.add(i, actor)
+                toQueue.add(i, actor)
                 return
             }
             i++
         }
-        actors.add(actor)
+        toQueue.add(actor)
     }
 
     fun getPlayer(): Player = actors.firstOrNull { it is Player } as Player
 
-    fun unloadActorsFromArea(x0: Int, x1: Int, y0: Int, y1: Int): Set<Actor> = actors.filter {
-        it.real && it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
-    }.map { remove(it) ; it }.filter { it !is Player }.toSet()
+    fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
+        return actors.filter {
+            it.real && it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
+        }.map { detachActor(it) ; it }.filter { it !is Player }.toSet()
+    }
 
     // Execute actors' actions until it's the player's turn.
     fun runQueue(level: Level) {
         var done = false
-        while (actors.isNotEmpty() && !done) {
-            if (actors[0].juice > 0f || actors[0] is Player) {
-                val actor = actors.removeAt(0)
+        actorQueue.clear()
+        actorQueue.addAll(actors)
+        while (actorQueue.isNotEmpty() && !done) {
+            if (actorQueue[0].juice > 0f || (actorQueue[0] is Player && actorQueue[0].queuedActions.isNotEmpty())) {
+                val actor = actorQueue.removeAt(0)
                 actor.nextAction()?.also { action ->
+
                     val duration = action.duration()
-                    //log.debug("$actor (j ${actor.juice}) executes $action for $duration turns")
 
                     action.execute(actor, level)
 
                     when (actor) {
-                        is WorldActor -> { actor.juice -= duration ; done = true } // Stop executing actions to let the renderer draw.
-                        is Player -> { actors.forEach { it.juice += duration} } // Player actions give juice to everyone else.
+                        is Player -> { actorQueue.forEach { if (it !is Player) it.juice += duration} } // Player actions give juice to everyone else.
                         else -> { actor.juice -= duration } // NPC actions cost them juice.
                     }
+                    if (actor is WorldActor) done = true // Stop executing actions to let the renderer draw.
+
                 } ?: if (actor is Player) {
                     // Player's turn, but has no queued actions, so we're done.
                     done = true
@@ -77,11 +89,13 @@ class Director {
                     throw RuntimeException("NPC $actor had no next action!")
                 }
                 // Put the actor back in queue, in position for their next turn.
-                addOrdered(actor)
+                addOrdered(actor, actorQueue)
             } else {
                 // If this actor has no juice, nobody does, so we're done.
                 done = true
             }
         }
+        actors.clear()
+        actors.addAll(actorQueue)
     }
 }

@@ -25,9 +25,10 @@ sealed class Actor(
     // How many turns am I owed?
     var juice = 0f
 
-    open fun moveTo(level: Level, x: Int, y: Int) {
+    open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level?) {
         this.xy.x = x
         this.xy.y = y
+        fromLevel?.onActorMovedFrom(this, x, y, level)
         level.onActorMovedTo(this, x, y)
     }
 

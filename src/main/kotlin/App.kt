@@ -10,9 +10,9 @@ import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.GameScreen
+import things.Sunsword
 import ui.modals.*
 import ui.panels.ConsolePanel
-import ui.panels.DebugPanel
 import ui.panels.LookPanel
 import ui.panels.StatusPanel
 import util.XY
@@ -112,27 +112,33 @@ object App : KtxGame<Screen>() {
 
         updateTime(state.time)
         GameScreen.restoreZoomIndex(state.zoomIndex)
-        movePlayerIntoLevel(player.xy.x, player.xy.y)
+        movePlayerIntoLevel(player.xy.x, player.xy.y, null)
         log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
     }
 
     private fun createNewWorld() {
         LevelKeeper.hibernateAll()
-        save.eraseAll()
-
-        level = LevelKeeper.getLevel("world")
-
-        player = Player()
-        level.setPov(200, 200)
-
         pendingJob = KtxAsync.launch {
+            while (ChunkLoader.isWorking()) {
+                log.info("Waiting for ChunkLoader to finish...")
+                delay(100)
+            }
+            save.eraseAll()
+
+            level = LevelKeeper.getLevel("world")
+
+            player = Player()
+            player.add(Sunsword())
+
+            level.setPov(200, 200)
+
             var playerStart: XY? = null
             while (playerStart == null) {
                 log.debug("Waiting for chunks...")
                 delay(50)
                 playerStart = level.getPlayerEntranceFrom(level)
             }
-            movePlayerIntoLevel(playerStart.x, playerStart.y)
+            movePlayerIntoLevel(playerStart.x, playerStart.y, null)
             updateTime(0.0)
             ConsolePanel.say("You step tentatively into the apocalypse...")
         }
@@ -153,7 +159,7 @@ object App : KtxGame<Screen>() {
     }
 
     fun enterLevelFromWorld(levelId: String) {
-        level.director.remove(player)
+        level.director.detachActor(player)
         val oldLevel = level
         level = LevelKeeper.getLevel(levelId)
 
@@ -164,13 +170,14 @@ object App : KtxGame<Screen>() {
                 delay(50)
                 entrance = level.getPlayerEntranceFrom(oldLevel)
             }
-            movePlayerIntoLevel(entrance.x, entrance.y)
+            movePlayerIntoLevel(entrance.x, entrance.y, oldLevel)
             ConsolePanel.say("You cautiously step inside...")
         }
     }
 
     fun enterWorldFromLevel(dest: XY) {
-        level.director.remove(player)
+        level.director.detachActor(player)
+        val oldLevel = level
         level = LevelKeeper.getLevel("world")
 
         KtxAsync.launch {
@@ -178,20 +185,20 @@ object App : KtxGame<Screen>() {
                 log.debug("Waiting for world...")
                 delay(50)
             }
-            movePlayerIntoLevel(dest.x, dest.y)
+            movePlayerIntoLevel(dest.x, dest.y, oldLevel)
             ConsolePanel.say("You step back outside to face the wilderness once again.")
         }
     }
 
-    private fun movePlayerIntoLevel(x: Int, y: Int) {
-        level.director.add(player, x, y, level)
+    private fun movePlayerIntoLevel(x: Int, y: Int, from: Level?) {
+        player.moveTo(level, x, y, from)
         updateTime(time)
         level.onRestore()
         GameScreen.mouseScrolled(0f)
         GameScreen.recenterCamera()
     }
 
-    fun passTime(passed: Float) {
+    fun advanceTime(passed: Float) {
         updateTime(time + passed.toDouble())
     }
 

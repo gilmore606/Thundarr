@@ -13,8 +13,8 @@ class Player : Actor(
 ) {
     override fun defaultAction(): Action? = null
 
-    override fun moveTo( level: Level, x: Int, y: Int,) {
-        super.moveTo(level, x, y)
+    override fun moveTo( level: Level, x: Int, y: Int, fromLevel: Level?) {
+        super.moveTo(level, x, y, fromLevel)
         App.level.setPov(x, y)
     }
 }

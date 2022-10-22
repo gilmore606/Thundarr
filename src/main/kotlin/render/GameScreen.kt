@@ -59,7 +59,8 @@ object GameScreen : KtxScreen {
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
-    private val fullLight = LightColor(1f, 1f, 1f)
+    val fullLight = LightColor(1f, 1f, 1f)
+    val fullDark = LightColor(0f, 0f, 0f)
 
     const val fontSize = 16
     const val titleFontSize = 24

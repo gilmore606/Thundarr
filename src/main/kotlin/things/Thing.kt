@@ -2,6 +2,7 @@ package things
 
 import actors.Actor
 import kotlinx.serialization.Serializable
+import render.GameScreen
 import render.tilesets.Glyph
 import util.LightColor
 
@@ -19,6 +20,7 @@ sealed class Thing {
         LIGHTBULB,
         APPLE,
         AXE,
+        SUNSWORD,
         ENERGY_DRINK,
         PINE_TREE,
         OAK_TREE,
@@ -57,6 +59,16 @@ class Lightbulb : LitThing() {
     override fun name() = "lightbulb"
     override val kind = Kind.LIGHTBULB
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
+}
+
+@Serializable
+class Sunsword : LitThing() {
+    var active = true
+    override fun glyph() = Glyph.HILT
+    override fun name() = "sunsword"
+    override val kind = Kind.SUNSWORD
+    override val lightColor = LightColor(0.1f, 0.2f, 0.3f)
+    override fun light() = if (active) lightColor else GameScreen.fullDark
 }
 
 @Serializable

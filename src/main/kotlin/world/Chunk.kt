@@ -83,7 +83,9 @@ class Chunk(
     fun onRestore(level: Level) {
         this.level = level
 
-        savedActors.forEach { actor -> level.director.attachActor(actor) }
+        savedActors.forEach { actor ->
+            level.director.attachActor(actor)
+        }
 
         // Find and reproject all lights.
         for (x in 0 until width) {

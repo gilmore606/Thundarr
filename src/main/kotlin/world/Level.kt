@@ -168,6 +168,9 @@ sealed class Level {
     }
 
     fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
+        if (actor !in director.actors) {
+            director.attachActor(actor)
+        }
         thingsAt(x, y).apply {
             if (isNotEmpty()) {
                 val thingList = mutableListOf<String>()
@@ -182,6 +185,12 @@ sealed class Level {
                     ConsolePanel.say("You see $things here.")
                 }
             }
+        }
+    }
+
+    fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {
+        if (toLevel != this) {
+            director.detachActor(actor)
         }
     }
 

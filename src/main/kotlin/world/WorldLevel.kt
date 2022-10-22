@@ -55,9 +55,8 @@ class WorldLevel() : Level() {
     }
 
     private fun unloadChunk(chunk: Chunk) {
-        chunk.unload(
-            director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
-        )
+        val actorsToSave = director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+        chunk.unload(actorsToSave)
         loadedChunks.remove(chunk)
     }
 
