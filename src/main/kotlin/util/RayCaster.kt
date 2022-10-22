@@ -137,8 +137,8 @@ class RayCaster() {
                             setVisibility(castX, castY, false)
                         } else {
                             val projection = line.projectTile(row, col)
-                            val visible = !line.isInShadow(projection) && (lightAt(castX, castY).brightness() >= VISIBILITY_BRIGHTNESS)
-                            setVisibility(castX, castY, visible)
+                            val visible = !line.isInShadow(projection)
+                            setVisibility(castX, castY, visible && (lightAt(castX, castY).brightness() >= VISIBILITY_BRIGHTNESS))
                             if (visible && isOpaqueAt(castX, castY)) {
                                 line.add(projection)
                                 fullShadow = line.isFullShadow()
