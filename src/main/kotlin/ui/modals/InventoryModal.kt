@@ -34,6 +34,7 @@ class InventoryModal(
     override fun drawModalText() {
         if (maxSelection < 0) {
             drawOptionText("Your backpack is empty.", 0)
+            selection = -1
             return
         }
         var n = 0
