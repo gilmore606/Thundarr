@@ -10,6 +10,7 @@ import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.GameScreen
+import things.Apple
 import things.Sunsword
 import ui.modals.*
 import ui.panels.ConsolePanel
@@ -90,46 +91,51 @@ object App : KtxGame<Screen>() {
         GameScreen.dispose()
     }
 
-    private fun saveStateForShutdown() {
-        LevelKeeper.hibernateAll()
+    private fun saveStateAndExitProcess() {
+        pendingJob = KtxAsync.launch {
+            LevelKeeper.hibernateAll()
 
-        save.putWorldState(
-            WorldState(
-                levelId = level.levelId(),
-                player = player,
-                time = time,
-                zoomIndex = GameScreen.zoomIndex
+            save.putWorldState(
+                WorldState(
+                    levelId = level.levelId(),
+                    player = player,
+                    time = time,
+                    zoomIndex = GameScreen.zoomIndex
+                )
             )
-        )
+
+            log.info("State saved.")
+            dispose()
+            exitProcess(0)
+        }
     }
 
     private fun restoreState() {
-        LevelKeeper.hibernateAll()
+        pendingJob = KtxAsync.launch {
+            LevelKeeper.hibernateAll()
 
-        val state = save.getWorldState()
-        level = LevelKeeper.getLevel(state.levelId)
-        player = state.player
+            val state = save.getWorldState()
+            level = LevelKeeper.getLevel(state.levelId)
+            player = state.player
 
-        updateTime(state.time)
-        GameScreen.restoreZoomIndex(state.zoomIndex)
-        movePlayerIntoLevel(player.xy.x, player.xy.y, null)
-        log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
+            updateTime(state.time)
+            GameScreen.restoreZoomIndex(state.zoomIndex)
+            movePlayerIntoLevel(player.xy.x, player.xy.y, null)
+            log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
+        }
     }
 
     private fun createNewWorld() {
-        LevelKeeper.hibernateAll()
         pendingJob = KtxAsync.launch {
-            while (ChunkLoader.isWorking()) {
-                log.info("Waiting for ChunkLoader to finish...")
-                delay(100)
-            }
+            LevelKeeper.hibernateAll()
             save.eraseAll()
 
             level = LevelKeeper.getLevel("world")
-
             player = Player()
             player.add(Sunsword())
+            repeat (4) { player.add(Apple()) }
 
+            updateTime(0.0)
             level.setPov(200, 200)
 
             var playerStart: XY? = null
@@ -139,7 +145,6 @@ object App : KtxGame<Screen>() {
                 playerStart = level.getPlayerEntranceFrom(level)
             }
             movePlayerIntoLevel(playerStart.x, playerStart.y, null)
-            updateTime(0.0)
             ConsolePanel.say("You step tentatively into the apocalypse...")
         }
     }
@@ -246,14 +251,7 @@ object App : KtxGame<Screen>() {
                     GameScreen.addModal(SavingModal())
                     KtxAsync.launch {
                         delay(200)
-                        saveStateForShutdown()
-                        while (ChunkLoader.isWorking()) {
-                            log.info("Waiting for ChunkLoader to finish...")
-                            delay(100)
-                        }
-                        log.info("State saved.")
-                        dispose()
-                        exitProcess(0)
+                        saveStateAndExitProcess()
                     }
                 } else {
                     ConsolePanel.say("You remember that one thing you needed to do...")

@@ -1,5 +1,6 @@
 package world
 
+import kotlinx.coroutines.delay
 import util.log
 
 object LevelKeeper {
@@ -41,10 +42,10 @@ object LevelKeeper {
         return level
     }
 
-    // Discard old levels if we're holding too many active.
+    // Discard old non-world levels if we're holding too many active.
     private fun pruneLevels() {
         if (liveLevels.size > maxLevelsToKeep) {
-            liveLevels.sortedBy { it.lastAccessedAt }.forEach {
+            liveLevels.sortedBy { it.lastAccessedAt }.filter { it.level !is WorldLevel }.forEach {
                 if (liveLevels.size > maxLevelsToKeep) {
                     hibernateLevel(it.level)
                 }
@@ -53,8 +54,17 @@ object LevelKeeper {
     }
 
     // Save and drop all levels in prep for exiting/restarting.
-    fun hibernateAll() {
+    private fun hibernateAllAsync() {
         mutableSetOf<LiveLevel>().apply { addAll(liveLevels) }.forEach { hibernateLevel(it.level) }
+        liveLevels.clear()
+    }
+
+    suspend fun hibernateAll() {
+        hibernateAllAsync()
+        while (ChunkLoader.isWorking()) {
+            log.info("Waiting for ChunkLoader to finish...")
+            delay(100)
+        }
     }
 
     // Unload and remove the specified level from the live list.

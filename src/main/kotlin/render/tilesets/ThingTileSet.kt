@@ -6,7 +6,7 @@ import render.tileholders.VariantsTile
 
 fun ThingTileSet() =
     TileSet("tiles_thing.png", 6, 6,
-            Texture.TextureFilter.MipMap).apply {
+            Texture.TextureFilter.MipMapLinearLinear).apply {
 
         setTile(Glyph.TREE, VariantsTile(this).apply {
             add(0.4f, 0, 1)

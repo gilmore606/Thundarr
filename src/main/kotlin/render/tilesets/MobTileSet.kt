@@ -6,7 +6,7 @@ import render.tileholders.SimpleTile
 
 fun ActorTileSet() =
     TileSet("tiles_mob.png", 4, 4,
-            Texture.TextureFilter.MipMap).apply {
+            Texture.TextureFilter.MipMapLinearLinear).apply {
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))

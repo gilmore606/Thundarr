@@ -145,7 +145,6 @@ sealed class Level {
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
-        if (actor.real) {
             val x = actor.xy.x
             val y = actor.xy.y
             val vis = visibilityAt(x, y)
@@ -154,7 +153,6 @@ sealed class Level {
                     x, y, actor.glyph
                 )
             }
-        }
     }
 
     // Move the POV.

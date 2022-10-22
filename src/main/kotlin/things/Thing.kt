@@ -83,10 +83,3 @@ class Axe : Portable() {
     override fun name() = "axe"
     override val kind = Kind.AXE
 }
-
-@Serializable
-class EnergyDrink: Portable() {
-    override fun glyph() = Glyph.BOTTLE
-    override fun name() = "Monster energy drink"
-    override val kind = Kind.ENERGY_DRINK
-}

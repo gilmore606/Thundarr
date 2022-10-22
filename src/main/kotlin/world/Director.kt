@@ -2,7 +2,6 @@ package world
 
 import actors.Actor
 import actors.Player
-import actors.WorldActor
 import kotlinx.serialization.Serializable
 import util.log
 
@@ -12,7 +11,9 @@ import util.log
 class Director {
 
     val actors = mutableListOf<Actor>()
-    val actorQueue = mutableListOf<Actor>()
+    private val actorQueue = mutableListOf<Actor>()
+
+    private var playerTimePassed = 0f
 
     // Attach already-positioned actor in the level.
     fun attachActor(actor: Actor) {
@@ -23,16 +24,10 @@ class Director {
         }
         actor.juice = 0f
         addOrdered(actor, actors)
-        if (actor is Player && WorldActor !in actors) {
-            attachActor(WorldActor)
-        }
     }
 
     fun detachActor(actor: Actor) {
         actors.remove(actor)
-        if (actor is Player && WorldActor in actors) {
-            detachActor(WorldActor)
-        }
     }
 
     // Insert actor into the queue in the correct order based on juice and speed.
@@ -57,7 +52,7 @@ class Director {
 
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
         return actors.filter {
-            it.real && it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
+            it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
         }.map { detachActor(it) ; it }.filter { it !is Player }.toSet()
     }
 
@@ -76,10 +71,17 @@ class Director {
                     action.execute(actor, level)
 
                     when (actor) {
-                        is Player -> { actorQueue.forEach { if (it !is Player) it.juice += duration} } // Player actions give juice to everyone else.
+                        is Player -> {
+                            actorQueue.forEach { if (it !is Player) it.juice += duration} // Player actions give juice to everyone else.
+                            playerTimePassed += duration
+                            if (playerTimePassed >= 1f) {
+                                App.advanceTime(playerTimePassed)
+                                playerTimePassed = 0f
+                                done = true
+                            }
+                        }
                         else -> { actor.juice -= duration } // NPC actions cost them juice.
                     }
-                    if (actor is WorldActor) done = true // Stop executing actions to let the renderer draw.
 
                 } ?: if (actor is Player) {
                     // Player's turn, but has no queued actions, so we're done.

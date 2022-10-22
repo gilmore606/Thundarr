@@ -26,7 +26,7 @@ abstract class SelectionModal(
 
     protected fun selectNext() {
         selection++
-        if (selection > maxSelection) selection = (if (maxSelection >= 0) maxSelection else -1)
+        if (selection > maxSelection) selection = (if (maxSelection >= 0) 0 else -1)
     }
 
     protected fun selectPrevious() {

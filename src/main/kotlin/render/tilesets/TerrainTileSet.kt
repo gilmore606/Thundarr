@@ -1,10 +1,12 @@
 package render.tilesets
 
 import RESOURCE_FILE_DIR
+import com.badlogic.gdx.graphics.Texture
 import render.tileholders.*
 
 fun TerrainTileSet() =
-    TileSet("tiles_terrain.png", 12, 4).apply {
+    TileSet("tiles_terrain.png", 12, 4,
+            Texture.TextureFilter.MipMapLinearLinear).apply {
 
         setTile(Glyph.BLANK, SimpleTile(this, 2, 2))
 

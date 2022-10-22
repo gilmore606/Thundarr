@@ -13,3 +13,10 @@ class Apple : Food() {
     override fun name() = "apple"
     override val kind = Kind.APPLE
 }
+
+@Serializable
+class EnergyDrink : Food() {
+    override fun glyph() = Glyph.BOTTLE
+    override fun name() = "Monster energy drink"
+    override val kind = Kind.ENERGY_DRINK
+}
