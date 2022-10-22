@@ -3,6 +3,7 @@ package util
 import java.lang.RuntimeException
 
 const val MAX_LIGHT_RANGE = 24f
+const val LIGHT_BLEED = 0.2f
 
 class RayCaster() {
 
@@ -102,15 +103,6 @@ class RayCaster() {
         }
     }
 
-    fun castLight(x: Int, y: Int, lightColor: LightColor,
-                  isOpaqueAt: (x: Int, y: Int) -> Boolean,
-                  setLight: (x: Int, y: Int, r: Float, g: Float, b: Float) -> Unit) {
-        setLight(x, y, lightColor.r, lightColor.g, lightColor.b)
-        lineCache.forEach { line ->
-            lightOctant(line, x, y, lightColor, isOpaqueAt, setLight)
-        }
-    }
-
     private fun visifyOctant(line: ShadowLine, povX: Int, povY: Int, distance: Float,
                              isOpaqueAt: (x: Int, y: Int) -> Boolean,
                              setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
@@ -156,7 +148,42 @@ class RayCaster() {
         }
     }
 
-    private fun lightOctant(line: ShadowLine, povX: Int, povY: Int, lightColor: LightColor,
+    fun castLight(x: Int, y: Int, lightColor: LightColor,
+                  isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                  setLight: (x: Int, y: Int, r: Float, g: Float, b: Float) -> Unit,
+                  getThisLight: (x: Int, y: Int) -> LightColor?
+                  ) {
+        val br = lightColor.brightness()
+        setLight(x, y, lightColor.r / br, lightColor.g / br, lightColor.b / br)
+        lineCache.forEach { line ->
+            lightOctant(line, x, y, lightColor, br, isOpaqueAt, setLight)
+        }
+        // Bleed light into neighboring cells.
+        val bleeds = mutableSetOf<Triple<Int,Int,LightColor>>()
+        for (ix in 0 until MAX_LIGHT_RANGE.toInt() * 2) {
+            for (iy in 0 until MAX_LIGHT_RANGE.toInt() * 2) {
+                val tx = x + ix - MAX_LIGHT_RANGE.toInt()
+                val ty = y + iy - MAX_LIGHT_RANGE.toInt()
+                getThisLight(tx, ty) ?: run {
+                    var bleed: LightColor? = null
+                    CARDINALS.forEach { dir ->
+                        if (!isOpaqueAt(tx, ty)) {
+                            getThisLight(tx + dir.x, ty + dir.y)?.also { neighbor ->
+                                if (bleed == null) bleed = LightColor(0f, 0f, 0f)
+                                bleed!!.r += neighbor.r * LIGHT_BLEED
+                                bleed!!.g += neighbor.g * LIGHT_BLEED
+                                bleed!!.b += neighbor.b * LIGHT_BLEED
+                            }
+                        }
+                    }
+                    bleed?.also { bleeds.add(Triple(tx, ty, it)) }
+                }
+            }
+        }
+        bleeds.forEach { setLight(it.first, it.second, it.third.r, it.third.g, it.third.b )}
+    }
+
+    private fun lightOctant(line: ShadowLine, povX: Int, povY: Int, lightColor: LightColor, brightness: Float,
                             isOpaqueAt: (x: Int, y: Int) -> Boolean,
                             setLight: (x: Int, y: Int, r: Float, g: Float, b: Float) -> Unit
     ) {
@@ -164,12 +191,13 @@ class RayCaster() {
         var fullShadow = false
         var row = 0
         var done = false
+        val range = MAX_LIGHT_RANGE * brightness
         while (!done) {
             row++
             line.transformOctant(row, 0)
             var castX = povX + line.transform.x
             var castY = povY + line.transform.y
-            var falloff = 1f - distanceBetween(povX, povY, castX, castY) / MAX_LIGHT_RANGE
+            var falloff = 1f - distanceBetween(povX, povY, castX, castY) / range
             if (falloff <= 0.05f) {
                 done = true
             } else {
@@ -179,13 +207,13 @@ class RayCaster() {
                     line.transformOctant(row, col)
                     castX = povX + line.transform.x
                     castY = povY + line.transform.y
-                    falloff = 1f - distanceBetween(povX, povY, castX, castY) / MAX_LIGHT_RANGE
+                    falloff = 1f - distanceBetween(povX, povY, castX, castY) / range
                     if (falloff <= 0.05f) {
                         doneRow = true
                     } else if (!fullShadow) {
-                        val lightR = lightColor.r * falloff
-                        val lightG = lightColor.g * falloff
-                        val lightB = lightColor.b * falloff
+                        val lightR = lightColor.r * falloff / brightness
+                        val lightG = lightColor.g * falloff / brightness
+                        val lightB = lightColor.b * falloff / brightness
                         val projection = line.projectTile(row, col)
                         val visible = !line.isInShadow(projection)
                         if (visible) setLight(castX, castY, lightR, lightG, lightB)

@@ -56,7 +56,7 @@ class Lightbulb : LitThing() {
     override fun glyph() = Glyph.LIGHTBULB
     override fun name() = "lightbulb"
     override val kind = Kind.LIGHTBULB
-    override val lightColor = LightColor(1f, 1f, 1f)
+    override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
 }
 
 @Serializable

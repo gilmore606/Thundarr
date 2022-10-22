@@ -3,6 +3,8 @@ package world
 import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.GameScreen
+import render.GameScreen.fullDark
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
@@ -299,6 +301,8 @@ class Chunk(
                 level.isOpaqueAt(x, y)
             }, { x, y, r, g, b ->
                 level.receiveLight(x, y, lightSource, r, g, b)
+            }, { x, y ->
+                level.getSingleLight(x, y, lightSource)
             })
         }
     }
@@ -317,6 +321,9 @@ class Chunk(
             }
         }
     }
+
+    fun getSingleLight(x: Int, y: Int, source: LightSource) =
+        if (boundsCheck(x, y)) lights[x - this.x][y - this.y][source] else null
 
     fun lightAt(x: Int, y: Int): LightColor {
         if (App.DEBUG_VISIBLE) return debugLight

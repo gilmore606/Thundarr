@@ -66,23 +66,19 @@ class InventoryModal(
         val parent = this
         GameScreen.addModal(ContextMenu(width - 10, optionY(selection) - 4).apply {
             this.parentModal = parent
-            val kind = byKind[selection].first
-            val pool = byKind[selection].second
-            if (pool.size > 1) {
-                addOption("drop one " + pool[0].name()) {
-                    App.player.queue(Drop(pool[0], groundAtPlayer()))
+            val these = byKind[selection].second
+            if (these.size > 1) {
+                addOption("drop one " + these[0].name()) {
+                    App.player.queue(Drop(these[0], groundAtPlayer()))
                 }
-                addOption("drop all " + pool[0].name().plural()) {
-                    pool.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
+                addOption("drop all " + these[0].name().plural()) {
+                    these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
                 }
             } else {
-                addOption("drop " + pool[0].name()) {
-                    App.player.queue(Drop(pool[0], groundAtPlayer()))
+                addOption("drop " + these[0].name()) {
+                    App.player.queue(Drop(these[0], groundAtPlayer()))
                 }
             }
-
-            addOption("eat it") { }
-            addOption("fuck it") { }
         })
     }
 
