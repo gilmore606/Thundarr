@@ -57,11 +57,4 @@ sealed class Actor(
     override fun remove(thing: Thing) { contents.remove(thing) }
     override fun add(thing: Thing) { contents.add(thing) }
 
-    fun takeThing(thing: Thing, from: ThingHolder) {
-        from.remove(thing)
-        add(thing)
-        if (this is Player) {
-            ConsolePanel.say("You pick up " + thing.name().aOrAn() + ".")
-        }
-    }
 }

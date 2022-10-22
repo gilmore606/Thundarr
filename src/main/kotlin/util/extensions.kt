@@ -55,6 +55,8 @@ fun String.plural(): String {
     return this + "s"
 }
 
+fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
+
 val log = KotlinLogging.logger {}
 
 val NORTH = XY(0, -1)

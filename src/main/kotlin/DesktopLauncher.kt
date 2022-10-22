@@ -6,8 +6,8 @@ object DesktopLauncher {
     fun main(args: Array<String>) {
         val config = LwjglApplicationConfiguration().apply {
             title = "Thundarr"
-            width = 1200
-            height = 900
+            width = 1600
+            height = 1000
         }
         LwjglApplication(App, config)
     }

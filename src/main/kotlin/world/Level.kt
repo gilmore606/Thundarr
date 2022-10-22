@@ -2,6 +2,7 @@ package world
 
 import actors.Actor
 import actors.Player
+import actors.actions.Get
 import actors.actions.processes.WalkTo
 import render.GameScreen
 import render.sunLights
@@ -204,7 +205,11 @@ sealed class Level {
 
     fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
 
+    fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
+
     fun removeThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.removeThingAt(x, y, thing)
+
+    fun onRemoveThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onRemoveThing(x, y, thing)
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
@@ -302,8 +307,8 @@ sealed class Level {
         if (App.player.xy.x == x && App.player.xy.y == y) {
             thingsAt(x,y).forEach {
                 if (it.isPortable()) {
-                    menu.addOption("Take " + it.name()) {
-                        App.player.takeThing(it, cellContainerAt(x, y))
+                    menu.addOption("take " + it.name()) {
+                        App.player.queue(Get(it, cellContainerAt(x, y)))
                     }
                 }
             }

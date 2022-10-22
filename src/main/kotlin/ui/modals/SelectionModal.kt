@@ -21,6 +21,9 @@ abstract class SelectionModal(
 
     protected var mouseSelection = true
 
+    protected fun optionX(n: Int) = this.x + padding
+    protected fun optionY(n: Int) = this.y + headerPad + spacing * n
+
     protected fun selectNext() {
         selection++
         if (selection > maxSelection) selection = (if (maxSelection >= 0) maxSelection else -1)

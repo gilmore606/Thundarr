@@ -1,23 +1,29 @@
 package ui.modals
 
+import actors.actions.Drop
 import com.badlogic.gdx.Input
+import render.GameScreen
 import things.Thing
 import things.ThingHolder
 import util.aOrAn
+import util.groundAtPlayer
 import util.plural
 import java.lang.Integer.max
 
 class InventoryModal(
     private val thingHolder: ThingHolder
-    ) : SelectionModal(400, 700, "- bACkPACk -", default = 0) {
+    ) : SelectionModal(300, 700, "- bACkPACk -", default = 0), ContextMenu.ParentModal {
 
-    private val byKindCache: MutableMap<Thing.Kind, MutableSet<Thing>>
+    private val byKind = ArrayList<Pair<Thing.Kind, ArrayList<Thing>>>().apply {
+        thingHolder.byKind().forEach { pair -> add(Pair(pair.key, ArrayList<Thing>().apply {
+            pair.value.forEach { add(it) }
+        })) }
+    }
 
     init {
         adjustHeight()
         selectionBoxHeight = 18
         spacing = 28
-        byKindCache = thingHolder.byKind()
     }
 
     private fun adjustHeight() {
@@ -31,12 +37,12 @@ class InventoryModal(
             return
         }
         var n = 0
-        byKindCache.forEach {
+        byKind.forEach {
             var text = ""
-            text = if (it.value.size > 1) {
-                it.value.size.toString() + " " + it.value.first().name().plural()
+            text = if (it.second.size > 1) {
+                it.second.size.toString() + " " + it.second.first().name().plural()
             } else {
-                it.value.first().name().aOrAn()
+                it.second.first().name().aOrAn()
             }
             drawOptionText(text, n, true)
             n++
@@ -50,21 +56,43 @@ class InventoryModal(
 
     override fun drawThings() {
         var n = 0
-        byKindCache.forEach {
-            drawOptionIcon(it.value.first().glyph(), n)
+        byKind.forEach {
+            drawOptionIcon(it.second.first().glyph(), n)
             n++
         }
     }
 
     override fun doSelect() {
+        val parent = this
+        GameScreen.addModal(ContextMenu(width - 10, optionY(selection) - 4).apply {
+            this.parentModal = parent
+            val kind = byKind[selection].first
+            val pool = byKind[selection].second
+            if (pool.size > 1) {
+                addOption("drop one " + pool[0].name()) {
+                    App.player.queue(Drop(pool[0], groundAtPlayer()))
+                }
+                addOption("drop all " + pool[0].name().plural()) {
+                    pool.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
+                }
+            } else {
+                addOption("drop " + pool[0].name()) {
+                    App.player.queue(Drop(pool[0], groundAtPlayer()))
+                }
+            }
 
+            addOption("eat it") { }
+            addOption("fuck it") { }
+        })
     }
 
+    override fun childSucceeded() { dismiss() }
+
     override fun keyDown(keycode: Int) {
-        if (keycode == Input.Keys.TAB) {
-            dismiss()
-        } else {
-            super.keyDown(keycode)
+        when (keycode) {
+            Input.Keys.TAB -> dismiss()
+            Input.Keys.NUMPAD_6 -> doSelect()
+            else -> super.keyDown(keycode)
         }
     }
 }

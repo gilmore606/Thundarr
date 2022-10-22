@@ -89,11 +89,16 @@ class Chunk(
         // Find and reproject all lights.
         for (x in 0 until width) {
             for (y in 0 until height) {
+                // Restore circular reference from CellContainer back to the level.
+                things[x][y].level = level
+                things[x][y].x = x + this.x
+                things[x][y].y = y + this.y
                 things[x][y].contents.forEach { thing ->
                     if (thing is LightSource) {
                         level.dirtyLights[thing] = XY(x + this.x, y + this.y)
                     }
                 }
+
             }
         }
     }
@@ -135,6 +140,9 @@ class Chunk(
 
     fun addThingAt(x: Int, y: Int, thing: Thing) {
         things[x - this.x][y - this.y].add(thing)
+    }
+
+    fun onAddThing(x: Int, y: Int, thing: Thing) {
         if (!generating) {
             updateOpaque(x - this.x, y - this.y)
             updateWalkable(x - this.x, y - this.y)
@@ -144,8 +152,13 @@ class Chunk(
 
     fun removeThingAt(x: Int, y: Int, thing: Thing) {
         things[x - this.x][y - this.y].remove(thing)
-        updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
+    }
+
+    fun onRemoveThing(x: Int, y: Int, thing: Thing) {
+        if (!generating) {
+            updateOpaque(x - this.x, y - this.y)
+            updateWalkable(x - this.x, y - this.y)
+        }
         if (thing is LightSource) { level.removeLightSource(thing) }
     }
 

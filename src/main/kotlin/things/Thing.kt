@@ -14,7 +14,6 @@ sealed class Thing {
     abstract fun name(): String
     abstract val kind: Kind
 
-    open fun onWalkedOnBy(actor: Actor) { }
 
     enum class Kind {
         LIGHTBULB,
@@ -24,6 +23,13 @@ sealed class Thing {
         PINE_TREE,
         OAK_TREE,
         PALM_TREE,
+    }
+
+    open fun onWalkedOnBy(actor: Actor) { }
+
+    fun moveTo(from: ThingHolder, to: ThingHolder) {
+        from.remove(this)
+        to.add(this)
     }
 }
 

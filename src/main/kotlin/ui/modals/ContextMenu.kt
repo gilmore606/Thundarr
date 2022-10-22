@@ -3,13 +3,16 @@ package ui.modals
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.GameScreen
-import ui.input.Mouse
-import java.lang.Integer.min
 
 class ContextMenu(
     screenX: Int,
     screenY: Int
 ): SelectionModal(100, 50, null, Position.CURSOR, 0) {
+
+    var parentModal: ParentModal? = null
+    interface ParentModal {
+        fun childSucceeded()
+    }
 
     private val options = mutableMapOf<String,()->Unit>()
     private var maxOptionWidth = 0
@@ -52,7 +55,19 @@ class ContextMenu(
 
     override fun doSelect() {
         dismiss()
+        parentModal?.childSucceeded()
         GameScreen.clearCursor()
         options[options.keys.toList()[selection]]?.invoke()
+    }
+
+    override fun keyDown(keycode: Int) {
+        when (keycode) {
+            Input.Keys.TAB -> {
+                parentModal?.childSucceeded()
+                dismiss()
+            }
+            Input.Keys.NUMPAD_4 -> dismiss()
+            else -> super.keyDown(keycode)
+        }
     }
 }
