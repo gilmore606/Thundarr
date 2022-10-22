@@ -236,17 +236,9 @@ sealed class Level {
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     fun updateForRender() {
-        if (shadowDirty) {
-            allChunks().forEach { it.clearVisibility() }
-            shadowCaster.castVisibility(pov, App.player.visualRange(), { x, y ->
-                isOpaqueAt(x, y)
-            }, { x, y, vis ->
-                setTileVisibility(x, y, vis)
-            })
-            shadowDirty = false
-        }
         if (dirtyLights.isNotEmpty()) {
             log.debug("Reprojecting ${dirtyLights.size} lights")
+            shadowDirty = true
             mutableMapOf<LightSource,XY>().apply {
                 putAll(dirtyLights)
                 forEach { (lightSource, location) ->
@@ -258,7 +250,20 @@ sealed class Level {
                 }
             }
         }
+
         allChunks().forEach { it.dirtyAllLightCacheCells() }
+
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            shadowCaster.castVisibility(pov, App.player.visualRange(), { x, y ->
+                isOpaqueAt(x, y)
+            }, { x, y ->
+                lightAt(x, y)
+            }, { x, y, vis ->
+                setTileVisibility(x, y, vis)
+            })
+            shadowDirty = false
+        }
     }
 
     private fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit

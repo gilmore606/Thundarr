@@ -4,6 +4,7 @@ import java.lang.RuntimeException
 
 const val MAX_LIGHT_RANGE = 24f
 const val LIGHT_BLEED = 0.2f
+const val VISIBILITY_BRIGHTNESS = 0.4f
 
 class RayCaster() {
 
@@ -95,16 +96,20 @@ class RayCaster() {
 
     fun castVisibility(pov: XY, distance: Float,
                        isOpaqueAt: (x: Int, y: Int) -> Boolean,
-                       setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
+                       lightAt: (x: Int, y: Int) -> LightColor,
+                       setVisibility: (x: Int, y: Int, visibility: Boolean
+                       ) -> Unit
     ) {
         setVisibility(pov.x, pov.y, true)
         lineCache.forEach { line ->
-            visifyOctant(line, pov.x, pov.y, distance, isOpaqueAt, setVisibility)
+            visifyOctant(line, pov.x, pov.y, distance, isOpaqueAt, lightAt, setVisibility)
         }
+        DIRECTIONS.forEach { setVisibility(pov.x + it.x, pov.y + it.y, true) }
     }
 
     private fun visifyOctant(line: ShadowLine, povX: Int, povY: Int, distance: Float,
                              isOpaqueAt: (x: Int, y: Int) -> Boolean,
+                             lightAt: (x: Int, y: Int) -> LightColor,
                              setVisibility: (x: Int, y: Int, visibility: Boolean) -> Unit
     ) {
         line.reset()
@@ -132,7 +137,7 @@ class RayCaster() {
                             setVisibility(castX, castY, false)
                         } else {
                             val projection = line.projectTile(row, col)
-                            val visible = !line.isInShadow(projection)
+                            val visible = !line.isInShadow(projection) && (lightAt(castX, castY).brightness() >= VISIBILITY_BRIGHTNESS)
                             setVisibility(castX, castY, visible)
                             if (visible && isOpaqueAt(castX, castY)) {
                                 line.add(projection)

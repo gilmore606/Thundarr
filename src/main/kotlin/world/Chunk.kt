@@ -3,14 +3,11 @@ package world
 import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import render.GameScreen
-import render.GameScreen.fullDark
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
 import world.cartos.LevelCarto
-import world.cartos.RoomyMaze
 import world.cartos.WorldCarto
 import world.terrains.Terrain
 import java.lang.Float.min
@@ -305,6 +302,7 @@ class Chunk(
                 level.getSingleLight(x, y, lightSource)
             })
         }
+        level.shadowDirty = true
     }
 
 

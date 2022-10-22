@@ -40,6 +40,7 @@ class EnclosedLevel(
     }
 
     override fun debugText() = "level $levelId"
+    override fun statusText() = "level $levelId"
 
     override fun allChunks() = allChunks
 
