@@ -3,6 +3,7 @@ package ui.modals
 import com.badlogic.gdx.Input
 import kotlinx.coroutines.selects.select
 import render.GameScreen
+import render.tilesets.Glyph
 import ui.input.Mouse
 
 abstract class SelectionModal(
@@ -32,14 +33,20 @@ abstract class SelectionModal(
 
     abstract fun doSelect()
 
-    protected fun drawOptionText(text: String, index: Int) {
-        drawString(text, padding, headerPad + spacing * index,
+    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Boolean = false) {
+        drawString(text, padding + (if (spaceForIcon) 24 else 0), headerPad + spacing * index,
             if (index == selection) GameScreen.fontColorBold else GameScreen.fontColor)
+    }
+
+    protected fun drawOptionIcon(icon: Glyph, index: Int) {
+        val x0 = this.x + padding - 10
+        val y0 = this.y + headerPad + spacing * index - 12
+        thingBatch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, thingBatch.getTextureIndex(icon))
     }
 
     protected fun drawOptionShade() {
         if (!isAnimating() && selection >= 0) {
-            drawSelectionBox(padding, headerPad + selection * spacing, width - padding * 2 - 4, selectionBoxHeight)
+            drawSelectionBox(padding, headerPad + selection * spacing + 1, width - padding * 2 - 4, selectionBoxHeight)
         }
     }
 

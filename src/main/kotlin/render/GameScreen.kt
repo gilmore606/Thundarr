@@ -45,12 +45,17 @@ object GameScreen : KtxScreen {
     private var tileStride: Double = 0.01
 
     private val terrainTileSet = TerrainTileSet()
+    private val thingTileSet = ThingTileSet()
+    private val actorTileSet = ActorTileSet()
+    private val uiTileSet = UITileSet()
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
-    private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), MobTileSet())
-    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
-    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
-    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet(), isScrolling = false)
+    private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
+    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
+    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
+    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
+    private val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
+    private val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
@@ -421,6 +426,22 @@ object GameScreen : KtxScreen {
             draw()
         }
 
+        uiThingBatch.apply {
+            clear()
+            panels.forEach { panel ->
+                panel.renderThings(this)
+            }
+            draw()
+        }
+
+        uiActorBatch.apply {
+            clear()
+            panels.forEach { panel ->
+                panel.renderActors(this)
+            }
+            draw()
+        }
+
         textBatch.apply {
             projectionMatrix = textCamera.combined
             enableBlending()
@@ -455,5 +476,6 @@ object GameScreen : KtxScreen {
         thingBatch.dispose()
         uiBatch.dispose()
         uiWorldBatch.dispose()
+        uiThingBatch.dispose()
     }
 }

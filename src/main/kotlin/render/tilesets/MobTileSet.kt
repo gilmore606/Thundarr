@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
-fun MobTileSet() =
+fun ActorTileSet() =
     TileSet("tiles_mob.png", 4, 4,
             Texture.TextureFilter.MipMap).apply {
 

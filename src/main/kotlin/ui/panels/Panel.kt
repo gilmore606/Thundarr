@@ -11,6 +11,8 @@ abstract class Panel {
 
     private lateinit var textBatch: SpriteBatch
     protected lateinit var boxBatch: QuadBatch
+    protected lateinit var thingBatch: QuadBatch
+    protected lateinit var actorBatch: QuadBatch
 
     protected var x = 0
     protected var y = 0
@@ -34,7 +36,19 @@ abstract class Panel {
         this.drawBackground()
     }
 
+    fun renderThings(batch: QuadBatch) {
+        this.thingBatch = batch
+        this.drawThings()
+    }
+
+    fun renderActors(batch: QuadBatch) {
+        this.actorBatch = batch
+        this.drawActors()
+    }
+
     open fun drawBackground() { }
+    open fun drawThings() { }
+    open fun drawActors() { }
 
     abstract fun drawText()
 
