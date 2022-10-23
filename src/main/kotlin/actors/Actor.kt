@@ -2,11 +2,13 @@ package actors
 
 import actors.actions.Action
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import things.ThingHolder
 import ui.panels.ConsolePanel
+import util.LightColor
 import util.XY
 import util.aOrAn
 import util.hasOneWhere
@@ -20,6 +22,8 @@ sealed class Actor(
     val xy = XY(0,0)  // position in current level
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
+
+    @Transient var level: Level? = null
 
     override val contents = mutableListOf<Thing>()
 
@@ -52,9 +56,35 @@ sealed class Actor(
         queuedActions.add(action)
     }
 
-    override fun remove(thing: Thing) { contents.remove(thing) }
-    override fun add(thing: Thing) { contents.add(thing) }
+    override fun remove(thing: Thing) {
+        contents.remove(thing)
+        if (thing is LightSource && thing.light() != null) {
+            level?.removeLightSource(this)
+            level?.addLightSource(xy.x, xy.y, this)
+        }
+    }
 
-    fun heldLightSource() = contents.firstOrNull { it is LightSource && it.light() != null } as LightSource?
-    override fun light() = heldLightSource()?.light()
+    override fun add(thing: Thing) {
+        contents.add(thing)
+        if (thing is LightSource && light() != null) {
+            level?.removeLightSource(this)
+            level?.addLightSource(xy.x, xy.y, this)
+        }
+    }
+
+    override fun light(): LightColor? {
+        var light: LightColor? = null
+        contents.forEach { thing ->
+            if (thing is LightSource) {
+                val thingLight = thing.light()
+                if (thingLight != null) {
+                    if (light == null) light = LightColor(0f,0f,0f)
+                    light!!.r += thingLight.r
+                    light!!.g += thingLight.g
+                    light!!.b += thingLight.b
+                }
+            }
+        }
+        return light
+    }
 }

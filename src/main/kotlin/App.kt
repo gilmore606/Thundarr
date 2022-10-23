@@ -12,6 +12,7 @@ import ktx.async.KtxAsync
 import render.GameScreen
 import things.Apple
 import things.Sunsword
+import things.Torch
 import ui.modals.*
 import ui.panels.ConsolePanel
 import ui.panels.LookPanel
@@ -133,6 +134,9 @@ object App : KtxGame<Screen>() {
             level = LevelKeeper.getLevel("world")
             player = Player()
             player.add(Sunsword())
+            player.add(Torch())
+            player.add(Torch())
+            player.add(Torch())
             repeat (4) { player.add(Apple()) }
 
             updateTime(0.0)

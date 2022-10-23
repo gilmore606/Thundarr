@@ -139,6 +139,7 @@ class Chunk(
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
+    // Only call this during generation.  It doesn't do 'the right thing' in play.
     fun addThingAt(x: Int, y: Int, thing: Thing) {
         things[x - this.x][y - this.y].add(thing)
     }

@@ -1,6 +1,7 @@
 package ui.modals
 
 import actors.actions.Drop
+import actors.actions.UseThing
 import com.badlogic.gdx.Input
 import render.GameScreen
 import things.Thing
@@ -68,16 +69,24 @@ class InventoryModal(
         GameScreen.addModal(ContextMenu(width - 10, optionY(selection) - 4).apply {
             this.parentModal = parent
             val these = byKind[selection].second
+            val thing = these[0]
             if (these.size > 1) {
-                addOption("drop one " + these[0].name()) {
-                    App.player.queue(Drop(these[0], groundAtPlayer()))
+                addOption("drop one " + thing.name()) {
+                    App.player.queue(Drop(thing, groundAtPlayer()))
                 }
-                addOption("drop all " + these[0].name().plural()) {
+                addOption("drop all " + thing.name().plural()) {
                     these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
                 }
             } else {
-                addOption("drop " + these[0].name()) {
-                    App.player.queue(Drop(these[0], groundAtPlayer()))
+                addOption("drop " + thing.name()) {
+                    App.player.queue(Drop(thing, groundAtPlayer()))
+                }
+            }
+            thing.uses().forEach {
+                if (it.canDo(App.player)) {
+                    addOption(it.command) {
+                        App.player.queue(UseThing(thing, it.duration, it.toDo))
+                    }
                 }
             }
         })

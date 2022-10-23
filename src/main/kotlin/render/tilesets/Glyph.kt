@@ -44,9 +44,12 @@ enum class Glyph {
     BIG_ROCK,
     BLADE,
     HILT,
+    HILT_LIT,
     PINE_TREE,
     PALM_TREE,
     BOW,
     BOTTLE,
-    FRUIT
+    FRUIT,
+    TORCH,
+    TORCH_LIT
 }

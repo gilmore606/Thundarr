@@ -22,7 +22,7 @@ sealed class Level {
 
     val pov = XY(0, 0)
 
-    val director = Director()
+    val director = Director(this)
 
     private val shadowCaster = RayCaster()
     var shadowDirty = true
@@ -217,8 +217,6 @@ sealed class Level {
 
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: CellContainer()
 
-    fun addThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.addThingAt(x, y, thing)
-
     fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
 
     fun removeThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.removeThingAt(x, y, thing)
@@ -306,6 +304,8 @@ sealed class Level {
     fun lightSourceLocation(lightSource: LightSource): XY? = allChunks().firstNotNullOfOrNull {
         it.lightSourceLocation(lightSource)
     }
+
+    fun addLightSource(x: Int, y: Int, lightSource: LightSource) = chunkAt(x,y)?.projectLightSource(XY(x, y), lightSource)
 
     fun removeLightSource(lightSource: LightSource) {
         allChunks().forEach { it.removeLightSource(lightSource) }

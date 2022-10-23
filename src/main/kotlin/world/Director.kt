@@ -3,12 +3,12 @@ package world
 import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import util.log
 
 // A delegate class for Level to manage actors in time and space.
 
-@Serializable
-class Director {
+class Director(val level: Level) {
 
     val actors = mutableListOf<Actor>()
     private val actorQueue = mutableListOf<Actor>()
@@ -22,6 +22,7 @@ class Director {
         } else if (actor in actors) {
             throw RuntimeException("Attaching already-attached actor!")
         }
+        actor.level = this.level
         actor.juice = 0f
         addOrdered(actor, actors)
     }

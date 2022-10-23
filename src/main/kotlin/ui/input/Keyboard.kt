@@ -111,18 +111,8 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
             }
-            Input.Keys.F2 -> { App.level.addThingAt(App.player.xy.x, App.player.xy.y, Lightbulb()) }
-            Input.Keys.F3 -> {
-                KtxAsync.launch {
-                    val things: MutableList<Thing> = mutableListOf<Thing>().apply { addAll(App.level.thingsAt(App.player.xy.x, App.player.xy.y)) }
-                    things.forEach {
-                        App.level.removeThingAt(App.player.xy.x, App.player.xy.y, it)
-                    }
-                }
-            }
-            Input.Keys.F4 -> {
-                App.level.addThingAt(App.player.xy.x, App.player.xy.y, PalmTree())
-            }
+            Input.Keys.F2 -> { Lightbulb().moveTo(null, groundAtPlayer()) }
+            Input.Keys.F4 -> { PalmTree().moveTo(null, groundAtPlayer()) }
             Input.Keys.F5 -> {
                 App.DEBUG_PANEL = !App.DEBUG_PANEL
                 if (App.DEBUG_PANEL) {

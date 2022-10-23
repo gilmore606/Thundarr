@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import render.GameScreen
 import render.tilesets.Glyph
 import util.LightColor
+import world.Level
 
 @Serializable
 sealed class Thing {
@@ -25,14 +26,25 @@ sealed class Thing {
         PINE_TREE,
         OAK_TREE,
         PALM_TREE,
+        TORCH
     }
+
+    class Use(
+        val command: String,
+        val duration: Float,
+        val canDo: (Actor)->Boolean,
+        val toDo: (Actor, Level)->Unit
+    )
+
+    open fun uses(): Set<Use> = setOf()
 
     open fun onWalkedOnBy(actor: Actor) { }
 
-    fun moveTo(from: ThingHolder, to: ThingHolder) {
-        from.remove(this)
-        to.add(this)
+    fun moveTo(from: ThingHolder?, to: ThingHolder?) {
+        from?.remove(this)
+        to?.add(this)
     }
+
 }
 
 @Serializable
@@ -40,35 +52,6 @@ sealed class Portable : Thing() {
     override fun isOpaque() = false
     override fun isBlocking() = false
     override fun isPortable() = true
-}
-
-interface LightSource {
-    fun light(): LightColor?
-}
-
-@Serializable
-sealed class LitThing : Portable(), LightSource {
-    abstract val lightColor: LightColor
-
-    override fun light(): LightColor? = lightColor
-}
-
-@Serializable
-class Lightbulb : LitThing() {
-    override fun glyph() = Glyph.LIGHTBULB
-    override fun name() = "lightbulb"
-    override val kind = Kind.LIGHTBULB
-    override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
-}
-
-@Serializable
-class Sunsword : LitThing() {
-    var active = true
-    override fun glyph() = Glyph.HILT
-    override fun name() = "sunsword"
-    override val kind = Kind.SUNSWORD
-    override val lightColor = LightColor(0.1f, 0.2f, 0.3f)
-    override fun light() = if (active) lightColor else GameScreen.fullDark
 }
 
 @Serializable

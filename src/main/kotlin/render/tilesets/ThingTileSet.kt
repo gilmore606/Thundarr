@@ -1,6 +1,7 @@
 package render.tilesets
 
 import com.badlogic.gdx.graphics.Texture
+import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 
@@ -40,6 +41,7 @@ fun ThingTileSet() =
         })
         setTile(Glyph.BLADE, SimpleTile(this, 4, 2))
         setTile(Glyph.HILT, SimpleTile(this, 5, 2))
+        setTile(Glyph.HILT_LIT, SimpleTile(this, 5, 4))
         setTile(Glyph.PINE_TREE, VariantsTile(this).apply {
             add(0.5f, 0, 3)
             add(0.5f, 1, 3)
@@ -51,4 +53,9 @@ fun ThingTileSet() =
         setTile(Glyph.BOW, SimpleTile(this, 4, 3))
         setTile(Glyph.BOTTLE, SimpleTile(this, 5, 3))
         setTile(Glyph.FRUIT, SimpleTile(this, 0, 4))
+        setTile(Glyph.TORCH, SimpleTile(this, 1, 4))
+        setTile(Glyph.TORCH_LIT, AnimatedTile(this).apply {
+            add(2, 4)
+            add(2, 5)
+        })
     }
