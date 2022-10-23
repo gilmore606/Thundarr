@@ -90,15 +90,15 @@ object Keyboard : KtxInputAdapter {
 
     private fun pressKey(keycode: Int) {
         when (keycode) {
-            Input.Keys.NUMPAD_8 -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTH) else App.player.queue(Move(NORTH)) }
-            Input.Keys.NUMPAD_7 -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTHWEST) else App.player.queue(Move(NORTHWEST)) }
-            Input.Keys.NUMPAD_4 -> { if (CURSOR_MODE) GameScreen.moveCursor(WEST) else App.player.queue(Move(WEST)) }
-            Input.Keys.NUMPAD_1 -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTHWEST) else App.player.queue(Move(SOUTHWEST)) }
-            Input.Keys.NUMPAD_2 -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTH) else App.player.queue(Move(SOUTH)) }
-            Input.Keys.NUMPAD_3 -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTHEAST) else App.player.queue(Move(SOUTHEAST)) }
-            Input.Keys.NUMPAD_6 -> { if (CURSOR_MODE) GameScreen.moveCursor(EAST) else App.player.queue(Move(EAST)) }
-            Input.Keys.NUMPAD_9 -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTHEAST) else App.player.queue(Move(NORTHEAST)) }
-            Input.Keys.NUMPAD_5 -> { GameScreen.rightClickCursorTile() }
+            Input.Keys.NUMPAD_8, Input.Keys.W -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTH) else App.player.queue(Move(NORTH)) }
+            Input.Keys.NUMPAD_7, Input.Keys.Q -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTHWEST) else App.player.queue(Move(NORTHWEST)) }
+            Input.Keys.NUMPAD_4, Input.Keys.A -> { if (CURSOR_MODE) GameScreen.moveCursor(WEST) else App.player.queue(Move(WEST)) }
+            Input.Keys.NUMPAD_1, Input.Keys.Z -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTHWEST) else App.player.queue(Move(SOUTHWEST)) }
+            Input.Keys.NUMPAD_2, Input.Keys.X -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTH) else App.player.queue(Move(SOUTH)) }
+            Input.Keys.NUMPAD_3, Input.Keys.C -> { if (CURSOR_MODE) GameScreen.moveCursor(SOUTHEAST) else App.player.queue(Move(SOUTHEAST)) }
+            Input.Keys.NUMPAD_6, Input.Keys.D -> { if (CURSOR_MODE) GameScreen.moveCursor(EAST) else App.player.queue(Move(EAST)) }
+            Input.Keys.NUMPAD_9, Input.Keys.E -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTHEAST) else App.player.queue(Move(NORTHEAST)) }
+            Input.Keys.NUMPAD_5, Input.Keys.S -> { GameScreen.rightClickCursorTile() }
             Input.Keys.NUMPAD_DIVIDE -> { toggleCursorMode() }
 
             Input.Keys.EQUALS -> { GameScreen.mouseScrolled(-1.43f) }

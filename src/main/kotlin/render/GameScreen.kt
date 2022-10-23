@@ -384,9 +384,9 @@ object GameScreen : KtxScreen {
                 doOcclude = renderOcclude,
                 doSurf = renderSurf
             )
-            if (terrainBatch.vertexCount < 1) {
-                log.warn("Davey!  terrainBatch had 0 vertices")
-            }
+            //if (terrainBatch.vertexCount < 1) {
+            //    log.warn("Davey!  terrainBatch had 0 vertices")
+            //}
             draw()
         }
 

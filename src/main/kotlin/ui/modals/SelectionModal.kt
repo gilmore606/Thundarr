@@ -56,9 +56,9 @@ abstract class SelectionModal(
     override fun keyDown(keycode: Int) {
         super.keyDown(keycode)
         when (keycode) {
-            Input.Keys.NUMPAD_2, Input.Keys.DOWN -> { selectNext() }
-            Input.Keys.NUMPAD_8, Input.Keys.UP -> { selectPrevious() }
-            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
+            Input.Keys.NUMPAD_2, Input.Keys.DOWN, Input.Keys.X -> { selectNext() }
+            Input.Keys.NUMPAD_8, Input.Keys.UP, Input.Keys.W -> { selectPrevious() }
+            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER, Input.Keys.S -> {
                 doSelect()
             }
         }

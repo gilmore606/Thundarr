@@ -118,9 +118,14 @@ object App : KtxGame<Screen>() {
             val state = save.getWorldState()
             level = LevelKeeper.getLevel(state.levelId)
             player = state.player
+            level.setPov(player.xy.x, player.xy.y)
 
             updateTime(state.time)
             GameScreen.restoreZoomIndex(state.zoomIndex)
+            while (!level.isReady()) {
+                log.info("Waiting for level...")
+                delay(100)
+            }
             movePlayerIntoLevel(player.xy.x, player.xy.y, null)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
         }

@@ -3,6 +3,7 @@ package world
 import actors.Actor
 import actors.Player
 import actors.actions.Get
+import actors.actions.UseThing
 import actors.actions.processes.WalkTo
 import render.GameScreen
 import render.sunLights
@@ -172,7 +173,10 @@ sealed class Level {
         if (actor !in director.actors) {
             director.attachActor(actor)
         }
-        actor.light()?.also { chunkAt(x,y)?.projectLightSource(XY(x, y), actor) }
+        actor.light()?.also {
+            removeLightSource(actor)
+            addLightSource(x, y, actor)
+        }
 
         thingsAt(x, y).apply {
             if (isNotEmpty()) {
@@ -249,16 +253,13 @@ sealed class Level {
 
     fun updateForRender() {
         if (dirtyLights.isNotEmpty()) {
-            log.debug("Reprojecting ${dirtyLights.size} lights")
             shadowDirty = true
             mutableMapOf<LightSource,XY>().apply {
                 putAll(dirtyLights)
                 forEach { (lightSource, location) ->
                     removeLightSource(lightSource)
-                    chunkAt(location.x, location.y)?.apply {
-                        projectLightSource(location, lightSource)
-                        dirtyLights.remove(lightSource)
-                    }
+                    addLightSource(location.x, location.y, lightSource)
+                    dirtyLights.remove(lightSource)
                 }
             }
         }
@@ -342,14 +343,21 @@ sealed class Level {
                         App.player.queue(Get(it, cellContainerAt(x, y)))
                     }
                 }
+                it.uses().forEach { use ->
+                    if (use.canDo(App.player)) {
+                        menu.addOption(use.command) {
+                            App.player.queue(UseThing(it, use.duration, use.toDo))
+                        }
+                    }
+                }
             }
         } else {
             if (isWalkableAt(x, y)) {
-                menu.addOption("Walk to") {
+                menu.addOption("walk to") {
                     App.player.queue(WalkTo(this, x, y))
                 }
             }
         }
-        menu.addOption("Examine") { }
+        menu.addOption("examine") { }
     }
 }

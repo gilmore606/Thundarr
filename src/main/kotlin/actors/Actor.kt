@@ -8,10 +8,7 @@ import things.LightSource
 import things.Thing
 import things.ThingHolder
 import ui.panels.ConsolePanel
-import util.LightColor
-import util.XY
-import util.aOrAn
-import util.hasOneWhere
+import util.*
 import world.Level
 
 @Serializable
