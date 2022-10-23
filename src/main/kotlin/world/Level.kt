@@ -172,6 +172,8 @@ sealed class Level {
         if (actor !in director.actors) {
             director.attachActor(actor)
         }
+        actor.light()?.also { chunkAt(x,y)?.projectLightSource(XY(x, y), actor) }
+
         thingsAt(x, y).apply {
             if (isNotEmpty()) {
                 val thingList = mutableListOf<String>()
@@ -190,6 +192,8 @@ sealed class Level {
     }
 
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {
+        actor.light()?.also { removeLightSource(actor) }
+
         if (toLevel != this) {
             director.detachActor(actor)
         }

@@ -3,24 +3,25 @@ package actors
 import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.LightSource
 import things.Thing
 import things.ThingHolder
 import ui.panels.ConsolePanel
 import util.XY
 import util.aOrAn
+import util.hasOneWhere
 import world.Level
 
 @Serializable
 sealed class Actor(
     open val glyph: Glyph,
     open val speed: Float
-) : ThingHolder {
+) : ThingHolder, LightSource {
     val xy = XY(0,0)  // position in current level
-
+    var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
 
-    // How many turns am I owed?
-    var juice = 0f
+    override val contents = mutableListOf<Thing>()
 
     open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level?) {
         this.xy.x = x
@@ -51,8 +52,9 @@ sealed class Actor(
         queuedActions.add(action)
     }
 
-    override val contents = mutableListOf<Thing>()
     override fun remove(thing: Thing) { contents.remove(thing) }
     override fun add(thing: Thing) { contents.add(thing) }
 
+    fun heldLightSource() = contents.firstOrNull { it is LightSource && it.light() != null } as LightSource?
+    override fun light() = heldLightSource()?.light()
 }
