@@ -13,6 +13,7 @@ import render.tilesets.Glyph
 import render.tilesets.TileSet
 import things.LightSource
 import things.Portable
+import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
 import ui.panels.ConsolePanel
@@ -35,7 +36,7 @@ sealed class Level {
 
     abstract fun receiveChunk(chunk: Chunk)
 
-    abstract fun getPlayerEntranceFrom(level: Level): XY?
+    abstract fun getPlayerEntranceFrom(fromLevelId: String): XY?
 
     open fun debugText(): String = ""
     open fun statusText(): String = ""
@@ -203,6 +204,10 @@ sealed class Level {
         }
     }
 
+    fun advanceTime(delta: Float) = director.advanceTime(delta)
+    fun linkTemporal(temporal: Temporal) = director.linkTemporal(temporal)
+    fun unlinkTemporal(temporal: Temporal) = director.unlinkTemporal(temporal)
+
     abstract fun makeStepMap(): StepMap
 
     abstract fun isReady(): Boolean
@@ -213,13 +218,15 @@ sealed class Level {
 
     protected open fun onSetPov() { }
 
-    open fun onRestore() { }
+    open fun onRestore() {
+
+    }
 
     open fun unload() { }
 
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
-    fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: CellContainer()
+    fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")
 
     fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
 

@@ -48,7 +48,9 @@ fun String.aOrAn(): String {
 
 fun String.plural(): String {
     if (isNotEmpty()) {
-        if (get(lastIndex) == 's') {
+        if (listOf(
+                "s", "ch", "sh"
+            ).hasOneWhere { this.endsWith(it) }) {
             return this + "es"
         }
     }

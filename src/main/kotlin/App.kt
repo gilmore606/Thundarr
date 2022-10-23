@@ -118,6 +118,7 @@ object App : KtxGame<Screen>() {
             val state = save.getWorldState()
             level = LevelKeeper.getLevel(state.levelId)
             player = state.player
+            player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
 
             updateTime(state.time)
@@ -126,7 +127,7 @@ object App : KtxGame<Screen>() {
                 log.info("Waiting for level...")
                 delay(100)
             }
-            movePlayerIntoLevel(player.xy.x, player.xy.y, null)
+            movePlayerIntoLevel(player.xy.x, player.xy.y, level)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
         }
     }
@@ -138,11 +139,10 @@ object App : KtxGame<Screen>() {
 
             level = LevelKeeper.getLevel("world")
             player = Player()
-            player.add(Sunsword())
-            player.add(Torch())
-            player.add(Torch())
-            player.add(Torch())
-            repeat (4) { player.add(Apple()) }
+            Sunsword().moveTo(player)
+            Torch().moveTo(player)
+            Torch().moveTo(player)
+            Apple().moveTo(player)
 
             updateTime(0.0)
             level.setPov(200, 200)
@@ -151,7 +151,7 @@ object App : KtxGame<Screen>() {
             while (playerStart == null) {
                 log.debug("Waiting for chunks...")
                 delay(50)
-                playerStart = level.getPlayerEntranceFrom(level)
+                playerStart = level.getPlayerEntranceFrom(level.levelId())
             }
             movePlayerIntoLevel(playerStart.x, playerStart.y, null)
             ConsolePanel.say("You step tentatively into the apocalypse...")
@@ -174,17 +174,15 @@ object App : KtxGame<Screen>() {
 
     fun enterLevelFromWorld(levelId: String) {
         level.director.detachActor(player)
-        val oldLevel = level
+        val oldLevelId = level.levelId()
         level = LevelKeeper.getLevel(levelId)
-
         KtxAsync.launch {
-            var entrance: XY? = null
-            while (entrance == null) {
+            while (!level.isReady()) {
                 log.debug("Waiting for level...")
                 delay(50)
-                entrance = level.getPlayerEntranceFrom(oldLevel)
             }
-            movePlayerIntoLevel(entrance.x, entrance.y, oldLevel)
+            val entrance = level.getPlayerEntranceFrom(oldLevelId)
+            movePlayerIntoLevel(entrance!!.x, entrance!!.y, LevelKeeper.getLevel(oldLevelId))
             ConsolePanel.say("You cautiously step inside...")
         }
     }
@@ -212,8 +210,9 @@ object App : KtxGame<Screen>() {
         GameScreen.recenterCamera()
     }
 
-    fun advanceTime(passed: Float) {
-        updateTime(time + passed.toDouble())
+    fun advanceTime(delta: Float) {
+        updateTime(time + delta.toDouble())
+        LevelKeeper.advanceTime(delta)
     }
 
     private fun updateTime(newTime: Double) {

@@ -111,8 +111,8 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
             }
-            Input.Keys.F2 -> { Lightbulb().moveTo(null, groundAtPlayer()) }
-            Input.Keys.F4 -> { PalmTree().moveTo(null, groundAtPlayer()) }
+            Input.Keys.F2 -> { Lightbulb().moveTo(groundAtPlayer()) }
+            Input.Keys.F4 -> { PalmTree().moveTo(groundAtPlayer()) }
             Input.Keys.F5 -> {
                 App.DEBUG_PANEL = !App.DEBUG_PANEL
                 if (App.DEBUG_PANEL) {

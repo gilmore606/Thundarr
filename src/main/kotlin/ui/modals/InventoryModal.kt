@@ -97,7 +97,6 @@ class InventoryModal(
     override fun keyDown(keycode: Int) {
         when (keycode) {
             Input.Keys.TAB -> dismiss()
-            Input.Keys.NUMPAD_6 -> doSelect()
             else -> super.keyDown(keycode)
         }
     }

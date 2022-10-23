@@ -14,7 +14,7 @@ class Get(
 ) : Action(0.5f) {
 
     override fun execute(actor: Actor, level: Level) {
-        thing.moveTo(from, to = actor)
+        thing.moveTo(actor)
         if (actor is Player) {
             ConsolePanel.say("You pick up " + thing.name().aOrAn() + ".")
         }

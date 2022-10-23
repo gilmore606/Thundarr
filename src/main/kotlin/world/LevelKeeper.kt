@@ -11,7 +11,7 @@ object LevelKeeper {
         var lastAccessedAt: Long
     )
 
-    private const val maxLevelsToKeep = 6
+    private const val maxLevelsToKeep = 8
 
     val liveLevels = mutableSetOf<LiveLevel>()
 
@@ -40,6 +40,11 @@ object LevelKeeper {
 
         pruneLevels()
         return level
+    }
+
+    fun makeBuilding(building: Building) {
+        App.save.putBuilding(building)
+        getLevel(building.firstLevelId)
     }
 
     // Discard old non-world levels if we're holding too many active.
@@ -76,7 +81,16 @@ object LevelKeeper {
 
     // Run action queues for all live levels.  This happens on every render.
     fun runActorQueues() {
-        liveLevels.forEach { it.level.director.runQueue(it.level) }
+        mutableSetOf<LiveLevel>().apply { addAll(liveLevels) }.forEach {
+            it.level.director.runQueue(it.level)
+        }
+    }
+
+    // Distribute the passage of time to everyone that cares.
+    fun advanceTime(delta: Float) {
+        liveLevels.forEach {
+            it.level.advanceTime(delta)
+        }
     }
 
 }

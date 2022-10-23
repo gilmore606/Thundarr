@@ -5,7 +5,6 @@ import kotlinx.serialization.json.Json
 import util.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
-import java.lang.Float
 
 class EnclosedLevel(
     val levelId: String
@@ -13,6 +12,7 @@ class EnclosedLevel(
 
     private var chunk: Chunk? = null
     private var allChunks = setOf<Chunk>()
+    private var ready = false
 
     private val width: Int
         get() = chunk?.width ?: 1
@@ -31,6 +31,7 @@ class EnclosedLevel(
         this.chunk = chunk
         allChunks = setOf(chunk)
         stepMap = makeStepMap()
+        ready = true
     }
 
     override fun unload() {
@@ -44,22 +45,22 @@ class EnclosedLevel(
 
     override fun levelId() = levelId
 
-    override fun isReady() = allChunks.isNotEmpty()
+    override fun isReady() = ready
 
-    override fun getPlayerEntranceFrom(level: Level): XY? {
+    override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         if (isReady()) {
             for (x in 0 until width) {
                 for (y in 0 until height) {
                     if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
                         val doorData = Json.decodeFromString<PortalDoor.Data>(getTerrainData(x, y))
-                        if (doorData.levelId == level.levelId()) {
-                            log.debug("Found world exit at $x $y in level chunk")
+                        if (doorData.levelId == fromLevelId) {
                             // TODO: this changes when doors aren't all on north edge!
                             return XY(x, y + 1)
                         }
                     }
                 }
             }
+            log.info("Failed to find world exit in level chunk -- dropping player in randomly!")
             return chunk!!.randomPlayerStart()
         } else {
             return null

@@ -4,6 +4,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import util.*
 import world.Chunk
+import world.Level
 import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.random.Random
@@ -13,8 +14,9 @@ class LevelCarto(
     y0: Int,
     x1: Int,
     y1: Int,
-    chunk: Chunk
-) : Carto(x0, y0, x1, y1, chunk) {
+    chunk: Chunk,
+    level: Level
+) : Carto(x0, y0, x1, y1, chunk, level) {
 
     class WorldExit(
         val edge: XY,

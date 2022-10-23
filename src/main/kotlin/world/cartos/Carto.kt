@@ -6,6 +6,7 @@ import kotlin.random.Random
 import things.Thing
 import util.*
 import world.Chunk
+import world.Level
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
 import world.terrains.Terrain
@@ -17,10 +18,11 @@ abstract class Carto(
     val y0: Int,
     val x1: Int,
     val y1: Int,
-    val chunk: Chunk
+    val chunk: Chunk,
+    val level: Level
 ) {
 
-    protected lateinit var regions: Array<Array<Int?>>
+    protected var regions: Array<Array<Int?>> = Array(1+x1-x0) { Array(1+y1-y0) { null } }
 
     protected val bounds = Rect(x0,y0,x1,y1)
     protected var innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
@@ -30,7 +32,6 @@ abstract class Carto(
     protected val json = Json { ignoreUnknownKeys = true }
 
     init {
-        regions = Array(1+x1-x0) { Array(1+y1-y0) { null } }
         for (x in x0 .. x1) {
             for (y in y0 .. y1) {
                 chunk.setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
@@ -42,8 +43,13 @@ abstract class Carto(
     protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type)
     protected fun setTerrainData(x: Int, y: Int, data: String) = chunk.setTerrainData(x, y, data)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
-    protected fun addThingAt(x: Int, y: Int, thing: Thing) = chunk.addThingAt(x, y, thing)
 
+    protected fun addThing(x: Int, y: Int, thing: Thing) {
+        val dest = chunk.cellContainerAt(x, y)
+        dest.reconnect(level, x, y)
+        //log.info("moving $thing to $dest at $x $y in $level")
+        thing.moveTo(dest)
+    }
 
     protected fun regionAt(x: Int, y: Int): Int? = try {
         regions[x - x0][y - y0]

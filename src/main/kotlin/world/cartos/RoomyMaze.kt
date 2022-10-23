@@ -3,6 +3,7 @@ package world.cartos
 import render.tilesets.Glyph
 import util.*
 import world.Chunk
+import world.Level
 import world.terrains.Terrain
 import kotlin.random.Random
 
@@ -13,8 +14,9 @@ class RoomyMaze(
     y0: Int,
     x1: Int,
     y1: Int,
-    chunk: Chunk
-) : Carto(x0, y0, x1, y1, chunk) {
+    chunk: Chunk,
+    level: Level
+) : Carto(x0, y0, x1, y1, chunk, level) {
 
     fun carveLevel() {
         val rooms = ArrayList<Rect>()

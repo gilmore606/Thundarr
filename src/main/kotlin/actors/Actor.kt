@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
 import things.LightSource
+import things.Temporal
 import things.Thing
 import things.ThingHolder
 import ui.panels.ConsolePanel
@@ -15,14 +16,19 @@ import world.Level
 sealed class Actor(
     open val glyph: Glyph,
     open val speed: Float
-) : ThingHolder, LightSource {
-    val xy = XY(0,0)  // position in current level
+) : ThingHolder, LightSource, Temporal {
+    override val xy = XY(0,0)  // position in current level
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
 
-    @Transient var level: Level? = null
+    @Transient
+    override var level: Level? = null
 
     override val contents = mutableListOf<Thing>()
+
+    fun onRestore() {
+        contents.forEach { it.holder = this }
+    }
 
     open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level?) {
         this.xy.x = x
@@ -34,7 +40,8 @@ sealed class Actor(
     // What's my divider for action durations?
     fun speed() = this.speed
     // How far in tiles can I see things?
-    fun visualRange() = 24f
+    fun visualRange() = 22f
+
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
@@ -84,4 +91,6 @@ sealed class Actor(
         }
         return light
     }
+
+    override fun advanceTime(delta: Float) { }
 }

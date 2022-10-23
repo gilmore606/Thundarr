@@ -4,6 +4,7 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import things.Temporal
 import util.log
 
 // A delegate class for Level to manage actors in time and space.
@@ -12,6 +13,7 @@ class Director(val level: Level) {
 
     val actors = mutableListOf<Actor>()
     private val actorQueue = mutableListOf<Actor>()
+    private val temporals = mutableListOf<Temporal>()
 
     private var playerTimePassed = 0f
 
@@ -64,11 +66,12 @@ class Director(val level: Level) {
         actorQueue.addAll(actors)
         while (actorQueue.isNotEmpty() && !done) {
             if (actorQueue[0].juice > 0f || (actorQueue[0] is Player && actorQueue[0].queuedActions.isNotEmpty())) {
+                log.debug("Running queue for level ${level.levelId()}")
                 val actor = actorQueue.removeAt(0)
                 actor.nextAction()?.also { action ->
 
                     val duration = action.duration()
-
+                    log.debug("Executing $action for $actor")
                     action.execute(actor, level)
 
                     when (actor) {
@@ -100,5 +103,19 @@ class Director(val level: Level) {
         }
         actors.clear()
         actors.addAll(actorQueue)
+    }
+
+    // Advance world time for all actors.
+    fun advanceTime(delta: Float) {
+        actors.forEach { it.advanceTime(delta) }
+        temporals.forEach { it.advanceTime(delta) }
+    }
+
+    fun linkTemporal(temporal: Temporal) {
+        temporals.add(temporal)
+    }
+
+    fun unlinkTemporal(temporal: Temporal) {
+        temporals.remove(temporal)
     }
 }

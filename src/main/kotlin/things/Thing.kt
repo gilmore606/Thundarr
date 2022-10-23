@@ -2,9 +2,12 @@ package things
 
 import actors.Actor
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import render.GameScreen
 import render.tilesets.Glyph
 import util.LightColor
+import util.XY
+import util.log
 import world.Level
 
 @Serializable
@@ -16,6 +19,7 @@ sealed class Thing {
     abstract fun name(): String
     abstract val kind: Kind
 
+    @Transient var holder: ThingHolder? = null
 
     enum class Kind {
         LIGHTBULB,
@@ -40,8 +44,9 @@ sealed class Thing {
 
     open fun onWalkedOnBy(actor: Actor) { }
 
-    fun moveTo(from: ThingHolder?, to: ThingHolder?) {
-        from?.remove(this)
+    fun moveTo(to: ThingHolder?) {
+        holder?.remove(this)
+        this.holder = to
         to?.add(this)
     }
 

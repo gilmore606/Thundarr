@@ -2,6 +2,8 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import render.GameScreen
 import ui.input.Mouse
 
@@ -67,9 +69,6 @@ class ConfirmModal(
             }
             Input.Keys.Y -> { selection = 1 }
             Input.Keys.N -> { selection = 0 }
-            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER -> {
-                doSelect()
-            }
         }
     }
 
@@ -86,7 +85,9 @@ class ConfirmModal(
 
     override fun doSelect() {
         dismiss()
-        callback.invoke(selection == 0)
+        KtxAsync.launch {
+            callback.invoke(selection == 0)
+        }
     }
 
     private fun mouseToYesOrNo(screenX: Int, screenY: Int): Int? {

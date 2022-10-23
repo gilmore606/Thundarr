@@ -8,9 +8,7 @@ import util.CARDINALS
 import util.Dice
 import util.Perlin
 import util.UUID
-import world.Building
-import world.Chunk
-import world.ChunkLoader
+import world.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.Exception
@@ -21,8 +19,9 @@ class WorldCarto(
     y0: Int,
     x1: Int,
     y1: Int,
-    chunk: Chunk
-) : Carto(x0, y0, x1, y1, chunk) {
+    chunk: Chunk,
+    level: Level
+) : Carto(x0, y0, x1, y1, chunk, level) {
 
     val scale = 0.02
     val fullness = 0.002
@@ -54,7 +53,7 @@ class WorldCarto(
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
-                        addThingAt(x + this.x0, y + this.y0, OakTree())
+                        addThing(x + this.x0, y + this.y0, PalmTree())
                         if (Dice.chance(0.2f)) {
                             var clear = true
                             CARDINALS.forEach { dir ->
@@ -65,7 +64,8 @@ class WorldCarto(
                             if (clear) {
                                 val dir = CARDINALS.random()
                                 try {
-                                    addThingAt(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(3)) {
+
+                                    addThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(3)) {
                                         0 -> Apple()
                                         1 -> Axe()
                                         else -> EnergyDrink()
@@ -97,7 +97,7 @@ class WorldCarto(
                     enterMsg = building.doorMsg,
                     levelId = building.firstLevelId
                 )))
-                ChunkLoader.makeBuilding(building)
+                LevelKeeper.makeBuilding(building)
             }
         }
     }

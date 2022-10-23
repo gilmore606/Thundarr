@@ -20,7 +20,7 @@ sealed class Consumable : Portable() {
             canDo = { actor -> this in actor.contents },
             toDo = { actor, level ->
                 ConsolePanel.say(if (actor is Player) consumeSelfMsg() else consumeOtherMsg(actor) )
-                this.moveTo(actor, null)
+                this.moveTo(null)
                 onConsume(actor)
             })
     )

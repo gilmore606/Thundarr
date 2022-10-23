@@ -10,7 +10,7 @@ object DebugPanel : ShadedPanel() {
 
     init {
         this.width = 160
-        this.height = 110
+        this.height = 130
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -29,6 +29,7 @@ object DebugPanel : ShadedPanel() {
         drawString("light $lr $lg $lb", padding, padding + 40)
         drawString("render ${GameScreen.drawTime} ms", padding, padding + 60)
         drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 80)
+        drawString("${App.level.thingsAt(App.player.xy.x, App.player.xy.y).size} things", padding, padding + 100)
     }
 
 }

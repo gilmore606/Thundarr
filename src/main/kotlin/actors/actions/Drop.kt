@@ -10,11 +10,11 @@ import world.Level
 
 class Drop(
     private val thing: Thing,
-    private val to: ThingHolder
+    private val dest: ThingHolder
 ) : Action(0.3f) {
 
     override fun execute(actor: Actor, level: Level) {
-        thing.moveTo(from = actor, to = to)
+        thing.moveTo(dest)
         if (actor is Player) {
             ConsolePanel.say("You drop " + thing.name().aOrAn() + ".")
         }

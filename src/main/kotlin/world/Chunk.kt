@@ -33,7 +33,7 @@ class Chunk(
     private val things = Array(width) { Array(height) { CellContainer() } }
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
-    var generating = false
+    var generating = true
 
     @Transient
     private val lights = Array(width) { Array(height) { mutableMapOf<LightSource, LightColor>() } }
@@ -67,6 +67,13 @@ class Chunk(
 
     fun connectLevel(level: Level) {
         this.level = level
+
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                // Restore circular reference from CellContainer back to the level.
+                things[x][y].reconnect(level, x + this.x, y + this.y)
+            }
+        }
     }
 
     fun randomPlayerStart(): XY {
@@ -81,44 +88,30 @@ class Chunk(
     }
 
     fun onRestore(level: Level) {
-        this.level = level
+        connectLevel(level)
 
         savedActors.forEach { actor ->
+            actor.onRestore()
             level.director.attachActor(actor)
         }
 
-        // Find and reproject all lights.
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                // Restore circular reference from CellContainer back to the level.
-                things[x][y].level = level
-                things[x][y].x = x + this.x
-                things[x][y].y = y + this.y
-                things[x][y].contents.forEach { thing ->
-                    if (thing is LightSource) {
-                        level.dirtyLights[thing] = XY(x + this.x, y + this.y)
-                    }
-                }
-
-            }
-        }
     }
 
     // Carve myself into a chunk for the world.
-    fun generateWorld() {
+    fun generateWorld(level: Level) {
         generating = true
 
-        WorldCarto(x, y, x+width-1,y+height-1,this)
+        WorldCarto(x, y, x+width-1,y+height-1,this, level)
             .carveWorldChunk()
 
         generating = false
     }
 
     // Carve myself into a chunk for a building level.
-    fun generateLevel(building: Building) {
+    fun generateLevel(level: Level, building: Building) {
         generating = true
 
-        LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this)
+        LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this, level)
             .carveLevel(
                 worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
             )
@@ -138,11 +131,6 @@ class Chunk(
     }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
-
-    // Only call this during generation.  It doesn't do 'the right thing' in play.
-    fun addThingAt(x: Int, y: Int, thing: Thing) {
-        things[x - this.x][y - this.y].add(thing)
-    }
 
     fun onAddThing(x: Int, y: Int, thing: Thing) {
         if (!generating) {
@@ -170,7 +158,7 @@ class Chunk(
 
     fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
-    } else { CellContainer() }
+    } else { throw RuntimeException("no cell container for $x $y") }
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
@@ -215,16 +203,19 @@ class Chunk(
     } else { false }
 
     private fun updateWalkable(x: Int, y: Int): Boolean {
-        var v = Terrain.get(terrains[x][y]).isWalkable()
-        if (!v) {
-            var thingBlocking = false
-            things[x][y].contents.forEach { thing ->
-                thingBlocking = thingBlocking || thing.isBlocking()
+        if (boundsCheck(x + this.x, y + this.y)) {
+            var v = Terrain.get(terrains[x][y]).isWalkable()
+            if (!v) {
+                var thingBlocking = false
+                things[x][y].contents.forEach { thing ->
+                    thingBlocking = thingBlocking || thing.isBlocking()
+                }
+                v = thingBlocking
             }
-            v = thingBlocking
+            walkableCache[x][y] = v
+            return v
         }
-        walkableCache[x][y] = v
-        return v
+        return false
     }
 
     fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
@@ -261,22 +252,25 @@ class Chunk(
     } else { true }
 
     private fun updateOpaque(x: Int, y: Int): Boolean {
-        var v = Terrain.get(terrains[x][y]).isOpaque()
-        if (!v) {
-            var thingBlocking = false
-            things[x][y].contents.forEach { thing ->
-                thingBlocking = thingBlocking || thing.isOpaque()
+        if (boundsCheck(x + this.x, y + this.y)) {
+            var v = Terrain.get(terrains[x][y]).isOpaque()
+            if (!v) {
+                var thingBlocking = false
+                things[x][y].contents.forEach { thing ->
+                    thingBlocking = thingBlocking || thing.isOpaque()
+                }
+                v = thingBlocking
             }
-            v = thingBlocking
-        }
 
-        val oldValue = opaqueCache[x][y]
-        opaqueCache[x][y] = v
-        if (oldValue != null && oldValue != v) {
-            level.dirtyLightsTouching(x + this.x, y + this.y)
-            level.shadowDirty = true
+            val oldValue = opaqueCache[x][y]
+            opaqueCache[x][y] = v
+            if (oldValue != null && oldValue != v) {
+                level.dirtyLightsTouching(x + this.x, y + this.y)
+                level.shadowDirty = true
+            }
+            return v
         }
-        return v
+        return true
     }
 
     // Dirty all lights that fall on this cell.

@@ -37,7 +37,7 @@ object ChunkLoader {
         Chunk(CHUNK_SIZE, CHUNK_SIZE).apply {
             onCreate(x, y)
             connectLevel(level)
-            generateWorld()
+            generateWorld(level)
             val chunk = this
             KtxAsync.launch { callback(chunk) }
         }
@@ -57,24 +57,17 @@ object ChunkLoader {
                 val chunk = App.save.getLevelChunk(levelId).apply { onRestore(level) }
                 KtxAsync.launch { callback(chunk) }
             } else {
-                makeLevelChunk(levelId, callback)
+                makeLevelChunk(level, levelId, callback)
             }
         })
     }
 
-    fun makeBuilding(building: Building) {
-        App.save.putBuilding(building)
-        jobs.add(coroutineScope.launch {
-            makeLevelChunk(building.firstLevelId) { log.info("Pre-generated level chunk ${building.firstLevelId} .")}
-        })
-    }
-
-    private fun makeLevelChunk(levelId: String, callback: (Chunk) -> Unit) {
+    private fun makeLevelChunk(level: Level, levelId: String, callback: (Chunk) -> Unit) {
         log.debug("Creating level chunk $levelId")
         val building = App.save.getBuildingForLevel(levelId)
         Chunk(building.floorWidth, building.floorHeight).apply {
             onCreate(0, 0)
-            generateLevel(building)
+            generateLevel(level, building)
             App.save.putLevelChunk(this, levelId, building.id)
             val chunk = this
             KtxAsync.launch { callback(chunk) }

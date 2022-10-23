@@ -7,6 +7,7 @@ import render.tilesets.Glyph
 import ui.panels.ConsolePanel
 import util.LightColor
 import world.Level
+import java.lang.Float.max
 
 
 interface LightSource {
@@ -20,15 +21,39 @@ sealed class LitThing : Portable(), LightSource {
 
     override fun light(): LightColor? = lightColor
 
-    protected fun becomeLit(actor: Actor, level: Level) {
+    protected fun becomeLit() {
         active = true
-        level.addLightSource(actor.xy.x, actor.xy.y, actor)
+        holder?.also { holder ->
+            holder.level?.addLightSource(holder.xy.x, holder.xy.y,
+                if (holder is Actor) holder else this
+            )
+        }
     }
 
-    protected fun becomeDark(actor: Actor, level: Level) {
+    protected fun becomeDark() {
         active = false
-        level.removeLightSource(actor)
-        actor.light()?.also { level.addLightSource(actor.xy.x, actor.xy.y, actor) }
+        holder?.also { holder ->
+            holder.level?.also { level ->
+                level.removeLightSource(if (holder is Actor) holder else this )
+                if (holder is Actor) {
+                    ConsolePanel.announce(level, holder.xy.x, holder.xy.y, ConsolePanel.Reach.VISUAL,
+                        (if (holder is Player) "Your " else "Some guy's ") + " torch goes out.")
+                    holder.light()?.also { level.addLightSource(holder.xy.x, holder.xy.y, holder) }
+                } else {
+                    ConsolePanel.announce(level, holder.xy.x, holder.xy.y, ConsolePanel.Reach.VISUAL,
+                    "The torch burns out.")
+                }
+            }
+        }
+    }
+
+    protected fun reproject() {
+        holder?.also { holder ->
+            holder.level?.also { level ->
+                level.removeLightSource(if (holder is Actor) holder else this )
+                level.addLightSource(holder.xy.x, holder.xy.y, if (holder is Actor) holder else this)
+            }
+        }
     }
 }
 
@@ -57,10 +82,10 @@ class Sunsword : LitThing() {
             },
             toDo = { actor, level ->
                 if (active) {
-                    becomeDark(actor, level)
+                    becomeDark()
                     if (actor is Player) ConsolePanel.say("The shimmering blade vanishes.")
                 } else {
-                    becomeLit(actor, level)
+                    becomeLit()
                     if (actor is Player) ConsolePanel.say("A shimmering blade emerges from the sunsword's hilt.")
                 }
             })
@@ -68,21 +93,41 @@ class Sunsword : LitThing() {
 }
 
 @Serializable
-class Torch : LitThing() {
-    var lit = false
-    override fun glyph() = if (lit) Glyph.TORCH_LIT else Glyph.TORCH
+class Torch : LitThing(), Temporal {
+    private var fuel = 50f
+    override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"
     override val kind = Kind.TORCH
     override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
 
-    override fun light() = if (lit) lightColor else null
+    init { active = false }
+
+    override fun light() = if (active) lightColor else null
 
     override fun uses() = mutableSetOf<Use>().apply {
-        if (!lit) add(Use("light " + name(), 0.5f,
+        if (!active) add(Use("light " + name(), 0.5f,
                 canDo = { true },
                 toDo = { actor, level ->
-                    lit = true
-                    level.addLightSource(actor.xy.x, actor.xy.y, actor)
+                    active = true
+                    level.addLightSource(actor.xy.x, actor.xy.y, (if (holder == actor) actor else this@Torch) as LightSource)
+                    level.linkTemporal(this@Torch)
                 }))
         }
+
+    override fun advanceTime(delta: Float) {
+        if (fuel >= 0f) {
+            fuel -= delta
+            if (fuel < 16f) {
+                lightColor.r = max(0.2f, lightColor.r - delta * 0.05f)
+                lightColor.g = max(0f, lightColor.g - delta * 0.08f)
+                lightColor.b = max(0f, lightColor.b - delta * 0.07f)
+                if (fuel < 0f) {
+                    becomeDark()
+                    moveTo(null)
+                } else {
+                    reproject()
+                }
+            }
+        }
+    }
 }

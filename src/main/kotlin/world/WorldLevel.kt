@@ -1,7 +1,6 @@
 package world
 
 import util.*
-import java.lang.Float.min
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
@@ -26,8 +25,8 @@ class WorldLevel() : Level() {
 
     override fun isReady() = loadedChunks.size >= CHUNKS_WIDE * CHUNKS_WIDE
 
-    override fun getPlayerEntranceFrom(level: Level): XY? {
-        if (level is WorldLevel) {
+    override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
+        if (fromLevelId == "world" || true) {
             // Brand new start.
             val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.randomPlayerStart()
             if (start != null) {
@@ -62,6 +61,7 @@ class WorldLevel() : Level() {
     }
 
     override fun onRestore() {
+        super.onRestore()
         populateChunks()
         updateStepMap()
     }

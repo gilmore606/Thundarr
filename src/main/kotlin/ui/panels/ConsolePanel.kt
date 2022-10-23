@@ -1,6 +1,8 @@
 package ui.panels
 
 import render.GameScreen
+import util.log
+import world.Level
 import java.lang.Float.max
 
 
@@ -15,12 +17,21 @@ object ConsolePanel : Panel() {
     private var scroll = 0f
     private var scrollSpeed = 90f
 
+    enum class Reach { VISUAL, AUDIBLE, LEVEL }
+
     fun say(text: String) {
         if (text == lines.last()) return
+        log.info("  \"$text\"")
         lines.add(text)
         scroll += lineSpacing.toFloat()
         if (lines.size > maxLines) {
             lines.removeFirst()
+        }
+    }
+
+    fun announce(level: Level?, x: Int, y: Int, reach: Reach, text: String) {
+        if (level == App.level) {
+            say(text)
         }
     }
 
