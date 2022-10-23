@@ -41,9 +41,12 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    protected val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
+    // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
+    // This is safe because one thread asks for these values serially and doesn't store the result directly.
+    private val ambientResult = LightColor(0f,0f,0f)
 
     abstract fun allChunks(): Set<Chunk>
     abstract fun levelId(): String
@@ -280,7 +283,17 @@ sealed class Level {
 
     fun dirtyLightsTouching(x: Int, y: Int) = chunkAt(x,y)?.dirtyLightsTouching(x,y)
 
-    open fun ambientLight(x: Int = 0, y: Int = 0) = ambientLight
+    fun ambientLight(x: Int, y: Int): LightColor {
+        val brightness = ambientLight.brightness()
+        val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
+        val nearboost = if (distance < 1f) 1.3f else if (distance < 3f) 0.4f else if (distance < 4f) 0.2f else 0f
+        val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
+        return ambientResult.apply {
+            r = ambientLight.r * falloff
+            g = ambientLight.g * falloff
+            b = ambientLight.b * falloff
+        }
+    }
 
     fun getSingleLight(x: Int, y: Int, source: LightSource) = chunkAt(x,y)?.getSingleLight(x, y, source)
 

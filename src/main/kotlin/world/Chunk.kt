@@ -333,7 +333,7 @@ class Chunk(
             }
             return lightCache[x - this.x][y - this.y]
         }
-        return level.ambientLight()
+        return level.ambientLight(x, y)
     }
 
     // Force all cells to re-sum light on next frame.

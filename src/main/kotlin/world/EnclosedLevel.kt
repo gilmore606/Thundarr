@@ -2,12 +2,10 @@ package world
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import util.LightColor
-import util.StepMap
-import util.XY
-import util.log
+import util.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
+import java.lang.Float
 
 class EnclosedLevel(
     val levelId: String
@@ -22,7 +20,7 @@ class EnclosedLevel(
         get() = chunk?.height ?: 1
 
     override val sunLightSteps = mutableMapOf<Int, LightColor>().apply {
-        repeat (24) { n -> this[n] = LightColor(0.1f, 0.1f, 0.1f) }
+        repeat (24) { n -> this[n] = LightColor(0.08f, 0.15f, 0.3f) }
     }
 
     init {
