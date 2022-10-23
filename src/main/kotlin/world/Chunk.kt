@@ -346,7 +346,7 @@ class Chunk(
     }
 
     private fun refreshLightCacheAt(x: Int, y: Int) {
-        val ambient = level.ambientLight()
+        val ambient = level.ambientLight(x + this.x, y + this.y)
         lightCache[x][y].r = ambient.r
         lightCache[x][y].g = ambient.g
         lightCache[x][y].b = ambient.b

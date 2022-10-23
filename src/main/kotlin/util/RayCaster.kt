@@ -4,7 +4,7 @@ import java.lang.RuntimeException
 
 const val MAX_LIGHT_RANGE = 24f
 const val LIGHT_BLEED = 0.25f
-const val VISIBILITY_BRIGHTNESS = 0.4f
+const val VISIBILITY_BRIGHTNESS = 0.32f
 
 class RayCaster() {
 

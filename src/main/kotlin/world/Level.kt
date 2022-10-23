@@ -41,7 +41,7 @@ sealed class Level {
 
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
-    private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    protected val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
 
@@ -280,7 +280,7 @@ sealed class Level {
 
     fun dirtyLightsTouching(x: Int, y: Int) = chunkAt(x,y)?.dirtyLightsTouching(x,y)
 
-    fun ambientLight() = ambientLight
+    open fun ambientLight(x: Int = 0, y: Int = 0) = ambientLight
 
     fun getSingleLight(x: Int, y: Int, source: LightSource) = chunkAt(x,y)?.getSingleLight(x, y, source)
 

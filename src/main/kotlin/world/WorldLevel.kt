@@ -1,6 +1,7 @@
 package world
 
 import util.*
+import java.lang.Float.min
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
@@ -13,6 +14,10 @@ class WorldLevel() : Level() {
     private val chunks = Array(CHUNKS_WIDE) { Array<Chunk?>(CHUNKS_WIDE) { null } }
     private val loadedChunks = mutableSetOf<Chunk>()
     private val originChunkLocation = XY(0,0)
+
+    // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
+    // This is safe because one thread asks for these values serially and doesn't store the result directly.
+    private val ambientResult = LightColor(0f,0f,0f)
 
     private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
@@ -152,6 +157,19 @@ class WorldLevel() : Level() {
         for (y in -1 .. chunk.height) {
             dirtyLightsTouching(chunk.x - 1, y + chunk.y)
             dirtyLightsTouching(chunk.x + chunk.width, y + chunk.y)
+        }
+    }
+
+    override fun ambientLight(x: Int, y: Int): LightColor {
+        val brightness = ambientLight.brightness()
+        val distance = min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
+        //val nearboost = max(0f, 4f - distance) * 0.16f
+        val nearboost = if (distance <= 1f) 0.5f else if (distance < 3f) 0.4f else if (distance < 4f) 0.2f else 0f
+        val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
+        return ambientResult.apply {
+            r = ambientLight.r * falloff
+            g = ambientLight.g * falloff
+            b = ambientLight.b * falloff
         }
     }
 
