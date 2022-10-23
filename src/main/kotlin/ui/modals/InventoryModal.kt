@@ -53,14 +53,18 @@ class InventoryModal(
 
     override fun drawBackground() {
         super.drawBackground()
-        if (selection > -1) drawOptionShade()
+        if (!isAnimating()) {
+            if (selection > -1) drawOptionShade()
+        }
     }
 
     override fun drawThings() {
-        var n = 0
-        byKind.forEach {
-            drawOptionIcon(it.second.first().glyph(), n)
-            n++
+        if (!isAnimating()) {
+            var n = 0
+            byKind.forEach {
+                drawOptionIcon(it.second.first().glyph(), n)
+                n++
+            }
         }
     }
 

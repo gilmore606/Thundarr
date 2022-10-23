@@ -76,11 +76,13 @@ class ConfirmModal(
         mouseToYesOrNo(screenX, screenY)?.also { selection = it }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         mouseToYesOrNo(screenX, screenY)?.also { selected ->
             selection = selected
             doSelect()
+            return true
         }
+        return false
     }
 
     override fun doSelect() {

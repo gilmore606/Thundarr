@@ -46,7 +46,7 @@ class Chunk(
     @Transient
     private val lightCaster = RayCaster()
     @Transient
-    private val debugLight = LightColor(1f, 1f, 1f)
+    private val debugLight = LightColor(0.8f, 0.8f, 0.8f)
 
     @Transient
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.GameScreen
 import render.QuadBatch
 import render.tilesets.Glyph
+import ui.input.Mouse
 
 abstract class Panel {
 
@@ -14,8 +15,8 @@ abstract class Panel {
     protected lateinit var thingBatch: QuadBatch
     protected lateinit var actorBatch: QuadBatch
 
-    protected var x = 0
-    protected var y = 0
+    var x = 0
+    var y = 0
     var width = 500
     var height = 500
 
@@ -49,6 +50,9 @@ abstract class Panel {
     open fun drawBackground() { }
     open fun drawThings() { }
     open fun drawActors() { }
+
+    open fun mouseMovedTo(screenX: Int, screenY: Int) { }
+    open fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean { return false }
 
     abstract fun drawText()
 

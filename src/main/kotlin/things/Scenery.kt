@@ -16,6 +16,8 @@ sealed class Scenery : Thing() {
         if (actor is Player) { ConsolePanel.say(walkOnMsg()) }
     }
     abstract fun walkOnMsg(): String
+
+    override fun description() = "Just another bit of the hideous natural beauty of the wasteland."
 }
 
 

@@ -8,12 +8,9 @@ import kotlinx.coroutines.launch
 import ktx.app.KtxInputAdapter
 import ktx.async.KtxAsync
 import render.GameScreen
-import render.tilesets.Glyph
 import things.Lightbulb
 import things.PalmTree
-import things.PineTree
-import things.Thing
-import ui.modals.EscMenu
+import ui.modals.SystemMenu
 import ui.modals.InventoryModal
 import ui.modals.MapModal
 import ui.panels.DebugPanel
@@ -104,9 +101,9 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.EQUALS -> { GameScreen.mouseScrolled(-1.43f) }
             Input.Keys.MINUS -> { GameScreen.mouseScrolled(1.43f) }
 
-            Input.Keys.TAB -> { GameScreen.addModal(InventoryModal(App.player)) }
-            Input.Keys.ESCAPE -> { GameScreen.addModal(EscMenu()) }
-            Input.Keys.M -> { GameScreen.addModal(MapModal()) }
+            Input.Keys.TAB -> { App.openInventory() }
+            Input.Keys.ESCAPE -> { App.openSystemMenu() }
+            Input.Keys.M -> { App.openMap() }
 
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

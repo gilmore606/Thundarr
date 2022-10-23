@@ -22,8 +22,9 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
         drawString("a homofagge production", 132, 70)
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()
+        return true
     }
 
     override fun keyDown(keycode: Int) {

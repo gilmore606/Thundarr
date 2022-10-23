@@ -15,6 +15,7 @@ import things.Sunsword
 import things.Torch
 import ui.modals.*
 import ui.panels.ConsolePanel
+import ui.panels.LeftButtons
 import ui.panels.LookPanel
 import ui.panels.StatusPanel
 import util.XY
@@ -70,6 +71,7 @@ object App : KtxGame<Screen>() {
         GameScreen.addPanel(ConsolePanel)
         GameScreen.addPanel(StatusPanel)
         GameScreen.addPanel(LookPanel)
+        GameScreen.addPanel(LeftButtons)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
@@ -286,4 +288,8 @@ object App : KtxGame<Screen>() {
         )
     }
 
+    fun openInventory() { GameScreen.addModal(InventoryModal(player)) }
+    fun openMap() { GameScreen.addModal(MapModal()) }
+    fun openSystemMenu() { GameScreen.addModal(SystemMenu()) }
+    fun openJournal() { }
 }

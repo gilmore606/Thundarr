@@ -8,15 +8,14 @@ import render.tilesets.Glyph
 import util.LightColor
 import util.XY
 import util.log
+import world.Entity
 import world.Level
 
 @Serializable
-sealed class Thing {
-    abstract fun glyph(): Glyph
+sealed class Thing : Entity {
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
-    abstract fun name(): String
     abstract val kind: Kind
 
     @Transient var holder: ThingHolder? = null
@@ -41,6 +40,8 @@ sealed class Thing {
     )
 
     open fun uses(): Set<Use> = setOf()
+
+    override fun description() =  ""
 
     open fun onWalkedOnBy(actor: Actor) { }
 

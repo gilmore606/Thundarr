@@ -18,7 +18,7 @@ open class VariantsTile(
         level?.also { level ->
             return pickIndexFromVariants(level.getRandom(x,y), variants)
         }
-        return 0
+        return pickIndexFromVariants(0, variants)
     }
 
 }

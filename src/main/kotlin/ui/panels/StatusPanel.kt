@@ -5,7 +5,7 @@ object StatusPanel : ShadedPanel() {
     private val padding = 12
 
     init {
-        this.width = 150
+        this.width = 200
         this.height = 78
     }
 

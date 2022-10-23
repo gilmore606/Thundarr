@@ -237,6 +237,9 @@ object GameScreen : KtxScreen {
         topModal?.also { modal ->
             modal.mouseMovedTo(screenX, screenY)
         } ?: run {
+            panels.forEach {
+                it.mouseMovedTo(screenX, screenY)
+            }
             if (scrollDragging) {
                 scrollX = pixelToScrollX(dragOrigin.x - screenX)
                 scrollY = pixelToScrollY(dragOrigin.y - screenY)
@@ -285,23 +288,30 @@ object GameScreen : KtxScreen {
         topModal?.also { modal ->
             modal.mouseClicked(screenX + scrollX.toInt(), screenY + scrollY.toInt(), button)
         } ?: run {
+            mutableListOf<Panel>().apply { addAll(panels) }.forEach {
+                if (screenX >= it.x && screenX <= it.x + it.width && screenY >= it.y && screenY <= it.y + it.height) {
+                    if (it.mouseClicked(screenX, screenY, button)) return true
+                }
+            }
             when (button) {
                 Mouse.Button.LEFT -> {
                     scrollDragging = true
                     scrollLatch = true
                     dragOrigin.x = screenX + pixelScrollX()
                     dragOrigin.y = screenY + pixelScrollY()
+                    return true
                 }
                 Mouse.Button.RIGHT -> {
                     val x = screenXtoTileX(screenX)
                     val y = screenYtoTileY(screenY)
                     setCursorPosition(x,y)
                     rightClickCursorTile()
+                    return true
                 }
                 else -> { return false }
             }
         }
-        return true
+        return false
     }
 
     fun rightClickCursorTile() {

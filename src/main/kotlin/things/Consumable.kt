@@ -26,6 +26,8 @@ sealed class Consumable : Portable() {
     )
 
     open fun onConsume(actor: Actor) { }
+
+    override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
 }
 
 @Serializable
@@ -38,8 +40,10 @@ class Apple : Consumable() {
 @Serializable
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
-    override fun name() = "Monster energy drink"
+    override fun name() = "energy drink"
     override val kind = Kind.ENERGY_DRINK
 
     override fun consumeVerb() = "drink"
+
+    override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
 }

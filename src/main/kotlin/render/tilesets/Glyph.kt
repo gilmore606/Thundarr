@@ -24,6 +24,10 @@ enum class Glyph {
     SURF_V,
     SURF_H,
     PANEL_SHADOW,
+    BUTTON_INVENTORY,
+    BUTTON_MAP,
+    BUTTON_SYSTEM,
+    BUTTON_JOURNAL,
 
     PLAYER,
     MOK,

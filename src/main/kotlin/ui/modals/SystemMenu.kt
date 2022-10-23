@@ -1,10 +1,6 @@
 package ui.modals
 
-import com.badlogic.gdx.Input
-import render.GameScreen
-import ui.input.Mouse
-
-class EscMenu : SelectionModal(270, 230, "- ThUNdARR -") {
+class SystemMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Restart world") { App.restartWorld() }

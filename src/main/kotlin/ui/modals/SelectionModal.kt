@@ -64,9 +64,10 @@ abstract class SelectionModal(
         }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
-        super.mouseClicked(screenX, screenY, button)
-        mouseToOption(screenX, screenY)?.also { selection = it ; doSelect() }
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.mouseClicked(screenX, screenY, button)) return true
+        mouseToOption(screenX, screenY)?.also { selection = it ; doSelect(); return true }
+        return false
     }
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {

@@ -66,14 +66,14 @@ abstract class Modal(
 
     }
 
-    open fun mouseMovedTo(screenX: Int, screenY: Int) {
-
-    }
-
-    open fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button) {
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height) {
-            if (dismissOnClickOutside) dismiss()
+            if (dismissOnClickOutside) {
+                dismiss()
+                return true
+            }
         }
+        return false
     }
 
     protected fun dismiss() {

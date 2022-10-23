@@ -10,13 +10,14 @@ import things.Thing
 import things.ThingHolder
 import ui.panels.ConsolePanel
 import util.*
+import world.Entity
 import world.Level
 
 @Serializable
 sealed class Actor(
     open val glyph: Glyph,
     open val speed: Float
-) : ThingHolder, LightSource, Temporal {
+) : Entity, ThingHolder, LightSource, Temporal {
     override val xy = XY(0,0)  // position in current level
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
@@ -42,6 +43,10 @@ sealed class Actor(
     // How far in tiles can I see things?
     fun visualRange() = 22f
 
+    override fun glyph() = glyph
+
+    override fun name() = "Some guy"
+    override fun description() = "Just some guy walking around, who knows what he's up to?  I'd steer clear if I were you."
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
