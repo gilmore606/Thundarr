@@ -64,15 +64,28 @@ object GameScreen : KtxScreen {
     val fullDark = LightColor(0f, 0f, 0f)
 
     const val fontSize = 16
+    const val fontSizeSmall = 14
     const val titleFontSize = 24
     const val subTitleFontSize = 20
-    val fontColorDull = Color(0.7f, 0.7f, 0.4f, 0.6f)
+    val fontColorDull = Color(0.75f, 0.75f, 0.45f, 0.8f)
     val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
             borderWidth = 2.3f
+            spaceX = -1
+            kerning = true
+            genMipMaps = true
+            minFilter = TextureFilter.MipMapNearestNearest
+            magFilter = TextureFilter.MipMapNearestNearest
+            color = Color(1f, 1f, 0.8f, 0.9f)
+            borderColor = Color(0f, 0f, 0f, 0.5f)
+        })
+    val smallFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
+        .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+            size = fontSizeSmall
+            borderWidth = 2f
             spaceX = -1
             kerning = true
             genMipMaps = true

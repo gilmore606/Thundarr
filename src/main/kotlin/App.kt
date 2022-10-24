@@ -130,7 +130,7 @@ object App : KtxGame<Screen>() {
                 log.info("Waiting for level...")
                 delay(100)
             }
-            movePlayerIntoLevel(player.xy.x, player.xy.y, level)
+            movePlayerIntoLevel(player.xy.x, player.xy.y)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
         }
     }
@@ -157,7 +157,7 @@ object App : KtxGame<Screen>() {
                 delay(50)
                 playerStart = level.getPlayerEntranceFrom(level.levelId())
             }
-            movePlayerIntoLevel(playerStart.x, playerStart.y, null)
+            movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.say("You step tentatively into the apocalypse...")
         }
     }
@@ -186,14 +186,13 @@ object App : KtxGame<Screen>() {
                 delay(50)
             }
             val entrance = level.getPlayerEntranceFrom(oldLevelId)
-            movePlayerIntoLevel(entrance!!.x, entrance!!.y, LevelKeeper.getLevel(oldLevelId))
+            movePlayerIntoLevel(entrance!!.x, entrance!!.y)
             Console.say("You cautiously step inside...")
         }
     }
 
     fun enterWorldFromLevel(dest: XY) {
         level.director.detachActor(player)
-        val oldLevel = level
         level = LevelKeeper.getLevel("world")
 
         KtxAsync.launch {
@@ -201,13 +200,13 @@ object App : KtxGame<Screen>() {
                 log.debug("Waiting for world...")
                 delay(50)
             }
-            movePlayerIntoLevel(dest.x, dest.y, oldLevel)
+            movePlayerIntoLevel(dest.x, dest.y)
             Console.say("You step back outside to face the wilderness once again.")
         }
     }
 
-    private fun movePlayerIntoLevel(x: Int, y: Int, from: Level?) {
-        player.moveTo(level, x, y, from)
+    private fun movePlayerIntoLevel(x: Int, y: Int) {
+        player.moveTo(level, x, y)
         updateTime(time)
         level.onRestore()
         GameScreen.mouseScrolled(0f)

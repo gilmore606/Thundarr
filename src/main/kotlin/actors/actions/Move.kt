@@ -11,7 +11,7 @@ class Move(
 
     override fun execute(actor: Actor, level: Level) {
         if (level.isWalkableFrom(actor.xy, dir)) {
-            actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y, level)
+            actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
         } else {
             Terrain.get(level.getTerrain(actor.xy.x + dir.x, actor.xy.y + dir.y))
                 .onBump(actor, level.getTerrainData(actor.xy.x + dir.x, actor.xy.y + dir.y))

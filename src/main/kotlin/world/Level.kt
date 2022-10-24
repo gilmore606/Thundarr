@@ -178,6 +178,7 @@ sealed class Level {
             removeLightSource(actor)
             addLightSource(x, y, actor)
         }
+        chunkAt(x, y)?.onAddActor(x, y, actor)
 
         thingsAt(x, y).apply {
             if (isNotEmpty()) {
@@ -197,6 +198,7 @@ sealed class Level {
     }
 
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {
+        chunkAt(x, y)?.onRemoveActor(x, y, actor)
         actor.light()?.also { removeLightSource(actor) }
 
         if (toLevel != this) {

@@ -133,10 +133,8 @@ class Chunk(
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
     fun onAddThing(x: Int, y: Int, thing: Thing) {
-        if (!generating) {
-            updateOpaque(x - this.x, y - this.y)
-            updateWalkable(x - this.x, y - this.y)
-        }
+        updateOpaque(x - this.x, y - this.y)
+        updateWalkable(x - this.x, y - this.y)
         if (thing is LightSource) { projectLightSource(XY(x, y), thing) }
     }
 
@@ -145,11 +143,17 @@ class Chunk(
     }
 
     fun onRemoveThing(x: Int, y: Int, thing: Thing) {
-        if (!generating) {
-            updateOpaque(x - this.x, y - this.y)
-            updateWalkable(x - this.x, y - this.y)
-        }
+        updateOpaque(x - this.x, y - this.y)
+        updateWalkable(x - this.x, y - this.y)
         if (thing is LightSource) { level.removeLightSource(thing) }
+    }
+
+    fun onAddActor(x: Int, y: Int, actor: Actor) {
+        updateWalkable(x - this.x, y - this.y)
+    }
+
+    fun onRemoveActor(x: Int, y: Int, actor: Actor) {
+        updateWalkable(x - this.x, y - this.y)
     }
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -166,10 +170,8 @@ class Chunk(
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
         terrains[x - this.x][y - this.y] = type
-        if (!generating) {
-            updateOpaque(x - this.x, y - this.y)
-            updateWalkable(x - this.x, y - this.y)
-        }
+        updateOpaque(x - this.x, y - this.y)
+        updateWalkable(x - this.x, y - this.y)
     }
 
     fun getTerrainData(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -203,14 +205,15 @@ class Chunk(
     } else { false }
 
     private fun updateWalkable(x: Int, y: Int): Boolean {
+        if (generating) return Terrain.get(terrains[x][y]).isWalkable()
         if (boundsCheck(x + this.x, y + this.y)) {
-            var v = Terrain.get(terrains[x][y]).isWalkable()
-            if (!v) {
+            var v = (level.actorAt(x + this.x,y + this.y) == null) && Terrain.get(terrains[x][y]).isWalkable()
+            if (v) {
                 var thingBlocking = false
                 things[x][y].contents.forEach { thing ->
                     thingBlocking = thingBlocking || thing.isBlocking()
                 }
-                v = thingBlocking
+                v = !thingBlocking
             }
             walkableCache[x][y] = v
             return v
@@ -252,6 +255,7 @@ class Chunk(
     } else { true }
 
     private fun updateOpaque(x: Int, y: Int): Boolean {
+        if (generating) return Terrain.get(terrains[x][y]).isOpaque()
         if (boundsCheck(x + this.x, y + this.y)) {
             var v = Terrain.get(terrains[x][y]).isOpaque()
             if (!v) {

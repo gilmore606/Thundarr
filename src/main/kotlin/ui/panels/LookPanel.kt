@@ -1,5 +1,6 @@
 package ui.panels
 
+import actors.Player
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.GameScreen
 import things.Thing
@@ -38,7 +39,7 @@ object LookPanel : ShadedPanel() {
 
     private fun drawWrappedText(text: List<String>, x0: Int, y0: Int) {
         text.forEachIndexed { n, line ->
-            drawString(line, x0, y0 + n * 20)
+            drawString(line, x0, y0 + n * 20, GameScreen.fontColorDull, GameScreen.smallFont)
         }
     }
 
@@ -47,7 +48,7 @@ object LookPanel : ShadedPanel() {
         var remaining = text
         var nextLine = ""
         var linePixelsLeft = (width - padding * 2)
-        val spaceWidth = GlyphLayout(GameScreen.font, " ").width.toInt()
+        val spaceWidth = GlyphLayout(GameScreen.smallFont, " ").width.toInt()
         while (remaining.isNotEmpty() || remaining == " ") {
             // get next word
             val space = remaining.indexOf(' ')
@@ -60,7 +61,7 @@ object LookPanel : ShadedPanel() {
                 remaining = ""
             }
             if (word != " ") {
-                val wordWidth = GlyphLayout(GameScreen.font, word).width.toInt()
+                val wordWidth = GlyphLayout(GameScreen.smallFont, word).width.toInt()
                 if (nextLine == "" || wordWidth <= linePixelsLeft) {
                     nextLine += word + " "
                     linePixelsLeft -= wordWidth + spaceWidth
@@ -115,7 +116,8 @@ object LookPanel : ShadedPanel() {
         }
         val pos = showPos()
         var e: Entity? = null
-        App.level.actorAt(pos.x, pos.y)?.also { e = it } ?: run {
+        val actor = App.level.actorAt(pos.x, pos.y)
+        if (actor != null && actor !is Player) e = actor else {
             val things = App.level.thingsAt(pos.x, pos.y)
             if (things.isNotEmpty()) {
                 e = things[0]
