@@ -39,7 +39,9 @@ class Director(val level: Level) {
     }
 
     fun detachActor(actor: Actor) {
-        actors.remove(actor)
+        KtxAsync.launch {
+            actors.remove(actor)
+        }
     }
 
     // Insert actor into the queue in the correct order based on juice and speed.

@@ -41,16 +41,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         contents.forEach { it.onRestore(this) }
     }
 
-    fun moveTo(level: Level, x: Int, y: Int) {
+    fun moveTo(level: Level?, x: Int, y: Int) {
         val oldX = this.xy.x
         val oldY = this.xy.y
         val oldLevel = this.level
         this.xy.x = x
         this.xy.y = y
-        oldLevel?.onActorMovedFrom(this, oldX, oldY, level)
+        oldLevel?.onActorMovedFrom(this, oldX, oldY)
         if (oldLevel != level) oldLevel?.director?.detachActor(this)
-        level.onActorMovedTo(this, x, y)
-        if (oldLevel != level) level.director.attachActor(this)
+        level?.onActorMovedTo(this, x, y)
+        if (oldLevel != level) level?.director?.attachActor(this)
         onMove()
     }
 

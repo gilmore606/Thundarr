@@ -26,6 +26,13 @@ class CellContainer : ThingHolder {
             thing.onRestore(this)
         }
     }
+
+    fun unload() {
+        contents.forEach { it.holder = null }
+        level = null
+        contents.clear()
+    }
+
     override fun add(thing: Thing) {
         contents.add(thing)
         if (level == null) log.info("adding thing to cell $xy but level is null!")

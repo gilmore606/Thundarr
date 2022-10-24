@@ -2,10 +2,13 @@ package world
 
 import actors.Actor
 import actors.Player
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
@@ -129,7 +132,24 @@ class Chunk(
             lightSourceLocations.forEach { (it, _) -> add(it) }
         }.forEach { level.removeLightSource(it) }
 
-        ChunkLoader.saveWorldChunk(this)
+        ChunkLoader.saveWorldChunk(this) { finishUnload() }
+    }
+
+    // Null out references and so forth.
+    private fun finishUnload() {
+        generating = true
+        KtxAsync.launch {
+            savedActors.forEach { it.level = null }
+            savedActors.clear()
+            delay(500)
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    things[x][y].unload()
+                    lights[x][y].clear()
+                }
+            }
+            lightSourceLocations.clear()
+        }
     }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)

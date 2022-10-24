@@ -97,7 +97,7 @@ class SaveState(
         } else throw RuntimeException("Could not find and load chunk at $x $y!")
 
 
-    fun putWorldChunk(chunk: Chunk) {
+    fun putWorldChunk(chunk: Chunk, callback: ()->Unit) {
         transaction {
             WorldChunksTable.deleteWhere { (x eq chunk.x) and (y eq chunk.y) }
             WorldChunksTable.insert {
@@ -105,6 +105,7 @@ class SaveState(
                 it[y] = chunk.y
                 it[data] = toCompressed(chunk)
             }
+            callback()
         }
     }
 

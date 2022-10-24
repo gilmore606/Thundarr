@@ -43,10 +43,10 @@ object ChunkLoader {
         }
     }
 
-    fun saveWorldChunk(chunk: Chunk) {
+    fun saveWorldChunk(chunk: Chunk, callback: ()->Unit) {
         jobs.add(coroutineScope.launch {
             log.debug("ChunkLoader saving chunk ${chunk.x} ${chunk.y}")
-            App.save.putWorldChunk(chunk)
+            App.save.putWorldChunk(chunk, callback)
         })
     }
 

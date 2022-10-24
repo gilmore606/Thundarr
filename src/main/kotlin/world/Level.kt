@@ -192,11 +192,9 @@ sealed class Level {
                 }
             }
         }
-
-
     }
 
-    fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {
+    fun onActorMovedFrom(actor: Actor, x: Int, y: Int) {
         chunkAt(x, y)?.onRemoveActor(x, y, actor)
         actor.light()?.also { removeLightSource(actor) }
     }
