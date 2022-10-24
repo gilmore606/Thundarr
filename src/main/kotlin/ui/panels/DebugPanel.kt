@@ -14,8 +14,9 @@ object DebugPanel : ShadedPanel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = padding
-        y = padding
+        super.onResize(width, height)
+        x = xMargin
+        y = yMargin
     }
 
     override fun drawText() {

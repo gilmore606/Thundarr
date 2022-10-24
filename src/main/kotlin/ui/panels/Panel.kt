@@ -8,6 +8,9 @@ import render.GameScreen
 import render.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
+import util.Dice
+import world.LevelKeeper
+import java.lang.Integer.max
 
 abstract class Panel {
 
@@ -24,7 +27,16 @@ abstract class Panel {
     protected var shadowOffset = 10
     protected var borderWidth = 2
 
-    open fun onResize(width: Int, height: Int) { }
+    var dismissed = false
+
+    open fun onResize(width: Int, height: Int) {
+        xMargin = 2 + (max(0, width - 800) / 70)
+        yMargin = 2 + (max(0, height - 400) / 60)
+    }
+
+    // Amount of space to leave at window edges, scaled by window size.
+    protected var xMargin = 16
+    protected var yMargin = 16
 
     open fun onRender(delta: Float) { }
 
@@ -56,6 +68,8 @@ abstract class Panel {
     open fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean { return false }
 
     abstract fun drawText()
+
+    protected fun measure(text: String) = GlyphLayout(GameScreen.font, text).width.toInt()
 
     protected fun drawString(text: String, x: Int, y: Int, color: Color = GameScreen.fontColor, font: BitmapFont = GameScreen.font) {
         font.color = color

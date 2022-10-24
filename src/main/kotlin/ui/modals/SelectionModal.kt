@@ -37,7 +37,7 @@ abstract class SelectionModal(
     abstract fun doSelect()
 
     protected fun drawOptionText(text: String, index: Int, spaceForIcon: Boolean = false) {
-        drawString(text, padding + (if (spaceForIcon) 24 else 0), headerPad + spacing * index,
+        drawString(text, padding + (if (spaceForIcon) 28 else 0), headerPad + spacing * index - 2,
             if (index == selection) GameScreen.fontColorBold else GameScreen.fontColor)
     }
 

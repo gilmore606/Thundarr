@@ -3,7 +3,7 @@ package ui.modals
 import render.tilesets.Glyph
 import ui.input.Mouse
 
-class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN") {
+class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN", Position.CENTER_LOW) {
 
     override fun drawBackground() {
         super.drawBackground()

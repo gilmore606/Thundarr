@@ -23,8 +23,9 @@ object LookPanel : ShadedPanel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = width - (this.width + padding * 2)
-        y = padding + if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding) else 0
+        super.onResize(width, height)
+        x = width - (this.width) - xMargin
+        y = yMargin + if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding) else 0
     }
 
     override fun drawText() {

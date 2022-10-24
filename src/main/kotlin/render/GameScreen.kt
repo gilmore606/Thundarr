@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20.*
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
@@ -68,10 +69,14 @@ object GameScreen : KtxScreen {
     val fontColorDull = Color(0.7f, 0.7f, 0.4f, 0.6f)
     val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
-    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/alegreyaSans.ttf"))
+    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
             borderWidth = 1.5f
+            kerning = true
+            genMipMaps = true
+            minFilter = TextureFilter.MipMapNearestNearest
+            magFilter = TextureFilter.MipMapNearestNearest
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
@@ -80,6 +85,10 @@ object GameScreen : KtxScreen {
             size = titleFontSize
             borderWidth = 3f
             spaceX = -2
+            kerning = true
+            genMipMaps = true
+            minFilter = TextureFilter.MipMapNearestNearest
+            magFilter = TextureFilter.MipMapNearestNearest
             color = Color(1f, 0.9f, 0.2f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
@@ -88,11 +97,15 @@ object GameScreen : KtxScreen {
             size = subTitleFontSize
             borderWidth = 2f
             spaceX = -2
-            color = Color(0.9f, 0.8f, 0.15f, 1f)
+            kerning = true
+            genMipMaps = true
+            minFilter = TextureFilter.MipMapNearestNearest
+            magFilter = TextureFilter.MipMapNearestNearest
+            color = Color(1f, 0.9f, 0.2f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
 
-    val panels: MutableList<Panel> = mutableListOf()
+    val panels: ArrayList<Panel> = ArrayList()
     var topModal: Modal? = null
 
     var cursorPosition: XY? = null
@@ -100,10 +113,10 @@ object GameScreen : KtxScreen {
 
     private val pov
         get() = App.level.pov
-    val lastPov = XY(0,0)
+    private val lastPov = XY(0,0)
 
-    private const val cameraPull = 0.35f
-    private const val cameraAccel = 20f
+    private const val cameraPull = 0.19f
+    private const val cameraAccel = 25f
 
     var scrollX = 0f
     var scrollY = 0f
@@ -195,7 +208,21 @@ object GameScreen : KtxScreen {
     override fun render(delta: Float) {
         animateCamera(delta)
         App.level.updateForRender()
-        panels.forEach { it.onRender(delta) }
+        var dismissedPanel: Panel? = null
+        var topModalFound: Modal? = null
+        panels.forEach {
+            it.onRender(delta)
+            if (it.dismissed) dismissedPanel = it
+            else if (it is Modal) topModalFound = it
+        }
+        dismissedPanel?.also {
+            panels.remove(it)
+            topModal = topModalFound
+            if (topModal == null) {
+                this@GameScreen.scrollTargetX = 0f
+            }
+        }
+
         drawEverything()
 
         LevelKeeper.runActorQueues()
@@ -374,18 +401,18 @@ object GameScreen : KtxScreen {
     }
 
     fun dismissModal(modal: Modal) {
-        panels.remove(modal)
-        if (topModal == modal) {
-            topModal = null
-            panels.forEach { panel ->
-                if (panel is Modal) {
-                    topModal = panel
+            panels.remove(modal)
+            if (topModal == modal) {
+                topModal = null
+                panels.forEach { panel ->
+                    if (panel is Modal) {
+                        topModal = panel
+                    }
                 }
             }
-        }
-        if (topModal == null) {
-            this.scrollTargetX = 0f
-        }
+            if (topModal == null) {
+                this@GameScreen.scrollTargetX = 0f
+            }
     }
 
     private fun drawEverything() {

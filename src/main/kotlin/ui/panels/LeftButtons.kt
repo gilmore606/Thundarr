@@ -54,8 +54,9 @@ object LeftButtons : Panel() {
     }
 
     override fun onResize(width: Int, height: Int) {
+        super.onResize(width, height)
         yPadding = (height / 4)
-        this.x = xPadding
+        this.x = xPadding + xMargin
         this.y = yPadding
         this.height = height / 2
         this.width = iconSize * 2

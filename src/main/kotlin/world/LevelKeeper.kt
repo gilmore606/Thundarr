@@ -2,6 +2,7 @@ package world
 
 import kotlinx.coroutines.delay
 import util.log
+import java.util.concurrent.ConcurrentSkipListSet
 
 object LevelKeeper {
 
@@ -9,11 +10,17 @@ object LevelKeeper {
         val level: Level,
         val addedAtMs: Long,
         var lastAccessedAt: Long
-    )
+    ) : Comparable<LiveLevel> {
+        override fun compareTo(other: LiveLevel): Int {
+            if (other.level == this.level) return 0
+            else if (other.addedAtMs > this.addedAtMs) return 1
+            else return -1
+        }
+    }
 
     private const val maxLevelsToKeep = 8
 
-    val liveLevels = mutableSetOf<LiveLevel>()
+    val liveLevels = ConcurrentSkipListSet<LiveLevel>()
 
     fun forEachLiveLevel(doThis: (Level)->Unit) {
         liveLevels.forEach { liveLevel ->

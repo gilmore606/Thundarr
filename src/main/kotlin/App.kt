@@ -135,6 +135,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
+        GameScreen.addModal(LoadingModal("The moon...it's breaking in half!"))
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.eraseAll()
@@ -258,7 +259,7 @@ object App : KtxGame<Screen>() {
                 "Quit", "Cancel"
             ) { yes ->
                 if (yes) {
-                    GameScreen.addModal(SavingModal())
+                    GameScreen.addModal(LoadingModal("Recording your deeds..."))
                     KtxAsync.launch {
                         delay(200)
                         saveStateAndExitProcess()

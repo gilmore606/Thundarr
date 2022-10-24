@@ -1,6 +1,6 @@
 package ui.modals
 
-class ControlsModal : Modal(285, 350, "- debug controls -") {
+class ControlsModal : Modal(330, 360, "- debug controls -") {
 
     override fun drawModalText() {
         drawString("F1 : toggle debug vision", 25, 80)

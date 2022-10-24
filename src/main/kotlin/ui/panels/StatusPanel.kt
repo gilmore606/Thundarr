@@ -10,8 +10,9 @@ object StatusPanel : ShadedPanel() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        x = width - (this.width + padding * 2)
-        y = padding
+        super.onResize(width, height)
+        x = width - (this.width) - xMargin
+        y = yMargin
     }
 
     override fun drawText() {

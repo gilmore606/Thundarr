@@ -15,11 +15,11 @@ abstract class Modal(
 ) : Panel() {
     enum class Position { LEFT, CENTER_LOW, CURSOR }
 
-    private var dismissible = true
+    var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
     protected var animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
-    protected var dismissOnClickOutside = true
+    var dismissOnClickOutside = true
 
     init {
         this.width = width
@@ -28,7 +28,7 @@ abstract class Modal(
 
     override fun onResize(width: Int, height: Int) {
         if (position == Position.LEFT) {
-            this.x = 40
+            this.x = 40 + xMargin
         } else {
             this.x = (width - this.width) / 2
         }
@@ -68,7 +68,7 @@ abstract class Modal(
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height) {
-            if (dismissOnClickOutside) {
+            if (dismissOnClickOutside && dismissible) {
                 dismiss()
                 return true
             }
@@ -77,7 +77,7 @@ abstract class Modal(
     }
 
     protected fun dismiss() {
-        GameScreen.dismissModal(this)
+        dismissed = true
     }
 
     protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
