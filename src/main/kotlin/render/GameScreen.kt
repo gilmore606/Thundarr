@@ -72,7 +72,8 @@ object GameScreen : KtxScreen {
     val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
-            borderWidth = 1.5f
+            borderWidth = 2.3f
+            spaceX = -1
             kerning = true
             genMipMaps = true
             minFilter = TextureFilter.MipMapNearestNearest
