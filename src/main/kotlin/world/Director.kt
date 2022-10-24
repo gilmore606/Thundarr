@@ -1,10 +1,13 @@
 package world
 
 import actors.Actor
+import actors.NPC
 import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import things.Temporal
+import util.XY
+import util.distanceBetween
 import util.log
 
 // A delegate class for Level to manage actors in time and space.
@@ -13,6 +16,8 @@ class Director(val level: Level) {
 
     val actors = mutableListOf<Actor>()
     private val actorQueue = mutableListOf<Actor>()
+    private val nonActorQueue = mutableListOf<Actor>()
+
     private val temporals = mutableListOf<Temporal>()
 
     private var playerTimePassed = 0f
@@ -51,27 +56,36 @@ class Director(val level: Level) {
         toQueue.add(actor)
     }
 
-    fun getPlayer(): Player = actors.firstOrNull { it is Player } as Player
-
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
         return actors.filter {
             it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
         }.map { detachActor(it) ; it }.filter { it !is Player }.toSet()
     }
 
+    fun wakeNPCsNear(xy: XY) {
+        actors.forEach {
+            if (it is NPC) {
+                if (it.awareness == NPC.Awareness.HIBERNATED && distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.awareRadius) {
+                    it.unHibernate()
+                }
+            }
+        }
+    }
+
     // Execute actors' actions until it's the player's turn.
     fun runQueue(level: Level) {
+
         var done = false
         actorQueue.clear()
-        actorQueue.addAll(actors)
+        nonActorQueue.clear()
+        actors.forEach { if (it.isActing()) actorQueue.add(it) else nonActorQueue.add(it) }
+
         while (actorQueue.isNotEmpty() && !done) {
-            if (actorQueue[0].juice > 0f || (actorQueue[0] is Player && actorQueue[0].queuedActions.isNotEmpty())) {
-                log.debug("Running queue for level ${level.levelId()}")
+            if (actorQueue[0].canAct()) {
                 val actor = actorQueue.removeAt(0)
                 actor.nextAction()?.also { action ->
 
                     val duration = action.duration()
-                    log.debug("Executing $action for $actor")
                     action.execute(actor, level)
 
                     when (actor) {
@@ -101,8 +115,10 @@ class Director(val level: Level) {
                 done = true
             }
         }
+
         actors.clear()
-        actors.addAll(actorQueue)
+        actorQueue.forEach { actors.add(it) }
+        nonActorQueue.forEach { actors.add(it) }
     }
 
     // Advance world time for all actors.

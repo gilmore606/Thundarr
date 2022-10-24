@@ -1,7 +1,9 @@
 package actors
 
+import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.Dice
 
 @Serializable
 class Ox : NPC() {
@@ -11,4 +13,10 @@ class Ox : NPC() {
 
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
 
+    override fun pickAction(): Action {
+        if (Dice.chance(0.5f)) {
+            wander()?.also { return it }
+        }
+        return super.pickAction()
+    }
 }

@@ -179,22 +179,24 @@ sealed class Level {
             addLightSource(x, y, actor)
         }
         chunkAt(x, y)?.onAddActor(x, y, actor)
+        thingsAt(x, y).forEach { it.onWalkedOnBy(actor) }
 
-        thingsAt(x, y).apply {
-            if (isNotEmpty()) {
-                val thingList = mutableListOf<String>()
-                forEach {
-                    it.onWalkedOnBy(actor)
-                    if (it is Portable) {
-                        thingList.add(it.name().aOrAn())
+        if (actor is Player) {
+            setPov(actor.xy.x, actor.xy.y)
+            director.wakeNPCsNear(actor.xy)
+            thingsAt(x, y).apply {
+                if (isNotEmpty()) {
+                    val thingList = mutableListOf<String>()
+                    forEach { if (it is Portable) { thingList.add(it.name().aOrAn()) } }
+                    if (thingList.isNotEmpty()) {
+                        val things = thingList.joinToString(", ")
+                        Console.say("You see $things here.")
                     }
-                }
-                if (actor is Player && thingList.isNotEmpty()) {
-                    val things = thingList.joinToString(", ")
-                    Console.say("You see $things here.")
                 }
             }
         }
+
+
     }
 
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {

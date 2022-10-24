@@ -14,10 +14,8 @@ class Player : Actor() {
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A stalwart blond barbarian in a leather tunic."
 
+    override fun canAct() = queuedActions.isNotEmpty()
+    override fun isActing() = true
     override fun defaultAction(): Action? = null
 
-    override fun moveTo(level: Level, x: Int, y: Int) {
-        super.moveTo(level, x, y)
-        App.level.setPov(x, y)
-    }
 }
