@@ -95,13 +95,12 @@ object LookPanel : ShadedPanel() {
         }
     }
 
-    override fun drawThings() {
+    override fun drawEntities() {
         entity?.also { entity ->
-            if (entity is Thing) {
-                val x0 = x + padding - 10
-                val y0 = y + padding - 12
-                thingBatch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, thingBatch.getTextureIndex(entity.glyph()))
-            }
+            val x0 = x + padding - 10
+            val y0 = y + padding - 12
+            entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
+                entity.uiBatch().getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0))
         }
     }
 
@@ -116,9 +115,11 @@ object LookPanel : ShadedPanel() {
         }
         val pos = showPos()
         var e: Entity? = null
-        val things = App.level.thingsAt(pos.x, pos.y)
-        if (things.isNotEmpty()) {
-            e = things[0]
+        App.level.actorAt(pos.x, pos.y)?.also { e = it } ?: run {
+            val things = App.level.thingsAt(pos.x, pos.y)
+            if (things.isNotEmpty()) {
+                e = things[0]
+            }
         }
 
         return e

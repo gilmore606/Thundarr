@@ -1,6 +1,7 @@
 package ui.input
 
 import App
+import actors.Ox
 import actors.actions.Move
 import com.badlogic.gdx.Input
 import kotlinx.coroutines.delay
@@ -118,6 +119,10 @@ object Keyboard : KtxInputAdapter {
                     GameScreen.removePanel(DebugPanel)
                 }
             }
+            Input.Keys.F6 -> {
+                Ox().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
+            }
+
             else -> { lastKey = -1 }
         }
     }

@@ -2,6 +2,7 @@ package render.tileholders
 
 import render.tilesets.TileSet
 import world.Level
+import kotlin.math.abs
 
 open class AnimatedTile(
     set: TileSet
@@ -17,7 +18,7 @@ open class AnimatedTile(
 
     override fun getTextureIndex(level: Level?, x: Int, y: Int): Int {
         level?.also { level ->
-            val frame = (System.currentTimeMillis() / frameMs + level.getRandom(x,y)).toInt() % frames.size
+            val frame = abs((System.currentTimeMillis() / frameMs + level.getRandom(x,y)).toInt()) % frames.size
             return indexFromCoords(frames[frame].first, frames[frame].second)
         }
         return 0

@@ -1,5 +1,6 @@
 package world
 
+import render.QuadBatch
 import render.tilesets.Glyph
 import util.XY
 import util.aOrAn
@@ -20,6 +21,8 @@ interface Entity {
     }
 
     fun glyph(): Glyph
+    fun glyphBatch(): QuadBatch
+    fun uiBatch(): QuadBatch
     fun name(): String
     fun dname() = "the " + name()
     fun iname() = name().aOrAn()

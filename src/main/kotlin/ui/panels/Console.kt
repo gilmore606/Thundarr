@@ -27,7 +27,7 @@ object Console : Panel() {
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
     private const val burstMax = 2f
-    private const val dimDelayMs = 2000L
+    private const val dimDelayMs = 1200L
     private const val dimLevel = 0.5f
     private var burst = 1f
     private var burstFloor = 1f

@@ -224,6 +224,8 @@ sealed class Level {
 
     open fun unload() { }
 
+    fun actorAt(x: Int, y: Int) = director.actors.firstOrNull { it.xy.x == x && it.xy.y == y }
+
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")

@@ -51,12 +51,12 @@ object GameScreen : KtxScreen {
     private val uiTileSet = UITileSet()
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
-    private val mobBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
-    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
+    val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
+    val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
     private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
-    private val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
-    private val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
+    val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
+    val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
@@ -183,9 +183,9 @@ object GameScreen : KtxScreen {
     private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
-        mobBatch.addTileQuad(
+        actorBatch.addTileQuad(
             tx - pov.x, ty - pov.y, tileStride,
-            mobBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, lightCache[lx][ly], aspectRatio)
+            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, lightCache[lx][ly], aspectRatio)
     }
 
     override fun show() {
@@ -447,7 +447,7 @@ object GameScreen : KtxScreen {
             draw()
         }
 
-        mobBatch.apply {
+        actorBatch.apply {
             clear()
             App.level.forEachActorToRender(renderActor)
             draw()
@@ -468,26 +468,15 @@ object GameScreen : KtxScreen {
 
         uiBatch.apply {
             clear()
+            uiThingBatch.clear()
+            uiActorBatch.clear()
             panels.forEach { panel ->
                 panel.renderBackground(this)
+                panel.renderEntities()
             }
             draw()
-        }
-
-        uiThingBatch.apply {
-            clear()
-            panels.forEach { panel ->
-                panel.renderThings(this)
-            }
-            draw()
-        }
-
-        uiActorBatch.apply {
-            clear()
-            panels.forEach { panel ->
-                panel.renderActors(this)
-            }
-            draw()
+            uiThingBatch.draw()
+            uiActorBatch.draw()
         }
 
         textBatch.apply {
@@ -520,7 +509,7 @@ object GameScreen : KtxScreen {
     override fun dispose() {
         terrainBatch.dispose()
         overlapBatch.dispose()
-        mobBatch.dispose()
+        actorBatch.dispose()
         thingBatch.dispose()
         uiBatch.dispose()
         uiWorldBatch.dispose()

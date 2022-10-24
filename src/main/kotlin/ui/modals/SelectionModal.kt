@@ -5,6 +5,7 @@ import kotlinx.coroutines.selects.select
 import render.GameScreen
 import render.tilesets.Glyph
 import ui.input.Mouse
+import world.Entity
 
 abstract class SelectionModal(
     width: Int, height: Int, title: String? = null, position: Modal.Position = Position.LEFT,
@@ -41,10 +42,10 @@ abstract class SelectionModal(
             if (index == selection) GameScreen.fontColorBold else GameScreen.fontColor)
     }
 
-    protected fun drawOptionIcon(icon: Glyph, index: Int) {
+    protected fun drawOptionIcon(entity: Entity, index: Int) {
         val x0 = this.x + padding - 10
         val y0 = this.y + headerPad + spacing * index - 12
-        thingBatch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, thingBatch.getTextureIndex(icon))
+        entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32, entity.uiBatch().getTextureIndex(entity.glyph()))
     }
 
     protected fun drawOptionShade() {

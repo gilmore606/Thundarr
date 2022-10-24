@@ -8,16 +8,12 @@ import render.GameScreen
 import render.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
-import util.Dice
-import world.LevelKeeper
 import java.lang.Integer.max
 
 abstract class Panel {
 
     private lateinit var textBatch: SpriteBatch
     protected lateinit var boxBatch: QuadBatch
-    protected lateinit var thingBatch: QuadBatch
-    protected lateinit var actorBatch: QuadBatch
 
     var x = 0
     var y = 0
@@ -50,18 +46,12 @@ abstract class Panel {
         this.drawBackground()
     }
 
-    fun renderThings(batch: QuadBatch) {
-        this.thingBatch = batch
-        this.drawThings()
-    }
-
-    fun renderActors(batch: QuadBatch) {
-        this.actorBatch = batch
-        this.drawActors()
+    fun renderEntities() {
+        this.drawEntities()
     }
 
     open fun drawBackground() { }
-    open fun drawThings() { }
+    open fun drawEntities() { }
     open fun drawActors() { }
 
     open fun mouseMovedTo(screenX: Int, screenY: Int) { }

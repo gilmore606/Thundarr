@@ -5,6 +5,8 @@ import actors.actions.Equip
 import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.GameScreen
+import render.QuadBatch
 import things.*
 import util.*
 import world.Entity
@@ -12,6 +14,10 @@ import world.Level
 
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
+
+    open fun speed() = 1f
+    open fun visualRange() = 22f
+
 
     override val xy = XY(0,0)  // position in current level
     var juice = 0f // How many turns am I owed?
@@ -24,17 +30,17 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     @Transient
     val gear = mutableMapOf<Gear.Slot, Gear?>()
 
-    open fun speed() = 1f
-    open fun visualRange() = 22f
 
     override fun level() = level
     override fun xy() = xy
+    override fun glyphBatch() = GameScreen.actorBatch
+    override fun uiBatch() = GameScreen.uiActorBatch
 
     fun onRestore() {
         contents.forEach { it.onRestore(this) }
     }
 
-    open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level?) {
+    open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level? = null) {
         this.xy.x = x
         this.xy.y = y
         fromLevel?.onActorMovedFrom(this, x, y, level)

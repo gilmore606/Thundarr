@@ -4,6 +4,7 @@ import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
+import render.QuadBatch
 import render.tilesets.Glyph
 import util.LightColor
 import util.XY
@@ -46,6 +47,8 @@ sealed class Thing : Entity {
 
     override fun level() = holder?.level
     override fun xy() = holder?.xy
+    override fun glyphBatch() = GameScreen.thingBatch
+    override fun uiBatch() = GameScreen.uiThingBatch
 
     open fun listName() = name().aOrAn()
 

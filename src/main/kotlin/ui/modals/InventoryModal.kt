@@ -71,11 +71,11 @@ class InventoryModal(
         }
     }
 
-    override fun drawThings() {
+    override fun drawEntities() {
         if (!isAnimating()) {
             var n = 0
             grouped.forEach {
-                drawOptionIcon(it.first().glyph(), n)
+                drawOptionIcon(it.first(), n)
                 n++
             }
         }

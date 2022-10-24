@@ -114,6 +114,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun restoreState() {
+        GameScreen.addModal(LoadingModal("Returning to the wasteland..."))
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
 
