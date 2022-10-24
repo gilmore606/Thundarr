@@ -1,0 +1,89 @@
+package things
+
+import actors.Actor
+import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
+import util.aOrAn
+
+@Serializable
+sealed class Gear : Portable() {
+
+    enum class Slot(val duration: Float, val where: String, val verb: String, val unverb: String) {
+        WEAPON(0.5f, "as weapon", "wield", "put away"),
+        SECONDARY(0.5f, "as secondary", "ready", "unready"),
+        HEAD(0.6f, "on head", "wear", "remove"),
+        TORSO(1.5f, "on torso", "wear", "remove"),
+        LEGS(2.0f, "on legs", "wear", "remove"),
+        FEET(2.0f, "on feet", "wear", "remove")
+    }
+
+    var equipped = false
+    abstract val slot: Slot
+
+    open fun equipSelfMsg() = "You put on your " + name() + "."
+    open fun equipOtherMsg(actor: Actor) = actor.name() + " puts on their " + name() + "."
+    open fun unequipSelfMsg() = "You take off your " + name() + "."
+    open fun unequipOtherMsg(actor: Actor) = actor.name() + " takes off their " + name() + "."
+
+    override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {
+        this.equipped = false
+        if (from is Actor && from != to && from.gear[slot] == this) {
+            from.gear[slot] = null
+        }
+    }
+
+    override fun onRestore(holder: ThingHolder) {
+        super.onRestore(holder)
+        if (equipped && holder is Actor) {
+            holder.gear[slot] = this
+        }
+    }
+
+    override fun uses(): Set<Use> {
+        val uses = mutableSetOf<Use>()
+        val current = App.player.equippedOn(slot)
+        if (current == this) {
+            uses.add(
+                Use(slot.unverb + " " + this.name(), 0f,
+                    canDo = { actor -> this in actor.contents },
+                    toDo = { actor, level ->
+                        actor.unequipGear(this)
+                    })
+            )
+        } else if (current != null) {
+            uses.add(
+                Use(current.slot.verb + " " + current.name() + " and " + slot.verb + " " + name(), 0f,
+                    canDo = { actor -> this in actor.contents },
+                    toDo = { actor, level ->
+                        actor.equipGear(this)
+                    })
+            )
+        } else {
+            uses.add(
+                Use(slot.verb + " " + this.name() + " " + slot.where, 0f,
+                    canDo = { actor -> this in actor.contents },
+                    toDo = { actor, level ->
+                        actor.equipGear(this)
+                    }
+                )
+            )
+        }
+        return uses
+    }
+}
+
+@Serializable
+sealed class Weapon : Gear() {
+    override val slot = Slot.WEAPON
+    override fun equipSelfMsg() = "You ready your " + name() + " for action."
+    override fun unequipSelfMsg() = "You return your " + name() + " to its sheath."
+    override fun equipOtherMsg(actor: Actor) = actor.name() + " readies " + this.name().aOrAn() + "."
+    override fun unequipOtherMsg(actor: Actor) = actor.name() + " sheathes their " + this.name() + "."
+}
+
+@Serializable
+class Axe : Weapon() {
+    override fun glyph() = Glyph.AXE
+    override fun name() = "axe"
+    override val kind = Kind.AXE
+}

@@ -28,7 +28,7 @@ class InventoryModal(
     }
 
     private fun adjustHeight() {
-        height = headerPad + max(1, thingHolder.byKind().size) * 20 + padding * 2
+        height = headerPad + max(1, thingHolder.byKind().size) * spacing + padding * 2
         maxSelection = thingHolder.byKind().size - 1
     }
 

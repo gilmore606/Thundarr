@@ -1,13 +1,12 @@
 package actors
 
 import actors.actions.Action
+import actors.actions.Equip
+import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
-import things.LightSource
-import things.Temporal
-import things.Thing
-import things.ThingHolder
+import things.*
 import ui.panels.ConsolePanel
 import util.*
 import world.Entity
@@ -27,8 +26,11 @@ sealed class Actor(
 
     override val contents = mutableListOf<Thing>()
 
+    @Transient
+    val gear = mutableMapOf<Gear.Slot, Gear?>()
+
     fun onRestore() {
-        contents.forEach { it.holder = this }
+        contents.forEach { it.onRestore(this) }
     }
 
     open fun moveTo(level: Level, x: Int, y: Int, fromLevel: Level?) {
@@ -98,4 +100,19 @@ sealed class Actor(
     }
 
     override fun advanceTime(delta: Float) { }
+
+    fun equippedOn(slot: Gear.Slot): Gear? = gear[slot]
+
+    fun equipGear(gear: Gear) {
+        equippedOn(gear.slot)?.also { current ->
+            queue(Unequip(current))
+        }
+        queue(Equip(gear))
+    }
+
+    fun unequipGear(gear: Gear) {
+        if (gear.equipped) {
+            queue(Unequip(gear))
+        }
+    }
 }

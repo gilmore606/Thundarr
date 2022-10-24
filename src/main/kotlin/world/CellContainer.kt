@@ -21,10 +21,7 @@ class CellContainer : ThingHolder {
         xy.y = y
         this.level = level
         contents.forEach { thing ->
-            thing.holder = this
-            if (thing is LightSource) {
-                level.dirtyLights[thing] = xy
-            }
+            thing.onRestore(this)
         }
     }
     override fun add(thing: Thing) {

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.ConsolePanel
 import util.LightColor
-import world.Level
+import world.CellContainer
 import java.lang.Float.max
 
 
@@ -18,6 +18,13 @@ interface LightSource {
 sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
     var active = true
+
+    override fun onRestore(holder: ThingHolder) {
+        super.onRestore(holder)
+        if (light() != null && holder is CellContainer) {
+            holder.level?.dirtyLights?.set(this, holder.xy)
+        }
+    }
 
     override fun light(): LightColor? = lightColor
 

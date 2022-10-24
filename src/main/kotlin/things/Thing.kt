@@ -45,11 +45,19 @@ sealed class Thing : Entity {
 
     open fun onWalkedOnBy(actor: Actor) { }
 
+    open fun onRestore(holder: ThingHolder) {
+        this.holder = holder
+    }
+
     fun moveTo(to: ThingHolder?) {
+        val from = holder
         holder?.remove(this)
         this.holder = to
         to?.add(this)
+        onMoveTo(from, to)
     }
+
+    open fun onMoveTo(from: ThingHolder?, to: ThingHolder?) { }
 
 }
 
@@ -64,11 +72,4 @@ sealed class Portable : Thing() {
 sealed class Obstacle : Thing() {
     override fun isBlocking() = true
     override fun isPortable() = false
-}
-
-@Serializable
-class Axe : Portable() {
-    override fun glyph() = Glyph.AXE
-    override fun name() = "axe"
-    override val kind = Kind.AXE
 }
