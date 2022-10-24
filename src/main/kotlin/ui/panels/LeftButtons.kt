@@ -69,7 +69,8 @@ object LeftButtons : Panel() {
         if (contraction > 0) return
         buttons.forEachIndexed { n, button ->
             if (hovered == n) {
-                drawString(button.tip, iconSizeHovered + 18, n * spacing + iconSizeHovered / 2 - 8, GameScreen.fontColorBold)
+                drawString(button.tip, iconSizeHovered + 16, n * spacing + iconSizeHovered / 2 - 11,
+                    GameScreen.fontColorBold, GameScreen.subTitleFont)
             }
         }
 

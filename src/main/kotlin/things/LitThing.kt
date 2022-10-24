@@ -19,6 +19,8 @@ sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
     var active = true
 
+    override fun listName() = if (active) super.listName() + " (lit)" else super.listName()
+
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)
         if (light() != null && holder is CellContainer) {

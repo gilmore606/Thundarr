@@ -64,6 +64,7 @@ object GameScreen : KtxScreen {
 
     const val fontSize = 16
     const val titleFontSize = 24
+    const val subTitleFontSize = 20
     val fontColorDull = Color(0.7f, 0.7f, 0.4f, 0.6f)
     val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
@@ -80,6 +81,14 @@ object GameScreen : KtxScreen {
             borderWidth = 3f
             spaceX = -2
             color = Color(1f, 0.9f, 0.2f, 1f)
+            borderColor = Color(0f, 0f, 0f, 0.8f)
+        })
+    val subTitleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/worldOfWater.ttf"))
+        .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+            size = subTitleFontSize
+            borderWidth = 2f
+            spaceX = -2
+            color = Color(0.9f, 0.8f, 0.15f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
 

@@ -11,7 +11,7 @@ abstract class SelectionModal(
     default: Int =  -1
 ) : Modal(width, height, title, position) {
 
-    protected var selection = default
+    var selection = default
     protected var maxSelection = 1
 
     protected var headerPad = 70
@@ -59,12 +59,13 @@ abstract class SelectionModal(
             Input.Keys.NUMPAD_2, Input.Keys.DOWN, Input.Keys.X -> { selectNext() }
             Input.Keys.NUMPAD_8, Input.Keys.UP, Input.Keys.W -> { selectPrevious() }
             Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER, Input.Keys.S, Input.Keys.NUMPAD_6 -> {
-                doSelect()
+                if (selection >= 0 ) doSelect()
             }
         }
     }
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (button != Mouse.Button.LEFT) return false
         if (super.mouseClicked(screenX, screenY, button)) return true
         mouseToOption(screenX, screenY)?.also { selection = it ; doSelect(); return true }
         return false

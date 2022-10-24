@@ -25,6 +25,8 @@ sealed class Gear : Portable() {
     open fun unequipSelfMsg() = "You take off your " + name() + "."
     open fun unequipOtherMsg(actor: Actor) = actor.name() + " takes off their " + name() + "."
 
+    override fun listName() = if (equipped) super.listName() + " (equipped)" else super.listName()
+
     override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {
         this.equipped = false
         if (from is Actor && from != to && from.gear[slot] == this) {
@@ -52,7 +54,7 @@ sealed class Gear : Portable() {
             )
         } else if (current != null) {
             uses.add(
-                Use(current.slot.verb + " " + current.name() + " and " + slot.verb + " " + name(), 0f,
+                Use(current.slot.unverb + " " + current.name() + " and " + slot.verb + " " + name(), 0f,
                     canDo = { actor -> this in actor.contents },
                     toDo = { actor, level ->
                         actor.equipGear(this)

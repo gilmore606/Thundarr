@@ -1,6 +1,7 @@
 package ui.panels
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.GameScreen
@@ -56,9 +57,9 @@ abstract class Panel {
 
     abstract fun drawText()
 
-    protected fun drawString(text: String, x: Int, y: Int, color: Color = GameScreen.fontColor) {
-        GameScreen.font.color = color
-        GameScreen.font.draw(textBatch, text, ((x  + this.x) - (GameScreen.width / 2f)), 0f - ((y + this.y) - (GameScreen.height / 2f)))
+    protected fun drawString(text: String, x: Int, y: Int, color: Color = GameScreen.fontColor, font: BitmapFont = GameScreen.font) {
+        font.color = color
+        font.draw(textBatch, text, ((x  + this.x) - (GameScreen.width / 2f)), 0f - ((y + this.y) - (GameScreen.height / 2f)))
     }
 
     protected fun drawTitle(text: String) {

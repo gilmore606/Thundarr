@@ -346,7 +346,7 @@ sealed class Level {
         if (App.player.xy.x == x && App.player.xy.y == y) {
             thingsAt(x,y).forEach {
                 if (it.isPortable()) {
-                    menu.addOption("take " + it.name()) {
+                    menu.addOption("take " + it.listName()) {
                         App.player.queue(Get(it, cellContainerAt(x, y)))
                     }
                 }

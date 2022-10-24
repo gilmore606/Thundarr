@@ -8,6 +8,7 @@ import things.Thing
 import things.ThingHolder
 import util.aOrAn
 import util.groundAtPlayer
+import util.log
 import util.plural
 import java.lang.Integer.max
 
@@ -15,10 +16,20 @@ class InventoryModal(
     private val thingHolder: ThingHolder
     ) : SelectionModal(300, 700, "- bACkPACk -", default = 0), ContextMenu.ParentModal {
 
-    private val byKind = ArrayList<Pair<Thing.Kind, ArrayList<Thing>>>().apply {
-        thingHolder.byKind().forEach { pair -> add(Pair(pair.key, ArrayList<Thing>().apply {
-            pair.value.forEach { add(it) }
-        })) }
+    private val grouped = ArrayList<ArrayList<Thing>>().apply {
+        thingHolder.contents.forEach { thing ->
+            val listName = thing.listName()
+            var placed = false
+            forEach {
+                if (it.first().listName() == listName) {
+                    it.add(thing)
+                    placed = true
+                }
+            }
+            if (!placed) {
+                add(ArrayList<Thing>().apply { add(thing) })
+            }
+        }
     }
 
     init {
@@ -27,9 +38,11 @@ class InventoryModal(
         spacing = 28
     }
 
+    fun shownThing(): Thing? = if (selection > -1) grouped[selection].first() else null
+
     private fun adjustHeight() {
-        height = headerPad + max(1, thingHolder.byKind().size) * spacing + padding * 2
-        maxSelection = thingHolder.byKind().size - 1
+        height = headerPad + max(1, grouped.size) * spacing + padding * 2
+        maxSelection = grouped.size - 1
     }
 
     override fun drawModalText() {
@@ -39,12 +52,12 @@ class InventoryModal(
             return
         }
         var n = 0
-        byKind.forEach {
+        grouped.forEach {
             var text = ""
-            text = if (it.second.size > 1) {
-                it.second.size.toString() + " " + it.second.first().name().plural()
+            text = if (it.size > 1) {
+                it.size.toString() + " " + it.first().name().plural()
             } else {
-                it.second.first().name().aOrAn()
+                it.first().listName()
             }
             drawOptionText(text, n, true)
             n++
@@ -61,8 +74,8 @@ class InventoryModal(
     override fun drawThings() {
         if (!isAnimating()) {
             var n = 0
-            byKind.forEach {
-                drawOptionIcon(it.second.first().glyph(), n)
+            grouped.forEach {
+                drawOptionIcon(it.first().glyph(), n)
                 n++
             }
         }
@@ -70,9 +83,10 @@ class InventoryModal(
 
     override fun doSelect() {
         val parent = this
-        GameScreen.addModal(ContextMenu(width - 10, optionY(selection) - 4).apply {
+        val ourSelection = selection
+        GameScreen.addModal(ContextMenu(width - 10, optionY(ourSelection) - 4).apply {
             this.parentModal = parent
-            val these = byKind[selection].second
+            val these = grouped[ourSelection]
             val thing = these[0]
             if (these.size > 1) {
                 addOption("drop one " + thing.name()) {
@@ -82,7 +96,7 @@ class InventoryModal(
                     these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
                 }
             } else {
-                addOption("drop " + thing.name()) {
+                addOption("drop " + thing.listName()) {
                     App.player.queue(Drop(thing, groundAtPlayer()))
                 }
             }

@@ -3,6 +3,7 @@ package ui.panels
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.GameScreen
 import things.Thing
+import ui.modals.InventoryModal
 import util.XY
 import world.Entity
 
@@ -12,6 +13,7 @@ object LookPanel : ShadedPanel() {
 
     private var lastTime = 0.0
     private val lastPos = XY(showPos().x, showPos().y)
+    private var lastInventory = -1
     private var entity: Entity? = showEntity()
     private var wrapped = ArrayList<String>()
 
@@ -76,8 +78,15 @@ object LookPanel : ShadedPanel() {
 
         val newTime = App.time
         val newPos = showPos()
-        if (newPos != lastPos || newTime > lastTime) {
+        var newInventory = lastInventory
+        val inventory = isInventory()
+        if (inventory != null) {
+            newInventory = inventory.selection
+        }
+
+        if (newPos != lastPos || newTime > lastTime || newInventory != lastInventory) {
             lastTime = newTime
+            lastInventory = newInventory
             entity = showEntity()
             entity?.also { wrapText(it.description()) } ?: wrapped.clear()
         }
@@ -95,7 +104,13 @@ object LookPanel : ShadedPanel() {
 
     private fun showPos() = GameScreen.cursorPosition ?: App.player.xy
 
+    private fun isInventory(): InventoryModal? = GameScreen.panels.firstOrNull { it is InventoryModal } as InventoryModal?
+
     private fun showEntity(): Entity? {
+        val inventory = isInventory()
+        if (inventory != null) {
+            return inventory.shownThing()
+        }
         val pos = showPos()
         var e: Entity? = null
         val things = App.level.thingsAt(pos.x, pos.y)

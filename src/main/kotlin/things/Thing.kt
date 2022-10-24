@@ -7,6 +7,7 @@ import render.GameScreen
 import render.tilesets.Glyph
 import util.LightColor
 import util.XY
+import util.aOrAn
 import util.log
 import world.Entity
 import world.Level
@@ -42,6 +43,8 @@ sealed class Thing : Entity {
     open fun uses(): Set<Use> = setOf()
 
     override fun description() =  ""
+
+    open fun listName() = name().aOrAn()
 
     open fun onWalkedOnBy(actor: Actor) { }
 
