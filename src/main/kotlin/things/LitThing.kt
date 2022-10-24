@@ -33,9 +33,11 @@ sealed class LitThing : Portable(), LightSource {
     protected fun becomeLit() {
         active = true
         holder?.also { holder ->
-            holder.level?.addLightSource(holder.xy.x, holder.xy.y,
-                if (holder is Actor) holder else this
-            )
+            holder.xy()?.also { xy ->
+                holder.level?.addLightSource(xy.x, xy.y,
+                    if (holder is Actor) holder else this
+                )
+            }
         }
     }
 
@@ -43,12 +45,14 @@ sealed class LitThing : Portable(), LightSource {
         active = false
         holder?.also { holder ->
             holder.level?.also { level ->
-                level.removeLightSource(if (holder is Actor) holder else this )
-                if (holder is Actor) {
-                    Console.sayAct("Your torch sputters and dies.", "%Dn's torch goes out.", holder)
-                    holder.light()?.also { level.addLightSource(holder.xy.x, holder.xy.y, holder) }
-                } else {
-                    Console.sayAct("", "The torch sputters and dies.", this)
+                holder.xy()?.also { xy ->
+                    level.removeLightSource(if (holder is Actor) holder else this )
+                    if (holder is Actor) {
+                        Console.sayAct("Your torch sputters and dies.", "%Dn's torch goes out.", holder)
+                        holder.light()?.also { level.addLightSource(xy.x, xy.y, holder) }
+                    } else {
+                        Console.sayAct("", "The torch sputters and dies.", this)
+                    }
                 }
             }
         }
@@ -57,8 +61,10 @@ sealed class LitThing : Portable(), LightSource {
     protected fun reproject() {
         holder?.also { holder ->
             holder.level?.also { level ->
-                level.removeLightSource(if (holder is Actor) holder else this )
-                level.addLightSource(holder.xy.x, holder.xy.y, if (holder is Actor) holder else this)
+                holder.xy()?.also { xy ->
+                    level.removeLightSource(if (holder is Actor) holder else this )
+                    level.addLightSource(xy.x, xy.y, if (holder is Actor) holder else this)
+                }
             }
         }
     }

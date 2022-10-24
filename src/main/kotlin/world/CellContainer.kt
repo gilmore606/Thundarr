@@ -12,9 +12,11 @@ import util.log
 class CellContainer : ThingHolder {
 
     @Transient override var level: Level? = null
-    override var xy = XY(0,0)
+    val xy = XY(0,0)
+    val contents = mutableListOf<Thing>()
 
-    override val contents = mutableListOf<Thing>()
+    override fun xy() = xy
+    override fun contents() = contents
 
     fun reconnect(level: Level, x: Int, y: Int) {
         xy.x = x

@@ -17,7 +17,7 @@ class InventoryModal(
     ) : SelectionModal(300, 700, "- bACkPACk -", default = 0), ContextMenu.ParentModal {
 
     private val grouped = ArrayList<ArrayList<Thing>>().apply {
-        thingHolder.contents.forEach { thing ->
+        thingHolder.contents().forEach { thing ->
             val listName = thing.listName()
             var placed = false
             forEach {

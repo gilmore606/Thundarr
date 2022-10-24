@@ -6,10 +6,10 @@ import world.Level
 
 interface ThingHolder {
 
-    val contents: MutableList<Thing>
-    val xy: XY
     @Transient var level: Level?
 
+    fun contents(): MutableList<Thing>
+    fun xy(): XY?
     fun add(thing: Thing)
     fun remove(thing: Thing)
 

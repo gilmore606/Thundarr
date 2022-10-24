@@ -1,8 +1,11 @@
 package world
 
 import actors.Actor
+import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
@@ -70,7 +73,6 @@ class Chunk(
 
         for (x in 0 until width) {
             for (y in 0 until height) {
-                // Restore circular reference from CellContainer back to the level.
                 things[x][y].reconnect(level, x + this.x, y + this.y)
             }
         }
@@ -93,6 +95,7 @@ class Chunk(
         savedActors.forEach { actor ->
             actor.onRestore()
             level.director.attachActor(actor)
+            actor.moveTo(level, actor.xy.x, actor.xy.y)
         }
 
     }
@@ -120,12 +123,12 @@ class Chunk(
     }
 
     fun unload(saveActors: Set<Actor>) {
-        log.debug("Chunk ${x}x${y} unloading")
+        savedActors.clear()
         savedActors.addAll(saveActors)
 
-        val lightsToDispose = mutableSetOf<LightSource>()
-        lightSourceLocations.forEach { (it, _) -> lightsToDispose.add(it) }
-        lightsToDispose.forEach { level.removeLightSource(it) }
+        mutableSetOf<LightSource>().apply {
+            lightSourceLocations.forEach { (it, _) -> add(it) }
+        }.forEach { level.removeLightSource(it) }
 
         ChunkLoader.saveWorldChunk(this)
     }

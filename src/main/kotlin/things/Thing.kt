@@ -46,7 +46,7 @@ sealed class Thing : Entity {
     override fun description() =  ""
 
     override fun level() = holder?.level
-    override fun xy() = holder?.xy
+    override fun xy() = holder?.xy()
     override fun glyphBatch() = GameScreen.thingBatch
     override fun uiBatch() = GameScreen.uiThingBatch
 

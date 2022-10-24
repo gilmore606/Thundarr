@@ -15,24 +15,22 @@ import world.Level
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
-    open fun speed() = 1f
-    open fun visualRange() = 22f
-
-
-    override val xy = XY(0,0)  // position in current level
+    val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
+    val contents = mutableListOf<Thing>()
 
     @Transient
     override var level: Level? = null
-
-    override val contents = mutableListOf<Thing>()
     @Transient
     val gear = mutableMapOf<Gear.Slot, Gear?>()
 
+    open fun speed() = 1f
+    open fun visualRange() = 22f
 
     override fun level() = level
     override fun xy() = xy
+    override fun contents() = contents
     override fun glyphBatch() = GameScreen.actorBatch
     override fun uiBatch() = GameScreen.uiActorBatch
 
