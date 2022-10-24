@@ -75,7 +75,9 @@ object LookPanel : ShadedPanel() {
     }
 
     override fun drawBackground() {
-        super.drawBackground()
+        entity?.also {
+            super.drawBackground()
+        }
 
         val newTime = App.time
         val newPos = showPos()

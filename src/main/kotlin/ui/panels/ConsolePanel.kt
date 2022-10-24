@@ -80,6 +80,13 @@ object ConsolePanel : Panel() {
         }
     }
 
+    override fun mouseMovedTo(screenX: Int, screenY: Int) {
+        super.mouseMovedTo(screenX, screenY)
+        if (screenY > this.y) {
+            this.burst = 1.2f
+        }
+    }
+
     override fun drawText() {
         var offset = scroll.toInt() + padding
         lines.forEachIndexed { n, line ->
