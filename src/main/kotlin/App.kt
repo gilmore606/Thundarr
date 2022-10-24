@@ -177,7 +177,6 @@ object App : KtxGame<Screen>() {
     }
 
     fun enterLevelFromWorld(levelId: String) {
-        level.director.detachActor(player)
         val oldLevelId = level.levelId()
         level = LevelKeeper.getLevel(levelId)
         KtxAsync.launch {
@@ -192,7 +191,6 @@ object App : KtxGame<Screen>() {
     }
 
     fun enterWorldFromLevel(dest: XY) {
-        level.director.detachActor(player)
         level = LevelKeeper.getLevel("world")
 
         KtxAsync.launch {

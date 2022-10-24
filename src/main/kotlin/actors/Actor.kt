@@ -48,7 +48,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         this.xy.x = x
         this.xy.y = y
         oldLevel?.onActorMovedFrom(this, oldX, oldY, level)
+        if (oldLevel != level) oldLevel?.director?.detachActor(this)
         level.onActorMovedTo(this, x, y)
+        if (oldLevel != level) level.director.attachActor(this)
         onMove()
     }
 

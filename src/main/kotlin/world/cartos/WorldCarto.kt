@@ -1,13 +1,11 @@
 package world.cartos
 
+import actors.Ox
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import render.tilesets.Glyph
 import things.*
-import util.CARDINALS
-import util.Dice
-import util.Perlin
-import util.UUID
+import util.*
 import world.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
@@ -50,6 +48,9 @@ class WorldCarto(
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
+                    if (Dice.chance(0.005f)) {
+                        Ox().moveTo(level, x + this.x0, y + this.y0)
+                    }
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {

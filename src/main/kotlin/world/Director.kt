@@ -3,8 +3,10 @@ package world
 import actors.Actor
 import actors.NPC
 import actors.Player
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import ktx.async.KtxAsync
 import things.Temporal
 import util.XY
 import util.distanceBetween
@@ -24,14 +26,16 @@ class Director(val level: Level) {
 
     // Attach already-positioned actor in the level.
     fun attachActor(actor: Actor) {
-        if (actor is Player && actor != App.player) {
-            throw RuntimeException("Duplicate player attached!")
-        } else if (actor in actors) {
-            throw RuntimeException("Attaching already-attached actor!")
+        KtxAsync.launch {
+            if (actor is Player && actor != App.player) {
+                throw RuntimeException("Duplicate player attached!")
+            } else if (actor in actors) {
+                throw RuntimeException("Attaching already-attached actor!")
+            }
+            actor.level = this@Director.level
+            actor.juice = 0f
+            addOrdered(actor, actors)
         }
-        actor.level = this.level
-        actor.juice = 0f
-        addOrdered(actor, actors)
     }
 
     fun detachActor(actor: Actor) {

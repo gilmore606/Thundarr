@@ -94,7 +94,6 @@ class Chunk(
 
         savedActors.forEach { actor ->
             actor.onRestore()
-            level.director.attachActor(actor)
             actor.moveTo(level, actor.xy.x, actor.xy.y)
         }
 
@@ -224,7 +223,7 @@ class Chunk(
         return false
     }
 
-    fun visibilityAt(x: Int, y: Int): Float = if (App.DEBUG_VISIBLE) 1f else if (boundsCheck(x, y)) {
+    fun visibilityAt(x: Int, y: Int): Float = if (boundsCheck(x, y)) {
         (if (seen[x - this.x][y - this.y]) 0.5f else 0f) +
                 (if (visible[x - this.x][y - this.y]) 0.5f else 0f)
     } else { 0f }

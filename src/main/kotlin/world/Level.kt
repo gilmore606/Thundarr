@@ -70,7 +70,7 @@ sealed class Level {
     ) {
         for (x in pov.x - GameScreen.RENDER_WIDTH /2 until pov.x + GameScreen.RENDER_WIDTH /2) {
             for (y in pov.y - GameScreen.RENDER_HEIGHT /2 until pov.y + GameScreen.RENDER_HEIGHT /2) {
-                val vis = visibilityAt(x, y)
+                val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
                 if (vis > 0f) {
@@ -138,7 +138,7 @@ sealed class Level {
         for (x in pov.x - GameScreen.RENDER_WIDTH/2 until pov.x + GameScreen.RENDER_WIDTH/2) {
             for (y in pov.y - GameScreen.RENDER_HEIGHT/2 until pov.y + GameScreen.RENDER_HEIGHT/2) {
                 val thingsAt = thingsAt(x,y)
-                val vis = visibilityAt(x, y)
+                val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
                         x, y, vis, thingsAt[0].glyph()
@@ -152,8 +152,8 @@ sealed class Level {
     fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
-            val vis = visibilityAt(x, y)
-            if (vis == 1f) {
+            val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
+            if (vis == 1f && chunkAt(x,y) != null) {
                 doThis(
                     x, y, actor.glyph()
                 )
@@ -171,9 +171,6 @@ sealed class Level {
     }
 
     fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
-        if (actor !in director.actors) {
-            director.attachActor(actor)
-        }
         actor.light()?.also {
             removeLightSource(actor)
             addLightSource(x, y, actor)
@@ -202,10 +199,6 @@ sealed class Level {
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int, toLevel: Level) {
         chunkAt(x, y)?.onRemoveActor(x, y, actor)
         actor.light()?.also { removeLightSource(actor) }
-
-        if (toLevel != this) {
-            director.detachActor(actor)
-        }
     }
 
     fun advanceTime(delta: Float) = director.advanceTime(delta)

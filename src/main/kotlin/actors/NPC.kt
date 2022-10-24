@@ -37,7 +37,7 @@ sealed class NPC : Actor() {
     fun noticePlayer() { awareness = Awareness.AWARE }
     fun forgetPlayer() { if (awareness == Awareness.AWARE) awareness = Awareness.UNAWARE }
 
-    protected fun distanceToPlayer() = distanceBetween(xy.x, xy.y, App.player.xy.x, App.player.xy.y)
+    protected fun distanceToPlayer() = if (level == App.player.level) distanceBetween(xy.x, xy.y, App.player.xy.x, App.player.xy.y) else 1000f
 
     fun wander(): Action? {
         val dirs = mutableListOf<XY>()

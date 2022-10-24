@@ -14,7 +14,7 @@ class Ox : NPC() {
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
 
     override fun pickAction(): Action {
-        if (Dice.chance(0.5f)) {
+        if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
             wander()?.also { return it }
         }
         return super.pickAction()

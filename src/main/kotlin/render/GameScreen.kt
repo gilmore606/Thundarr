@@ -196,9 +196,10 @@ object GameScreen : KtxScreen {
     private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
+        val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
         actorBatch.addTileQuad(
             tx - pov.x, ty - pov.y, tileStride,
-            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, lightCache[lx][ly], aspectRatio)
+            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light, aspectRatio)
     }
 
     override fun show() {
