@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import util.LightColor
 import world.CellContainer
 import java.lang.Float.max
@@ -45,12 +45,10 @@ sealed class LitThing : Portable(), LightSource {
             holder.level?.also { level ->
                 level.removeLightSource(if (holder is Actor) holder else this )
                 if (holder is Actor) {
-                    ConsolePanel.announce(level, holder.xy.x, holder.xy.y, ConsolePanel.Reach.VISUAL,
-                        (if (holder is Player) "Your " else "Some guy's ") + " torch goes out.")
+                    Console.sayAct("Your torch sputters and dies.", "%Dn's torch goes out.", holder)
                     holder.light()?.also { level.addLightSource(holder.xy.x, holder.xy.y, holder) }
                 } else {
-                    ConsolePanel.announce(level, holder.xy.x, holder.xy.y, ConsolePanel.Reach.VISUAL,
-                    "The torch burns out.")
+                    Console.sayAct("", "The torch sputters and dies.", this)
                 }
             }
         }
@@ -92,10 +90,10 @@ class Sunsword : LitThing() {
             toDo = { actor, level ->
                 if (active) {
                     becomeDark()
-                    if (actor is Player) ConsolePanel.say("The shimmering blade vanishes.")
+                    Console.sayAct("The shimmering blade vanishes.", "%Dn's sunsword turns off.", actor)
                 } else {
                     becomeLit()
-                    if (actor is Player) ConsolePanel.say("A shimmering blade emerges from the sunsword's hilt.")
+                    Console.sayAct("A shimmering blade emerges from the sunsword's hilt.", "%Dn's sunsword turns on.", actor)
                 }
             })
     )

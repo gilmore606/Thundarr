@@ -4,10 +4,7 @@ import actors.actions.Action
 import actors.actions.Wait
 import render.tilesets.Glyph
 
-sealed class NPC(
-    override val glyph: Glyph,
-    override val speed: Float
-) : Actor(glyph, speed) {
+sealed class NPC : Actor() {
 
     final override fun defaultAction(): Action {
         return super.nextAction() ?: pickAction()

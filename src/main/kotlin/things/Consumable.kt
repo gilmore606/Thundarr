@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import util.aOrAn
 
 
@@ -12,14 +12,14 @@ import util.aOrAn
 sealed class Consumable : Portable() {
     open fun consumeVerb() = "eat"
     open fun consumeDuration() = 1f
-    open fun consumeSelfMsg() = "You " + consumeVerb() + " all of the " + name() + "."
-    open fun consumeOtherMsg(actor: Actor) = "Some guy " + consumeVerb() + " " + name().aOrAn() + "."
+    open fun consumeSelfMsg() = "You " + consumeVerb() + " all of %dd."
+    open fun consumeOtherMsg() = "%Dn " + consumeVerb() + "s %in."
 
     override fun uses() = setOf(
         Use(consumeVerb() + " " + name(), consumeDuration(),
             canDo = { actor -> this in actor.contents },
             toDo = { actor, level ->
-                ConsolePanel.say(if (actor is Player) consumeSelfMsg() else consumeOtherMsg(actor) )
+                Console.sayAct(consumeSelfMsg(), consumeOtherMsg(), actor, this)
                 this.moveTo(null)
                 onConsume(actor)
             })

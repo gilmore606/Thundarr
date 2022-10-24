@@ -44,6 +44,9 @@ sealed class Thing : Entity {
 
     override fun description() =  ""
 
+    override fun level() = holder?.level
+    override fun xy() = holder?.xy
+
     open fun listName() = name().aOrAn()
 
     open fun onWalkedOnBy(actor: Actor) { }

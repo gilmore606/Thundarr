@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import ui.panels.ConsolePanel
+import ui.panels.Console
 
 
 @Serializable
@@ -13,7 +13,7 @@ sealed class Scenery : Thing() {
     override fun isBlocking() = false
 
     override fun onWalkedOnBy(actor: Actor) {
-        if (actor is Player) { ConsolePanel.say(walkOnMsg()) }
+        if (actor is Player) { Console.say(walkOnMsg()) }
     }
     abstract fun walkOnMsg(): String
 

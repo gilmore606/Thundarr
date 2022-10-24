@@ -16,7 +16,7 @@ import things.Portable
 import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import util.*
 import world.terrains.Terrain
 
@@ -155,7 +155,7 @@ sealed class Level {
             val vis = visibilityAt(x, y)
             if (vis == 1f) {
                 doThis(
-                    x, y, actor.glyph
+                    x, y, actor.glyph()
                 )
             }
     }
@@ -190,7 +190,7 @@ sealed class Level {
                 }
                 if (actor is Player && thingList.isNotEmpty()) {
                     val things = thingList.joinToString(", ")
-                    ConsolePanel.say("You see $things here.")
+                    Console.say("You see $things here.")
                 }
             }
         }

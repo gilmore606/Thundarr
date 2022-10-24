@@ -20,10 +20,10 @@ sealed class Gear : Portable() {
     var equipped = false
     abstract val slot: Slot
 
-    open fun equipSelfMsg() = "You put on your " + name() + "."
-    open fun equipOtherMsg(actor: Actor) = actor.name() + " puts on their " + name() + "."
-    open fun unequipSelfMsg() = "You take off your " + name() + "."
-    open fun unequipOtherMsg(actor: Actor) = actor.name() + " takes off their " + name() + "."
+    open fun equipSelfMsg() = "You put on your %d."
+    open fun equipOtherMsg() = "%Dn puts on %p %d."
+    open fun unequipSelfMsg() = "You take off your %d."
+    open fun unequipOtherMsg() = "%Dn takes off %p %d."
 
     override fun listName() = if (equipped) super.listName() + " (equipped)" else super.listName()
 
@@ -77,10 +77,10 @@ sealed class Gear : Portable() {
 @Serializable
 sealed class Weapon : Gear() {
     override val slot = Slot.WEAPON
-    override fun equipSelfMsg() = "You ready your " + name() + " for action."
-    override fun unequipSelfMsg() = "You return your " + name() + " to its sheath."
-    override fun equipOtherMsg(actor: Actor) = actor.name() + " readies " + this.name().aOrAn() + "."
-    override fun unequipOtherMsg(actor: Actor) = actor.name() + " sheathes their " + this.name() + "."
+    override fun equipSelfMsg() = "You ready your %d for action."
+    override fun unequipSelfMsg() = "You return your %d to its sheath."
+    override fun equipOtherMsg() = "%Dn takes out %id."
+    override fun unequipOtherMsg() = "%Dn puts away %p %d."
 }
 
 @Serializable

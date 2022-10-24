@@ -3,7 +3,7 @@ package actors.actions
 import actors.Actor
 import actors.Player
 import things.Gear
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import world.Level
 
 class Equip(
@@ -14,11 +14,7 @@ class Equip(
         if (gear.holder == actor) {
             gear.equipped = true
             actor.gear[gear.slot] = gear
-            if (actor is Player) {
-                ConsolePanel.say(gear.equipSelfMsg())
-            } else {
-                ConsolePanel.announce(level, gear.holder!!.xy.x, gear.holder!!.xy.y, ConsolePanel.Reach.VISUAL, gear.equipOtherMsg(actor))
-            }
+            Console.sayAct(gear.equipSelfMsg(), gear.equipOtherMsg(), actor, gear)
         }
     }
 

@@ -3,7 +3,7 @@ package actors.actions
 import actors.Actor
 import actors.Player
 import things.Gear
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import world.Level
 
 class Unequip(
@@ -14,11 +14,7 @@ class Unequip(
         if (gear.holder == actor) {
             gear.equipped = false
             actor.gear[gear.slot] = null
-            if (actor is Player) {
-                ConsolePanel.say(gear.unequipSelfMsg())
-            } else {
-                ConsolePanel.announce(level, gear.holder!!.xy.x, gear.holder!!.xy.y, ConsolePanel.Reach.VISUAL, gear.unequipOtherMsg(actor))
-            }
+            Console.sayAct(gear.unequipSelfMsg(), gear.unequipOtherMsg(), actor, gear)
         }
     }
 

@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import things.Thing
 import things.ThingHolder
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import util.aOrAn
 import world.Level
 
@@ -15,9 +15,7 @@ class Drop(
 
     override fun execute(actor: Actor, level: Level) {
         thing.moveTo(dest)
-        if (actor is Player) {
-            ConsolePanel.say("You drop " + thing.name().aOrAn() + ".")
-        }
+        Console.sayAct("You drop %id.", "%DN drops %id.", actor, thing)
     }
 
 }

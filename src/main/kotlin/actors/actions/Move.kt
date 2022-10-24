@@ -1,10 +1,8 @@
 package actors.actions
 
 import actors.Actor
-import actors.Player
 import util.XY
 import world.Level
-import ui.panels.ConsolePanel
 import world.terrains.Terrain
 
 class Move(

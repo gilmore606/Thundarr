@@ -14,7 +14,7 @@ import things.Apple
 import things.Sunsword
 import things.Torch
 import ui.modals.*
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import ui.panels.LeftButtons
 import ui.panels.LookPanel
 import ui.panels.StatusPanel
@@ -68,15 +68,15 @@ object App : KtxGame<Screen>() {
 
         addScreen(GameScreen)
         setScreen<GameScreen>()
-        GameScreen.addPanel(ConsolePanel)
+        GameScreen.addPanel(Console)
         GameScreen.addPanel(StatusPanel)
         GameScreen.addPanel(LookPanel)
         GameScreen.addPanel(LeftButtons)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
-        ConsolePanel.say("The moon is broken in god-damned half!")
-        ConsolePanel.say("\"Demon dogs!\"")
+        Console.say("The moon is broken in god-damned half!")
+        Console.say("\"Demon dogs!\"")
     }
 
     private fun setupLog() {
@@ -157,7 +157,7 @@ object App : KtxGame<Screen>() {
                 playerStart = level.getPlayerEntranceFrom(level.levelId())
             }
             movePlayerIntoLevel(playerStart.x, playerStart.y, null)
-            ConsolePanel.say("You step tentatively into the apocalypse...")
+            Console.say("You step tentatively into the apocalypse...")
         }
     }
 
@@ -186,7 +186,7 @@ object App : KtxGame<Screen>() {
             }
             val entrance = level.getPlayerEntranceFrom(oldLevelId)
             movePlayerIntoLevel(entrance!!.x, entrance!!.y, LevelKeeper.getLevel(oldLevelId))
-            ConsolePanel.say("You cautiously step inside...")
+            Console.say("You cautiously step inside...")
         }
     }
 
@@ -201,7 +201,7 @@ object App : KtxGame<Screen>() {
                 delay(50)
             }
             movePlayerIntoLevel(dest.x, dest.y, oldLevel)
-            ConsolePanel.say("You step back outside to face the wilderness once again.")
+            Console.say("You step back outside to face the wilderness once again.")
         }
     }
 
@@ -265,7 +265,7 @@ object App : KtxGame<Screen>() {
                         saveStateAndExitProcess()
                     }
                 } else {
-                    ConsolePanel.say("You remember that one thing you needed to do...")
+                    Console.say("You remember that one thing you needed to do...")
                 }
             }
         )
@@ -279,11 +279,11 @@ object App : KtxGame<Screen>() {
             "Abandon", "Cancel"
         ) { yes ->
             if (yes) {
-                ConsolePanel.say("You abandon the world.")
+                Console.say("You abandon the world.")
                 pendingJob?.cancel()
                 createNewWorld()
             } else {
-                ConsolePanel.say("You gather your resolve and carry on.")
+                Console.say("You gather your resolve and carry on.")
             }
         }
         )

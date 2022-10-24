@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import render.GameScreen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
-import ui.panels.ConsolePanel
+import ui.panels.Console
 import util.XY
 
 sealed class Terrain(
@@ -71,7 +71,7 @@ object BrickWall : Terrain(
     true,
 ){
     override fun onBump(actor: Actor, data: String) {
-        if (actor is Player) ConsolePanel.say("You bump into a brick wall.")
+        if (actor is Player) Console.say("You bump into a brick wall.")
     }
 }
 
@@ -113,7 +113,7 @@ object PortalDoor : Terrain(
                     App.enterLevelFromWorld(terrainData.levelId)
                 }
             } else {
-                ConsolePanel.say("You reconsider and step away.")
+                Console.say("You reconsider and step away.")
             }
         })
     }

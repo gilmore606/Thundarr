@@ -1,11 +1,9 @@
 package actors.actions
 
 import actors.Actor
-import actors.Player
 import things.Thing
 import things.ThingHolder
-import ui.panels.ConsolePanel
-import util.aOrAn
+import ui.panels.Console
 import world.Level
 
 class Get(
@@ -15,9 +13,7 @@ class Get(
 
     override fun execute(actor: Actor, level: Level) {
         thing.moveTo(actor)
-        if (actor is Player) {
-            ConsolePanel.say("You pick up " + thing.name().aOrAn() + ".")
-        }
+        Console.sayAct("You pick up %id.", "%DN picks up %id.", actor, thing)
     }
 
 }

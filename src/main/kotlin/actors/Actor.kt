@@ -5,18 +5,14 @@ import actors.actions.Equip
 import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import render.tilesets.Glyph
 import things.*
-import ui.panels.ConsolePanel
 import util.*
 import world.Entity
 import world.Level
 
 @Serializable
-sealed class Actor(
-    open val glyph: Glyph,
-    open val speed: Float
-) : Entity, ThingHolder, LightSource, Temporal {
+sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
+
     override val xy = XY(0,0)  // position in current level
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
@@ -25,9 +21,14 @@ sealed class Actor(
     override var level: Level? = null
 
     override val contents = mutableListOf<Thing>()
-
     @Transient
     val gear = mutableMapOf<Gear.Slot, Gear?>()
+
+    open fun speed() = 1f
+    open fun visualRange() = 22f
+
+    override fun level() = level
+    override fun xy() = xy
 
     fun onRestore() {
         contents.forEach { it.onRestore(this) }
@@ -39,16 +40,6 @@ sealed class Actor(
         fromLevel?.onActorMovedFrom(this, x, y, level)
         level.onActorMovedTo(this, x, y)
     }
-
-    // What's my divider for action durations?
-    fun speed() = this.speed
-    // How far in tiles can I see things?
-    fun visualRange() = 22f
-
-    override fun glyph() = glyph
-
-    override fun name() = "Some guy"
-    override fun description() = "Just some guy walking around, who knows what he's up to?  I'd steer clear if I were you."
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
@@ -63,7 +54,7 @@ sealed class Actor(
     abstract fun defaultAction(): Action?
 
     // Queue an action to be executed next.
-    open fun queue(action: Action) {
+    fun queue(action: Action) {
         queuedActions.add(action)
     }
 
