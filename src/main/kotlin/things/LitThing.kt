@@ -3,9 +3,13 @@ package things
 import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
+import render.sparks.Scoot
+import render.sparks.Smoke
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.Dice
 import util.LightColor
+import util.NORTH
 import world.CellContainer
 import java.lang.Float.max
 import kotlin.random.Random
@@ -121,14 +125,27 @@ class Torch : LitThing(), Temporal {
     override val kind = Kind.TORCH
     override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
 
-    init { active = false }
+    private val smokeChance = 1.1f
+
+    private var spawned = false
+    init {
+        if (!spawned) {
+            spawned = true
+            active = false
+        }
+    }
 
     override fun light() = if (active) lightColor else null
 
     private var flicker = 1f
     override fun flicker() = flicker
     override fun onRender(delta: Float) {
-        if (System.currentTimeMillis() % 5 == 1L) flicker = Random.nextFloat() * 0.12f + 0.88f
+        if (active && System.currentTimeMillis() % 5 == 1L) {
+            flicker = Random.nextFloat() * 0.12f + 0.88f
+            if (Dice.chance(delta * smokeChance * 5f)) {
+                xy()?.also { xy -> level()?.addSpark(Smoke().at(xy.x, xy.y)) }
+            }
+        }
     }
 
     override fun uses() = mutableSetOf<Use>().apply {

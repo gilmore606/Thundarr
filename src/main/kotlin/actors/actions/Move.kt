@@ -12,7 +12,7 @@ class Move(
 
     override fun execute(actor: Actor, level: Level) {
         if (level.isWalkableFrom(actor.xy, dir)) {
-            actor.level?.addSpark(Scoot(dir, actor.glyph()).at(actor.xy.x, actor.xy.y))
+            actor.level?.addSpark(Scoot(dir).at(actor.xy.x, actor.xy.y))
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
         } else {
             Terrain.get(level.getTerrain(actor.xy.x + dir.x, actor.xy.y + dir.y))

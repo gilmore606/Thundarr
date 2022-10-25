@@ -7,8 +7,7 @@ import kotlin.random.Random
 
 @Serializable
 class Scoot(
-    val dir: XY,
-    val glyph: Glyph
+    val dir: XY
     ) : Spark() {
 
     init {
