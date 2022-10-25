@@ -49,6 +49,7 @@ object GameScreen : KtxScreen {
     private val thingTileSet = ThingTileSet()
     private val actorTileSet = ActorTileSet()
     private val uiTileSet = UITileSet()
+    private val tileSets = listOf(terrainTileSet, thingTileSet, actorTileSet, uiTileSet)
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
@@ -57,6 +58,7 @@ object GameScreen : KtxScreen {
     private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
     val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
     val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
+    private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
@@ -200,6 +202,16 @@ object GameScreen : KtxScreen {
         actorBatch.addTileQuad(
             tx - pov.x, ty - pov.y, tileStride,
             actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light, aspectRatio)
+    }
+
+    private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
+        worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
+            batch.addTileQuad(
+                tx - pov.x, ty - pov.y, tileStride,
+                batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light, aspectRatio,
+                offsetX, offsetY, scale, alpha
+            )
+        }
     }
 
     override fun show() {
@@ -457,6 +469,7 @@ object GameScreen : KtxScreen {
 
         App.level.forEachThingToRender(renderThing)
         App.level.forEachActorToRender(renderActor)
+        App.level.forEachSparkToRender(renderSpark)
 
         uiWorldBatch.apply {
             cursorPosition?.also { cursorPosition ->

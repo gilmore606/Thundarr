@@ -55,5 +55,6 @@ enum class Glyph {
     BOTTLE,
     FRUIT,
     TORCH,
-    TORCH_LIT
+    TORCH_LIT,
+    SMOKE_PUFF,
 }

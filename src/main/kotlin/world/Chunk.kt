@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
+import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
@@ -36,6 +37,7 @@ class Chunk(
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array(height) { "" } }
     private val things = Array(width) { Array(height) { CellContainer() } }
+    private val sparks = ArrayList<Spark>()
 
     val savedActors: MutableSet<Actor> = mutableSetOf()
     var generating = true
@@ -363,6 +365,22 @@ class Chunk(
         }
         lightSourceLocations.remove(lightSource)
     }
+
+    fun onRender(delta: Float) {
+        dirtyAllLightCacheCells()
+        val doneSparks = mutableSetOf<Spark>()
+        sparks.forEach {
+            it.onRender(delta)
+            if (it.done) doneSparks.add(it)
+        }
+        doneSparks.forEach { sparks.remove(it) }
+    }
+
+    fun addSpark(spark: Spark) {
+        sparks.add(spark)
+    }
+
+    fun sparks() = sparks
 
     private fun forEachCell(doThis: (Int,Int)->Unit) {
         for (x in 0 until width) {

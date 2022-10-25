@@ -6,6 +6,7 @@ import actors.actions.Get
 import actors.actions.UseThing
 import actors.actions.processes.WalkTo
 import render.GameScreen
+import render.sparks.Spark
 import render.sunLights
 import render.tileholders.OverlapTile
 import render.tileholders.WaterTile
@@ -163,6 +164,20 @@ sealed class Level {
             }
     }
 
+    // DoThis for all spark glyphs.
+    fun forEachSparkToRender(doThis: (x: Int, y: Int, glyph: Glyph, light: LightColor,
+                                      offsetX: Float, offsetY: Float, scale: Float, alpha: Float) -> Unit) {
+        allChunks().forEach { it.sparks().forEach { spark ->
+            val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(spark.xy.x, spark.xy.y)
+            if (vis == 1f && chunkAt(spark.xy.x, spark.xy.y) != null) {
+                val light = if (spark.isLit()) this.lightAt(spark.xy.x, spark.xy.y) else GameScreen.fullLight
+                doThis(
+                    spark.xy.x, spark.xy.y, spark.glyph(), light, spark.offsetX(), spark.offsetY(), spark.scale(), spark.alpha()
+                )
+            }
+        }}
+    }
+
     // Move the POV.
     fun setPov(x: Int, y: Int) {
         pov.x = x
@@ -256,7 +271,9 @@ sealed class Level {
 
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
-    fun updateForRender() {
+    fun addSpark(spark: Spark) = chunkAt(spark.xy.x, spark.xy.y)?.addSpark(spark)
+
+    fun onRender(delta: Float) {
         if (dirtyLights.isNotEmpty()) {
             shadowDirty = true
             mutableMapOf<LightSource,XY>().apply {
@@ -269,7 +286,7 @@ sealed class Level {
             }
         }
 
-        allChunks().forEach { it.dirtyAllLightCacheCells() }
+        allChunks().forEach { it.onRender(delta) }
 
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }

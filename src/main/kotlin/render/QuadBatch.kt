@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import kotlinx.serialization.descriptors.PrimitiveKind
 import ktx.graphics.use
 import render.tilesets.TileSet
 import render.tilesets.Glyph
@@ -21,7 +22,7 @@ class QuadBatch(
     val isScrolling: Boolean = true
 ) {
 
-    private val FLOATS_PER_VERTEX = 8
+    private val FLOATS_PER_VERTEX = 9
     private val MAX_QUADS = 40000
 
     private val floats: FloatArray = FloatArray(MAX_QUADS * FLOATS_PER_VERTEX * 4 * 4)
@@ -32,7 +33,7 @@ class QuadBatch(
     private val shadowPad = 0.001f
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
-                                     lightR: Float, lightG: Float, lightB: Float, grayOut: Float) {
+                                     lightR: Float, lightG: Float, lightB: Float, lightA: Float, grayOut: Float) {
         this[floatCount] = x
         this[floatCount+1] = y
         this[floatCount+2] = tx
@@ -40,8 +41,9 @@ class QuadBatch(
         this[floatCount+4] = lightR
         this[floatCount+5] = lightG
         this[floatCount+6] = lightB
-        this[floatCount+7] = grayOut
-        floatCount += 8
+        this[floatCount+7] = lightA
+        this[floatCount+8] = grayOut
+        floatCount += FLOATS_PER_VERTEX
         vertexCount++
     }
 
@@ -49,7 +51,7 @@ class QuadBatch(
         true, MAX_QUADS * 6, 0,
         VertexAttribute(Usage.Position, 2, "a_Position"),
         VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
-        VertexAttribute(Usage.ColorUnpacked, 3, "a_Light"),
+        VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
         VertexAttribute(Usage.Generic, 1, "a_Grayout")
     )
 
@@ -64,14 +66,18 @@ class QuadBatch(
     }
 
     fun addTileQuad(col: Int, row: Int, stride: Double,
-                    textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double) {
-        val x0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
-        val y0 = row.toDouble() * stride - (stride * 0.5)
+                    textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double,
+                    offsetX: Float = 0f, offsetY: Float = 0f, scale: Float = 1f, alpha: Float = 1f) {
+        val scaleOffset = (1f - scale) * stride * 0.5f
+        val x0 = ((col.toDouble() + offsetX) * stride - (stride * 0.5) + scaleOffset) / aspectRatio
+        val y0 = (row.toDouble() + offsetY) * stride - (stride * 0.5) + scaleOffset
+        val x1 = x0 + stride / aspectRatio - scaleOffset * 2f
+        val y1 = y0 + stride - scaleOffset * 2f
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(x0, y0, x0 + stride / aspectRatio, y0 + stride, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, grayOut)
+        addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut)
     }
 
     fun addOverlapQuad(col: Int, row: Int, stride: Double, edge: XY,
@@ -109,7 +115,7 @@ class QuadBatch(
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(ix0, iy0, ix1, iy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, grayOut)
+        addQuad(ix0, iy0, ix1, iy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, 1f, grayOut)
     }
 
     fun addOccludeQuad(col: Int, row: Int, stride: Double, edge: XY,
@@ -184,7 +190,7 @@ class QuadBatch(
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
         addQuad(ix0 - shadowPad, iy0 - shadowPad, ix1 + shadowPad, iy1 + shadowPad,
-            tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, grayOut)
+            tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, 1f, grayOut)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int,
@@ -193,12 +199,12 @@ class QuadBatch(
         val gly0 = (y0 / GameScreen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / GameScreen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / GameScreen.height.toDouble()) * 2f - 1f
-        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB)
+        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, 1f, 0f)
     }
 
     private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
-                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, grayOut: Float = 0f
+                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f
     ) {
         val x0 = ix0.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
         val y0 = -iy0.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
@@ -209,12 +215,12 @@ class QuadBatch(
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
         val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerColumn * tilePad)
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, grayOut)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, grayOut)
+            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut)
         }
     }
 

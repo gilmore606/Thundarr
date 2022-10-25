@@ -3,11 +3,11 @@ package render.shaders
 fun tileVertShader() = """
     attribute vec3 a_Position;
     attribute vec2 a_TexCoordinate;
-    attribute vec3 a_Light;
+    attribute vec4 a_Light;
     attribute float a_Grayout;
 
     varying vec2 v_TexCoordinate;
-    varying vec3 v_Light;
+    varying vec4 v_Light;
     varying float v_Grayout;
 
     void main()
