@@ -11,12 +11,16 @@ class Scoot(
     val glyph: Glyph
     ) : Spark() {
 
-    private val driftSpeed = 1.2f
-    private val shrinkSpeed = 1.5f
-    private val fadeSpeed = 1.3f
+    init {
+        scale = 0.6f
+        alpha = 1.2f
+    }
+    private val driftSpeed = 0.7f
+    private val shrinkSpeed = -0.7f
+    private val fadeSpeed = 1.6f
 
     override fun isLit() = true
-    override fun duration() = 0.6f
+    override fun duration() = 0.7f
     override fun glyph() = Glyph.SMOKE_PUFF
 
     override fun onRender(delta: Float) {
