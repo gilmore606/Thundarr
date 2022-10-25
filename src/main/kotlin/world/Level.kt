@@ -66,7 +66,8 @@ sealed class Level {
         doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
         doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit,
         doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
-        doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit
+        doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
+        delta: Float
     ) {
         for (x in pov.x - GameScreen.RENDER_WIDTH /2 until pov.x + GameScreen.RENDER_WIDTH /2) {
             for (y in pov.y - GameScreen.RENDER_HEIGHT /2 until pov.y + GameScreen.RENDER_HEIGHT /2) {
@@ -74,6 +75,8 @@ sealed class Level {
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
                 if (vis > 0f) {
+                    thingsAt(x,y).forEach { it.onRender(delta) }
+                    actorAt(x,y)?.onRender(delta)
                     doTile(
                         x, y, vis, glyph, lightAt(x, y)
                     )

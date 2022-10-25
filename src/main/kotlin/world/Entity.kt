@@ -31,4 +31,6 @@ interface Entity {
 
     fun level(): Level?
     fun xy(): XY?
+
+    fun onRender(delta: Float) { }
 }

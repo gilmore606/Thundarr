@@ -8,10 +8,12 @@ import ui.panels.Console
 import util.LightColor
 import world.CellContainer
 import java.lang.Float.max
+import kotlin.random.Random
 
 
 interface LightSource {
     fun light(): LightColor?
+    fun flicker(): Float = 1f
 }
 
 @Serializable
@@ -76,7 +78,6 @@ class Lightbulb : LitThing() {
     override fun name() = "lightbulb"
     override val kind = Kind.LIGHTBULB
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
-
 }
 
 @Serializable
@@ -116,6 +117,12 @@ class Torch : LitThing(), Temporal {
     init { active = false }
 
     override fun light() = if (active) lightColor else null
+
+    private var flicker = 1f
+    override fun flicker() = flicker
+    override fun onRender(delta: Float) {
+        if (System.currentTimeMillis() % 5 == 1L) flicker = Random.nextFloat() * 0.12f + 0.88f
+    }
 
     override fun uses() = mutableSetOf<Use>().apply {
         if (!active) add(Use("light " + name(), 0.5f,

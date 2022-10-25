@@ -346,10 +346,11 @@ class Chunk(
         lightCache[x][y].r = ambient.r
         lightCache[x][y].g = ambient.g
         lightCache[x][y].b = ambient.b
-        lights[x][y].forEach { (_, color) ->
-            lightCache[x][y].r = min(1f, lightCache[x][y].r + color.r)
-            lightCache[x][y].g = min(1f, lightCache[x][y].g + color.g)
-            lightCache[x][y].b = min(1f, lightCache[x][y].b + color.b)
+        lights[x][y].forEach { (light, color) ->
+            val flicker = light.flicker()
+            lightCache[x][y].r = min(1f, (lightCache[x][y].r + color.r) * flicker)
+            lightCache[x][y].g = min(1f, (lightCache[x][y].g + color.g) * flicker)
+            lightCache[x][y].b = min(1f, (lightCache[x][y].b + color.b) * flicker)
         }
         lightCacheDirty[x][y] = false
     }

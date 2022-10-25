@@ -238,7 +238,7 @@ object GameScreen : KtxScreen {
             }
         }
 
-        drawEverything()
+        drawEverything(delta)
 
         LevelKeeper.runActorQueues()
     }
@@ -430,7 +430,7 @@ object GameScreen : KtxScreen {
             }
     }
 
-    private fun drawEverything() {
+    private fun drawEverything(delta: Float) {
 
         val startTime = System.currentTimeMillis()
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -443,7 +443,8 @@ object GameScreen : KtxScreen {
                 doTile = renderTile,
                 doOverlap = renderOverlap,
                 doOcclude = renderOcclude,
-                doSurf = renderSurf
+                doSurf = renderSurf,
+                delta = delta
             )
             //if (terrainBatch.vertexCount < 1) {
             //    log.warn("Davey!  terrainBatch had 0 vertices")

@@ -26,11 +26,12 @@ object Console : Panel() {
 
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
-    private const val burstMax = 2f
+    private const val burstMax = 1.3f
     private const val dimDelayMs = 1200L
     private const val dimLevel = 0.5f
     private var burst = 1f
     private var burstFloor = 1f
+    private var mouseInside = false
 
     private val pronounSubs = mutableMapOf<String,(Entity?,Entity?,Entity?)->String>().apply {
         set("n") { s,d,i -> s?.name() ?: "???" } // subject
@@ -144,24 +145,28 @@ object Console : Panel() {
         if (burstFloor == 1f && System.currentTimeMillis() - dimDelayMs > lastLineMs) {
             burstFloor = dimLevel
         }
-        burst = max(burstFloor, burst - burstDecay * delta)
+        if (!mouseInside) burst = max(burstFloor, burst - burstDecay * delta)
+
         color.apply {
             r = min(1f, GameScreen.fontColor.r * burst)
             g = min(1f, GameScreen.fontColor.g * burst)
             b = min(1f, GameScreen.fontColor.b * burst)
+            a = min(1f, GameScreen.fontColor.a * max(1f, burst))
         }
         colorDull.apply {
             r = min(1f, GameScreen.fontColorDull.r * burst)
             g = min(1f, GameScreen.fontColorDull.g * burst)
             b = min(1f, GameScreen.fontColorDull.b * burst)
+            a = min(1f, GameScreen.fontColorDull.a * burst)
         }
     }
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         super.mouseMovedTo(screenX, screenY)
         if (screenY > this.y) {
+            mouseInside = true
             this.burst = 1.2f
-        }
+        } else mouseInside = false
     }
 
     override fun drawText() {
