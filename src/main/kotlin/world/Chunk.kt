@@ -1,13 +1,10 @@
 package world
 
 import actors.Actor
-import actors.Player
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import things.LightSource
@@ -26,6 +23,8 @@ class Chunk(
 ) {
     @Transient
     private lateinit var level: Level
+    @Transient
+    private var unloaded = false
 
     var x: Int = -999
     var y: Int = -999
@@ -38,7 +37,7 @@ class Chunk(
     private val terrainData = Array(width) { Array(height) { "" } }
     private val things = Array(width) { Array(height) { CellContainer() } }
 
-    private val savedActors: MutableSet<Actor> = mutableSetOf()
+    val savedActors: MutableSet<Actor> = mutableSetOf()
     var generating = true
 
     @Transient
@@ -91,38 +90,36 @@ class Chunk(
 
     fun onRestore(level: Level) {
         connectLevel(level)
-
+        //log.debug("chunk ${this.x} ${this.y} restoring ${savedActors.size} actors")
         savedActors.forEach { actor ->
             actor.onRestore()
             actor.moveTo(level, actor.xy.x, actor.xy.y)
         }
-
     }
 
     // Carve myself into a chunk for the world.
     fun generateWorld(level: Level) {
         generating = true
-
         WorldCarto(x, y, x+width-1,y+height-1,this, level)
             .carveWorldChunk()
-
         generating = false
     }
 
     // Carve myself into a chunk for a building level.
     fun generateLevel(level: Level, building: Building) {
         generating = true
-
         LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this, level)
             .carveLevel(
                 worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
             )
-
         generating = false
     }
 
     fun unload(saveActors: Set<Actor>) {
+        if (unloaded) return
+        unloaded = true
         savedActors.clear()
+        //log.debug("chunk $x $y saving ${saveActors.size} actors")
         savedActors.addAll(saveActors)
 
         mutableSetOf<LightSource>().apply {
@@ -135,9 +132,9 @@ class Chunk(
     // Null out references and so forth.
     private fun finishUnload() {
         generating = true
+        savedActors.forEach { it.level = null }
+        savedActors.clear()
         KtxAsync.launch {
-            savedActors.forEach { it.level = null }
-            savedActors.clear()
             delay(500)
             forEachCell { x, y ->
                 things[x][y].unload()

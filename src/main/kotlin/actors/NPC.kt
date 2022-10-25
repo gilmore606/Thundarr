@@ -5,13 +5,12 @@ import actors.actions.Move
 import actors.actions.Wait
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import util.DIRECTIONS
-import util.XY
-import util.distanceBetween
-import util.log
+import util.*
 
 @Serializable
 sealed class NPC : Actor() {
+
+    val id = shortID()
 
     enum class Awareness { HIBERNATED, UNAWARE, AWARE }
     @Transient val awareRadius = 40f

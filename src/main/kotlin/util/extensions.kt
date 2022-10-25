@@ -9,6 +9,7 @@ import java.util.zip.GZIPOutputStream
 import java.util.UUID
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 inline fun <T> Iterable<T>.hasOneWhere(predicate: (T) -> Boolean): Boolean {
     for (element in this) if (predicate(element)) return true
@@ -36,6 +37,7 @@ fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
     sqrt((x1-x0).toFloat().pow(2) + (y1-y0).toFloat().pow(2))
 
 fun UUID() = UUID.randomUUID().toString()
+fun shortID() = Random.nextInt(100000000).toString()
 
 fun String.aOrAn(): String {
     if (isNotEmpty()) {
