@@ -73,11 +73,8 @@ class Chunk(
 
     fun connectLevel(level: Level) {
         this.level = level
-
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                things[x][y].reconnect(level, x + this.x, y + this.y)
-            }
+        forEachCell { x, y ->
+            things[x][y].reconnect(level, x + this.x, y + this.y)
         }
     }
 
@@ -142,11 +139,9 @@ class Chunk(
             savedActors.forEach { it.level = null }
             savedActors.clear()
             delay(500)
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    things[x][y].unload()
-                    lights[x][y].clear()
-                }
+            forEachCell { x, y ->
+                things[x][y].unload()
+                lights[x][y].clear()
             }
             lightSourceLocations.clear()
         }
@@ -158,10 +153,6 @@ class Chunk(
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
         if (thing is LightSource) { projectLightSource(XY(x, y), thing) }
-    }
-
-    fun removeThingAt(x: Int, y: Int, thing: Thing) {
-        things[x - this.x][y - this.y].remove(thing)
     }
 
     fun onRemoveThing(x: Int, y: Int, thing: Thing) {
@@ -257,19 +248,11 @@ class Chunk(
     }
 
     fun clearVisibility() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                visible[x][y] = false
-            }
-        }
+        forEachCell { x, y -> visible[x][y] = false }
     }
 
     fun clearSeen() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                seen[x][y] = false
-            }
-        }
+        forEachCell { x, y -> seen[x][y] = false }
     }
 
     fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
@@ -328,7 +311,6 @@ class Chunk(
         level.shadowDirty = true
     }
 
-
     // Receive projected light from a source and save it in cache.
     fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) {
         if (boundsCheck(x, y)) {
@@ -359,11 +341,7 @@ class Chunk(
 
     // Force all cells to re-sum light on next frame.
     fun dirtyAllLightCacheCells() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                lightCacheDirty[x][y] = true
-            }
-        }
+        forEachCell { x,y -> lightCacheDirty[x][y] = true }
     }
 
     private fun refreshLightCacheAt(x: Int, y: Int) {
@@ -380,14 +358,19 @@ class Chunk(
     }
 
     fun removeLightSource(lightSource: LightSource) {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                if (lights[x][y].remove(lightSource) != null) {
-                    lightCacheDirty[x][y] = true
-                }
+        forEachCell { x, y ->
+            if (lights[x][y].remove(lightSource) != null) {
+                lightCacheDirty[x][y] = true
             }
         }
         lightSourceLocations.remove(lightSource)
     }
 
+    private fun forEachCell(doThis: (Int,Int)->Unit) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                doThis(x,y)
+            }
+        }
+    }
 }

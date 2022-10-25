@@ -227,8 +227,6 @@ sealed class Level {
 
     fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
 
-    fun removeThingAt(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.removeThingAt(x, y, thing)
-
     fun onRemoveThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onRemoveThing(x, y, thing)
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
