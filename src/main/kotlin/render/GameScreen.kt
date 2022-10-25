@@ -222,7 +222,7 @@ object GameScreen : KtxScreen {
 
     override fun render(delta: Float) {
         animateCamera(delta)
-        App.level.updateForRender()
+        App.level.onRender(delta)
         var dismissedPanel: Panel? = null
         var topModalFound: Modal? = null
         panels.forEach {
@@ -436,40 +436,29 @@ object GameScreen : KtxScreen {
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL_BLEND)
 
+        terrainBatch.clear()
         overlapBatch.clear()
-        terrainBatch.apply {
-            clear()
-            App.level.forEachCellToRender(tileSet,
-                doTile = renderTile,
-                doOverlap = renderOverlap,
-                doOcclude = renderOcclude,
-                doSurf = renderSurf,
-                delta = delta
-            )
-            //if (terrainBatch.vertexCount < 1) {
-            //    log.warn("Davey!  terrainBatch had 0 vertices")
-            //}
-            draw()
-        }
+        thingBatch.clear()
+        actorBatch.clear()
+        uiWorldBatch.clear()
+        uiBatch.clear()
+        uiThingBatch.clear()
+        uiActorBatch.clear()
 
-        overlapBatch.apply {
-            draw()
-        }
+        App.level.forEachCellToRender(
+            terrainBatch.tileSet,
+            doTile = renderTile,
+            doOverlap = renderOverlap,
+            doOcclude = renderOcclude,
+            doSurf = renderSurf,
+            delta = delta
+        )
+        if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }
 
-        thingBatch.apply {
-            clear()
-            App.level.forEachThingToRender(renderThing)
-            draw()
-        }
-
-        actorBatch.apply {
-            clear()
-            App.level.forEachActorToRender(renderActor)
-            draw()
-        }
+        App.level.forEachThingToRender(renderThing)
+        App.level.forEachActorToRender(renderActor)
 
         uiWorldBatch.apply {
-            clear()
             cursorPosition?.also { cursorPosition ->
                 addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
                     getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
@@ -478,21 +467,21 @@ object GameScreen : KtxScreen {
                         getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
                 }
             }
-            draw()
         }
 
-        uiBatch.apply {
-            clear()
-            uiThingBatch.clear()
-            uiActorBatch.clear()
-            panels.forEach { panel ->
-                panel.renderBackground(this)
-                panel.renderEntities()
-            }
-            draw()
-            uiThingBatch.draw()
-            uiActorBatch.draw()
+        panels.forEach { panel ->
+            panel.renderBackground(uiBatch)
+            panel.renderEntities()
         }
+
+        terrainBatch.draw()
+        overlapBatch.draw()
+        thingBatch.draw()
+        actorBatch.draw()
+        uiWorldBatch.draw()
+        uiBatch.draw()
+        uiThingBatch.draw()
+        uiActorBatch.draw()
 
         textBatch.apply {
             projectionMatrix = textCamera.combined

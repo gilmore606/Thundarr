@@ -19,7 +19,7 @@ interface LightSource {
 @Serializable
 sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
-    var active = true
+    var active: Boolean = true
 
     override fun listName() = if (active) super.listName() + " (lit)" else super.listName()
 
@@ -82,6 +82,13 @@ class Lightbulb : LitThing() {
 
 @Serializable
 class Sunsword : LitThing() {
+    private var spawned = false
+    init {
+        if (!spawned) {
+            spawned = true
+            active = false
+        }
+    }
     override fun glyph() = if (active) Glyph.HILT_LIT else Glyph.HILT
     override fun name() = "sunsword"
     override val kind = Kind.SUNSWORD

@@ -5,7 +5,7 @@ import world.ChunkLoader
 
 class LoadingModal(text: String) : SplashModal(text) {
 
-    val minDelayMs = 600
+    val minDelayMs = 1000
 
     private var launchTime = System.currentTimeMillis()
     private var lastCheckTime = System.currentTimeMillis()
