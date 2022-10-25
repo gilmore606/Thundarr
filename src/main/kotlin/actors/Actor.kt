@@ -6,7 +6,6 @@ import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
-import render.QuadBatch
 import things.*
 import util.*
 import world.Entity
@@ -15,6 +14,8 @@ import world.Level
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
+    val id = shortID()
+    var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
@@ -39,6 +40,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun onRestore() {
         contents.forEach { it.onRestore(this) }
+        isUnloading = false
     }
 
     fun moveTo(level: Level?, x: Int, y: Int) {

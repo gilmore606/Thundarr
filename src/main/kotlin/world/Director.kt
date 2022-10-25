@@ -4,8 +4,6 @@ import actors.Actor
 import actors.NPC
 import actors.Player
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
 import things.Temporal
 import util.XY
@@ -24,7 +22,9 @@ class Director(val level: Level) {
 
     private var playerTimePassed = 0f
 
-    // Attach already-positioned actor in the level.
+    private fun MutableList<Actor>.addOnce(actor: Actor) { if (!actor.isUnloading && !contains(actor)) add(actor) }
+    private fun MutableList<Actor>.addOnce(i: Int, actor: Actor) { if (!actor.isUnloading && !contains(actor)) add(i, actor) }
+
     fun attachActor(actor: Actor) {
         KtxAsync.launch {
             if (actor is Player && actor != App.player) {
@@ -54,24 +54,34 @@ class Director(val level: Level) {
                 (toQueue[i].juice == actor.juice && actor is Player) ||
                 (toQueue[i].juice == actor.juice && actors[i].speed() < actorSpeed)
             ) {
-                toQueue.add(i, actor)
+                toQueue.addOnce(i, actor)
                 return
             }
             i++
         }
-        toQueue.add(actor)
+        toQueue.addOnce(actor)
     }
 
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
-        return actors.filter {
-            it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1
-        }.map { detachActor(it) ; it }.filter { it !is Player }.toSet()
+        val unloads = actors.filter { it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1 }
+        val unloadSet = mutableSetOf<Actor>()
+        for (actor in unloads) {
+            if (actor !is Player) {
+                detachActor(actor)
+                actor.isUnloading = true
+                unloadSet.add(actor)
+            }
+        }
+        return unloadSet
     }
 
     fun wakeNPCsNear(xy: XY) {
         actors.forEach {
             if (it is NPC) {
-                if (it.awareness == NPC.Awareness.HIBERNATED && distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.awareRadius) {
+                if (it.awareness == NPC.Awareness.HIBERNATED &&
+                    it.xy.x >= xy.x - it.awareRadius && it.xy.y >= xy.y - it.awareRadius &&
+                    it.xy.x <= xy.x + it.awareRadius && it.xy.y <= xy.y + it.awareRadius &&
+                    distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.awareRadius) {
                     it.unHibernate()
                 }
             }
@@ -123,8 +133,8 @@ class Director(val level: Level) {
         }
 
         actors.clear()
-        actorQueue.forEach { actors.add(it) }
-        nonActorQueue.forEach { actors.add(it) }
+        actorQueue.forEach { actors.addOnce(it) }
+        nonActorQueue.forEach { actors.addOnce(it) }
     }
 
     // Advance world time for all actors.

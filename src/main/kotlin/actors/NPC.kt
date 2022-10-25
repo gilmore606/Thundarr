@@ -10,8 +10,6 @@ import util.*
 @Serializable
 sealed class NPC : Actor() {
 
-    val id = shortID()
-
     enum class Awareness { HIBERNATED, UNAWARE, AWARE }
     @Transient val awareRadius = 40f
     @Transient val hibernateRadius = 50f
