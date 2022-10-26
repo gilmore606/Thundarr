@@ -33,6 +33,7 @@ object Screen : KtxScreen {
     private const val WORLD_ZOOM = 0.85
     private const val ZOOM_SPEED = 4.0
     private const val CAMERA_SPRING = 0.3
+    private const val CAMERA_MENU_SHIFT = 0.8
     var RENDER_WIDTH = 160
     var RENDER_HEIGHT = 100
     var zoom = 0.5
@@ -143,13 +144,12 @@ object Screen : KtxScreen {
 
     private var cameraPovX = 0.0
     private var cameraPovY = 0.0
-    var scrollX = 0f
-    var scrollY = 0f
-    private var scrollTargetX = 0f
-    private var scrollTargetY = 0f
+    private var cameraOffsetX = 0.0
+    private var cameraOffsetY = 0.0
     var scrollLatch = false
     var scrollDragging = false
-    private val dragOrigin = XY(0, 0)
+    private val dragPixels = XY(0, 0)
+    private val lastDrag = XY(0, 0)
 
     var drawTime: Int = 0
     private val lastDrawTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -264,7 +264,8 @@ object Screen : KtxScreen {
             panels.remove(it)
             topModal = topModalFound
             if (topModal == null) {
-                this@Screen.scrollTargetX = 0f
+                this@Screen.cameraOffsetX = 0.0
+                this@Screen.cameraOffsetY = 0.0
             }
         }
 
@@ -287,55 +288,29 @@ object Screen : KtxScreen {
         }
         if (scrollLatch) return
 
-        val xdist = (pov.x - cameraPovX)
-        val ydist = (pov.y - cameraPovY)
+        val targetX = pov.x + cameraOffsetX
+        val targetY = pov.y + cameraOffsetY
+        val xdist = (targetX - cameraPovX)
+        val ydist = (targetY - cameraPovY)
         val xinc = max(0.5, min(1000.0, (xdist.absoluteValue / CAMERA_SPRING))) * xdist.sign
         val yinc = max(0.5, min(1000.0, (ydist.absoluteValue / CAMERA_SPRING))) * ydist.sign
-        if (cameraPovX < pov.x) {
-            cameraPovX = min(pov.x.toDouble(), cameraPovX + xinc * delta)
-        } else if (cameraPovX > pov.x) {
-            cameraPovX = max(pov.x.toDouble(),  cameraPovX + xinc * delta)
+        if (cameraPovX < targetX) {
+            cameraPovX = min(targetX, cameraPovX + xinc * delta)
+        } else if (cameraPovX > targetX) {
+            cameraPovX = max(targetX,  cameraPovX + xinc * delta)
         }
-        if (cameraPovY < pov.y) {
-            cameraPovY = min(pov.y.toDouble(), cameraPovY + yinc * delta)
-        } else if (cameraPovY > pov.y) {
-            cameraPovY = max(pov.y.toDouble(), cameraPovY + yinc * delta)
+        if (cameraPovY < targetY) {
+            cameraPovY = min(targetY, cameraPovY + yinc * delta)
+        } else if (cameraPovY > targetY) {
+            cameraPovY = max(targetY, cameraPovY + yinc * delta)
         }
     }
 
     fun recenterCamera() {
         lastPov.x = pov.x
         lastPov.y = pov.y
-        scrollX = 0f
-        scrollY = 0f
-    }
-
-    fun mouseMovedTo(screenX: Int, screenY: Int) {
-        topModal?.also { modal ->
-            modal.mouseMovedTo(screenX, screenY)
-        } ?: run {
-            panels.forEach {
-                it.mouseMovedTo(screenX, screenY)
-            }
-            if (scrollDragging) {
-                scrollX = pixelToScrollX(dragOrigin.x - screenX)
-                scrollY = pixelToScrollY(dragOrigin.y - screenY)
-            } else {
-                val col = screenXtoTileX(screenX + pixelScrollX())
-                val row = screenYtoTileY(screenY + pixelScrollY())
-                if (col != cursorPosition?.x || row != cursorPosition?.y) {
-                    if (App.level.isSeenAt(col, row)) {
-                        if (App.player.queuedActions.isEmpty()) {
-                            val newCursor = XY(col, row)
-                            cursorPosition = newCursor
-                            cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
-                        } else {
-                            clearCursor()
-                        }
-                    }
-                }
-            }
-        }
+        cameraPovX = pov.x.toDouble()
+        cameraPovY = pov.y.toDouble()
     }
 
     fun clearCursor() {
@@ -376,6 +351,40 @@ object Screen : KtxScreen {
         }
     }
 
+    fun mouseMovedTo(screenX: Int, screenY: Int) {
+        topModal?.also { modal ->
+            modal.mouseMovedTo(screenX, screenY)
+        } ?: run {
+            panels.forEach {
+                it.mouseMovedTo(screenX, screenY)
+            }
+            if (scrollDragging) {
+                dragPixels.x += lastDrag.x - screenX
+                dragPixels.y += lastDrag.y - screenY
+                lastDrag.x = screenX
+                lastDrag.y = screenY
+                val txdist = (dragPixels.x / width.toDouble()) * 2.0 * aspectRatio / tileStride
+                val tydist = (dragPixels.y / height.toDouble()) * 2.0 / tileStride
+                cameraPovX = pov.x + txdist
+                cameraPovY = pov.y + tydist
+            } else {
+                val col = screenXtoTileX(screenX + dragPixels.x)
+                val row = screenYtoTileY(screenY + dragPixels.y)
+                if (col != cursorPosition?.x || row != cursorPosition?.y) {
+                    if (App.level.isSeenAt(col, row)) {
+                        if (App.player.queuedActions.isEmpty()) {
+                            val newCursor = XY(col, row)
+                            cursorPosition = newCursor
+                            cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
+                        } else {
+                            clearCursor()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun mouseScrolled(amount: Float) {
         zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
         zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) WORLD_ZOOM else 1.0)
@@ -383,7 +392,7 @@ object Screen : KtxScreen {
 
     fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         topModal?.also { modal ->
-            modal.mouseClicked(screenX + scrollX.toInt(), screenY + scrollY.toInt(), button)
+            modal.mouseClicked(screenX, screenY, button)
         } ?: run {
             mutableListOf<Panel>().apply { addAll(panels) }.forEach {
                 if (screenX >= it.x && screenX <= it.x + it.width && screenY >= it.y && screenY <= it.y + it.height) {
@@ -392,15 +401,15 @@ object Screen : KtxScreen {
             }
             when (button) {
                 Mouse.Button.LEFT -> {
+                    lastDrag.x = screenX
+                    lastDrag.y = screenY
                     scrollDragging = true
                     scrollLatch = true
-                    dragOrigin.x = screenX + pixelScrollX()
-                    dragOrigin.y = screenY + pixelScrollY()
                     return true
                 }
                 Mouse.Button.RIGHT -> {
-                    val x = screenXtoTileX(screenX)
-                    val y = screenYtoTileY(screenY)
+                    val x = screenXtoTileX(screenX + dragPixels.x)
+                    val y = screenYtoTileY(screenY + dragPixels.y)
                     setCursorPosition(x,y)
                     rightClickCursorTile()
                     return true
@@ -410,21 +419,6 @@ object Screen : KtxScreen {
         }
         return false
     }
-
-    fun rightClickCursorTile() {
-        if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
-        val offset = (8.0 * zoom).toInt()
-        val menu = ContextMenu(tileXtoScreenX(cursorPosition!!.x) - offset, tileYtoScreenY(cursorPosition!!.y) - offset).apply {
-            App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
-        }
-        if (menu.options.isNotEmpty()) addModal(menu)
-    }
-
-    private const val scrollScale = 450.0  // magic from experimentation, should figure out how this is derived, i'm so dumb
-    private fun pixelToScrollX(px: Int) = ((px.toDouble() / zoom) / scrollScale / aspectRatio).toFloat()
-    private fun pixelToScrollY(py: Int) = ((py.toDouble() / zoom) / scrollScale).toFloat()
-    private fun pixelScrollX() = ((scrollX * zoom.toFloat()) * scrollScale * aspectRatio.toFloat()).toInt()
-    private fun pixelScrollY() = ((scrollY * zoom.toFloat()) * scrollScale).toInt()
 
     fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         when (button) {
@@ -440,8 +434,29 @@ object Screen : KtxScreen {
         return false
     }
 
+    fun releaseScrollLatch() {
+        scrollLatch = false
+        scrollDragging = false
+        dragPixels.x = 0
+        dragPixels.y = 0
+    }
+
+    fun rightClickCursorTile() {
+        if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
+        val offset = (8.0 * zoom).toInt()
+        val menu = ContextMenu(
+            tileXtoScreenX(cursorPosition!!.x) - dragPixels.x - offset,
+            tileYtoScreenY(cursorPosition!!.y) - dragPixels.y - offset
+        ).apply {
+            App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
+        }
+        if (menu.options.isNotEmpty()) addModal(menu)
+    }
+
+
     fun povMoved() {
         clearCursor()
+        releaseScrollLatch()
     }
 
     fun addPanel(panel: Panel) {
@@ -456,8 +471,14 @@ object Screen : KtxScreen {
     fun addModal(modal: Modal) {
         if (modal !is ContextMenu) clearCursor()
         addPanel(modal)
-        if (modal.position == Modal.Position.LEFT) {
-            this.scrollTargetX = 0f - (modal.width / 2400f / zoom).toFloat()
+        val tileWidth = ((modal.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride
+        val tileHeight = ((modal.height.toDouble() / (height)) * 2.0) / tileStride
+        when (modal.position) {
+            Modal.Position.LEFT -> { this.cameraOffsetX = 0.0 - (tileWidth / 2.0 * CAMERA_MENU_SHIFT) }
+            Modal.Position.RIGHT -> { this.cameraOffsetX = 0.0 + (tileWidth / 2.0 * CAMERA_MENU_SHIFT) }
+            Modal.Position.TOP -> { this.cameraOffsetY = 0.0 - (tileHeight / 2.0 * CAMERA_MENU_SHIFT) }
+            Modal.Position.BOTTOM -> { this.cameraOffsetY = 0.0 + (tileHeight / 2.0 * CAMERA_MENU_SHIFT) }
+            else -> { }
         }
         topModal = modal
     }
@@ -521,7 +542,6 @@ object Screen : KtxScreen {
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
     fun tileYtoGly(row: Double) = ((row - (cameraPovY) - 0.5) * tileStride)
-
     private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
     private fun screenYtoTileY(screenY: Int) = (((screenY.toFloat() / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + pov.y).toInt()
     private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()

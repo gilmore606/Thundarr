@@ -16,7 +16,7 @@ object ActorPanel : ShadedPanel() {
     private var actors =  ArrayList<Actor>()
 
     init {
-        this.width = 200
+        this.width = RIGHT_PANEL_WIDTH
         this.height = 250
     }
 

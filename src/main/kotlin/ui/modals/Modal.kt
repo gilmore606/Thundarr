@@ -12,7 +12,7 @@ abstract class Modal(
     val title: String? = null,
     val position: Position = Position.LEFT
 ) : Panel() {
-    enum class Position { LEFT, CENTER_LOW, CURSOR }
+    enum class Position { LEFT, TOP, RIGHT, BOTTOM, CENTER_LOW, CURSOR }
 
     var dismissible = true
     private val launchTimeMs = System.currentTimeMillis()
@@ -28,13 +28,20 @@ abstract class Modal(
     override fun onResize(width: Int, height: Int) {
         if (position == Position.LEFT) {
             this.x = 40 + xMargin
+        } else if (position == Position.RIGHT) {
+            this.x = width - xMargin - 40
         } else {
             this.x = (width - this.width) / 2
         }
-        if (position == Position.CENTER_LOW) {
+        if (position == Position.TOP) {
+            this.y = 40 + yMargin
+        } else if (position == Position.BOTTOM) {
+            this.y = height - yMargin - 40
+        } else if (position == Position.CENTER_LOW) {
             this.y = (height - this.height) / 2 + 100
+        } else {
+            this.y = (height - this.height) / 2
         }
-        this.y = (height - this.height) / 2
     }
 
     override fun drawBackground() {

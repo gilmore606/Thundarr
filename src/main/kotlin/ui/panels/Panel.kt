@@ -12,6 +12,10 @@ import java.lang.Integer.max
 
 abstract class Panel {
 
+    companion object {
+        const val RIGHT_PANEL_WIDTH = 200
+    }
+
     private lateinit var textBatch: SpriteBatch
     protected lateinit var boxBatch: QuadBatch
 
@@ -25,14 +29,15 @@ abstract class Panel {
 
     var dismissed = false
 
+    // Amount of space to leave at window edges, scaled by window size.
+    protected var xMargin = 16
+    protected var yMargin = 16
+
     open fun onResize(width: Int, height: Int) {
         xMargin = 2 + (max(0, width - 800) / 70)
         yMargin = 2 + (max(0, height - 400) / 60)
     }
 
-    // Amount of space to leave at window edges, scaled by window size.
-    protected var xMargin = 16
-    protected var yMargin = 16
 
     open fun onRender(delta: Float) { }
 

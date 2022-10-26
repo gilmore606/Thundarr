@@ -17,7 +17,7 @@ object LookPanel : ShadedPanel() {
     private var wrapped = ArrayList<String>()
 
     init {
-        this.width = 200
+        this.width = RIGHT_PANEL_WIDTH
         this.height = 180
     }
 
