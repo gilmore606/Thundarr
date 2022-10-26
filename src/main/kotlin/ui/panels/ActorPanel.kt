@@ -1,7 +1,7 @@
 package ui.panels
 
 import actors.Actor
-import render.GameScreen
+import render.Screen
 import render.tilesets.Glyph
 import world.ChunkLoader
 
@@ -23,8 +23,8 @@ object ActorPanel : ShadedPanel() {
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
         x = width - (this.width) - xMargin
-        y = yMargin + (if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding * 2) else 0) +
-                if (GameScreen.panels.contains(LookPanel)) (LookPanel.height + padding * 2) else 0
+        y = yMargin + (if (Screen.panels.contains(StatusPanel)) (StatusPanel.height + padding * 2) else 0) +
+                if (Screen.panels.contains(LookPanel)) (LookPanel.height + padding * 2) else 0
 
     }
 
@@ -39,8 +39,8 @@ object ActorPanel : ShadedPanel() {
 
     override fun drawText() {
         actors.forEachIndexed { n, actor ->
-            drawString(actor.iname(), padding + 38, padding + spacing * n, font = GameScreen.smallFont,
-                color = if (actor == LookPanel.entity) GameScreen.fontColorBold else GameScreen.fontColorDull)
+            drawString(actor.iname(), padding + 38, padding + spacing * n, font = Screen.smallFont,
+                color = if (actor == LookPanel.entity) Screen.fontColorBold else Screen.fontColorDull)
         }
     }
 
@@ -51,10 +51,10 @@ object ActorPanel : ShadedPanel() {
             actor.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
                 actor.uiBatch().getTextureIndex(actor.glyph(), actor.level(), actor.xy().x, actor.xy().y))
             if (actor == LookPanel.entity) {
-                GameScreen.uiBatch.addPixelQuad(x0 + 36, y0 + 16, x0 + width - padding * 2 - 34, y0 + 36,
-                    GameScreen.uiBatch.getTextureIndex(Glyph.CURSOR))
+                Screen.uiBatch.addPixelQuad(x0 + 36, y0 + 16, x0 + width - padding * 2 - 34, y0 + 36,
+                    Screen.uiBatch.getTextureIndex(Glyph.CURSOR))
             }
-            GameScreen.uiBatch.addHealthBar(x0 + 38, y0 + 20,
+            Screen.uiBatch.addHealthBar(x0 + 38, y0 + 20,
                 x0 + width - padding * 2 - 38, y0 + 32, actor.hp, actor.hpMax)
         }
     }

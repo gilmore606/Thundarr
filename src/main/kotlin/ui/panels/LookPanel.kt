@@ -1,9 +1,7 @@
 package ui.panels
 
 import actors.Player
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import render.GameScreen
-import things.Thing
+import render.Screen
 import ui.modals.InventoryModal
 import util.XY
 import world.Entity
@@ -26,7 +24,7 @@ object LookPanel : ShadedPanel() {
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
         x = width - (this.width) - xMargin
-        y = yMargin + if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding * 2) else 0
+        y = yMargin + if (Screen.panels.contains(StatusPanel)) (StatusPanel.height + padding * 2) else 0
     }
 
     override fun drawText() {
@@ -39,7 +37,7 @@ object LookPanel : ShadedPanel() {
 
     private fun drawWrappedText(text: List<String>, x0: Int, y0: Int) {
         text.forEachIndexed { n, line ->
-            drawString(line, x0, y0 + n * 20, GameScreen.fontColorDull, GameScreen.smallFont)
+            drawString(line, x0, y0 + n * 20, Screen.fontColorDull, Screen.smallFont)
         }
     }
 
@@ -73,9 +71,9 @@ object LookPanel : ShadedPanel() {
         }
     }
 
-    private fun showPos() = GameScreen.cursorPosition ?: App.player.xy
+    private fun showPos() = Screen.cursorPosition ?: App.player.xy
 
-    private fun isInventory(): InventoryModal? = GameScreen.panels.firstOrNull { it is InventoryModal } as InventoryModal?
+    private fun isInventory(): InventoryModal? = Screen.panels.firstOrNull { it is InventoryModal } as InventoryModal?
 
     private fun showEntity(): Entity? {
         val inventory = isInventory()

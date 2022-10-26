@@ -2,7 +2,7 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import render.GameScreen
+import render.Screen
 
 class ContextMenu(
     screenX: Int,
@@ -30,7 +30,7 @@ class ContextMenu(
 
     fun addOption(text: String, handler: ()->Unit): ContextMenu {
         options[text] = handler
-        val optionWidth = GlyphLayout(GameScreen.font, text).width.toInt()
+        val optionWidth = GlyphLayout(Screen.font, text).width.toInt()
         if (optionWidth > maxOptionWidth) {
             maxOptionWidth = optionWidth
             width = optionWidth + padding * 2
@@ -56,7 +56,7 @@ class ContextMenu(
     override fun doSelect() {
         dismiss()
         parentModal?.childSucceeded()
-        GameScreen.clearCursor()
+        Screen.clearCursor()
         options[options.keys.toList()[selection]]?.invoke()
     }
 

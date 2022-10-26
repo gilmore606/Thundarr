@@ -1,7 +1,6 @@
 import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.Screen
 import kotlinx.coroutines.*
 import ui.input.Keyboard
 import ui.input.Mouse
@@ -9,7 +8,7 @@ import kotlinx.serialization.Serializable
 import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
-import render.GameScreen
+import render.Screen
 import things.Apple
 import things.Sunsword
 import things.Torch
@@ -22,7 +21,7 @@ import kotlin.system.exitProcess
 
 const val RESOURCE_FILE_DIR = "src/main/resources/"
 
-object App : KtxGame<Screen>() {
+object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     @Serializable
     data class WorldState(
@@ -65,13 +64,13 @@ object App : KtxGame<Screen>() {
             createNewWorld()
         }
 
-        addScreen(GameScreen)
-        setScreen<GameScreen>()
-        GameScreen.addPanel(Console)
-        GameScreen.addPanel(StatusPanel)
-        GameScreen.addPanel(LookPanel)
-        GameScreen.addPanel(ActorPanel)
-        GameScreen.addPanel(LeftButtons)
+        addScreen(render.Screen)
+        setScreen<render.Screen>()
+        Screen.addPanel(Console)
+        Screen.addPanel(StatusPanel)
+        Screen.addPanel(LookPanel)
+        Screen.addPanel(ActorPanel)
+        Screen.addPanel(LeftButtons)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 
@@ -91,7 +90,7 @@ object App : KtxGame<Screen>() {
 
     override fun dispose() {
         log.info("Thundarr shutting down.")
-        GameScreen.dispose()
+        Screen.dispose()
     }
 
     private fun saveStateAndExitProcess() {
@@ -103,9 +102,9 @@ object App : KtxGame<Screen>() {
                     levelId = level.levelId(),
                     player = player,
                     time = time,
-                    zoomIndex = GameScreen.zoomIndex,
-                    windowSize = GameScreen.savedWindowSize(),
-                    fullscreen = GameScreen.FULLSCREEN
+                    zoomIndex = Screen.zoomIndex,
+                    windowSize = Screen.savedWindowSize(),
+                    fullscreen = Screen.FULLSCREEN
                 )
             )
 
@@ -116,15 +115,15 @@ object App : KtxGame<Screen>() {
     }
 
     private fun restoreState() {
-        GameScreen.addModal(LoadingModal("Returning to the wasteland..."))
+        Screen.addModal(LoadingModal("Returning to the wasteland..."))
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
 
             val state = save.getWorldState()
 
-            GameScreen.resize(state.windowSize.x, state.windowSize.y)
+            Screen.resize(state.windowSize.x, state.windowSize.y)
             if (state.fullscreen) {
-                GameScreen.toggleFullscreen(true)
+                Screen.toggleFullscreen(true)
             } else {
                 Gdx.graphics.setWindowedMode(state.windowSize.x, state.windowSize.y)
             }
@@ -135,7 +134,7 @@ object App : KtxGame<Screen>() {
             level.setPov(player.xy.x, player.xy.y)
 
             updateTime(state.time)
-            GameScreen.restoreZoomIndex(state.zoomIndex)
+            Screen.restoreZoomIndex(state.zoomIndex)
             while (!level.isReady()) {
                 log.info("Waiting for level...")
                 delay(100)
@@ -146,7 +145,7 @@ object App : KtxGame<Screen>() {
     }
 
     private fun createNewWorld() {
-        GameScreen.addModal(LoadingModal("The moon...it's breaking in half!"))
+        Screen.addModal(LoadingModal("The moon...it's breaking in half!"))
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.eraseAll()
@@ -203,8 +202,8 @@ object App : KtxGame<Screen>() {
         player.moveTo(level, x, y)
         updateTime(time)
         level.onRestore()
-        GameScreen.mouseScrolled(0f)
-        GameScreen.recenterCamera()
+        Screen.mouseScrolled(0f)
+        Screen.recenterCamera()
     }
 
     fun advanceTime(delta: Float) {
@@ -247,13 +246,13 @@ object App : KtxGame<Screen>() {
     }
 
     fun saveAndQuit() {
-        GameScreen.addModal(
+        Screen.addModal(
             ConfirmModal(
                 listOf("Quit the game?", "Your progress will be saved."),
                 "Quit", "Cancel"
             ) { yes ->
                 if (yes) {
-                    GameScreen.addModal(LoadingModal("Recording your deeds..."))
+                    Screen.addModal(LoadingModal("Recording your deeds..."))
                     KtxAsync.launch {
                         delay(200)
                         saveStateAndExitProcess()
@@ -266,7 +265,7 @@ object App : KtxGame<Screen>() {
     }
 
     fun restartWorld() {
-        GameScreen.addModal(ConfirmModal(
+        Screen.addModal(ConfirmModal(
             listOf(
                 "Abandon this world?",
                 "All your progress will be lost."),
@@ -283,11 +282,11 @@ object App : KtxGame<Screen>() {
         )
     }
 
-    fun openSettings() { GameScreen.addModal(SettingsModal()) }
-    fun openControls() { GameScreen.addModal(ControlsModal()) }
-    fun openCredits() { GameScreen.addModal(CreditsModal()) }
-    fun openInventory() { GameScreen.addModal(InventoryModal(player)) }
-    fun openMap() { GameScreen.addModal(MapModal()) }
-    fun openSystemMenu() { GameScreen.addModal(SystemMenu()) }
-    fun openJournal() { GameScreen.addModal(JournalModal()) }
+    fun openSettings() { Screen.addModal(SettingsModal()) }
+    fun openControls() { Screen.addModal(ControlsModal()) }
+    fun openCredits() { Screen.addModal(CreditsModal()) }
+    fun openInventory() { Screen.addModal(InventoryModal(player)) }
+    fun openMap() { Screen.addModal(MapModal()) }
+    fun openSystemMenu() { Screen.addModal(SystemMenu()) }
+    fun openJournal() { Screen.addModal(JournalModal()) }
 }

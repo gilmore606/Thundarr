@@ -2,7 +2,7 @@ package ui.panels
 
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
-import render.GameScreen
+import render.Screen
 import render.tilesets.Glyph
 import ui.input.Mouse
 import ui.modals.ContextMenu
@@ -48,8 +48,8 @@ object LeftButtons : Panel() {
 
     private fun shouldShow(): Boolean {
         if (!mouseInside) return false
-        if (GameScreen.topModal == null) return true
-        if (GameScreen.topModal is ContextMenu) return true
+        if (Screen.topModal == null) return true
+        if (Screen.topModal is ContextMenu) return true
         return false
     }
 
@@ -71,7 +71,7 @@ object LeftButtons : Panel() {
         buttons.forEachIndexed { n, button ->
             if (hovered == n) {
                 drawString(button.tip, iconSizeHovered + 16, n * spacing + iconSizeHovered / 2 - 11,
-                    GameScreen.fontColorBold, GameScreen.subTitleFont)
+                    Screen.fontColorBold, Screen.subTitleFont)
             }
         }
 

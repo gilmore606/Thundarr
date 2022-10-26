@@ -1,7 +1,6 @@
 package ui.modals
 
 import com.badlogic.gdx.Input
-import render.GameScreen
 import ui.panels.Panel
 import render.tilesets.Glyph
 import ui.input.Mouse

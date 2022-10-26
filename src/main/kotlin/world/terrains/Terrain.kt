@@ -5,7 +5,7 @@ import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import render.GameScreen
+import render.Screen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.panels.Console
@@ -103,7 +103,7 @@ object PortalDoor : Terrain(
 
     override fun onBump(actor: Actor, data: String) {
         val terrainData = Json.decodeFromString<Data>(data)
-        GameScreen.addModal(ConfirmModal(
+        Screen.addModal(ConfirmModal(
             terrainData.enterMsg.split('\n'), "Travel", "Cancel"
         ) { yes ->
             if (yes) {

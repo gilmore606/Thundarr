@@ -2,7 +2,7 @@ package ui.panels
 
 import actors.Player
 import com.badlogic.gdx.graphics.Color
-import render.GameScreen
+import render.Screen
 import util.log
 import world.Entity
 import world.Level
@@ -148,16 +148,16 @@ object Console : Panel() {
         if (!mouseInside) burst = max(burstFloor, burst - burstDecay * delta)
 
         color.apply {
-            r = min(1f, GameScreen.fontColor.r * burst)
-            g = min(1f, GameScreen.fontColor.g * burst)
-            b = min(1f, GameScreen.fontColor.b * burst)
-            a = min(1f, GameScreen.fontColor.a * max(1f, burst))
+            r = min(1f, Screen.fontColor.r * burst)
+            g = min(1f, Screen.fontColor.g * burst)
+            b = min(1f, Screen.fontColor.b * burst)
+            a = min(1f, Screen.fontColor.a * max(1f, burst))
         }
         colorDull.apply {
-            r = min(1f, GameScreen.fontColorDull.r * burst)
-            g = min(1f, GameScreen.fontColorDull.g * burst)
-            b = min(1f, GameScreen.fontColorDull.b * burst)
-            a = min(1f, GameScreen.fontColorDull.a * burst)
+            r = min(1f, Screen.fontColorDull.r * burst)
+            g = min(1f, Screen.fontColorDull.g * burst)
+            b = min(1f, Screen.fontColorDull.b * burst)
+            a = min(1f, Screen.fontColorDull.a * burst)
         }
     }
 

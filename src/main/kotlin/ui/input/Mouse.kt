@@ -2,25 +2,24 @@ package ui.input
 
 import com.badlogic.gdx.Input
 import ktx.app.KtxInputAdapter
-import render.GameScreen
-import util.log
+import render.Screen
 
 object Mouse : KtxInputAdapter {
 
     enum class Button { LEFT, MIDDLE, RIGHT }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        GameScreen.mouseMovedTo(screenX, screenY)
+        Screen.mouseMovedTo(screenX, screenY)
         return super.mouseMoved(screenX, screenY)
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        GameScreen.mouseMovedTo(screenX, screenY)
+        Screen.mouseMovedTo(screenX, screenY)
         return true
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        GameScreen.mouseScrolled(amountY)
+        Screen.mouseScrolled(amountY)
         return true
     }
 
@@ -31,7 +30,7 @@ object Mouse : KtxInputAdapter {
             Input.Buttons.RIGHT -> Button.RIGHT
             else -> Button.RIGHT
         }
-        if (GameScreen.mouseDown(screenX, screenY, ourButton)) return true
+        if (Screen.mouseDown(screenX, screenY, ourButton)) return true
         return super.touchDown(screenX, screenY, pointer, button)
     }
 
@@ -42,7 +41,7 @@ object Mouse : KtxInputAdapter {
             Input.Buttons.RIGHT -> Button.RIGHT
             else -> Button.RIGHT
         }
-        if (GameScreen.mouseUp(screenX, screenY, ourButton)) return true
+        if (Screen.mouseUp(screenX, screenY, ourButton)) return true
         return super.touchUp(screenX, screenY, pointer, button)
     }
 }

@@ -1,6 +1,6 @@
 package ui.modals
 
-import render.GameScreen
+import render.Screen
 import ui.input.Mouse
 import world.Entity
 
@@ -10,8 +10,8 @@ class ExamineModal(
 
     private val padding = 22
 
-    private val wrappedDesc = wrapText(entity.description(), width - 64, padding, GameScreen.font)
-    private val wrappedInfo = wrapText("You don't know anything interesting about " + entity.iname() + ".", width, padding, GameScreen.font)
+    private val wrappedDesc = wrapText(entity.description(), width - 64, padding, Screen.font)
+    private val wrappedInfo = wrapText("You don't know anything interesting about " + entity.iname() + ".", width, padding, Screen.font)
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()
@@ -26,8 +26,8 @@ class ExamineModal(
     override fun drawText() {
         super.drawText()
         if (isAnimating()) return
-        drawWrappedText(wrappedDesc, padding, padding + 60, 24, GameScreen.font)
-        drawWrappedText(wrappedInfo, padding, padding + 80 + 24 * wrappedDesc.size, 24, GameScreen.font)
+        drawWrappedText(wrappedDesc, padding, padding + 60, 24, Screen.font)
+        drawWrappedText(wrappedInfo, padding, padding + 80 + 24 * wrappedDesc.size, 24, Screen.font)
     }
 
     override fun drawEntities() {

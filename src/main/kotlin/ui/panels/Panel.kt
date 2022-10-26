@@ -4,11 +4,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import render.GameScreen
+import render.Screen
 import render.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
-import util.LightColor
 import java.lang.Integer.max
 
 abstract class Panel {
@@ -60,17 +59,17 @@ abstract class Panel {
 
     abstract fun drawText()
 
-    protected fun measure(text: String) = GlyphLayout(GameScreen.font, text).width.toInt()
+    protected fun measure(text: String) = GlyphLayout(Screen.font, text).width.toInt()
 
-    protected fun drawString(text: String, x: Int, y: Int, color: Color = GameScreen.fontColor, font: BitmapFont = GameScreen.font) {
+    protected fun drawString(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         font.color = color
-        font.draw(textBatch, text, ((x  + this.x) - (GameScreen.width / 2f)), 0f - ((y + this.y) - (GameScreen.height / 2f)))
+        font.draw(textBatch, text, ((x  + this.x) - (Screen.width / 2f)), 0f - ((y + this.y) - (Screen.height / 2f)))
     }
 
     protected fun drawTitle(text: String) {
-        val xOffset = (width - GlyphLayout(GameScreen.titleFont, text).width) / 2f
+        val xOffset = (width - GlyphLayout(Screen.titleFont, text).width) / 2f
         val yOffset = 24f
-        GameScreen.titleFont.draw(textBatch, text, ((this.x + xOffset) - (GameScreen.width / 2f)), 0f - ((this.y + yOffset) - (GameScreen.height / 2f)))
+        Screen.titleFont.draw(textBatch, text, ((this.x + xOffset) - (Screen.width / 2f)), 0f - ((this.y + yOffset) - (Screen.height / 2f)))
     }
 
     protected fun drawBox(x: Int, y: Int, width: Int, height: Int) {
@@ -82,7 +81,7 @@ abstract class Panel {
             boxBatch.getTextureIndex(Glyph.BOX_BG))
     }
 
-    protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = GameScreen.smallFont): ArrayList<String> {
+    protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.smallFont): ArrayList<String> {
         val wrapped = ArrayList<String>()
         var remaining = text
         var nextLine = ""
@@ -116,8 +115,8 @@ abstract class Panel {
     }
 
     protected fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
-                                    font: BitmapFont = GameScreen.smallFont,
-                                    color: Color = GameScreen.fontColor) {
+                                  font: BitmapFont = Screen.smallFont,
+                                  color: Color = Screen.fontColor) {
         text.forEachIndexed { n, line ->
             drawString(line, x0, y0 + n * spacing, color, font)
         }

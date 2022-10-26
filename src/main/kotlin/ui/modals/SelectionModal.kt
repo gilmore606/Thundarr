@@ -1,9 +1,7 @@
 package ui.modals
 
 import com.badlogic.gdx.Input
-import kotlinx.coroutines.selects.select
-import render.GameScreen
-import render.tilesets.Glyph
+import render.Screen
 import ui.input.Mouse
 import world.Entity
 
@@ -39,7 +37,7 @@ abstract class SelectionModal(
 
     protected fun drawOptionText(text: String, index: Int, spaceForIcon: Boolean = false) {
         drawString(text, padding + (if (spaceForIcon) 28 else 0), headerPad + spacing * index - 2,
-            if (index == selection) GameScreen.fontColorBold else GameScreen.fontColor)
+            if (index == selection) Screen.fontColorBold else Screen.fontColor)
     }
 
     protected fun drawOptionIcon(entity: Entity, index: Int) {

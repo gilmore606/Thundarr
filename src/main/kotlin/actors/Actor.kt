@@ -5,7 +5,7 @@ import actors.actions.Equip
 import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import render.GameScreen
+import render.Screen
 import render.sparks.HealthUp
 import things.*
 import util.*
@@ -37,8 +37,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun level() = level
     override fun xy() = xy
     override fun contents() = contents
-    override fun glyphBatch() = GameScreen.actorBatch
-    override fun uiBatch() = GameScreen.uiActorBatch
+    override fun glyphBatch() = Screen.actorBatch
+    override fun uiBatch() = Screen.uiActorBatch
 
     abstract fun canAct(): Boolean
     abstract fun isActing(): Boolean

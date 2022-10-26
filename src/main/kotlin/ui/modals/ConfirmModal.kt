@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
-import render.GameScreen
+import render.Screen
 import ui.input.Mouse
 
 class ConfirmModal(
@@ -19,7 +19,7 @@ class ConfirmModal(
 ) {
 
     companion object {
-        fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(GameScreen.font, it).width }.toInt()
+        fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(Screen.font, it).width }.toInt()
     }
 
     val yesOffset: Int
@@ -29,8 +29,8 @@ class ConfirmModal(
 
     init {
         mouseSelection = false
-        yesWidth = GlyphLayout(GameScreen.font, yesText).width.toInt()
-        noWidth = GlyphLayout(GameScreen.font, noText).width.toInt()
+        yesWidth = GlyphLayout(Screen.font, yesText).width.toInt()
+        noWidth = GlyphLayout(Screen.font, noText).width.toInt()
         val spaceWidth = (width - 48) - (yesWidth + noWidth)
         yesOffset = spaceWidth / 3
         noOffset = yesOffset + yesWidth + spaceWidth / 3
@@ -39,14 +39,14 @@ class ConfirmModal(
     override fun drawModalText() {
         var iy = 24
         text.forEach { line ->
-            drawString(line, 24, iy, GameScreen.fontColorBold)
+            drawString(line, 24, iy, Screen.fontColorBold)
             iy += 24
         }
         iy += 20
         drawString(yesText, 24 + yesOffset, iy,
-            if (selection == 0) GameScreen.fontColorBold else GameScreen.fontColor)
+            if (selection == 0) Screen.fontColorBold else Screen.fontColor)
         drawString(noText, 24 + noOffset, iy,
-            if (selection == 1) GameScreen.fontColorBold else GameScreen.fontColor)
+            if (selection == 1) Screen.fontColorBold else Screen.fontColor)
     }
 
     override fun drawBackground() {

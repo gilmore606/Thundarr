@@ -25,13 +25,14 @@ import world.WorldLevel
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
-object GameScreen : KtxScreen {
-
-    var FNORD_STEP = 0.1f
+object Screen : KtxScreen {
 
     private const val WORLD_ZOOM = 0.85
     private const val ZOOM_SPEED = 4.0
+    private const val CAMERA_SPRING = 0.3
     var RENDER_WIDTH = 160
     var RENDER_HEIGHT = 100
     var zoom = 0.5
@@ -140,11 +141,8 @@ object GameScreen : KtxScreen {
         get() = App.level.pov
     private val lastPov = XY(0,0)
 
-    private const val cameraPull = 0.19f
-    private const val cameraAccel = 25f
-
-    private var cameraPovX = 0f
-    private var cameraPovY = 0f
+    private var cameraPovX = 0.0
+    private var cameraPovY = 0.0
     var scrollX = 0f
     var scrollY = 0f
     private var scrollTargetX = 0f
@@ -160,7 +158,7 @@ object GameScreen : KtxScreen {
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
         terrainBatch.addTileQuad(
-            tx - pov.x, ty - pov.y, textureIndex, vis, light
+            tx, ty, textureIndex, vis, light
         )
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
@@ -172,7 +170,7 @@ object GameScreen : KtxScreen {
     private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
         overlapBatch.addOverlapQuad(
-            tx - pov.x - edge.x, ty - pov.y - edge.y, edge,
+            tx - edge.x, ty - edge.y, edge,
             textureIndex, vis, light
         )
     }
@@ -182,7 +180,7 @@ object GameScreen : KtxScreen {
             if (edge == NORTH || edge == SOUTH) Glyph.OCCLUSION_SHADOWS_H else Glyph.OCCLUSION_SHADOWS_V
         )
         overlapBatch.addOccludeQuad(
-            tx - pov.x, ty - pov.y, edge, textureIndex, 1f, fullLight
+            tx, ty, edge, textureIndex, 1f, fullLight
         )
     }
 
@@ -191,7 +189,7 @@ object GameScreen : KtxScreen {
             if (edge == NORTH || edge == SOUTH) Glyph.SURF_H else Glyph.SURF_V
         )
         overlapBatch.addOccludeQuad(
-            tx - pov.x, ty - pov.y, edge, textureIndex, vis, light
+            tx, ty, edge, textureIndex, vis, light
         )
     }
 
@@ -199,7 +197,7 @@ object GameScreen : KtxScreen {
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
         thingBatch.addTileQuad(
-            tx - pov.x, ty - pov.y,
+            tx, ty,
             thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly])
     }
 
@@ -208,14 +206,14 @@ object GameScreen : KtxScreen {
         val ly = ty - pov.y + RENDER_HEIGHT
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
         actorBatch.addTileQuad(
-            tx - pov.x, ty - pov.y,
+            tx, ty,
             actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light)
     }
 
     private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
         worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
             batch.addTileQuad(
-                tx - pov.x, ty - pov.y,
+                tx, ty,
                 batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light,
                 offsetX, offsetY, scale, alpha
             )
@@ -266,7 +264,7 @@ object GameScreen : KtxScreen {
             panels.remove(it)
             topModal = topModalFound
             if (topModal == null) {
-                this@GameScreen.scrollTargetX = 0f
+                this@Screen.scrollTargetX = 0f
             }
         }
 
@@ -288,24 +286,20 @@ object GameScreen : KtxScreen {
             zoom = max(zoomTarget, zoom - diff * delta * ZOOM_SPEED)
         }
         if (scrollLatch) return
-        val step = FNORD_STEP
-        if (pov.x != lastPov.x || pov.y != lastPov.y) {
-            scrollX += ((lastPov.x - pov.x) * step / aspectRatio).toFloat()
-            scrollY += ((lastPov.y - pov.y) * step).toFloat()
-            lastPov.x = pov.x
-            lastPov.y = pov.y
+
+        val xdist = (pov.x - cameraPovX)
+        val ydist = (pov.y - cameraPovY)
+        val xinc = max(0.5, min(1000.0, (xdist.absoluteValue / CAMERA_SPRING))) * xdist.sign
+        val yinc = max(0.5, min(1000.0, (ydist.absoluteValue / CAMERA_SPRING))) * ydist.sign
+        if (cameraPovX < pov.x) {
+            cameraPovX = min(pov.x.toDouble(), cameraPovX + xinc * delta)
+        } else if (cameraPovX > pov.x) {
+            cameraPovX = max(pov.x.toDouble(),  cameraPovX + xinc * delta)
         }
-        val accX = 1f + abs(scrollX - scrollTargetX) * cameraAccel / zoom.toFloat()
-        val accY = 1f + abs(scrollY - scrollTargetY) * cameraAccel / zoom.toFloat()
-        scrollX = if (scrollX > scrollTargetX) {
-            kotlin.math.max(scrollTargetX,(scrollX - cameraPull * delta * accX * zoom.toFloat() ))
-        } else {
-            kotlin.math.min(scrollTargetX,(scrollX + cameraPull * delta * accX * zoom.toFloat() ))
-        }
-        scrollY = if (scrollY > scrollTargetY) {
-            kotlin.math.max(scrollTargetY,(scrollY - cameraPull * delta * accY * zoom.toFloat() ))
-        } else {
-            kotlin.math.min(scrollTargetY,(scrollY + cameraPull * delta * accY * zoom.toFloat() ))
+        if (cameraPovY < pov.y) {
+            cameraPovY = min(pov.y.toDouble(), cameraPovY + yinc * delta)
+        } else if (cameraPovY > pov.y) {
+            cameraPovY = max(pov.y.toDouble(), cameraPovY + yinc * delta)
         }
     }
 
@@ -492,10 +486,10 @@ object GameScreen : KtxScreen {
 
         uiWorldBatch.apply {
             cursorPosition?.also { cursorPosition ->
-                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y,
+                addTileQuad(cursorPosition.x, cursorPosition.y,
                     getTextureIndex(Glyph.CURSOR), 1f, fullLight)
                 cursorLine.forEach { xy ->
-                    addTileQuad(xy.x - pov.x, xy.y - pov.y,
+                    addTileQuad(xy.x, xy.y,
                         getTextureIndex(Glyph.CURSOR), 1f, fullLight)
                 }
             }
@@ -525,8 +519,8 @@ object GameScreen : KtxScreen {
         drawTime /= 10
     }
 
-    fun tileXtoGlx(col: Double) = ((col - 0.5) * tileStride) / aspectRatio - (scrollX * zoom)
-    fun tileYtoGly(row: Double) = ((row - 0.5) * tileStride) - (scrollY * zoom)
+    fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
+    fun tileYtoGly(row: Double) = ((row - (cameraPovY) - 0.5) * tileStride)
 
     private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
     private fun screenYtoTileY(screenY: Int) = (((screenY.toFloat() / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + pov.y).toInt()

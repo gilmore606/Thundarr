@@ -3,12 +3,10 @@ package ui.modals
 import actors.actions.Drop
 import actors.actions.UseThing
 import com.badlogic.gdx.Input
-import render.GameScreen
+import render.Screen
 import things.Thing
 import things.ThingHolder
-import util.aOrAn
 import util.groundAtPlayer
-import util.log
 import util.plural
 import java.lang.Integer.max
 
@@ -84,7 +82,7 @@ class InventoryModal(
     override fun doSelect() {
         val parent = this
         val ourSelection = selection
-        GameScreen.addModal(ContextMenu(width - 10, optionY(ourSelection) - 4).apply {
+        Screen.addModal(ContextMenu(width - 10, optionY(ourSelection) - 4).apply {
             this.parentModal = parent
             val these = grouped[ourSelection]
             val thing = these[0]

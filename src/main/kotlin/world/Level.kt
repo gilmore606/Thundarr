@@ -4,7 +4,7 @@ import actors.Actor
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
-import render.GameScreen
+import render.Screen
 import render.sparks.Spark
 import render.sunLights
 import render.tileholders.OverlapTile
@@ -70,8 +70,8 @@ sealed class Level {
         doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
         delta: Float
     ) {
-        for (x in pov.x - GameScreen.RENDER_WIDTH /2 until pov.x + GameScreen.RENDER_WIDTH /2) {
-            for (y in pov.y - GameScreen.RENDER_HEIGHT /2 until pov.y + GameScreen.RENDER_HEIGHT /2) {
+        for (x in pov.x - Screen.RENDER_WIDTH /2 until pov.x + Screen.RENDER_WIDTH /2) {
+            for (y in pov.y - Screen.RENDER_HEIGHT /2 until pov.y + Screen.RENDER_HEIGHT /2) {
                 val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
@@ -139,8 +139,8 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     ) {
-        for (x in pov.x - GameScreen.RENDER_WIDTH/2 until pov.x + GameScreen.RENDER_WIDTH/2) {
-            for (y in pov.y - GameScreen.RENDER_HEIGHT/2 until pov.y + GameScreen.RENDER_HEIGHT/2) {
+        for (x in pov.x - Screen.RENDER_WIDTH/2 until pov.x + Screen.RENDER_WIDTH/2) {
+            for (y in pov.y - Screen.RENDER_HEIGHT/2 until pov.y + Screen.RENDER_HEIGHT/2) {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
@@ -170,7 +170,7 @@ sealed class Level {
         allChunks().forEach { it.sparks().forEach { spark ->
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(spark.xy.x, spark.xy.y)
             if (vis == 1f && chunkAt(spark.xy.x, spark.xy.y) != null) {
-                val light = if (spark.isLit()) this.lightAt(spark.xy.x, spark.xy.y) else GameScreen.fullLight
+                val light = if (spark.isLit()) this.lightAt(spark.xy.x, spark.xy.y) else Screen.fullLight
                 doThis(
                     spark.xy.x, spark.xy.y, spark.glyph(), light, spark.offsetX(), spark.offsetY(), spark.scale(), spark.alpha()
                 )
@@ -185,7 +185,7 @@ sealed class Level {
         onSetPov()
         shadowDirty = true
         updateStepMap()
-        if (this == App.level) GameScreen.povMoved()
+        if (this == App.level) Screen.povMoved()
     }
 
     fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
@@ -380,7 +380,7 @@ sealed class Level {
         }
         actorAt(x, y)?.also { actor ->
             menu.addOption("examine " + actor.name()) {
-                GameScreen.addModal(ExamineModal(actor))
+                Screen.addModal(ExamineModal(actor))
             }
         }
     }

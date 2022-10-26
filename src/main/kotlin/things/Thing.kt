@@ -3,13 +3,8 @@ package things
 import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import render.GameScreen
-import render.QuadBatch
-import render.tilesets.Glyph
-import util.LightColor
-import util.XY
+import render.Screen
 import util.aOrAn
-import util.log
 import world.Entity
 import world.Level
 
@@ -47,8 +42,8 @@ sealed class Thing : Entity {
 
     override fun level() = holder?.level
     override fun xy() = holder?.xy()
-    override fun glyphBatch() = GameScreen.thingBatch
-    override fun uiBatch() = GameScreen.uiThingBatch
+    override fun glyphBatch() = Screen.thingBatch
+    override fun uiBatch() = Screen.uiThingBatch
 
     open fun listName() = name().aOrAn()
 
