@@ -34,8 +34,8 @@ object Screen : KtxScreen {
     private const val ZOOM_SPEED = 4.0
     private const val CAMERA_SPRING = 0.3
     private const val CAMERA_MENU_SHIFT = 0.8
-    var RENDER_WIDTH = 160
-    var RENDER_HEIGHT = 100
+    private const val MAX_RENDER_WIDTH = 150
+    private const val MAX_RENDER_HEIGHT = 120
     var zoom = 0.5
         set(value) {
             field = value
@@ -53,6 +53,8 @@ object Screen : KtxScreen {
 
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
+    var renderTilesWide = 80
+    var renderTilesHigh = 50
 
     private val terrainTileSet = TerrainTileSet()
     private val thingTileSet = ThingTileSet()
@@ -72,7 +74,7 @@ object Screen : KtxScreen {
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
 
-    private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
+    private val lightCache = Array(MAX_RENDER_WIDTH * 2 + 1) { Array(MAX_RENDER_HEIGHT * 2 + 1) { LightColor(1f, 0f, 0f) } }
     val fullLight = LightColor(1f, 1f, 1f)
     val fullDark = LightColor(0f, 0f, 0f)
 
@@ -160,8 +162,8 @@ object Screen : KtxScreen {
         terrainBatch.addTileQuad(
             tx, ty, textureIndex, vis, light
         )
-        val lx = tx - pov.x + RENDER_WIDTH
-        val ly = ty - pov.y + RENDER_HEIGHT
+        val lx = tx - pov.x + renderTilesWide
+        val ly = ty - pov.y + renderTilesHigh
         lightCache[lx][ly].r = light.r
         lightCache[lx][ly].g = light.g
         lightCache[lx][ly].b = light.b
@@ -194,16 +196,16 @@ object Screen : KtxScreen {
     }
 
     private val renderThing: (Int, Int, Float, Glyph)->Unit = { tx, ty, vis, glyph ->
-        val lx = tx - pov.x + RENDER_WIDTH
-        val ly = ty - pov.y + RENDER_HEIGHT
+        val lx = tx - pov.x + renderTilesWide
+        val ly = ty - pov.y + renderTilesHigh
         thingBatch.addTileQuad(
             tx, ty,
             thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly])
     }
 
     private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
-        val lx = tx - pov.x + RENDER_WIDTH
-        val ly = ty - pov.y + RENDER_HEIGHT
+        val lx = tx - pov.x + renderTilesWide
+        val ly = ty - pov.y + renderTilesHigh
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
         actorBatch.addTileQuad(
             tx, ty,
@@ -550,6 +552,9 @@ object Screen : KtxScreen {
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
         tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01) * zoom
+        renderTilesWide = kotlin.math.min(MAX_RENDER_WIDTH, ((width.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
+        renderTilesHigh = kotlin.math.min(MAX_RENDER_HEIGHT, ((height.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
+        log.debug("new surface params aspect $aspectRatio stride $tileStride, $renderTilesWide by $renderTilesHigh tiles")
     }
 
     override fun dispose() {

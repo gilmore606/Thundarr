@@ -70,8 +70,8 @@ sealed class Level {
         doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
         delta: Float
     ) {
-        for (x in pov.x - Screen.RENDER_WIDTH /2 until pov.x + Screen.RENDER_WIDTH /2) {
-            for (y in pov.y - Screen.RENDER_HEIGHT /2 until pov.y + Screen.RENDER_HEIGHT /2) {
+        for (x in pov.x - Screen.renderTilesWide /2 until pov.x + Screen.renderTilesWide /2) {
+            for (y in pov.y - Screen.renderTilesHigh /2 until pov.y + Screen.renderTilesHigh /2) {
                 val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
@@ -139,8 +139,8 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
     ) {
-        for (x in pov.x - Screen.RENDER_WIDTH/2 until pov.x + Screen.RENDER_WIDTH/2) {
-            for (y in pov.y - Screen.RENDER_HEIGHT/2 until pov.y + Screen.RENDER_HEIGHT/2) {
+        for (x in pov.x - Screen.renderTilesWide/2 until pov.x + Screen.renderTilesWide/2) {
+            for (y in pov.y - Screen.renderTilesHigh/2 until pov.y + Screen.renderTilesHigh/2) {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
