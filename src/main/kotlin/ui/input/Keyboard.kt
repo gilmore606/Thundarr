@@ -97,7 +97,10 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.NUMPAD_6, Input.Keys.D -> { if (CURSOR_MODE) GameScreen.moveCursor(EAST) else App.player.tryMove(EAST) }
             Input.Keys.NUMPAD_9, Input.Keys.E -> { if (CURSOR_MODE) GameScreen.moveCursor(NORTHEAST) else App.player.tryMove(NORTHEAST) }
             Input.Keys.NUMPAD_5, Input.Keys.S -> { GameScreen.rightClickCursorTile() }
+
             Input.Keys.NUMPAD_DIVIDE -> { toggleCursorMode() }
+            Input.Keys.PAGE_UP -> { CURSOR_MODE = true ; GameScreen.cursorNextActor(-1) }
+            Input.Keys.PAGE_DOWN -> { CURSOR_MODE = true ; GameScreen.cursorNextActor(1) }
 
             Input.Keys.EQUALS -> { GameScreen.mouseScrolled(-1.43f) }
             Input.Keys.MINUS -> { GameScreen.mouseScrolled(1.43f) }

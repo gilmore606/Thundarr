@@ -14,7 +14,7 @@ class ContextMenu(
         fun childSucceeded()
     }
 
-    private val options = mutableMapOf<String,()->Unit>()
+    val options = mutableMapOf<String,()->Unit>()
     private var maxOptionWidth = 0
 
     init {

@@ -31,7 +31,19 @@ sealed class Consumable : Portable() {
 }
 
 @Serializable
-class Apple : Consumable() {
+sealed class Food : Consumable() {
+    override fun consumeDuration() = 2f
+    override fun consumeSelfMsg() = "You wolf down %id.  That really hit the spot."
+
+    open fun nutrition() = 5f
+
+    override fun onConsume(actor: Actor) {
+        actor.gainHealth(nutrition())
+    }
+}
+
+@Serializable
+class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
     override val kind = Kind.APPLE

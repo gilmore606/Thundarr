@@ -6,10 +6,12 @@ import actors.actions.Unequip
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.GameScreen
+import render.sparks.HealthUp
 import things.*
 import util.*
 import world.Entity
 import world.Level
+import java.lang.Integer.min
 
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
@@ -20,6 +22,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var juice = 0f // How many turns am I owed?
     val queuedActions: MutableList<Action> = mutableListOf()
     val contents = mutableListOf<Thing>()
+
+    var hp = 8
+    var hpMax = 20
 
     @Transient
     override var level: Level? = null
@@ -122,5 +127,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (gear.equipped) {
             queue(Unequip(gear))
         }
+    }
+
+    fun gainHealth(amount: Float) {
+        hp = min(hpMax, (hp + amount).toInt())
+        level?.addSpark(HealthUp().at(xy.x, xy.y))
     }
 }

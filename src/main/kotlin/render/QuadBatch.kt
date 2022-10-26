@@ -202,6 +202,25 @@ class QuadBatch(
         addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, 1f, 0f)
     }
 
+    fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, hp: Int, hpMax: Int) {
+        val amount = (hp.toFloat() / hpMax.toFloat())
+        val xMid = x0 + ((x1 - x0) * amount).toInt()
+        val glx0 = (x0 / GameScreen.width.toDouble()) * 2f - 1f
+        val gly0 = (y0 / GameScreen.height.toDouble()) * 2f - 1f
+        val glx1 = (x1 / GameScreen.width.toDouble()) * 2f - 1f
+        val gly1 = (y1 / GameScreen.height.toDouble()) * 2f - 1f
+        val glxMid = (xMid / GameScreen.width.toDouble()) * 2f - 1f
+        val textureIndex = getTextureIndex(Glyph.COLOR_BARS)
+
+        val texOffset = when {
+            amount < 0.35 -> 0f
+            amount < 0.5 -> 0.125f
+            else -> 0.25f
+        }
+        addQuad(glx0, gly0, glxMid, gly1, textureIndex = textureIndex, ity0 = texOffset + 0.001f, ity1 = texOffset + 0.124f)
+        addQuad(glxMid, gly0, glx1, gly1, textureIndex = textureIndex, ity0 = 0.376f, ity1 = 0.499f)
+    }
+
     private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double,
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f

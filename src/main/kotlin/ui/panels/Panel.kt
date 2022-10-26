@@ -8,6 +8,7 @@ import render.GameScreen
 import render.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
+import util.LightColor
 import java.lang.Integer.max
 
 abstract class Panel {
@@ -79,5 +80,46 @@ abstract class Panel {
             boxBatch.getTextureIndex(Glyph.BOX_BORDER))
         boxBatch.addPixelQuad(x, y, x + width, y + height,
             boxBatch.getTextureIndex(Glyph.BOX_BG))
+    }
+
+    protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = GameScreen.smallFont): ArrayList<String> {
+        val wrapped = ArrayList<String>()
+        var remaining = text
+        var nextLine = ""
+        var linePixelsLeft = (width - padding * 2)
+        val spaceWidth = GlyphLayout(font, " ").width.toInt()
+        while (remaining.isNotEmpty() || remaining == " ") {
+            // get next word
+            val space = remaining.indexOf(' ')
+            var word = ""
+            if (space >= 0) {
+                word = remaining.substring(0, space)
+                remaining = remaining.substring(space + 1, remaining.length)
+            } else {
+                word = remaining
+                remaining = ""
+            }
+            if (word != " ") {
+                val wordWidth = GlyphLayout(font, word).width.toInt()
+                if (nextLine == "" || wordWidth <= linePixelsLeft) {
+                    nextLine += word + " "
+                    linePixelsLeft -= wordWidth + spaceWidth
+                } else {
+                    wrapped.add(nextLine)
+                    nextLine = word + " "
+                    linePixelsLeft = (width - padding * 2) - wordWidth - spaceWidth
+                }
+            }
+        }
+        if (nextLine != "") wrapped.add(nextLine)
+        return wrapped
+    }
+
+    protected fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
+                                    font: BitmapFont = GameScreen.smallFont,
+                                    color: Color = GameScreen.fontColor) {
+        text.forEachIndexed { n, line ->
+            drawString(line, x0, y0 + n * spacing, color, font)
+        }
     }
 }

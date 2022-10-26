@@ -16,6 +16,7 @@ import things.Portable
 import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
+import ui.modals.ExamineModal
 import ui.panels.Console
 import util.*
 import world.terrains.Terrain
@@ -230,9 +231,7 @@ sealed class Level {
 
     protected open fun onSetPov() { }
 
-    open fun onRestore() {
-
-    }
+    open fun onRestore() { }
 
     open fun unload() { }
 
@@ -374,12 +373,16 @@ sealed class Level {
             }
         } else {
             if (isWalkableAt(x, y)) {
-                menu.addOption("walk to") {
+                menu.addOption("walk here") {
                     App.player.queue(WalkTo(this, x, y))
                 }
             }
         }
-        menu.addOption("examine") { }
+        actorAt(x, y)?.also { actor ->
+            menu.addOption("examine " + actor.name()) {
+                GameScreen.addModal(ExamineModal(actor))
+            }
+        }
     }
 
     // What action does the player take when bumping into xy?
@@ -390,5 +393,11 @@ sealed class Level {
             return BumpTerrain(XY(x,y))
         }
         return null
+    }
+
+    fun visibleNPCs() = ArrayList<Actor>().apply {
+        director.actors.forEach { actor ->
+            if (visibilityAt(actor.xy.x, actor.xy.y) == 1f && actor !is Player) add(actor)
+        }
     }
 }

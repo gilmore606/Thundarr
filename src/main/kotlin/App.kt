@@ -1,3 +1,4 @@
+import actors.Actor
 import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -14,10 +15,7 @@ import things.Apple
 import things.Sunsword
 import things.Torch
 import ui.modals.*
-import ui.panels.Console
-import ui.panels.LeftButtons
-import ui.panels.LookPanel
-import ui.panels.StatusPanel
+import ui.panels.*
 import util.XY
 import util.log
 import world.*
@@ -71,6 +69,7 @@ object App : KtxGame<Screen>() {
         GameScreen.addPanel(Console)
         GameScreen.addPanel(StatusPanel)
         GameScreen.addPanel(LookPanel)
+        GameScreen.addPanel(ActorPanel)
         GameScreen.addPanel(LeftButtons)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)

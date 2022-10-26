@@ -26,7 +26,7 @@ class WorldLevel() : Level() {
     override fun isReady() = loadedChunks.size >= CHUNKS_WIDE * CHUNKS_WIDE
 
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
-        if (fromLevelId == "world" || true) {
+        if (fromLevelId == "world") {
             // Brand new start.
             val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.randomPlayerStart()
             if (start != null) {

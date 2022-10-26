@@ -18,6 +18,7 @@ import ui.input.Mouse
 import ui.modals.ContextMenu
 import ui.panels.Panel
 import ui.modals.Modal
+import ui.panels.ActorPanel
 import util.*
 import world.LevelKeeper
 import world.WorldLevel
@@ -55,7 +56,7 @@ object GameScreen : KtxScreen {
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
     private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
-    private val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
+    val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
     val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
     val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
@@ -342,6 +343,26 @@ object GameScreen : KtxScreen {
         cursorPosition?.also { it.x = x ; it.y = y }
     }
 
+    fun cursorNextActor(dir: Int) {
+        cursorPosition?.also { cursor ->
+            App.level.actorAt(cursor.x, cursor.y)?.also { actor ->
+                ActorPanel.actorAfter(actor, dir)?.also { nextActor ->
+                    cursor.x = nextActor.xy.x
+                    cursor.y = nextActor.xy.y
+                }
+            } ?: run {
+                ActorPanel.firstActor()?.also { actor ->
+                    cursor.x = actor.xy.x
+                    cursor.y = actor.xy.y
+                }
+            }
+        } ?: run {
+            ActorPanel.firstActor()?.also { actor ->
+                cursorPosition = XY(actor.xy.x, actor.xy.y)
+            }
+        }
+    }
+
     fun mouseScrolled(amount: Float) {
         zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
         zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) WORLD_ZOOM else 1.0)
@@ -380,9 +401,10 @@ object GameScreen : KtxScreen {
     fun rightClickCursorTile() {
         if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
         val offset = (8.0 * zoom).toInt()
-        addModal(ContextMenu(tileXtoScreenX(cursorPosition!!.x) - offset, tileYtoScreenY(cursorPosition!!.y) - offset).apply {
+        val menu = ContextMenu(tileXtoScreenX(cursorPosition!!.x) - offset, tileYtoScreenY(cursorPosition!!.y) - offset).apply {
             App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
-        })
+        }
+        if (menu.options.isNotEmpty()) addModal(menu)
     }
 
     private const val scrollScale = 450.0  // magic from experimentation, should figure out how this is derived, i'm so dumb
@@ -425,21 +447,6 @@ object GameScreen : KtxScreen {
             this.scrollTargetX = 0f - (modal.width / 1200f / zoom).toFloat()
         }
         topModal = modal
-    }
-
-    fun dismissModal(modal: Modal) {
-            panels.remove(modal)
-            if (topModal == modal) {
-                topModal = null
-                panels.forEach { panel ->
-                    if (panel is Modal) {
-                        topModal = panel
-                    }
-                }
-            }
-            if (topModal == null) {
-                this@GameScreen.scrollTargetX = 0f
-            }
     }
 
     private fun drawEverything(delta: Float) {

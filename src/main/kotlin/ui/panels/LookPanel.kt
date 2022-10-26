@@ -10,12 +10,12 @@ import world.Entity
 
 object LookPanel : ShadedPanel() {
 
-    private val padding = 12
+    private const val padding = 12
 
     private var lastTime = 0.0
     private val lastPos = XY(showPos().x, showPos().y)
     private var lastInventory = -1
-    private var entity: Entity? = showEntity()
+    var entity: Entity? = showEntity()
     private var wrapped = ArrayList<String>()
 
     init {
@@ -26,7 +26,7 @@ object LookPanel : ShadedPanel() {
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
         x = width - (this.width) - xMargin
-        y = yMargin + if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding) else 0
+        y = yMargin + if (GameScreen.panels.contains(StatusPanel)) (StatusPanel.height + padding * 2) else 0
     }
 
     override fun drawText() {
@@ -41,38 +41,6 @@ object LookPanel : ShadedPanel() {
         text.forEachIndexed { n, line ->
             drawString(line, x0, y0 + n * 20, GameScreen.fontColorDull, GameScreen.smallFont)
         }
-    }
-
-    private fun wrapText(text: String) {
-        wrapped.clear()
-        var remaining = text
-        var nextLine = ""
-        var linePixelsLeft = (width - padding * 2)
-        val spaceWidth = GlyphLayout(GameScreen.smallFont, " ").width.toInt()
-        while (remaining.isNotEmpty() || remaining == " ") {
-            // get next word
-            val space = remaining.indexOf(' ')
-            var word = ""
-            if (space >= 0) {
-                word = remaining.substring(0, space)
-                remaining = remaining.substring(space + 1, remaining.length)
-            } else {
-                word = remaining
-                remaining = ""
-            }
-            if (word != " ") {
-                val wordWidth = GlyphLayout(GameScreen.smallFont, word).width.toInt()
-                if (nextLine == "" || wordWidth <= linePixelsLeft) {
-                    nextLine += word + " "
-                    linePixelsLeft -= wordWidth + spaceWidth
-                } else {
-                    wrapped.add(nextLine)
-                    nextLine = word + " "
-                    linePixelsLeft = (width - padding * 2) - wordWidth - spaceWidth
-                }
-            }
-        }
-        if (nextLine != "") wrapped.add(nextLine)
     }
 
     override fun drawBackground() {
@@ -92,7 +60,7 @@ object LookPanel : ShadedPanel() {
             lastTime = newTime
             lastInventory = newInventory
             entity = showEntity()
-            entity?.also { wrapText(it.description()) } ?: wrapped.clear()
+            entity?.also { wrapped = wrapText(it.description(), width, padding) } ?: wrapped.clear()
         }
     }
 

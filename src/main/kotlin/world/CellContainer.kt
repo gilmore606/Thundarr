@@ -3,6 +3,7 @@ package world
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import things.LightSource
+import things.Temporal
 import things.Thing
 import things.ThingHolder
 import util.XY
@@ -24,6 +25,7 @@ class CellContainer : ThingHolder {
         this.level = level
         contents.forEach { thing ->
             thing.onRestore(this)
+            if (thing is Temporal) level.linkTemporal(thing)
         }
     }
 

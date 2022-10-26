@@ -13,6 +13,7 @@ class Scoot(
     init {
         scale = 0.6f
         alpha = 1.2f
+        offsetY = 0.3f
     }
     private val driftSpeed = 0.7f
     private val shrinkSpeed = -0.7f

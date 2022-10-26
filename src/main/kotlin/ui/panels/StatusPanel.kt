@@ -8,7 +8,7 @@ object StatusPanel : ShadedPanel() {
 
     init {
         this.width = 200
-        this.height = 83
+        this.height = 120
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -21,5 +21,13 @@ object StatusPanel : ShadedPanel() {
         drawString(App.level.statusText(), padding, padding)
         drawString(App.timeString, padding, padding + 25, GameScreen.fontColorDull, GameScreen.smallFont)
         drawString(App.dateString, padding, padding + 45, GameScreen.fontColorDull, GameScreen.smallFont)
+
+        drawString(App.player.hp.toString() + "/" + App.player.hpMax.toString(), padding, padding + 70)
+    }
+
+    override fun drawEntities() {
+        GameScreen.uiBatch.addHealthBar(x + padding + 55, y + padding + 71,
+            x + width - padding * 2 + 2, y + padding + 71 + 12,
+            App.player.hp, App.player.hpMax)
     }
 }

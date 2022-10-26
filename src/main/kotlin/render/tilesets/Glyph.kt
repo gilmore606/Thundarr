@@ -28,6 +28,7 @@ enum class Glyph {
     BUTTON_MAP,
     BUTTON_SYSTEM,
     BUTTON_JOURNAL,
+    COLOR_BARS,
 
     PLAYER,
     MOK,
@@ -57,5 +58,6 @@ enum class Glyph {
     TORCH,
     TORCH_LIT,
     SMOKE_PUFF,
-    DUST_PUFF
+    DUST_PUFF,
+    HEALTH_ICON
 }
