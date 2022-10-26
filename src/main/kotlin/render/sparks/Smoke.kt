@@ -13,12 +13,12 @@ class Smoke : Spark() {
         offsetY = -0.5f
     }
     private val driftSpeed = 1.3f
-    private val shrinkSpeed = -0.8f
+    private val shrinkSpeed = -0.9f
     private val fadeSpeed = 1.2f
-    private val jitterSpeed = 1.5f
+    private val jitterSpeed = 1.7f
 
     override fun isLit() = true
-    override fun duration() = 0.9f
+    override fun duration() = 1.3f
     override fun glyph() = Glyph.SMOKE_PUFF
 
     override fun onRender(delta: Float) {

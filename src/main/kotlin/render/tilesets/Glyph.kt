@@ -57,4 +57,5 @@ enum class Glyph {
     TORCH,
     TORCH_LIT,
     SMOKE_PUFF,
+    DUST_PUFF
 }

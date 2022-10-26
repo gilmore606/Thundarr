@@ -14,9 +14,6 @@ class Move(
         if (level.isWalkableFrom(actor.xy, dir)) {
             actor.level?.addSpark(Scoot(dir).at(actor.xy.x, actor.xy.y))
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
-        } else {
-            Terrain.get(level.getTerrain(actor.xy.x + dir.x, actor.xy.y + dir.y))
-                .onBump(actor, level.getTerrainData(actor.xy.x + dir.x, actor.xy.y + dir.y))
         }
     }
 

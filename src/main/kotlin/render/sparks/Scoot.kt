@@ -20,7 +20,7 @@ class Scoot(
 
     override fun isLit() = true
     override fun duration() = 0.7f
-    override fun glyph() = Glyph.SMOKE_PUFF
+    override fun glyph() = Glyph.DUST_PUFF
 
     override fun onRender(delta: Float) {
         super.onRender(delta)

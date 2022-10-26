@@ -59,4 +59,5 @@ fun ThingTileSet() =
             add(2, 5)
         })
         setTile(Glyph.SMOKE_PUFF, SimpleTile(this, 0, 5))
+        setTile(Glyph.DUST_PUFF, SimpleTile(this, 1, 5))
     }

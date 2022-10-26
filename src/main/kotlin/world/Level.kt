@@ -2,8 +2,7 @@ package world
 
 import actors.Actor
 import actors.Player
-import actors.actions.Get
-import actors.actions.UseThing
+import actors.actions.*
 import actors.actions.processes.WalkTo
 import render.GameScreen
 import render.sparks.Spark
@@ -381,5 +380,15 @@ sealed class Level {
             }
         }
         menu.addOption("examine") { }
+    }
+
+    // What action does the player take when bumping into xy?
+    fun bumpActionAt(x: Int, y: Int): Action? {
+        actorAt(x,y)?.also { actor ->
+            return Converse(actor)
+        } ?: run {
+            return BumpTerrain(XY(x,y))
+        }
+        return null
     }
 }

@@ -80,6 +80,7 @@ sealed class LitThing : Portable(), LightSource {
 class Lightbulb : LitThing() {
     override fun glyph() = Glyph.LIGHTBULB
     override fun name() = "lightbulb"
+    override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
     override val kind = Kind.LIGHTBULB
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
 }
@@ -95,6 +96,7 @@ class Sunsword : LitThing() {
     }
     override fun glyph() = if (active) Glyph.HILT_LIT else Glyph.HILT
     override fun name() = "sunsword"
+    override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
     override val kind = Kind.SUNSWORD
     override val lightColor = LightColor(0.1f, 0.25f, 0.3f)
 
@@ -122,6 +124,7 @@ class Torch : LitThing(), Temporal {
     private var fuel = 50f
     override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"
+    override fun description() = "A branch dipped in pitch tar."
     override val kind = Kind.TORCH
     override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
 
