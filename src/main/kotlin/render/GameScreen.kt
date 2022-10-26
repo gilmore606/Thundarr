@@ -43,6 +43,9 @@ object GameScreen : KtxScreen {
 
     var width = 0
     var height = 0
+    var FULLSCREEN = false
+    private var savedWidth = width
+    private var savedHeight = height
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
 
@@ -231,6 +234,19 @@ object GameScreen : KtxScreen {
         panels.forEach { it.onResize(width, height) }
 
         updateSurfaceParams()
+    }
+
+    fun toggleFullscreen() = toggleFullscreen(!FULLSCREEN)
+    fun toggleFullscreen(newValue: Boolean) {
+        if (newValue && !FULLSCREEN) {
+            savedWidth = width
+            savedHeight = height
+            FULLSCREEN = true
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
+        } else if (!newValue && FULLSCREEN) {
+            FULLSCREEN = false
+            Gdx.graphics.setWindowedMode(savedWidth, savedHeight)
+        }
     }
 
     override fun render(delta: Float) {
@@ -444,7 +460,7 @@ object GameScreen : KtxScreen {
         if (modal !is ContextMenu) clearCursor()
         addPanel(modal)
         if (modal.position == Modal.Position.LEFT) {
-            this.scrollTargetX = 0f - (modal.width / 1200f / zoom).toFloat()
+            this.scrollTargetX = 0f - (modal.width / 2400f / zoom).toFloat()
         }
         topModal = modal
     }

@@ -3,6 +3,7 @@ package ui.input
 import App
 import actors.Ox
 import actors.actions.Move
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ object Keyboard : KtxInputAdapter {
     var lastKeyTime = System.currentTimeMillis()
 
     private const val REPEAT_DELAY_MS = 300L
-    private const val REPEAT_MS = 65L
+    private const val REPEAT_MS = 70L
 
     private var SHIFT = false
     private var CTRL = false
@@ -49,15 +50,16 @@ object Keyboard : KtxInputAdapter {
         GameScreen.topModal?.also { modal ->
             modal.keyDown(keycode)
         } ?: run {
-            when  {
-                keycode == Input.Keys.SHIFT_LEFT -> { SHIFT = true }
-                keycode == Input.Keys.CONTROL_LEFT  -> { CTRL = true }
-                keycode == Input.Keys.ALT_LEFT -> { ALT = true }
-                else -> {
-                    lastKey = keycode
-                    lastKeyTime = System.currentTimeMillis()
-                    pressKey(keycode)
-                }
+            if (keycode == Input.Keys.ALT_LEFT || keycode == Input.Keys.ALT_RIGHT) {
+                ALT = true
+            } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                CTRL = true
+            } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+                SHIFT = true
+            } else {
+                lastKey = keycode
+                lastKeyTime = System.currentTimeMillis()
+                pressKey(keycode)
             }
         }
         return true
@@ -67,10 +69,12 @@ object Keyboard : KtxInputAdapter {
         GameScreen.topModal?.also { modal ->
             modal.keyUp(keycode)
         } ?: run {
-            when (keycode) {
-                Input.Keys.SHIFT_LEFT or Input.Keys.SHIFT_RIGHT -> { SHIFT = false }
-                Input.Keys.CONTROL_LEFT or Input.Keys.CONTROL_RIGHT -> { CTRL = false }
-                Input.Keys.ALT_LEFT or Input.Keys.ALT_RIGHT -> { ALT = false }
+            if (keycode == Input.Keys.ALT_LEFT || keycode == Input.Keys.ALT_RIGHT) {
+                ALT = false
+            } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                CTRL = false
+            } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+                SHIFT = false
             }
         }
         lastKey = -1
@@ -108,6 +112,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.TAB -> { App.openInventory() }
             Input.Keys.ESCAPE -> { App.openSystemMenu() }
             Input.Keys.M -> { App.openMap() }
+            Input.Keys.ENTER -> { lastKey = -1; if (ALT) GameScreen.toggleFullscreen() }
 
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture
 import world.Level
 import render.tileholders.TileHolder
 import util.log
-import java.io.File
 
 
 class TileSet(

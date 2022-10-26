@@ -2,8 +2,7 @@ package ui.modals
 
 import ui.input.Mouse
 
-class MapModal : Modal(600, 600, "- yOUr tRAvELs -") {
-
+class JournalModal : Modal(600, 600, "- yOUr dEEDs -") {
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()

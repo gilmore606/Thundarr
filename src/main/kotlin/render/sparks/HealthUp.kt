@@ -14,6 +14,7 @@ class HealthUp : Spark() {
 
     override fun glyph() = Glyph.HEALTH_ICON
     override fun duration() = 1.5f
+    override fun isLit() = false
 
     override fun onRender(delta: Float) {
         super.onRender(delta)

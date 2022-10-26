@@ -161,20 +161,6 @@ object App : KtxGame<Screen>() {
         }
     }
 
-
-
-    fun openSettings() {
-
-    }
-
-    fun openControls() {
-        GameScreen.addModal(ControlsModal())
-    }
-
-    fun openCredits() {
-        GameScreen.addModal(CreditsModal())
-    }
-
     fun enterLevelFromWorld(levelId: String) {
         val oldLevelId = level.levelId()
         level = LevelKeeper.getLevel(levelId)
@@ -286,8 +272,11 @@ object App : KtxGame<Screen>() {
         )
     }
 
+    fun openSettings() { }
+    fun openControls() { GameScreen.addModal(ControlsModal()) }
+    fun openCredits() { GameScreen.addModal(CreditsModal()) }
     fun openInventory() { GameScreen.addModal(InventoryModal(player)) }
     fun openMap() { GameScreen.addModal(MapModal()) }
     fun openSystemMenu() { GameScreen.addModal(SystemMenu()) }
-    fun openJournal() { }
+    fun openJournal() { GameScreen.addModal(JournalModal()) }
 }
