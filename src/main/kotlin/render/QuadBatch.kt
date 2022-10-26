@@ -1,5 +1,6 @@
 package render
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
@@ -18,8 +19,7 @@ import java.lang.Float.min
 class QuadBatch(
     vertexShaderSource: String,
     fragmentShaderSource: String,
-    val tileSet: TileSet,
-    val isScrolling: Boolean = true
+    val tileSet: TileSet
 ) {
 
     private val FLOATS_PER_VERTEX = 9
@@ -65,14 +65,14 @@ class QuadBatch(
         vertexCount = 0
     }
 
-    fun addTileQuad(col: Int, row: Int, stride: Double,
-                    textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double,
+    fun addTileQuad(col: Int, row: Int,
+                    textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f, scale: Float = 1f, alpha: Float = 1f) {
-        val scaleOffset = (1f - scale) * stride * 0.5f
-        val x0 = ((col.toDouble() + offsetX) * stride - (stride * 0.5) + scaleOffset) / aspectRatio
-        val y0 = (row.toDouble() + offsetY) * stride - (stride * 0.5) + scaleOffset
-        val x1 = x0 + stride / aspectRatio - scaleOffset * 2f
-        val y1 = y0 + stride - scaleOffset * 2f
+        val scaleOffset = (1f - scale) * 0.5
+        val x0 = GameScreen.tileXtoGlx(col + offsetX + scaleOffset)
+        val y0 = GameScreen.tileYtoGly(row + offsetY + scaleOffset)
+        val x1 = GameScreen.tileXtoGlx(col + offsetX + 1.0 - scaleOffset * 2.0)
+        val y1 = GameScreen.tileYtoGly(row + offsetY + 1.0 - scaleOffset * 2.0)
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
@@ -80,36 +80,40 @@ class QuadBatch(
         addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut)
     }
 
-    fun addOverlapQuad(col: Int, row: Int, stride: Double, edge: XY,
-                        textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double) {
-        var ix0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
-        var iy0 = row.toDouble() * stride - (stride * 0.5)
-        var ix1 = ix0 + stride / aspectRatio
-        var iy1 = iy0 + stride * 0.25
+    fun addOverlapQuad(col: Int, row: Int, edge: XY,
+                        textureIndex: Int, visibility: Float, light: LightColor) {
+        var ox0 = col.toDouble()
+        var oy0 = row.toDouble()
+        var ox1 = col.toDouble() + 1.0
+        var oy1 = row.toDouble() + 0.25
         var tx0 = 0f
         var ty0 = 0f
         var tx1 = 1f
         var ty1 = 0.25f
         when (edge) {
             SOUTH -> {
-                iy0 += stride * 0.75
-                iy1 = iy0 + stride * 0.25
+                oy0 = row.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 ty0 = 0.75f
                 ty1 = 1f
             }
             EAST -> {
-                ix0 += stride * 0.75 / aspectRatio
-                iy1 = iy0 + stride
+                ox0 = col.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 tx0 = 0.75f
                 ty1 = 1f
             }
             WEST -> {
-                ix1 = ix0 + stride * 0.25 / aspectRatio
-                iy1 = iy0 + stride
+                ox1 = col.toDouble() + 0.25
+                oy1 = row.toDouble() + 1.0
                 tx1 = 0.25f
                 ty1 = 1f
             }
         }
+        val ix0 = GameScreen.tileXtoGlx(ox0)
+        val iy0 = GameScreen.tileYtoGly(oy0)
+        val ix1 = GameScreen.tileXtoGlx(ox1)
+        val iy1 = GameScreen.tileYtoGly(oy1)
 
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
@@ -118,72 +122,76 @@ class QuadBatch(
         addQuad(ix0, iy0, ix1, iy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, 1f, grayOut)
     }
 
-    fun addOccludeQuad(col: Int, row: Int, stride: Double, edge: XY,
-                        textureIndex: Int, visibility: Float, light: LightColor, aspectRatio: Double) {
-        var ix0 = (col.toDouble() * stride - (stride * 0.5)) / aspectRatio
-        var iy0 = row.toDouble() * stride - (stride * 0.5)
-        var ix1 = ix0 + stride / aspectRatio
-        var iy1 = iy0 + stride * 0.25
+    fun addOccludeQuad(col: Int, row: Int, edge: XY,
+                        textureIndex: Int, visibility: Float, light: LightColor) {
+        var ox0 = col.toDouble()
+        var oy0 = row.toDouble()
+        var ox1 = col.toDouble() + 1.0
+        var oy1 = row.toDouble() + 0.25
         var tx0 = 0f
         var ty0 = 0.5f
         var tx1 = 1f
         var ty1 = 0.75f
         when (edge) {
             SOUTH -> {
-                iy0 += stride * 0.75
-                iy1 = iy0 + stride * 0.25
+                oy0 = row.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 ty0 = 0.75f
                 ty1 = 0.5f
             }
             EAST -> {
-                ix0 += stride * 0.75 / aspectRatio
-                iy1 = iy0 + stride
+                ox0 = col.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 tx0 = 0.75f
                 tx1 = 0.5f
                 ty0 = 0f
                 ty1 = 1f
             }
             WEST -> {
-                ix1 = ix0 + stride * 0.25 / aspectRatio
-                iy1 = iy0 + stride
+                ox1 = col.toDouble() + 0.25
+                oy1 = row.toDouble() + 1.0
                 tx0 = 0.5f
                 tx1 = 0.75f
                 ty0 = 0f
                 ty1 = 1f
             }
             NORTHEAST -> {
-                ix0 += stride * 0.75 / aspectRatio
+                ox0 = col.toDouble() + 0.75
                 tx0 = 1f
                 tx1 = 0.75f
                 ty0 = 0.25f
                 ty1 = 0f
             }
             NORTHWEST -> {
-                ix1 -= stride * 0.75 / aspectRatio
+                ox1 = col.toDouble() + 0.25
                 tx0 = 0.75f
                 tx1 = 1f
                 ty0 = 0.25f
                 ty1 = 0f
             }
             SOUTHEAST -> {
-                ix0 += stride * 0.75 / aspectRatio
-                iy0 += stride * 0.75
-                iy1 += stride * 0.75
+                ox0 = col.toDouble() + 0.75
+                oy0 = row.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 tx0 = 1f
                 tx1 = 0.75f
                 ty0 = 0f
                 ty1 = 0.25f
             }
             SOUTHWEST -> {
-                iy0 += stride * 0.75
-                iy1 += stride * 0.75
-                ix1 -= stride * 0.75 / aspectRatio
+                oy0 = row.toDouble() + 0.75
+                ox1 = col.toDouble() + 0.75
+                oy1 = row.toDouble() + 1.0
                 tx0 = 0.75f
                 tx1 = 1f
                 ty0 = 0f
                 ty1 = 0.25f
             }
         }
+        val ix0 = GameScreen.tileXtoGlx(ox0)
+        val iy0 = GameScreen.tileYtoGly(oy0)
+        val ix1 = GameScreen.tileXtoGlx(ox1)
+        val iy1 = GameScreen.tileYtoGly(oy1)
 
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
@@ -225,10 +233,10 @@ class QuadBatch(
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f
     ) {
-        val x0 = ix0.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y0 = -iy0.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
-        val x1 = ix1.toFloat() - if (isScrolling) GameScreen.scrollX * GameScreen.zoom.toFloat() else 0f
-        val y1 = -iy1.toFloat() + if (isScrolling) GameScreen.scrollY * GameScreen.zoom.toFloat() else 0f
+        val x0 = ix0.toFloat()
+        val y0 = -iy0.toFloat()
+        val x1 = ix1.toFloat()
+        val y1 = -iy1.toFloat()
         val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
         val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)

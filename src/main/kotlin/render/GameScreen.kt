@@ -28,6 +28,8 @@ import kotlin.math.abs
 
 object GameScreen : KtxScreen {
 
+    var FNORD_STEP = 0.1f
+
     private const val WORLD_ZOOM = 0.85
     private const val ZOOM_SPEED = 4.0
     var RENDER_WIDTH = 160
@@ -44,8 +46,9 @@ object GameScreen : KtxScreen {
     var width = 0
     var height = 0
     var FULLSCREEN = false
-    private var savedWidth = width
-    private var savedHeight = height
+    private var savedWindowSize  = XY(0, 0)
+    fun savedWindowSize() = if (savedWindowSize.x == 0) XY(width, height) else savedWindowSize
+
     private var aspectRatio = 1.0
     private var tileStride: Double = 0.01
 
@@ -59,12 +62,14 @@ object GameScreen : KtxScreen {
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
     private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
-    val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet, isScrolling = false)
-    val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet, isScrolling = false)
-    val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet, isScrolling = false)
+    val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
+    val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
+    val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
+    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch)
     private val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
+
     private val lightCache = Array(RENDER_WIDTH * 2 + 1) { Array(RENDER_WIDTH * 2 + 1) { LightColor(1f, 0f, 0f) } }
     val fullLight = LightColor(1f, 1f, 1f)
     val fullDark = LightColor(0f, 0f, 0f)
@@ -138,6 +143,8 @@ object GameScreen : KtxScreen {
     private const val cameraPull = 0.19f
     private const val cameraAccel = 25f
 
+    private var cameraPovX = 0f
+    private var cameraPovY = 0f
     var scrollX = 0f
     var scrollY = 0f
     private var scrollTargetX = 0f
@@ -153,8 +160,7 @@ object GameScreen : KtxScreen {
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
         terrainBatch.addTileQuad(
-            tx - pov.x, ty - pov.y, tileStride,
-            textureIndex, vis, light, aspectRatio
+            tx - pov.x, ty - pov.y, textureIndex, vis, light
         )
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
@@ -166,8 +172,8 @@ object GameScreen : KtxScreen {
     private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
         overlapBatch.addOverlapQuad(
-            tx - pov.x - edge.x, ty - pov.y - edge.y, tileStride, edge,
-            textureIndex, vis, light, aspectRatio
+            tx - pov.x - edge.x, ty - pov.y - edge.y, edge,
+            textureIndex, vis, light
         )
     }
 
@@ -176,8 +182,7 @@ object GameScreen : KtxScreen {
             if (edge == NORTH || edge == SOUTH) Glyph.OCCLUSION_SHADOWS_H else Glyph.OCCLUSION_SHADOWS_V
         )
         overlapBatch.addOccludeQuad(
-            tx - pov.x, ty - pov.y, tileStride, edge,
-            textureIndex, 1f, fullLight, aspectRatio
+            tx - pov.x, ty - pov.y, edge, textureIndex, 1f, fullLight
         )
     }
 
@@ -186,8 +191,7 @@ object GameScreen : KtxScreen {
             if (edge == NORTH || edge == SOUTH) Glyph.SURF_H else Glyph.SURF_V
         )
         overlapBatch.addOccludeQuad(
-            tx - pov.x, ty - pov.y, tileStride, edge,
-            textureIndex, vis, light, aspectRatio
+            tx - pov.x, ty - pov.y, edge, textureIndex, vis, light
         )
     }
 
@@ -195,8 +199,8 @@ object GameScreen : KtxScreen {
         val lx = tx - pov.x + RENDER_WIDTH
         val ly = ty - pov.y + RENDER_HEIGHT
         thingBatch.addTileQuad(
-            tx - pov.x, ty - pov.y, tileStride,
-            thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly], aspectRatio)
+            tx - pov.x, ty - pov.y,
+            thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly])
     }
 
     private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
@@ -204,15 +208,15 @@ object GameScreen : KtxScreen {
         val ly = ty - pov.y + RENDER_HEIGHT
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
         actorBatch.addTileQuad(
-            tx - pov.x, ty - pov.y, tileStride,
-            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light, aspectRatio)
+            tx - pov.x, ty - pov.y,
+            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light)
     }
 
     private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
         worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
             batch.addTileQuad(
-                tx - pov.x, ty - pov.y, tileStride,
-                batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light, aspectRatio,
+                tx - pov.x, ty - pov.y,
+                batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light,
                 offsetX, offsetY, scale, alpha
             )
         }
@@ -239,13 +243,12 @@ object GameScreen : KtxScreen {
     fun toggleFullscreen() = toggleFullscreen(!FULLSCREEN)
     fun toggleFullscreen(newValue: Boolean) {
         if (newValue && !FULLSCREEN) {
-            savedWidth = width
-            savedHeight = height
+            savedWindowSize = XY(width, height)
             FULLSCREEN = true
             Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
         } else if (!newValue && FULLSCREEN) {
             FULLSCREEN = false
-            Gdx.graphics.setWindowedMode(savedWidth, savedHeight)
+            Gdx.graphics.setWindowedMode(savedWindowSize.x, savedWindowSize.y)
         }
     }
 
@@ -285,7 +288,7 @@ object GameScreen : KtxScreen {
             zoom = max(zoomTarget, zoom - diff * delta * ZOOM_SPEED)
         }
         if (scrollLatch) return
-        val step = 0.1f
+        val step = FNORD_STEP
         if (pov.x != lastPov.x || pov.y != lastPov.y) {
             scrollX += ((lastPov.x - pov.x) * step / aspectRatio).toFloat()
             scrollY += ((lastPov.y - pov.y) * step).toFloat()
@@ -471,14 +474,7 @@ object GameScreen : KtxScreen {
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL_BLEND)
 
-        terrainBatch.clear()
-        overlapBatch.clear()
-        thingBatch.clear()
-        actorBatch.clear()
-        uiWorldBatch.clear()
-        uiBatch.clear()
-        uiThingBatch.clear()
-        uiActorBatch.clear()
+        allBatches.forEach { it.clear() }
 
         App.level.forEachCellToRender(
             terrainBatch.tileSet,
@@ -496,11 +492,11 @@ object GameScreen : KtxScreen {
 
         uiWorldBatch.apply {
             cursorPosition?.also { cursorPosition ->
-                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y, tileStride,
-                    getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
+                addTileQuad(cursorPosition.x - pov.x, cursorPosition.y - pov.y,
+                    getTextureIndex(Glyph.CURSOR), 1f, fullLight)
                 cursorLine.forEach { xy ->
-                    addTileQuad(xy.x - pov.x, xy.y - pov.y, tileStride,
-                        getTextureIndex(Glyph.CURSOR), 1f, fullLight, aspectRatio)
+                    addTileQuad(xy.x - pov.x, xy.y - pov.y,
+                        getTextureIndex(Glyph.CURSOR), 1f, fullLight)
                 }
             }
         }
@@ -510,14 +506,7 @@ object GameScreen : KtxScreen {
             panel.renderEntities()
         }
 
-        terrainBatch.draw()
-        overlapBatch.draw()
-        thingBatch.draw()
-        actorBatch.draw()
-        uiWorldBatch.draw()
-        uiBatch.draw()
-        uiThingBatch.draw()
-        uiActorBatch.draw()
+        allBatches.forEach { it.draw() }
 
         textBatch.apply {
             projectionMatrix = textCamera.combined
@@ -536,6 +525,9 @@ object GameScreen : KtxScreen {
         drawTime /= 10
     }
 
+    fun tileXtoGlx(col: Double) = ((col - 0.5) * tileStride) / aspectRatio - (scrollX * zoom)
+    fun tileYtoGly(row: Double) = ((row - 0.5) * tileStride) - (scrollY * zoom)
+
     private fun screenXtoTileX(screenX: Int) = (((((screenX.toFloat() / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + pov.x).toInt()
     private fun screenYtoTileY(screenY: Int) = (((screenY.toFloat() / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + pov.y).toInt()
     private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()
@@ -547,12 +539,6 @@ object GameScreen : KtxScreen {
     }
 
     override fun dispose() {
-        terrainBatch.dispose()
-        overlapBatch.dispose()
-        actorBatch.dispose()
-        thingBatch.dispose()
-        uiBatch.dispose()
-        uiWorldBatch.dispose()
-        uiThingBatch.dispose()
+        allBatches.forEach { it.dispose() }
     }
 }

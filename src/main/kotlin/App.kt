@@ -1,4 +1,3 @@
-import actors.Actor
 import actors.Player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -31,6 +30,8 @@ object App : KtxGame<Screen>() {
         val player: Player,
         val time: Double,
         val zoomIndex: Double,
+        val windowSize: XY,
+        val fullscreen: Boolean
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -102,7 +103,9 @@ object App : KtxGame<Screen>() {
                     levelId = level.levelId(),
                     player = player,
                     time = time,
-                    zoomIndex = GameScreen.zoomIndex
+                    zoomIndex = GameScreen.zoomIndex,
+                    windowSize = GameScreen.savedWindowSize(),
+                    fullscreen = GameScreen.FULLSCREEN
                 )
             )
 
@@ -118,6 +121,14 @@ object App : KtxGame<Screen>() {
             LevelKeeper.hibernateAll()
 
             val state = save.getWorldState()
+
+            GameScreen.resize(state.windowSize.x, state.windowSize.y)
+            if (state.fullscreen) {
+                GameScreen.toggleFullscreen(true)
+            } else {
+                Gdx.graphics.setWindowedMode(state.windowSize.x, state.windowSize.y)
+            }
+
             level = LevelKeeper.getLevel(state.levelId)
             player = state.player
             player.onRestore()
@@ -272,7 +283,7 @@ object App : KtxGame<Screen>() {
         )
     }
 
-    fun openSettings() { }
+    fun openSettings() { GameScreen.addModal(SettingsModal()) }
     fun openControls() { GameScreen.addModal(ControlsModal()) }
     fun openCredits() { GameScreen.addModal(CreditsModal()) }
     fun openInventory() { GameScreen.addModal(InventoryModal(player)) }
