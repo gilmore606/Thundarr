@@ -37,6 +37,7 @@ enum class Glyph {
     PEASANT,
     CITIZEN,
     TRIBAL,
+    HERDER,
 
     TREE,
     LIGHTBULB,
@@ -61,5 +62,7 @@ enum class Glyph {
     DUST_PUFF,
     HEALTH_ICON,
     ANGRY_THUNDARR,
-    SPEECH_BUBBLE
+    SPEECH_BUBBLE,
+    POW_ICON,
+    HOSTILE_ICON
 }

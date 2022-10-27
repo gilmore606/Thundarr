@@ -368,7 +368,7 @@ sealed class Level {
                 it.uses().forEach { use ->
                     if (use.canDo(App.player)) {
                         menu.addOption(use.command) {
-                            App.player.queue(UseThing(it, use.duration, use.toDo))
+                            App.player.queue(Use(it, use.duration, use.toDo))
                         }
                     }
                 }

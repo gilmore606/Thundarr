@@ -16,7 +16,9 @@ class Converse(
         actor.animation = Hop()
 
         if (actor is Player) {
-            Console.say(target.dname().capitalize() + " seems uninterested in you.")
+            if (!target.onConverse(actor)) {
+                Console.say(target.dname().capitalize() + " seems uninterested in you.")
+            }
         }
     }
 

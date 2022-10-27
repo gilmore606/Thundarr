@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
 
 fun UITileSet() =
-    TileSet("tiles_ui.png", 4, 4,
+    TileSet("tiles_ui.png", 4, 5,
             Texture.TextureFilter.Nearest).apply {
         setTile(Glyph.CURSOR, SimpleTile(this, 0, 0))
         setTile(Glyph.BOX_BG, SimpleTile(this, 1, 0))
@@ -22,4 +22,6 @@ fun UITileSet() =
         setTile(Glyph.HEALTH_ICON, SimpleTile(this, 1, 3))
         setTile(Glyph.ANGRY_THUNDARR, SimpleTile(this, 2, 3))
         setTile(Glyph.SPEECH_BUBBLE, SimpleTile(this, 3, 3))
+        setTile(Glyph.POW_ICON, SimpleTile(this, 0, 4))
+        setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
     }

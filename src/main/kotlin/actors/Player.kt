@@ -24,6 +24,13 @@ class Player : Actor() {
     override fun isActing() = true
     override fun defaultAction(): Action? = null
 
+    override fun statusGlyph(): Glyph? {
+        if (willAggro) {
+            return Glyph.HOSTILE_ICON
+        }
+        return null
+    }
+
     fun tryMove(dir: XY) {
         level?.also { level ->
             if (level.isWalkableFrom(xy, dir)) {

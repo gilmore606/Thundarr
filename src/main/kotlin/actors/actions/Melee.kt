@@ -2,9 +2,9 @@ package actors.actions
 
 import actors.Actor
 import actors.animations.Whack
+import render.sparks.Pow
 import ui.panels.Console
 import util.XY
-import util.log
 import world.Level
 
 class Melee(
@@ -14,7 +14,9 @@ class Melee(
 
     override fun execute(actor: Actor, level: Level) {
         actor.animation = Whack(dir)
-        Console.say("Whack.")
+        level.addSpark(Pow().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
+        Console.say("Whack!")
+        target.receiveAttack(actor)
     }
 
 }

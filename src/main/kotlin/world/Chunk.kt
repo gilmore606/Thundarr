@@ -14,6 +14,7 @@ import util.*
 import world.cartos.LevelCarto
 import world.cartos.WorldCarto
 import world.terrains.Terrain
+import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.random.Random
 
@@ -350,9 +351,9 @@ class Chunk(
         lightCache[x][y].b = ambient.b
         lights[x][y].forEach { (light, color) ->
             val flicker = light.flicker()
-            lightCache[x][y].r = min(1f, (lightCache[x][y].r + color.r) * flicker)
-            lightCache[x][y].g = min(1f, (lightCache[x][y].g + color.g) * flicker)
-            lightCache[x][y].b = min(1f, (lightCache[x][y].b + color.b) * flicker)
+            lightCache[x][y].r = min(1f, (lightCache[x][y].r + max(0f, (color.r * flicker))))
+            lightCache[x][y].g = min(1f, (lightCache[x][y].g + max(0f, (color.g * flicker))))
+            lightCache[x][y].b = min(1f, (lightCache[x][y].b + max(0f, (color.b * flicker))))
         }
         lightCacheDirty[x][y] = false
     }

@@ -23,5 +23,5 @@ fun ActorTileSet() =
             add(2, 2)
             add(3, 2)
         })
-
+        setTile(Glyph.HERDER, SimpleTile(this, 1, 0))
     }

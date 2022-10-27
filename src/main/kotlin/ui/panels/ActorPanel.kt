@@ -50,6 +50,10 @@ object ActorPanel : ShadedPanel() {
             val y0 = y + padding + spacing * n + 1
             actor.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
                 actor.uiBatch().getTextureIndex(actor.glyph(), actor.level(), actor.xy().x, actor.xy().y))
+            actor.statusGlyph()?.also { statusGlyph ->
+                Screen.uiBatch.addPixelQuad(x0, y0 - 12, x0 + 32, y0 + 20,
+                    Screen.uiBatch.getTextureIndex(statusGlyph))
+            }
             if (actor == LookPanel.entity) {
                 Screen.uiBatch.addPixelQuad(x0 + 36, y0 + 16, x0 + width - padding * 2 - 34, y0 + 36,
                     Screen.uiBatch.getTextureIndex(Glyph.CURSOR))

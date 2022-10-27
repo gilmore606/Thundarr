@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.sparks.HealthUp
+import render.tilesets.Glyph
 import things.*
 import util.*
 import world.Entity
@@ -70,6 +71,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     open fun onMove() { }
+
+    open fun onConverse(actor: Actor): Boolean = false
+
+    open fun statusGlyph(): Glyph? = null
+
+    open fun receiveAttack(attacker: Actor) { }
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {

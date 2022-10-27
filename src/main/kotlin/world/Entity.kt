@@ -25,7 +25,9 @@ interface Entity {
     fun uiBatch(): QuadBatch
     fun name(): String
     fun dname() = "the " + name()
+    fun dnamec() = "The " + name()
     fun iname() = name().aOrAn()
+    fun inamec() = name().aOrAn().capitalize()
     fun description(): String
     open fun gender(): Gender = Gender.NEUTER
 

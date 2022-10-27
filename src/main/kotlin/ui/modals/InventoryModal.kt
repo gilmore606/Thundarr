@@ -1,7 +1,7 @@
 package ui.modals
 
 import actors.actions.Drop
-import actors.actions.UseThing
+import actors.actions.Use
 import com.badlogic.gdx.Input
 import render.Screen
 import things.Thing
@@ -101,7 +101,7 @@ class InventoryModal(
             thing.uses().forEach {
                 if (it.canDo(App.player)) {
                     addOption(it.command) {
-                        App.player.queue(UseThing(thing, it.duration, it.toDo))
+                        App.player.queue(Use(thing, it.duration, it.toDo))
                     }
                 }
             }
@@ -113,6 +113,8 @@ class InventoryModal(
     override fun keyDown(keycode: Int) {
         when (keycode) {
             Input.Keys.TAB -> dismiss()
+            Input.Keys.NUMPAD_4 -> dismiss()
+            Input.Keys.NUMPAD_6 -> doSelect()
             else -> super.keyDown(keycode)
         }
     }

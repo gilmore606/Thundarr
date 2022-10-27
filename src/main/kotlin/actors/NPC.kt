@@ -3,8 +3,12 @@ package actors
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
+import actors.animations.Hop
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.sparks.Speak
+import render.tilesets.Glyph
+import ui.panels.Console
 import util.*
 
 @Serializable
@@ -17,8 +21,14 @@ sealed class NPC : Actor() {
 
     var awareness = Awareness.HIBERNATED
     var lastPlayerSeenTime = 0.0
+    var hostile = false
 
     open fun pickAction(): Action = Wait(1f)
+
+    open fun converseLines(): List<String> = listOf()
+
+    open fun isHostile(): Boolean = hostile
+    open fun becomeHostileMsg(): List<String> = listOf("%DN bellows with rage!", "%DN turns angrily toward you!")
 
     final override fun canAct() = juice > 0f
     final override fun isActing() = awareness != Awareness.HIBERNATED
@@ -60,6 +70,29 @@ sealed class NPC : Actor() {
             } else if (awareness == Awareness.AWARE && App.time - lastPlayerSeenTime > forgetPlayerTime) {
                 forgetPlayer()
             }
+        }
+    }
+
+    override fun onConverse(actor: Actor): Boolean {
+        val converseLines = converseLines()
+        if (converseLines.isNotEmpty()) {
+            Console.announce(level, xy.x, xy.y, Console.Reach.AUDIBLE, this.dnamec() + " says, \"" + converseLines.random() + "\"")
+            level?.addSpark(Speak().at(xy.x, xy.y))
+            return true
+        }
+        return false
+    }
+
+    override fun statusGlyph(): Glyph? {
+        if (isHostile()) return Glyph.HOSTILE_ICON
+        return null
+    }
+
+    override fun receiveAttack(attacker: Actor) {
+        if (attacker is Player && !hostile) {
+            hostile = true
+            val m = becomeHostileMsg().random()
+            Console.sayAct("", m, this, attacker, null, Console.Reach.AUDIBLE)
         }
     }
 }

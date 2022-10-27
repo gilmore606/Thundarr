@@ -1,5 +1,6 @@
 package world.cartos
 
+import actors.Herder
 import actors.Ox
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -48,8 +49,12 @@ class WorldCarto(
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
-                    if (Dice.chance(0.005f)) {
-                        Ox().moveTo(level, x + this.x0, y + this.y0)
+                    if (Dice.chance(0.006f)) {
+                        if (Dice.chance(0.85f)) {
+                            Ox().moveTo(level, x + this.x0, y + this.y0)
+                        } else {
+                            Herder().moveTo(level, x + this.x0, y + this.y0)
+                        }
                     }
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5

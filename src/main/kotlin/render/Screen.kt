@@ -214,6 +214,13 @@ object Screen : KtxScreen {
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
             offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY()
         )
+        actor.statusGlyph()?.also { statusGlyph ->
+            uiWorldBatch.addTileQuad(
+                tx, ty,
+                uiBatch.getTextureIndex(statusGlyph), 1f, fullLight,
+                offsetX = actor.animOffsetX(), offsetY = -0.4f + actor.animOffsetY()
+            )
+        }
     }
 
     private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->

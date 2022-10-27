@@ -4,7 +4,7 @@ import actors.Actor
 import things.Thing
 import world.Level
 
-class UseThing(
+class Use(
     private val thing: Thing,
     duration: Float,
     private val toDo: (Actor, Level)->Unit
