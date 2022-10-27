@@ -82,9 +82,14 @@ abstract class Modal(
         return false
     }
 
+    open fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button) { }
+
     protected fun dismiss() {
+        onDismiss()
         dismissed = true
     }
+
+    open fun onDismiss() { }
 
     protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
         boxBatch.addPixelQuad(this.x + x0 - 6, this.y + y0 - (7 + height / 4),

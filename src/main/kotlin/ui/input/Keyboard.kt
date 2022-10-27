@@ -107,7 +107,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.TAB -> { App.openInventory() }
             Input.Keys.ESCAPE -> { App.openSystemMenu() }
             Input.Keys.M -> { App.openMap() }
-            Input.Keys.ENTER -> { lastKey = -1; if (ALT) Screen.toggleFullscreen() }
+            Input.Keys.ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
 
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

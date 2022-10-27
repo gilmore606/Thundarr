@@ -30,10 +30,10 @@ import kotlin.math.sign
 
 object Screen : KtxScreen {
 
-    private const val WORLD_ZOOM = 0.85
+    var worldZoom = 1.3
+    var cameraSlack = 0.3
+    var cameraMenuShift = 0.8
     private const val ZOOM_SPEED = 4.0
-    private const val CAMERA_SPRING = 0.3
-    private const val CAMERA_MENU_SHIFT = 0.8
     private const val MAX_RENDER_WIDTH = 150
     private const val MAX_RENDER_HEIGHT = 120
     var zoom = 0.5
@@ -217,7 +217,7 @@ object Screen : KtxScreen {
             batch.addTileQuad(
                 tx, ty,
                 batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light,
-                offsetX, offsetY, scale, alpha
+                offsetX, offsetY, scale.toDouble(), alpha
             )
         }
     }
@@ -294,8 +294,8 @@ object Screen : KtxScreen {
         val targetY = pov.y + cameraOffsetY
         val xdist = (targetX - cameraPovX)
         val ydist = (targetY - cameraPovY)
-        val xinc = max(0.5, min(1000.0, (xdist.absoluteValue / CAMERA_SPRING))) * xdist.sign
-        val yinc = max(0.5, min(1000.0, (ydist.absoluteValue / CAMERA_SPRING))) * ydist.sign
+        val xinc = max(0.5, min(1000.0, (xdist.absoluteValue / cameraSlack))) * xdist.sign
+        val yinc = max(0.5, min(1000.0, (ydist.absoluteValue / cameraSlack))) * ydist.sign
         if (cameraPovX < targetX) {
             cameraPovX = min(targetX, cameraPovX + xinc * delta)
         } else if (cameraPovX > targetX) {
@@ -389,7 +389,7 @@ object Screen : KtxScreen {
 
     fun mouseScrolled(amount: Float) {
         zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
-        zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) WORLD_ZOOM else 1.0)
+        zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) (1.0 / worldZoom) else 1.0)
     }
 
     fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
@@ -423,15 +423,24 @@ object Screen : KtxScreen {
     }
 
     fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        when (button) {
-            Mouse.Button.LEFT -> {
-                scrollDragging = false
-                return true
-            }
-            Mouse.Button.RIGHT -> {
+        topModal?.also { modal ->
+            modal.mouseUp(screenX, screenY, button)
+            return true
+        } ?: run {
+            when (button) {
+                Mouse.Button.LEFT -> {
+                    scrollDragging = false
+                    return true
+                }
 
+                Mouse.Button.RIGHT -> {
+
+                }
+
+                else -> {
+                    return false
+                }
             }
-            else -> { return false }
         }
         return false
     }
@@ -476,10 +485,10 @@ object Screen : KtxScreen {
         val tileWidth = ((modal.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride
         val tileHeight = ((modal.height.toDouble() / (height)) * 2.0) / tileStride
         when (modal.position) {
-            Modal.Position.LEFT -> { this.cameraOffsetX = 0.0 - (tileWidth / 2.0 * CAMERA_MENU_SHIFT) }
-            Modal.Position.RIGHT -> { this.cameraOffsetX = 0.0 + (tileWidth / 2.0 * CAMERA_MENU_SHIFT) }
-            Modal.Position.TOP -> { this.cameraOffsetY = 0.0 - (tileHeight / 2.0 * CAMERA_MENU_SHIFT) }
-            Modal.Position.BOTTOM -> { this.cameraOffsetY = 0.0 + (tileHeight / 2.0 * CAMERA_MENU_SHIFT) }
+            Modal.Position.LEFT -> { this.cameraOffsetX = 0.0 - (tileWidth / 2.0 * cameraMenuShift) }
+            Modal.Position.RIGHT -> { this.cameraOffsetX = 0.0 + (tileWidth / 2.0 * cameraMenuShift) }
+            Modal.Position.TOP -> { this.cameraOffsetY = 0.0 - (tileHeight / 2.0 * cameraMenuShift) }
+            Modal.Position.BOTTOM -> { this.cameraOffsetY = 0.0 + (tileHeight / 2.0 * cameraMenuShift) }
             else -> { }
         }
         topModal = modal

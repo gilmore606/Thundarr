@@ -65,8 +65,8 @@ class QuadBatch(
 
     fun addTileQuad(col: Int, row: Int, // global tile XY
                     textureIndex: Int, visibility: Float, light: LightColor,
-                    offsetX: Float = 0f, offsetY: Float = 0f, scale: Float = 1f, alpha: Float = 1f) {
-        val scaleOffset = (1f - scale) * 0.5
+                    offsetX: Float = 0f, offsetY: Float = 0f, scale: Double = 1.0, alpha: Float = 1f) {
+        val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
         val x1 = Screen.tileXtoGlx(col + offsetX + 1.0 - scaleOffset * 2.0)

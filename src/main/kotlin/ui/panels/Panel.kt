@@ -86,6 +86,11 @@ abstract class Panel {
             boxBatch.getTextureIndex(Glyph.BOX_BG))
     }
 
+    protected fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
+        boxBatch.addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
+            boxBatch.getTextureIndex(glyph))
+    }
+
     protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.smallFont): ArrayList<String> {
         val wrapped = ArrayList<String>()
         var remaining = text

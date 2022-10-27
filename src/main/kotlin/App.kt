@@ -30,7 +30,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val time: Double,
         val zoomIndex: Double,
         val windowSize: XY,
-        val fullscreen: Boolean
+        val fullscreen: Boolean,
+        val worldZoom: Double,
+        val cameraSlack: Double,
+        val cameraMenuShift: Double
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -104,7 +107,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     time = time,
                     zoomIndex = Screen.zoomIndex,
                     windowSize = Screen.savedWindowSize(),
-                    fullscreen = Screen.FULLSCREEN
+                    fullscreen = Screen.FULLSCREEN,
+                    cameraSlack = Screen.cameraSlack,
+                    cameraMenuShift = Screen.cameraMenuShift,
+                    worldZoom = Screen.worldZoom
                 )
             )
 
@@ -133,8 +139,13 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
 
-            updateTime(state.time)
             Screen.restoreZoomIndex(state.zoomIndex)
+            Screen.worldZoom = state.worldZoom
+            Screen.cameraSlack = state.cameraSlack
+            Screen.cameraMenuShift = state.cameraMenuShift
+
+            updateTime(state.time)
+
             while (!level.isReady()) {
                 log.info("Waiting for level...")
                 delay(100)
