@@ -1,12 +1,13 @@
 package ui.modals
 
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
 import ui.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
 
-class SettingsModal : Modal(300, 400, "- settings -") {
+class SettingsModal : Modal(300, 500, "- settings -") {
 
     val contentY = 130
 
@@ -22,7 +23,7 @@ class SettingsModal : Modal(300, 400, "- settings -") {
         var dragging = false
 
         fun drawText(modal: SettingsModal) {
-            modal.drawString(title, modal.padding, modal.contentY + y)
+            modal.drawString(title, modal.padding, modal.contentY + y, color = if (dragging) Screen.fontColorBold else Screen.fontColor)
         }
         fun drawBackground(modal: SettingsModal) {
             modal.drawQuad(modal.padding, modal.contentY + y + 40, modal.width - modal.padding * 2, 4, Glyph.BOX_BORDER)
@@ -45,6 +46,29 @@ class SettingsModal : Modal(300, 400, "- settings -") {
         fun mouseUp(modal: SettingsModal) { dragging = false }
     }
 
+    class Multipick(
+        val title: String,
+        val y: Int,
+        val options: List<String>
+    ) {
+        var selected = 0
+        var hovered: Int? = null
+        val widths = options.map { option -> GlyphLayout(Screen.font, option).width.toInt() + 20 }
+
+        fun drawText(modal: SettingsModal) {
+            modal.drawString(title, modal.padding, modal.contentY + y)
+            var xused = 0
+            options.forEachIndexed { n, option ->
+                modal.drawString(option, modal.padding + xused + 10, modal.contentY + y + 30,
+                    color = if (n == selected) Screen.fontColorBold else Screen.fontColorDull)
+                xused += widths[n]
+            }
+        }
+        fun drawBackground(modal: SettingsModal) {
+
+        }
+    }
+
     abstract class Section(
         val title: String
     ) {
@@ -60,12 +84,16 @@ class SettingsModal : Modal(300, 400, "- settings -") {
         val sliderWorldZoom = Slider("Overworld auto zoom-out", 85, Screen.worldZoom, 1.0, 1.4) { Screen.worldZoom = it }
         val sliderMenuShift = Slider("Camera shift on menu open", 170, Screen.cameraMenuShift, 0.01, 0.9) { Screen.cameraMenuShift = it}
         val sliders = listOf(sliderCameraSpring, sliderWorldZoom, sliderMenuShift)
+
+        val menuPos = Multipick("Dialog window position", 270, listOf("Left", "Center", "Top"))
         override fun drawText(modal: SettingsModal) {
             sliders.forEach { it.drawText(modal) }
+            menuPos.drawText(modal)
         }
 
         override fun drawBackground(modal: SettingsModal) {
             sliders.forEach { it.drawBackground(modal) }
+            menuPos.drawBackground(modal)
         }
         override fun mouseClicked(modal: SettingsModal, modalX: Int, modalY: Int) {
             sliders.forEachIndexed { n, slider ->

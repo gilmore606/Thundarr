@@ -30,6 +30,7 @@ import kotlin.math.sign
 
 object Screen : KtxScreen {
 
+    val textureFilter = TextureFilter.MipMapLinearLinear
     var worldZoom = 1.3
     var cameraSlack = 0.3
     var cameraMenuShift = 0.8
@@ -42,8 +43,8 @@ object Screen : KtxScreen {
             updateSurfaceParams()
         }
     private var zoomTarget = 0.75
-    private val zoomLevels = listOf(0.42, 0.5, 0.6, 0.75, 0.85, 1.0)
-    var zoomIndex = 3.0
+    private val zoomLevels = listOf(0.5, 0.6, 0.75, 0.85, 1.0, 2.0)
+    var zoomIndex = 2.0
 
     var width = 0
     var height = 0
@@ -62,10 +63,10 @@ object Screen : KtxScreen {
     private val uiTileSet = UITileSet()
     private val tileSets = listOf(terrainTileSet, thingTileSet, actorTileSet, uiTileSet)
     private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
-    private val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
+    val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
-    private val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
+    val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
     val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
     val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
     val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)

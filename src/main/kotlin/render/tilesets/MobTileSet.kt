@@ -1,12 +1,13 @@
 package render.tilesets
 
 import com.badlogic.gdx.graphics.Texture
+import render.Screen
 import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
 fun ActorTileSet() =
     TileSet("tiles_mob.png", 4, 4,
-            Texture.TextureFilter.MipMapLinearLinear).apply {
+        Screen.textureFilter).apply {
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))

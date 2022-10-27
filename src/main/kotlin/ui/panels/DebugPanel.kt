@@ -30,6 +30,7 @@ object DebugPanel : ShadedPanel() {
         drawString("light $lr $lg $lb", padding, padding + 40)
         drawString("render ${Screen.drawTime} ms", padding, padding + 60)
         drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 80)
+
     }
 
 }

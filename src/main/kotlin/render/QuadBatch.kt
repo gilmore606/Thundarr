@@ -27,8 +27,12 @@ class QuadBatch(
     private var floatCount = 0
     var vertexCount = 0
 
-    private val tilePad = 0.00004f
-    private val shadowPad = 0.001f
+    private val textureEdgePad = 0.0015f
+    var shadowTexturePadX = -0.0105f
+    var shadowTexturePadY = -0.0062f
+    private val quadEdgePadX = 0.0002f
+    private val quadEdgePadY = -0.0006f
+    private val shadowPad = -0.0001f
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, lightA: Float, grayOut: Float) {
@@ -178,7 +182,7 @@ class QuadBatch(
             }
             SOUTHWEST -> {
                 oy0 = row.toDouble() + 0.75
-                ox1 = col.toDouble() + 0.75
+                ox1 = col.toDouble() + 0.25
                 oy1 = row.toDouble() + 1.0
                 tx0 = 0.75f
                 tx1 = 1f
@@ -196,7 +200,8 @@ class QuadBatch(
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
         addQuad(ix0 - shadowPad, iy0 - shadowPad, ix1 + shadowPad, iy1 + shadowPad,
-            tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, 1f, grayOut)
+            tx0 + shadowTexturePadX, ty0 + shadowTexturePadY, tx1 - shadowTexturePadX, ty1 - shadowTexturePadY,
+            textureIndex, lightR, lightG, lightB, 1f, grayOut)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
@@ -232,14 +237,14 @@ class QuadBatch(
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f
     ) {
-        val x0 = ix0.toFloat()
-        val y0 = -iy0.toFloat()
-        val x1 = ix1.toFloat()
-        val y1 = -iy1.toFloat()
-        val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + (tileSet.tilesPerRow * tilePad)
-        val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + (tileSet.tilesPerColumn * tilePad)
-        val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - (tileSet.tilesPerRow * tilePad)
-        val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - (tileSet.tilesPerColumn * tilePad)
+        val x0 = ix0.toFloat() - quadEdgePadX
+        val y0 = -iy0.toFloat() - quadEdgePadY
+        val x1 = ix1.toFloat() + quadEdgePadX
+        val y1 = -iy1.toFloat() + quadEdgePadY
+        val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + textureEdgePad
+        val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + textureEdgePad
+        val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - textureEdgePad
+        val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - textureEdgePad
         floats.apply {
             addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut)
             addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut)
