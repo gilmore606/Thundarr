@@ -1,6 +1,7 @@
 package render
 
 import App
+import actors.Actor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20.*
@@ -204,13 +205,15 @@ object Screen : KtxScreen {
             thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly])
     }
 
-    private val renderActor: (Int, Int, Glyph)->Unit = { tx, ty, glyph ->
+    private val renderActor: (Int, Int, Actor)->Unit = { tx, ty, actor ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
         actorBatch.addTileQuad(
             tx, ty,
-            actorBatch.getTextureIndex(glyph, App.level, tx, ty), 1f, light)
+            actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
+            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY()
+        )
     }
 
     private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->

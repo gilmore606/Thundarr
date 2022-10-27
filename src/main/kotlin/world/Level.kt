@@ -153,13 +153,14 @@ sealed class Level {
     }
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
-    fun forEachActorToRender(doThis: (x: Int, y: Int, glyph: Glyph) -> Unit) = director.actors.forEach { actor ->
+    fun forEachActorToRender(doThis: (x: Int, y: Int, actor: Actor) -> Unit) =
+        director.actors.forEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
             if (vis == 1f && chunkAt(x,y) != null) {
                 doThis(
-                    x, y, actor.glyph()
+                    x, y, actor
                 )
             }
     }
@@ -285,6 +286,7 @@ sealed class Level {
         }
 
         allChunks().forEach { it.onRender(delta) }
+        director.actors.forEach { it.onRender(delta) }
 
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }
@@ -385,12 +387,15 @@ sealed class Level {
         }
     }
 
-    // What action does the player take when bumping into xy?
-    fun bumpActionAt(x: Int, y: Int): Action? {
-        actorAt(x,y)?.also { actor ->
-            return Converse(actor)
+    // What action does the player take when bumping into dir from xy?
+    fun bumpActionTo(x: Int, y: Int, dir: XY): Action? {
+        actorAt(x + dir.x,y + dir.y)?.also { target ->
+            if (App.player.willAggro) {
+                return Melee(target, dir)
+            }
+            return Converse(target)
         } ?: run {
-            return BumpTerrain(XY(x,y))
+            return Bump(x, y, dir)
         }
         return null
     }

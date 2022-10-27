@@ -3,6 +3,7 @@ package actors
 import actors.actions.Action
 import actors.actions.Equip
 import actors.actions.Unequip
+import actors.animations.Animation
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -30,6 +31,13 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override var level: Level? = null
     @Transient
     val gear = mutableMapOf<Gear.Slot, Gear?>()
+
+    @Transient
+    var animation: Animation? = null
+        set(value) {
+            field = value
+            value?.onStart()
+        }
 
     open fun speed() = 1f
     open fun visualRange() = 22f
@@ -110,6 +118,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             }
         }
         return light
+    }
+
+    fun animOffsetX() = animation?.offsetX() ?: 0f
+    fun animOffsetY() = animation?.offsetY() ?: 0f
+    override fun onRender(delta: Float) {
+        animation?.also { if (it.done) animation = null else it.onRender(delta) }
     }
 
     override fun advanceTime(delta: Float) { }

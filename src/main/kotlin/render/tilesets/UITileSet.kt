@@ -20,4 +20,6 @@ fun UITileSet() =
         setTile(Glyph.BUTTON_JOURNAL, SimpleTile(this, 3, 1))
         setTile(Glyph.COLOR_BARS, SimpleTile(this, 0, 3))
         setTile(Glyph.HEALTH_ICON, SimpleTile(this, 1, 3))
+        setTile(Glyph.ANGRY_THUNDARR, SimpleTile(this, 2, 3))
+        setTile(Glyph.SPEECH_BUBBLE, SimpleTile(this, 3, 3))
     }

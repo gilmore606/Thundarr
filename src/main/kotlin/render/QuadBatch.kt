@@ -31,7 +31,7 @@ class QuadBatch(
     var shadowTexturePadX = -0.0105f
     var shadowTexturePadY = -0.0062f
     private val quadEdgePadX = 0.0002f
-    private val quadEdgePadY = -0.0006f
+    private val quadEdgePadY = -0.0024f
     private val shadowPad = -0.0001f
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,

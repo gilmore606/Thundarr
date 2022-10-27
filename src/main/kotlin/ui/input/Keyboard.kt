@@ -109,6 +109,8 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.M -> { App.openMap() }
             Input.Keys.ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
 
+            Input.Keys.BACKSPACE -> { App.player.toggleAggro() }
+
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
             }

@@ -1,6 +1,7 @@
 package ui.panels
 
 import render.Screen
+import render.tilesets.Glyph
 
 object StatusPanel : ShadedPanel() {
 
@@ -23,6 +24,14 @@ object StatusPanel : ShadedPanel() {
         drawString(App.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
 
         drawString(App.player.hp.toString() + "/" + App.player.hpMax.toString(), padding, padding + 70)
+    }
+
+    override fun drawBackground() {
+        super.drawBackground()
+        if (App.player.willAggro) {
+            Screen.uiBatch.addPixelQuad(x - 40, y + 20, x - 40 + 31, y + 20 + 31,
+                Screen.uiBatch.getTextureIndex(Glyph.ANGRY_THUNDARR))
+        }
     }
 
     override fun drawEntities() {

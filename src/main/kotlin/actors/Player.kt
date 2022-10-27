@@ -5,12 +5,16 @@ import actors.actions.Action
 import actors.actions.Move
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.panels.Console
 import util.XY
 import world.Entity
 import world.Level
 
 @Serializable
 class Player : Actor() {
+
+    var willAggro: Boolean = false
+
     override fun glyph() = Glyph.PLAYER
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
@@ -25,8 +29,17 @@ class Player : Actor() {
             if (level.isWalkableFrom(xy, dir)) {
                 queue(Move(dir))
             } else {
-                level.bumpActionAt(xy.x + dir.x, xy.y + dir.y)?.also { queue(it) }
+                level.bumpActionTo(xy.x, xy.y, dir)?.also { queue(it) }
             }
         }
+    }
+
+    fun toggleAggro() {
+        if (willAggro) {
+            Console.say("You calm down.")
+        } else {
+            Console.say("You boil over with rage, ready to smash the next creature you approach!")
+        }
+        willAggro = !willAggro
     }
 }
