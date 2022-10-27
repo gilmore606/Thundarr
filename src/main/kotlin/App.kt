@@ -297,6 +297,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openControls() { Screen.addModal(ControlsModal()) }
     fun openCredits() { Screen.addModal(CreditsModal()) }
     fun openInventory() { Screen.addModal(InventoryModal(player)) }
+    fun openGear() { Screen.addModal(GearModal(player)) }
     fun openMap() { Screen.addModal(MapModal()) }
     fun openSystemMenu() { Screen.addModal(SystemMenu()) }
     fun openJournal() { Screen.addModal(JournalModal()) }

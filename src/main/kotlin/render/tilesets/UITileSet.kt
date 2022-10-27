@@ -15,6 +15,7 @@ fun UITileSet() =
         setTile(Glyph.LOGO_OOKLA, SimpleTile(this, 2, 1))
         setTile(Glyph.PANEL_SHADOW, SimpleTile(this, 0, 2))
         setTile(Glyph.BUTTON_INVENTORY, SimpleTile(this, 1, 2))
+        setTile(Glyph.BUTTON_GEAR, SimpleTile(this, 3, 0))
         setTile(Glyph.BUTTON_MAP, SimpleTile(this, 2, 2))
         setTile(Glyph.BUTTON_SYSTEM, SimpleTile(this, 3, 2))
         setTile(Glyph.BUTTON_JOURNAL, SimpleTile(this, 3, 1))

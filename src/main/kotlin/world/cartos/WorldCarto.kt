@@ -50,7 +50,7 @@ class WorldCarto(
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
                     if (Dice.chance(0.005f)) {
-                        if (Dice.chance(0.85f)) {
+                        if (Dice.chance(0.9f)) {
                             Ox().moveTo(level, x + this.x0, y + this.y0)
                         } else {
                             Herder().moveTo(level, x + this.x0, y + this.y0)

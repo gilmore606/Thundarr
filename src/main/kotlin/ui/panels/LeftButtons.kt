@@ -15,7 +15,15 @@ object LeftButtons : Panel() {
         val glyph: Glyph,
         val tip: String,
         val onPress: ()->Unit
-    )
+    ) {
+        var size = 36.0
+        var targetSize = 36.0
+        val growSpeed = 260.0
+        fun onRender(delta: Float) {
+            if (size < targetSize) size = kotlin.math.min((size + growSpeed * delta), targetSize)
+            else if (size > targetSize) size = kotlin.math.max((size - growSpeed * delta), targetSize)
+        }
+    }
 
     private val xPadding = 36
     private var yPadding = 200
@@ -37,6 +45,9 @@ object LeftButtons : Panel() {
         },
         Button(Glyph.BUTTON_INVENTORY, "backpack") {
             App.openInventory()
+        },
+        Button(Glyph.BUTTON_GEAR, "gear") {
+            App.openGear()
         },
         Button(Glyph.BUTTON_MAP, "world map") {
             App.openMap()
@@ -64,6 +75,11 @@ object LeftButtons : Panel() {
         this.contraction = this.width
     }
 
+    override fun onRender(delta: Float) {
+        super.onRender(delta)
+        buttons.forEach { it.onRender(delta) }
+    }
+
     override fun drawText() {
         if (!shouldShow()) return
         if (hovered < 0) return
@@ -86,22 +102,12 @@ object LeftButtons : Panel() {
         val cx = 0 - contraction
         var cy = 0
         buttons.forEachIndexed { n, button ->
-            if (hovered == n) {
                 boxBatch.addPixelQuad(
-                    cx + this.x - (iconSizeHovered - iconSize) / 2,
-                    cy + this.y - (iconSizeHovered - iconSize) / 2,
-                    cx + this.x + iconSizeHovered,
-                    cy + this.y + iconSizeHovered,
+                    cx + this.x - (button.size.toInt()) / 2 + 16,
+                    cy + this.y - (button.size.toInt()) / 2 + 24,
+                    cx + this.x + button.size.toInt() / 2 + 16,
+                    cy + this.y + button.size.toInt() / 2 + 24,
                     boxBatch.getTextureIndex(button.glyph))
-            } else {
-                boxBatch.addPixelQuad(
-                    cx + this.x,
-                    cy + this.y,
-                    cx + this.x + iconSize,
-                    cy + this.y + iconSize,
-                    boxBatch.getTextureIndex(button.glyph)
-                )
-            }
             cy += spacing
         }
     }
@@ -120,8 +126,12 @@ object LeftButtons : Panel() {
                 }
             }
             hovered = newHover
+            buttons.forEachIndexed { n, button ->
+                button.targetSize = if (n == hovered) 56.0 else 36.0
+            }
         } else {
             mouseInside = false
+            buttons.forEach { it.targetSize = 36.0 }
         }
     }
 

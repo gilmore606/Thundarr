@@ -28,6 +28,7 @@ enum class Glyph {
     BUTTON_MAP,
     BUTTON_SYSTEM,
     BUTTON_JOURNAL,
+    BUTTON_GEAR,
     COLOR_BARS,
 
     PLAYER,

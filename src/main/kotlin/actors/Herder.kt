@@ -2,7 +2,6 @@ package actors
 
 import actors.actions.Action
 import kotlinx.serialization.Serializable
-import render.sparks.Smoke
 import render.tilesets.Glyph
 import util.Dice
 import util.LightColor
