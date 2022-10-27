@@ -88,6 +88,12 @@ sealed class NPC : Actor() {
         return null
     }
 
+    override fun examineDescription(): String {
+        var d = description()
+        if (hostile) d += "  " + this.gender().ps.capitalize() + " seems very angry at you!"
+        return d
+    }
+
     override fun receiveAttack(attacker: Actor) {
         if (attacker is Player && !hostile) {
             hostile = true

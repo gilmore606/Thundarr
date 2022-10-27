@@ -10,7 +10,7 @@ class ExamineModal(
 
     private val padding = 22
 
-    private val wrappedDesc = wrapText(entity.description(), width - 64, padding, Screen.font)
+    private val wrappedDesc = wrapText(entity.examineDescription(), width - 64, padding, Screen.font)
     private val wrappedInfo = wrapText("You don't know anything interesting about " + entity.iname() + ".", width, padding, Screen.font)
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {

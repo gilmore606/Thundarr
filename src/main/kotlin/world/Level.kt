@@ -4,6 +4,8 @@ import actors.Actor
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.Spark
 import render.sunLights
@@ -75,18 +77,19 @@ sealed class Level {
                 val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
+                val light = if (vis == 1f) lightAt(x, y) else Screen.halfLight
                 if (vis > 0f) {
                     thingsAt(x,y).forEach { it.onRender(delta) }
                     actorAt(x,y)?.onRender(delta)
                     doTile(
-                        x, y, vis, glyph, lightAt(x, y)
+                        x, y, vis, glyph, light
                     )
                     // Ground overlaps
                     if (tileSet.tileHolders[glyph] is OverlapTile) {
                         CARDINALS.forEach { edge ->
                             if ((tileSet.tileHolders[glyph] as OverlapTile).overlapsIn(this, x, y, edge)) {
                                 doOverlap(
-                                    x, y, vis, glyph, edge, lightAt(x - edge.x, y - edge.y)
+                                    x, y, vis, glyph, edge, light
                                 )
                             }
                         }
@@ -96,7 +99,7 @@ sealed class Level {
                         listOf(NORTH, WEST, EAST).forEach { edge ->
                             if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y)).glyph()] !is WaterTile) {
                                 doSurf(
-                                    x, y, vis, lightAt(x, y), edge
+                                    x, y, vis, light, edge
                                 )
                             }
                         }
@@ -331,7 +334,9 @@ sealed class Level {
     fun addLightSource(x: Int, y: Int, lightSource: LightSource) = chunkAt(x,y)?.projectLightSource(XY(x, y), lightSource)
 
     fun removeLightSource(lightSource: LightSource) {
-        allChunks().forEach { it.removeLightSource(lightSource) }
+        KtxAsync.launch {
+            allChunks().forEach { it.removeLightSource(lightSource) }
+        }
     }
 
     fun updateAmbientLight(hour: Int, minute: Int) {

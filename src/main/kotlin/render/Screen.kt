@@ -35,6 +35,7 @@ object Screen : KtxScreen {
     var worldZoom = 1.3
     var cameraSlack = 0.3
     var cameraMenuShift = 0.8
+    private const val CAMERA_MAX_JERK = 0.4
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150
     private const val MAX_RENDER_HEIGHT = 120
@@ -78,6 +79,7 @@ object Screen : KtxScreen {
 
     private val lightCache = Array(MAX_RENDER_WIDTH * 2 + 1) { Array(MAX_RENDER_HEIGHT * 2 + 1) { LightColor(1f, 0f, 0f) } }
     val fullLight = LightColor(1f, 1f, 1f)
+    val halfLight = LightColor(0.3f, 0.3f, 0.3f)
     val fullDark = LightColor(0f, 0f, 0f)
 
     const val fontSize = 16
@@ -150,6 +152,9 @@ object Screen : KtxScreen {
     private var cameraPovY = 0.0
     private var cameraOffsetX = 0.0
     private var cameraOffsetY = 0.0
+    private var cameraLastMoveX = 0.0
+    private var cameraLastMoveY = 0.0
+
     var scrollLatch = false
     var scrollDragging = false
     private val dragPixels = XY(0, 0)
@@ -305,8 +310,17 @@ object Screen : KtxScreen {
         val targetY = pov.y + cameraOffsetY
         val xdist = (targetX - cameraPovX)
         val ydist = (targetY - cameraPovY)
-        val xinc = max(0.5, min(1000.0, (xdist.absoluteValue / cameraSlack))) * xdist.sign
-        val yinc = max(0.5, min(1000.0, (ydist.absoluteValue / cameraSlack))) * ydist.sign
+        var xinc = max(0.5, min(1000.0, (xdist.absoluteValue / cameraSlack))) * xdist.sign
+        var yinc = max(0.5, min(1000.0, (ydist.absoluteValue / cameraSlack))) * ydist.sign
+        var xchange = cameraLastMoveX - xinc
+        var ychange = cameraLastMoveY - yinc
+        xchange = if (xchange >= 0.0) min(xchange, CAMERA_MAX_JERK) else max(xchange, -CAMERA_MAX_JERK)
+        ychange = if (ychange >= 0.0) min(ychange, CAMERA_MAX_JERK) else max(ychange, -CAMERA_MAX_JERK)
+        xinc = cameraLastMoveX - xchange
+        yinc = cameraLastMoveY - ychange
+        cameraLastMoveX = xinc
+        cameraLastMoveY = yinc
+
         if (cameraPovX < targetX) {
             cameraPovX = min(targetX, cameraPovX + xinc * delta)
         } else if (cameraPovX > targetX) {

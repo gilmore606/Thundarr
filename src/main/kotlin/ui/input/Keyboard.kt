@@ -1,6 +1,7 @@
 package ui.input
 
 import App
+import actors.Herder
 import actors.Ox
 import com.badlogic.gdx.Input
 import kotlinx.coroutines.delay
@@ -19,7 +20,7 @@ object Keyboard : KtxInputAdapter {
     var lastKeyTime = System.currentTimeMillis()
 
     private const val REPEAT_DELAY_MS = 300L
-    private const val REPEAT_MS = 70L
+    private const val REPEAT_MS = 90L
 
     private var SHIFT = false
     private var CTRL = false
@@ -125,7 +126,7 @@ object Keyboard : KtxInputAdapter {
                 }
             }
             Input.Keys.F6 -> {
-                Ox().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
+                Herder().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
             }
 
             else -> { lastKey = -1 }
