@@ -4,6 +4,7 @@ import actors.actions.Drop
 import actors.actions.Use
 import com.badlogic.gdx.Input
 import render.Screen
+import things.Container
 import things.Thing
 import things.ThingHolder
 import util.groundAtPlayer
@@ -11,7 +12,8 @@ import util.plural
 import java.lang.Integer.max
 
 class InventoryModal(
-    private val thingHolder: ThingHolder
+    private val thingHolder: ThingHolder,
+    private val container: Container? = null
     ) : SelectionModal(300, 700, "- bACkPACk -", default = 0), ContextMenu.ParentModal {
 
     private val grouped = ArrayList<ArrayList<Thing>>().apply {
@@ -80,6 +82,7 @@ class InventoryModal(
     }
 
     override fun doSelect() {
+        if (selection < 0) return
         val parent = this
         val ourSelection = selection
         Screen.addModal(ContextMenu(width - 10, optionY(ourSelection) - 4).apply {

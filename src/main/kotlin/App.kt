@@ -10,6 +10,7 @@ import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.Screen
 import things.Apple
+import things.Container
 import things.Sunsword
 import things.Torch
 import ui.modals.*
@@ -291,7 +292,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openSettings() { Screen.addModal(SettingsModal()) }
     fun openControls() { Screen.addModal(ControlsModal()) }
     fun openCredits() { Screen.addModal(CreditsModal()) }
-    fun openInventory() { Screen.addModal(InventoryModal(player)) }
+    fun openInventory(withContainer: Container? = null) { Screen.addModal(InventoryModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }
     fun openMap() { Screen.addModal(MapModal()) }
     fun openSystemMenu() { Screen.addModal(SystemMenu()) }

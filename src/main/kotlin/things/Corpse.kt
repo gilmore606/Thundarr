@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 
 @Serializable
-class Corpse : Portable(), Temporal {
+class Corpse : Container(), Temporal {
 
     var rot = 0f
     open fun rotTime() = 20f
@@ -16,6 +16,7 @@ class Corpse : Portable(), Temporal {
     override fun glyph() = Glyph.CORPSE
     override val kind = Kind.CORPSE
     override fun isPortable(): Boolean = false
+    override fun openVerb() = "search"
 
     override fun advanceTime(delta: Float) {
         rot += delta
