@@ -15,51 +15,24 @@ import util.log
 class Director(val level: Level) {
 
     val actors = mutableListOf<Actor>()
-    private val actorQueue = mutableListOf<Actor>()
-    private val nonActorQueue = mutableListOf<Actor>()
 
     private val temporals = mutableListOf<Temporal>()
 
     private var playerTimePassed = 0f
 
-    private fun MutableList<Actor>.addOnce(actor: Actor) { if (!actor.isUnloading && !contains(actor)) add(actor) }
-    private fun MutableList<Actor>.addOnce(i: Int, actor: Actor) { if (!actor.isUnloading && !contains(actor)) add(i, actor) }
-
     fun attachActor(actor: Actor) {
-        KtxAsync.launch {
-            if (actor is Player && actor != App.player) {
-                throw RuntimeException("Duplicate player attached!")
-            } else if (actor in actors) {
-                throw RuntimeException("Attaching already-attached actor!")
-            }
-            actor.level = this@Director.level
-            actor.juice = 0f
-            addOrdered(actor, actors)
+        if (actor is Player && actor != App.player) {
+            throw RuntimeException("Duplicate player attached!")
+        } else if (actor in actors) {
+            throw RuntimeException("Attaching already-attached actor!")
         }
+        actor.level = this@Director.level
+        actor.juice = 0f
+        actors.add(actor)
     }
 
     fun detachActor(actor: Actor) {
-        KtxAsync.launch {
-            actors.remove(actor)
-        }
-    }
-
-    // Insert actor into the queue in the correct order based on juice and speed.
-    private fun addOrdered(actor: Actor, toQueue: MutableList<Actor>) {
-        var i = 0
-        val actorSpeed = actor.speed()
-        while (i < toQueue.size) {
-            if (
-                (toQueue[i].juice < actor.juice) ||
-                (toQueue[i].juice == actor.juice && actor is Player) ||
-                (toQueue[i].juice == actor.juice && actors[i].speed() < actorSpeed)
-            ) {
-                toQueue.addOnce(i, actor)
-                return
-            }
-            i++
-        }
-        toQueue.addOnce(actor)
+        actors.remove(actor)
     }
 
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
@@ -89,53 +62,54 @@ class Director(val level: Level) {
     }
 
     // Execute actors' actions until it's the player's turn.
-    // TODO: change to give juice to all active levels not just this one!
+    // TODO: change to give juice to all active levels not just this one
+
     fun runQueue(level: Level) {
-
-        var done = false
-        actorQueue.clear()
-        nonActorQueue.clear()
-        actors.forEach { if (it.isActing()) actorQueue.add(it) else nonActorQueue.add(it) }
-
-        while (actorQueue.isNotEmpty() && !done) {
-            if (actorQueue[0].canAct()) {
-                val actor = actorQueue.removeAt(0)
-                actor.nextAction()?.also { action ->
-
-                    val duration = action.duration()
-                    action.execute(actor, level)
-
-                    when (actor) {
-                        is Player -> {
-                            actorQueue.forEach { if (it !is Player) it.juice += duration} // Player actions give juice to everyone else.
-                            playerTimePassed += duration
-                            if (playerTimePassed >= 1f) {
-                                App.advanceTime(playerTimePassed)
-                                playerTimePassed = 0f
-                                done = true
-                            }
-                        }
-                        else -> { actor.juice -= duration } // NPC actions cost them juice.
+        while (true) {
+            // find actor with highest juice
+            var actor: Actor? = null
+            var checkActor: Actor
+            var unloadingActor: Actor? = null
+            for (n in 0 .. actors.lastIndex) {
+                checkActor = actors[n]
+                if (checkActor.isUnloading) {
+                    unloadingActor = checkActor
+                } else if (checkActor.isActing()) {
+                    if ((checkActor.juice > (actor?.juice ?: 0f)) ||
+                        ((checkActor is Player) && (checkActor.juice == (actor?.juice ?: 0f))) ||
+                        ((checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.speed() > (actor?.speed() ?: 0f)))
+                    ) {
+                        actor = checkActor
                     }
-
-                } ?: if (actor is Player) {
-                    // Player's turn, but has no queued actions, so we're done.
-                    done = true
-                } else {
-                    // NPCs should always return an action, even if it's a wait.
-                    throw RuntimeException("NPC $actor had no next action!")
                 }
-                // Put the actor back in queue, in position for their next turn.
-                addOrdered(actor, actorQueue)
-            } else {
-                // If this actor has no juice, nobody does, so we're done.
-                done = true
+            }
+            unloadingActor?.also { actors.remove(it) }
+            if (actor == null || !actor.canAct()) return  // no one had juice, we're done
+
+            // execute their action
+            actor.nextAction()?.also { action ->
+                val duration = action.duration()
+                action.execute(actor, level)
+                // pay the juice
+                if (actor is Player) {  // player pays juice to all actors
+                    actors.forEach {
+                        if (it.isActing() && (it !is Player)) { it.juice += duration }
+                    }
+                    playerTimePassed += duration
+                    if (playerTimePassed >= 1f) {
+                        App.advanceTime(playerTimePassed)
+                        playerTimePassed = 0f
+                        return  // quit to let the renderer run
+                    }
+                } else {  // NPC spends juice
+                    actor.juice -= duration
+                }
+            } ?: run {
+                // they had juice, but no action
+                if (actor is Player) return
+                throw RuntimeException("NPC $actor had no next action!")
             }
         }
-
-        actors.clear()
-        actorQueue.forEach { actors.addOnce(it) }
-        nonActorQueue.forEach { actors.addOnce(it) }
     }
 
     // Advance world time for all actors.

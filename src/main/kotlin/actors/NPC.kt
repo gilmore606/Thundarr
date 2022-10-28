@@ -91,6 +91,8 @@ sealed class NPC : Actor() {
     override fun examineDescription(): String {
         var d = description()
         if (hostile) d += "  " + this.gender().ps.capitalize() + " seems very angry at you!"
+        if (awareness == Awareness.HIBERNATED) d += "  " + this.gender().ps.capitalize() + " looks very sleepy."
+        if (awareness == Awareness.UNAWARE) d += "  " + this.gender().ps.capitalize() + " doesn't seem to notice you."
         return d
     }
 
