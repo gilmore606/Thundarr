@@ -14,6 +14,9 @@ sealed class Stain : Temporal {
     @Transient var holder: CellContainer? = null
     private var birthTime: Double = App.time
     protected var sizeMod: Float = 0f
+    protected var posModX: Float = 0f
+    protected var posModY: Float = 0f
+    protected var alphaMod: Float = 0f
     protected var alpha: Float = 1f
 
     abstract fun glyph(): Glyph
@@ -43,10 +46,10 @@ sealed class Stain : Temporal {
         holder?.expireStain(this)
     }
 
-    fun offsetX() = sizeMod
-    fun offsetY() = sizeMod
+    fun offsetX() = posModX + sizeMod
+    fun offsetY() = posModY + sizeMod
     fun scale() = 1f - sizeMod
-    fun alpha() = alpha
+    fun alpha() = alpha + alphaMod
 
     fun onRestore(holder: CellContainer) {
         this.holder = holder

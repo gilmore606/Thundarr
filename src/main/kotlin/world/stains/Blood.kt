@@ -9,10 +9,18 @@ class Blood : Stain() {
 
     override fun glyph() = Glyph.BLOODSTAIN
     override fun name() = "blood"
-    override fun lifespan() = 50.0
+    override fun lifespan() = 500000.0
     override fun stackType() = Type.BLOOD
 
+    var spawned = false
+
     init {
-        sizeMod = Dice.float(-0.25f, 0.2f)
+        if (!spawned) {
+            spawned = true
+            sizeMod = Dice.float(-0.25f, 0.2f)
+            posModX = Dice.float(-0.3f, 0.3f)
+            posModY = Dice.float(-0.3f, 0.3f)
+            alphaMod = Dice.float(-0.3f, 0.3f)
+        }
     }
 }

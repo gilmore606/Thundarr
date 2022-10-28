@@ -78,66 +78,92 @@ sealed class Level {
     ) {
         for (x in pov.x - Screen.renderTilesWide /2 until pov.x + Screen.renderTilesWide /2) {
             for (y in pov.y - Screen.renderTilesHigh /2 until pov.y + Screen.renderTilesHigh /2) {
-                val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
-                val terrain = Terrain.get(getTerrain(x,y))
-                val glyph = terrain.glyph()
-                val holder = tileSet.tileHolders[glyph]
-                if (vis > 0f) {
-                    val light = if (vis == 1f) lightAt(x, y) else Screen.halfLight
-                    doTile(
-                        x, y, vis, glyph, light
-                    )
-                    if (vis == 1f) {
-                        thingsAt(x,y).forEach { it.onRender(delta) }
-                        actorAt(x,y)?.onRender(delta)
-                        stainAt(x,y)?.also { doStain(x, y, it, light) }
-                    }
-                    // Ground overlaps
-                    if (holder is OverlapTile) {
-                        CARDINALS.forEach { edge ->
-                            if (holder.overlapsIn(this, x, y, edge)) {
-                                doOverlap(
-                                    x, y, vis, glyph, edge, light
-                                )
-                            }
+                chunkAt(x, y)?.also { chunk -> // optimization!  you'd be surprised
+                    val vis = if (App.DEBUG_VISIBLE) 1f else chunk.visibilityAt(x, y)
+                    val terrain = Terrain.get(chunk.getTerrain(x, y))
+                    val glyph = terrain.glyph()
+                    val holder = tileSet.tileHolders[glyph]
+                    if (vis > 0f) {
+                        val light = if (vis == 1f) chunk.lightAt(x, y) else Screen.halfLight
+                        doTile(
+                            x, y, vis, glyph, light
+                        )
+                        if (vis == 1f) {
+                            chunk.thingsAt(x, y).forEach { it.onRender(delta) }
+                            actorAt(x, y)?.onRender(delta)
+                            chunk.stainAt(x, y)?.also { doStain(x, y, it, light) }
                         }
-                    }
-                    // Water surf
-                    if (holder is WaterTile) {
-                        listOf(NORTH, WEST, EAST).forEach { edge ->
-                            if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y)).glyph()] !is WaterTile) {
-                                doSurf(
-                                    x, y, vis, light, edge
-                                )
-                            }
-                        }
-                    }
-                    // Occlusion shadows
-                    if (vis == 1f && !terrain.isOpaque()) {
-                        var okNE = true
-                        var okSE = true
-                        var okNW = true
-                        var okSW = true
-                        CARDINALS.forEach { edge ->
-                            if (Terrain.get(getTerrain(x + edge.x, y + edge.y)).isOpaque()) {
-                                doOcclude(
-                                    x, y, edge
-                                )
-                                when (edge) {
-                                    NORTH -> { okNE = false ; okNW = false }
-                                    SOUTH -> { okSE = false ; okSW = false }
-                                    EAST -> { okNE = false ; okSE = false}
-                                    WEST -> { okNW = false ; okSW = false }
+                        // Ground overlaps
+                        if (holder is OverlapTile) {
+                            CARDINALS.forEach { edge ->
+                                if (holder.overlapsIn(this, x, y, edge)) {
+                                    doOverlap(
+                                        x, y, vis, glyph, edge, light
+                                    )
                                 }
                             }
                         }
-                        CORNERS.forEach { corner ->
-                            if (Terrain.get(getTerrain(x + corner.x, y + corner.y)).isOpaque()) {
-                                when {
-                                    corner == NORTHEAST && okNE -> { doOcclude(x, y, corner) }
-                                    corner == NORTHWEST && okNW -> { doOcclude(x, y, corner) }
-                                    corner == SOUTHEAST && okSE -> { doOcclude(x, y, corner) }
-                                    corner == SOUTHWEST && okSW -> { doOcclude(x, y, corner) }
+                        // Water surf
+                        if (holder is WaterTile) {
+                            listOf(NORTH, WEST, EAST).forEach { edge ->
+                                if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y))
+                                        .glyph()] !is WaterTile
+                                ) {
+                                    doSurf(
+                                        x, y, vis, light, edge
+                                    )
+                                }
+                            }
+                        }
+                        // Occlusion shadows
+                        if (vis == 1f && !terrain.isOpaque()) {
+                            var okNE = true
+                            var okSE = true
+                            var okNW = true
+                            var okSW = true
+                            CARDINALS.forEach { edge ->
+                                if (Terrain.get(getTerrain(x + edge.x, y + edge.y)).isOpaque()) {
+                                    doOcclude(
+                                        x, y, edge
+                                    )
+                                    when (edge) {
+                                        NORTH -> {
+                                            okNE = false; okNW = false
+                                        }
+
+                                        SOUTH -> {
+                                            okSE = false; okSW = false
+                                        }
+
+                                        EAST -> {
+                                            okNE = false; okSE = false
+                                        }
+
+                                        WEST -> {
+                                            okNW = false; okSW = false
+                                        }
+                                    }
+                                }
+                            }
+                            CORNERS.forEach { corner ->
+                                if (Terrain.get(getTerrain(x + corner.x, y + corner.y)).isOpaque()) {
+                                    when {
+                                        corner == NORTHEAST && okNE -> {
+                                            doOcclude(x, y, corner)
+                                        }
+
+                                        corner == NORTHWEST && okNW -> {
+                                            doOcclude(x, y, corner)
+                                        }
+
+                                        corner == SOUTHEAST && okSE -> {
+                                            doOcclude(x, y, corner)
+                                        }
+
+                                        corner == SOUTHWEST && okSW -> {
+                                            doOcclude(x, y, corner)
+                                        }
+                                    }
                                 }
                             }
                         }
