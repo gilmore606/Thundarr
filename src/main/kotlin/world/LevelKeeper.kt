@@ -93,10 +93,18 @@ object LevelKeeper {
         }
     }
 
-    // Distribute the passage of time to everyone that cares.
-    fun advanceTime(delta: Float) {
+    // Distribute the passage of player action juice to everyone that acts.
+    fun advanceJuice(juice: Float) {
         liveLevels.forEach {
-            it.level.advanceTime(delta)
+            it.level.director.advanceJuice(juice)
+        }
+    }
+
+    // Distribute the passage of time to everyone that cares.
+    fun advanceTime(turns: Float) {
+        App.updateTime(App.time + turns.toDouble())
+        liveLevels.forEach {
+            it.level.advanceTime(turns)
         }
     }
 

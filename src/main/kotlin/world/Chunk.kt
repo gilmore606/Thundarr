@@ -94,8 +94,8 @@ class Chunk(
 
     fun onRestore(level: Level) {
         connectLevel(level)
-        savedActors.forEach { actor ->
-            KtxAsync.launch {
+        KtxAsync.launch {
+            savedActors.forEach { actor ->
                 actor.onRestore()
                 actor.moveTo(level, actor.xy.x, actor.xy.y)
             }
@@ -127,10 +127,10 @@ class Chunk(
         //log.debug("chunk $x $y saving ${saveActors.size} actors")
         savedActors.addAll(saveActors)
 
-        mutableSetOf<LightSource>().apply {
-            lightSourceLocations.forEach { (it, _) -> add(it) }
-        }.forEach {
-            KtxAsync.launch {
+        KtxAsync.launch {
+            mutableSetOf<LightSource>().apply {
+                lightSourceLocations.forEach { (it, _) -> add(it) }
+            }.forEach {
                 level.removeLightSource(it)
             }
         }

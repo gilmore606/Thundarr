@@ -217,12 +217,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.recenterCamera()
     }
 
-    fun advanceTime(delta: Float) {
-        updateTime(time + delta.toDouble())
-        LevelKeeper.advanceTime(delta)
-    }
-
-    private fun updateTime(newTime: Double) {
+    fun updateTime(newTime: Double) {
         val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
 
         time = newTime

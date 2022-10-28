@@ -92,12 +92,10 @@ class Director(val level: Level) {
                 action.execute(actor, level)
                 // pay the juice
                 if (actor is Player) {  // player pays juice to all actors
-                    actors.forEach {
-                        if (it.isActing() && (it !is Player)) { it.juice += duration }
-                    }
+                    LevelKeeper.advanceJuice(duration)
                     playerTimePassed += duration
                     if (playerTimePassed >= 1f) {
-                        App.advanceTime(playerTimePassed)
+                        LevelKeeper.advanceTime(playerTimePassed)
                         playerTimePassed = 0f
                         return  // quit to let the renderer run
                     }
@@ -112,7 +110,10 @@ class Director(val level: Level) {
         }
     }
 
-    // Advance world time for all actors.
+    fun advanceJuice(juice: Float) {
+        actors.forEach { if (it.isActing() && (it !is Player)) { it.juice += juice } }
+    }
+
     fun advanceTime(delta: Float) {
         actors.forEach { it.advanceTime(delta) }
         temporals.forEach { it.advanceTime(delta) }
