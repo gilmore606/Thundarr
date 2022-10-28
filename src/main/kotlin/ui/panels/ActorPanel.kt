@@ -30,7 +30,7 @@ object ActorPanel : ShadedPanel() {
 
     override fun drawBackground() {
         if (actors.isNotEmpty()) super.drawBackground()
-        if ((lastTime < App.time || lastCheckMs + checkInterval < System.currentTimeMillis()) && !ChunkLoader.isWorking()) {
+        if ((lastTime < App.time || lastCheckMs + checkInterval < System.currentTimeMillis())) {
             lastTime = App.time
             lastCheckMs = System.currentTimeMillis()
             updateActors()

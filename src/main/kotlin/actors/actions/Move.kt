@@ -15,7 +15,7 @@ class Move(
         if (level.isWalkableFrom(actor.xy, dir)) {
             actor.level?.addSpark(Scoot(dir).at(actor.xy.x, actor.xy.y))
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
-            actor.animation = Slide(dir)
+            actor.animation = actor.stepAnimation(dir)
         }
     }
 

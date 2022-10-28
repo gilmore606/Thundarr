@@ -4,6 +4,7 @@ import actors.actions.Action
 import actors.actions.Equip
 import actors.actions.Unequip
 import actors.animations.Animation
+import actors.animations.Step
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -45,6 +46,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun visualRange() = 22f
 
     open fun bleedChance() = 0.6f
+    open fun stepAnimation(dir: XY) = Step(dir)
 
     override fun level() = level
     override fun xy() = xy

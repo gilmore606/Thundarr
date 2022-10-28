@@ -20,7 +20,7 @@ object Keyboard : KtxInputAdapter {
     var lastKeyTime = System.currentTimeMillis()
 
     private const val REPEAT_DELAY_MS = 300L
-    private const val REPEAT_MS = 90L
+    const val REPEAT_MS = 90L
 
     private var SHIFT = false
     private var CTRL = false
