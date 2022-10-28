@@ -76,15 +76,15 @@ sealed class Level {
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
         delta: Float
     ) {
-        for (x in pov.x - Screen.renderTilesWide /2 until pov.x + Screen.renderTilesWide /2) {
-            for (y in pov.y - Screen.renderTilesHigh /2 until pov.y + Screen.renderTilesHigh /2) {
-                chunkAt(x, y)?.also { chunk -> // optimization!  you'd be surprised
+        for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
+            for (y in pov.y - Screen.renderTilesHigh / 2 until pov.y + Screen.renderTilesHigh / 2) {
+                chunkAt(x, y)?.also { chunk ->
                     val vis = if (App.DEBUG_VISIBLE) 1f else chunk.visibilityAt(x, y)
                     val terrain = Terrain.get(chunk.getTerrain(x, y))
                     val glyph = terrain.glyph()
                     val holder = tileSet.tileHolders[glyph]
                     if (vis > 0f) {
-                        val light = if (vis == 1f) chunk.lightAt(x, y) else Screen.halfLight
+                        val light = if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
                         doTile(
                             x, y, vis, glyph, light
                         )
@@ -121,48 +121,26 @@ sealed class Level {
                             var okSE = true
                             var okNW = true
                             var okSW = true
-                            CARDINALS.forEach { edge ->
+                            CARDINALS.forEachIndexed { n, edge ->
                                 if (Terrain.get(getTerrain(x + edge.x, y + edge.y)).isOpaque()) {
                                     doOcclude(
                                         x, y, edge
                                     )
-                                    when (edge) {
-                                        NORTH -> {
-                                            okNE = false; okNW = false
-                                        }
-
-                                        SOUTH -> {
-                                            okSE = false; okSW = false
-                                        }
-
-                                        EAST -> {
-                                            okNE = false; okSE = false
-                                        }
-
-                                        WEST -> {
-                                            okNW = false; okSW = false
-                                        }
+                                    when (n) {
+                                        0 -> { okNE = false; okNW = false }
+                                        1 -> { okSE = false; okSW = false }
+                                        2 -> { okNW = false; okSW = false }
+                                        3 -> { okNE = false; okSE = false }
                                     }
                                 }
                             }
-                            CORNERS.forEach { corner ->
+                            CORNERS.forEachIndexed { n, corner ->
                                 if (Terrain.get(getTerrain(x + corner.x, y + corner.y)).isOpaque()) {
                                     when {
-                                        corner == NORTHEAST && okNE -> {
-                                            doOcclude(x, y, corner)
-                                        }
-
-                                        corner == NORTHWEST && okNW -> {
-                                            doOcclude(x, y, corner)
-                                        }
-
-                                        corner == SOUTHEAST && okSE -> {
-                                            doOcclude(x, y, corner)
-                                        }
-
-                                        corner == SOUTHWEST && okSW -> {
-                                            doOcclude(x, y, corner)
-                                        }
+                                        n == 0 && okNE -> doOcclude(x, y, corner)
+                                        n == 1 && okNW -> doOcclude(x, y, corner)
+                                        n == 2 && okSW -> doOcclude(x, y, corner)
+                                        n == 3 && okSE -> doOcclude(x, y, corner)
                                     }
                                 }
                             }

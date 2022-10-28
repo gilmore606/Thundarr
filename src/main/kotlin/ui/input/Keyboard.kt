@@ -128,6 +128,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.F6 -> {
                 Herder().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
             }
+            Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
             else -> { lastKey = -1 }
         }
