@@ -23,6 +23,7 @@ import ui.panels.ActorPanel
 import util.*
 import world.LevelKeeper
 import world.WorldLevel
+import world.stains.Stain
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
@@ -35,7 +36,7 @@ object Screen : KtxScreen {
     var worldZoom = 1.3
     var cameraSlack = 0.3
     var cameraMenuShift = 0.8
-    private const val CAMERA_MAX_JERK = 0.4
+    private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150
     private const val MAX_RENDER_HEIGHT = 120
@@ -202,6 +203,14 @@ object Screen : KtxScreen {
         )
     }
 
+    private val renderStain: (Int, Int, Stain, LightColor)->Unit = { tx, ty, stain, light ->
+        thingBatch.addTileQuad(
+            tx, ty,
+            thingBatch.getTextureIndex(stain.glyph(), App.level, tx, ty), 1f, light,
+            offsetX = stain.offsetX(), offsetY = stain.offsetY(), scale = stain.scale().toDouble(), alpha = stain.alpha()
+        )
+    }
+
     private val renderThing: (Int, Int, Float, Glyph)->Unit = { tx, ty, vis, glyph ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
@@ -228,7 +237,8 @@ object Screen : KtxScreen {
         }
     }
 
-    private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit = { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
+    private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit =
+        { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
         worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
             batch.addTileQuad(
                 tx, ty,
@@ -533,6 +543,7 @@ object Screen : KtxScreen {
             doOverlap = renderOverlap,
             doOcclude = renderOcclude,
             doSurf = renderSurf,
+            doStain = renderStain,
             delta = delta
         )
         if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }

@@ -22,6 +22,7 @@ import ui.modals.ContextMenu
 import ui.modals.ExamineModal
 import ui.panels.Console
 import util.*
+import world.stains.Stain
 import world.terrains.Terrain
 import kotlin.coroutines.coroutineContext
 
@@ -72,6 +73,7 @@ sealed class Level {
         doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit,
         doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
         doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
+        doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
         delta: Float
     ) {
         for (x in pov.x - Screen.renderTilesWide /2 until pov.x + Screen.renderTilesWide /2) {
@@ -80,13 +82,16 @@ sealed class Level {
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
                 val holder = tileSet.tileHolders[glyph]
-                val light = if (vis == 1f) lightAt(x, y) else Screen.halfLight
                 if (vis > 0f) {
-                    thingsAt(x,y).forEach { it.onRender(delta) }
-                    actorAt(x,y)?.onRender(delta)
+                    val light = if (vis == 1f) lightAt(x, y) else Screen.halfLight
                     doTile(
                         x, y, vis, glyph, light
                     )
+                    if (vis == 1f) {
+                        thingsAt(x,y).forEach { it.onRender(delta) }
+                        actorAt(x,y)?.onRender(delta)
+                        stainAt(x,y)?.also { doStain(x, y, it, light) }
+                    }
                     // Ground overlaps
                     if (holder is OverlapTile) {
                         CARDINALS.forEach { edge ->
@@ -246,6 +251,8 @@ sealed class Level {
 
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
+    fun stainAt(x: Int, y: Int): Stain? = chunkAt(x,y)?.stainAt(x,y)
+
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")
 
     fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
@@ -277,6 +284,8 @@ sealed class Level {
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     fun addSpark(spark: Spark) = chunkAt(spark.xy.x, spark.xy.y)?.addSpark(spark)
+
+    fun addStain(stain: Stain, x: Int, y: Int) = chunkAt(x,y)?.addStain(stain, x, y)
 
     fun onRender(delta: Float) {
         if (dirtyLights.isNotEmpty()) {

@@ -13,6 +13,7 @@ import things.*
 import util.*
 import world.Entity
 import world.Level
+import world.stains.Blood
 import java.lang.Integer.min
 
 @Serializable
@@ -42,6 +43,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun speed() = 1f
     open fun visualRange() = 22f
+
+    open fun bleedChance() = 0.6f
 
     override fun level() = level
     override fun xy() = xy
@@ -76,7 +79,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun statusGlyph(): Glyph? = null
 
-    open fun receiveAttack(attacker: Actor) { }
+    open fun receiveAttack(attacker: Actor) {
+        if (Dice.chance(bleedChance())) {
+            level?.addStain(Blood(), xy.x, xy.y)
+            if (Dice.chance(0.4f)) {
+                level?.addStain(Blood(), xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2))
+            }
+        }
+    }
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
@@ -129,6 +139,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun animOffsetX() = animation?.offsetX() ?: 0f
     fun animOffsetY() = animation?.offsetY() ?: 0f
+
     override fun onRender(delta: Float) {
         animation?.also { if (it.done) animation = null else it.onRender(delta) }
     }

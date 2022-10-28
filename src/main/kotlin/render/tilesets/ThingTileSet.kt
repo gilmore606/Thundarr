@@ -61,4 +61,8 @@ fun ThingTileSet() =
         })
         setTile(Glyph.SMOKE_PUFF, SimpleTile(this, 0, 5))
         setTile(Glyph.DUST_PUFF, SimpleTile(this, 1, 5))
+        setTile(Glyph.BLOODSTAIN, VariantsTile(this).apply {
+            add(0.5f, 3, 4)
+            add(0.5f, 4, 4)
+        })
     }

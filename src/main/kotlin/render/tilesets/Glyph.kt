@@ -65,5 +65,7 @@ enum class Glyph {
     ANGRY_THUNDARR,
     SPEECH_BUBBLE,
     POW_ICON,
-    HOSTILE_ICON
+    HOSTILE_ICON,
+
+    BLOODSTAIN
 }

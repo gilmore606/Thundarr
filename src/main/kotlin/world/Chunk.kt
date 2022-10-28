@@ -13,6 +13,7 @@ import things.Thing
 import util.*
 import world.cartos.LevelCarto
 import world.cartos.WorldCarto
+import world.stains.Stain
 import world.terrains.Terrain
 import java.lang.Float.max
 import java.lang.Float.min
@@ -177,6 +178,10 @@ class Chunk(
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y].contents
     } else { noThing }
+
+    fun stainAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        things[x - this.x][y - this.y].topStain()
+    } else null
 
     fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
@@ -384,11 +389,13 @@ class Chunk(
         doneSparks.forEach { sparks.remove(it) }
     }
 
-    fun addSpark(spark: Spark) {
-        sparks.add(spark)
-    }
+    fun addSpark(spark: Spark) { sparks.add(spark) }
 
     fun sparks() = sparks
+
+    fun addStain(stain: Stain, x: Int, y: Int) {
+        if (boundsCheck(x, y)) { things[x-this.x][y-this.y].addStain(stain) }
+    }
 
     private fun forEachCell(doThis: (Int,Int)->Unit) {
         for (x in 0 until width) {

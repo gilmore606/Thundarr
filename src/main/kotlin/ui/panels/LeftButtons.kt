@@ -30,7 +30,7 @@ object LeftButtons : Panel() {
     private val iconSize = 36
     private val iconSizeHovered = 48
     private val slop = 18
-    private val wakeSlop = 60
+    private val wakeSlop = 70
     private var spacing = 0
 
     private var contraction = width
@@ -66,10 +66,10 @@ object LeftButtons : Panel() {
 
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
-        yPadding = (height / 4)
+        yPadding = (height / 6)
         this.x = xPadding + xMargin
         this.y = yPadding
-        this.height = height / 2
+        this.height = height / 3 * 2
         this.width = iconSize * 2
         this.spacing = (LeftButtons.height - iconSize * buttons.size) / (buttons.size - 1)
         this.contraction = this.width
