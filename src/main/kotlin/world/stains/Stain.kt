@@ -28,6 +28,7 @@ sealed class Stain : Temporal {
     abstract fun lifespan(): Double
     abstract fun stackType(): Type
 
+    override fun temporalDone() = holder == null
 
     open fun stackWith(stain: Stain) {
         birthTime = App.time

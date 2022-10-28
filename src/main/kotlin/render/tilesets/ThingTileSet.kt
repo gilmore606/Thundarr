@@ -65,4 +65,5 @@ fun ThingTileSet() =
             add(0.5f, 3, 4)
             add(0.5f, 4, 4)
         })
+        setTile(Glyph.CORPSE, SimpleTile(this, 3, 5))
     }

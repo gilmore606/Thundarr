@@ -66,6 +66,7 @@ enum class Glyph {
     SPEECH_BUBBLE,
     POW_ICON,
     HOSTILE_ICON,
+    CORPSE,
 
     BLOODSTAIN
 }

@@ -33,6 +33,17 @@ fun ByteArray.gzipDecompress(): String {
     GZIPInputStream(bais).bufferedReader(Charsets.UTF_8).use { return it.readText() }
 }
 
+fun <T> MutableList<T>.filterOut(condition: (T)->Boolean, elseDo: (T)->Unit) {
+    var n = 0
+    while (n < size) {
+        if (condition(this[n])) {
+            removeAt(n)
+            n--
+        } else elseDo(this[n])
+        n++
+    }
+}
+
 fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
     sqrt((x1-x0).toFloat().pow(2) + (y1-y0).toFloat().pow(2))
 

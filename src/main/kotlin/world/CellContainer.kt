@@ -30,7 +30,7 @@ class CellContainer : ThingHolder {
             thing.onRestore(this)
             if (thing is Temporal) level.linkTemporal(thing)
         }
-        stains.forEach { stain ->
+        stains.forEach { stain ->2
             stain.onRestore(this)
         }
     }
@@ -44,12 +44,14 @@ class CellContainer : ThingHolder {
 
     override fun add(thing: Thing) {
         contents.add(thing)
-        if (level == null) log.info("adding thing to cell $xy but level is null!")
+        if (level == null) log.warn("adding thing to cell $xy but level is null!")
+        if (thing is Temporal) level?.linkTemporal(thing)
         level?.onAddThing(xy.x, xy.y, thing)
     }
 
     override fun remove(thing: Thing) {
         contents.remove(thing)
+        if (thing is Temporal) level?.unlinkTemporal(thing)
         level?.onRemoveThing(xy.x, xy.y, thing)
     }
 

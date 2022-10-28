@@ -9,12 +9,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.sparks.HealthUp
+import render.sparks.Scoot
+import render.sparks.Spark
 import render.tilesets.Glyph
 import things.*
 import util.*
 import world.Entity
 import world.Level
 import world.stains.Blood
+import java.lang.Float.max
 import java.lang.Integer.min
 
 @Serializable
@@ -27,7 +30,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val queuedActions: MutableList<Action> = mutableListOf()
     val contents = mutableListOf<Thing>()
 
-    var hp = 8
+    var hp = 20
     var hpMax = 20
 
     @Transient
@@ -47,6 +50,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun bleedChance() = 0.6f
     open fun stepAnimation(dir: XY) = Step(dir)
+    open fun stepSpark(dir: XY): Spark? = Scoot(dir)
 
     override fun level() = level
     override fun xy() = xy
@@ -169,4 +173,21 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         hp = min(hpMax, (hp + amount).toInt())
         level?.addSpark(HealthUp().at(xy.x, xy.y))
     }
+
+    fun takeDamage(amount: Float) {
+        hp = max(0f, hp - amount).toInt()
+        if (hp < 1) { die() }
+    }
+
+    open fun die() {
+        val corpse = corpse()
+        //contents.forEach { it.moveTo(corpse) }
+        level?.also { corpse.moveTo(it, xy.x, xy.y) }
+        onDeath()
+
+        this.animation = null
+        moveTo(null, 0, 0)
+    }
+    open fun corpse() = Corpse()
+    open fun onDeath() { }
 }

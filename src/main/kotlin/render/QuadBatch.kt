@@ -218,6 +218,7 @@ class QuadBatch(
     fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
                      hp: Int, hpMax: Int) {
         val amount = (hp.toFloat() / hpMax.toFloat())
+        if (amount >= 1f) return
         val xMid = x0 + ((x1 - x0) * amount).toInt()
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
@@ -228,7 +229,7 @@ class QuadBatch(
 
         val texOffset = when {
             amount < 0.35 -> 0f
-            amount < 0.5 -> 0.125f
+            amount < 0.65 -> 0.125f
             else -> 0.25f
         }
         addQuad(glx0, gly0, glxMid, gly1, textureIndex = textureIndex, ity0 = texOffset + 0.001f, ity1 = texOffset + 0.124f)

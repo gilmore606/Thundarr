@@ -7,6 +7,7 @@ import render.Screen
 import util.aOrAn
 import world.Entity
 import world.Level
+import java.lang.RuntimeException
 
 @Serializable
 sealed class Thing : Entity {
@@ -26,7 +27,8 @@ sealed class Thing : Entity {
         PINE_TREE,
         OAK_TREE,
         PALM_TREE,
-        TORCH
+        TORCH,
+        CORPSE
     }
 
     class Use(
@@ -60,6 +62,8 @@ sealed class Thing : Entity {
         to?.add(this)
         onMoveTo(from, to)
     }
+    fun moveTo(x: Int, y: Int) = moveTo(level()?.cellContainerAt(x, y) ?: throw RuntimeException("moved $this to local coords but it wasn't in a level!"))
+    fun moveTo(level: Level, x: Int, y: Int) = moveTo(level.cellContainerAt(x, y))
 
     open fun onMoveTo(from: ThingHolder?, to: ThingHolder?) { }
 

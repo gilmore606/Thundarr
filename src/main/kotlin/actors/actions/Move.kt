@@ -13,7 +13,9 @@ class Move(
 
     override fun execute(actor: Actor, level: Level) {
         if (level.isWalkableFrom(actor.xy, dir)) {
-            actor.level?.addSpark(Scoot(dir).at(actor.xy.x, actor.xy.y))
+            actor.stepSpark(dir)?.also {
+                actor.level?.addSpark(it.at(actor.xy.x, actor.xy.y))
+            }
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
             actor.animation = actor.stepAnimation(dir)
         }

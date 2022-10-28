@@ -49,4 +49,8 @@ class Player : Actor() {
         }
         willAggro = !willAggro
     }
+
+    override fun die() {
+
+    }
 }

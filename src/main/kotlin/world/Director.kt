@@ -8,6 +8,7 @@ import ktx.async.KtxAsync
 import things.Temporal
 import util.XY
 import util.distanceBetween
+import util.filterOut
 import util.log
 
 // A delegate class for Level to manage actors in time and space.
@@ -115,8 +116,8 @@ class Director(val level: Level) {
     }
 
     fun advanceTime(delta: Float) {
-        actors.forEach { it.advanceTime(delta) }
-        temporals.forEach { it.advanceTime(delta) }
+        actors.filterOut({ it.level != level }) { it.advanceTime(delta) }
+        temporals.filterOut({ it.temporalDone() }) { it.advanceTime(delta) }
     }
 
     fun linkTemporal(temporal: Temporal) {

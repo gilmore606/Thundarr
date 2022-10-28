@@ -1,7 +1,9 @@
 package world.cartos
 
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
 import kotlin.random.Random
 import things.Thing
 import util.*
@@ -46,9 +48,11 @@ abstract class Carto(
 
     protected fun addThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)
-        dest.reconnect(level, x, y)
-        //log.info("moving $thing to $dest at $x $y in $level")
-        thing.moveTo(dest)
+        KtxAsync.launch {
+            dest.reconnect(level, x, y)
+            //log.info("moving $thing to $dest at $x $y in $level")
+            thing.moveTo(dest)
+        }
     }
 
     protected fun regionAt(x: Int, y: Int): Int? = try {

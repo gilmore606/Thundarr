@@ -1,15 +1,12 @@
 package things
 
 import actors.Actor
-import actors.Player
 import kotlinx.serialization.Serializable
-import render.sparks.Scoot
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
 import util.LightColor
-import util.NORTH
 import world.CellContainer
 import java.lang.Float.max
 import kotlin.random.Random
