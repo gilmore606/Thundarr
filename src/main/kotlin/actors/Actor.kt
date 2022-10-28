@@ -8,6 +8,7 @@ import actors.animations.Step
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
+import render.sparks.Gore
 import render.sparks.HealthUp
 import render.sparks.Scoot
 import render.sparks.Spark
@@ -182,7 +183,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun die() {
         val corpse = corpse()
         //contents.forEach { it.moveTo(corpse) }
-        level?.also { corpse.moveTo(it, xy.x, xy.y) }
+        level?.also { level ->
+            corpse.moveTo(level, xy.x, xy.y)
+            repeat (6) {
+                level.addSpark(Gore().at(xy.x, xy.y))
+            }
+        }
         onDeath()
 
         this.animation = null
