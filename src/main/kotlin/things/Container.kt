@@ -6,7 +6,7 @@ import kotlinx.serialization.Transient
 import world.Level
 
 @Serializable
-abstract class Container : Portable(), ThingHolder {
+sealed class Container : Portable(), ThingHolder {
 
     private val contents = ArrayList<Thing>()
 

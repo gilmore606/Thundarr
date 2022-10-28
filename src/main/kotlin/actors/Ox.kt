@@ -3,6 +3,8 @@ package actors
 import actors.actions.Action
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Corpse
+import things.Meat
 import util.Dice
 
 @Serializable
@@ -18,5 +20,9 @@ class Ox : NPC() {
             wander()?.also { return it }
         }
         return super.pickAction()
+    }
+
+    override fun onDeath(corpse: Corpse) {
+        Meat().moveTo(corpse)
     }
 }

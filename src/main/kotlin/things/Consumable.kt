@@ -50,6 +50,13 @@ class Apple : Food() {
 }
 
 @Serializable
+class Meat : Food() {
+    override fun glyph() = Glyph.MEAT
+    override fun name() = "raw steak"
+    override val kind = Kind.MEAT
+}
+
+@Serializable
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"

@@ -44,6 +44,10 @@ fun <T> MutableList<T>.filterOut(condition: (T)->Boolean, elseDo: (T)->Unit) {
     }
 }
 
+fun <T> MutableList<T>.iterateAndEmpty(iteration: (T)->Unit) {
+    while (isNotEmpty()) { iteration(first()) ; if (isNotEmpty()) removeFirst() }
+}
+
 fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
     sqrt((x1-x0).toFloat().pow(2) + (y1-y0).toFloat().pow(2))
 

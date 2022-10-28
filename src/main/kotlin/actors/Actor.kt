@@ -181,19 +181,22 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     open fun die() {
-        val corpse = corpse()
-        //contents.forEach { it.moveTo(corpse) }
         level?.also { level ->
+            val corpse = corpse()
             corpse.moveTo(level, xy.x, xy.y)
             repeat (6) {
                 level.addSpark(Gore().at(xy.x, xy.y))
             }
+            onDeath(corpse)
+            contents.forEach { it.moveTo(corpse) }
+        } ?: run {
+            contents.forEach { it.moveTo(null) }
         }
-        onDeath()
 
         this.animation = null
         moveTo(null, 0, 0)
     }
+
     open fun corpse() = Corpse()
-    open fun onDeath() { }
+    open fun onDeath(corpse: Corpse) { }
 }

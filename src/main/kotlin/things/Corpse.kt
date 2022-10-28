@@ -2,6 +2,7 @@ package things
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.iterateAndEmpty
 
 @Serializable
 class Corpse : Container(), Temporal {
@@ -27,6 +28,13 @@ class Corpse : Container(), Temporal {
 
     fun rot() {
         onRot()
+        level()?.also { level ->
+            xy()?.also { xy ->
+                contents().iterateAndEmpty { it.moveTo(level, xy.x, xy.y) }
+            }
+        } ?: run {
+            contents().iterateAndEmpty { it.moveTo(null) }
+        }
         moveTo(null)
     }
 
