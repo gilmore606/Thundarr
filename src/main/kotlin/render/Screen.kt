@@ -164,6 +164,9 @@ object Screen : KtxScreen {
     var drawTime: Int = 0
     private val lastDrawTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     private var drawTimeIndex = 0
+    var actTime: Int = 0
+    private val lastActTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    private var actTimeIndex = 0
 
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
@@ -207,7 +210,7 @@ object Screen : KtxScreen {
         thingBatch.addTileQuad(
             tx, ty,
             thingBatch.getTextureIndex(stain.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = stain.offsetX(), offsetY = stain.offsetY(), scale = stain.scale().toDouble(), alpha = stain.alpha()
+            offsetX = stain.offsetX, offsetY = stain.offsetY, scale = stain.scale, alpha = stain.alpha
         )
     }
 
@@ -299,7 +302,16 @@ object Screen : KtxScreen {
 
         drawEverything(delta)
 
+        val startTime = System.currentTimeMillis()
         LevelKeeper.runActorQueues()
+        val thisActTime = System.currentTimeMillis() - startTime
+        if (thisActTime > 0) {
+            lastActTimes[actTimeIndex] = thisActTime.toInt()
+            actTimeIndex = if (actTimeIndex == 9) 0 else actTimeIndex + 1
+            actTime = 0
+            lastActTimes.forEach { actTime += it }
+            actTime /= 10
+        }
     }
 
     fun restoreZoomIndex(index: Double) {
@@ -568,6 +580,13 @@ object Screen : KtxScreen {
             panel.renderEntities()
         }
 
+        // Calculate our render time before hitting the GPU
+        lastDrawTimes[drawTimeIndex] = (System.currentTimeMillis() - startTime).toInt()
+        drawTimeIndex = if (drawTimeIndex == 9) 0 else drawTimeIndex + 1
+        drawTime = 0
+        lastDrawTimes.forEach { drawTime += it }
+        drawTime /= 10
+
         allBatches.forEach { it.draw() }
 
         textBatch.apply {
@@ -580,11 +599,6 @@ object Screen : KtxScreen {
             end()
         }
 
-        lastDrawTimes[drawTimeIndex] = (System.currentTimeMillis() - startTime).toInt()
-        drawTimeIndex = if (drawTimeIndex == 9) 0 else drawTimeIndex + 1
-        drawTime = 0
-        lastDrawTimes.forEach { drawTime += it }
-        drawTime /= 10
     }
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio

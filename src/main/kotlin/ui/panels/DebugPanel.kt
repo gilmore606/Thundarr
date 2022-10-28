@@ -29,7 +29,8 @@ object DebugPanel : ShadedPanel() {
         val lb = (l.b * 100).toInt()
         drawString("light $lr $lg $lb", padding, padding + 40)
         drawString("render ${Screen.drawTime} ms", padding, padding + 60)
-        drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 80)
+        drawString("action ${Screen.actTime} ms", padding, padding + 80)
+        drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 100)
 
     }
 

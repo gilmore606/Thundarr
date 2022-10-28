@@ -11,13 +11,17 @@ sealed class Stain : Temporal {
 
     enum class Type { BLOOD }
 
+    var offsetX = 0f
+    var offsetY = 0f
+    var scale = 1.0
+    var alpha = 1f
+
     @Transient var holder: CellContainer? = null
     private var birthTime: Double = App.time
     protected var sizeMod: Float = 0f
     protected var posModX: Float = 0f
     protected var posModY: Float = 0f
     protected var alphaMod: Float = 0f
-    protected var alpha: Float = 1f
 
     abstract fun glyph(): Glyph
     abstract fun name(): String
@@ -30,26 +34,24 @@ sealed class Stain : Temporal {
     }
 
     override fun advanceTime(delta: Float) {
+        offsetX = posModX + sizeMod
+        offsetY = posModY + sizeMod
+        scale = 1.0 - sizeMod
         val elapsed = App.time - birthTime
         val lifespan = lifespan()
         val halfspan = (lifespan / 2f).toFloat()
         if (elapsed > lifespan) {
             expire()
         } else if (elapsed > halfspan) {
-            alpha = 1f - (elapsed - halfspan).toFloat() / halfspan
+            alpha = 1f - (elapsed - halfspan).toFloat() / halfspan + alphaMod
         } else {
-            alpha = 1f
+            alpha = 1f + alphaMod
         }
     }
 
     fun expire() {
         holder?.expireStain(this)
     }
-
-    fun offsetX() = posModX + sizeMod
-    fun offsetY() = posModY + sizeMod
-    fun scale() = 1f - sizeMod
-    fun alpha() = alpha + alphaMod
 
     fun onRestore(holder: CellContainer) {
         this.holder = holder
