@@ -1,13 +1,14 @@
 package render.sparks
 
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
-import util.XY
 
+@Serializable
 class Gore : Spark() {
 
-    val dirx = Dice.float(-1.5f, 1.5f)
-    val diry = Dice.float(-1.5f, -0.2f)
+    val dirx = Dice.float(-2f, 2f)
+    val diry = Dice.float(-2.5f, -0.2f)
     val fadeSpeed = 1.2f
     var gravity = -0.4f
     val gravityForce = 5f
@@ -26,7 +27,7 @@ class Gore : Spark() {
         offsetY += gravity * delta * gravityForce
         alpha -= fadeSpeed * delta
         gravity += delta * 2f
-        if (offsetY > 0.3f) alpha = 0f
+        if (offsetY > 0.4f) alpha = 0f
     }
 
 }

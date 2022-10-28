@@ -29,11 +29,8 @@ sealed class Spark {
     open fun onRender(delta: Float) {
         progress += delta / duration()
         if (progress > 1f) {
-            dismiss()
+            done = true
         }
     }
 
-    private fun dismiss() {
-        done = true
-    }
 }

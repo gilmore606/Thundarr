@@ -381,12 +381,7 @@ class Chunk(
 
     fun onRender(delta: Float) {
         dirtyAllLightCacheCells()
-        val doneSparks = mutableSetOf<Spark>()
-        sparks.forEach {
-            it.onRender(delta)
-            if (it.done) doneSparks.add(it)
-        }
-        doneSparks.forEach { sparks.remove(it) }
+        sparks.filterOut({ it.done }) { it.onRender(delta) }
     }
 
     fun addSpark(spark: Spark) { sparks.add(spark) }
