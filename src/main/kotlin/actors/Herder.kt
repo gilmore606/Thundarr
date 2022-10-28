@@ -35,7 +35,7 @@ class Herder : NPC() {
     override fun light() = lantern
     private var flicker = 1f
     override fun flicker() = flicker
-    override fun onRender(delta: Float) {
+    override fun doOnRender(delta: Float) {
         if (awareness != Awareness.HIBERNATED && System.currentTimeMillis() % 5 == 1L) {
             flicker = Random.nextFloat() * 0.12f + 0.88f
         }

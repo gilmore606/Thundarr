@@ -140,9 +140,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     fun animOffsetX() = animation?.offsetX() ?: 0f
     fun animOffsetY() = animation?.offsetY() ?: 0f
 
-    override fun onRender(delta: Float) {
+    final override fun onRender(delta: Float) {
         animation?.also { if (it.done) animation = null else it.onRender(delta) }
+        doOnRender(delta)
     }
+    open fun doOnRender(delta: Float) { }
 
     override fun advanceTime(delta: Float) { }
 
