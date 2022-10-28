@@ -31,13 +31,13 @@ class CellContainer : ThingHolder {
             if (thing is Temporal) level.linkTemporal(thing)
         }
         stains.forEach { stain ->
-            stain.holder = this
-            level.linkTemporal(stain)
+            stain.onRestore(this)
         }
     }
 
     fun unload() {
         contents.forEach { it.holder = null }
+        stains.forEach { it.holder = null }
         level = null
         contents.clear()
     }

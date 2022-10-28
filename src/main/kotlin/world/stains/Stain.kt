@@ -47,4 +47,10 @@ sealed class Stain : Temporal {
     fun offsetY() = sizeMod
     fun scale() = 1f - sizeMod
     fun alpha() = alpha
+
+    fun onRestore(holder: CellContainer) {
+        this.holder = holder
+        holder.level?.linkTemporal(this)
+        advanceTime(0f)
+    }
 }
