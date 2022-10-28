@@ -27,6 +27,8 @@ class QuadBatch(
     private var floatCount = 0
     var vertexCount = 0
 
+    private val textureIndexCache = tileSet.getCache()
+
     private val textureEdgePad = 0.0015f
     var shadowTexturePadX = -0.0105f
     var shadowTexturePadY = -0.0062f
@@ -255,8 +257,9 @@ class QuadBatch(
         }
     }
 
-    fun getTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0) =
-        tileSet.getIndex(glyph, level, x, y)
+    fun getTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0): Int {
+        return textureIndexCache[glyph] ?: tileSet.getIndex(glyph, level, x, y)
+    }
 
     fun draw() {
         mesh.setVertices(floats, 0, floatCount)

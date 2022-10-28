@@ -93,10 +93,11 @@ class Chunk(
 
     fun onRestore(level: Level) {
         connectLevel(level)
-        //log.debug("chunk ${this.x} ${this.y} restoring ${savedActors.size} actors")
         savedActors.forEach { actor ->
-            actor.onRestore()
-            actor.moveTo(level, actor.xy.x, actor.xy.y)
+            KtxAsync.launch {
+                actor.onRestore()
+                actor.moveTo(level, actor.xy.x, actor.xy.y)
+            }
         }
     }
 
@@ -127,7 +128,11 @@ class Chunk(
 
         mutableSetOf<LightSource>().apply {
             lightSourceLocations.forEach { (it, _) -> add(it) }
-        }.forEach { level.removeLightSource(it) }
+        }.forEach {
+            KtxAsync.launch {
+                level.removeLightSource(it)
+            }
+        }
 
         ChunkLoader.saveWorldChunk(this) { finishUnload() }
     }
@@ -359,12 +364,14 @@ class Chunk(
     }
 
     fun removeLightSource(lightSource: LightSource) {
-        forEachCell { x, y ->
-            if (lights[x][y].remove(lightSource) != null) {
-                lightCacheDirty[x][y] = true
+        if (lightSource in lightSourceLocations) {
+            forEachCell { x, y ->
+                if (lights[x][y].remove(lightSource) != null) {
+                    lightCacheDirty[x][y] = true
+                }
             }
+            lightSourceLocations.remove(lightSource)
         }
-        lightSourceLocations.remove(lightSource)
     }
 
     fun onRender(delta: Float) {

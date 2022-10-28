@@ -2,8 +2,10 @@ package world.cartos
 
 import actors.Herder
 import actors.Ox
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import things.*
 import util.*
@@ -50,10 +52,12 @@ class WorldCarto(
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
                     if (Dice.chance(0.005f)) {
-                        if (Dice.chance(0.9f)) {
-                            Ox().moveTo(level, x + this.x0, y + this.y0)
-                        } else {
-                            Herder().moveTo(level, x + this.x0, y + this.y0)
+                        KtxAsync.launch {
+                            if (Dice.chance(0.9f)) {
+                                Ox().moveTo(level, x + x0, y + y0)
+                            } else {
+                                Herder().moveTo(level, x + x0, y + y0)
+                            }
                         }
                     }
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +

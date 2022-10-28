@@ -3,6 +3,7 @@ package render.tilesets
 import RESOURCE_FILE_DIR
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Texture
+import render.tileholders.SimpleTile
 import world.Level
 import render.tileholders.TileHolder
 import util.log
@@ -44,5 +45,16 @@ class TileSet(
 
     fun dispose() {
         texture.dispose()
+    }
+
+    // Return all texture indices a QuadBatch can safely cache on startup (because they're SimpleTile or other unchanging tile).
+    fun getCache(): Map<Glyph,Int> {
+        val cache = mutableMapOf<Glyph,Int>()
+        tileHolders.forEach { glyph, holder ->
+            if (holder is SimpleTile) {
+                cache[glyph] = holder.getTextureIndex(null, 0, 0)
+            }
+        }
+        return cache
     }
 }

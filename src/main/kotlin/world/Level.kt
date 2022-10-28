@@ -4,6 +4,7 @@ import actors.Actor
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
@@ -22,6 +23,7 @@ import ui.modals.ExamineModal
 import ui.panels.Console
 import util.*
 import world.terrains.Terrain
+import kotlin.coroutines.coroutineContext
 
 sealed class Level {
 
@@ -77,6 +79,7 @@ sealed class Level {
                 val vis = if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 val terrain = Terrain.get(getTerrain(x,y))
                 val glyph = terrain.glyph()
+                val holder = tileSet.tileHolders[glyph]
                 val light = if (vis == 1f) lightAt(x, y) else Screen.halfLight
                 if (vis > 0f) {
                     thingsAt(x,y).forEach { it.onRender(delta) }
@@ -85,9 +88,9 @@ sealed class Level {
                         x, y, vis, glyph, light
                     )
                     // Ground overlaps
-                    if (tileSet.tileHolders[glyph] is OverlapTile) {
+                    if (holder is OverlapTile) {
                         CARDINALS.forEach { edge ->
-                            if ((tileSet.tileHolders[glyph] as OverlapTile).overlapsIn(this, x, y, edge)) {
+                            if (holder.overlapsIn(this, x, y, edge)) {
                                 doOverlap(
                                     x, y, vis, glyph, edge, light
                                 )
@@ -95,7 +98,7 @@ sealed class Level {
                         }
                     }
                     // Water surf
-                    if (tileSet.tileHolders[glyph] is WaterTile) {
+                    if (holder is WaterTile) {
                         listOf(NORTH, WEST, EAST).forEach { edge ->
                             if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y)).glyph()] !is WaterTile) {
                                 doSurf(
@@ -334,9 +337,7 @@ sealed class Level {
     fun addLightSource(x: Int, y: Int, lightSource: LightSource) = chunkAt(x,y)?.projectLightSource(XY(x, y), lightSource)
 
     fun removeLightSource(lightSource: LightSource) {
-        KtxAsync.launch {
-            allChunks().forEach { it.removeLightSource(lightSource) }
-        }
+        allChunks().forEach { it.removeLightSource(lightSource) }
     }
 
     fun updateAmbientLight(hour: Int, minute: Int) {
