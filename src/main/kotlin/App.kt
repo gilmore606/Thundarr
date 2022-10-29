@@ -136,6 +136,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
 
             level = LevelKeeper.getLevel(state.levelId)
+            if (level !is WorldLevel) LevelKeeper.getLevel("world")
+
             player = state.player
             player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
@@ -198,7 +200,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     fun enterWorldFromLevel(dest: XY) {
-        level = LevelKeeper.getLevel("world")
+        level = LevelKeeper.getWarmedWorld(dest)
 
         KtxAsync.launch {
             while (!level.isReady()) {

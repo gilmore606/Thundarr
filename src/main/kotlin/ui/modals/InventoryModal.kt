@@ -16,7 +16,7 @@ import java.lang.Integer.min
 
 class InventoryModal(
     private val thingHolder: ThingHolder,
-    val withContainer: Container? = null,
+    private val withContainer: Container? = null,
     private val parentModal: Modal? = null,
     sidecarTitle: String? = null
     ) : SelectionModal(300, 700, default = 0,
@@ -90,13 +90,16 @@ class InventoryModal(
         if (selection < 0) return
         val parent = this
         val ourSelection = selection
-        Screen.addModal(ContextMenu(width - 10, optionY(ourSelection) - 4).apply {
+        Screen.addModal(ContextMenu(
+            width + (sidecar?.width ?: 0) + (parentModal?.width ?: 0) - 2,
+            optionY(ourSelection) - 4
+        ).apply {
             this.parentModal = parent
             val these = grouped[ourSelection]
             val thing = these[0]
             if (these.size > 1) {
                 parent.withContainer?.also { container ->
-                    addOption("put " + thing.iname() + " in " + container.name()) {
+                    addOption("put one " + thing.name() + " in " + container.name()) {
                         App.player.queue(Drop(thing, container))
                     }
                     addOption("put all " + thing.name().plural() + " in " + container.name()) {
@@ -121,7 +124,7 @@ class InventoryModal(
                 }
             } else {
                 parent.withContainer?.also { container ->
-                    addOption("put " + thing.listName() + " in " + container.name()) {
+                    addOption("put " + thing.name() + " in " + container.name()) {
                         App.player.queue(Drop(thing, container))
                     }
                 } ?: run {
@@ -136,6 +139,11 @@ class InventoryModal(
                     }
                 }
             }
+
+            addOption("examine " + thing.name()) {
+                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW))
+            }
+
             if (parent.withContainer == null && parent.parentModal == null) {
                 thing.uses().forEach {
                     if (it.canDo(App.player)) {

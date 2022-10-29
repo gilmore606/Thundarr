@@ -5,8 +5,9 @@ import ui.input.Mouse
 import world.Entity
 
 class ExamineModal(
-    val entity: Entity
-) : Modal(400, 400, entity.name()) {
+    val entity: Entity,
+    position: Position = Position.LEFT
+) : Modal(400, 400, entity.name(), position) {
 
     private val padding = 22
 

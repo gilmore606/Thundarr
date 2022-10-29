@@ -28,7 +28,7 @@ sealed class NPC : Actor() {
     open fun converseLines(): List<String> = listOf()
 
     open fun isHostile(): Boolean = hostile
-    open fun becomeHostileMsg(): List<String> = listOf("%DN bellows with rage!", "%DN turns angrily toward you!")
+    open fun becomeHostileMsg(): List<String> = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!")
 
     final override fun canAct() = juice > 0f
     final override fun isActing() = awareness != Awareness.HIBERNATED

@@ -68,7 +68,6 @@ class LevelCarto(
 
         addDoor(worldExit)
 
-
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {

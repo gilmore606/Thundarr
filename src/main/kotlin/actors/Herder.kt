@@ -17,6 +17,7 @@ class Herder : NPC() {
     override fun name() = "herdsman"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A peasant farm worker.  He looks oppressed, possibly by wizards."
+    override fun becomeHostileMsg(): List<String> = listOf("%Dn yelps in dismay at your sudden brutality!")
     override fun converseLines() = listOf(
         "Shoveling ox poo all day for a wizard.  It's a living.",
         "The love of an ox, is not like that of a square.  You know what I mean?",

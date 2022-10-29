@@ -2,6 +2,7 @@ package world
 
 import kotlinx.coroutines.delay
 import render.Screen
+import util.XY
 import util.log
 import java.util.concurrent.ConcurrentSkipListSet
 
@@ -49,6 +50,8 @@ object LevelKeeper {
         pruneLevels()
         return level
     }
+
+    fun getWarmedWorld(around: XY): Level = getLevel("world").apply { setPov(around.x, around.y) }
 
     fun makeBuilding(building: Building) {
         App.save.putBuilding(building)
