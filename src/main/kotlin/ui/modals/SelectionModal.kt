@@ -2,6 +2,7 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import render.Screen
+import things.Thing
 import ui.input.Mouse
 import world.Entity
 import java.lang.Integer.min
@@ -50,7 +51,8 @@ abstract class SelectionModal(
     protected fun drawOptionIcon(entity: Entity, index: Int) {
         val x0 = this.x + padding - 10
         val y0 = this.y + headerPad + spacing * index - 12
-        entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32, entity.uiBatch().getTextureIndex(entity.glyph()))
+        val batch = if (entity is Thing) myThingBatch() else myActorBatch()
+        batch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()))
     }
 
     protected fun drawOptionShade() {

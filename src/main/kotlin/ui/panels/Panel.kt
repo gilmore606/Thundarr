@@ -3,9 +3,7 @@ package ui.panels
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.Screen
-import render.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
 import java.lang.Integer.max
@@ -29,6 +27,11 @@ abstract class Panel {
     // Amount of space to leave at window edges, scaled by window size.
     protected var xMargin = 16
     protected var yMargin = 16
+
+    protected open fun myTextBatch() = Screen.textBatch
+    protected open fun myBoxBatch() = Screen.uiBatch
+    protected open fun myThingBatch() = Screen.thingBatch
+    protected open fun myActorBatch() = Screen.actorBatch
 
     open fun onResize(width: Int, height: Int) {
         xMargin = 2 + (max(0, width - 800) / 70)
@@ -63,27 +66,27 @@ abstract class Panel {
 
     protected fun drawString(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         font.color = color
-        font.draw(Screen.textBatch, text, ((x  + this.x) - (Screen.width / 2f)), 0f - ((y + this.y) - (Screen.height / 2f)))
+        font.draw(myTextBatch(), text, ((x  + this.x) - (Screen.width / 2f)), 0f - ((y + this.y) - (Screen.height / 2f)))
     }
 
     protected fun drawTitle(text: String) {
         val xOffset = (width - GlyphLayout(Screen.titleFont, text).width) / 2f
         val yOffset = 24f
-        Screen.titleFont.draw(Screen.textBatch, text, ((this.x + xOffset) - (Screen.width / 2f)), 0f - ((this.y + yOffset) - (Screen.height / 2f)))
+        Screen.titleFont.draw(myTextBatch(), text, ((this.x + xOffset) - (Screen.width / 2f)), 0f - ((this.y + yOffset) - (Screen.height / 2f)))
     }
 
     protected fun drawBox(x: Int, y: Int, width: Int, height: Int) {
-        Screen.uiBatch.addPixelQuad(x+ shadowOffset, y + (shadowOffset * 1.2).toInt(), x + width + shadowOffset, y + height + shadowOffset,
-            Screen.uiBatch.getTextureIndex(Glyph.BOX_SHADOW))
-        Screen.uiBatch.addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
-            Screen.uiBatch.getTextureIndex(Glyph.BOX_BORDER))
-        Screen.uiBatch.addPixelQuad(x, y, x + width, y + height,
-            Screen.uiBatch.getTextureIndex(Glyph.BOX_BG))
+        myBoxBatch().addPixelQuad(x+ shadowOffset, y + (shadowOffset * 1.2).toInt(), x + width + shadowOffset, y + height + shadowOffset,
+            myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW))
+        myBoxBatch().addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
+            myBoxBatch().getTextureIndex(Glyph.BOX_BORDER))
+        myBoxBatch().addPixelQuad(x, y, x + width, y + height,
+            myBoxBatch().getTextureIndex(Glyph.BOX_BG))
     }
 
     protected fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
-        Screen.uiBatch.addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
-            Screen.uiBatch.getTextureIndex(glyph))
+        myBoxBatch().addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
+            myBoxBatch().getTextureIndex(glyph))
     }
 
     protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.smallFont): ArrayList<String> {

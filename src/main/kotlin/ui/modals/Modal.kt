@@ -1,8 +1,13 @@
 package ui.modals
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import javafx.scene.input.MouseButton
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import render.QuadBatch
 import render.Screen
+import render.shaders.tileFragShader
+import render.shaders.tileVertShader
 import ui.panels.Panel
 import render.tilesets.Glyph
 import ui.input.Mouse
@@ -22,6 +27,11 @@ abstract class Modal(
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
     var dismissOnClickOutside = true
 
+    private val boxBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.uiTileSet)
+    private val textBatch = SpriteBatch()
+    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.thingTileSet)
+    private val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.actorTileSet)
+
     var sidecar: Modal? = null
     var isSidecar = false
     var isInSidecar = false
@@ -35,6 +45,11 @@ abstract class Modal(
 
     open fun moveToSidecar() { sidecar?.also { isInSidecar = true } }
     open fun returnFromSidecar() { isInSidecar = false }
+
+    override fun myTextBatch() = textBatch
+    override fun myBoxBatch() = boxBatch
+    override fun myThingBatch() = thingBatch
+    override fun myActorBatch() = actorBatch
 
     override fun onResize(width: Int, height: Int) {
         val myXmargin = myXmargin()
@@ -132,10 +147,66 @@ abstract class Modal(
     open fun onDismiss() { }
 
     protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
-        Screen.uiBatch.addPixelQuad(this.x + x0 - 6, this.y + y0 - (7 + height / 4),
+        myBoxBatch().addPixelQuad(this.x + x0 - 6, this.y + y0 - (7 + height / 4),
             this.x + x0 + width + 12, this.y + y0 + height,
-            Screen.uiBatch.getTextureIndex(Glyph.BOX_SHADOW))
+            myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW))
     }
 
     open fun advanceTime(turns: Float) { sidecar?.advanceTime(turns) }
+
+    fun drawEverything() {
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+
+        clearBoxBatch()
+        renderBackground()
+        drawBoxBatch()
+
+        clearThingBatch()
+        clearActorBatch()
+        renderEntities()
+        drawThingBatch()
+        drawActorBatch()
+
+        beginTextBatch()
+        renderText()
+        endTextBatch()
+    }
+
+    fun clearBoxBatch() {
+        boxBatch.clear()
+        sidecar?.clearBoxBatch()
+    }
+    fun drawBoxBatch() {
+        boxBatch.draw()
+        sidecar?.drawBoxBatch()
+    }
+    fun beginTextBatch() {
+        textBatch.apply {
+            projectionMatrix = Screen.textCamera.combined
+            enableBlending()
+            begin()
+        }
+        sidecar?.beginTextBatch()
+    }
+    fun endTextBatch() {
+        textBatch.end()
+        sidecar?.endTextBatch()
+    }
+    fun clearThingBatch() {
+        thingBatch.clear()
+        sidecar?.clearThingBatch()
+    }
+    fun drawThingBatch() {
+        thingBatch.draw()
+        sidecar?.drawThingBatch()
+    }
+    fun clearActorBatch() {
+        actorBatch.clear()
+        sidecar?.clearActorBatch()
+    }
+    fun drawActorBatch() {
+        actorBatch.draw()
+        sidecar?.drawActorBatch()
+    }
 }

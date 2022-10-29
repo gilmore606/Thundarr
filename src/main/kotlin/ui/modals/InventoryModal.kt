@@ -91,7 +91,7 @@ class InventoryModal(
         val parent = this
         val ourSelection = selection
         Screen.addModal(ContextMenu(
-            width + (sidecar?.width ?: 0) + (parentModal?.width ?: 0) - 2,
+            width + (parentModal?.width ?: 0) - 2,
             optionY(ourSelection) - 4
         ).apply {
             this.parentModal = parent

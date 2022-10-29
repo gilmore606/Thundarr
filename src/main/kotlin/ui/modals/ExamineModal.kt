@@ -1,6 +1,7 @@
 package ui.modals
 
 import render.Screen
+import things.Thing
 import ui.input.Mouse
 import world.Entity
 
@@ -35,7 +36,8 @@ class ExamineModal(
         if (isAnimating()) return
         val x0 = x + width - padding - 64
         val y0 = y + padding
-        entity.uiBatch().addPixelQuad(x0, y0, x0 + 64, y0 + 64,
-            entity.uiBatch().getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0))
+        val batch = if (entity is Thing) myThingBatch() else myActorBatch()
+        batch.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
+            batch.getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0))
     }
 }

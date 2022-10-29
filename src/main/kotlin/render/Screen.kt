@@ -62,9 +62,9 @@ object Screen : KtxScreen {
     var renderTilesHigh = 50
 
     private val terrainTileSet = TerrainTileSet()
-    private val thingTileSet = ThingTileSet()
-    private val actorTileSet = ActorTileSet()
-    private val uiTileSet = UITileSet()
+    val thingTileSet = ThingTileSet()
+    val actorTileSet = ActorTileSet()
+    val uiTileSet = UITileSet()
     private val tileSets = listOf(terrainTileSet, thingTileSet, actorTileSet, uiTileSet)
     val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
@@ -77,7 +77,7 @@ object Screen : KtxScreen {
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch)
     val textBatch = SpriteBatch()
-    private var textCamera = OrthographicCamera(100f, 100f)
+    var textCamera = OrthographicCamera(100f, 100f)
 
     private val lightCache = Array(MAX_RENDER_WIDTH * 2 + 1) { Array(MAX_RENDER_HEIGHT * 2 + 1) { LightColor(1f, 0f, 0f) } }
     val fullLight = LightColor(1f, 1f, 1f)
@@ -577,8 +577,10 @@ object Screen : KtxScreen {
         }
 
         panels.forEach { panel ->
-            panel.renderBackground()
-            panel.renderEntities()
+            if (panel !is Modal) {
+                panel.renderBackground()
+                panel.renderEntities()
+            }
         }
 
         // Calculate our render time before hitting the GPU
@@ -595,11 +597,18 @@ object Screen : KtxScreen {
             enableBlending()
             begin()
             panels.forEach { panel ->
-                panel.renderText()
+                if (panel !is Modal) {
+                    panel.renderText()
+                }
             }
             end()
         }
 
+        panels.forEach { panel ->
+            if (panel is Modal) {
+                panel.drawEverything()
+            }
+        }
     }
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
