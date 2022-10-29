@@ -75,6 +75,11 @@ abstract class Modal(
         sidecar?.drawText()
     }
 
+    override fun drawEntities() {
+        super.drawEntities()
+        sidecar?.drawEntities()
+    }
+
     open fun drawModalText() { }
 
     fun keyDown(keycode: Int) {

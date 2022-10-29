@@ -3,6 +3,7 @@ package things
 import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import world.Level
 
 @Serializable
@@ -43,4 +44,16 @@ sealed class Container : Portable(), ThingHolder {
                 }
             }))
     }
+}
+
+@Serializable
+class FilingCabinet : Container() {
+
+    override fun name() = "filing cabinet"
+    override fun description() = "You don't know what files are, but you know they went in here."
+    override fun glyph() = Glyph.FILING_CABINET
+    override val kind = Kind.FILING_CABINET
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+
 }

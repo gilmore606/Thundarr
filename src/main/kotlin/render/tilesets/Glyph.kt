@@ -68,6 +68,7 @@ enum class Glyph {
     HOSTILE_ICON,
     CORPSE,
     MEAT,
+    FILING_CABINET,
 
     BLOODSTAIN
 }

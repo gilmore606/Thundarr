@@ -53,6 +53,7 @@ class Apple : Food() {
 class Meat : Food() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw steak"
+    override fun description() = "A bloody chunk of raw meat.  Your victim?  Sadly, this game does not keep track."
     override val kind = Kind.MEAT
 }
 

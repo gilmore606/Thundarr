@@ -24,7 +24,7 @@ class InventoryModal(
         position = if (parentModal == null) Position.LEFT else Position.SIDECAR
     ), ContextMenu.ParentModal {
 
-    private var grouped = ArrayList<ArrayList<Thing>>()
+    var grouped = ArrayList<ArrayList<Thing>>()
 
     init {
         parentModal?.also { this.isSidecar = true ; selection = 0 }
@@ -76,6 +76,7 @@ class InventoryModal(
     }
 
     override fun drawEntities() {
+        super.drawEntities()
         if (!isAnimating()) {
             var n = 0
             grouped.forEach {
@@ -178,10 +179,11 @@ class InventoryModal(
 
     private fun returnToParent() {
         parentModal?.also {
-            log.info("return to parent")
-            it.returnFromSidecar()
-            (it as SelectionModal).selection = max(0, min(selection, it.maxSelection))
-            selection = -1
+            if (it is InventoryModal && it.grouped.isNotEmpty()) {
+                it.returnFromSidecar()
+                (it as SelectionModal).selection = max(0, min(selection, it.maxSelection))
+                selection = -1
+            }
         }
     }
 
@@ -210,6 +212,7 @@ class InventoryModal(
         selection = min(maxSelection, selection)
         adjustHeight()
         if (maxSelection < 0) {
+            selection = -1
             sidecar?.also { moveToSidecar() } ?: run {
                 parentModal?.also { returnToParent() }
             }

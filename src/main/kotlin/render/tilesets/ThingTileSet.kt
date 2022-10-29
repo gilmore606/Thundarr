@@ -67,4 +67,5 @@ fun ThingTileSet() =
         })
         setTile(Glyph.CORPSE, SimpleTile(this, 3, 5))
         setTile(Glyph.MEAT, SimpleTile(this, 4, 5))
+        setTile(Glyph.FILING_CABINET, SimpleTile(this, 5, 5))
     }

@@ -12,7 +12,7 @@ object LookPanel : ShadedPanel() {
 
     private var lastTime = 0.0
     private val lastPos = XY(showPos().x, showPos().y)
-    private var lastInventory = -1
+    private var lastInventory: Entity? = null
     var entity: Entity? = showEntity()
     private var wrapped = ArrayList<String>()
 
@@ -51,7 +51,7 @@ object LookPanel : ShadedPanel() {
         var newInventory = lastInventory
         val inventory = isInventory()
         if (inventory != null) {
-            newInventory = inventory.selection
+            newInventory = inventory.shownThing()
         }
 
         if (newPos != lastPos || newTime > lastTime || newInventory != lastInventory) {

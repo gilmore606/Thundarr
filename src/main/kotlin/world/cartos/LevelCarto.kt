@@ -1,7 +1,10 @@
 package world.cartos
 
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ktx.async.KtxAsync
+import things.FilingCabinet
 import util.*
 import world.Chunk
 import world.Level
@@ -37,6 +40,11 @@ class LevelCarto(
             if (rooms.hasNoneWhere { it.isTouching(room) }) {
                 rooms.add(room)
                 carveRoom(room, nextRegion)
+
+                if (Dice.chance(0.3f)) {
+                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), FilingCabinet())
+                }
+
                 nextRegion++
             }
         }
@@ -59,6 +67,8 @@ class LevelCarto(
         }
 
         addDoor(worldExit)
+
+
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {

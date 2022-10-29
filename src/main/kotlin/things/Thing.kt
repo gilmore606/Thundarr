@@ -29,7 +29,8 @@ sealed class Thing : Entity {
         PALM_TREE,
         TORCH,
         CORPSE,
-        MEAT
+        MEAT,
+        FILING_CABINET
     }
 
     class Use(
