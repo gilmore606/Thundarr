@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import render.Screen
 import ui.input.Mouse
 import world.Entity
+import java.lang.Integer.min
 
 abstract class SelectionModal(
     width: Int, height: Int, title: String? = null, position: Modal.Position = Position.LEFT,
@@ -11,7 +12,7 @@ abstract class SelectionModal(
 ) : Modal(width, height, title, position) {
 
     var selection = default
-    protected var maxSelection = 1
+    var maxSelection = 1
 
     protected var headerPad = 70
     protected var padding = 15
@@ -19,6 +20,12 @@ abstract class SelectionModal(
     protected var selectionBoxHeight = 20
 
     protected var mouseSelection = true
+
+    override fun moveToSidecar() {
+        super.moveToSidecar()
+        sidecar?.also { if (it is SelectionModal) it.selection = min(it.maxSelection, selection) }
+        selection = -1
+    }
 
     protected fun optionX(n: Int) = this.x + padding
     protected fun optionY(n: Int) = this.y + headerPad + spacing * n
@@ -52,8 +59,8 @@ abstract class SelectionModal(
         }
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
+    override fun onKeyDown(keycode: Int) {
+        super.onKeyDown(keycode)
         when (keycode) {
             Input.Keys.NUMPAD_2, Input.Keys.DOWN, Input.Keys.X -> { selectNext() }
             Input.Keys.NUMPAD_8, Input.Keys.UP, Input.Keys.W -> { selectPrevious() }
@@ -63,15 +70,20 @@ abstract class SelectionModal(
         }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (button != Mouse.Button.LEFT) return false
-        if (super.mouseClicked(screenX, screenY, button)) return true
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         mouseToOption(screenX, screenY)?.also { selection = it ; doSelect(); return true }
         return false
     }
 
-    override fun mouseMovedTo(screenX: Int, screenY: Int) {
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
         selection = mouseToOption(screenX, screenY) ?: -1
+        if (selection > 0) {
+            if (isInSidecar) {
+                returnFromSidecar()
+            }
+        }
     }
 
     private fun mouseToOption(screenX: Int, screenY: Int): Int? {

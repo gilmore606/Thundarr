@@ -1,5 +1,6 @@
 package ui.panels
 
+import render.Screen
 import render.tilesets.Glyph
 
 open class ShadedPanel: Panel() {
@@ -7,7 +8,7 @@ open class ShadedPanel: Panel() {
     override fun drawText() { }
 
     override fun drawBackground() {
-        boxBatch.addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
-            boxBatch.getTextureIndex(Glyph.PANEL_SHADOW))
+        Screen.uiBatch.addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
+            Screen.uiBatch.getTextureIndex(Glyph.PANEL_SHADOW))
     }
 }

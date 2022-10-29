@@ -102,12 +102,12 @@ object LeftButtons : Panel() {
         val cx = 0 - contraction
         var cy = 0
         buttons.forEachIndexed { n, button ->
-                boxBatch.addPixelQuad(
+            Screen.uiBatch.addPixelQuad(
                     cx + this.x - (button.size.toInt()) / 2 + 16,
                     cy + this.y - (button.size.toInt()) / 2 + 24,
                     cx + this.x + button.size.toInt() / 2 + 16,
                     cy + this.y + button.size.toInt() / 2 + 24,
-                    boxBatch.getTextureIndex(button.glyph))
+                Screen.uiBatch.getTextureIndex(button.glyph))
             cy += spacing
         }
     }

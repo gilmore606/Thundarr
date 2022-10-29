@@ -381,7 +381,7 @@ sealed class Level {
             thingsAt(x,y).forEach {
                 if (it.isPortable()) {
                     menu.addOption("take " + it.listName()) {
-                        App.player.queue(Get(it, cellContainerAt(x, y)))
+                        App.player.queue(Get(it))
                     }
                 }
                 it.uses().forEach { use ->

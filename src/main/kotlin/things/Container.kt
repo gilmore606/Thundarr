@@ -19,6 +19,7 @@ sealed class Container : Portable(), ThingHolder {
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)
         this.level = holder.level
+        contents.forEach { it.onRestore(this) }
     }
 
     override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {

@@ -66,7 +66,7 @@ object Screen : KtxScreen {
     private val actorTileSet = ActorTileSet()
     private val uiTileSet = UITileSet()
     private val tileSets = listOf(terrainTileSet, thingTileSet, actorTileSet, uiTileSet)
-    private val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
+    val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
@@ -76,7 +76,7 @@ object Screen : KtxScreen {
     val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch)
-    private val textBatch = SpriteBatch()
+    val textBatch = SpriteBatch()
     private var textCamera = OrthographicCamera(100f, 100f)
 
     private val lightCache = Array(MAX_RENDER_WIDTH * 2 + 1) { Array(MAX_RENDER_HEIGHT * 2 + 1) { LightColor(1f, 0f, 0f) } }
@@ -577,7 +577,7 @@ object Screen : KtxScreen {
         }
 
         panels.forEach { panel ->
-            panel.renderBackground(uiBatch)
+            panel.renderBackground()
             panel.renderEntities()
         }
 
@@ -595,7 +595,7 @@ object Screen : KtxScreen {
             enableBlending()
             begin()
             panels.forEach { panel ->
-                panel.renderText(this)
+                panel.renderText()
             }
             end()
         }
@@ -615,6 +615,10 @@ object Screen : KtxScreen {
         renderTilesWide = kotlin.math.min(MAX_RENDER_WIDTH, ((width.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
         renderTilesHigh = kotlin.math.min(MAX_RENDER_HEIGHT, ((height.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
         log.debug("new surface params aspect $aspectRatio stride $tileStride, $renderTilesWide by $renderTilesHigh tiles")
+    }
+
+    fun advanceTime(turns: Float) {
+        topModal?.advanceTime(turns)
     }
 
     override fun dispose() {

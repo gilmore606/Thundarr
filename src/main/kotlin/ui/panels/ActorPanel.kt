@@ -69,7 +69,7 @@ object ActorPanel : ShadedPanel() {
         } ?: run {
             if (actors.isNotEmpty()) actors = ArrayList()
         }
-        this.height = actors.size * spacing + padding * 2
+        this.height = actors.size * spacing + padding
     }
 
     fun actorAfter(actor: Actor, dir: Int): Actor? {

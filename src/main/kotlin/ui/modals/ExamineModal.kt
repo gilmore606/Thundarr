@@ -13,13 +13,13 @@ class ExamineModal(
     private val wrappedDesc = wrapText(entity.examineDescription(), width - 64, padding, Screen.font)
     private val wrappedInfo = wrapText("You don't know anything interesting about " + entity.iname() + ".", width, padding, Screen.font)
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()
         return true
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
+    override fun onKeyDown(keycode: Int) {
+        super.onKeyDown(keycode)
         dismiss()
     }
 

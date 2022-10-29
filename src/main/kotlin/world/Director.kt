@@ -85,8 +85,10 @@ class Director(val level: Level) {
                 }
             }
             unloadingActor?.also { actors.remove(it) }
-            if (actor == null || !actor.canAct()) return  // no one had juice, we're done
-
+            if (actor == null || !actor.canAct()) {  // no one had juice, we're done
+                triggerAdvanceTime()
+                return
+            }
             // execute their action
             actor.nextAction()?.also { action ->
                 val duration = action.duration()
@@ -96,8 +98,7 @@ class Director(val level: Level) {
                     LevelKeeper.advanceJuice(duration)
                     playerTimePassed += duration
                     if (playerTimePassed >= 1f) {
-                        LevelKeeper.advanceTime(playerTimePassed)
-                        playerTimePassed = 0f
+                        triggerAdvanceTime()
                         return  // quit to let the renderer run
                     }
                 } else {  // NPC spends juice
@@ -105,9 +106,19 @@ class Director(val level: Level) {
                 }
             } ?: run {
                 // they had juice, but no action
-                if (actor is Player) return
+                if (actor is Player) {
+                    triggerAdvanceTime()
+                    return
+                }
                 throw RuntimeException("NPC $actor had no next action!")
             }
+        }
+    }
+
+    private fun triggerAdvanceTime() {
+        if (playerTimePassed > 0f) {
+            LevelKeeper.advanceTime(playerTimePassed)
+            playerTimePassed = 0f
         }
     }
 

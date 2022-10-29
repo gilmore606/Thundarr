@@ -60,14 +60,14 @@ class ContextMenu(
         options[options.keys.toList()[selection]]?.invoke()
     }
 
-    override fun keyDown(keycode: Int) {
+    override fun onKeyDown(keycode: Int) {
         when (keycode) {
             Input.Keys.TAB -> {
                 parentModal?.childSucceeded()
                 dismiss()
             }
             Input.Keys.NUMPAD_4 -> dismiss()
-            else -> super.keyDown(keycode)
+            else -> super.onKeyDown(keycode)
         }
     }
 }

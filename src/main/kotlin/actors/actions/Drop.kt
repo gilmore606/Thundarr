@@ -2,6 +2,7 @@ package actors.actions
 
 import actors.Actor
 import actors.Player
+import things.Container
 import things.Thing
 import things.ThingHolder
 import ui.panels.Console
@@ -15,7 +16,12 @@ class Drop(
 
     override fun execute(actor: Actor, level: Level) {
         thing.moveTo(dest)
-        Console.sayAct("You drop %id.", "%DN drops %id.", actor, thing)
+
+        if (dest is Container) {
+            Console.sayAct("You put %id into " + dest.dname() + ".", "%DN puts %id into " + dest.dname() + ".", actor, thing)
+        } else {
+            Console.sayAct("You drop %id.", "%DN drops %id.", actor, thing)
+        }
     }
 
 }

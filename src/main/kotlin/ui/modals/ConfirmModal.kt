@@ -60,8 +60,8 @@ class ConfirmModal(
         }
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
+    override fun onKeyDown(keycode: Int) {
+        super.onKeyDown(keycode)
         when (keycode) {
             Input.Keys.NUMPAD_8, Input.Keys.NUMPAD_2, Input.Keys.NUMPAD_4, Input.Keys.NUMPAD_6, Input.Keys.DOWN,
             Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB -> {
@@ -72,11 +72,11 @@ class ConfirmModal(
         }
     }
 
-    override fun mouseMovedTo(screenX: Int, screenY: Int) {
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
         mouseToYesOrNo(screenX, screenY)?.also { selection = it }
     }
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         mouseToYesOrNo(screenX, screenY)?.also { selected ->
             selection = selected
             doSelect()

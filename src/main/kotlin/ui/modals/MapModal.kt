@@ -5,13 +5,13 @@ import ui.input.Mouse
 class MapModal : Modal(600, 600, "- yOUr tRAvELs -") {
 
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()
         return true
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
+    override fun onKeyDown(keycode: Int) {
+        super.onKeyDown(keycode)
         dismiss()
     }
 }

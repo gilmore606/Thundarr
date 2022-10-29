@@ -139,7 +139,7 @@ class SettingsModal : Modal(300, 500, "- settings -") {
     private var selectedSection = 0
     private var hoveredSection: Int? = null
 
-    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (!(screenX in x until x+width && screenY in y until y+height)) {
             dismiss()
             return true
@@ -152,7 +152,7 @@ class SettingsModal : Modal(300, 500, "- settings -") {
         return true
     }
 
-    override fun mouseMovedTo(screenX: Int, screenY: Int) {
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
         if (!(screenX in x until x+width && screenY in y until y+height)) {
             return
         }
@@ -170,12 +170,12 @@ class SettingsModal : Modal(300, 500, "- settings -") {
         }
     }
 
-    override fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button) {
+    override fun onMouseUp(screenX: Int, screenY: Int, button: Mouse.Button) {
         sections[selectedSection].mouseUp(this)
     }
 
-    override fun keyDown(keycode: Int) {
-        super.keyDown(keycode)
+    override fun onKeyDown(keycode: Int) {
+        super.onKeyDown(keycode)
         dismiss()
     }
 
