@@ -157,9 +157,10 @@ class SaveState(
         }
     }
 
-    fun updateLevelChunk(chunk: Chunk, levelId: String) {
+    fun updateLevelChunk(chunk: Chunk, levelId: String, callback: ()->Unit) {
         transaction {
             LevelChunksTable.update({ LevelChunksTable.id eq levelId }) { it[data] = toCompressed(chunk) }
+            callback()
         }
     }
 

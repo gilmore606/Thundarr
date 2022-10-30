@@ -53,6 +53,8 @@ class Chunk(
     @Transient
     private val lightSourceLocations = mutableMapOf<LightSource, XY>()
     @Transient
+    private val lightsTouching = ArrayList<LightSource>()
+    @Transient
     private val lightCaster = RayCaster()
     @Transient
     private val debugLight = LightColor(0.8f, 0.8f, 0.8f)
@@ -120,7 +122,7 @@ class Chunk(
         generating = false
     }
 
-    fun unload(saveActors: Set<Actor>) {
+    fun unload(saveActors: Set<Actor>, levelId: String = "world") {
         if (unloaded) return
         unloaded = true
         savedActors.clear()
@@ -135,7 +137,11 @@ class Chunk(
             }
         }
 
-        ChunkLoader.saveWorldChunk(this) { finishUnload() }
+        if (levelId == "world") {
+            ChunkLoader.saveWorldChunk(this) { finishUnload() }
+        } else {
+            ChunkLoader.saveLevelChunk(this, levelId) { finishUnload() }
+        }
     }
 
     // Null out references and so forth.
@@ -324,6 +330,7 @@ class Chunk(
     // Receive projected light from a source and save it in cache.
     fun receiveLight(x: Int, y: Int, lightSource: LightSource, r: Float, g: Float, b: Float) {
         if (boundsCheck(x, y)) {
+            lightsTouching.add(lightSource)
             lightCacheDirty[x - this.x][y - this.y] = true
             if (lights[x - this.x][y - this.y].contains(lightSource)) {
                 lights[x - this.x][y - this.y][lightSource]?.r = r
@@ -369,13 +376,14 @@ class Chunk(
     }
 
     fun removeLightSource(lightSource: LightSource) {
-        if (lightSource in lightSourceLocations) {
+        if (lightSource in lightsTouching) {
             forEachCell { x, y ->
                 if (lights[x][y].remove(lightSource) != null) {
                     lightCacheDirty[x][y] = true
                 }
             }
             lightSourceLocations.remove(lightSource)
+            lightsTouching.remove(lightSource)
         }
     }
 

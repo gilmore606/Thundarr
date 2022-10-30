@@ -35,7 +35,7 @@ class EnclosedLevel(
     }
 
     override fun unload() {
-        chunk?.also { ChunkLoader.saveLevelChunk(it, levelId) }
+        chunk?.also { unloadChunk(it, levelId) }
     }
 
     override fun debugText() = "level $levelId"

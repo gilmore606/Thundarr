@@ -7,6 +7,8 @@ import render.Screen
 import things.Gear
 import things.ThingHolder
 import util.log
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 class GearModal(
     private val thingHolder: ThingHolder
@@ -23,7 +25,7 @@ class GearModal(
 
     init {
         selectionBoxHeight = 18
-        spacing = 40
+        spacing = 32
         headerPad = 80
         fillSlots()
 
@@ -49,11 +51,13 @@ class GearModal(
     override fun doSelect() {
         if (selection < 0) return
         val ourSelection = selection
+        var startPos = slots[ourSelection].things.indexOf(slots[ourSelection].current)
+        if (startPos < 0) startPos = slots[ourSelection].things.size
         Screen.addModal(ContextMenu(
-            padding + xMargin + 120, optionY(selection) - 16) { hoverOption ->
+            padding + xMargin + 120, optionY(selection) - 16 - startPos * 26) { hoverOption ->
                 sidecar?.also {
-                    val things = slots[this@GearModal.selection].things
-                    if (hoverOption >= 0 && hoverOption <= things.lastIndex && things[hoverOption] != slots[this@GearModal.selection].current) {
+                    val things = slots[ourSelection].things
+                    if (hoverOption >= 0 && hoverOption <= things.lastIndex && things[hoverOption] != slots[ourSelection].current) {
                         (it as CompareSidecar).showGear2(things[hoverOption])
                     } else {
                         (it as CompareSidecar).showGear2(null)
@@ -77,6 +81,7 @@ class GearModal(
             } else {
                 addOption("(none)") { }
             }
+            changeSelection(startPos)
         })
     }
 

@@ -12,13 +12,15 @@ sealed class Gear : Portable() {
         WEAPON(0.5f, "primary", "as weapon", "wield", "put away"),
         SECONDARY(0.5f, "secondary", "as secondary", "ready", "unready"),
         HEAD(0.6f, "head", "on head", "wear", "remove"),
+        NECK(1.0f, "neck", "around neck", "wear", "remove"),
+        HANDS(1.5f, "hands", "on hands", "wear", "remove"),
         TORSO(1.5f, "torso", "on torso", "wear", "remove"),
         LEGS(2.0f, "legs", "on legs", "wear", "remove"),
         FEET(2.0f, "feet", "on feet", "wear", "remove")
     }
 
     companion object {
-        val slots = listOf(Slot.WEAPON, Slot.SECONDARY, Slot.HEAD, Slot.TORSO, Slot.LEGS, Slot.FEET)
+        val slots = listOf(Slot.WEAPON, Slot.SECONDARY, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.LEGS, Slot.FEET)
     }
 
     var equipped = false

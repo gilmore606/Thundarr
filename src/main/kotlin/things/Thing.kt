@@ -46,7 +46,7 @@ sealed class Thing : Entity {
     open fun uses(): Set<Use> = setOf()
 
     override fun description() =  ""
-    open fun listName() = name().aOrAn()
+    open fun listName() = name()
 
     override fun level() = holder?.level
     override fun xy() = holder?.xy()

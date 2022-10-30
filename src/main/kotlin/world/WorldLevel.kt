@@ -49,15 +49,13 @@ class WorldLevel() : Level() {
 
     // Save all live chunks and remove their actors.
     override fun unload() {
-        super.unload()
         log.info("Unloading ${loadedChunks.size} chunks")
         mutableSetOf<Chunk>().apply { addAll(loadedChunks) }.forEach { unloadChunk(it) }
     }
 
-    private fun unloadChunk(chunk: Chunk) {
-        val actorsToSave = director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+    override fun unloadChunk(chunk: Chunk, levelId: String) {
         loadedChunks.remove(chunk)
-        chunk.unload(actorsToSave)
+        super.unloadChunk(chunk, levelId)
     }
 
     override fun onRestore() {

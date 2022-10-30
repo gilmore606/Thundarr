@@ -13,7 +13,7 @@ class Bump(
 ) : Action(0.1f) {
 
     override fun execute(actor: Actor, level: Level) {
-        actor.animation = Whack(dir)
+        actor.animation = actors.animations.Bump(dir)
         Terrain.get(level.getTerrain(x + dir.x, y + dir.y))
             .onBump(actor, level.getTerrainData(x + dir.x, y + dir.y))
     }

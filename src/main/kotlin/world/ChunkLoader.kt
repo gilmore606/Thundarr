@@ -50,6 +50,13 @@ object ChunkLoader {
         })
     }
 
+    fun saveLevelChunk(chunk: Chunk, levelId: String, callback: ()->Unit) {
+        jobs.add(coroutineScope.launch {
+            log.debug("ChunkLoader saving level chunk $levelId")
+            App.save.updateLevelChunk(chunk, levelId, callback)
+        })
+    }
+
     fun getLevelChunk(level: Level, levelId: String, callback: (Chunk)->Unit) {
         jobs.add(coroutineScope.launch {
             if (App.save.hasLevelChunk(levelId)) {
@@ -74,10 +81,4 @@ object ChunkLoader {
         }
     }
 
-    fun saveLevelChunk(chunk: Chunk, levelId: String) {
-        jobs.add(coroutineScope.launch {
-            log.debug("ChunkLoader saving level chunk $levelId")
-            App.save.updateLevelChunk(chunk, levelId)
-        })
-    }
 }

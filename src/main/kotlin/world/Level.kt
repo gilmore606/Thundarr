@@ -229,8 +229,9 @@ sealed class Level {
     }
 
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int) {
+        val light = actor.light()
         chunkAt(x, y)?.onRemoveActor(x, y, actor)
-        actor.light()?.also { removeLightSource(actor) }
+        light?.also { removeLightSource(actor) }
     }
 
     fun advanceTime(delta: Float) = director.advanceTime(delta)
@@ -423,5 +424,10 @@ sealed class Level {
         director.actors.forEach { actor ->
             if (visibilityAt(actor.xy.x, actor.xy.y) == 1f && actor !is Player) add(actor)
         }
+    }
+
+    protected open fun unloadChunk(chunk: Chunk, levelId: String = "world") {
+        val actorsToSave = director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
+        chunk.unload(actorsToSave, levelId)
     }
 }
