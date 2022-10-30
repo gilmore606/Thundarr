@@ -13,7 +13,8 @@ sealed class Container : Portable(), ThingHolder {
 
     override fun contents() = contents
     override fun xy() = holder?.xy()
-    @Transient override var level: Level? = null
+    @Transient
+    override var level: Level? = null
 
     open fun openVerb() = "look inside"
 
@@ -36,14 +37,14 @@ sealed class Container : Portable(), ThingHolder {
         contents.remove(thing)
     }
 
-    override fun uses() = mutableSetOf<Use>().apply {
-        add(Use(openVerb() + " " + name(), 1.5f, { it.xy.x == xy()?.x && it.xy.y == xy()?.y },
+    override fun uses() = setOf(
+        Use(openVerb() + " " + name(), 1.5f, { it.xy.x == xy()?.x && it.xy.y == xy()?.y },
             { actor, level ->
                 if (actor is Player) {
                     App.openInventory(withContainer = this@Container)
                 }
-            }))
-    }
+            })
+    )
 }
 
 @Serializable
