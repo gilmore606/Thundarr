@@ -109,7 +109,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     // Queue an action to be executed next.
     fun queue(action: Action) {
-        queuedActions.add(action)
+        if (action.canQueueFor(this)) queuedActions.add(action)
     }
 
     override fun remove(thing: Thing) {

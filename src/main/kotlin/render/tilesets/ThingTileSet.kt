@@ -7,7 +7,7 @@ import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 
 fun ThingTileSet() =
-    TileSet("tiles_thing.png", 6, 6,
+    TileSet("tiles_thing.png", 8, 8,
         Screen.textureFilter).apply {
 
         setTile(Glyph.TREE, VariantsTile(this).apply {
@@ -68,4 +68,7 @@ fun ThingTileSet() =
         setTile(Glyph.CORPSE, SimpleTile(this, 3, 5))
         setTile(Glyph.MEAT, SimpleTile(this, 4, 5))
         setTile(Glyph.FILING_CABINET, SimpleTile(this, 5, 5))
+        setTile(Glyph.HARD_HAT, SimpleTile(this, 6, 0))
+        setTile(Glyph.HORNED_HAT, SimpleTile(this, 6, 1))
+        setTile(Glyph.HELMET, SimpleTile(this, 6, 2))
     }

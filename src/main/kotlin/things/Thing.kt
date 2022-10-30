@@ -30,7 +30,10 @@ sealed class Thing : Entity {
         TORCH,
         CORPSE,
         MEAT,
-        FILING_CABINET
+        FILING_CABINET,
+        HARD_HAT,
+        HORNED_HELMET,
+        RIOT_HELMET
     }
 
     class Use(
@@ -43,13 +46,14 @@ sealed class Thing : Entity {
     open fun uses(): Set<Use> = setOf()
 
     override fun description() =  ""
+    open fun listName() = name().aOrAn()
 
     override fun level() = holder?.level
     override fun xy() = holder?.xy()
     override fun glyphBatch() = Screen.thingBatch
     override fun uiBatch() = Screen.uiThingBatch
 
-    open fun listName() = name().aOrAn()
+    open fun weight() = 0.1f
 
     open fun onWalkedOnBy(actor: Actor) { }
 

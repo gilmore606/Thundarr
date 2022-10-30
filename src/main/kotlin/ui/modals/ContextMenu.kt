@@ -6,7 +6,8 @@ import render.Screen
 
 class ContextMenu(
     screenX: Int,
-    screenY: Int
+    screenY: Int,
+    private val onHover: ((Int)->Unit)? = null
 ): SelectionModal(100, 50, null, Position.CURSOR, 0) {
 
     var parentModal: ParentModal? = null
@@ -41,6 +42,21 @@ class ContextMenu(
     }
 
     override fun onResize(width: Int, height: Int) { }
+
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
+        super.onMouseMovedTo(screenX, screenY)
+        onHover?.invoke(selection)
+    }
+
+    override fun selectNext() {
+        super.selectNext()
+        onHover?.invoke(selection)
+    }
+
+    override fun selectPrevious() {
+        super.selectPrevious()
+        onHover?.invoke(selection)
+    }
 
     override fun drawModalText() {
         options.keys.forEachIndexed { n, text ->

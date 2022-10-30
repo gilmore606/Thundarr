@@ -8,8 +8,11 @@ import render.QuadBatch
 import render.Screen
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
+import render.tilesets.ActorTileSet
 import ui.panels.Panel
 import render.tilesets.Glyph
+import render.tilesets.ThingTileSet
+import render.tilesets.UITileSet
 import ui.input.Mouse
 import java.lang.Float.min
 
@@ -27,10 +30,10 @@ abstract class Modal(
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
     var dismissOnClickOutside = true
 
-    private val boxBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.uiTileSet)
+    private val boxBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
     private val textBatch = SpriteBatch()
-    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.thingTileSet)
-    private val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), Screen.actorTileSet)
+    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
+    private val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), ActorTileSet())
 
     var sidecar: Modal? = null
     var isSidecar = false
@@ -113,12 +116,16 @@ abstract class Modal(
     }
     open fun onKeyUp(keycode: Int) { }
 
-    final override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean =
-        if (isInSidecar) (sidecar?.onMouseClicked(screenX, screenY, button) ?: onMouseClicked(screenX, screenY, button))
-        else onMouseClicked(screenX, screenY, button)
+    final override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        return if (sidecar?.isInBounds(screenX, screenY) == true) {
+            sidecar?.onMouseClicked(screenX, screenY, button) ?: false
+        } else {
+            onMouseClicked(screenX, screenY, button)
+        }
+    }
 
     open fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        if (screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height) {
+        if (!isInBounds(screenX, screenY) && sidecar?.isInBounds(screenX, screenY) != true) {
             if (dismissOnClickOutside && dismissible) {
                 dismiss()
                 return true
@@ -208,5 +215,12 @@ abstract class Modal(
     fun drawActorBatch() {
         actorBatch.draw()
         sidecar?.drawActorBatch()
+    }
+
+    override fun dispose() {
+        textBatch.dispose()
+        boxBatch.dispose()
+        thingBatch.dispose()
+        actorBatch.dispose()
     }
 }

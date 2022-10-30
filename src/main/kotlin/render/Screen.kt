@@ -10,7 +10,10 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ktx.app.KtxScreen
+import ktx.async.KtxAsync
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.*
@@ -91,6 +94,8 @@ object Screen : KtxScreen {
     val fontColorDull = Color(0.75f, 0.75f, 0.45f, 0.8f)
     val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
+    val fontColorRed = Color(1f, 0f, 0f, 1f)
+    val fontColorGreen = Color(0f, 1f, 0f, 1f)
     val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
@@ -294,6 +299,7 @@ object Screen : KtxScreen {
         }
         dismissedPanel?.also {
             panels.remove(it)
+            it.dispose()
             topModal = topModalFound
             if (topModal == null) {
                 this@Screen.cameraOffsetX = 0.0

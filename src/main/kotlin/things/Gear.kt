@@ -8,13 +8,17 @@ import util.aOrAn
 @Serializable
 sealed class Gear : Portable() {
 
-    enum class Slot(val duration: Float, val where: String, val verb: String, val unverb: String) {
-        WEAPON(0.5f, "as weapon", "wield", "put away"),
-        SECONDARY(0.5f, "as secondary", "ready", "unready"),
-        HEAD(0.6f, "on head", "wear", "remove"),
-        TORSO(1.5f, "on torso", "wear", "remove"),
-        LEGS(2.0f, "on legs", "wear", "remove"),
-        FEET(2.0f, "on feet", "wear", "remove")
+    enum class Slot(val duration: Float, val title: String, val where: String, val verb: String, val unverb: String) {
+        WEAPON(0.5f, "primary", "as weapon", "wield", "put away"),
+        SECONDARY(0.5f, "secondary", "as secondary", "ready", "unready"),
+        HEAD(0.6f, "head", "on head", "wear", "remove"),
+        TORSO(1.5f, "torso", "on torso", "wear", "remove"),
+        LEGS(2.0f, "legs", "on legs", "wear", "remove"),
+        FEET(2.0f, "feet", "on feet", "wear", "remove")
+    }
+
+    companion object {
+        val slots = listOf(Slot.WEAPON, Slot.SECONDARY, Slot.HEAD, Slot.TORSO, Slot.LEGS, Slot.FEET)
     }
 
     var equipped = false
@@ -87,5 +91,6 @@ sealed class Weapon : Gear() {
 class Axe : Weapon() {
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
+    override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about living creatures here."
     override val kind = Kind.AXE
 }

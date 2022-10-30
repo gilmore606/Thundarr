@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import render.Screen
 import things.Thing
 import ui.input.Mouse
+import util.log
 import world.Entity
 import java.lang.Integer.min
 
@@ -31,20 +32,20 @@ abstract class SelectionModal(
     protected fun optionX(n: Int) = this.x + padding
     protected fun optionY(n: Int) = this.y + headerPad + spacing * n
 
-    protected fun selectNext() {
+    protected open fun selectNext() {
         selection++
         if (selection > maxSelection) selection = (if (maxSelection >= 0) 0 else -1)
     }
 
-    protected fun selectPrevious() {
+    protected open fun selectPrevious() {
         selection--
         if (selection < 0) selection = maxSelection
     }
 
     abstract fun doSelect()
 
-    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Boolean = false) {
-        drawString(text, padding + (if (spaceForIcon) 28 else 0), headerPad + spacing * index - 2,
+    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0) {
+        drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,
             if (index == selection) Screen.fontColorBold else Screen.fontColor)
     }
 
@@ -55,9 +56,9 @@ abstract class SelectionModal(
         batch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()))
     }
 
-    protected fun drawOptionShade() {
+    protected fun drawOptionShade(space: Int = 0) {
         if (!isAnimating() && selection >= 0) {
-            drawSelectionBox(padding, headerPad + selection * spacing + 1, width - padding * 2 - 4, selectionBoxHeight)
+            drawSelectionBox(padding + space, headerPad + selection * spacing + 1, width - padding * 2 - 4 - space, selectionBoxHeight)
         }
     }
 
@@ -88,9 +89,9 @@ abstract class SelectionModal(
         }
     }
 
-    private fun mouseToOption(screenX: Int, screenY: Int): Int? {
+    protected open fun mouseToOption(screenX: Int, screenY: Int): Int? {
         val localX = screenX - x
-        val localY = screenY - y
+        val localY = screenY - y + (spacing / 2)
         if (localX in 1 until width) {
             val hoverOption = (localY - headerPad) / spacing
             if (hoverOption in 0..maxSelection) {

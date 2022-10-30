@@ -9,10 +9,7 @@ import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.Screen
-import things.Apple
-import things.Container
-import things.Sunsword
-import things.Torch
+import things.*
 import ui.modals.*
 import ui.panels.*
 import util.XY
@@ -170,6 +167,9 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Torch().moveTo(player)
             Torch().moveTo(player)
             Apple().moveTo(player)
+            HornetHelmet().moveTo(player)
+            HardHat().moveTo(player)
+            RiotHelmet().moveTo(player)
 
             updateTime(0.0)
             level.setPov(200, 200)

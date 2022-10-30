@@ -10,12 +10,21 @@ class Equip(
     private val gear: Gear
 ) : Action(gear.slot.duration) {
 
-    override fun execute(actor: Actor, level: Level) {
+    override fun canQueueFor(actor: Actor): Boolean {
         if (gear.holder == actor) {
-            gear.equipped = true
-            actor.gear[gear.slot] = gear
-            Console.sayAct(gear.equipSelfMsg(), gear.equipOtherMsg(), actor, gear)
+            val currentGear = actor.equippedOn(gear.slot)
+            if (currentGear != null && currentGear != gear) {
+                actor.queue(Unequip(currentGear))
+            }
+            return currentGear != gear
         }
+        return false
+    }
+
+    override fun execute(actor: Actor, level: Level) {
+        gear.equipped = true
+        actor.gear[gear.slot] = gear
+        Console.sayAct(gear.equipSelfMsg(), gear.equipOtherMsg(), actor, gear)
     }
 
 }

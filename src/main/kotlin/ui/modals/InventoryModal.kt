@@ -44,7 +44,7 @@ class InventoryModal(
         else if (selection > -1) grouped[selection].first() else null
 
     private fun adjustHeight() {
-        height = headerPad + max(1, grouped.size) * spacing + padding * 2
+        height = headerPad + max(1, grouped.size + 1) * spacing + padding * 2
     }
 
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
@@ -63,7 +63,7 @@ class InventoryModal(
             } else {
                 it.first().listName()
             }
-            drawOptionText(text, n, true)
+            drawOptionText(text, n, 30)
             n++
         }
     }
@@ -163,7 +163,7 @@ class InventoryModal(
     override fun onMouseMovedTo(screenX: Int, screenY: Int) {
         super.onMouseMovedTo(screenX, screenY)
         if (selection > 0) {
-            parentModal?.isInSidecar = true
+            parentModal?.moveToSidecar()
         }
     }
 
@@ -173,7 +173,6 @@ class InventoryModal(
             Input.Keys.NUMPAD_4 -> {
                 parentModal?.also {
                     returnToParent()
-                    selection = -1
                 } ?: run { dismiss() }
             }
             Input.Keys.NUMPAD_6 -> {
@@ -217,6 +216,7 @@ class InventoryModal(
             }
         }
         maxSelection = grouped.size - 1
+        parentModal?.also { log.info("child max set to $maxSelection")}
         selection = min(maxSelection, selection)
         adjustHeight()
         if (maxSelection < 0) {

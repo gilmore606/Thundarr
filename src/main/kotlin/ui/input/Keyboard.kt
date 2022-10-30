@@ -106,6 +106,7 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.MINUS -> { Screen.mouseScrolled(1.43f) }
 
             Input.Keys.TAB -> { App.openInventory() }
+            Input.Keys.G -> { App.openGear() }
             Input.Keys.ESCAPE -> { App.openSystemMenu() }
             Input.Keys.M -> { App.openMap() }
             Input.Keys.ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }

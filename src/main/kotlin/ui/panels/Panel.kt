@@ -62,7 +62,7 @@ abstract class Panel {
 
     abstract fun drawText()
 
-    protected fun measure(text: String) = GlyphLayout(Screen.font, text).width.toInt()
+    protected fun measure(text: String, font: BitmapFont = Screen.font) = GlyphLayout(font, text).width.toInt()
 
     protected fun drawString(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         font.color = color
@@ -129,4 +129,8 @@ abstract class Panel {
             drawString(line, x0, y0 + n * spacing, color, font)
         }
     }
+
+    open fun dispose() { }
+
+    fun isInBounds(screenX: Int, screenY: Int) = !(screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height)
 }

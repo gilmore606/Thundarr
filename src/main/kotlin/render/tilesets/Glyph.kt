@@ -69,6 +69,9 @@ enum class Glyph {
     CORPSE,
     MEAT,
     FILING_CABINET,
+    HARD_HAT,
+    HORNED_HAT,
+    HELMET,
 
     BLOODSTAIN
 }
