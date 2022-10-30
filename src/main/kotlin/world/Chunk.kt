@@ -36,6 +36,7 @@ class Chunk(
 
     private val seen = Array(width) { Array(height) { false } }
     private val visible = Array(width) { Array(height) { false } }
+    private val roofed = Array(width) { Array(height) { true } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array(height) { "" } }
     private val things = Array(width) { Array(height) { CellContainer() } }
@@ -198,10 +199,15 @@ class Chunk(
         terrains[x - this.x][y - this.y]
     } else { Terrain.Type.TERRAIN_BRICKWALL }
 
-    fun setTerrain(x: Int, y: Int, type: Terrain.Type) {
-        terrains[x - this.x][y - this.y] = type
+    fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
+        this.terrains[x - this.x][y - this.y] = type
+        roofed?.also { this.roofed[x - this.x][y - this.y] = it }
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
+    }
+
+    fun setRoofed(x: Int, y: Int, newRoofed: Boolean) {
+        this.roofed[x - this.x][y - this.y] = newRoofed
     }
 
     fun getTerrainData(x: Int, y: Int) = if (boundsCheck(x, y)) {
@@ -228,6 +234,10 @@ class Chunk(
 
     fun isSeenAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         seen[x - this.x][y - this.y]
+    } else { false }
+
+    fun isRoofedAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
+        roofed[x - this.x][y - this.y]
     } else { false }
 
     fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
@@ -354,7 +364,7 @@ class Chunk(
             }
             return lightCache[x - this.x][y - this.y]
         }
-        return level.ambientLight(x, y)
+        return level.ambientLight(x, y, roofed[x - this.x][y - this.y])
     }
 
     // Force all cells to re-sum light on next frame.
@@ -363,7 +373,7 @@ class Chunk(
     }
 
     private fun refreshLightCacheAt(x: Int, y: Int) {
-        val ambient = level.ambientLight(x + this.x, y + this.y)
+        val ambient = level.ambientLight(x + this.x, y + this.y, roofed[x][y])
         lightCache[x][y].r = ambient.r
         lightCache[x][y].g = ambient.g
         lightCache[x][y].b = ambient.b

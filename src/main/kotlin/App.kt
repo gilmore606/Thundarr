@@ -12,6 +12,7 @@ import render.Screen
 import things.*
 import ui.modals.*
 import ui.panels.*
+import util.Dice
 import util.XY
 import util.log
 import world.*
@@ -41,7 +42,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     lateinit var level: Level
     lateinit var save: SaveState
 
-    var time: Double = 0.0
+    var time: Double = 200.0
     var lastHour = -1
     var timeString: String = "???"
     var dateString: String = "???"
@@ -164,7 +165,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             level = LevelKeeper.getLevel("world")
             player = Player()
             Sunsword().moveTo(player)
-            Torch().moveTo(player)
+            repeat (20) { Torch().moveTo(player) }
             Torch().moveTo(player)
             Apple().moveTo(player)
             HornetHelmet().moveTo(player)
@@ -173,7 +174,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Pickaxe().moveTo(player)
             Axe().moveTo(player)
 
-            updateTime(0.0)
+            updateTime(Dice.range(200, 600).toDouble())
             level.setPov(200, 200)
 
             var playerStart: XY? = null

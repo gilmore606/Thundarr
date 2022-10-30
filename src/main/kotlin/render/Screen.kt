@@ -443,8 +443,11 @@ object Screen : KtxScreen {
 
     fun mouseScrolled(amount: Float) {
         zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
-        zoomTarget = zoomLevels[zoomIndex.toInt()] * (if (App.level is WorldLevel) (1.0 / worldZoom) else 1.0)
+        updateZoomTarget()
     }
+
+    fun updateZoomTarget() { zoomTarget = zoomLevels[zoomIndex.toInt()] *
+            (if (!App.level.isRoofedAt(App.player.xy.x, App.player.xy.y)) (1.0 / worldZoom) else 1.0) }
 
     fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         topModal?.also { modal ->

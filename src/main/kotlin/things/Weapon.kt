@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.Player
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
@@ -36,8 +37,11 @@ class Pickaxe : Weapon() {
             level.addSpark(Smoke().at(x,y))
             val terrain = level.getTerrain(x, y)
             if (terrain == Terrain.Type.TERRAIN_BRICKWALL) {
-                Console.sayAct("You tunnel through solid rock.", "%Dn digs furiously into the stone!", actor)
-                actor.level()?.setTerrain(x, y, Terrain.Type.TERRAIN_STONEFLOOR)
+                if (actor is Player && !actor.willAggro) return
+                else {
+                    Console.sayAct("You tunnel through solid rock.", "%Dn digs furiously into the stone!", actor)
+                    actor.level()?.setTerrain(x, y, Terrain.Type.TERRAIN_STONEFLOOR, roofed = true)
+                }
             }
         }
     }

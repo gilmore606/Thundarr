@@ -50,6 +50,7 @@ sealed class Level {
     abstract fun chunkAt(x: Int, y: Int): Chunk?
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    private val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
@@ -214,6 +215,7 @@ sealed class Level {
 
         if (actor is Player) {
             setPov(actor.xy.x, actor.xy.y)
+            Screen.updateZoomTarget()
             director.wakeNPCsNear(actor.xy)
         }
     }
@@ -258,7 +260,7 @@ sealed class Level {
 
     fun getTerrainData(x: Int, y: Int): String = chunkAt(x,y)?.getTerrainData(x,y) ?: ""
 
-    fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunkAt(x,y)?.setTerrain(x,y,type) ?: Unit
+    fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) = chunkAt(x,y)?.setTerrain(x,y,type,roofed) ?: Unit
 
     fun setTerrainData(x: Int, y: Int, data: String) = chunkAt(x,y)?.setTerrainData(x,y,data)
 
@@ -269,6 +271,8 @@ sealed class Level {
     fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
 
     fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
+
+    fun isRoofedAt(x: Int, y: Int) = chunkAt(x,y)?.isRoofedAt(x,y) ?: false
 
     fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
@@ -318,15 +322,16 @@ sealed class Level {
 
     fun dirtyLightsTouching(x: Int, y: Int) = chunkAt(x,y)?.dirtyLightsTouching(x,y)
 
-    fun ambientLight(x: Int, y: Int): LightColor {
-        val brightness = ambientLight.brightness()
+    fun ambientLight(x: Int, y: Int, roofed: Boolean): LightColor {
+        val light = if (roofed) indoorLight else ambientLight
+        val brightness = light.brightness()
         val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
         val nearboost = if (distance < 1f) 1.3f else if (distance < 3f) 0.4f else if (distance < 4f) 0.2f else 0f
         val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
         return ambientResult.apply {
-            r = ambientLight.r * falloff
-            g = ambientLight.g * falloff
-            b = ambientLight.b * falloff
+            r = light.r * falloff
+            g = light.g * falloff
+            b = light.b * falloff
         }
     }
 

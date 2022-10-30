@@ -42,7 +42,7 @@ abstract class Carto(
     }
 
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
-    protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type)
+    protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
     protected fun setTerrainData(x: Int, y: Int, data: String) = chunk.setTerrainData(x, y, data)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
@@ -149,6 +149,19 @@ abstract class Carto(
         return c
     }
 
+    protected fun neighborBlockerCount(x: Int, y: Int): Int {
+        var c = 0
+        if (!isWalkableAt(x-1,y)) c++
+        if (!isWalkableAt(x+1,y)) c++
+        if (!isWalkableAt(x,y-1)) c++
+        if (!isWalkableAt(x,y+1)) c++
+        if (!isWalkableAt(x-1,y-1)) c++
+        if (!isWalkableAt(x+1,y+1)) c++
+        if (!isWalkableAt(x+1,y-1)) c++
+        if (!isWalkableAt(x-1,y+1)) c++
+        return c
+    }
+
     // Can we carve from xy in direction without hitting space?
     protected fun canCarve(xy: XY, dir: XY): Boolean {
         val destNext = xy + dir * 2
@@ -218,5 +231,15 @@ abstract class Carto(
             }
         }
         throw RuntimeException("Can't find edge for door!")
+    }
+
+    protected fun setRoofedInRock() {
+        for (y in y0  .. y1) {
+            for (x in x0 .. x1) {
+                if (isRock(x, y) && neighborBlockerCount(x, y) < 8) {
+                    chunk.setRoofed(x, y, false)
+                }
+            }
+        }
     }
 }
