@@ -16,6 +16,7 @@ class Bump(
         actor.animation = actors.animations.Bump(dir)
         Terrain.get(level.getTerrain(x + dir.x, y + dir.y))
             .onBump(actor, level.getTerrainData(x + dir.x, y + dir.y))
+        actor.onBump(x + dir.x, y + dir.y)
     }
 
 }

@@ -15,7 +15,6 @@ class Corpse : Container(), Temporal {
     override fun name() = "corpse"
     override fun description() = "The mangled body of some unfortunate creature.  It's so damaged you can hardly tell what it was."
     override fun glyph() = Glyph.CORPSE
-    override val kind = Kind.CORPSE
     override fun isPortable(): Boolean = false
     override fun openVerb() = "search"
 

@@ -14,27 +14,8 @@ sealed class Thing : Entity {
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
-    abstract val kind: Kind
 
     @Transient var holder: ThingHolder? = null
-
-    enum class Kind {
-        LIGHTBULB,
-        APPLE,
-        AXE,
-        SUNSWORD,
-        ENERGY_DRINK,
-        PINE_TREE,
-        OAK_TREE,
-        PALM_TREE,
-        TORCH,
-        CORPSE,
-        MEAT,
-        FILING_CABINET,
-        HARD_HAT,
-        HORNED_HELMET,
-        RIOT_HELMET
-    }
 
     class Use(
         val command: String,

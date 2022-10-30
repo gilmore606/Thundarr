@@ -79,20 +79,3 @@ sealed class Gear : Portable() {
         return uses
     }
 }
-
-@Serializable
-sealed class Weapon : Gear() {
-    override val slot = Slot.WEAPON
-    override fun equipSelfMsg() = "You ready your %d for action."
-    override fun unequipSelfMsg() = "You return your %d to its sheath."
-    override fun equipOtherMsg() = "%Dn takes out %id."
-    override fun unequipOtherMsg() = "%Dn puts away %p %d."
-}
-
-@Serializable
-class Axe : Weapon() {
-    override fun glyph() = Glyph.AXE
-    override fun name() = "axe"
-    override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about living creatures here."
-    override val kind = Kind.AXE
-}

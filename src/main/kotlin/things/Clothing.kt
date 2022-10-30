@@ -20,7 +20,6 @@ class HardHat : Clothing() {
     override fun name() = "hard hat"
     override fun description() = "A dented yellow plastic helmet labelled 'BEN LLI  ONSTRU TION'."
     override val slot = Slot.HEAD
-    override val kind = Kind.HARD_HAT
     override fun weight() = 0.5f
     override fun armor() = 1f
 }
@@ -31,7 +30,6 @@ class HornetHelmet : Clothing() {
     override fun name() = "horned helmet"
     override fun description() = "A fur-lined metal skullcap affixed with two large curved ox horns."
     override val slot = Slot.HEAD
-    override val kind = Kind.HORNED_HELMET
     override fun weight() = 1.8f
     override fun armor() = 2f
 }
@@ -42,7 +40,6 @@ class RiotHelmet : Clothing() {
     override fun name() = "riot helmet"
     override fun description() = "A shiny blue-black helmet made of some high tech material."
     override val slot = Slot.HEAD
-    override val kind = Kind.RIOT_HELMET
     override fun weight() = 0.7f
     override fun armor() = 4f
 }

@@ -170,6 +170,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             HornetHelmet().moveTo(player)
             HardHat().moveTo(player)
             RiotHelmet().moveTo(player)
+            Pickaxe().moveTo(player)
+            Axe().moveTo(player)
 
             updateTime(0.0)
             level.setPov(200, 200)

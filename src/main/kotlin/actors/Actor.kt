@@ -156,6 +156,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun advanceTime(delta: Float) { }
 
     fun equippedOn(slot: Gear.Slot): Gear? = gear[slot]
+    fun weapon() = equippedOn(Gear.Slot.WEAPON) as Weapon?  // unsafe assertion! inshallah
 
     fun equipGear(gear: Gear) {
         equippedOn(gear.slot)?.also { current ->
@@ -199,4 +200,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun corpse() = Corpse()
     open fun onDeath(corpse: Corpse) { }
+
+    fun onBump(x: Int, y: Int) {
+        weapon()?.onBump(this, x, y)
+    }
 }

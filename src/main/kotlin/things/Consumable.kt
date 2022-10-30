@@ -1,11 +1,9 @@
 package things
 
 import actors.Actor
-import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
-import util.aOrAn
 
 
 @Serializable
@@ -46,7 +44,6 @@ sealed class Food : Consumable() {
 class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
-    override val kind = Kind.APPLE
 }
 
 @Serializable
@@ -54,14 +51,12 @@ class Meat : Food() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw steak"
     override fun description() = "A bloody chunk of raw meat.  Your victim?  Sadly, this game does not keep track."
-    override val kind = Kind.MEAT
 }
 
 @Serializable
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"
-    override val kind = Kind.ENERGY_DRINK
 
     override fun consumeVerb() = "drink"
 
