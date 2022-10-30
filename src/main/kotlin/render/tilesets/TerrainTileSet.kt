@@ -52,6 +52,7 @@ fun TerrainTileSet() =
             add(WallTile.Slot.OUTSIDE_RIGHTBOTTOM, 1f, 2, 3)
             add(WallTile.Slot.FULL, 1f, 4, 2)
         })
+        setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))
 
         setTile(Glyph.WATER, WaterTile(this).apply {
             add(0.3f, 9, 0)

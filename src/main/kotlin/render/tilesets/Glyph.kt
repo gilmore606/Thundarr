@@ -12,6 +12,7 @@ enum class Glyph {
     GRASS,
     WATER,
     PORTAL_DOOR,
+    WALL_DAMAGE,
 
     CURSOR,
     BOX_BG,

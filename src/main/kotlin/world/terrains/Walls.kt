@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.LightColor
+import world.Level
 
 sealed class Wall(
     type: Type,
@@ -39,6 +41,16 @@ sealed class Wall(
                 }
             } else {
                 if (actor is Player) Console.say(bumpMsg())
+            }
+        }
+    }
+
+    override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
+                                  doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit
+    ) {
+        level.getTerrainData(x, y)?.let { it as Data }?.also {
+            if (it.damage > 0f) {
+                doTile(x, y, vis, Glyph.WALL_DAMAGE, light)
             }
         }
     }

@@ -90,6 +90,7 @@ sealed class Level {
                         doTile(
                             x, y, vis, glyph, light
                         )
+                        terrain.renderExtraQuads(this, x, y, vis, glyph, light, doTile)
                         if (vis == 1f) {
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)

@@ -9,7 +9,9 @@ import render.Screen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.panels.Console
+import util.LightColor
 import util.XY
+import world.Level
 
 sealed class Terrain(
     val type: Type,
@@ -52,6 +54,9 @@ sealed class Terrain(
     }
 
     open fun glyph() = this.glyph
+
+    open fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
+                              doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit) { }
 
     open fun isWalkable() = this.walkable
 
