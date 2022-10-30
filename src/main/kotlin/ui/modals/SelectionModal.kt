@@ -1,6 +1,7 @@
 package ui.modals
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import render.Screen
 import things.Thing
 import ui.input.Mouse
@@ -46,9 +47,9 @@ abstract class SelectionModal(
 
     abstract fun doSelect()
 
-    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0) {
+    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0, colorOverride: Color? = null) {
         drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,
-            if (index == selection) Screen.fontColorBold else Screen.fontColor)
+            colorOverride ?: if (index == selection) Screen.fontColorBold else Screen.fontColor)
     }
 
     protected fun drawOptionIcon(entity: Entity, index: Int) {

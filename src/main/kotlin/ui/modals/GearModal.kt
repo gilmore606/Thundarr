@@ -22,6 +22,7 @@ class GearModal(
     ) { }
 
     var slots = ArrayList<SlotMenu>()
+    var childDeployed = false
 
     init {
         selectionBoxHeight = 18
@@ -34,7 +35,8 @@ class GearModal(
 
     override fun drawModalText() {
         slots.forEachIndexed { n, slot ->
-            drawOptionText((slot.current?.name() ?: "(none)"), n, 90)
+            drawOptionText((slot.current?.name() ?: ""), n, 90,
+                if (childDeployed) Screen.fontColorDull else null)
             val label = slot.name + ":"
             drawString(label, padding + 90 - measure(label), headerPad + spacing * n - 2,
                 Screen.fontColorDull, Screen.smallFont)
@@ -53,6 +55,7 @@ class GearModal(
         val ourSelection = selection
         var startPos = slots[ourSelection].things.indexOf(slots[ourSelection].current)
         if (startPos < 0) startPos = slots[ourSelection].things.size
+        childDeployed = true
         Screen.addModal(ContextMenu(
             padding + xMargin + 120, optionY(selection) - 16 - startPos * 26) { hoverOption ->
                 sidecar?.also {
@@ -97,10 +100,12 @@ class GearModal(
     }
 
     override fun childSucceeded() {
+        childDeployed = false
         changeSelection(selection)
     }
 
     override fun childCancelled() {
+        childDeployed = false
         changeSelection(selection)
     }
 

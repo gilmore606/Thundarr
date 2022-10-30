@@ -10,6 +10,8 @@ class ContextMenu(
     private val onHover: ((Int)->Unit)? = null
 ): SelectionModal(100, 50, null, Position.CURSOR, 0) {
 
+    class Option(val name: String, val onPick: ()->Unit)
+
     var parentModal: ParentModal? = null
     interface ParentModal {
         fun childSucceeded()
@@ -17,7 +19,7 @@ class ContextMenu(
     }
     var succeeded = false
 
-    val options = mutableMapOf<String,()->Unit>()
+    val options = mutableListOf<Option>()
     private var maxOptionWidth = 0
 
     init {
@@ -33,7 +35,7 @@ class ContextMenu(
     }
 
     fun addOption(text: String, handler: ()->Unit): ContextMenu {
-        options[text] = handler
+        options.add(Option(text, handler))
         val optionWidth = GlyphLayout(Screen.font, text).width.toInt()
         if (optionWidth > maxOptionWidth) {
             maxOptionWidth = optionWidth
@@ -52,8 +54,8 @@ class ContextMenu(
     }
 
     override fun drawModalText() {
-        options.keys.forEachIndexed { n, text ->
-            drawOptionText(text, n)
+        options.forEachIndexed { n, opt ->
+            drawOptionText(opt.name, n)
         }
     }
 
@@ -65,7 +67,7 @@ class ContextMenu(
     override fun doSelect() {
         dismissSuccess()
         Screen.clearCursor()
-        options[options.keys.toList()[selection]]?.invoke()
+        options[selection].onPick.invoke()
     }
 
     override fun onKeyDown(keycode: Int) {
