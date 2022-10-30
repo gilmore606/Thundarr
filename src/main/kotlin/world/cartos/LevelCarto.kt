@@ -143,12 +143,11 @@ class LevelCarto(
     private fun addDoor(worldExit: WorldExit) {
         val door = findEdgeForDoor(worldExit.edge)
         carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
-        setTerrainData(door.x, door.y, Json.encodeToString(
-            PortalDoor.Data(
+        setTerrainData(door.x, door.y, PortalDoor.Data(
                 enterMsg = "The door leads outside to the wilderness.\nExit the building?",
                 levelId = "world",
                 xy = XY(worldExit.dest.x, worldExit.dest.y)
-        )))
+        ))
     }
 
 

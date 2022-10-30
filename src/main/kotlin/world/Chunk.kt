@@ -15,6 +15,7 @@ import world.cartos.LevelCarto
 import world.cartos.WorldCarto
 import world.stains.Stain
 import world.terrains.Terrain
+import world.terrains.TerrainData
 import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.random.Random
@@ -38,7 +39,7 @@ class Chunk(
     private val visible = Array(width) { Array(height) { false } }
     private val roofed = Array(width) { Array(height) { true } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
-    private val terrainData = Array(width) { Array(height) { "" } }
+    private val terrainData = Array(width) { Array<TerrainData?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
     private val sparks = ArrayList<Spark>()
 
@@ -201,6 +202,7 @@ class Chunk(
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
         this.terrains[x - this.x][y - this.y] = type
+        this.terrainData[x - this.x][y - this.y] = null
         roofed?.also { this.roofed[x - this.x][y - this.y] = it }
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
@@ -212,9 +214,12 @@ class Chunk(
 
     fun getTerrainData(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrainData[x - this.x][y - this.y]
-    } else { "" }
+    } else null
 
-    fun setTerrainData(x: Int, y: Int, data: String) {
+    fun setTerrainData(x: Int, y: Int, data: TerrainData?) {
+        if (data != null && terrains[x - this.x][y - this.y] != data.forType) {
+            throw RuntimeException("attempt to set terrain data for mismatched type ${data.forType} (terrain was ${terrains[x-this.x][y-this.y]})")
+        }
         terrainData[x - this.x][y - this.y] = data
     }
 

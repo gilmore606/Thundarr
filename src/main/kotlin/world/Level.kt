@@ -24,6 +24,7 @@ import ui.panels.Console
 import util.*
 import world.stains.Stain
 import world.terrains.Terrain
+import world.terrains.TerrainData
 import kotlin.coroutines.coroutineContext
 
 sealed class Level {
@@ -258,11 +259,11 @@ sealed class Level {
 
     fun getTerrain(x: Int, y: Int): Terrain.Type = chunkAt(x,y)?.getTerrain(x,y) ?: Terrain.Type.TERRAIN_STONEFLOOR
 
-    fun getTerrainData(x: Int, y: Int): String = chunkAt(x,y)?.getTerrainData(x,y) ?: ""
+    fun getTerrainData(x: Int, y: Int): TerrainData? = chunkAt(x,y)?.getTerrainData(x,y)
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) = chunkAt(x,y)?.setTerrain(x,y,type,roofed) ?: Unit
 
-    fun setTerrainData(x: Int, y: Int, data: String) = chunkAt(x,y)?.setTerrainData(x,y,data)
+    fun setTerrainData(x: Int, y: Int, data: TerrainData?) = chunkAt(x,y)?.setTerrainData(x,y,data)
 
     fun getRandom(x: Int, y: Int): Int = chunkAt(x,y)?.getRandom(x,y) ?: 4 // chosen by fair dice roll
 

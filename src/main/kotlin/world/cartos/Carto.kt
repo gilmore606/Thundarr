@@ -12,6 +12,7 @@ import world.Level
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
 import world.terrains.Terrain
+import world.terrains.TerrainData
 import java.io.File
 import java.lang.Integer.max
 
@@ -43,7 +44,7 @@ abstract class Carto(
 
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
     protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
-    protected fun setTerrainData(x: Int, y: Int, data: String) = chunk.setTerrainData(x, y, data)
+    protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
     protected fun addThing(x: Int, y: Int, thing: Thing) {

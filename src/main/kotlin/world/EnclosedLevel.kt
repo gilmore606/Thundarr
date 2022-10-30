@@ -52,7 +52,7 @@ class EnclosedLevel(
             for (x in 0 until width) {
                 for (y in 0 until height) {
                     if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-                        val doorData = Json.decodeFromString<PortalDoor.Data>(getTerrainData(x, y))
+                        val doorData = getTerrainData(x, y) as PortalDoor.Data
                         if (doorData.levelId == fromLevelId) {
                             // TODO: this changes when doors aren't all on north edge!
                             return XY(x, y + 1)

@@ -105,10 +105,10 @@ class WorldCarto(
                     firstLevelId = UUID(),
                     doorMsg = "A door labelled $buildingId.\nOpen it and step inside?"
                 )
-                setTerrainData(x, y, Json.encodeToString(PortalDoor.Data(
+                setTerrainData(x, y, PortalDoor.Data(
                     enterMsg = building.doorMsg,
                     levelId = building.firstLevelId
-                )))
+                ))
                 LevelKeeper.makeBuilding(building)
             }
         }

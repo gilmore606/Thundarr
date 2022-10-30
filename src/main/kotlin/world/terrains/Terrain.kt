@@ -53,8 +53,13 @@ sealed class Terrain(
 
     open fun isOpaque() = this.opaque
 
-    open fun onBump(actor: Actor, data: String) { }
+    open fun onBump(actor: Actor, data: TerrainData?) { }
 }
+
+@Serializable
+sealed class TerrainData(
+    val forType: Terrain.Type
+)
 
 
 object StoneFloor : Terrain(
@@ -70,7 +75,7 @@ object BrickWall : Terrain(
     false,
     true,
 ){
-    override fun onBump(actor: Actor, data: String) {
+    override fun onBump(actor: Actor, data: TerrainData?) {
         if (actor is Player) Console.say("You bump into a brick wall.")
     }
 }
@@ -99,10 +104,11 @@ object PortalDoor : Terrain(
         val enterMsg: String,
         val levelId: String,
         val xy: XY? = null // only for doors to world
-    )
+    ) : TerrainData(Type.TERRAIN_PORTAL_DOOR)
 
-    override fun onBump(actor: Actor, data: String) {
-        val terrainData = Json.decodeFromString<Data>(data)
+    override fun onBump(actor: Actor, data: TerrainData?) {
+        if (data == null) throw RuntimeException("portalDoor had null terrain data!")
+        val terrainData = data as Data
         Screen.addModal(ConfirmModal(
             terrainData.enterMsg.split('\n'), "Travel", "Cancel"
         ) { yes ->
