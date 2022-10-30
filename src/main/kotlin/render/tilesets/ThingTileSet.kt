@@ -71,4 +71,5 @@ fun ThingTileSet() =
         setTile(Glyph.HARD_HAT, SimpleTile(this, 6, 0))
         setTile(Glyph.HORNED_HAT, SimpleTile(this, 6, 1))
         setTile(Glyph.HELMET, SimpleTile(this, 6, 2))
+        setTile(Glyph.LOG, SimpleTile(this, 6, 3))
     }

@@ -4,6 +4,7 @@ import actors.Actor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
+import render.tilesets.Glyph
 import util.aOrAn
 import world.Entity
 import world.Level
@@ -67,4 +68,11 @@ sealed class Portable : Thing() {
 sealed class Obstacle : Thing() {
     override fun isBlocking() = true
     override fun isPortable() = false
+}
+
+@Serializable
+class Log : Portable() {
+    override fun name() = "log"
+    override fun description() = "Big, heavy, wood.  Better than bad.  Good."
+    override fun glyph() = Glyph.LOG
 }
