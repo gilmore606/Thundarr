@@ -97,6 +97,7 @@ class Chunk(
     fun onRestore(level: Level) {
         connectLevel(level)
         KtxAsync.launch {
+            while (!level.isReady()) delay(20)
             savedActors.forEach { actor ->
                 actor.onRestore()
                 actor.moveTo(level, actor.xy.x, actor.xy.y)

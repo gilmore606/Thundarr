@@ -215,16 +215,6 @@ sealed class Level {
         if (actor is Player) {
             setPov(actor.xy.x, actor.xy.y)
             director.wakeNPCsNear(actor.xy)
-            thingsAt(x, y).apply {
-                if (isNotEmpty()) {
-                    val thingList = mutableListOf<String>()
-                    forEach { if (it is Portable) { thingList.add(it.name().aOrAn()) } }
-                    if (thingList.isNotEmpty()) {
-                        val things = thingList.joinToString(", ")
-                        Console.say("You see $things here.")
-                    }
-                }
-            }
         }
     }
 

@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.XY
+import util.englishList
 import world.Entity
 import world.Level
 
@@ -29,6 +30,16 @@ class Player : Actor() {
             return Glyph.HOSTILE_ICON
         }
         return null
+    }
+
+    override fun onMove() {
+        super.onMove()
+        level?.also { level ->
+            val things = level.thingsAt(xy.x, xy.y)
+            if (things.isNotEmpty()) {
+                Console.say("You see " + things.englishList() + " here.")
+            }
+        }
     }
 
     fun tryMove(dir: XY) {

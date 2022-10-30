@@ -2,6 +2,7 @@ package util
 
 import mu.KotlinLogging
 import world.Chunk
+import world.Entity
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
@@ -67,6 +68,45 @@ fun String.aOrAn(): String {
     return "a " + this
 }
 
+fun Int.toEnglish(): String {
+    if (this > 99) return this.toString()
+    var str =  when (this % 10) {
+        0 -> if (this < 10) "zero" else ""
+        1 -> "one"
+        2 -> "two"
+        3 -> "three"
+        4 -> "four"
+        5 -> "five"
+        6 -> "six"
+        7 -> "seven"
+        8 -> "eight"
+        9 -> "nine"
+        else -> "???"
+    }
+    if (this > 9) {
+        str = when ((this / 10) % 10) {
+            0 -> str
+            1 -> when (str) {
+                "one" -> "eleven"
+                "two" -> "twelve"
+                "three" -> "thirteen"
+                "five" -> "fifteen"
+                else -> str + "teen"
+            }
+            2 -> "twenty-" + str
+            3 -> "thirty-" + str
+            4 -> "forty-" + str
+            5 -> "fifty-" + str
+            6 -> "sixty-" + str
+            7 -> "seventy-" + str
+            8 -> "eighty-" + str
+            9 -> "ninety-" + str
+            else -> "???" + str
+        }
+    }
+    return str
+}
+
 fun String.plural(): String {
     if (isNotEmpty()) {
         if (listOf(
@@ -76,6 +116,16 @@ fun String.plural(): String {
         }
     }
     return this + "s"
+}
+
+fun List<Entity>.englishList(): String {
+    val grouped = this.groupBy { it.name() }.toList()
+    var str = ""
+    grouped.forEachIndexed { n, s ->
+        str += if (s.second.size <= 1) s.first.aOrAn() else s.second.size.toEnglish() + " " + s.first.plural()
+        str += if (n == grouped.lastIndex) "" else if (n == grouped.lastIndex - 1) " and " else ", "
+    }
+    return str
 }
 
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
