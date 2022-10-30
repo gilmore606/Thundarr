@@ -217,7 +217,7 @@ class Chunk(
     } else null
 
     fun setTerrainData(x: Int, y: Int, data: TerrainData?) {
-        if (data != null && terrains[x - this.x][y - this.y] != data.forType) {
+        if (data != null && Terrain.get(terrains[x - this.x][y - this.y]).dataType != data.forType) {
             throw RuntimeException("attempt to set terrain data for mismatched type ${data.forType} (terrain was ${terrains[x-this.x][y-this.y]})")
         }
         terrainData[x - this.x][y - this.y] = data

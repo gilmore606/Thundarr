@@ -12,10 +12,12 @@ import ui.panels.Console
 import util.XY
 
 sealed class Terrain(
+    val type: Type,
     private val glyph: Glyph,
     private val walkable: Boolean,
     private val flyable: Boolean,
     private val opaque: Boolean,
+    val dataType: Type = type  // should match TerrainData.forType
 ) {
 
     companion object {
@@ -26,6 +28,7 @@ sealed class Terrain(
             Type.TERRAIN_GRASS -> Grass
             Type.TERRAIN_WATER -> Water
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
+            else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
             27 -> null
@@ -39,6 +42,7 @@ sealed class Terrain(
     }
 
     enum class Type {
+        GENERIC_WALL,
         TERRAIN_BRICKWALL,
         TERRAIN_STONEFLOOR,
         TERRAIN_DIRT,
@@ -53,7 +57,7 @@ sealed class Terrain(
 
     open fun isOpaque() = this.opaque
 
-    open fun onBump(actor: Actor, data: TerrainData?) { }
+    open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
 }
 
 @Serializable
@@ -62,39 +66,8 @@ sealed class TerrainData(
 )
 
 
-object StoneFloor : Terrain(
-    Glyph.STONE_FLOOR,
-    true,
-    true,
-    false
-)
-
-object BrickWall : Terrain(
-    Glyph.BRICK_WALL,
-    false,
-    false,
-    true,
-){
-    override fun onBump(actor: Actor, data: TerrainData?) {
-        if (actor is Player) Console.say("You bump into a brick wall.")
-    }
-}
-
-object Dirt : Terrain(
-    Glyph.DIRT,
-    true,
-    true,
-    false
-)
-
-object Grass : Terrain(
-    Glyph.GRASS,
-    true,
-    true,
-    false
-)
-
 object PortalDoor : Terrain(
+    Type.TERRAIN_PORTAL_DOOR,
     Glyph.PORTAL_DOOR,
     false,
     false,
@@ -106,7 +79,7 @@ object PortalDoor : Terrain(
         val xy: XY? = null // only for doors to world
     ) : TerrainData(Type.TERRAIN_PORTAL_DOOR)
 
-    override fun onBump(actor: Actor, data: TerrainData?) {
+    override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         if (data == null) throw RuntimeException("portalDoor had null terrain data!")
         val terrainData = data as Data
         Screen.addModal(ConfirmModal(
@@ -126,6 +99,7 @@ object PortalDoor : Terrain(
 }
 
 object Water : Terrain(
+    Type.TERRAIN_WATER,
     Glyph.WATER,
     false,
     true,
