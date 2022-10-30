@@ -2,6 +2,7 @@ package ui.modals
 
 import actors.actions.Equip
 import actors.actions.Unequip
+import com.badlogic.gdx.Input
 import render.Screen
 import things.Gear
 import things.ThingHolder
@@ -9,7 +10,7 @@ import util.log
 
 class GearModal(
     private val thingHolder: ThingHolder
-) : SelectionModal(300, 350, "- gEAr -", default = 0) {
+) : SelectionModal(300, 350, "- gEAr -", default = 0), ContextMenu.ParentModal {
 
     class SlotMenu(
         val name: String,
@@ -60,6 +61,7 @@ class GearModal(
                 }
             }
         .apply {
+            parentModal = this@GearModal
             val things = slots[ourSelection].things
             if (things.isNotEmpty()) {
                 slots[ourSelection].things.forEach { thing ->
@@ -82,15 +84,25 @@ class GearModal(
         (sidecar as CompareSidecar).showGear1(null)
     }
 
-    override fun mouseToOption(screenX: Int, screenY: Int): Int? {
-        val hoverOption = super.mouseToOption(screenX, screenY)
-        hoverOption?.also { (sidecar as CompareSidecar).showGear1(slots[it].current) }
-        return hoverOption
+    override fun changeSelection(newSelection: Int) {
+        super.changeSelection(newSelection)
+        if (newSelection > -1) {
+            (sidecar as CompareSidecar).showGear1(slots[newSelection].current)
+        }
+    }
+
+    override fun childSucceeded() {
+        changeSelection(selection)
+    }
+
+    override fun childCancelled() {
+        changeSelection(selection)
     }
 
     override fun advanceTime(turns: Float) {
         super.advanceTime(turns)
         fillSlots()
+        changeSelection(selection)
     }
 
     private fun fillSlots() {
@@ -103,5 +115,15 @@ class GearModal(
             ))
         }
         maxSelection = slots.size - 1
+    }
+
+    override fun onKeyDown(keycode: Int) {
+        when (keycode) {
+            Input.Keys.G -> dismiss()
+            Input.Keys.TAB -> dismiss()
+            Input.Keys.NUMPAD_4 -> dismiss()
+            Input.Keys.NUMPAD_6 -> doSelect()
+            else -> super.onKeyDown(keycode)
+        }
     }
 }

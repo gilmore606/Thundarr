@@ -13,7 +13,9 @@ class ContextMenu(
     var parentModal: ParentModal? = null
     interface ParentModal {
         fun childSucceeded()
+        fun childCancelled() { }
     }
+    var succeeded = false
 
     val options = mutableMapOf<String,()->Unit>()
     private var maxOptionWidth = 0
@@ -27,6 +29,7 @@ class ContextMenu(
         this.shadowOffset = 6
         this.borderWidth = 1
         this.headerPad = 16
+        changeSelection(0)
     }
 
     fun addOption(text: String, handler: ()->Unit): ContextMenu {
@@ -43,19 +46,9 @@ class ContextMenu(
 
     override fun onResize(width: Int, height: Int) { }
 
-    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
-        super.onMouseMovedTo(screenX, screenY)
-        onHover?.invoke(selection)
-    }
-
-    override fun selectNext() {
-        super.selectNext()
-        onHover?.invoke(selection)
-    }
-
-    override fun selectPrevious() {
-        super.selectPrevious()
-        onHover?.invoke(selection)
+    override fun changeSelection(newSelection: Int) {
+        super.changeSelection(newSelection)
+        onHover?.invoke(newSelection)
     }
 
     override fun drawModalText() {
@@ -70,20 +63,30 @@ class ContextMenu(
     }
 
     override fun doSelect() {
-        dismiss()
-        parentModal?.childSucceeded()
+        dismissSuccess()
         Screen.clearCursor()
         options[options.keys.toList()[selection]]?.invoke()
     }
 
     override fun onKeyDown(keycode: Int) {
         when (keycode) {
-            Input.Keys.TAB -> {
-                parentModal?.childSucceeded()
-                dismiss()
-            }
+            Input.Keys.TAB -> dismissSuccess()
             Input.Keys.NUMPAD_4 -> dismiss()
             else -> super.onKeyDown(keycode)
         }
+    }
+
+    override fun onDismiss() {
+        super.onDismiss()
+        if (!succeeded) {
+            parentModal?.childCancelled()
+        } else {
+            parentModal?.childSucceeded()
+        }
+    }
+
+    private fun dismissSuccess() {
+        succeeded = true
+        dismiss()
     }
 }

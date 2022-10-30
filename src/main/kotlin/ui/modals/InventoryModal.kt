@@ -27,7 +27,7 @@ class InventoryModal(
     var grouped = ArrayList<ArrayList<Thing>>()
 
     init {
-        parentModal?.also { this.isSidecar = true ; selection = 0 }
+        parentModal?.also { this.isSidecar = true ; changeSelection(0) }
         updateGrouped()
         adjustHeight()
         selectionBoxHeight = 18
@@ -36,7 +36,7 @@ class InventoryModal(
             sidecar = InventoryModal(withContainer, parentModal = this, sidecarTitle = withContainer.name())
             moveToSidecar()
         } ?: run {
-            selection = 0
+            changeSelection(0)
         }
     }
 
@@ -52,7 +52,7 @@ class InventoryModal(
     override fun drawModalText() {
         if (maxSelection < 0) {
             drawOptionText(if (isSidecar) "It's empty." else "Your backpack is empty.", 0)
-            selection = -1
+            changeSelection(-1)
             return
         }
         var n = 0
@@ -188,8 +188,8 @@ class InventoryModal(
         parentModal?.also {
             if (it is InventoryModal && it.grouped.isNotEmpty()) {
                 it.returnFromSidecar()
-                (it as SelectionModal).selection = max(0, min(selection, it.maxSelection))
-                selection = -1
+                (it as SelectionModal).changeSelection(max(0, min(selection, it.maxSelection)))
+                changeSelection(-1)
             }
         }
     }
@@ -217,10 +217,10 @@ class InventoryModal(
         }
         maxSelection = grouped.size - 1
         parentModal?.also { log.info("child max set to $maxSelection")}
-        selection = min(maxSelection, selection)
+        changeSelection(min(maxSelection, selection))
         adjustHeight()
         if (maxSelection < 0) {
-            selection = -1
+            changeSelection(-1)
             sidecar?.also { moveToSidecar() } ?: run {
                 parentModal?.also { returnToParent() }
             }

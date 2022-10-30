@@ -26,20 +26,22 @@ abstract class SelectionModal(
     override fun moveToSidecar() {
         super.moveToSidecar()
         sidecar?.also { if (it is SelectionModal) it.selection = min(it.maxSelection, selection) }
-        selection = -1
+        changeSelection(-1)
     }
 
     protected fun optionX(n: Int) = this.x + padding
     protected fun optionY(n: Int) = this.y + headerPad + spacing * n
 
     protected open fun selectNext() {
-        selection++
-        if (selection > maxSelection) selection = (if (maxSelection >= 0) 0 else -1)
+        changeSelection(if (selection >= maxSelection) if (maxSelection < 0) -1 else 0 else selection + 1)
     }
 
     protected open fun selectPrevious() {
-        selection--
-        if (selection < 0) selection = maxSelection
+        changeSelection(if (selection < 1) maxSelection else selection - 1)
+    }
+
+    open fun changeSelection(newSelection: Int) {
+        selection = newSelection
     }
 
     abstract fun doSelect()
@@ -76,12 +78,12 @@ abstract class SelectionModal(
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (button != Mouse.Button.LEFT) return false
         if (super.onMouseClicked(screenX, screenY, button)) return true
-        mouseToOption(screenX, screenY)?.also { selection = it ; doSelect(); return true }
+        mouseToOption(screenX, screenY)?.also { changeSelection(it) ; doSelect(); return true }
         return false
     }
 
     override fun onMouseMovedTo(screenX: Int, screenY: Int) {
-        selection = mouseToOption(screenX, screenY) ?: -1
+        changeSelection(mouseToOption(screenX, screenY) ?: -1)
         if (selection > 0) {
             if (isInSidecar) {
                 returnFromSidecar()
