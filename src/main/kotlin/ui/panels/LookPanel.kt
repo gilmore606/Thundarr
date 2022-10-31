@@ -67,7 +67,8 @@ object LookPanel : ShadedPanel() {
             val x0 = x + padding - 10
             val y0 = y + padding - 12
             entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
-                entity.uiBatch().getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0))
+                entity.uiBatch().getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0),
+                hue = entity.hue())
         }
     }
 

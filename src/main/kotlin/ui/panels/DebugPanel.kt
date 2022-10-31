@@ -2,6 +2,7 @@ package ui.panels
 
 import App
 import render.Screen
+import ui.input.Keyboard
 import world.LevelKeeper
 
 object DebugPanel : ShadedPanel() {
@@ -10,7 +11,7 @@ object DebugPanel : ShadedPanel() {
 
     init {
         this.width = 160
-        this.height = 130
+        this.height = 150
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -31,7 +32,7 @@ object DebugPanel : ShadedPanel() {
         drawString("render ${Screen.drawTime} ms", padding, padding + 60)
         drawString("action ${Screen.actTime} ms", padding, padding + 80)
         drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 100)
-
+        drawString("debug ${Keyboard.debugFloat}", padding, padding + 120)
     }
 
 }

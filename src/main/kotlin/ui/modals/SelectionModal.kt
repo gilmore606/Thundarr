@@ -56,7 +56,7 @@ abstract class SelectionModal(
         val x0 = this.x + padding - 10
         val y0 = this.y + headerPad + spacing * index - 12
         val batch = if (entity is Thing) myThingBatch() else myActorBatch()
-        batch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()))
+        batch.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()), hue = entity.hue())
     }
 
     protected fun drawOptionShade(space: Int = 0) {

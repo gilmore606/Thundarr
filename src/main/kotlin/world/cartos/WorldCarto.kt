@@ -1,6 +1,7 @@
 package world.cartos
 
 import actors.Herder
+import actors.MuskOx
 import actors.Ox
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -54,7 +55,7 @@ class WorldCarto(
                     if (Dice.chance(0.005f)) {
                         KtxAsync.launch {
                             if (Dice.chance(0.9f)) {
-                                Ox().moveTo(level, x + x0, y + y0)
+                                (if (Dice.flip()) Ox() else MuskOx()).moveTo(level, x + x0, y + y0)
                             } else {
                                 Herder().moveTo(level, x + x0, y + y0)
                             }
@@ -75,9 +76,11 @@ class WorldCarto(
                                 val dir = CARDINALS.random()
                                 try {
 
-                                    addThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(3)) {
+                                    addThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(4)) {
                                         0 -> Apple()
                                         1 -> Axe()
+                                        2 -> Pear()
+                                        3 -> Pickaxe()
                                         else -> EnergyDrink()
                                     })
                                 } catch (_: Exception) { }

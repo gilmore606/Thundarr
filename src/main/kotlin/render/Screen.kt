@@ -15,6 +15,7 @@ import render.batches.CloudBatch
 import render.batches.QuadBatch
 import render.batches.RainBatch
 import render.tilesets.*
+import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
 import ui.modals.ContextMenu
@@ -36,6 +37,7 @@ object Screen : KtxScreen {
     var worldZoom = 1.3
     var cameraSlack = 0.3
     var cameraMenuShift = 0.8
+    var uiHue = 0.0
     var showSeenAreas = false
     private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
@@ -224,12 +226,12 @@ object Screen : KtxScreen {
         )
     }
 
-    private val renderThing: (Int, Int, Float, Glyph)->Unit = { tx, ty, vis, glyph ->
+    private val renderThing: (Int, Int, Thing, Float)->Unit = { tx, ty, thing, vis ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
         thingBatch.addTileQuad(
-            tx, ty,
-            thingBatch.getTextureIndex(glyph, App.level, tx, ty), vis, lightCache[lx][ly])
+            tx, ty, thingBatch.getTextureIndex(thing.glyph(), App.level, tx, ty),
+            vis, lightCache[lx][ly], hue = thing.hue())
     }
 
     private val renderActor: (Int, Int, Actor)->Unit = { tx, ty, actor ->
@@ -239,7 +241,7 @@ object Screen : KtxScreen {
         actorBatch.addTileQuad(
             tx, ty,
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY()
+            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue()
         )
         actor.statusGlyph()?.also { statusGlyph ->
             uiWorldBatch.addTileQuad(

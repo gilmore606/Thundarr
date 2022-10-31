@@ -23,7 +23,8 @@ class QuadBatch(
         VertexAttribute(Usage.Position, 2, "a_Position"),
         VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
         VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
-        VertexAttribute(Usage.Generic, 1, "a_Grayout")
+        VertexAttribute(Usage.Generic, 1, "a_Grayout"),
+        VertexAttribute(Usage.Generic, 1, "a_Hue")
     )
 
     val textureIndexCache = tileSet.getCache()
@@ -33,6 +34,7 @@ class QuadBatch(
     private val quadEdgePadX = 0.0002f
     private val quadEdgePadY = -0.0024f
     private val shadowPad = -0.0001f
+
 
     override fun bindTextures() {
         Gdx.gl.glActiveTexture(GL_TEXTURE0)
@@ -46,7 +48,8 @@ class QuadBatch(
     }
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
-                                     lightR: Float, lightG: Float, lightB: Float, lightA: Float, grayOut: Float) {
+                                            lightR: Float, lightG: Float, lightB: Float, lightA: Float,
+                                            grayOut: Float, hue: Float) {
         this[floatCount] = x
         this[floatCount+1] = y
         this[floatCount+2] = tx
@@ -56,13 +59,15 @@ class QuadBatch(
         this[floatCount+6] = lightB
         this[floatCount+7] = lightA
         this[floatCount+8] = grayOut
+        this[floatCount+9] = hue
         floatCount += floatsPerVertex
         vertexCount++
     }
 
     fun addTileQuad(col: Int, row: Int, // global tile XY
                     textureIndex: Int, visibility: Float, light: LightColor,
-                    offsetX: Float = 0f, offsetY: Float = 0f, scale: Double = 1.0, alpha: Float = 1f) {
+                    offsetX: Float = 0f, offsetY: Float = 0f,
+                    scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f) {
         val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
@@ -72,7 +77,7 @@ class QuadBatch(
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut)
+        addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 
     fun addOverlapQuad(col: Int, row: Int, // global tile XY
@@ -198,12 +203,14 @@ class QuadBatch(
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
-                     textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f) {
+                     textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
+                     hue: Float? = null) {
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / Screen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / Screen.height.toDouble()) * 2f - 1f
-        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, 1f, 0f)
+        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex,
+                lightR, lightG, lightB, 1f, 0f, hue ?: Screen.uiHue.toFloat())
     }
 
     fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
@@ -229,7 +236,8 @@ class QuadBatch(
 
     private inline fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double, // GL screen float XY
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
-                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f
+                        textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f,
+                               grayOut: Float = 0f, hue: Float = 0f
     ) {
         val x0 = ix0.toFloat() - quadEdgePadX
         val y0 = -iy0.toFloat() - quadEdgePadY
@@ -240,12 +248,12 @@ class QuadBatch(
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - textureEdgePad
         val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - textureEdgePad
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut)
+            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
         }
     }
 

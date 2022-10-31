@@ -21,6 +21,7 @@ interface Entity {
     }
 
     fun glyph(): Glyph
+    fun hue(): Float = 0f
     fun glyphBatch(): QuadBatch
     fun uiBatch(): QuadBatch
     fun name(): String

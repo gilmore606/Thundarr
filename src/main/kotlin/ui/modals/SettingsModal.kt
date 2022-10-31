@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
 import ui.input.Mouse
+import util.log
 import kotlin.math.max
 import kotlin.math.min
 
-class SettingsModal : Modal(300, 500, "- settings -") {
+class SettingsModal : Modal(300, 580, "- settings -") {
 
     val contentY = 130
 
@@ -80,12 +81,17 @@ class SettingsModal : Modal(300, 500, "- settings -") {
     }
 
     object Video : Section("video") {
-        val sliderCameraSpring = Slider("Camera follow slack", 0, Screen.cameraSlack, 0.04, 0.7) { Screen.cameraSlack = it }
-        val sliderWorldZoom = Slider("Overworld auto zoom-out", 85, Screen.worldZoom, 1.0, 1.4) { Screen.worldZoom = it }
-        val sliderMenuShift = Slider("Camera shift on menu open", 170, Screen.cameraMenuShift, 0.01, 0.9) { Screen.cameraMenuShift = it}
-        val sliders = listOf(sliderCameraSpring, sliderWorldZoom, sliderMenuShift)
+        val sliderCameraSpring = Slider("Camera follow slack", 0, Screen.cameraSlack, 0.04, 0.7) {
+            Screen.cameraSlack = it }
+        val sliderWorldZoom = Slider("Overworld auto zoom-out", 85, Screen.worldZoom, 1.0, 1.4) {
+            Screen.worldZoom = it }
+        val sliderMenuShift = Slider("Camera shift on menu open", 170, Screen.cameraMenuShift, 0.01, 0.9) {
+            Screen.cameraMenuShift = it}
+        val sliderUIColor = Slider("UI hue adjust", 255, Screen.uiHue, 0.0, 6.283) {
+            Screen.uiHue = it }
+        val sliders = listOf(sliderCameraSpring, sliderWorldZoom, sliderMenuShift, sliderUIColor)
 
-        val menuPos = Multipick("Dialog window position", 270, listOf("Left", "Center", "Top"))
+        val menuPos = Multipick("Dialog window position", 355, listOf("Left", "Center", "Top"))
         override fun drawText(modal: SettingsModal) {
             sliders.forEach { it.drawText(modal) }
             menuPos.drawText(modal)

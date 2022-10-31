@@ -5,6 +5,7 @@ import actors.Player
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
+import ui.input.Keyboard
 import ui.panels.Console
 import world.terrains.Terrain
 
@@ -30,6 +31,7 @@ class Axe : Weapon() {
 @Serializable
 class Pickaxe : Weapon() {
     override fun glyph() = Glyph.AXE
+    override fun hue() = 5.2f
     override fun name() = "pickaxe"
     override fun description() = "A miner's pickaxe.  Looks like it could pick more than flesh.  I'm talking about stone here."
     override fun canDig(terrainType: Terrain.Type) = Terrain.get(terrainType).dataType == Terrain.Type.GENERIC_WALL

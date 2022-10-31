@@ -3,6 +3,7 @@ package things
 import actors.Actor
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.input.Keyboard
 import ui.panels.Console
 
 
@@ -44,6 +45,13 @@ sealed class Food : Consumable() {
 class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
+}
+
+@Serializable
+class Pear : Food() {
+    override fun glyph() = Glyph.FRUIT
+    override fun hue() = 0.9f
+    override fun name() = "pear"
 }
 
 @Serializable

@@ -7,6 +7,7 @@ object Dice {
     val random = Random(Random.nextInt())
 
     fun chance(c: Float) = random.nextFloat() < c
+    fun flip() = chance(0.5f)
 
     fun float(f0: Float, f1: Float) = random.nextFloat() * (f1 - f0) + f0
 

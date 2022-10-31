@@ -98,7 +98,7 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
     private fun drawExamEntity(gear: Gear, x0: Int) {
         val ex = x0 + x + widthPerGear - padding - 64 + 8
         val ey = y + padding
-        myThingBatch().addPixelQuad(ex, ey, ex + 64, ey + 64, myThingBatch().getTextureIndex(gear.glyph()))
+        myThingBatch().addPixelQuad(ex, ey, ex + 64, ey + 64, myThingBatch().getTextureIndex(gear.glyph()), hue = gear.hue())
     }
 
 }

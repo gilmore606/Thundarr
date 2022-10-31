@@ -16,6 +16,9 @@ import util.*
 
 object Keyboard : KtxInputAdapter {
 
+    var debugFloat = 0f
+    val debugFloatStep = 0.05f
+
     var lastKey = -1
     var lastKeyTime = System.currentTimeMillis()
 
@@ -130,6 +133,9 @@ object Keyboard : KtxInputAdapter {
                 Herder().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
             }
             Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
+
+            Input.Keys.F9 -> { debugFloat += debugFloatStep }
+            Input.Keys.F10 -> { debugFloat -= debugFloatStep }
 
             else -> { lastKey = -1 }
         }

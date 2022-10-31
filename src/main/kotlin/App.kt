@@ -32,7 +32,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val fullscreen: Boolean,
         val worldZoom: Double,
         val cameraSlack: Double,
-        val cameraMenuShift: Double
+        val cameraMenuShift: Double,
+        val uiHue: Double
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -110,7 +111,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     fullscreen = Screen.FULLSCREEN,
                     cameraSlack = Screen.cameraSlack,
                     cameraMenuShift = Screen.cameraMenuShift,
-                    worldZoom = Screen.worldZoom
+                    worldZoom = Screen.worldZoom,
+                    uiHue = Screen.uiHue
                 )
             )
 
@@ -145,6 +147,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Screen.worldZoom = state.worldZoom
             Screen.cameraSlack = state.cameraSlack
             Screen.cameraMenuShift = state.cameraMenuShift
+            Screen.uiHue = state.uiHue
 
             updateTime(state.time)
 

@@ -162,7 +162,7 @@ sealed class Level {
     }
 
     fun forEachThingToRender(
-        doThis: (x: Int, y: Int, vis: Float, glyph: Glyph) -> Unit
+        doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit
     ) {
         for (x in pov.x - Screen.renderTilesWide/2 until pov.x + Screen.renderTilesWide/2) {
             for (y in pov.y - Screen.renderTilesHigh/2 until pov.y + Screen.renderTilesHigh/2) {
@@ -170,7 +170,7 @@ sealed class Level {
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
                     doThis(
-                        x, y, vis, thingsAt[0].glyph()
+                        x, y, thingsAt[0], vis
                     )
                 }
             }
