@@ -1,7 +1,9 @@
 package render.sparks
 
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 
+@Serializable
 class Raindrop : Spark() {
 
     init {

@@ -20,7 +20,7 @@ class CloudBatch : RenderBatch() {
         VertexAttribute(VertexAttributes.Usage.Generic, 1, "a_CloudAlpha")
     )
 
-    val TILE_SCALE = 120f
+    val TILE_SCALE = 170f
 
     val startTime = System.currentTimeMillis()
 

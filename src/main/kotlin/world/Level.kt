@@ -102,7 +102,8 @@ sealed class Level {
                         )
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doTile)
                         if (vis == 1f) {
-                            if (!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) {
+                            if ((!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) ||
+                                (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1)))) {
                                 doWeather(x, y, this.cloudIntensity, this.rainIntensity)
                                 framesBeforeRaindrop--
                                 if (framesBeforeRaindrop < 0 && rainIntensity > 0.2f) {
