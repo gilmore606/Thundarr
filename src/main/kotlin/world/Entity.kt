@@ -1,6 +1,6 @@
 package world
 
-import render.QuadBatch
+import render.batches.QuadBatch
 import render.tilesets.Glyph
 import util.XY
 import util.aOrAn

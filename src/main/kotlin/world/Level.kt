@@ -54,6 +54,7 @@ sealed class Level {
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     private val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
     private var cloudIntensity = 1f
+    private var rainIntensity = 1f
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
@@ -78,7 +79,7 @@ sealed class Level {
         doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
         doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
-        doWeather: (x: Int, y: Int, alpha: Float) -> Unit,
+        doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float) -> Unit,
         delta: Float
     ) {
         for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
@@ -96,7 +97,7 @@ sealed class Level {
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doTile)
                         if (vis == 1f) {
                             if (!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) {
-                                doWeather(x, y, this.cloudIntensity)
+                                doWeather(x, y, this.cloudIntensity, this.rainIntensity)
                             }
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)

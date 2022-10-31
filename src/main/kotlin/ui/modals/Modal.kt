@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import render.QuadBatch
+import render.batches.QuadBatch
 import render.Screen
-import render.shaders.tileFragShader
-import render.shaders.tileVertShader
 import render.tilesets.ActorTileSet
 import ui.panels.Panel
 import render.tilesets.Glyph

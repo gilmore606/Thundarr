@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ktx.app.KtxScreen
+import render.batches.CloudBatch
+import render.batches.QuadBatch
+import render.batches.RainBatch
 import render.tilesets.*
 import ui.input.Keyboard
 import ui.input.Mouse
@@ -71,8 +74,10 @@ object Screen : KtxScreen {
     val uiThingBatch = QuadBatch(thingTileSet)
     val uiActorBatch = QuadBatch(actorTileSet)
     val cloudBatch = CloudBatch()
+    val rainBatch = RainBatch()
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
-    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch)
+    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch,
+        uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
 
@@ -180,8 +185,9 @@ object Screen : KtxScreen {
         lightCache[lx][ly].b = light.b
     }
 
-    private val renderWeather: (Int, Int, Float)->Unit = { tx, ty, alpha ->
-        cloudBatch.addTileQuad(tx, ty, alpha)
+    private val renderWeather: (Int, Int, Float, Float)->Unit = { tx, ty, cloudAlpha, rainAlpha ->
+        cloudBatch.addTileQuad(tx, ty, cloudAlpha)
+        rainBatch.addTileQuad(tx, ty, rainAlpha)
     }
 
     private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->

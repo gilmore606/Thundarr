@@ -1,4 +1,4 @@
-package render
+package render.batches
 
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Mesh

@@ -1,32 +1,35 @@
-package render
+package render.batches
 
 import RESOURCE_FILE_DIR
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
-import render.shaders.weatherFragShader
-import render.shaders.weatherVertShader
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.VertexAttribute
+import com.badlogic.gdx.graphics.VertexAttributes
+import render.Screen
+import render.shaders.rainFragShader
+import render.shaders.rainVertShader
 import util.log
 
-class CloudBatch : RenderBatch() {
+class RainBatch : RenderBatch() {
 
-    override fun vertShader() = weatherVertShader()
-    override fun fragShader() = weatherFragShader()
+    override fun vertShader() = rainVertShader()
+    override fun fragShader() = rainFragShader()
     override fun vertexAttributes() = listOf(
         VertexAttribute(VertexAttributes.Usage.Position, 2, "a_Position"),
-        VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_TexCoordinate"),
-        VertexAttribute(VertexAttributes.Usage.Generic, 1, "a_Alpha")
+        VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_RainUV"),
+        VertexAttribute(VertexAttributes.Usage.Generic, 2, "a_RainAlpha")
     )
-
-    val TILE_SCALE = 120f
 
     val startTime = System.currentTimeMillis()
 
-    private val texture = Texture(FileHandle("${RESOURCE_FILE_DIR}mask_clouds.png"), true).apply {
-        setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        log.info("Loaded weather texture mask_clouds.png ($width x $height)")
+    private val rainMask = Texture(FileHandle("${RESOURCE_FILE_DIR}mask_rainfall.png"), true).apply {
+        setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat)
+        log.info("Loaded weather texture mask_rainfall.png ($width x $height)")
     }
+
 
     inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float, alpha: Float) {
         this[floatCount] = x
@@ -44,15 +47,11 @@ class CloudBatch : RenderBatch() {
         val x1 = Screen.tileXtoGlx(col + 1.0).toFloat()
         val y1 = 0f - Screen.tileYtoGly(row + 1.0).toFloat()
 
-        val windX = 0.6f
-        val windY = 0.2f
-        val timeshift = App.time + ((System.currentTimeMillis() - startTime) / 256f)
-        val tcol = col.toFloat() + windX * timeshift
-        val trow = row.toFloat() + windY * timeshift
-        val tx0 = ((tcol % TILE_SCALE).toFloat() / TILE_SCALE)
-        val ty0 = ((trow % TILE_SCALE).toFloat() / TILE_SCALE)
-        val tx1 = tx0 + 1f / TILE_SCALE
-        val ty1 = ty0 + 1f / TILE_SCALE
+        val tx0 = x0 % 1.0f
+        val ty0 = y0 % 1.0f
+        val tx1 = x1 % 1.0f
+        val ty1 = y1 % 1.0f
+
         floats.apply {
             addVertex(x0, y0, tx0, ty0, alpha)
             addVertex(x0, y1, tx0, ty1, alpha)
@@ -65,13 +64,15 @@ class CloudBatch : RenderBatch() {
 
     override fun bindTextures() {
         Gdx.gl.glActiveTexture(GL_TEXTURE0)
-        texture.bind()
-        shader.setUniformi("u_Texture", 0)
+        rainMask.bind()
+        shader.setUniformi("u_RainMask", 0)
+        shader.setUniformf("u_Time", (System.currentTimeMillis() - startTime).toFloat())
+        shader.setUniformf("u_Speed", 0.007f * Screen.zoom.toFloat())
     }
 
     override fun dispose() {
         super.dispose()
-        texture.dispose()
+        rainMask.dispose()
     }
 
 }
