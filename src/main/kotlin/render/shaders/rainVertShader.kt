@@ -12,8 +12,10 @@ fun rainVertShader() = """
 
     void main()
     {
-        float rainu = a_Position.x * 3.0;
-        float rainv = a_Position.y * 3.0;
+        // float rainu = a_Position.x * 1.0;
+        // float rainv = a_Position.y * 1.0;
+        float rainu = a_RainUV.x;
+        float rainv = a_RainUV.y;
         
         v_RainUV = vec2(rainu, rainv);
         v_RainAlpha = a_RainAlpha;

@@ -26,6 +26,7 @@ class CloudBatch : RenderBatch() {
 
     private val cloudTexture = Texture(FileHandle("${RESOURCE_FILE_DIR}mask_clouds.png"), true).apply {
         setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat)
         log.info("Loaded weather texture mask_clouds.png ($width x $height)")
     }
 

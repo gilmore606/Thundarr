@@ -47,10 +47,12 @@ class RainBatch : RenderBatch() {
         val x1 = Screen.tileXtoGlx(col + 1.0).toFloat()
         val y1 = 0f - Screen.tileYtoGly(row + 1.0).toFloat()
 
-        val tx0 = x0 % 1.0f
-        val ty0 = y0 % 1.0f
-        val tx1 = x1 % 1.0f
-        val ty1 = y1 % 1.0f
+        val scale = 2.5f / Screen.zoom.toFloat()
+
+        val tx0 = x0 * scale
+        val ty0 = y0 * scale
+        val tx1 = x1 * scale
+        val ty1 = y1 * scale
 
         floats.apply {
             addVertex(x0, y0, tx0, ty0, alpha)
@@ -67,7 +69,7 @@ class RainBatch : RenderBatch() {
         rainMask.bind()
         shader.setUniformi("u_RainMask", 0)
         shader.setUniformf("u_Time", (System.currentTimeMillis() - startTime).toFloat())
-        shader.setUniformf("u_Speed", 0.007f * Screen.zoom.toFloat())
+        shader.setUniformf("u_Speed", 0.005f)
     }
 
     override fun dispose() {

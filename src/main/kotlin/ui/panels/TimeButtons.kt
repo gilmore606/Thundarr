@@ -13,7 +13,7 @@ import java.lang.Integer.min
 
 object TimeButtons : Panel() {
 
-    private val ffwdDelay = 60L
+    private val ffwdDelay = 30L
     private val playDivider = 6
 
     enum class State { PAUSE, PLAY, FFWD }
@@ -37,7 +37,7 @@ object TimeButtons : Panel() {
     private const val iconSize = 24
     private const val iconSizeHovered = 36
     private const val slop = 18
-    private const val wakeSlop = 70
+    private const val wakeSlop = 50
     private var spacing = 48
 
     private var contraction = height
@@ -119,7 +119,7 @@ object TimeButtons : Panel() {
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         val lx = screenX - this.x
         val ly = screenY - this.y
-        if (ly < this.height + 50 && lx >= 0 && lx < this.width && !Screen.scrollDragging) {
+        if (ly < this.height + slop && lx >= 0 && lx < this.width && !Screen.scrollDragging) {
             mouseInside = true
             if (!shouldShow()) return
             var newHover = -1
