@@ -30,6 +30,9 @@ enum class Glyph {
     BUTTON_SYSTEM,
     BUTTON_JOURNAL,
     BUTTON_GEAR,
+    BUTTON_PAUSE,
+    BUTTON_PLAY,
+    BUTTON_FFWD,
     COLOR_BARS,
 
     PLAYER,

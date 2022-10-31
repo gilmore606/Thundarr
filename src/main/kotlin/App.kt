@@ -73,6 +73,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.addPanel(LookPanel)
         Screen.addPanel(ActorPanel)
         Screen.addPanel(LeftButtons)
+        Screen.addPanel(TimeButtons)
 
         Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
 

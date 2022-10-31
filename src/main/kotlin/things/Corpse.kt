@@ -8,7 +8,7 @@ import util.iterateAndEmpty
 class Corpse : Container(), Temporal {
 
     var rot = 0f
-    open fun rotTime() = 20f
+    open fun rotTime() = 50f
 
     override fun temporalDone() = holder == null
 

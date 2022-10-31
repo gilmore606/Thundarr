@@ -25,6 +25,7 @@ import util.*
 import world.stains.Stain
 import world.terrains.Terrain
 import world.terrains.TerrainData
+import java.lang.Float.max
 import kotlin.coroutines.coroutineContext
 
 sealed class Level {
@@ -52,6 +53,7 @@ sealed class Level {
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     private val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
+    private var cloudIntensity = 1f
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
@@ -76,6 +78,7 @@ sealed class Level {
         doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
         doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
+        doWeather: (x: Int, y: Int, alpha: Float) -> Unit,
         delta: Float
     ) {
         for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
@@ -92,6 +95,9 @@ sealed class Level {
                         )
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doTile)
                         if (vis == 1f) {
+                            if (!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) {
+                                doWeather(x, y, this.cloudIntensity)
+                            }
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)
                             chunk.stainAt(x, y)?.also { doStain(x, y, it, light) }
@@ -372,6 +378,8 @@ sealed class Level {
         ambientLight.r = c1!!.r + (c2!!.r - c1.r) * fraction
         ambientLight.g = c1!!.g + (c2!!.g - c1.g) * fraction
         ambientLight.b = c1!!.b + (c2!!.b - c1.b) * fraction
+
+        cloudIntensity = max(0f, ambientLight.brightness() - 0.3f)
     }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {

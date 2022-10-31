@@ -16,6 +16,8 @@ import ktx.app.KtxScreen
 import ktx.async.KtxAsync
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
+import render.shaders.weatherFragShader
+import render.shaders.weatherVertShader
 import render.tilesets.*
 import ui.input.Keyboard
 import ui.input.Mouse
@@ -24,6 +26,7 @@ import ui.panels.Panel
 import ui.modals.Modal
 import ui.panels.ActorPanel
 import util.*
+import world.Level
 import world.LevelKeeper
 import world.WorldLevel
 import world.stains.Stain
@@ -68,7 +71,6 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
-    private val tileSets = listOf(terrainTileSet, thingTileSet, actorTileSet, uiTileSet)
     val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
     val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
@@ -77,8 +79,9 @@ object Screen : KtxScreen {
     val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
     val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
     val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
+    val weatherBatch = WeatherBatch()
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
-    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch)
+    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, weatherBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
 
@@ -184,6 +187,10 @@ object Screen : KtxScreen {
         lightCache[lx][ly].r = light.r
         lightCache[lx][ly].g = light.g
         lightCache[lx][ly].b = light.b
+    }
+
+    private val renderWeather: (Int, Int, Float)->Unit = { tx, ty, alpha ->
+        weatherBatch.addTileQuad(tx, ty, alpha)
     }
 
     private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->
@@ -432,10 +439,10 @@ object Screen : KtxScreen {
                             val newCursor = XY(col, row)
                             cursorPosition = newCursor
                             cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
-                        } else {
-                            clearCursor()
+                            return
                         }
                     }
+                    clearCursor()
                 }
             }
         }
@@ -566,6 +573,7 @@ object Screen : KtxScreen {
             doOcclude = renderOcclude,
             doSurf = renderSurf,
             doStain = renderStain,
+            doWeather = renderWeather,
             delta = delta
         )
         if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }

@@ -37,7 +37,7 @@ object LeftButtons : Panel() {
     private val speed = 18
 
     private var hovered = -1
-    private var mouseInside = false
+    var mouseInside = false
 
     private val buttons = listOf(
         Button(Glyph.BUTTON_SYSTEM, "system") {

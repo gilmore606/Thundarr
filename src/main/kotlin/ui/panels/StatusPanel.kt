@@ -29,7 +29,7 @@ object StatusPanel : ShadedPanel() {
     override fun drawBackground() {
         super.drawBackground()
         if (App.player.willAggro) {
-            Screen.uiBatch.addPixelQuad(x - 40, y + 20, x - 40 + 31, y + 20 + 31,
+            Screen.uiBatch.addPixelQuad(x - 46, y + 70, x - 46 + 31, y + 70 + 31,
                 Screen.uiBatch.getTextureIndex(Glyph.ANGRY_THUNDARR))
         }
     }

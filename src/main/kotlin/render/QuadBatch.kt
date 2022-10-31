@@ -18,7 +18,7 @@ class QuadBatch(
     vertexShaderSource: String,
     fragmentShaderSource: String,
     val tileSet: TileSet
-) {
+) : RenderBatch {
 
     private val FLOATS_PER_VERTEX = 9
     private val MAX_QUADS = 40000
@@ -36,6 +36,18 @@ class QuadBatch(
     private val quadEdgePadY = -0.0024f
     private val shadowPad = -0.0001f
 
+    private val tileShader = ShaderProgram(vertexShaderSource, fragmentShaderSource).apply {
+        if (!isCompiled) throw RuntimeException("Can't compile shader: $log")
+    }
+
+    private val mesh = Mesh(
+        true, MAX_QUADS * 6, 0,
+        VertexAttribute(Usage.Position, 2, "a_Position"),
+        VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
+        VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
+        VertexAttribute(Usage.Generic, 1, "a_Grayout")
+    )
+
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, lightA: Float, grayOut: Float) {
         this[floatCount] = x
@@ -51,20 +63,10 @@ class QuadBatch(
         vertexCount++
     }
 
-    private val mesh = Mesh(
-        true, MAX_QUADS * 6, 0,
-        VertexAttribute(Usage.Position, 2, "a_Position"),
-        VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
-        VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
-        VertexAttribute(Usage.Generic, 1, "a_Grayout")
-    )
-
-    private val tileShader = ShaderProgram(vertexShaderSource, fragmentShaderSource).apply {
-        if (!isCompiled) throw RuntimeException("Can't compile shader: $log")
-    }
 
 
-    fun clear() {
+
+    override fun clear() {
         floatCount = 0
         vertexCount = 0
     }
@@ -262,7 +264,7 @@ class QuadBatch(
         return textureIndexCache[glyph] ?: tileSet.getIndex(glyph, level, x, y)
     }
 
-    fun draw() {
+    override fun draw() {
         mesh.setVertices(floats, 0, floatCount)
         tileShader.use { shader ->
             Gdx.gl.glActiveTexture(GL_TEXTURE0)
@@ -272,7 +274,7 @@ class QuadBatch(
         }
     }
 
-    fun dispose() {
+    override fun dispose() {
         mesh.dispose()
         tileSet.dispose()
         tileShader.dispose()
