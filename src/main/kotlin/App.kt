@@ -258,7 +258,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         dateString = "$monthName $monthDay, $realYear"
         lastHour = hour
 
-        LevelKeeper.forEachLiveLevel { it.updateAmbientLight(hour, minute) }
+        LevelKeeper.forEachLiveLevel { it.updateTime(hour, minute) }
     }
 
     fun saveAndQuit() {

@@ -8,6 +8,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
+import render.sparks.Raindrop
 import render.sparks.Spark
 import render.sunLights
 import render.tileholders.OverlapTile
@@ -26,6 +27,7 @@ import world.stains.Stain
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.lang.Float.max
+import java.lang.Float.min
 import kotlin.coroutines.coroutineContext
 
 sealed class Level {
@@ -53,8 +55,12 @@ sealed class Level {
 
     private val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     private val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
-    private var cloudIntensity = 1f
-    private var rainIntensity = 1f
+    var weatherIntensity = 0f
+    private var weatherIntensityTarget = 0f
+    var cloudIntensity = 0f
+    var rainIntensity = 0f
+    private var framesBeforeRaindrop = 0
+    private var lastWeatherHour = 0
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
@@ -98,6 +104,12 @@ sealed class Level {
                         if (vis == 1f) {
                             if (!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) {
                                 doWeather(x, y, this.cloudIntensity, this.rainIntensity)
+                                framesBeforeRaindrop--
+                                if (framesBeforeRaindrop < 0 && rainIntensity > 0.2f) {
+                                    val rainInterval = (1800 - rainIntensity * 1600).toInt()
+                                    framesBeforeRaindrop = rainInterval + Dice.oneTo(rainInterval)
+                                    addSpark(Raindrop().at(x, y))
+                                }
                             }
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)
@@ -308,6 +320,12 @@ sealed class Level {
             }
         }
 
+        weatherIntensity = if (weatherIntensity < weatherIntensityTarget) {
+            min(weatherIntensityTarget, weatherIntensity + 0.25f * delta)
+        } else {
+            max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
+        }
+
         allChunks().forEach { it.onRender(delta) }
         director.actors.forEach { it.onRender(delta) }
 
@@ -358,7 +376,48 @@ sealed class Level {
         allChunks().forEach { it.removeLightSource(lightSource) }
     }
 
-    fun updateAmbientLight(hour: Int, minute: Int) {
+    fun updateTime(hour: Int, minute: Int) {
+        updateAmbientLight(hour, minute)
+        if (hour != lastWeatherHour) {
+            lastWeatherHour = hour
+            updateWeather(hour, minute)
+        }
+        val cloudLight = min(1f, (ambientLight.brightness() - 0.5f) * 2f)
+        cloudIntensity = max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
+        rainIntensity = max(0f, (weatherIntensity - 0.5f) * 2f)
+    }
+
+    private fun updateWeather(hour: Int, minute: Int) {
+        if (Dice.chance(0.4f + weatherIntensity * 0.3f)) {
+            weatherIntensityTarget = min(1f, weatherIntensityTarget + 0.3f)
+            if (App.player.level == this && !isRoofedAt(App.player.xy.x, App.player.xy.y)) {
+                if (weatherIntensity < 0.45f && weatherIntensityTarget > 0.45f) {
+                    Console.say("It begins to rain.")
+                } else if (weatherIntensity >= 0.5f) {
+                    Console.say("The rain falls harder.")
+                } else if (hour in 7..18) {
+                    Console.say("Clouds gather in the sky.")
+                }
+            }
+        } else {
+            weatherIntensityTarget = max(0f, weatherIntensityTarget - 0.3f)
+            if (App.player.level == this && !isRoofedAt(App.player.xy.x, App.player.xy.y)) {
+                if (weatherIntensity > 0.45f && weatherIntensityTarget < 0.45f) {
+                    Console.say("It stops raining.")
+                } else if (weatherIntensity > 0.45f) {
+                    Console.say("The rain lets up a bit.")
+                } else if (hour in 7..18) {
+                    if (weatherIntensity > 0.3f) {
+                        Console.say("The sun breaks through the clouds.")
+                    } else {
+                        Console.say("The bright sunlight warms your heart and body.")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateAmbientLight(hour: Int, minute: Int) {
         val stepHours = sunLightSteps.keys
         var hour1 = 0
         var hour2 = 0

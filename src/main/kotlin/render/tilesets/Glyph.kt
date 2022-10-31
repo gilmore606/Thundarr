@@ -77,6 +77,7 @@ enum class Glyph {
     HORNED_HAT,
     HELMET,
     LOG,
+    RAINDROP,
 
     BLOODSTAIN
 }

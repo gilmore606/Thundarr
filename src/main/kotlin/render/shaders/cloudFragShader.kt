@@ -9,10 +9,12 @@ fun cloudFragShader() = """
     void main()
     {
         vec4 sample = texture2D(u_CloudTexture, v_CloudUV);
-        float cirrus = max(0.0, v_CloudAlpha - 0.1);
-        vec4 sample2 = texture2D(u_CloudTexture, vec2(v_CloudUV.x * 0.35, v_CloudUV.y * 0.42)) * cirrus;
-        float value = sample.r - sample2.r;
-        gl_FragColor = vec4(value, value, value, (sample.a + sample2.a) * v_CloudAlpha);
+        float cirrus = max(0.0, v_CloudAlpha - 0.4) * 2;
+        vec4 sample2 = texture2D(u_CloudTexture, vec2(v_CloudUV.x + 0.4, v_CloudUV.y + 0.3)) * cirrus;
+        float cumulus = max(0.0, v_CloudAlpha - 0.7) * 3.5;
+        vec4 sample3 = texture2D(u_CloudTexture, vec2(v_CloudUV.x + 0.63, v_CloudUV.y + 0.41)) * cumulus;
+        float value = sample.r - sample2.r - sample3.r;
+        gl_FragColor = vec4(value, value, value, min(0.3, (sample.a + sample2.a + sample3.a) * (v_CloudAlpha - 0.05) * 0.5));
     }
 
 """.trimIndent()

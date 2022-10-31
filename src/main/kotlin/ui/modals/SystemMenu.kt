@@ -3,10 +3,11 @@ package ui.modals
 class SystemMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
-        put("Restart world") { App.restartWorld() }
+        put("Resume") { }
         put("Settings") { App.openSettings() }
         put("Controls") { App.openControls() }
         put("Credits") { App.openCredits() }
+        put("Restart world") { App.restartWorld() }
         put("Save and quit") { App.saveAndQuit() }
     }
 

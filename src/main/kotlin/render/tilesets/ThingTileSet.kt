@@ -72,4 +72,15 @@ fun ThingTileSet() =
         setTile(Glyph.HORNED_HAT, SimpleTile(this, 6, 1))
         setTile(Glyph.HELMET, SimpleTile(this, 6, 2))
         setTile(Glyph.LOG, SimpleTile(this, 6, 3))
+        setTile(Glyph.RAINDROP, AnimatedTile(this).apply {
+            frameMs = 26
+            add(0, 6)
+            add(1, 6)
+            add(2, 6)
+            add(3, 6)
+            add(4, 6)
+            add(5, 6)
+            add(6, 6)
+            add(7, 6)
+        })
     }

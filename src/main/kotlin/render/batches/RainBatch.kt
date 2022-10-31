@@ -47,7 +47,7 @@ class RainBatch : RenderBatch() {
         val x1 = Screen.tileXtoGlx(col + 1.0).toFloat()
         val y1 = 0f - Screen.tileYtoGly(row + 1.0).toFloat()
 
-        val scale = 2.5f / Screen.zoom.toFloat()
+        val scale = 1.3f / Screen.zoom.toFloat()
 
         val tx0 = x0 * scale
         val ty0 = y0 * scale
