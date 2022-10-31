@@ -30,10 +30,10 @@ abstract class Modal(
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
     var dismissOnClickOutside = true
 
-    private val boxBatch = QuadBatch(tileVertShader(), tileFragShader(), UITileSet())
+    private val boxBatch = QuadBatch(UITileSet())
     private val textBatch = SpriteBatch()
-    private val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), ThingTileSet())
-    private val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), ActorTileSet())
+    private val thingBatch = QuadBatch(ThingTileSet())
+    private val actorBatch = QuadBatch(ActorTileSet())
 
     var sidecar: Modal? = null
     var isSidecar = false

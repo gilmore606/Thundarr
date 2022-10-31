@@ -10,14 +10,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import ktx.app.KtxScreen
-import ktx.async.KtxAsync
-import render.shaders.tileFragShader
-import render.shaders.tileVertShader
-import render.shaders.weatherFragShader
-import render.shaders.weatherVertShader
 import render.tilesets.*
 import ui.input.Keyboard
 import ui.input.Mouse
@@ -26,9 +19,7 @@ import ui.panels.Panel
 import ui.modals.Modal
 import ui.panels.ActorPanel
 import util.*
-import world.Level
 import world.LevelKeeper
-import world.WorldLevel
 import world.stains.Stain
 import java.lang.Double.max
 import java.lang.Double.min
@@ -71,17 +62,17 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
-    val terrainBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
-    val overlapBatch = QuadBatch(tileVertShader(), tileFragShader(), terrainTileSet)
-    val actorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
-    val thingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
-    val uiWorldBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
-    val uiBatch = QuadBatch(tileVertShader(), tileFragShader(), uiTileSet)
-    val uiThingBatch = QuadBatch(tileVertShader(), tileFragShader(), thingTileSet)
-    val uiActorBatch = QuadBatch(tileVertShader(), tileFragShader(), actorTileSet)
-    val weatherBatch = WeatherBatch()
+    val terrainBatch = QuadBatch(terrainTileSet)
+    val overlapBatch = QuadBatch(terrainTileSet)
+    val actorBatch = QuadBatch(actorTileSet)
+    val thingBatch = QuadBatch(thingTileSet)
+    val uiWorldBatch = QuadBatch(uiTileSet)
+    val uiBatch = QuadBatch(uiTileSet)
+    val uiThingBatch = QuadBatch(thingTileSet)
+    val uiActorBatch = QuadBatch(actorTileSet)
+    val cloudBatch = CloudBatch()
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
-    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, weatherBatch)
+    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch, uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
 
@@ -190,7 +181,7 @@ object Screen : KtxScreen {
     }
 
     private val renderWeather: (Int, Int, Float)->Unit = { tx, ty, alpha ->
-        weatherBatch.addTileQuad(tx, ty, alpha)
+        cloudBatch.addTileQuad(tx, ty, alpha)
     }
 
     private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->

@@ -3,11 +3,12 @@ package render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
-import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
+import render.shaders.tileFragShader
+import render.shaders.tileVertShader
 import render.tilesets.TileSet
 import render.tilesets.Glyph
 import util.*
@@ -15,20 +16,19 @@ import world.Level
 import java.lang.Float.min
 
 class QuadBatch(
-    vertexShaderSource: String,
-    fragmentShaderSource: String,
     val tileSet: TileSet
-) : RenderBatch {
+) : RenderBatch() {
 
-    private val FLOATS_PER_VERTEX = 9
-    private val MAX_QUADS = 40000
+    override fun vertShader() = tileVertShader()
+    override fun fragShader() = tileFragShader()
+    override fun vertexAttributes() = listOf(
+        VertexAttribute(Usage.Position, 2, "a_Position"),
+        VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
+        VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
+        VertexAttribute(Usage.Generic, 1, "a_Grayout")
+    )
 
-    private val floats: FloatArray = FloatArray(MAX_QUADS * FLOATS_PER_VERTEX * 4 * 4)
-    private var floatCount = 0
-    var vertexCount = 0
-
-    private val textureIndexCache = tileSet.getCache()
-
+    val textureIndexCache = tileSet.getCache()
     private val textureEdgePad = 0.0015f
     var shadowTexturePadX = -0.0105f
     var shadowTexturePadY = -0.0062f
@@ -36,17 +36,16 @@ class QuadBatch(
     private val quadEdgePadY = -0.0024f
     private val shadowPad = -0.0001f
 
-    private val tileShader = ShaderProgram(vertexShaderSource, fragmentShaderSource).apply {
-        if (!isCompiled) throw RuntimeException("Can't compile shader: $log")
+    override fun bindTextures() {
+        Gdx.gl.glActiveTexture(GL_TEXTURE0)
+        tileSet.texture.bind()
+        shader.setUniformi("u_Texture", 0)
     }
 
-    private val mesh = Mesh(
-        true, MAX_QUADS * 6, 0,
-        VertexAttribute(Usage.Position, 2, "a_Position"),
-        VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
-        VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
-        VertexAttribute(Usage.Generic, 1, "a_Grayout")
-    )
+    override fun dispose() {
+        super.dispose()
+        tileSet.dispose()
+    }
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                      lightR: Float, lightG: Float, lightB: Float, lightA: Float, grayOut: Float) {
@@ -59,16 +58,8 @@ class QuadBatch(
         this[floatCount+6] = lightB
         this[floatCount+7] = lightA
         this[floatCount+8] = grayOut
-        floatCount += FLOATS_PER_VERTEX
+        floatCount += floatsPerVertex
         vertexCount++
-    }
-
-
-
-
-    override fun clear() {
-        floatCount = 0
-        vertexCount = 0
     }
 
     fun addTileQuad(col: Int, row: Int, // global tile XY
@@ -238,7 +229,7 @@ class QuadBatch(
         addQuad(glxMid, gly0, glx1, gly1, textureIndex = textureIndex, ity0 = 0.376f, ity1 = 0.499f)
     }
 
-    private fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double, // GL screen float XY
+    private inline fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double, // GL screen float XY
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f, grayOut: Float = 0f
     ) {
@@ -260,23 +251,8 @@ class QuadBatch(
         }
     }
 
-    fun getTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0): Int {
+    inline fun getTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0): Int {
         return textureIndexCache[glyph] ?: tileSet.getIndex(glyph, level, x, y)
     }
 
-    override fun draw() {
-        mesh.setVertices(floats, 0, floatCount)
-        tileShader.use { shader ->
-            Gdx.gl.glActiveTexture(GL_TEXTURE0)
-            tileSet.texture.bind()
-            shader.setUniformi("u_Texture", 0)
-            mesh.render(shader, GL20.GL_TRIANGLES, 0, vertexCount)
-        }
-    }
-
-    override fun dispose() {
-        mesh.dispose()
-        tileSet.dispose()
-        tileShader.dispose()
-    }
 }

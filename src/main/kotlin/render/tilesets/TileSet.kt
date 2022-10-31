@@ -36,7 +36,7 @@ class TileSet(
 
     fun hasGlyph(glyph: Glyph) = tileHolders.contains(glyph)
 
-    fun getIndex(
+    inline fun getIndex(
         glyph: Glyph,
         level: Level? = null,
         x: Int = 0,
