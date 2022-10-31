@@ -68,6 +68,7 @@ class LevelCarto(
 
         addDoor(worldExit)
 
+        forEachCell { x, y -> chunk.setRoofed(x - chunk.x, y - chunk.y, true) }
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {

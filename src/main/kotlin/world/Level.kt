@@ -379,7 +379,7 @@ sealed class Level {
         ambientLight.g = c1!!.g + (c2!!.g - c1.g) * fraction
         ambientLight.b = c1!!.b + (c2!!.b - c1.b) * fraction
 
-        cloudIntensity = max(0f, ambientLight.brightness() - 0.3f)
+        cloudIntensity = max(0f, ambientLight.brightness() - 0.5f)
     }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
