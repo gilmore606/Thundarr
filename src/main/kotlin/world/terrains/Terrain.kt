@@ -57,7 +57,7 @@ sealed class Terrain(
     open fun glyph() = this.glyph
 
     open fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
-                              doTile: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
+                              doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                                        vis: Float, glyph: Glyph, light: LightColor)->Unit) { }
 
     open fun isWalkable() = this.walkable

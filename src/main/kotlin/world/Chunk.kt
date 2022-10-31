@@ -14,6 +14,7 @@ import util.*
 import world.cartos.LevelCarto
 import world.cartos.WorldCarto
 import world.stains.Stain
+import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.lang.Float.max
@@ -198,7 +199,7 @@ class Chunk(
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
-    } else { Terrain.Type.TERRAIN_BRICKWALL }
+    } else { Terrain.Type.TERRAIN_STONEFLOOR }
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
         this.terrains[x - this.x][y - this.y] = type
@@ -206,6 +207,17 @@ class Chunk(
         roofed?.also { this.roofed[x - this.x][y - this.y] = it }
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
+        for (i in (-1..1)) {
+            for (j in (-1..1)) {
+                if (boundsCheck(x+i,y+j)) {
+                    Terrain.get(getTerrain(x + i, y + j)).also { terrain ->
+                        if (terrain is Floor && !generating) {
+                            setTerrainData(x + i, y + j, terrain.makeOverlaps(this, x + i, y + j))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun setRoofed(x: Int, y: Int, newRoofed: Boolean) {
@@ -289,7 +301,7 @@ class Chunk(
 
     fun isOpaqueAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         opaqueCache[x - this.x][y - this.y] ?: updateOpaque(x - this.x, y - this.y)
-    } else { true }
+    } else { false }
 
     private fun updateOpaque(x: Int, y: Int): Boolean {
         if (generating) return Terrain.get(terrains[x][y]).isOpaque()
