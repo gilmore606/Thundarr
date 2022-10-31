@@ -29,11 +29,8 @@ class QuadBatch(
 
     val textureIndexCache = tileSet.getCache()
     private val textureEdgePad = 0.0015f
-    var shadowTexturePadX = -0.0105f
-    var shadowTexturePadY = -0.0062f
     private val quadEdgePadX = 0.0002f
     private val quadEdgePadY = -0.0024f
-    private val shadowPad = -0.0001f
 
 
     override fun bindTextures() {
@@ -80,126 +77,19 @@ class QuadBatch(
         addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 
-    fun addOverlapQuad(col: Int, row: Int, // global tile XY
-                       edge: XY, textureIndex: Int, visibility: Float, light: LightColor) {
-        var ox0 = col.toDouble()
-        var oy0 = row.toDouble()
-        var ox1 = col.toDouble() + 1.0
-        var oy1 = row.toDouble() + 0.25
-        var tx0 = 0f
-        var ty0 = 0f
-        var tx1 = 1f
-        var ty1 = 0.25f
-        when (edge) {
-            SOUTH -> {
-                oy0 = row.toDouble() + 0.75
-                oy1 = row.toDouble() + 1.0
-                ty0 = 0.75f
-                ty1 = 1f
-            }
-            EAST -> {
-                ox0 = col.toDouble() + 0.75
-                oy1 = row.toDouble() + 1.0
-                tx0 = 0.75f
-                ty1 = 1f
-            }
-            WEST -> {
-                ox1 = col.toDouble() + 0.25
-                oy1 = row.toDouble() + 1.0
-                tx1 = 0.25f
-                ty1 = 1f
-            }
-        }
-        val ix0 = Screen.tileXtoGlx(ox0)
-        val iy0 = Screen.tileYtoGly(oy0)
-        val ix1 = Screen.tileXtoGlx(ox1)
-        val iy1 = Screen.tileYtoGly(oy1)
-
+    fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,
+                       textureIndex: Int, visibility: Float, light: LightColor,
+                       tx0: Float, ty0: Float, tx1: Float, ty1: Float,
+                       alpha: Float = 1f, hue: Float = 0f) {
+        val gx0 = Screen.tileXtoGlx(x0)
+        val gy0 = Screen.tileYtoGly(y0)
+        val gx1 = Screen.tileXtoGlx(x1)
+        val gy1 = Screen.tileYtoGly(y1)
         val lightR = min(visibility, light.r)
         val lightG = min(visibility, light.g)
         val lightB = min(visibility, light.b)
         val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(ix0, iy0, ix1, iy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, 1f, grayOut)
-    }
-
-    fun addOccludeQuad(col: Int, row: Int, // global tile XY
-                       edge: XY, textureIndex: Int, visibility: Float, light: LightColor) {
-        var ox0 = col.toDouble()
-        var oy0 = row.toDouble()
-        var ox1 = col.toDouble() + 1.0
-        var oy1 = row.toDouble() + 0.25
-        var tx0 = 0f
-        var ty0 = 0.5f
-        var tx1 = 1f
-        var ty1 = 0.75f
-        when (edge) {
-            SOUTH -> {
-                oy0 = row.toDouble() + 0.75
-                oy1 = row.toDouble() + 1.0
-                ty0 = 0.75f
-                ty1 = 0.5f
-            }
-            EAST -> {
-                ox0 = col.toDouble() + 0.75
-                oy1 = row.toDouble() + 1.0
-                tx0 = 0.75f
-                tx1 = 0.5f
-                ty0 = 0f
-                ty1 = 1f
-            }
-            WEST -> {
-                ox1 = col.toDouble() + 0.25
-                oy1 = row.toDouble() + 1.0
-                tx0 = 0.5f
-                tx1 = 0.75f
-                ty0 = 0f
-                ty1 = 1f
-            }
-            NORTHEAST -> {
-                ox0 = col.toDouble() + 0.75
-                tx0 = 1f
-                tx1 = 0.75f
-                ty0 = 0.25f
-                ty1 = 0f
-            }
-            NORTHWEST -> {
-                ox1 = col.toDouble() + 0.25
-                tx0 = 0.75f
-                tx1 = 1f
-                ty0 = 0.25f
-                ty1 = 0f
-            }
-            SOUTHEAST -> {
-                ox0 = col.toDouble() + 0.75
-                oy0 = row.toDouble() + 0.75
-                oy1 = row.toDouble() + 1.0
-                tx0 = 1f
-                tx1 = 0.75f
-                ty0 = 0f
-                ty1 = 0.25f
-            }
-            SOUTHWEST -> {
-                oy0 = row.toDouble() + 0.75
-                ox1 = col.toDouble() + 0.25
-                oy1 = row.toDouble() + 1.0
-                tx0 = 0.75f
-                tx1 = 1f
-                ty0 = 0f
-                ty1 = 0.25f
-            }
-        }
-        val ix0 = Screen.tileXtoGlx(ox0)
-        val iy0 = Screen.tileYtoGly(oy0)
-        val ix1 = Screen.tileXtoGlx(ox1)
-        val iy1 = Screen.tileYtoGly(oy1)
-
-        val lightR = min(visibility, light.r)
-        val lightG = min(visibility, light.g)
-        val lightB = min(visibility, light.b)
-        val grayOut = if (visibility < 1f) 1f else 0f
-        addQuad(ix0 - shadowPad, iy0 - shadowPad, ix1 + shadowPad, iy1 + shadowPad,
-            tx0 + shadowTexturePadX, ty0 + shadowTexturePadY, tx1 - shadowTexturePadX, ty1 - shadowTexturePadY,
-            textureIndex, lightR, lightG, lightB, 1f, grayOut)
+        addQuad(gx0, gy0, gx1, gy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY

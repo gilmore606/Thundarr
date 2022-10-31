@@ -4,6 +4,7 @@ import App
 import render.Screen
 import ui.input.Keyboard
 import world.LevelKeeper
+import world.terrains.Terrain
 
 object DebugPanel : ShadedPanel() {
 
@@ -11,7 +12,7 @@ object DebugPanel : ShadedPanel() {
 
     init {
         this.width = 160
-        this.height = 150
+        this.height = 200
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -33,6 +34,12 @@ object DebugPanel : ShadedPanel() {
         drawString("action ${Screen.actTime} ms", padding, padding + 80)
         drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 100)
         drawString("debug ${Keyboard.debugFloat}", padding, padding + 120)
+
+        val terrain = Terrain.get(App.level.getTerrain(App.player.xy.x, App.player.xy.y))
+        val tdata = App.level.getTerrainData(App.player.xy.x, App.player.xy.y)
+        val datatext = terrain.debugData(tdata)
+        drawString(terrain.type.toString(), padding, padding + 140)
+        drawString("  $datatext", padding, padding + 160)
     }
 
 }

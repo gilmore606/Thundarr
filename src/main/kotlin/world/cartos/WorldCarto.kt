@@ -92,6 +92,7 @@ class WorldCarto(
         }
 
         setRoofedInRock()
+        setOverlaps()
     }
 
     private fun assignDoors() {

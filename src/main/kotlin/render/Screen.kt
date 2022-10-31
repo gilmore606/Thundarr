@@ -187,35 +187,15 @@ object Screen : KtxScreen {
         lightCache[lx][ly].b = light.b
     }
 
+    private val renderQuad: (Double, Double, Double, Double, Float, Float, Float, Float, Float, Glyph, LightColor)->Unit =
+        { x0, y0, x1, y1, tx0, ty0, tx1, ty1, vis, glyph, light ->
+            val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, x0.toInt(), y0.toInt())
+            terrainBatch.addPartialQuad(x0, y0, x1, y1, textureIndex, vis, light, tx0, ty0, tx1, ty1, 1f)
+    }
+
     private val renderWeather: (Int, Int, Float, Float)->Unit = { tx, ty, cloudAlpha, rainAlpha ->
         cloudBatch.addTileQuad(tx, ty, cloudAlpha)
         rainBatch.addTileQuad(tx, ty, rainAlpha)
-    }
-
-    private val renderOverlap: (Int, Int, Float, Glyph, XY, LightColor)->Unit = { tx, ty, vis, glyph, edge, light ->
-        val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
-        overlapBatch.addOverlapQuad(
-            tx - edge.x, ty - edge.y, edge,
-            textureIndex, vis, light
-        )
-    }
-
-    private val renderOcclude: (Int, Int, XY)->Unit = { tx, ty, edge ->
-        val textureIndex = terrainBatch.getTextureIndex(
-            if (edge == NORTH || edge == SOUTH) Glyph.OCCLUSION_SHADOWS_H else Glyph.OCCLUSION_SHADOWS_V
-        )
-        overlapBatch.addOccludeQuad(
-            tx, ty, edge, textureIndex, 1f, fullLight
-        )
-    }
-
-    private val renderSurf: (Int, Int, Float, LightColor, XY)->Unit = { tx, ty, vis, light, edge ->
-        val textureIndex = terrainBatch.getTextureIndex(
-            if (edge == NORTH || edge == SOUTH) Glyph.SURF_H else Glyph.SURF_V
-        )
-        overlapBatch.addOccludeQuad(
-            tx, ty, edge, textureIndex, vis, light
-        )
     }
 
     private val renderStain: (Int, Int, Stain, LightColor)->Unit = { tx, ty, stain, light ->
@@ -566,11 +546,8 @@ object Screen : KtxScreen {
         allBatches.forEach { it.clear() }
 
         App.level.forEachCellToRender(
-            terrainBatch.tileSet,
             doTile = renderTile,
-            doOverlap = renderOverlap,
-            doOcclude = renderOcclude,
-            doSurf = renderSurf,
+            doQuad = renderQuad,
             doStain = renderStain,
             doWeather = renderWeather,
             delta = delta

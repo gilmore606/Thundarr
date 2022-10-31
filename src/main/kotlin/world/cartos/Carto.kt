@@ -11,6 +11,7 @@ import world.Chunk
 import world.Level
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
+import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.io.File
@@ -51,7 +52,6 @@ abstract class Carto(
         val dest = chunk.cellContainerAt(x, y)
         KtxAsync.launch {
             dest.reconnect(level, x, y)
-            //log.info("moving $thing to $dest at $x $y in $level")
             thing.moveTo(dest)
         }
     }
@@ -239,6 +239,19 @@ abstract class Carto(
             for (x in x0 .. x1) {
                 if (isRock(x, y) && neighborBlockerCount(x, y) < 8) {
                     chunk.setRoofed(x, y, false)
+                }
+            }
+        }
+    }
+
+    // Cartos should always run this at the end to overlap floor tiles and occlude shadows.
+    protected fun setOverlaps() {
+        for (y in y0..y1) {
+            for (x in x0..x1) {
+                val terrain = Terrain.get(getTerrain(x,y))
+                if (terrain is Floor) {
+                    val quadData = terrain.makeOverlaps(chunk,x,y)
+                    setTerrainData(x, y, quadData)
                 }
             }
         }

@@ -45,6 +45,7 @@ sealed class Terrain(
 
     enum class Type {
         GENERIC_WALL,
+        GENERIC_FLOOR,
         TERRAIN_BRICKWALL,
         TERRAIN_STONEFLOOR,
         TERRAIN_DIRT,
@@ -56,13 +57,16 @@ sealed class Terrain(
     open fun glyph() = this.glyph
 
     open fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
-                              doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit) { }
+                              doTile: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
+                                       vis: Float, glyph: Glyph, light: LightColor)->Unit) { }
 
     open fun isWalkable() = this.walkable
 
     open fun isOpaque() = this.opaque
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
+
+    open fun debugData(data: TerrainData?): String { return "none" }
 }
 
 @Serializable

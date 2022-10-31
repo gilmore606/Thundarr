@@ -4,19 +4,12 @@ import actors.Actor
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.Raindrop
 import render.sparks.Spark
 import render.sunLights
-import render.tileholders.OverlapTile
-import render.tileholders.WaterTile
 import render.tilesets.Glyph
-import render.tilesets.TileSet
 import things.LightSource
-import things.Portable
 import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
@@ -28,7 +21,6 @@ import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.lang.Float.max
 import java.lang.Float.min
-import kotlin.coroutines.coroutineContext
 
 sealed class Level {
 
@@ -79,11 +71,9 @@ sealed class Level {
     }
 
     fun forEachCellToRender(
-        tileSet: TileSet,
         doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
-        doOverlap: (x: Int, y: Int, vis: Float, glyph: Glyph, edge: XY, light: LightColor) -> Unit,
-        doOcclude: (x: Int, y: Int, edge: XY) -> Unit,
-        doSurf: (x: Int, y: Int, vis: Float, light: LightColor, edge: XY) -> Unit,
+        doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
+                 vis: Float, glyph: Glyph, light: LightColor)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
         doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float) -> Unit,
         delta: Float
@@ -94,13 +84,12 @@ sealed class Level {
                     val vis = if (App.DEBUG_VISIBLE) 1f else chunk.visibilityAt(x, y)
                     val terrain = Terrain.get(chunk.getTerrain(x, y))
                     val glyph = terrain.glyph()
-                    val holder = tileSet.tileHolders[glyph]
                     if (vis > 0f) {
                         val light = if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
                         doTile(
                             x, y, vis, glyph, light
                         )
-                        terrain.renderExtraQuads(this, x, y, vis, glyph, light, doTile)
+                        terrain.renderExtraQuads(this, x, y, vis, glyph, light, doQuad)
                         if (vis == 1f) {
                             if ((!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) ||
                                 (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1)))) {
@@ -115,58 +104,6 @@ sealed class Level {
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)
                             chunk.stainAt(x, y)?.also { doStain(x, y, it, light) }
-                        }
-                        // Ground overlaps
-                        if (holder is OverlapTile) {
-                            CARDINALS.forEach { edge ->
-                                if (holder.overlapsIn(this, x, y, edge)) {
-                                    doOverlap(
-                                        x, y, vis, glyph, edge, light
-                                    )
-                                }
-                            }
-                        }
-                        // Water surf
-                        if (holder is WaterTile) {
-                            listOf(NORTH, WEST, EAST).forEach { edge ->
-                                if (tileSet.tileHolders[Terrain.get(getTerrain(x + edge.x, y + edge.y))
-                                        .glyph()] !is WaterTile
-                                ) {
-                                    doSurf(
-                                        x, y, vis, light, edge
-                                    )
-                                }
-                            }
-                        }
-                        // Occlusion shadows
-                        if (vis == 1f && !terrain.isOpaque()) {
-                            var okNE = true
-                            var okSE = true
-                            var okNW = true
-                            var okSW = true
-                            CARDINALS.forEachIndexed { n, edge ->
-                                if (Terrain.get(getTerrain(x + edge.x, y + edge.y)).isOpaque()) {
-                                    doOcclude(
-                                        x, y, edge
-                                    )
-                                    when (n) {
-                                        0 -> { okNE = false; okNW = false }
-                                        1 -> { okSE = false; okSW = false }
-                                        2 -> { okNW = false; okSW = false }
-                                        3 -> { okNE = false; okSE = false }
-                                    }
-                                }
-                            }
-                            CORNERS.forEachIndexed { n, corner ->
-                                if (Terrain.get(getTerrain(x + corner.x, y + corner.y)).isOpaque()) {
-                                    when {
-                                        n == 0 && okNE -> doOcclude(x, y, corner)
-                                        n == 1 && okNW -> doOcclude(x, y, corner)
-                                        n == 2 && okSW -> doOcclude(x, y, corner)
-                                        n == 3 && okSE -> doOcclude(x, y, corner)
-                                    }
-                                }
-                            }
                         }
                     }
                 }
