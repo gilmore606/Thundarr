@@ -9,6 +9,8 @@ abstract class Animation(
 
     open fun offsetX(): Float = 0f
     open fun offsetY(): Float = 0f
+    open fun shadowOffsetX(): Float = 0f
+    open fun shadowOffsetY(): Float = 0f
 
     open fun onStart() {
         startMs = System.currentTimeMillis()

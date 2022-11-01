@@ -218,6 +218,12 @@ object Screen : KtxScreen {
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
+
+        actor.renderShadow { x0, y0, x1, y1 ->
+            actorBatch.addPartialQuad(x0, y0, x1, y1, actorBatch.getTextureIndex(Glyph.MOB_SHADOW),
+                1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f)
+        }
+
         actorBatch.addTileQuad(
             tx, ty,
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,

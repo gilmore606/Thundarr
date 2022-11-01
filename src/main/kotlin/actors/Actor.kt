@@ -155,6 +155,20 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     override fun advanceTime(delta: Float) { }
 
+    fun renderShadow(doDraw: (Double,Double,Double,Double)->Unit) {
+        val extra = (shadowWidth() - 1f) * 0.5f
+        val offset = shadowXOffset()
+        val ox = animation?.shadowOffsetX()?.toDouble() ?: 0.0
+        val oy = animation?.shadowOffsetY()?.toDouble() ?: 0.0
+        val x0 = xy.x.toDouble() + ox - extra + offset
+        val y0 = xy.y.toDouble() + oy
+        val x1 = x0 + 1.0 + extra + offset
+        val y1 = y0 + 1.0
+        doDraw(x0, y0, x1, y1)
+    }
+    open fun shadowWidth() = 1f
+    open fun shadowXOffset() = 0f
+
     fun equippedOn(slot: Gear.Slot): Gear? = gear[slot]
     fun weapon() = equippedOn(Gear.Slot.WEAPON) as Weapon?  // unsafe assertion! inshallah
 

@@ -43,6 +43,7 @@ enum class Glyph {
     CITIZEN,
     TRIBAL,
     HERDER,
+    MOB_SHADOW,
 
     TREE,
     LIGHTBULB,

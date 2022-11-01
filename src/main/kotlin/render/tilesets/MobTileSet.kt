@@ -9,6 +9,8 @@ fun ActorTileSet() =
     TileSet("tiles_mob.png", 4, 4,
         Screen.textureFilter).apply {
 
+        setTile(Glyph.MOB_SHADOW, SimpleTile(this, 3, 1))
+
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))
         setTile(Glyph.TRIBAL, SimpleTile(this, 3, 0))

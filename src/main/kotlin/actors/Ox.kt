@@ -11,7 +11,8 @@ import util.Dice
 @Serializable
 class Ox : NPC() {
     override fun glyph() = Glyph.CATTLE
-
+    override fun shadowWidth() = 1.7f
+    override fun shadowXOffset() = 0.2f
     override fun name() = "ox"
 
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
@@ -32,7 +33,8 @@ class Ox : NPC() {
 class MuskOx : NPC() {
     override fun glyph() = Glyph.CATTLE
     override fun hue() = 4.3f
-
+    override fun shadowWidth() = 1.7f
+    override fun shadowXOffset() = 0.2f
     override fun name() = "musk ox"
 
     override fun description() = "Predictably, it smells awful."
