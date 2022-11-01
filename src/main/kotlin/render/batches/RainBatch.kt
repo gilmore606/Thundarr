@@ -41,7 +41,7 @@ class RainBatch : RenderBatch() {
         vertexCount++
     }
 
-    inline fun addTileQuad(col: Int, row: Int, alpha: Float) {
+    inline fun addTileQuad(col: Int, row: Int, alpha: Float, fadeTop: Boolean = false) {
         val x0 = Screen.tileXtoGlx(col.toDouble()).toFloat()
         val y0 = 0f - Screen.tileYtoGly(row.toDouble()).toFloat()
         val x1 = Screen.tileXtoGlx(col + 1.0).toFloat()
@@ -55,10 +55,10 @@ class RainBatch : RenderBatch() {
         val ty1 = y1 * scale
 
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, alpha)
+            addVertex(x0, y0, tx0, ty0, if (fadeTop) 0f else alpha)
             addVertex(x0, y1, tx0, ty1, alpha)
-            addVertex(x1, y0, tx1, ty0, alpha)
-            addVertex(x1, y0, tx1, ty0, alpha)
+            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else alpha)
+            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else alpha)
             addVertex(x0, y1, tx0, ty1, alpha)
             addVertex(x1, y1, tx1, ty1, alpha)
         }

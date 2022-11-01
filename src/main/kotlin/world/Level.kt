@@ -75,7 +75,7 @@ sealed class Level {
         doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                  vis: Float, glyph: Glyph, light: LightColor)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
-        doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float) -> Unit,
+        doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,
         delta: Float
     ) {
         for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
@@ -91,15 +91,16 @@ sealed class Level {
                         )
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doQuad)
                         if (vis == 1f) {
-                            if ((!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y))) ||
-                                (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1)))) {
-                                doWeather(x, y, this.cloudIntensity, this.rainIntensity)
+                            if ((!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y)))) {
+                                doWeather(x, y, this.cloudIntensity, this.rainIntensity, false)
                                 framesBeforeRaindrop--
                                 if (framesBeforeRaindrop < 0 && rainIntensity > 0.2f) {
                                     val rainInterval = (1800 - rainIntensity * 1600).toInt()
                                     framesBeforeRaindrop = rainInterval + Dice.oneTo(rainInterval)
                                     addSpark(Raindrop().at(x, y))
                                 }
+                            } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1))) {
+                                doWeather(x, y, this.cloudIntensity, this.rainIntensity, true)
                             }
                             chunk.thingsAt(x, y).forEach { it.onRender(delta) }
                             actorAt(x, y)?.onRender(delta)
