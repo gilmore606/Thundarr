@@ -28,7 +28,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
-    val queuedActions: MutableList<Action> = mutableListOf()
+    @Transient val queuedActions: MutableList<Action> = mutableListOf()
     val contents = mutableListOf<Thing>()
 
     var hp = 20

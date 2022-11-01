@@ -8,7 +8,7 @@ class Raindrop : Spark() {
 
     init {
         scale = 0.6f
-        alpha = (App.player.level?.rainIntensity ?: 0f) * 0.4f + 0.8f
+        alpha = (App.player.level?.weather?.rainIntensity ?: 0f) * 0.6f + 0.8f
     }
 
     private val fadeSpeed = 2.0f
@@ -19,7 +19,7 @@ class Raindrop : Spark() {
 
     override fun onRender(delta: Float) {
         super.onRender(delta)
-        alpha -= (fadeSpeed - (App.player.level?.rainIntensity ?: 0f)) * delta
+        alpha -= (fadeSpeed - (App.player.level?.weather?.rainIntensity ?: 0f)) * delta
     }
 
 }
