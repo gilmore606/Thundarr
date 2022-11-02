@@ -72,6 +72,7 @@ sealed class NPC : Actor() {
     }
 
     override fun advanceTime(delta: Float) {
+        super.advanceTime(delta)
         if (awareness != Awareness.HIBERNATED) {
             if (level?.visibilityAt(xy.x, xy.y) == 1f) {
                 lastPlayerSeenTime = App.time
