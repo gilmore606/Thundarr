@@ -1,7 +1,7 @@
 import actors.Player
-import actors.stats.skills.Dig
-import actors.stats.skills.Fight
-import actors.stats.skills.Throw
+import actors.stats.Brains
+import actors.stats.Strength
+import actors.stats.skills.*
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import kotlinx.coroutines.*
@@ -171,12 +171,16 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             level = LevelKeeper.getLevel("world")
             player = Player().apply {
+                Strength.set(this, 14f)
+                Brains.set(this, 9f)
                 Dig.set(this, 2f)
                 Fight.set(this, 1f)
                 Throw.set(this, 4f)
+                Build.set(this, 1f)
+                Survive.set(this, 2f)
             }
             Sunsword().moveTo(player)
-            repeat (20) { Torch().moveTo(player) }
+            repeat (20) { EnergyDrink().moveTo(player) }
             Torch().moveTo(player)
             Apple().moveTo(player)
             HornetHelmet().moveTo(player)

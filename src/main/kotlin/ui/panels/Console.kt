@@ -81,6 +81,7 @@ object Console : Panel() {
     enum class Reach { VISUAL, AUDIBLE, LEVEL, WORLD }
 
     fun say(text: String) {
+        if (text == "") return
         burst = min(burstMax, burst + burstOnSay)
         burstFloor = 1f
         lastLineMs = System.currentTimeMillis()

@@ -15,10 +15,13 @@ abstract class Skill(tag: Stat.Tag, name: String,
 
     // A skill total is the average of dependent stats, plus base.
     override fun total(actor: Actor, base: Float): Float {
-        var total = 0f
-        dependsOn.forEach { total += it.get(actor) }
-        total /= dependsOn.size
-        total += base
+        var total = super.total(actor, base)
+
+        var deptotal = 0f
+        dependsOn.forEach { deptotal += it.get(actor) }
+        deptotal /= dependsOn.size
+        total += deptotal
+
         return total
     }
 

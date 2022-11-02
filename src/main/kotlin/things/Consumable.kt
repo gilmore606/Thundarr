@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.statuses.Wired
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.input.Keyboard
@@ -65,8 +66,7 @@ class Meat : Food() {
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"
-
     override fun consumeVerb() = "drink"
-
     override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
+    override fun onConsume(actor: Actor) { actor.addStatus(Wired()) }
 }

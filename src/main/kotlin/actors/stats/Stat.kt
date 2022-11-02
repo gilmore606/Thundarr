@@ -1,9 +1,7 @@
 package actors.stats
 
 import actors.Actor
-import actors.stats.skills.Dig
-import actors.stats.skills.Fight
-import actors.stats.skills.Throw
+import actors.stats.skills.*
 import kotlinx.serialization.Serializable
 
 val allStats = listOf(Strength, Speed, Brains)
@@ -14,7 +12,7 @@ abstract class Stat(
 ) {
 
     enum class Tag { STR, SPD, BRN,
-                     DIG, FIGHT, THROW }
+                     DIG, FIGHT, THROW, BUILD, SURVIVE }
     companion object {
         fun get(tag: Tag) = when (tag) {
             Tag.STR -> Strength
@@ -23,6 +21,8 @@ abstract class Stat(
             Tag.DIG -> Dig
             Tag.FIGHT -> Fight
             Tag.THROW -> Throw
+            Tag.BUILD -> Build
+            Tag.SURVIVE -> Survive
         }
     }
 
@@ -54,7 +54,15 @@ abstract class Stat(
     }
 
     // Calculate the total for this actor's base, given status effects, environment, etc
-    open fun total(actor: Actor, base: Float) = base
+    open fun total(actor: Actor, base: Float) = base + statBonuses(actor)
+
+    fun statBonuses(actor: Actor): Float {
+        var total = 0f
+        actor.statuses.forEach { status ->
+            status.statEffects()[tag]?.also { total += it }
+        }
+        return total
+    }
 
     open fun getDefaultBase(actor: Actor) = 10f
 

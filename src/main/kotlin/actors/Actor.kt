@@ -7,6 +7,8 @@ import actors.animations.Animation
 import actors.animations.Step
 import actors.stats.Stat
 import actors.stats.skills.Skill
+import actors.statuses.StatEffector
+import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -33,6 +35,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val contents = mutableListOf<Thing>()
 
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
+    val statuses = mutableListOf<Status>()
 
     @Transient val queuedActions: MutableList<Action> = mutableListOf()
 
@@ -158,8 +161,6 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
     open fun doOnRender(delta: Float) { }
 
-    override fun advanceTime(delta: Float) { }
-
     fun renderShadow(doDraw: (Double,Double,Double,Double)->Unit) {
         val extra = (shadowWidth() - 1f) * 0.5f
         val offset = shadowXOffset()
@@ -222,4 +223,42 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun corpse() = Corpse()
     open fun onDeath(corpse: Corpse) { }
 
+    override fun advanceTime(delta: Float) {
+        statuses.forEach {
+            it.advanceTime(this, delta)
+        }
+        statuses.filterAnd({ it.done }) { onRemoveStatus(it) }
+    }
+
+    fun addStatus(status: Status) {
+        statuses.forEach {
+            if (it.tag == status.tag) {
+                it.onAddStack(this, status)
+                return
+            }
+        }
+        statuses.add(status)
+        status.onAdd(this)
+        status.statEffects().forEach { (tag, _) ->
+            Stat.get(tag).touch(this)
+        }
+    }
+
+    fun removeStatus(statusTag: Status.Tag) {
+        statuses.firstOrNull { it.tag == statusTag }?.also { status ->
+            statuses.remove(status)
+            onRemoveStatus(status)
+        }
+    }
+
+    fun statEffectors(stat: Stat) = ArrayList<StatEffector>().apply {
+        addAll(statuses.filter { it.statEffects().containsKey(stat.tag) })
+    }
+
+    private fun onRemoveStatus(status: Status) {
+        status.onRemove(this)
+        status.statEffects().forEach { (tag, _) ->
+            Stat.get(tag).touch(this)
+        }
+    }
 }

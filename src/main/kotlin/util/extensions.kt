@@ -34,13 +34,24 @@ fun ByteArray.gzipDecompress(): String {
     GZIPInputStream(bais).bufferedReader(Charsets.UTF_8).use { return it.readText() }
 }
 
-fun <T> MutableList<T>.filterOut(condition: (T)->Boolean, elseDo: (T)->Unit) {
+fun <T> MutableList<T>.filterOut(condition: (T)->Boolean, elseDo: ((T)->Unit)? = null) {
     var n = 0
     while (n < size) {
         if (condition(this[n])) {
             removeAt(n)
             n--
-        } else elseDo(this[n])
+        } else elseDo?.invoke(this[n])
+        n++
+    }
+}
+
+fun <T> MutableList<T>.filterAnd(condition: (T)->Boolean, thenDo: ((T)->Unit)? = null) {
+    var n = 0
+    while (n < size) {
+        if (condition(this[n])) {
+            thenDo?.invoke(removeAt(n)) ?: run { removeAt(n) }
+            n--
+        }
         n++
     }
 }
