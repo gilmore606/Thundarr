@@ -50,12 +50,21 @@ class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
                     drawString(aff, padding + 12, padding + 270 + n * 20, Screen.fontColorDull, Screen.smallFont)
                 }
             }
+            val ip = skill.getImprovement(App.player)
+            if (ip > 0f) {
+                drawString("Progress:", padding, padding + 325)
+            }
         }
     }
 
     override fun drawBackground() {
         if (!isAnimating() && width > 0) {
             super.drawBackground()
+            val ip = skill?.getImprovement(App.player) ?: 0f
+            if (ip > 0f) {
+                boxBatch.addHealthBar(x + padding, y + padding + 350, x + width - padding * 2, y + padding + 350 + 12,
+                    ip.toInt(), 100, true)
+            }
         }
     }
 

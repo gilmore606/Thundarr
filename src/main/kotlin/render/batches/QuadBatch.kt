@@ -104,7 +104,7 @@ class QuadBatch(
     }
 
     fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
-                     hp: Int, hpMax: Int) {
+                     hp: Int, hpMax: Int, allGreen: Boolean = false) {
         val amount = (hp.toFloat() / hpMax.toFloat())
         if (amount >= 1f) return
         val xMid = x0 + ((x1 - x0) * amount).toInt()
@@ -116,6 +116,7 @@ class QuadBatch(
         val textureIndex = getTextureIndex(Glyph.COLOR_BARS)
 
         val texOffset = when {
+            allGreen -> 0.25f
             amount < 0.35 -> 0f
             amount < 0.65 -> 0.125f
             else -> 0.25f

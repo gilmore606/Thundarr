@@ -1,8 +1,11 @@
 package actors.stats
 
 import actors.Actor
+import actors.Player
 import actors.stats.skills.*
 import kotlinx.serialization.Serializable
+import ui.panels.Console
+import util.Dice
 
 val allStats = listOf(Strength, Speed, Brains)
 
@@ -11,8 +14,11 @@ abstract class Stat(
     val name: String
 ) {
 
+    private val ipPerImprove = 5f
+
     enum class Tag { STR, SPD, BRN,
                      DIG, FIGHT, THROW, BUILD, SURVIVE }
+
     companion object {
         fun get(tag: Tag) = when (tag) {
             Tag.STR -> Strength
@@ -36,6 +42,11 @@ abstract class Stat(
     private val affects = mutableSetOf<Stat>()
     fun addDependent(dependent: Stat) = affects.add(dependent)
 
+    abstract fun description(): String
+    abstract fun verb(): String
+    open fun improveChance() = 0.2f
+    open fun improveMsg() = "You gain new insights into " + verb() + "."
+
     // Set the base value for actor.  Probably only use this in initial NPC spawn.
     fun set(actor: Actor, base: Float) { actor.stats[tag] = Value(base) }
 
@@ -46,6 +57,9 @@ abstract class Stat(
 
     // Get the base value.  Does not add a blank record if skill not known.  Probably only use this in stat displays.
     fun getBase(actor: Actor) = actor.stats[tag]?.base ?: getDefaultBase(actor)
+
+    // Get the improvement level.  Usage as above.
+    fun getImprovement(actor: Actor) = actor.stats[tag]?.ip ?: 0f
 
     // Invalidate cache for actor because something relevant changed
     fun touch(actor: Actor) {
@@ -71,9 +85,6 @@ abstract class Stat(
 
     open fun getDefaultBase(actor: Actor) = 10f
 
-    abstract fun description(): String
-    abstract fun verb(): String
-
     // Change actor's base value, refill the cache, and return the new final value
     private fun updateBase(actor: Actor, newBase: Float): Float {
         actor.stats[tag]?.also { it.base = newBase } ?: run {
@@ -86,6 +97,31 @@ abstract class Stat(
     private fun updateCached(actor: Actor): Float {
         actor.stats[tag]?.also { it.final = total(actor, it.base) }
         return actor.stats[tag]?.final ?: throw RuntimeException("update found no stat")
+    }
+
+    // Roll a skill check and return the +/- result, possibly improving the skill.
+    fun resolve(actor: Actor, difficulty: Float, noImprove: Boolean = false): Float {
+        val effective = get(actor) - difficulty
+        if (!noImprove && effective in 8.0..14.0) {
+            val improveChance = improveChance() * (1f + (15.0 - effective) * 0.1f)
+            if (Dice.chance(improveChance.toFloat())) {
+                improve(actor)
+            }
+        }
+        val roll = Dice.skillCheck()
+        return effective - roll
+    }
+
+    // Gain an improvement point, possibly gaining a base level.
+    fun improve(actor: Actor) {
+        val value = actor.stats[tag] ?: Value(getDefaultBase(actor))
+        value.ip += ipPerImprove
+        if (value.ip >= 100f) {
+            value.ip = value.ip - 100f
+            value.base += 1f
+            if (actor is Player) Console.say(improveMsg())
+        }
+        actor.stats[tag] = value
     }
 
 }

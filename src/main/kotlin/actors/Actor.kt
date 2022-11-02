@@ -5,6 +5,7 @@ import actors.actions.Equip
 import actors.actions.Unequip
 import actors.animations.Animation
 import actors.animations.Step
+import actors.stats.Speed
 import actors.stats.Stat
 import actors.stats.skills.Skill
 import actors.statuses.StatEffector
@@ -55,7 +56,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             value?.onStart()
         }
 
-    open fun speed() = 1f
+    open fun speed() = 0.5f + Speed.get(this) * 0.05f
     open fun visualRange() = 22f
 
     open fun bleedChance() = 0.6f
