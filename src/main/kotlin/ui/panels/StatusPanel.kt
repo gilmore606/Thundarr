@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
 import ui.modals.StatusSidecar
+import util.log
 
 object StatusPanel : ShadedPanel() {
 
@@ -13,18 +14,28 @@ object StatusPanel : ShadedPanel() {
 
     private val sidecar = StatusSidecar(this)
 
-    private val tagStrs = App.player.statuses.map { it.panelTag() }
-    private val tagColors = App.player.statuses.map { it.panelTagColor() }
-    private val tagWidths = tagStrs.map { GlyphLayout(Screen.smallFont, it).width.toInt() }
-    private val tagXs = ArrayList<Int>()
-    private val tagYs = ArrayList<Int>()
-    private val statuses = App.player.statuses
+    private var tagStrs = App.player.statuses.map { it.panelTag() }
+    private var tagColors = App.player.statuses.map { it.panelTagColor() }
+    private var tagWidths = tagStrs.map { GlyphLayout(Screen.smallFont, it).width.toInt() }
+    private var tagXs = ArrayList<Int>()
+    private var tagYs = ArrayList<Int>()
+    private var statuses = App.player.statuses
 
     init {
         this.width = RIGHT_PANEL_WIDTH
         this.height = 140
+        refillCache()
+    }
+
+    fun refillCache() {
         var cursor = padding
-        var cursorY = 96 + padding
+        var cursorY = 100 + padding
+        statuses = App.player.statuses
+        tagStrs = App.player.statuses.map { it.panelTag() }
+        tagColors = App.player.statuses.map { it.panelTagColor() }
+        tagWidths = tagStrs.map { GlyphLayout(Screen.smallFont, it).width.toInt() }
+        tagXs.clear()
+        tagYs.clear()
         tagStrs.forEachIndexed { n, tagStr ->
             if (cursor + tagWidths[n] < (width - padding)) {
                 tagXs.add(n, cursor)

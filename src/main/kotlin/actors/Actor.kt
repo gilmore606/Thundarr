@@ -18,6 +18,7 @@ import render.sparks.Scoot
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.*
+import ui.panels.StatusPanel
 import util.*
 import world.Entity
 import world.Level
@@ -254,6 +255,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         status.statEffects().forEach { (tag, _) ->
             Stat.get(tag).touch(this)
         }
+        if (this is Player) StatusPanel.refillCache()
     }
 
     fun removeStatus(statusTag: Status.Tag) {
@@ -273,5 +275,6 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         status.statEffects().forEach { (tag, _) ->
             Stat.get(tag).touch(this)
         }
+        if (this is Player) StatusPanel.refillCache()
     }
 }
