@@ -5,7 +5,10 @@ import actors.Player
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
+import things.Brick
+import things.Thing
 import ui.panels.Console
+import util.Dice
 import util.LightColor
 import world.Level
 
@@ -20,6 +23,7 @@ sealed class Wall(
     ) : TerrainData(Type.GENERIC_WALL)
 
     open fun bumpMsg() = "You bump into solid rock."
+    open fun digResult(): Thing? = null
 
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level()?.also { level ->
@@ -36,7 +40,10 @@ sealed class Wall(
                         Console.sayAct("You tunnel through solid rock.", "%Dn digs furiously into the stone!", actor)
                     } else {
                         Console.sayAct("You break through!", "%Dn digs furiously into the stone!", actor)
-                        actor.level()?.setTerrain(x, y, Type.TERRAIN_STONEFLOOR, roofed = true)
+                        actor.level()?.also { level ->
+                            level.setTerrain(x, y, Type.TERRAIN_STONEFLOOR, roofed = true)
+                            digResult()?.also { it.moveTo(level, actor.xy.x, actor.xy.y) }
+                        }
                     }
                 }
             } else {
@@ -60,4 +67,5 @@ sealed class Wall(
 
 object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
     override fun bumpMsg() = "You bump into a brick wall."
+    override fun digResult() = if (Dice.chance(0.3f)) Brick() else null
 }

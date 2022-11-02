@@ -70,10 +70,10 @@ class QuadBatch(
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
         val x1 = Screen.tileXtoGlx(col + offsetX + 1.0 - scaleOffset * 2.0)
         val y1 = Screen.tileYtoGly(row + offsetY + 1.0 - scaleOffset * 2.0)
-        val lightR = min(visibility, light.r)
-        val lightG = min(visibility, light.g)
-        val lightB = min(visibility, light.b)
-        val grayOut = if (visibility < 1f) 1f else 0f
+        val lightR = min(visibility, light.r + App.level.weather.lightning.r)
+        val lightG = min(visibility, light.g + App.level.weather.lightning.g)
+        val lightB = min(visibility, light.b + App.level.weather.lightning.b)
+        val grayOut = if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
         addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 
@@ -85,10 +85,10 @@ class QuadBatch(
         val gy0 = Screen.tileYtoGly(y0)
         val gx1 = Screen.tileXtoGlx(x1)
         val gy1 = Screen.tileYtoGly(y1)
-        val lightR = min(visibility, light.r)
-        val lightG = min(visibility, light.g)
-        val lightB = min(visibility, light.b)
-        val grayOut = if (visibility < 1f) 1f else 0f
+        val lightR = min(visibility, light.r + App.level.weather.lightning.r)
+        val lightG = min(visibility, light.g + App.level.weather.lightning.g)
+        val lightB = min(visibility, light.b + App.level.weather.lightning.b)
+        val grayOut = if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
         addQuad(gx0, gy0, gx1, gy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 

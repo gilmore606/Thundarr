@@ -18,7 +18,8 @@ fun tileFragShader() = """
         vec3 hueShifted = vec3(color * cosAngle + cross(k, color) * sin(v_Hue) + k * dot(k, color) * (1.0 - cosAngle));
         
         float grey = 0.21 * hueShifted.r + 0.71 * hueShifted.g + 0.07 * hueShifted.b;
-        gl_FragColor = vec4(hueShifted.r * (1.0 - v_Grayout) + grey * v_Grayout, hueShifted.g * (1.0 - v_Grayout) + grey * v_Grayout, hueShifted.b * (1.0 - v_Grayout) + grey * v_Grayout, sample.a);
+        float white = max(0.0, v_Grayout - 1.0);
+        gl_FragColor = vec4(hueShifted.r * (1.0 - v_Grayout) + grey * v_Grayout + white, hueShifted.g * (1.0 - v_Grayout) + grey * v_Grayout + white, hueShifted.b * (1.0 - v_Grayout) + grey * v_Grayout + white, sample.a);
        
        // scanlines
         if (mod(floor(gl_FragCoord.y), 4.0) == 0.0) {

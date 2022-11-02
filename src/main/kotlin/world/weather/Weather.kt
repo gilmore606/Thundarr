@@ -3,7 +3,9 @@ package world.weather
 import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
+import util.LightColor
 import world.Level
+import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.math.cos
 import kotlin.math.sin
@@ -16,6 +18,7 @@ class Weather {
     var windY = 0f
     var cloudIntensity = 0f
     var rainIntensity = 0f
+    val lightning = LightColor(2f, 2f, 2f)
 
     var windSpeed = 0f
     var windDirection = 0.2f
@@ -44,6 +47,21 @@ class Weather {
         } else {
             java.lang.Float.max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
         }
+
+        var bolt = max(0f, lightning.r - 3.6f * delta)
+        val boltChance = (rainIntensity - 0.4f) * 0.4f
+        val extraChance = boltChance * 0.6f
+        if (Dice.chance(delta * boltChance)) {
+            bolt = 0.7f + Dice.float(0f, rainIntensity)
+        }
+        if (bolt > 0.01f) {
+            if (Dice.chance(delta * extraChance)) {
+                bolt += Dice.float(0.1f, 0.4f)
+            }
+        }
+        lightning.r = bolt
+        lightning.g = bolt
+        lightning.b = bolt
     }
 
     fun updateTime(hour: Int, minute: Int, level: Level) {
@@ -62,10 +80,10 @@ class Weather {
         if (Dice.chance(0.5f)) {
             // Wind speed change
             if (Dice.chance(0.7f - windSpeed * 0.5f)) {
-                windSpeed += Dice.float(0.1f, 0.3f)
+                windSpeed += Dice.float(0.05f, 0.2f)
                 m += "The wind picks up.  "
             } else if (Dice.chance(0.7f)) {
-                windSpeed -= Dice.float(0.1f, 0.3f)
+                windSpeed -= Dice.float(0.05f, 0.2f)
                 m += "The wind dies down.  "
             }
         }
