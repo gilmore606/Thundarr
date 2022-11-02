@@ -59,9 +59,9 @@ class InventoryModal(
         grouped.forEach {
             var text = ""
             text = if (it.size > 1) {
-                it.size.toString() + " " + it.first().name().plural()
+                it.size.toString() + " " + it.first().name().plural() + " " + it.first().listTag()
             } else {
-                it.first().listName()
+                it.first().name() + " " + it.first().listTag()
             }
             drawOptionText(text, n, 30)
             n++
@@ -150,6 +150,11 @@ class InventoryModal(
                         addOption(it.command) {
                             App.player.queue(Use(thing, it.duration, it.toDo))
                         }
+                    }
+                }
+                if (thing.thingTag() != App.player.thrownTag) {
+                    addOption("ready " + thing.name().plural() + " for throwing") {
+                        App.player.readyForThrowing(thing.thingTag())
                     }
                 }
             }

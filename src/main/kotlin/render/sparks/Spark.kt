@@ -14,8 +14,9 @@ sealed class Spark {
     var alpha = 1f
     var progress = 0f
     var done = false
+    var pausesAction = false
 
-    fun at(x: Int, y: Int): Spark = this.apply { xy.x = x ; xy.y = y }
+    open fun at(x: Int, y: Int): Spark = this.apply { xy.x = x ; xy.y = y }
 
     open fun duration() = 1f
     open fun isLit() = true
@@ -30,7 +31,10 @@ sealed class Spark {
         progress += delta / duration()
         if (progress > 1f) {
             done = true
+            onDone()
         }
     }
+
+    open fun onDone() { }
 
 }

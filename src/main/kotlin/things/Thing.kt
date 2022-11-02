@@ -8,6 +8,7 @@ import render.tilesets.Glyph
 import util.aOrAn
 import world.Entity
 import world.Level
+import java.lang.Float.min
 import java.lang.RuntimeException
 
 @Serializable
@@ -25,10 +26,19 @@ sealed class Thing : Entity {
         val toDo: (Actor, Level)->Unit
     )
 
+    open fun thingTag() = name()
     open fun uses(): Set<Use> = setOf()
 
     override fun description() =  ""
-    open fun listName() = name()
+    open fun listTag() = if (thingTag() == App.player.thrownTag) "(throwing)" else ""
+    fun listName() = name() + " " + listTag()
+
+    override fun examineInfo(): String {
+        if (thrownDamage() > defaultThrownDamage()) {
+            return "It looks like it would do extra damage when thrown."
+        }
+        return super.examineInfo()
+    }
 
     override fun level() = holder?.level
     override fun xy() = holder?.xy()
@@ -55,6 +65,8 @@ sealed class Thing : Entity {
 
     open fun onMoveTo(from: ThingHolder?, to: ThingHolder?) { }
 
+    open fun thrownDamage() = defaultThrownDamage()
+    private fun defaultThrownDamage() = min(weight() / 0.1f, 4f)
 }
 
 @Serializable
@@ -82,4 +94,6 @@ class Brick : Portable() {
     override fun name() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun glyph() = Glyph.BRICK
+    override fun weight() = 0.4f
+    override fun thrownDamage() = super.thrownDamage() + 1f
 }

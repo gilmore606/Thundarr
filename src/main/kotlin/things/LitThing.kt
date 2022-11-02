@@ -22,7 +22,7 @@ sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
     var active: Boolean = true
 
-    override fun listName() = if (active) super.listName() + " (lit)" else super.listName()
+    override fun listTag() = if (active) "(lit)" else ""
 
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)

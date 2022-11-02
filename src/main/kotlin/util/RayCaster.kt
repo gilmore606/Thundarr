@@ -234,4 +234,8 @@ class RayCaster() {
             }
         }
     }
+
+    fun blendVisibility(pov: XY, range: Float, getVis: (x: Int, y: Int)->Float, setVis: (x: Int, y: Int, vis: Float)->Unit) {
+
+    }
 }

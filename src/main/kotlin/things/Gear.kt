@@ -35,7 +35,7 @@ sealed class Gear : Portable(), StatEffector {
 open fun unequipSelfMsg() = "You take off your %d."
     open fun unequipOtherMsg() = "%Dn takes off %p %d."
 
-    override fun listName() = if (equipped) super.listName() + " (equipped)" else super.listName()
+    override fun listTag() = if (equipped) "(equipped)" else ""
 
     override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {
         this.equipped = false

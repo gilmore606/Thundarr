@@ -5,9 +5,11 @@ import actors.actions.Action
 import actors.actions.Move
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Thing
 import ui.panels.Console
 import util.XY
 import util.englishList
+import util.plural
 import world.Entity
 import world.Level
 
@@ -15,7 +17,7 @@ import world.Level
 class Player : Actor() {
 
     var willAggro: Boolean = false
-
+    var thrownTag: String = ""
     override fun glyph() = Glyph.PLAYER
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
@@ -59,6 +61,16 @@ class Player : Actor() {
             Console.say("You boil over with rage, ready to smash the next creature you approach!")
         }
         willAggro = !willAggro
+    }
+
+    fun readyForThrowing(tag: String) {
+        thrownTag = tag
+        Console.say("You'll throw " + thrownTag.plural() + " now.")
+    }
+
+    fun getThrown(): Thing? {
+        if (thrownTag == "") return null
+        return contents.firstOrNull { it.thingTag() == thrownTag }
     }
 
     override fun die() {

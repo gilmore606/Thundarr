@@ -232,6 +232,7 @@ sealed class Level {
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
 
     fun addSpark(spark: Spark) = chunkAt(spark.xy.x, spark.xy.y)?.addSpark(spark)
+    fun hasBlockingSpark() = allChunks().hasOneWhere { it.sparks().hasOneWhere { it.pausesAction }}
 
     fun addStain(stain: Stain, x: Int, y: Int) = chunkAt(x,y)?.addStain(stain, x, y)
 
@@ -261,7 +262,6 @@ sealed class Level {
             }, { x, y, vis ->
                 setTileVisibility(x, y, vis)
             })
-            shadowDirty = false
         }
     }
 
@@ -350,9 +350,18 @@ sealed class Level {
                 }
             }
         }
+        var actorAt: Actor? = null
         actorAt(x, y)?.also { actor ->
+            actorAt = actor
             menu.addOption("examine " + actor.name()) {
                 Screen.addModal(ExamineModal(actor))
+            }
+        }
+        if (App.player.thrownTag != "") {
+            App.player.getThrown()?.also { thrown ->
+                menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
+                    App.player.queue(Throw(thrown, x, y))
+                }
             }
         }
     }

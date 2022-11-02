@@ -67,6 +67,7 @@ class Director(val level: Level) {
 
     fun runQueue(level: Level) {
         while (true) {
+            if (level.hasBlockingSpark()) return
             // find actor with highest juice
             var actor: Actor? = null
             var checkActor: Actor
