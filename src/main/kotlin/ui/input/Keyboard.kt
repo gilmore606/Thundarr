@@ -109,12 +109,13 @@ object Keyboard : KtxInputAdapter {
             Input.Keys.MINUS -> { Screen.mouseScrolled(1.43f) }
 
             Input.Keys.TAB -> { App.openInventory() }
-            Input.Keys.G -> { App.openGear() }
+            Input.Keys.BACKSLASH -> { App.openGear() }
+            Input.Keys.BACKSPACE -> { App.openSkills() }
             Input.Keys.ESCAPE -> { App.openSystemMenu() }
             Input.Keys.M -> { App.openMap() }
             Input.Keys.ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
 
-            Input.Keys.BACKSPACE -> { App.player.toggleAggro() }
+            Input.Keys.NUM_1 -> { App.player.toggleAggro() }
 
             Input.Keys.F1 -> {
                 App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

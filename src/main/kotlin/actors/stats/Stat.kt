@@ -61,12 +61,18 @@ abstract class Stat(
         actor.statuses.forEach { status ->
             status.statEffects()[tag]?.also { total += it }
         }
+        actor.gear.values.forEach { gear ->
+            gear?.also { gear ->
+                gear.statEffects()[tag]?.also { total += it }
+            }
+        }
         return total
     }
 
     open fun getDefaultBase(actor: Actor) = 10f
 
     abstract fun description(): String
+    abstract fun verb(): String
 
     // Change actor's base value, refill the cache, and return the new final value
     private fun updateBase(actor: Actor, newBase: Float): Float {

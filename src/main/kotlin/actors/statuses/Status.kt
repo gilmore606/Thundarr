@@ -1,6 +1,7 @@
 package actors.statuses
 
 import actors.Actor
+import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Stat
 import actors.stats.skills.Fight
@@ -25,12 +26,13 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED }
+    enum class Tag { WIRED, DAZED }
 
     open fun panelTag(): String = ""
     open fun panelTagColor(): Color = tagColors[TagColor.NORMAL]!!
 
-    override fun statEffects() = mapOf<Stat.Tag, Float>()
+    override fun statEffects() = defaultStatEffects
+    protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
 
     open fun onAddStack(actor: Actor, added: Status) { }
 
@@ -81,7 +83,7 @@ sealed class TimeStatus : Status() {
 class Wired : TimeStatus() {
     override val tag = Tag.WIRED
     override fun name() = "wired"
-    override fun panelTag() = "wired"
+    override fun panelTag() = "wire"
     override fun panelTagColor() = tagColors[TagColor.GOOD]!!
     override fun onAddMsg() = "Your skin vibrates and your pupils dilate.  You feel speedy."
     override fun onRemoveMsg() = "You feel your nerves relax and slow back down."
@@ -92,4 +94,21 @@ class Wired : TimeStatus() {
     }
     override fun duration() = 10f
     override fun maxDuration() = 20f
+}
+
+@Serializable
+class Dazed : TimeStatus() {
+    override val tag = Tag.DAZED
+    override fun name() = "dazed"
+    override fun panelTag() = "daze"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun onAddMsg() = "You stagger, dazed."
+    override fun onRemoveMsg() = "You shake out of your daze."
+    override fun onStackMsg() = "Whooaaa!"
+    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
+        this[Speed.tag] = -2f
+        this[Brains.tag] = -4f
+    }
+    override fun duration() = 3f
+    override fun maxDuration() = 5f
 }

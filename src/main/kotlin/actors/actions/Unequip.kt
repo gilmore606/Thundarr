@@ -14,6 +14,8 @@ class Unequip(
         if (gear.holder == actor) {
             gear.equipped = false
             actor.gear[gear.slot] = null
+            actor.onUnequip(gear)
+            gear.onUnequip(actor)
             Console.sayAct(gear.unequipSelfMsg(), gear.unequipOtherMsg(), actor, gear)
         }
     }

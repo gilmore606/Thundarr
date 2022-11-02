@@ -31,6 +31,7 @@ interface Entity {
     fun inamec() = name().aOrAn().capitalize()
     fun description(): String
     fun examineDescription(): String = description()
+    fun examineInfo(): String = "You don't know anything interesting about " + iname() + "."
     fun gender(): Gender = Gender.NEUTER
 
     fun level(): Level?

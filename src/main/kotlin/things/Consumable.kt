@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.statuses.Status
 import actors.statuses.Wired
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -25,9 +26,19 @@ sealed class Consumable : Portable() {
             })
     )
 
-    open fun onConsume(actor: Actor) { }
+    open fun onConsume(actor: Actor) {
+        statusEffect()?.also { actor.addStatus(it) }
+    }
+
+    open fun statusEffect(): Status? = null
 
     override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
+
+    override fun examineInfo(): String {
+        return statusEffect()?.let { effect ->
+            consumeVerb().capitalize() + "ing this makes you " + effect.name() + "."
+        } ?: super.examineInfo()
+    }
 }
 
 @Serializable
@@ -68,5 +79,5 @@ class EnergyDrink : Consumable() {
     override fun name() = "energy drink"
     override fun consumeVerb() = "drink"
     override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
-    override fun onConsume(actor: Actor) { actor.addStatus(Wired()) }
+    override fun statusEffect() = Wired()
 }

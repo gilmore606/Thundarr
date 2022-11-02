@@ -187,9 +187,21 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         queue(Equip(gear))
     }
 
+    fun onEquip(gear: Gear) {
+        gear.statEffects().forEach { (tag, _) ->
+            Stat.get(tag).touch(this)
+        }
+    }
+
     fun unequipGear(gear: Gear) {
         if (gear.equipped) {
             queue(Unequip(gear))
+        }
+    }
+
+    fun onUnequip(gear: Gear) {
+        gear.statEffects().forEach { (tag, _) ->
+            Stat.get(tag).touch(this)
         }
     }
 
@@ -253,6 +265,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun statEffectors(stat: Stat) = ArrayList<StatEffector>().apply {
         addAll(statuses.filter { it.statEffects().containsKey(stat.tag) })
+        addAll(gear.values.filter { it != null && it.statEffects().containsKey(stat.tag) }.map { it as StatEffector })
     }
 
     private fun onRemoveStatus(status: Status) {

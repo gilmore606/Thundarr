@@ -129,7 +129,7 @@ class GearModal(
 
     override fun onKeyDown(keycode: Int) {
         when (keycode) {
-            Input.Keys.G -> dismiss()
+            Input.Keys.BACKSLASH -> dismiss()
             Input.Keys.TAB -> dismiss()
             Input.Keys.NUMPAD_4 -> dismiss()
             Input.Keys.NUMPAD_6 -> doSelect()

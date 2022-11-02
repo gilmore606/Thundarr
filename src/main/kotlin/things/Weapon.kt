@@ -35,4 +35,7 @@ class Pickaxe : Weapon() {
     override fun description() = "A miner's pickaxe.  Looks like it could pick more than flesh.  I'm talking about stone here."
     override fun skill() = Dig
     override fun canDig(terrainType: Terrain.Type) = Terrain.get(terrainType).dataType == Terrain.Type.GENERIC_WALL
+    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
+        this[Dig.tag] = 1f
+    }
 }

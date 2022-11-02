@@ -2,6 +2,7 @@ package world.terrains
 
 import actors.Actor
 import actors.Player
+import actors.statuses.Dazed
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
@@ -48,6 +49,7 @@ sealed class Wall(
                 }
             } else {
                 if (actor is Player) Console.say(bumpMsg())
+                actor.addStatus(Dazed())
             }
         }
     }

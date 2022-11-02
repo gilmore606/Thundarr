@@ -1,12 +1,15 @@
 package things
 
 import actors.Actor
+import actors.stats.Stat
+import actors.statuses.StatEffector
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.aOrAn
+import util.toEnglishList
 
 @Serializable
-sealed class Gear : Portable() {
+sealed class Gear : Portable(), StatEffector {
 
     enum class Slot(val duration: Float, val title: String, val where: String, val verb: String, val unverb: String) {
         WEAPON(0.5f, "primary", "as weapon", "wield", "put away"),
@@ -24,11 +27,12 @@ sealed class Gear : Portable() {
     }
 
     var equipped = false
+    var known = false
     abstract val slot: Slot
 
     open fun equipSelfMsg() = "You put on your %d."
     open fun equipOtherMsg() = "%Dn puts on %p %d."
-    open fun unequipSelfMsg() = "You take off your %d."
+open fun unequipSelfMsg() = "You take off your %d."
     open fun unequipOtherMsg() = "%Dn takes off %p %d."
 
     override fun listName() = if (equipped) super.listName() + " (equipped)" else super.listName()
@@ -46,6 +50,9 @@ sealed class Gear : Portable() {
             holder.gear[slot] = this
         }
     }
+
+    open fun onEquip(actor: Actor) { known = true }
+    open fun onUnequip(actor: Actor) { }
 
     override fun uses(): Set<Use> {
         val uses = mutableSetOf<Use>()
@@ -77,5 +84,29 @@ sealed class Gear : Portable() {
             )
         }
         return uses
+    }
+
+    override fun statEffects() = defaultStatEffects
+    protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
+
+    override fun examineInfo(): String {
+        if (!known) return super.examineInfo()
+        val effects = statEffects()
+        if (effects.isEmpty()) return super.examineInfo()
+        val helps = ArrayList<String>()
+        val hurts = ArrayList<String>()
+        effects.forEach { (tag, value) ->
+            if (value > 0f) helps.add(Stat.get(tag).verb()) else hurts.add(Stat.get(tag).verb())
+        }
+        var info = slot.verb.capitalize() + "ing this seems to "
+        if (hurts.isNotEmpty()) {
+            info += "interfere with " + hurts.toEnglishList(false)
+            if (helps.isNotEmpty()) info += " but "
+        }
+        if (helps.isNotEmpty()) {
+            info += "help with " + helps.toEnglishList(false)
+        }
+        info += "."
+        return info
     }
 }

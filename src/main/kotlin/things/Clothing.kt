@@ -1,5 +1,9 @@
 package things
 
+import actors.stats.Brains
+import actors.stats.Stat
+import actors.stats.skills.Build
+import actors.stats.skills.Fight
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 
@@ -22,6 +26,9 @@ class HardHat : Clothing() {
     override val slot = Slot.HEAD
     override fun weight() = 0.5f
     override fun armor() = 1f
+    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
+        this[Build.tag] = 1f
+    }
 }
 
 @Serializable
@@ -32,6 +39,10 @@ class HornetHelmet : Clothing() {
     override val slot = Slot.HEAD
     override fun weight() = 1.8f
     override fun armor() = 2f
+    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
+        this[Fight.tag] = 1f
+        this[Brains.tag] = -1f
+    }
 }
 
 @Serializable

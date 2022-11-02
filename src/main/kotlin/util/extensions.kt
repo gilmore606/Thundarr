@@ -139,6 +139,16 @@ fun List<Entity>.englishList(): String {
     return str
 }
 
+fun List<String>.toEnglishList(articles: Boolean = true): String {
+    val grouped = this.groupBy { it }.toList()
+    var str = ""
+    grouped.forEachIndexed { n, s ->
+        str += if (s.second.size <= 1) (if (articles) s.first.aOrAn() else s.first) else s.second.size.toEnglish() + " " + s.first.plural()
+        str += if (n == grouped.lastIndex) "" else if (n == grouped.lastIndex - 1) " and " else ", "
+    }
+    return str
+}
+
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
 
 val log = KotlinLogging.logger {}
