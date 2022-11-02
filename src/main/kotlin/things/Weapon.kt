@@ -15,8 +15,11 @@ sealed class Weapon : Gear() {
     override fun equipOtherMsg() = "%Dn takes out %id."
     override fun unequipOtherMsg() = "%Dn puts away %p %d."
 
+    override fun thrownDamage() = damage()
+
     open fun skill(): Stat = Fight
     open fun canDig(terrainType: Terrain.Type): Boolean = false
+    open fun damage(): Float = 2f
 
 }
 
@@ -25,6 +28,7 @@ class Axe : Weapon() {
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
+    override fun damage() = 4f
 }
 
 @Serializable
@@ -38,4 +42,5 @@ class Pickaxe : Weapon() {
     override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
         this[Dig.tag] = 1f
     }
+    override fun damage() = 3f
 }

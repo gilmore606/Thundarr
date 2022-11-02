@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.input.Keyboard
 import ui.panels.Console
+import world.Level
 
 
 @Serializable
@@ -38,6 +39,28 @@ sealed class Consumable : Portable() {
         return statusEffect()?.let { effect ->
             consumeVerb().capitalize() + "ing this makes you " + effect.name() + "."
         } ?: super.examineInfo()
+    }
+
+    open fun breakOnThrow() = false
+    open fun onBreak() {
+        val m = dnamec() + " shatters"
+        var announced = false
+        level()?.also { level ->
+            xy()?.also { xy ->
+                level.actorAt(xy.x, xy.y)?.also { target ->
+                    Console.announce(level, xy.x, xy.y, Console.Reach.VISUAL, m + ", splashing " + target.dname() + "!")
+                    announced = true
+                    statusEffect()?.also { target.addStatus(it) }
+                }
+                if (!announced) Console.announce(level, xy.x, xy.y, Console.Reach.VISUAL, m + "!")
+            }
+        }
+        moveTo(null)
+    }
+
+    override fun onThrownAt(thrower: Actor, level: Level, x: Int, y: Int) {
+        super.onThrownAt(thrower, level, x, y)
+        if (breakOnThrow()) onBreak()
     }
 }
 
@@ -80,4 +103,5 @@ class EnergyDrink : Consumable() {
     override fun consumeVerb() = "drink"
     override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
     override fun statusEffect() = Wired()
+    override fun breakOnThrow() = true
 }

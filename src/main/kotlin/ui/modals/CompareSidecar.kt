@@ -3,6 +3,7 @@ package ui.modals
 import render.Screen
 import things.Clothing
 import things.Gear
+import things.Weapon
 
 class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
 
@@ -65,6 +66,12 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
             val armor = gear.armor()
             val comp = armor - (if (compareTo is Clothing) compareTo.armor() else armor)
             drawStat("armor:", "", armor, x0, comp)
+        }
+
+        if (gear is Weapon) {
+            val damage = gear.damage()
+            val comp = damage - (if (compareTo is Weapon) compareTo.damage() else damage)
+            drawStat("damage:", "", damage, x0, comp)
         }
     }
 

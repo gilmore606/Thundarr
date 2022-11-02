@@ -108,7 +108,9 @@ class Wired : TimeStatus() {
     override fun panelTag() = "wire"
     override fun panelTagColor() = tagColors[TagColor.GOOD]!!
     override fun onAddMsg() = "Your skin vibrates and your pupils dilate.  You feel speedy."
+    override fun onAddOtherMsg() = "%Dn's movements speed up."
     override fun onRemoveMsg() = "You feel your nerves relax and slow back down."
+    override fun onRemoveOtherMsg() = "%Dn's movements slow down to normal."
     override fun onStackMsg() = "Ahh...that should keep the party going."
     override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
         this[Speed.tag] = 4f
@@ -126,7 +128,9 @@ class Dazed : TimeStatus() {
     override fun panelTag() = "daze"
     override fun panelTagColor() = tagColors[TagColor.BAD]!!
     override fun onAddMsg() = "You stagger, dazed."
+    override fun onAddOtherMsg()  = "%Dn staggers!"
     override fun onRemoveMsg() = "You shake out of your daze."
+    override fun onRemoveOtherMsg() = "%Dn shakes out of %p daze."
     override fun onStackMsg() = "Whooaaa!"
     override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
         this[Speed.tag] = -2f

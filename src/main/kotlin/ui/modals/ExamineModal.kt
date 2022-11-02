@@ -1,5 +1,6 @@
 package ui.modals
 
+import actors.Actor
 import render.Screen
 import things.Thing
 import ui.input.Mouse
@@ -30,6 +31,20 @@ class ExamineModal(
         if (isAnimating()) return
         drawWrappedText(wrappedDesc, padding, padding + 60, 24, Screen.font)
         drawWrappedText(wrappedInfo, padding, padding + 80 + 24 * wrappedDesc.size, 24, Screen.font)
+
+        if (entity is Actor) {
+            val effects = entity.statuses
+            if (effects.isNotEmpty()) {
+                var m = ""
+                effects.forEachIndexed { n, status ->
+                    m += status.name()
+                    if (n < effects.lastIndex) { m += ", " }
+                }
+                val ty = padding + 100 + 24 * (wrappedDesc.size + wrappedInfo.size)
+                drawString("Affected by: ", padding, ty)
+                drawString(m, padding + 120, ty, Screen.fontColorBold)
+            }
+        }
     }
 
     override fun drawEntities() {

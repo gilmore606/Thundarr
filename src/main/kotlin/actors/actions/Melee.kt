@@ -16,6 +16,7 @@ class Melee(
         actor.animation = Whack(dir)
         level.addSpark(Pow().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
         Console.say("Whack!")
+        target.takeDamage(actor.weapon()?.damage() ?: 1f)
         target.receiveAttack(actor)
     }
 

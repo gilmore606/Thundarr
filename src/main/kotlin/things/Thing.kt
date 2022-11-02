@@ -67,6 +67,14 @@ sealed class Thing : Entity {
 
     open fun thrownDamage() = defaultThrownDamage()
     private fun defaultThrownDamage() = min(weight() / 0.1f, 4f)
+
+    open fun onThrownAt(thrower: Actor, level: Level, x: Int, y: Int) {
+        level.actorAt(x, y)?.also {
+            it.takeDamage(thrownDamage())
+            it.receiveAttack(thrower)
+        }
+        moveTo(level, x, y)
+    }
 }
 
 @Serializable

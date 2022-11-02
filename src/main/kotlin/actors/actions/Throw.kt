@@ -15,9 +15,8 @@ class Throw(
 
     override fun execute(actor: Actor, level: Level) {
         level.addSpark(Projectile(thing.glyph(), x, y, 40f) {
-            thing.moveTo(level, x, y)
             level.addSpark(Smoke().at(x, y))
-            level.actorAt(x, y)?.also { it.takeDamage(thing.thrownDamage()) }
+            thing.onThrownAt(actor, level, x, y)
         }.at(actor.xy.x, actor.xy.y))
 
         level.addSpark(ProjectileShadow(x, y, 40f).at(actor.xy.x, actor.xy.y))

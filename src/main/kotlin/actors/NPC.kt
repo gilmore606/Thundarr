@@ -112,6 +112,5 @@ sealed class NPC : Actor() {
             val m = becomeHostileMsg().random()
             Console.sayAct("", m, this, attacker, null, Console.Reach.AUDIBLE)
         }
-        takeDamage(5f)
     }
 }

@@ -95,14 +95,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun statusGlyph(): Glyph? = null
 
-    open fun receiveAttack(attacker: Actor) {
-        if (Dice.chance(bleedChance())) {
-            level?.addStain(Blood(), xy.x, xy.y)
-            if (Dice.chance(0.4f)) {
-                level?.addStain(Blood(), xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2))
-            }
-        }
-    }
+    open fun receiveAttack(attacker: Actor) { }
 
     // What will I do right now?
     fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
@@ -212,6 +205,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun takeDamage(amount: Float) {
+        if (Dice.chance(bleedChance() * amount * 0.25f)) {
+            level?.addStain(Blood(), xy.x, xy.y)
+            if (Dice.chance(0.1f * amount)) {
+                level?.addStain(Blood(), xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2))
+            }
+        }
         hp = max(0f, hp - amount).toInt()
         if (hp < 1) { die() }
     }
