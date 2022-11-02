@@ -48,11 +48,11 @@ class Weather {
             java.lang.Float.max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
         }
 
-        var bolt = max(0f, lightning.r - 3.6f * delta)
+        var bolt = max(0f, lightning.r - 3.8f * delta)
         val boltChance = (rainIntensity - 0.4f) * 0.4f
         val extraChance = boltChance * 0.6f
         if (Dice.chance(delta * boltChance)) {
-            bolt = 0.7f + Dice.float(0f, rainIntensity)
+            bolt = 0.4f + Dice.float(0f, rainIntensity)
         }
         if (bolt > 0.01f) {
             if (Dice.chance(delta * extraChance)) {

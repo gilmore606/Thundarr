@@ -53,6 +53,9 @@ abstract class Panel {
         this.drawEntities()
     }
 
+    open fun drawsGrouped() = true
+    open fun drawsSeparate() = false
+    open fun drawEverything() { }
     open fun drawBackground() { }
     open fun drawEntities() { }
     open fun drawActors() { }

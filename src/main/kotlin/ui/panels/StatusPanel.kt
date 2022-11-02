@@ -1,22 +1,49 @@
 package ui.panels
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
+import ui.modals.StatusSidecar
 
 object StatusPanel : ShadedPanel() {
 
     private val padding = 12
 
+    private val sidecar = StatusSidecar(this)
+
+    private val tagStrs = App.player.statuses.map { it.panelTag() }
+    private val tagColors = App.player.statuses.map { it.panelTagColor() }
+    private val tagWidths = tagStrs.map { GlyphLayout(Screen.smallFont, it).width.toInt() }
+    private val tagXs = ArrayList<Int>()
+    private val tagYs = ArrayList<Int>()
+    private val statuses = App.player.statuses
+
     init {
         this.width = RIGHT_PANEL_WIDTH
         this.height = 140
+        var cursor = padding
+        var cursorY = 96 + padding
+        tagStrs.forEachIndexed { n, tagStr ->
+            if (cursor + tagWidths[n] < (width - padding)) {
+                tagXs.add(n, cursor)
+                tagYs.add(n, cursorY)
+                cursor += tagWidths[n] + 10
+            } else {
+                tagXs.add(n, padding)
+                cursor = padding + tagWidths[n] + 10
+                cursorY += 18
+                tagYs.add(n, cursorY)
+            }
+        }
     }
 
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
         x = width - (this.width) - xMargin
         y = yMargin
+        sidecar.onResize(width, height)
     }
 
     override fun drawText() {
@@ -26,17 +53,23 @@ object StatusPanel : ShadedPanel() {
 
         drawString("hp", padding, padding + 70, Screen.fontColorDull, Screen.smallFont)
         drawString(App.player.hp.toString() + "/" + App.player.hpMax.toString(), padding + 20, padding + 70)
-        var xc = padding
-        var yc = padding + 96
-        App.player.statuses.forEach { status ->
-            val tag = status.panelTag()
-            drawString(tag, xc, yc, status.panelTagColor(), Screen.smallFont)
-            xc += GlyphLayout(Screen.smallFont, tag).width.toInt() + 10
-            if (xc > width - padding) {
-                xc = padding
-                yc += 18
+        for (i in 0 .. tagStrs.lastIndex) {
+            drawString(tagStrs[i], tagXs[i], tagYs[i], tagColors[i], Screen.smallFont)
+        }
+    }
+
+    override fun mouseMovedTo(screenX: Int, screenY: Int) {
+        val lx = screenX - x
+        val ly = screenY - y
+        var shown = false
+        for (i in 0..tagStrs.lastIndex) {
+            if (lx >= tagXs[i] - 3 && lx <= tagXs[i] + tagWidths[i] + 6 &&
+                        ly >= tagYs[i] - 3 && ly <= tagYs[i] + 20) {
+                sidecar.showStatus(statuses[i])
+                shown = true
             }
         }
+        if (!shown) sidecar.showStatus(null)
     }
 
     override fun drawBackground() {
@@ -51,5 +84,19 @@ object StatusPanel : ShadedPanel() {
         Screen.uiBatch.addHealthBar(x + padding + 75, y + padding + 71,
             x + width - padding * 2 + 2, y + padding + 71 + 12,
             App.player.hp, App.player.hpMax)
+    }
+
+    override fun drawsSeparate() = true
+    override fun drawEverything() {
+        if (sidecar.status == null) return
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+
+        sidecar.clearBoxBatch()
+        sidecar.renderBackground()
+        sidecar.drawBoxBatch()
+        sidecar.beginTextBatch()
+        sidecar.renderText()
+        sidecar.endTextBatch()
     }
 }

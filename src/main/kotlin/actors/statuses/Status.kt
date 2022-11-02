@@ -8,6 +8,7 @@ import actors.stats.skills.Fight
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
 import ui.panels.Console
+import util.toEnglishList
 
 @Serializable
 sealed class Status : StatEffector {
@@ -28,6 +29,7 @@ sealed class Status : StatEffector {
     abstract val tag: Tag
     enum class Tag { WIRED, DAZED }
 
+    abstract fun description(): String
     open fun panelTag(): String = ""
     open fun panelTagColor(): Color = tagColors[TagColor.NORMAL]!!
 
@@ -49,6 +51,25 @@ sealed class Status : StatEffector {
     }
     open fun onRemoveMsg() = ""
     open fun onRemoveOtherMsg() = ""
+
+    open fun panelInfo(): String {
+        val effects = statEffects()
+        if (effects.isEmpty()) return ""
+        var info = ""
+        val helps = ArrayList<String>()
+        val hurts = ArrayList<String>()
+        effects.forEach { (tag, value) ->
+            if (value > 0f) helps.add(Stat.get(tag).name) else hurts.add(Stat.get(tag).name)
+        }
+        if (helps.isNotEmpty()) {
+            info += "Boosts " + helps.toEnglishList(false)
+        }
+        if (hurts.isNotEmpty()) {
+            info += (if (info.isEmpty()) "Reduces " else ", reduces ") + hurts.toEnglishList(false)
+        }
+        info += "."
+        return info
+    }
 }
 
 @Serializable
@@ -83,6 +104,7 @@ sealed class TimeStatus : Status() {
 class Wired : TimeStatus() {
     override val tag = Tag.WIRED
     override fun name() = "wired"
+    override fun description() = "Stimulant drugs drive your reflexes to extreme speed."
     override fun panelTag() = "wire"
     override fun panelTagColor() = tagColors[TagColor.GOOD]!!
     override fun onAddMsg() = "Your skin vibrates and your pupils dilate.  You feel speedy."
@@ -100,6 +122,7 @@ class Wired : TimeStatus() {
 class Dazed : TimeStatus() {
     override val tag = Tag.DAZED
     override fun name() = "dazed"
+    override fun description() = "A minor concussion makes it hard to think or move for a short time."
     override fun panelTag() = "daze"
     override fun panelTagColor() = tagColors[TagColor.BAD]!!
     override fun onAddMsg() = "You stagger, dazed."

@@ -576,7 +576,7 @@ object Screen : KtxScreen {
         }
 
         panels.forEach { panel ->
-            if (panel !is Modal) {
+            if (panel.drawsGrouped()) {
                 panel.renderBackground()
                 panel.renderEntities()
             }
@@ -604,7 +604,7 @@ object Screen : KtxScreen {
         }
 
         panels.forEach { panel ->
-            if (panel is Modal) {
+            if (panel.drawsSeparate()) {
                 panel.drawEverything()
             }
         }
