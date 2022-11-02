@@ -1,4 +1,6 @@
 package actors.stats
 
-class Brains {
+object Brains : Stat(Tag.BRN, "brains") {
+
+
 }

@@ -1,12 +1,10 @@
 package things
 
-import actors.Actor
-import actors.Player
+import actors.stats.Stat
+import actors.stats.skills.Dig
+import actors.stats.skills.Fight
 import kotlinx.serialization.Serializable
-import render.sparks.Smoke
 import render.tilesets.Glyph
-import ui.input.Keyboard
-import ui.panels.Console
 import world.terrains.Terrain
 
 @Serializable
@@ -17,6 +15,7 @@ sealed class Weapon : Gear() {
     override fun equipOtherMsg() = "%Dn takes out %id."
     override fun unequipOtherMsg() = "%Dn puts away %p %d."
 
+    open fun skill(): Stat = Fight
     open fun canDig(terrainType: Terrain.Type): Boolean = false
 
 }
@@ -34,5 +33,6 @@ class Pickaxe : Weapon() {
     override fun hue() = 5.2f
     override fun name() = "pickaxe"
     override fun description() = "A miner's pickaxe.  Looks like it could pick more than flesh.  I'm talking about stone here."
+    override fun skill() = Dig
     override fun canDig(terrainType: Terrain.Type) = Terrain.get(terrainType).dataType == Terrain.Type.GENERIC_WALL
 }

@@ -55,16 +55,16 @@ class WorldCarto(
                     if (Dice.chance(0.005f)) {
                         KtxAsync.launch {
                             if (Dice.chance(0.9f)) {
-                                (if (Dice.flip()) Ox() else MuskOx()).moveTo(level, x + x0, y + y0)
+                                (if (Dice.flip()) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
                             } else {
-                                Herder().moveTo(level, x + x0, y + y0)
+                                Herder().spawnAt(level, x + x0, y + y0)
                             }
                         }
                     }
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
-                        addThing(x + this.x0, y + this.y0, PalmTree())
+                        addThing(x + this.x0, y + this.y0, if (Dice.flip()) OakTree() else PineTree())
                         if (Dice.chance(0.2f)) {
                             var clear = true
                             CARDINALS.forEach { dir ->

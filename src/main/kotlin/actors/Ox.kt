@@ -1,6 +1,9 @@
 package actors
 
 import actors.actions.Action
+import actors.stats.Brains
+import actors.stats.Speed
+import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Corpse
@@ -14,8 +17,12 @@ class Ox : NPC() {
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
     override fun name() = "ox"
-
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
+    override fun onSpawn() {
+        Strength.set(this, 14f)
+        Speed.set(this, 8f)
+        Brains.set(this, 5f)
+    }
 
     override fun pickAction(): Action {
         if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
@@ -36,8 +43,12 @@ class MuskOx : NPC() {
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
     override fun name() = "musk ox"
-
     override fun description() = "Predictably, it smells awful."
+    override fun onSpawn() {
+        Strength.set(this, 15f)
+        Speed.set(this, 10f)
+        Brains.set(this, 6f)
+    }
 
     override fun pickAction(): Action {
         if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {

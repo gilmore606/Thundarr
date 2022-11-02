@@ -5,6 +5,7 @@ import actors.actions.Equip
 import actors.actions.Unequip
 import actors.animations.Animation
 import actors.animations.Step
+import actors.stats.Stat
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -28,8 +29,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
-    @Transient val queuedActions: MutableList<Action> = mutableListOf()
     val contents = mutableListOf<Thing>()
+
+    val stats = mutableMapOf<Stat.Tag, Stat.Value>()
+
+    @Transient val queuedActions: MutableList<Action> = mutableListOf()
 
     var hp = 20
     var hpMax = 20

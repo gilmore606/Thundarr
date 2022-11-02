@@ -1,4 +1,6 @@
 package actors.stats
 
-class Speed {
+object Speed : Stat(Tag.SPD, "speed") {
+
+
 }

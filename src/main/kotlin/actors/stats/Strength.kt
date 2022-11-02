@@ -1,4 +1,7 @@
 package actors.stats
 
-class Strength {
+
+object Strength : Stat(Tag.STR, "strength") {
+
+
 }

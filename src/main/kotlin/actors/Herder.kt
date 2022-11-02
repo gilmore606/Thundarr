@@ -1,6 +1,9 @@
 package actors
 
 import actors.actions.Action
+import actors.stats.Brains
+import actors.stats.Speed
+import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
@@ -17,6 +20,11 @@ class Herder : NPC() {
     override fun name() = "herdsman"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A peasant farm worker.  He looks oppressed, possibly by wizards."
+    override fun onSpawn() {
+        Strength.set(this, 9f)
+        Speed.set(this, 11f)
+        Brains.set(this, 11f)
+    }
     override fun becomeHostileMsg(): List<String> = listOf("%Dn yelps in dismay at your sudden brutality!")
     override fun converseLines() = listOf(
         "Shoveling ox poo all day for a wizard.  It's a living.",

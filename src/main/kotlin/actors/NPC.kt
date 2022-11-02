@@ -10,6 +10,7 @@ import render.sparks.Speak
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.*
+import world.Level
 
 @Serializable
 sealed class NPC : Actor() {
@@ -22,6 +23,14 @@ sealed class NPC : Actor() {
     var awareness = Awareness.HIBERNATED
     var lastPlayerSeenTime = 0.0
     var hostile = false
+
+    fun spawnAt(level: Level, x: Int, y: Int): NPC {
+        onSpawn()
+        moveTo(level, x, y)
+        return this
+    }
+
+    open fun onSpawn() { }
 
     open fun pickAction(): Action = Wait(1f)
 

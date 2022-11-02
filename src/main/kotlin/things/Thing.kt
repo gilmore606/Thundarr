@@ -76,3 +76,10 @@ class Log : Portable() {
     override fun description() = "Big, heavy, wood.  Better than bad.  Good."
     override fun glyph() = Glyph.LOG
 }
+
+@Serializable
+class Brick : Portable() {
+    override fun name() = "brick"
+    override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
+    override fun glyph() = Glyph.BRICK
+}

@@ -1,4 +1,6 @@
 package actors.stats.skills
 
-class Dig {
-}
+import actors.stats.Strength
+
+
+object Dig : Skill(Tag.DIG, "dig", setOf(Strength))
