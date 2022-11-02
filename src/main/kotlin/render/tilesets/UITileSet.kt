@@ -19,6 +19,7 @@ fun UITileSet() =
         setTile(Glyph.BUTTON_MAP, SimpleTile(this, 2, 2))
         setTile(Glyph.BUTTON_SYSTEM, SimpleTile(this, 3, 2))
         setTile(Glyph.BUTTON_JOURNAL, SimpleTile(this, 3, 1))
+        setTile(Glyph.BUTTON_SKILLS, SimpleTile(this, 4, 3))
         setTile(Glyph.BUTTON_PAUSE, SimpleTile(this, 4, 0))
         setTile(Glyph.BUTTON_PLAY, SimpleTile(this, 4, 1))
         setTile(Glyph.BUTTON_FFWD, SimpleTile(this, 4, 2))

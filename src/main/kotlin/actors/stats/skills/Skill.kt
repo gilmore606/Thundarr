@@ -3,6 +3,7 @@ package actors.stats.skills
 import actors.Actor
 import actors.stats.Stat
 
+val allSkills = listOf(Dig, Fight, Throw)
 
 abstract class Skill(tag: Stat.Tag, name: String,
                     val dependsOn: Set<Stat>

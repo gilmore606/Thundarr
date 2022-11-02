@@ -49,6 +49,9 @@ object LeftButtons : Panel() {
         Button(Glyph.BUTTON_GEAR, "gear") {
             App.openGear()
         },
+        Button(Glyph.BUTTON_SKILLS, "skills") {
+            App.openSkills()
+        },
         Button(Glyph.BUTTON_MAP, "world map") {
             App.openMap()
         },

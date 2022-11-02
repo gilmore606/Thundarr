@@ -1,4 +1,7 @@
 import actors.Player
+import actors.stats.skills.Dig
+import actors.stats.skills.Fight
+import actors.stats.skills.Throw
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import kotlinx.coroutines.*
@@ -167,7 +170,11 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             save.eraseAll()
 
             level = LevelKeeper.getLevel("world")
-            player = Player()
+            player = Player().apply {
+                Dig.set(this, 2f)
+                Fight.set(this, 1f)
+                Throw.set(this, 4f)
+            }
             Sunsword().moveTo(player)
             repeat (20) { Torch().moveTo(player) }
             Torch().moveTo(player)
@@ -303,6 +310,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openCredits() { Screen.addModal(CreditsModal()) }
     fun openInventory(withContainer: Container? = null) { Screen.addModal(InventoryModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }
+    fun openSkills() { Screen.addModal(SkillsModal(player)) }
     fun openMap() { Screen.addModal(MapModal()) }
     fun openSystemMenu() { Screen.addModal(SystemMenu()) }
     fun openJournal() { Screen.addModal(JournalModal()) }

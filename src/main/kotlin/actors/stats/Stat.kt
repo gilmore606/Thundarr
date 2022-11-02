@@ -1,7 +1,12 @@
 package actors.stats
 
 import actors.Actor
+import actors.stats.skills.Dig
+import actors.stats.skills.Fight
+import actors.stats.skills.Throw
 import kotlinx.serialization.Serializable
+
+val allStats = listOf(Strength, Speed, Brains)
 
 abstract class Stat(
     val tag: Tag,
@@ -10,6 +15,16 @@ abstract class Stat(
 
     enum class Tag { STR, SPD, BRN,
                      DIG, FIGHT, THROW }
+    companion object {
+        fun get(tag: Tag) = when (tag) {
+            Tag.STR -> Strength
+            Tag.SPD -> Speed
+            Tag.BRN -> Brains
+            Tag.DIG -> Dig
+            Tag.FIGHT -> Fight
+            Tag.THROW -> Throw
+        }
+    }
 
     @Serializable
     class Value(
@@ -29,6 +44,9 @@ abstract class Stat(
     // If there is no value at all, set the default and refresh cache.
     fun get(actor: Actor) = actor.stats[tag]?.let { it.final ?: updateCached(actor) } ?: updateBase(actor, getDefaultBase(actor))
 
+    // Get the base value.  Does not add a blank record if skill not known.  Probably only use this in stat displays.
+    fun getBase(actor: Actor) = actor.stats[tag]?.base ?: getDefaultBase(actor)
+
     // Invalidate cache for actor because something relevant changed
     fun touch(actor: Actor) {
         actor.stats[tag]?.also { it.final = null } ?: run { actor.stats[tag] = Value(getDefaultBase(actor)) }
@@ -39,6 +57,8 @@ abstract class Stat(
     open fun total(actor: Actor, base: Float) = base
 
     open fun getDefaultBase(actor: Actor) = 10f
+
+    abstract fun description(): String
 
     // Change actor's base value, refill the cache, and return the new final value
     private fun updateBase(actor: Actor, newBase: Float): Float {

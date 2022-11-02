@@ -130,6 +130,14 @@ abstract class Panel {
         }
     }
 
+    protected fun drawRightText(text: String, x0: Int, y0: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+        drawString(text, x0 - GlyphLayout(font, text).width.toInt(), y0, color, font)
+    }
+
+    protected fun drawCenterText(text: String, x0: Int, y0: Int, width: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+        drawString(text, x0 + (width - GlyphLayout(font, text).width.toInt()) / 2, y0, color, font)
+    }
+
     open fun dispose() { }
 
     fun isInBounds(screenX: Int, screenY: Int) = !(screenX < this.x || screenX > (this.x + width) || screenY < this.y || screenY > this.y + height)

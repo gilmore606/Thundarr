@@ -56,7 +56,7 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
     }
 
     private fun drawExamText(gear: Gear, x0: Int, desc: List<String>, compareTo: Gear? = null) {
-        drawString(gear.name(), x0 + padding, padding, font = Screen.subTitleFont, color = Screen.fontColorBold)
+        drawString(gear.name(), x0 + padding, padding, font = Screen.subTitleFont)
         drawWrappedText(desc, x0 + padding, padding + 35, 20, Screen.smallFont)
         beginStats()
         drawStat("weight:", "lb", gear.weight(), x0, (compareTo?.weight() ?: gear.weight()) - gear.weight())

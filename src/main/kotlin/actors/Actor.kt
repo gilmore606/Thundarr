@@ -6,6 +6,7 @@ import actors.actions.Unequip
 import actors.animations.Animation
 import actors.animations.Step
 import actors.stats.Stat
+import actors.stats.skills.Skill
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -172,6 +173,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
     open fun shadowWidth() = 1f
     open fun shadowXOffset() = 0f
+
+    fun knownSkills() = stats.keys.map { Stat.get(it) }.filterIsInstance<Skill>()
 
     fun equippedOn(slot: Gear.Slot): Gear? = gear[slot]
     fun weapon() = equippedOn(Gear.Slot.WEAPON) as Weapon?  // unsafe assertion! inshallah
