@@ -3,6 +3,7 @@ package actors
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
+import actors.stats.Speed
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.sparks.Speak
@@ -38,10 +39,12 @@ sealed class NPC : Actor() {
     open fun isHostile(): Boolean = hostile
     override fun willAggro(target: Actor) = isHostile() && target is Player
 
+    override fun visualRange() = 8f + Speed.get(this)
+
     open fun becomeHostileMsg(): List<String> = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!")
 
-    final override fun canAct() = juice > 0f
-    final override fun isActing() = awareness != Awareness.HIBERNATED
+    final override fun hasActionJuice() = juice > 0f
+    final override fun wantsToAct() = awareness != Awareness.HIBERNATED
     final override fun defaultAction(): Action {
         if (distanceToPlayer() > hibernateRadius) {
             hibernate()

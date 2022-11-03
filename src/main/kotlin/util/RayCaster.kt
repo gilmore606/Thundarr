@@ -1,12 +1,15 @@
 package util
 
+import actors.Actor
+import world.Entity
+import world.Level
 import java.lang.RuntimeException
 
 const val MAX_LIGHT_RANGE = 24f
 const val LIGHT_BLEED = 0.25f
 const val VISIBILITY_BRIGHTNESS = 0.32f
 
-class RayCaster() {
+class RayCaster {
 
     class Shadow {
         var start = 0f
@@ -235,7 +238,57 @@ class RayCaster() {
         }
     }
 
-    fun blendVisibility(pov: XY, range: Float, getVis: (x: Int, y: Int)->Float, setVis: (x: Int, y: Int, vis: Float)->Unit) {
+    fun entitiesSeenBy(actor: Actor): Set<Entity> {
+        val entities = mutableSetOf<Entity>()
+        actor.level?.also { level ->
+            lineCache.forEach { line ->
+                seenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange())
+            }
+        }
+        return entities
+    }
 
+    private fun seenOctant(level: Level, resultSet: MutableSet<Entity>, line: ShadowLine, povX: Int, povY: Int, distance: Float) {
+        line.reset()
+        var fullShadow = false
+        var row = 0
+        var done = false
+        while (!done) {
+            row++
+            line.transformOctant(row, 0)
+            var castX = povX + line.transform.x
+            var castY = povY + line.transform.y
+            if (distanceBetween(povX, povY, castX, castY) > distance) {
+                done = true
+            } else {
+                var doneRow = false
+                var col = 0
+                while (!doneRow && col <= row) {
+                    line.transformOctant(row, col)
+                    castX = povX + line.transform.x
+                    castY = povY + line.transform.y
+                    if (distanceBetween(povX, povY, castX, castY) > distance) {
+                        doneRow = true
+                    } else {
+                        if (fullShadow) {
+                            // blocked cell
+                        } else {
+                            val projection = line.projectTile(row, col)
+                            val visible = !line.isInShadow(projection)
+                            if (visible && level.isOpaqueAt(castX, castY)) {
+                                line.add(projection)
+                                fullShadow = line.isFullShadow()
+                            } else {
+                                // collect targets
+                                level.actorAt(castX, castY)?.also { resultSet.add(it) }
+                                resultSet.addAll(level.thingsAt(castX, castY))
+                                line.discard(projection)
+                            }
+                        }
+                    }
+                    col++
+                }
+            }
+        }
     }
 }

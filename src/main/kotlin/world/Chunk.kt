@@ -9,7 +9,6 @@ import ktx.async.KtxAsync
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
-import things.Lightbulb
 import things.Thing
 import util.*
 import world.cartos.LevelCarto
@@ -103,8 +102,8 @@ class Chunk(
         KtxAsync.launch {
             while (!level.isReady()) delay(20)
             savedActors.forEach { actor ->
-                actor.onRestore()
                 actor.moveTo(level, actor.xy.x, actor.xy.y)
+                actor.onRestore()
             }
         }
     }
@@ -139,7 +138,6 @@ class Chunk(
         if (unloaded) return
         unloaded = true
         savedActors.clear()
-        //log.debug("chunk $x $y saving ${saveActors.size} actors")
         savedActors.addAll(saveActors)
 
         KtxAsync.launch {
@@ -394,7 +392,7 @@ class Chunk(
     }
 
     // Force all cells to re-sum light on next frame.
-    fun dirtyAllLightCacheCells() {
+    private fun dirtyAllLightCacheCells() {
         forEachCell { x,y -> lightCacheDirty[x][y] = true }
     }
 

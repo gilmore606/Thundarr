@@ -30,7 +30,10 @@ import java.lang.Integer.min
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
-    val id = shortID()
+    companion object {
+        val caster = RayCaster()
+    }
+
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
@@ -68,11 +71,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun contents() = contents
     override fun glyphBatch() = Screen.actorBatch
     override fun uiBatch() = Screen.uiActorBatch
-    var mirror = false
-    fun isMirrored() = mirror
+    var mirrorGlyph = false
 
-    abstract fun canAct(): Boolean
-    abstract fun isActing(): Boolean
+    abstract fun hasActionJuice(): Boolean
+    abstract fun wantsToAct(): Boolean
 
     fun onRestore() {
         contents.forEach { it.onRestore(this) }
@@ -280,5 +282,31 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             Stat.get(tag).touch(this)
         }
         if (this is Player) StatusPanel.refillCache()
+    }
+
+    ///// useful utilities
+
+    protected fun doWeHave(thingTag: String): Thing? {
+        for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) return contents[i]
+        return null
+    }
+
+    protected fun howManyWeHave(thingTag: String): Int {
+        var c = 0
+        for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) c++
+        return c
+    }
+
+    protected fun entitiesSeen() = caster.entitiesSeenBy(this)
+
+    protected fun entitiesNextToUs(): Set<Entity> {
+        val entities = mutableSetOf<Entity>()
+        level?.also { level ->
+            DIRECTIONS.forEach { dir ->
+                level.actorAt(xy.x + dir.x, xy.y + dir.y)?.also { entities.add(it) }
+                entities.addAll(level.thingsAt(xy.x + dir.x, xy.y + dir.y))
+            }
+        }
+        return entities
     }
 }

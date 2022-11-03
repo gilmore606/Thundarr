@@ -1,12 +1,13 @@
 package actors
 
-import actors.actions.Action
-import actors.actions.Get
-import actors.actions.Move
+import actors.actions.*
 import render.tilesets.Glyph
+import things.Apple
+import things.Pear
 import util.DIRECTIONS
 import util.Dice
 import util.XY
+import util.log
 import kotlin.random.Random
 
 class AttractPlayer : Player() {
@@ -17,19 +18,45 @@ class AttractPlayer : Player() {
 
     override fun nextAction() = super.nextAction() ?: defaultAction()
 
-    override fun canAct() = true
+    override fun hasActionJuice() = true
 
     override fun defaultAction(): Action? {
         if (System.currentTimeMillis() - lastActionMs > 400L) {
             lastActionMs = System.currentTimeMillis() - Random.nextLong(200L)
 
             level?.also { level ->
+                // Pick up stuff
                 val stuff = level.thingsAt(xy.x, xy.y)
                 if (stuff.isNotEmpty()) {
                     stuff.forEach {
                         if (it.isPortable()) {
                             return Get(it)
                         }
+                    }
+                }
+
+                // Yeet apples at herders
+                if (Dice.chance(0.2f)) {
+                    val seen = entitiesSeen()
+                    seen.forEach { target ->
+                        if (target is Herder) {
+                            doWeHave("apple")?.also {
+                                return Throw(it, target.xy.x, target.xy.y)
+                            }
+                        }
+                    }
+                }
+
+                // talk or fight or grab nearby stuff
+                entitiesNextToUs().forEach { entity ->
+                    if (entity is NPC && entity.isHostile()) {
+                        return Melee(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+                    }
+                    if (entity is Ox || entity is MuskOx) {
+                        return Converse(entity as Actor)
+                    }
+                    if (entity is Apple || entity is Pear) {
+                        return Move(XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                 }
             }
@@ -66,4 +93,5 @@ class AttractPlayer : Player() {
         }
         return null
     }
+
 }

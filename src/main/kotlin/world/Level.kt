@@ -20,6 +20,8 @@ import world.stains.Stain
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import world.weather.Weather
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 sealed class Level {
 
@@ -111,9 +113,8 @@ sealed class Level {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
-                    doThis(
-                        x, y, thingsAt[0], vis
-                    )
+                    for (i in max(0, thingsAt.size - 2) until thingsAt.size)
+                    doThis(x, y, thingsAt[i], vis)
                 }
             }
         }
@@ -126,9 +127,7 @@ sealed class Level {
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
             if (vis == 1f && chunkAt(x,y) != null) {
-                doThis(
-                    x, y, actor
-                )
+                doThis(x, y, actor)
             }
     }
 

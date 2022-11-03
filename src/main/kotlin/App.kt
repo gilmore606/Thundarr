@@ -117,6 +117,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(500)
             Screen.addModal(AttractMenu().apply { populate() })
             Lightbulb().moveTo(player)
+            repeat (10) { Apple().moveTo(player) }
         }
     }
 

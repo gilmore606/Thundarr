@@ -3,13 +3,10 @@ package world
 import actors.Actor
 import actors.NPC
 import actors.Player
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
 import things.Temporal
 import util.XY
 import util.distanceBetween
 import util.filterOut
-import util.log
 
 // A delegate class for Level to manage actors in time and space.
 
@@ -76,7 +73,7 @@ class Director(val level: Level) {
                 checkActor = actors[n]
                 if (checkActor.isUnloading) {
                     unloadingActor = checkActor
-                } else if (checkActor.isActing()) {
+                } else if (checkActor.wantsToAct()) {
                     if ((checkActor.juice > (actor?.juice ?: 0f)) ||
                         ((checkActor is Player) && (checkActor.juice == (actor?.juice ?: 0f))) ||
                         ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.speed() > (actor?.speed() ?: 0f)))
@@ -86,7 +83,7 @@ class Director(val level: Level) {
                 }
             }
             unloadingActor?.also { actors.remove(it) }
-            if (actor == null || !actor.canAct()) {  // no one had juice, we're done
+            if (actor == null || !actor.hasActionJuice()) {  // no one had juice, we're done
                 triggerAdvanceTime()
                 return
             }
@@ -124,7 +121,7 @@ class Director(val level: Level) {
     }
 
     fun advanceJuice(juice: Float) {
-        actors.forEach { if (it.isActing() && (it !is Player)) { it.juice += juice } }
+        actors.forEach { if (it.wantsToAct() && (it !is Player)) { it.juice += juice } }
     }
 
     fun advanceTime(delta: Float) {

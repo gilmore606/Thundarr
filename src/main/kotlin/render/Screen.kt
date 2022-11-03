@@ -19,7 +19,6 @@ import render.tilesets.*
 import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
-import ui.modals.AttractMenu
 import ui.modals.ContextMenu
 import ui.panels.Panel
 import ui.modals.Modal
@@ -231,7 +230,7 @@ object Screen : KtxScreen {
         actorBatch.addTileQuad(
             tx, ty,
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(), mirror = actor.isMirrored()
+            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(), mirror = actor.mirrorGlyph
         )
         actor.statusGlyph()?.also { statusGlyph ->
             uiWorldBatch.addTileQuad(
