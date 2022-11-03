@@ -30,6 +30,10 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
         height = spacing * options.size + headerPad + padding / 2
     }
 
+    override fun myXmargin(): Int {
+        return 100
+    }
+
     override fun drawModalText() {
         if (isAnimating()) return
         drawCenterText("the bARbARiAn", 0, 54, width, Screen.fontColor, Screen.subTitleFont)

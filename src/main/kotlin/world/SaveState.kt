@@ -18,6 +18,10 @@ import java.util.Base64
 class SaveState(
     private val id: String
 ) {
+    object PrefsStateTable : Table() {
+        val state = text("state")
+    }
+
     object WorldStateTable : Table() {
         val state = text("state")
     }
@@ -50,7 +54,7 @@ class SaveState(
         Database.connect("jdbc:sqlite:$saveFileFolder/${id}.thundarr", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            SchemaUtils.create(WorldStateTable, WorldChunksTable, LevelChunksTable, BuildingsTable)
+            SchemaUtils.create(PrefsStateTable, WorldStateTable, WorldChunksTable, LevelChunksTable, BuildingsTable)
         }
     }
 
@@ -129,6 +133,31 @@ class SaveState(
             }
         }
         log.info("Saved world state.")
+    }
+
+    fun getPrefsState(): App.PrefsState? {
+        val exists = transaction { PrefsStateTable.selectAll().count().toInt() }
+        if (exists < 1) return null
+
+        var result: ResultRow? = null
+        var state: App.PrefsState? = null
+        transaction {
+            result = PrefsStateTable.selectAll().first()
+        }
+        result?.also {
+            state = fromCompressed(it[PrefsStateTable.state])
+        }
+        return state
+    }
+
+    fun putPrefsState(state: App.PrefsState) {
+        transaction {
+            PrefsStateTable.deleteAll()
+            PrefsStateTable.insert {
+                it[PrefsStateTable.state] = toCompressed(state)
+            }
+        }
+        log.info("Saved prefs.")
     }
 
     fun hasLevelChunk(levelId: String) = transaction {

@@ -33,14 +33,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val levelId: String,
         val player: Player,
         val time: Double,
+        val consoleLines: List<String>
+    )
+
+    @Serializable
+    data class PrefsState(
         val zoomIndex: Double,
         val windowSize: XY,
         val fullscreen: Boolean,
         val worldZoom: Double,
         val cameraSlack: Double,
         val cameraMenuShift: Double,
-        val uiHue: Double,
-        val consoleLines: List<String>
+        val uiHue: Double
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -77,6 +81,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         setupLog()
 
         save = SaveState("myworld")
+        restorePrefs()
 
         addScreen(render.Screen)
         setScreen<render.Screen>()
@@ -111,7 +116,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         attractMode = false
         if (Screen.topModal is AttractMenu) (Screen.topModal as AttractMenu).dismissSelf()
         TimeButtons.state = TimeButtons.State.PAUSE
-        Speaker.requestSong(Speaker.Song.WORLD)
     }
 
     private fun addGamePanels() {
@@ -138,13 +142,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     levelId = level.levelId(),
                     player = player,
                     time = time,
-                    zoomIndex = Screen.zoomIndex,
-                    windowSize = Screen.savedWindowSize(),
-                    fullscreen = Screen.FULLSCREEN,
-                    cameraSlack = Screen.cameraSlack,
-                    cameraMenuShift = Screen.cameraMenuShift,
-                    worldZoom = Screen.worldZoom,
-                    uiHue = Screen.uiHue,
                     consoleLines = Console.lines
                 )
             )
@@ -153,6 +150,20 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             log.info("State saved.")
             startAttract()
         }
+    }
+
+    private fun savePrefs() {
+        save.putPrefsState(
+            PrefsState(
+                zoomIndex = Screen.zoomIndex,
+                windowSize = Screen.savedWindowSize(),
+                fullscreen = Screen.FULLSCREEN,
+                cameraSlack = Screen.cameraSlack,
+                cameraMenuShift = Screen.cameraMenuShift,
+                worldZoom = Screen.worldZoom,
+                uiHue = Screen.uiHue,
+            )
+        )
     }
 
     private fun restoreState() {
@@ -164,12 +175,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             val state = save.getWorldState()
 
-            Screen.resize(state.windowSize.x, state.windowSize.y)
-            if (state.fullscreen) {
-                Screen.toggleFullscreen(true)
-            } else {
-                Gdx.graphics.setWindowedMode(state.windowSize.x, state.windowSize.y)
-            }
+
 
             level = LevelKeeper.getLevel(state.levelId)
             if (level !is WorldLevel) LevelKeeper.getLevel("world")
@@ -178,11 +184,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
 
-            Screen.restoreZoomIndex(state.zoomIndex)
-            Screen.worldZoom = state.worldZoom
-            Screen.cameraSlack = state.cameraSlack
-            Screen.cameraMenuShift = state.cameraMenuShift
-            Screen.uiHue = state.uiHue
 
             Console.restoreLines(state.consoleLines)
 
@@ -197,6 +198,26 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(300)
             Screen.brightnessTarget = 1f
             addGamePanels()
+            Speaker.requestSong(Speaker.Song.WORLD)
+        }
+    }
+
+    private fun restorePrefs() {
+        KtxAsync.launch {
+            save.getPrefsState()?.also { state ->
+                Screen.resize(state.windowSize.x, state.windowSize.y)
+                if (state.fullscreen) {
+                    Screen.toggleFullscreen(true)
+                } else {
+                    Gdx.graphics.setWindowedMode(state.windowSize.x, state.windowSize.y)
+                }
+
+                Screen.restoreZoomIndex(state.zoomIndex)
+                Screen.worldZoom = state.worldZoom
+                Screen.cameraSlack = state.cameraSlack
+                Screen.cameraMenuShift = state.cameraMenuShift
+                Screen.uiHue = state.uiHue
+            }
         }
     }
 
@@ -244,6 +265,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Console.say("You stride bravely into the dawn.")
             Screen.brightnessTarget = 1f
             addGamePanels()
+            Speaker.requestSong(Speaker.Song.WORLD)
         }
     }
 
@@ -381,6 +403,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     fun doQuit() {
+        savePrefs()
         dispose()
         exitProcess(0)
     }

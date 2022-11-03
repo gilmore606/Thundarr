@@ -2,7 +2,7 @@ package audio
 
 import RESOURCE_FILE_DIR
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.files.FileHandle
 import util.filterAnd
 import java.lang.Double.max
@@ -18,16 +18,19 @@ object Speaker {
     private val audio = Gdx.audio
 
     class Deck(
-        val song: Sound
+        val song: Music
     ) {
         var done = false
-        val songId = song.loop()
         var fader = 0.0
         var faderTarget = 1.0
         val faderSpeed = 0.4
 
         init {
-            song.setVolume(songId, (volumeMaster * volumeMusic).toFloat())
+            song.apply {
+                volume = (fader * volumeMaster * volumeMusic).toFloat()
+                isLooping = true
+                play()
+            }
         }
         fun requestFadeout() { faderTarget = 0.0 }
         fun onRender(delta: Float) {
@@ -37,7 +40,7 @@ object Speaker {
                 fader = max(0.0, fader - faderSpeed * delta)
                 if (fader == 0.0) done = true
             }
-            song.setVolume(songId, (fader * volumeMaster * volumeMusic).toFloat())
+            song.setVolume((fader * volumeMaster * volumeMusic).toFloat())
         }
         fun dispose() { song.dispose() }
     }
@@ -53,8 +56,9 @@ object Speaker {
         decks.forEach { it.requestFadeout() }
         decks.filterAnd({ it.done }) { it.dispose() }
 
-        decks.add(Deck(audio.newSound(FileHandle("${RESOURCE_FILE_DIR}/music/${request.file}"))))
+        decks.add(Deck(audio.newMusic(FileHandle("${RESOURCE_FILE_DIR}/music/${request.file}"))))
     }
+
 
     fun requestMusicFade() {
         decks.forEach { it.requestFadeout() }
