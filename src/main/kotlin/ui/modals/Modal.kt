@@ -28,10 +28,13 @@ abstract class Modal(
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
     var dismissOnClickOutside = true
 
-    protected val boxBatch = QuadBatch(UITileSet())
+    protected val boxBatch = newBoxBatch()
     protected val textBatch = SpriteBatch()
-    protected val thingBatch = QuadBatch(ThingTileSet())
-    protected val actorBatch = QuadBatch(ActorTileSet())
+    protected val thingBatch: QuadBatch? = newThingBatch()
+    protected val actorBatch: QuadBatch? = newActorBatch()
+    protected open fun newBoxBatch(): QuadBatch = QuadBatch(UITileSet())
+    protected open fun newThingBatch(): QuadBatch? = QuadBatch(ThingTileSet())
+    protected open fun newActorBatch(): QuadBatch? = QuadBatch(ActorTileSet())
 
     var sidecar: Modal? = null
     var isSidecar = false
@@ -201,26 +204,26 @@ abstract class Modal(
         sidecar?.endTextBatch()
     }
     fun clearThingBatch() {
-        thingBatch.clear()
+        thingBatch?.clear()
         sidecar?.clearThingBatch()
     }
     fun drawThingBatch() {
-        thingBatch.draw()
+        thingBatch?.draw()
         sidecar?.drawThingBatch()
     }
     fun clearActorBatch() {
-        actorBatch.clear()
+        actorBatch?.clear()
         sidecar?.clearActorBatch()
     }
     fun drawActorBatch() {
-        actorBatch.draw()
+        actorBatch?.draw()
         sidecar?.drawActorBatch()
     }
 
     override fun dispose() {
         textBatch.dispose()
         boxBatch.dispose()
-        thingBatch.dispose()
-        actorBatch.dispose()
+        thingBatch?.dispose()
+        actorBatch?.dispose()
     }
 }

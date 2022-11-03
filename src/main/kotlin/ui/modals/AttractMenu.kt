@@ -2,10 +2,19 @@ package ui.modals
 
 import App
 import render.Screen
+import render.batches.QuadBatch
+import render.tilesets.UITileSet
 
 class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>()
+    companion object {
+        val boxBatch = QuadBatch(UITileSet())
+    }
+
+    override fun newBoxBatch() = AttractMenu.boxBatch
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     init {
         spacing = 32
@@ -67,5 +76,7 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
         dismissible = true
         dismiss()
     }
-
+    override fun dispose() {
+        textBatch.dispose()
+    }
 }

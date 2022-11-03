@@ -2,13 +2,25 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.Screen
+import render.batches.QuadBatch
+import render.tilesets.ThingTileSet
+import render.tilesets.UITileSet
 
 class ContextMenu(
     screenX: Int,
     screenY: Int,
     private val onHover: ((Int)->Unit)? = null
 ): SelectionModal(100, 50, null, Position.CURSOR, 0) {
+
+    companion object {
+        val boxBatch = QuadBatch(UITileSet())
+    }
+
+    override fun newBoxBatch() = ContextMenu.boxBatch
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     class Option(val name: String, val onPick: ()->Unit)
 
@@ -92,4 +104,9 @@ class ContextMenu(
         succeeded = true
         dismiss()
     }
+
+    override fun dispose() {
+        textBatch.dispose()
+    }
+
 }

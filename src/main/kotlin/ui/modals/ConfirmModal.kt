@@ -6,6 +6,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
+import render.batches.QuadBatch
+import render.tilesets.UITileSet
 import ui.input.Mouse
 
 class ConfirmModal(
@@ -19,8 +21,13 @@ class ConfirmModal(
     position = Position.LEFT
 ) {
 
+    override fun newBoxBatch() = ConfirmModal.boxBatch
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
+
     companion object {
         fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(Screen.font, it).width }.toInt()
+        val boxBatch = QuadBatch(UITileSet())
     }
 
     val yesOffset: Int
@@ -109,5 +116,8 @@ class ConfirmModal(
             }
         }
         return null
+    }
+    override fun dispose() {
+        textBatch.dispose()
     }
 }

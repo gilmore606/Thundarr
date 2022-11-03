@@ -78,7 +78,7 @@ class ExamineModal(
         val x0 = x + width - padding - 64
         val y0 = y + padding
         val batch = if (entity is Thing) myThingBatch() else myActorBatch()
-        batch.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
+        batch?.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
             batch.getTextureIndex(entity.glyph(), entity.level(), entity.xy()?.x ?: 0, entity.xy()?.y ?: 0),
             hue = entity.hue())
     }

@@ -1,8 +1,18 @@
 package ui.modals
 
 import render.Screen
+import render.batches.QuadBatch
+import render.tilesets.UITileSet
 
 class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
+
+    companion object {
+        val boxBatch = QuadBatch(UITileSet())
+    }
+
+    override fun newBoxBatch() = SystemMenu.boxBatch
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Resume") { }
@@ -37,4 +47,7 @@ class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
         }
     }
 
+    override fun dispose() {
+        textBatch.dispose()
+    }
 }

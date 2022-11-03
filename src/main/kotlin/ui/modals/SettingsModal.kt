@@ -3,12 +3,16 @@ package ui.modals
 import audio.Speaker
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
+import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
 
 class SettingsModal : Modal(300, 580, "- settings -") {
+
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     val contentY = 130
 

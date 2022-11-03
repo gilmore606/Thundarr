@@ -1,9 +1,19 @@
 package ui.modals
 
+import render.batches.QuadBatch
+import render.tilesets.UITileSet
 import util.log
 import world.ChunkLoader
 
 class LoadingModal(text: String) : SplashModal(text) {
+
+    companion object {
+        val boxBatch = QuadBatch(UITileSet())
+    }
+
+    override fun newBoxBatch() = LoadingModal.boxBatch
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     val minDelayMs = 1000
 
@@ -31,4 +41,8 @@ class LoadingModal(text: String) : SplashModal(text) {
     }
 
     private fun isLoading() = ChunkLoader.isWorking()
+
+    override fun dispose() {
+        textBatch.dispose()
+    }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
+import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
 import java.lang.Integer.max
@@ -30,8 +31,8 @@ abstract class Panel {
 
     protected open fun myTextBatch() = Screen.textBatch
     protected open fun myBoxBatch() = Screen.uiBatch
-    protected open fun myThingBatch() = Screen.thingBatch
-    protected open fun myActorBatch() = Screen.actorBatch
+    protected open fun myThingBatch(): QuadBatch? = Screen.thingBatch
+    protected open fun myActorBatch(): QuadBatch? = Screen.actorBatch
 
     open fun onResize(width: Int, height: Int) {
         xMargin = 2 + (max(0, width - 800) / 70)

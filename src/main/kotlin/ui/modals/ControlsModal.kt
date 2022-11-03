@@ -1,6 +1,11 @@
 package ui.modals
 
+import render.batches.QuadBatch
+
 class ControlsModal : Modal(330, 360, "- debug controls -") {
+
+    override fun newThingBatch() = null
+    override fun newActorBatch() = null
 
     override fun drawModalText() {
         drawString("F1 : toggle debug vision", 25, 80)
