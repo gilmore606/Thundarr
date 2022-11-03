@@ -3,7 +3,6 @@ package actors
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
-import actors.animations.Hop
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.sparks.Speak

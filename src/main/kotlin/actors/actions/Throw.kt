@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.animations.Hop
 import render.sparks.Projectile
 import render.sparks.ProjectileShadow
 import render.sparks.Smoke
@@ -14,6 +15,7 @@ class Throw(
 ) : Action(1.0f) {
 
     override fun execute(actor: Actor, level: Level) {
+        actor.animation = Hop()
         level.addSpark(Projectile(thing.glyph(), x, y, 40f) {
             level.addSpark(Smoke().at(x, y))
             thing.onThrownAt(actor, level, x, y)
