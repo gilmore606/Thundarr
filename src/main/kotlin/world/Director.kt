@@ -118,7 +118,7 @@ class Director(val level: Level) {
 
     private fun triggerAdvanceTime() {
         if (playerTimePassed > 0f) {
-            LevelKeeper.advanceTime(playerTimePassed)
+            LevelKeeper.advanceTime(playerTimePassed * level.timeScale())
             playerTimePassed = 0f
         }
     }

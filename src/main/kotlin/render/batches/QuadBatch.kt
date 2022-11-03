@@ -64,7 +64,7 @@ class QuadBatch(
     fun addTileQuad(col: Int, row: Int, // global tile XY
                     textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f,
-                    scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f, grayBlend: Float? = null) {
+                    scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f, grayBlend: Float? = null, mirror: Boolean = false) {
         val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
@@ -74,7 +74,9 @@ class QuadBatch(
         val lightG = min(visibility, light.g + App.level.weather.lightning.g) * Screen.brightness
         val lightB = min(visibility, light.b + App.level.weather.lightning.b) * Screen.brightness
         val grayOut = grayBlend ?: if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
-        addQuad(x0, y0, x1, y1, 0f, 0f, 1f, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
+        val itx0 = if (mirror) 1f else 0f
+        val itx1 = if (mirror) 0f else 1f
+        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
     }
 
     fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,

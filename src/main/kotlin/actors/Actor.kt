@@ -68,6 +68,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun contents() = contents
     override fun glyphBatch() = Screen.actorBatch
     override fun uiBatch() = Screen.uiActorBatch
+    var mirror = false
+    fun isMirrored() = mirror
 
     abstract fun canAct(): Boolean
     abstract fun isActing(): Boolean
@@ -99,7 +101,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun receiveAttack(attacker: Actor) { }
 
     // What will I do right now?
-    fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
+    open fun nextAction(): Action? = if (queuedActions.isNotEmpty()) {
         val action = queuedActions[0]
         if (!action.shouldContinueFor(this)) {
             queuedActions.remove(action)

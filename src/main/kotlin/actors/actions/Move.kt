@@ -18,6 +18,7 @@ class Move(
             }
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
             actor.animation = actor.stepAnimation(dir)
+            if (dir.x != 0) actor.mirror = dir.x < 0
         }
     }
 

@@ -99,6 +99,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
         level = LevelKeeper.getLevel("attract")
         player = AttractPlayer()
+
         updateTime(Dice.range(700, 1200).toDouble())
         level.setPov(60, 60)
         Screen.recenterCamera()
@@ -109,6 +110,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         KtxAsync.launch {
             delay(500)
             Screen.addModal(AttractMenu().apply { populate() })
+            Lightbulb().moveTo(player)
         }
     }
 

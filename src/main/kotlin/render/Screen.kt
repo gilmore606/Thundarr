@@ -231,7 +231,7 @@ object Screen : KtxScreen {
         actorBatch.addTileQuad(
             tx, ty,
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue()
+            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(), mirror = actor.isMirrored()
         )
         actor.statusGlyph()?.also { statusGlyph ->
             uiWorldBatch.addTileQuad(

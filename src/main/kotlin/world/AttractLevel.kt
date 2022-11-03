@@ -6,6 +6,8 @@ class AttractLevel() : EnclosedLevel("attract") {
         val dimension = 120
     }
 
+    override fun timeScale() = 40f
+
     override fun updateVisibility() {
         for (cx in 0 until width) {
             for (cy in 0 until height) {
