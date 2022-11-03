@@ -79,7 +79,7 @@ class Director(val level: Level) {
                 } else if (checkActor.isActing()) {
                     if ((checkActor.juice > (actor?.juice ?: 0f)) ||
                         ((checkActor is Player) && (checkActor.juice == (actor?.juice ?: 0f))) ||
-                        ((checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.speed() > (actor?.speed() ?: 0f)))
+                        ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.speed() > (actor?.speed() ?: 0f)))
                     ) {
                         actor = checkActor
                     }

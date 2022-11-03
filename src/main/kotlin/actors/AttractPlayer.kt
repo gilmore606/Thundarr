@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.Action
+import actors.actions.Get
 import actors.actions.Move
 import render.tilesets.Glyph
 import util.DIRECTIONS
@@ -15,12 +16,25 @@ class AttractPlayer : Player() {
     override fun glyph() = Glyph.MOK
 
     override fun nextAction() = super.nextAction() ?: defaultAction()
+
     override fun canAct() = true
 
     override fun defaultAction(): Action? {
         if (System.currentTimeMillis() - lastActionMs > 400L) {
             lastActionMs = System.currentTimeMillis() - Random.nextLong(200L)
+
+            level?.also { level ->
+                val stuff = level.thingsAt(xy.x, xy.y)
+                if (stuff.isNotEmpty()) {
+                    stuff.forEach {
+                        if (it.isPortable()) {
+                            return Get(it)
+                        }
+                    }
+                }
+            }
             return wander()
+
         }
         return null
     }
