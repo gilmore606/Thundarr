@@ -184,6 +184,7 @@ class SettingsModal : Modal(300, 580, "- settings -") {
             return true
         }
         hoveredSection?.also { hovered ->
+            if (hovered != selectedSection) Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
             selectedSection = hovered
         } ?: run {
             sections[selectedSection].mouseClicked(this, screenX - this.x, screenY - this.y)
@@ -203,6 +204,7 @@ class SettingsModal : Modal(300, 580, "- settings -") {
                 newSection = min(sections.lastIndex, (localX / spacePerSectionTitle))
             }
         }
+        if (newSection != hoveredSection) Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
         hoveredSection = newSection
         if (localY >= contentY) {
             sections[selectedSection].mouseMovedTo(this, localX, localY)

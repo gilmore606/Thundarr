@@ -65,6 +65,7 @@ class ContextMenu(
     }
 
     override fun doSelect() {
+        super.doSelect()
         dismissSuccess()
         Screen.clearCursor()
         options[selection].onPick.invoke()

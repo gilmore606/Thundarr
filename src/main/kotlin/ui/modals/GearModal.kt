@@ -52,6 +52,7 @@ class GearModal(
 
     override fun doSelect() {
         if (selection < 0) return
+        super.doSelect()
         val ourSelection = selection
         var startPos = slots[ourSelection].things.indexOf(slots[ourSelection].current)
         if (startPos < 0) startPos = slots[ourSelection].things.size

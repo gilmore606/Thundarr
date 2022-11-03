@@ -1,5 +1,6 @@
 package ui.modals
 
+import audio.Speaker
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import render.Screen
@@ -42,10 +43,15 @@ abstract class SelectionModal(
     }
 
     open fun changeSelection(newSelection: Int) {
+        if (newSelection != selection) {
+            Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
+        }
         selection = newSelection
     }
 
-    abstract fun doSelect()
+    open fun doSelect() {
+        Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
+    }
 
     protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0, colorOverride: Color? = null) {
         drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,

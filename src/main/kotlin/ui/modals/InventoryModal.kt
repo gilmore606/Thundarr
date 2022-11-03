@@ -88,6 +88,7 @@ class InventoryModal(
 
     override fun doSelect() {
         if (selection < 0) return
+        super.doSelect()
         val parent = this
         val ourSelection = selection
         Screen.addModal(ContextMenu(

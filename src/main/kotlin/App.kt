@@ -84,6 +84,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     override fun create() {
         KtxAsync.initiate()
         setupLog()
+        Speaker.init()
 
         save = SaveState("myworld")
         restorePrefs()

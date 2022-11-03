@@ -50,6 +50,7 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
     }
 
     override fun doSelect() {
+        super.doSelect()
         if (selection >= 0 && selection < options.keys.size) {
             dismiss()
             options[options.keys.toList()[selection]]?.invoke()

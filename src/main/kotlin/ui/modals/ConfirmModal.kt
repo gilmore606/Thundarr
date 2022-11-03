@@ -68,18 +68,18 @@ class ConfirmModal(
             Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB -> {
                 selectNext()
             }
-            Input.Keys.Y -> { selection = 1 }
-            Input.Keys.N -> { selection = 0 }
+            Input.Keys.Y -> { changeSelection(1) }
+            Input.Keys.N -> { changeSelection(0) }
         }
     }
 
     override fun onMouseMovedTo(screenX: Int, screenY: Int) {
-        mouseToYesOrNo(screenX, screenY)?.also { selection = it }
+        mouseToYesOrNo(screenX, screenY)?.also { changeSelection(it) }
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         mouseToYesOrNo(screenX, screenY)?.also { selected ->
-            selection = selected
+            changeSelection(selected)
             doSelect()
             return true
         }
@@ -87,6 +87,7 @@ class ConfirmModal(
     }
 
     override fun doSelect() {
+        super.doSelect()
         dismiss()
         KtxAsync.launch {
             delay(100)
