@@ -12,6 +12,7 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
         padding = 48
         headerPad += 48
         dismissible = false
+        animTime = 200f
     }
 
     fun populate() {
@@ -30,15 +31,18 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
     }
 
     override fun drawModalText() {
+        if (isAnimating()) return
         drawCenterText("the bARbARiAn", 0, 54, width, Screen.fontColor, Screen.subTitleFont)
-        options.keys.forEachIndexed { n, optionText ->
-            drawOptionText(optionText, n)
+        if ((System.currentTimeMillis() - launchTimeMs) > animTime * 2f) {
+            options.keys.forEachIndexed { n, optionText ->
+                drawOptionText(optionText, n)
+            }
         }
     }
 
     override fun drawBackground() {
         super.drawBackground()
-        drawOptionShade()
+        if (!isAnimating()) drawOptionShade()
     }
 
     override fun doSelect() {

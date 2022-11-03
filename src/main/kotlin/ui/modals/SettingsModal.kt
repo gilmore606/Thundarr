@@ -1,10 +1,10 @@
 package ui.modals
 
+import audio.Speaker
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
 import ui.input.Mouse
-import util.log
 import kotlin.math.max
 import kotlin.math.min
 
@@ -121,11 +121,44 @@ class SettingsModal : Modal(300, 580, "- settings -") {
     }
 
     object Audio : Section("audio") {
-        override fun drawText(modal: SettingsModal) {
-
+        val sliderMaster = Slider("Master volume", 0, Speaker.volumeMaster, 0.0, 1.0) {
+            Speaker.volumeMaster = it
         }
-        override fun drawBackground(modal: SettingsModal) { }
-        override fun mouseClicked(modal: SettingsModal, screenX: Int, screenY: Int) { }
+        val sliderWorld = Slider("World volume", 85, Speaker.volumeWorld, 0.0, 1.0) {
+            Speaker.volumeWorld = it
+        }
+        val sliderMusic = Slider("Music volume", 170, Speaker.volumeMusic, 0.0, 1.0) {
+            Speaker.volumeMusic = it
+        }
+        val sliderUI = Slider("UI volume", 255, Speaker.volumeUI, 0.0, 1.0) {
+            Speaker.volumeUI = it
+        }
+        val sliders = listOf(sliderMaster, sliderWorld, sliderMusic, sliderUI)
+
+        override fun drawText(modal: SettingsModal) {
+            sliders.forEach { it.drawText(modal) }
+        }
+
+        override fun drawBackground(modal: SettingsModal) {
+            sliders.forEach { it.drawBackground(modal) }
+        }
+        override fun mouseClicked(modal: SettingsModal, modalX: Int, modalY: Int) {
+            sliders.forEachIndexed { n, slider ->
+                if (modalY > slider.y + modal.contentY + 10  && modalY < slider.y + 75 + modal.contentY ) {
+                    slider.mouseClicked(modal, modalX, modalY)
+                }
+            }
+        }
+        override fun mouseMovedTo(modal: SettingsModal, modalX: Int, modalY: Int) {
+            sliders.forEach { slider ->
+                if (modalY > slider.y + modal.contentY + 10 && modalY < slider.y + 75 + modal.contentY) {
+                    slider.mouseMovedTo(modal, modalX, modalY)
+                }
+            }
+        }
+        override fun mouseUp(modal: SettingsModal) {
+            sliders.forEach { it.mouseUp(modal) }
+        }
     }
 
     object Game : Section("game") {

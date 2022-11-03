@@ -15,7 +15,7 @@ object Console : Panel() {
     private val maxLines = 7
     private val lineSpacing = 21
     private val padding = 12
-    private val lines: MutableList<String> = mutableListOf<String>().apply {
+    val lines: MutableList<String> = mutableListOf<String>().apply {
         repeat(maxLines) { add("") }
     }
     private var lastLineMs = System.currentTimeMillis()
@@ -130,6 +130,11 @@ object Console : Panel() {
         if (subject is Player) say(out) else {
             announce(subject.level(), subject.xy()?.x ?: 0, subject.xy()?.y ?: 0, reach, out)
         }
+    }
+
+    fun restoreLines(newLines: List<String>) {
+        lines.clear()
+        lines.addAll(newLines)
     }
 
     override fun onResize(width: Int, height: Int) {

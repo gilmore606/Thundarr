@@ -3,6 +3,7 @@ import actors.Player
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
+import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import kotlinx.coroutines.*
@@ -38,7 +39,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val worldZoom: Double,
         val cameraSlack: Double,
         val cameraMenuShift: Double,
-        val uiHue: Double
+        val uiHue: Double,
+        val consoleLines: List<String>
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -87,6 +89,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     private fun startAttract() {
         Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
         attractMode = true
+        Speaker.requestSong(Speaker.Song.ATTRACT)
         Screen.addPanel(TimeButtons)
 
         level = LevelKeeper.getLevel("attract")
@@ -108,6 +111,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         attractMode = false
         if (Screen.topModal is AttractMenu) (Screen.topModal as AttractMenu).dismissSelf()
         TimeButtons.state = TimeButtons.State.PAUSE
+        Speaker.requestSong(Speaker.Song.WORLD)
     }
 
     private fun addGamePanels() {
@@ -121,10 +125,12 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     override fun dispose() {
         log.info("Thundarr shutting down.")
         Screen.dispose()
+        Speaker.dispose()
     }
 
     private fun saveStateAndReturnToMenu() {
         Screen.panels.filterAnd({ it !is Modal }) { Screen.removePanel(it) }
+        Speaker.requestMusicFade()
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.putWorldState(
@@ -138,7 +144,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     cameraSlack = Screen.cameraSlack,
                     cameraMenuShift = Screen.cameraMenuShift,
                     worldZoom = Screen.worldZoom,
-                    uiHue = Screen.uiHue
+                    uiHue = Screen.uiHue,
+                    consoleLines = Console.lines
                 )
             )
             delay(500)
@@ -176,6 +183,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Screen.cameraSlack = state.cameraSlack
             Screen.cameraMenuShift = state.cameraMenuShift
             Screen.uiHue = state.uiHue
+
+            Console.restoreLines(state.consoleLines)
 
             updateTime(state.time)
 
@@ -232,7 +241,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
-            Console.say("You step tentatively into the apocalypse...")
+            Console.say("You stride bravely into the dawn.")
             Screen.brightnessTarget = 1f
             addGamePanels()
         }
@@ -335,7 +344,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             "Abandon", "Cancel"
         ) { yes ->
             if (yes) {
-                Console.say("You abandon the world.")
+                Console.say("You abandon Numeria to its own devices.")
                 pendingJob?.cancel()
                 startGame()
                 createNewWorld()

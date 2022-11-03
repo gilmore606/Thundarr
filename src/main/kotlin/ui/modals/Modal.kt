@@ -23,7 +23,7 @@ abstract class Modal(
     enum class Position { LEFT, TOP, RIGHT, BOTTOM, CENTER_LOW, CURSOR, SIDECAR }
 
     var dismissible = true
-    private val launchTimeMs = System.currentTimeMillis()
+    protected val launchTimeMs = System.currentTimeMillis()
     protected var animTime = 80f
     protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
     var dismissOnClickOutside = true

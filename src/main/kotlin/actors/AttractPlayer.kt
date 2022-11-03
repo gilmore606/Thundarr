@@ -9,7 +9,7 @@ import util.XY
 class AttractPlayer : Player() {
 
     override fun glyph() = Glyph.MOK
-    
+
     override fun defaultAction(): Action? {
         return wander()
     }

@@ -2,6 +2,7 @@ package render
 
 import App
 import actors.Actor
+import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20.*
@@ -284,6 +285,7 @@ object Screen : KtxScreen {
 
     override fun render(delta: Float) {
         animateCamera(delta)
+        Speaker.onRender(delta)
         App.level.onRender(delta)
         var dismissedPanel: Panel? = null
         var topModalFound: Modal? = null
