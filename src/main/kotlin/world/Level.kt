@@ -258,6 +258,7 @@ sealed class Level {
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }
             updateVisibility()
+            shadowDirty = false
         }
     }
 
