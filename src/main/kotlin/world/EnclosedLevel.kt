@@ -1,22 +1,20 @@
 package world
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import util.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
 
-class EnclosedLevel(
+open class EnclosedLevel(
     val levelId: String
     ) : Level() {
 
-    private var chunk: Chunk? = null
+    protected var chunk: Chunk? = null
     private var allChunks = setOf<Chunk>()
     private var ready = false
 
-    private val width: Int
+    protected val width: Int
         get() = chunk?.width ?: 1
-    private val height: Int
+    protected val height: Int
         get() = chunk?.height ?: 1
 
     override val sunLightSteps = mutableMapOf<Int, LightColor>().apply {

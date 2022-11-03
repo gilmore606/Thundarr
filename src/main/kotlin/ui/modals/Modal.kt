@@ -144,7 +144,7 @@ abstract class Modal(
     }
     open fun onMouseMovedTo(screenX: Int, screenY: Int) { }
 
-    protected fun dismiss() {
+    protected open fun dismiss() {
         dismissed = true
         sidecar?.dismiss()
         onDismiss()

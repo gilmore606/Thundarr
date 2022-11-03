@@ -9,6 +9,7 @@ import ktx.async.KtxAsync
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
+import things.Lightbulb
 import things.Thing
 import util.*
 import world.cartos.LevelCarto
@@ -123,6 +124,15 @@ class Chunk(
             .carveLevel(
                 worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
             )
+        generating = false
+    }
+
+    fun generateAttractLevel(level: Level) {
+        generating = true
+        WorldCarto(0, 0, AttractLevel.dimension - 1, AttractLevel.dimension - 1, this, level).apply {
+            carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0)
+            addThing(55, 53, Lightbulb())
+        }
         generating = false
     }
 

@@ -2,6 +2,7 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
@@ -88,6 +89,7 @@ class ConfirmModal(
     override fun doSelect() {
         dismiss()
         KtxAsync.launch {
+            delay(100)
             callback.invoke(selection == 0)
         }
     }

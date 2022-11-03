@@ -1,14 +1,15 @@
 package ui.modals
 
-class SystemMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
+import render.Screen
+
+class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Resume") { }
         put("Settings") { App.openSettings() }
         put("Controls") { App.openControls() }
         put("Credits") { App.openCredits() }
-        put("Restart world") { App.restartWorld() }
-        put("Save and quit") { App.saveAndQuit() }
+        put("Save and exit") { App.saveAndReturnToMenu() }
     }
 
     init {

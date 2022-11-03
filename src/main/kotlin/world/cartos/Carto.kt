@@ -48,7 +48,7 @@ abstract class Carto(
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
-    protected fun addThing(x: Int, y: Int, thing: Thing) {
+    fun addThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)
         KtxAsync.launch {
             dest.reconnect(level, x, y)

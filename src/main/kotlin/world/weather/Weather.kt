@@ -18,7 +18,7 @@ class Weather {
     var windY = 0f
     var cloudIntensity = 0f
     var rainIntensity = 0f
-    val lightning = LightColor(2f, 2f, 2f)
+    val lightning = LightColor(0f, 0f, 0f)
 
     var windSpeed = 0f
     var windDirection = 0.2f

@@ -1,3 +1,4 @@
+import actors.AttractPlayer
 import actors.Player
 import actors.stats.Brains
 import actors.stats.Strength
@@ -17,6 +18,7 @@ import ui.modals.*
 import ui.panels.*
 import util.Dice
 import util.XY
+import util.filterAnd
 import util.log
 import world.*
 import kotlin.system.exitProcess
@@ -56,34 +58,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     var DEBUG_VISIBLE = false
     var DEBUG_PANEL = false
 
-    override fun create() {
-        KtxAsync.initiate()
-        setupLog()
-
-        save = SaveState("myworld")
-
-        if (save.worldExists()) {
-            log.info("Loading saved state...")
-            restoreState()
-        } else {
-            log.info("No saved state found, creating new world...")
-            createNewWorld()
-        }
-
-        addScreen(render.Screen)
-        setScreen<render.Screen>()
-        Screen.addPanel(Console)
-        Screen.addPanel(StatusPanel)
-        Screen.addPanel(LookPanel)
-        Screen.addPanel(ActorPanel)
-        Screen.addPanel(LeftButtons)
-        Screen.addPanel(TimeButtons)
-
-        Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
-
-        Console.say("The moon is broken in god-damned half!")
-        Console.say("\"Demon dogs!\"")
-    }
+    var attractMode = true
 
     private fun setupLog() {
         Dispatchers.KTX.mainThread.name = "main"
@@ -95,15 +70,63 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         log.info("Thundarr starting up!")
     }
 
+    override fun create() {
+        KtxAsync.initiate()
+        setupLog()
+
+        save = SaveState("myworld")
+
+        addScreen(render.Screen)
+        setScreen<render.Screen>()
+
+        Gdx.input.inputProcessor = InputMultiplexer(Keyboard, Mouse)
+
+        startAttract()
+    }
+
+    private fun startAttract() {
+        Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
+        attractMode = true
+        Screen.addPanel(TimeButtons)
+
+        level = LevelKeeper.getLevel("attract")
+        player = AttractPlayer()
+        updateTime(Dice.range(700, 1200).toDouble())
+        level.setPov(60, 60)
+        Screen.recenterCamera()
+        movePlayerIntoLevel(70, 70)
+
+        TimeButtons.state = TimeButtons.State.PLAY
+        Screen.brightnessTarget = 1f
+        KtxAsync.launch {
+            delay(500)
+            Screen.addModal(AttractMenu().apply { populate() })
+        }
+    }
+
+    private fun startGame() {
+        attractMode = false
+        if (Screen.topModal is AttractMenu) (Screen.topModal as AttractMenu).dismissSelf()
+        TimeButtons.state = TimeButtons.State.PAUSE
+    }
+
+    private fun addGamePanels() {
+        Screen.addPanel(Console)
+        Screen.addPanel(StatusPanel)
+        Screen.addPanel(LookPanel)
+        Screen.addPanel(ActorPanel)
+        Screen.addPanel(LeftButtons)
+    }
+
     override fun dispose() {
         log.info("Thundarr shutting down.")
         Screen.dispose()
     }
 
-    private fun saveStateAndExitProcess() {
+    private fun saveStateAndReturnToMenu() {
+        Screen.panels.filterAnd({ it !is Modal }) { Screen.removePanel(it) }
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
-
             save.putWorldState(
                 WorldState(
                     levelId = level.levelId(),
@@ -118,16 +141,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     uiHue = Screen.uiHue
                 )
             )
+            delay(500)
 
             log.info("State saved.")
-            dispose()
-            exitProcess(0)
+            startAttract()
         }
     }
 
     private fun restoreState() {
-        Screen.addModal(LoadingModal("Returning to the wasteland..."))
+        Screen.addModal(LoadingModal("Returning to Numeria..."))
+
         pendingJob = KtxAsync.launch {
+            Screen.brightnessTarget = 0f
             LevelKeeper.hibernateAll()
 
             val state = save.getWorldState()
@@ -160,14 +185,20 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             movePlayerIntoLevel(player.xy.x, player.xy.y)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
+            delay(300)
+            Screen.brightnessTarget = 1f
+            addGamePanels()
         }
     }
 
     private fun createNewWorld() {
-        Screen.addModal(LoadingModal("The moon...it's breaking in half!"))
+        Screen.addModal(LoadingModal("The moon...it's breaking in god-damned half!"))
+        Screen.brightnessTarget = 0f
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.eraseAll()
+
+            delay(400)
 
             level = LevelKeeper.getLevel("world")
             player = Player().apply {
@@ -196,11 +227,14 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             var playerStart: XY? = null
             while (playerStart == null) {
                 log.debug("Waiting for chunks...")
-                delay(50)
+                delay(200)
                 playerStart = level.getPlayerEntranceFrom(level.levelId())
             }
+            delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.say("You step tentatively into the apocalypse...")
+            Screen.brightnessTarget = 1f
+            addGamePanels()
         }
     }
 
@@ -273,17 +307,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         LevelKeeper.forEachLiveLevel { it.updateTime(hour, minute) }
     }
 
-    fun saveAndQuit() {
+    fun saveAndReturnToMenu() {
         Screen.addModal(
             ConfirmModal(
-                listOf("Quit the game?", "Your progress will be saved."),
-                "Quit", "Cancel"
+                listOf("Exit the world?", "Your progress will be saved."),
+                "Exit", "Cancel"
             ) { yes ->
                 if (yes) {
+                    Screen.brightnessTarget = 0f
                     Screen.addModal(LoadingModal("Recording your deeds..."))
                     KtxAsync.launch {
-                        delay(200)
-                        saveStateAndExitProcess()
+                        delay(600)
+                        saveStateAndReturnToMenu()
                     }
                 } else {
                     Console.say("You remember that one thing you needed to do...")
@@ -292,7 +327,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         )
     }
 
-    fun restartWorld() {
+    private fun restartWorld() {
         Screen.addModal(ConfirmModal(
             listOf(
                 "Abandon this world?",
@@ -302,6 +337,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             if (yes) {
                 Console.say("You abandon the world.")
                 pendingJob?.cancel()
+                startGame()
                 createNewWorld()
             } else {
                 Console.say("You gather your resolve and carry on.")
@@ -319,4 +355,24 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openMap() { Screen.addModal(MapModal()) }
     fun openSystemMenu() { Screen.addModal(SystemMenu()) }
     fun openJournal() { Screen.addModal(JournalModal()) }
+
+    fun doContinue() {
+        startGame()
+        restoreState()
+    }
+
+    fun doStartNewGame() {
+        if (save.worldExists()) {
+            restartWorld()
+        } else {
+            pendingJob?.cancel()
+            startGame()
+            createNewWorld()
+        }
+    }
+
+    fun doQuit() {
+        dispose()
+        exitProcess(0)
+    }
 }

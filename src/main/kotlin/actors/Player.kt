@@ -14,7 +14,7 @@ import world.Entity
 import world.Level
 
 @Serializable
-class Player : Actor() {
+open class Player : Actor() {
 
     var willAggro: Boolean = false
     var thrownTag: String = ""

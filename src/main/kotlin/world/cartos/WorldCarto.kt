@@ -28,10 +28,10 @@ class WorldCarto(
     val scale = 0.02
     val fullness = 0.002
 
-    fun carveWorldChunk() {
+    fun carveWorldChunk(offset: Double = 0.0) {
         forEachCell { x, y ->
-            val n = Perlin.noise(x.toDouble() * scale, y.toDouble() * scale, 59.0) +
-                    Perlin.noise(x.toDouble() * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
+            val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
+                    Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
             if (n > fullness * scale - Dice.float(0f,0.18f).toDouble()) {
                 carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
             } else {

@@ -85,7 +85,7 @@ object TimeButtons : Panel() {
         super.onResize(width, height)
         this.width = spacing * buttons.size
         this.height = yPadding + iconSizeHovered
-        this.x = width - this.width - StatusPanel.width - xMargin
+        this.x = width - this.width - 200 - xMargin
         this.y = yPadding
         this.contraction = this.height
     }
@@ -98,6 +98,7 @@ object TimeButtons : Panel() {
     override fun drawText() { }
 
     override fun drawBackground() {
+        if (App.attractMode) return
         contraction = if (shouldShow()) {
             max(0, contraction - speed)
         } else {

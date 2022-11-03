@@ -71,6 +71,18 @@ object ChunkLoader {
 
     private fun makeLevelChunk(level: Level, levelId: String, callback: (Chunk) -> Unit) {
         log.debug("Creating level chunk $levelId")
+
+        if (levelId == "attract") {
+            Chunk(AttractLevel.dimension, AttractLevel.dimension).apply {
+                onCreate(0, 0)
+                connectLevel(level)
+                generateAttractLevel(level)
+                val chunk = this
+                KtxAsync.launch { callback(chunk) }
+            }
+            return
+        }
+
         val building = App.save.getBuildingForLevel(levelId)
         Chunk(building.floorWidth, building.floorHeight).apply {
             onCreate(0, 0)

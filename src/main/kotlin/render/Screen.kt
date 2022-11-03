@@ -18,6 +18,7 @@ import render.tilesets.*
 import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
+import ui.modals.AttractMenu
 import ui.modals.ContextMenu
 import ui.panels.Panel
 import ui.modals.Modal
@@ -33,6 +34,8 @@ import kotlin.math.sign
 
 object Screen : KtxScreen {
 
+    var brightness = 0f
+    var brightnessTarget = 1f
     val textureFilter = TextureFilter.MipMapLinearLinear
     var worldZoom = 1.3
     var cameraSlack = 0.3
@@ -319,6 +322,11 @@ object Screen : KtxScreen {
     }
 
     private fun animateCamera(delta: Float) {
+        if (brightness < brightnessTarget) {
+            brightness = kotlin.math.min(brightnessTarget, brightness + delta * 0.6f)
+        } else if (brightness > brightnessTarget) {
+            brightness = kotlin.math.max(brightnessTarget, brightness - delta * 1.6f)
+        }
         val diff = min(3.0, max(0.04, abs(zoom - zoomTarget)))
         if (zoom < zoomTarget) {
             zoom = min(zoomTarget, zoom + diff * delta * ZOOM_SPEED)

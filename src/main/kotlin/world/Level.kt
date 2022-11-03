@@ -59,7 +59,9 @@ sealed class Level {
     companion object {
         fun make(levelId: String) = if (levelId == "world") {
             WorldLevel()
-        }  else {
+        } else if (levelId == "attract") {
+            AttractLevel()
+        } else {
             EnclosedLevel(levelId)
         }
     }
@@ -255,14 +257,18 @@ sealed class Level {
 
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }
-            shadowCaster.castVisibility(pov, App.player.visualRange(), { x, y ->
-                isOpaqueAt(x, y)
-            }, { x, y ->
-                lightAt(x, y)
-            }, { x, y, vis ->
-                setTileVisibility(x, y, vis)
-            })
+            updateVisibility()
         }
+    }
+
+    open fun updateVisibility() {
+        shadowCaster.castVisibility(pov, App.player.visualRange(), { x, y ->
+            isOpaqueAt(x, y)
+        }, { x, y ->
+            lightAt(x, y)
+        }, { x, y, vis ->
+            setTileVisibility(x, y, vis)
+        })
     }
 
     private fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
