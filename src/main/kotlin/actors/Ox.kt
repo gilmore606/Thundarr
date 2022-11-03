@@ -25,7 +25,7 @@ class Ox : NPC() {
     }
 
     override fun pickAction(): Action {
-        if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
+        if (awareness == Awareness.AWARE && Dice.chance(0.3f)) {
             wander()?.also { return it }
         }
         return super.pickAction()

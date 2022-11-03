@@ -98,6 +98,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun statusGlyph(): Glyph? = null
 
+    open fun willAggro(target: Actor) = false
+
     open fun receiveAttack(attacker: Actor) { }
 
     // What will I do right now?

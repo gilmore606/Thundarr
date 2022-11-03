@@ -147,7 +147,7 @@ sealed class Level {
     }
 
     // Move the POV.
-    fun setPov(x: Int, y: Int) {
+    open fun setPov(x: Int, y: Int) {
         pov.x = x
         pov.y = y
         onSetPov()
@@ -358,12 +358,14 @@ sealed class Level {
         }
         var actorAt: Actor? = null
         actorAt(x, y)?.also { actor ->
-            actorAt = actor
-            menu.addOption("examine " + actor.name()) {
-                Screen.addModal(ExamineModal(actor))
+            if (actor !is Player) {
+                actorAt = actor
+                menu.addOption("examine " + actor.name()) {
+                    Screen.addModal(ExamineModal(actor))
+                }
             }
         }
-        if (App.player.thrownTag != "") {
+        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))
@@ -375,7 +377,7 @@ sealed class Level {
     // What action does the player take when bumping into dir from xy?
     fun bumpActionTo(x: Int, y: Int, dir: XY): Action? {
         actorAt(x + dir.x,y + dir.y)?.also { target ->
-            if (App.player.willAggro) {
+            if (App.player.willAggro(target) || target.willAggro(App.player)) {
                 return Melee(target, dir)
             }
             return Converse(target)

@@ -17,10 +17,6 @@ open class EnclosedLevel(
     protected val height: Int
         get() = chunk?.height ?: 1
 
-    override val sunLightSteps = mutableMapOf<Int, LightColor>().apply {
-        repeat (24) { n -> this[n] = LightColor(0.08f, 0.15f, 0.3f) }
-    }
-
     init {
         ChunkLoader.getLevelChunk(this, levelId) { receiveChunk(it) }
     }

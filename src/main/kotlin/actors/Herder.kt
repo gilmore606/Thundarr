@@ -22,7 +22,7 @@ class Herder : NPC() {
     override fun description() = "A peasant farm worker.  He looks oppressed, possibly by wizards."
     override fun onSpawn() {
         Strength.set(this, 9f)
-        Speed.set(this, 11f)
+        Speed.set(this, 5f)
         Brains.set(this, 11f)
     }
     override fun becomeHostileMsg(): List<String> = listOf("%Dn yelps in dismay at your sudden brutality!")
@@ -35,7 +35,7 @@ class Herder : NPC() {
     )
 
     override fun pickAction(): Action {
-        if (awareness != Awareness.HIBERNATED && Dice.chance(0.5f)) {
+        if (awareness != Awareness.HIBERNATED && Dice.chance(0.7f)) {
             wander()?.also { return it }
         }
         return super.pickAction()

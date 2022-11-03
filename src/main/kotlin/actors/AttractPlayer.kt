@@ -18,8 +18,8 @@ class AttractPlayer : Player() {
     override fun canAct() = true
 
     override fun defaultAction(): Action? {
-        if (System.currentTimeMillis() - lastActionMs > 1000L) {
-            lastActionMs = System.currentTimeMillis() - Random.nextLong(800L)
+        if (System.currentTimeMillis() - lastActionMs > 400L) {
+            lastActionMs = System.currentTimeMillis() - Random.nextLong(200L)
             return wander()
         }
         return null
@@ -28,7 +28,7 @@ class AttractPlayer : Player() {
     val lastDirs = mutableListOf<XY>()
 
     fun wander(): Action? {
-        if (Dice.chance(0.03f)) level?.setPov(xy.x, xy.y)
+        if (Dice.chance(0.08f)) level?.setPov(xy.x, xy.y)
         val dirs = mutableListOf<XY>()
         level?.also { level ->
             lastDirs.forEach { dir ->

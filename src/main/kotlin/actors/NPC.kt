@@ -36,6 +36,8 @@ sealed class NPC : Actor() {
     open fun converseLines(): List<String> = listOf()
 
     open fun isHostile(): Boolean = hostile
+    override fun willAggro(target: Actor) = isHostile() && target is Player
+
     open fun becomeHostileMsg(): List<String> = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!")
 
     final override fun canAct() = juice > 0f

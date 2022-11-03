@@ -54,6 +54,8 @@ open class Player : Actor() {
         }
     }
 
+    override fun willAggro(target: Actor) = willAggro
+
     fun toggleAggro() {
         if (willAggro) {
             Console.say("You calm down.")

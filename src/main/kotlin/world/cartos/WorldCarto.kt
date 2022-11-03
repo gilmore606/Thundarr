@@ -54,7 +54,7 @@ class WorldCarto(
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
                     if (Dice.chance(0.005f)) {
                         KtxAsync.launch {
-                            if (Dice.chance(0.9f)) {
+                            if (Dice.chance(0.8f)) {
                                 (if (Dice.flip()) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
                             } else {
                                 Herder().spawnAt(level, x + x0, y + y0)

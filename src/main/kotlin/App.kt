@@ -3,6 +3,7 @@ import actors.Player
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
+import actors.statuses.Wired
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -44,7 +45,11 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val worldZoom: Double,
         val cameraSlack: Double,
         val cameraMenuShift: Double,
-        val uiHue: Double
+        val uiHue: Double,
+        val volumeMaster: Double,
+        val volumeWorld: Double,
+        val volumeMusic: Double,
+        val volumeUI: Double
     )
 
     private const val TURNS_PER_DAY = 2000.0
@@ -164,6 +169,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 cameraMenuShift = Screen.cameraMenuShift,
                 worldZoom = Screen.worldZoom,
                 uiHue = Screen.uiHue,
+                volumeMaster = Speaker.volumeMaster,
+                volumeWorld = Speaker.volumeWorld,
+                volumeMusic = Speaker.volumeMusic,
+                volumeUI = Speaker.volumeUI
             )
         )
     }
@@ -219,6 +228,11 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Screen.cameraSlack = state.cameraSlack
                 Screen.cameraMenuShift = state.cameraMenuShift
                 Screen.uiHue = state.uiHue
+
+                Speaker.volumeMaster = state.volumeMaster
+                Speaker.volumeWorld = state.volumeWorld
+                Speaker.volumeMusic = state.volumeMusic
+                Speaker.volumeUI = state.volumeUI
             }
         }
     }

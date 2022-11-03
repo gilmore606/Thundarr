@@ -46,7 +46,7 @@ object Screen : KtxScreen {
     private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150
-    private const val MAX_RENDER_HEIGHT = 120
+    private const val MAX_RENDER_HEIGHT = 150
     var zoom = 0.5
         set(value) {
             field = value
