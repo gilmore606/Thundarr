@@ -105,7 +105,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.recenterCamera()
         movePlayerIntoLevel(70, 70)
 
-        TimeButtons.state = TimeButtons.State.PLAY
+        //TimeButtons.state = TimeButtons.State.PLAY
         Screen.brightnessTarget = 1f
         KtxAsync.launch {
             delay(500)

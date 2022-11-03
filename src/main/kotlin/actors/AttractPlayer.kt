@@ -28,6 +28,7 @@ class AttractPlayer : Player() {
     val lastDirs = mutableListOf<XY>()
 
     fun wander(): Action? {
+        if (Dice.chance(0.03f)) level?.setPov(xy.x, xy.y)
         val dirs = mutableListOf<XY>()
         level?.also { level ->
             lastDirs.forEach { dir ->

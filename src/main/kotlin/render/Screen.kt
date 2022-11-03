@@ -337,16 +337,18 @@ object Screen : KtxScreen {
         }
         if (scrollLatch) return
 
+        val slack = if (App.attractMode) cameraSlack * 3.5 else cameraSlack
+        val maxJerk = if (App.attractMode) CAMERA_MAX_JERK * 0.5 else CAMERA_MAX_JERK
         val targetX = pov.x + cameraOffsetX
         val targetY = pov.y + cameraOffsetY
         val xdist = (targetX - cameraPovX)
         val ydist = (targetY - cameraPovY)
-        var xinc = max(0.5, min(1000.0, (xdist.absoluteValue / cameraSlack))) * xdist.sign
-        var yinc = max(0.5, min(1000.0, (ydist.absoluteValue / cameraSlack))) * ydist.sign
+        var xinc = max(0.5, min(1000.0, (xdist.absoluteValue / slack))) * xdist.sign
+        var yinc = max(0.5, min(1000.0, (ydist.absoluteValue / slack))) * ydist.sign
         var xchange = cameraLastMoveX - xinc
         var ychange = cameraLastMoveY - yinc
-        xchange = if (xchange >= 0.0) min(xchange, CAMERA_MAX_JERK) else max(xchange, -CAMERA_MAX_JERK)
-        ychange = if (ychange >= 0.0) min(ychange, CAMERA_MAX_JERK) else max(ychange, -CAMERA_MAX_JERK)
+        xchange = if (xchange >= 0.0) min(xchange, maxJerk) else max(xchange, -maxJerk)
+        ychange = if (ychange >= 0.0) min(ychange, maxJerk) else max(ychange, -maxJerk)
         xinc = cameraLastMoveX - xchange
         yinc = cameraLastMoveY - ychange
         cameraLastMoveX = xinc

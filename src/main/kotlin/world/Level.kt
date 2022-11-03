@@ -165,7 +165,7 @@ sealed class Level {
         thingsAt(x, y).forEach { it.onWalkedOnBy(actor) }
 
         if (actor is Player) {
-            setPov(actor.xy.x, actor.xy.y)
+            if (!App.attractMode) setPov(actor.xy.x, actor.xy.y)
             Screen.updateZoomTarget()
             director.wakeNPCsNear(actor.xy)
         }
