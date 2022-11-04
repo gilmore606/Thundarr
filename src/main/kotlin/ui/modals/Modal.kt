@@ -1,5 +1,8 @@
 package ui.modals
 
+import actors.actions.Drop
+import actors.actions.Get
+import actors.actions.Use
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
@@ -11,7 +14,11 @@ import ui.panels.Panel
 import render.tilesets.Glyph
 import render.tilesets.ThingTileSet
 import render.tilesets.UITileSet
+import things.Container
+import things.Thing
 import ui.input.Mouse
+import util.groundAtPlayer
+import util.plural
 import java.lang.Float.min
 
 abstract class Modal(
@@ -153,6 +160,7 @@ abstract class Modal(
         onDismiss()
     }
     open fun onDismiss() { }
+    open fun onAdd() { }
 
     protected fun drawSelectionBox(x0: Int, y0: Int, width: Int, height: Int) {
         myBoxBatch().addPixelQuad(this.x + x0 - 6, this.y + y0 - (7 + height / 4),
@@ -161,6 +169,74 @@ abstract class Modal(
     }
 
     open fun advanceTime(turns: Float) { sidecar?.advanceTime(turns) }
+
+    protected fun addInventoryOptions(menu: ContextMenu, thing: Thing, these: List<Thing> = listOf(thing),
+                                      asWithContainer: Container? = null, asWithParent: Modal? = null, forExamine: Boolean = false) {
+        menu.apply {
+            if (these.size > 1) {
+                asWithContainer?.also { container ->
+                    addOption("put one " + thing.name() + " in " + container.name()) {
+                        App.player.queue(Drop(thing, container))
+                    }
+                    addOption("put all " + thing.name().plural() + " in " + container.name()) {
+                        these.forEach { App.player.queue(Drop(it, container)) }
+                    }
+                } ?: run {
+                    asWithParent?.also { parent ->
+                        addOption("take one " + thing.name()) {
+                            App.player.queue(Get(thing))
+                        }
+                        addOption("take all " + thing.name().plural()) {
+                            these.forEach { App.player.queue(Get(it)) }
+                        }
+                    } ?: run {
+                        addOption("drop one " + thing.name()) {
+                            App.player.queue(Drop(thing, groundAtPlayer()))
+                        }
+                        addOption("drop all " + thing.name().plural()) {
+                            these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
+                        }
+                    }
+                }
+            } else {
+                asWithContainer?.also { container ->
+                    addOption("put " + thing.name() + " in " + container.name()) {
+                        App.player.queue(Drop(thing, container))
+                    }
+                } ?: run {
+                    asWithParent?.also {
+                        addOption("take " + thing.name()) {
+                            App.player.queue(Get(thing))
+                        }
+                    } ?: run {
+                        addOption("drop " + thing.listName()) {
+                            App.player.queue(Drop(thing, groundAtPlayer()))
+                        }
+                    }
+                }
+            }
+
+            if (!forExamine) addOption("examine " + thing.name()) {
+                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW))
+            }
+
+            if (asWithContainer == null && asWithParent == null) {
+                thing.uses().values.forEach {
+                    if (it.canDo(App.player)) {
+                        addOption(it.command) {
+                            App.player.queue(Use(thing, it.duration, it.toDo))
+                        }
+                    }
+                }
+                if (thing.thingTag() != App.player.thrownTag) {
+                    addOption("ready " + thing.name().plural() + " for throwing") {
+                        App.player.readyForThrowing(thing.thingTag())
+                    }
+                }
+            }
+        }
+
+    }
 
     override fun drawsGrouped() = false
     override fun drawsSeparate() = true

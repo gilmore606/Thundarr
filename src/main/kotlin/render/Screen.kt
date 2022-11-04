@@ -290,10 +290,12 @@ object Screen : KtxScreen {
         App.level.onRender(delta)
         var dismissedPanel: Panel? = null
         var topModalFound: Modal? = null
-        panels.forEach {
-            it.onRender(delta)
-            if (it.dismissed) dismissedPanel = it
-            else if (it is Modal) topModalFound = it
+        for (i in 0 until panels.size) {
+            panels[i].also {
+                it.onRender(delta)
+                if (it.dismissed) dismissedPanel = it
+                else if (it is Modal) topModalFound = it
+            }
         }
         dismissedPanel?.also {
             Speaker.ui(Speaker.SFX.UICLOSE)
@@ -552,6 +554,7 @@ object Screen : KtxScreen {
     fun addModal(modal: Modal) {
         if (modal !is ContextMenu) clearCursor()
         addPanel(modal)
+        modal.onAdd()
         Speaker.ui(Speaker.SFX.UIOPEN, screenX = modal.x)
         val tileWidth = ((modal.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride
         val tileHeight = ((modal.height.toDouble() / (height)) * 2.0) / tileStride

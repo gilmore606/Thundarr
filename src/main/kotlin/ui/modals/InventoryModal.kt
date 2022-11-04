@@ -96,69 +96,8 @@ class InventoryModal(
             optionY(ourSelection) - 4
         ).apply {
             this.parentModal = parent
-            val these = grouped[ourSelection]
-            val thing = these[0]
-            if (these.size > 1) {
-                parent.withContainer?.also { container ->
-                    addOption("put one " + thing.name() + " in " + container.name()) {
-                        App.player.queue(Drop(thing, container))
-                    }
-                    addOption("put all " + thing.name().plural() + " in " + container.name()) {
-                        these.forEach { App.player.queue(Drop(it, container)) }
-                    }
-                } ?: run {
-                    parent.parentModal?.also { parent ->
-                        addOption("take one " + thing.name()) {
-                            App.player.queue(Get(thing))
-                        }
-                        addOption("take all " + thing.name().plural()) {
-                            these.forEach { App.player.queue(Get(it)) }
-                        }
-                    } ?: run {
-                        addOption("drop one " + thing.name()) {
-                            App.player.queue(Drop(thing, groundAtPlayer()))
-                        }
-                        addOption("drop all " + thing.name().plural()) {
-                            these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
-                        }
-                    }
-                }
-            } else {
-                parent.withContainer?.also { container ->
-                    addOption("put " + thing.name() + " in " + container.name()) {
-                        App.player.queue(Drop(thing, container))
-                    }
-                } ?: run {
-                    parent.parentModal?.also {
-                        addOption("take " + thing.name()) {
-                            App.player.queue(Get(thing))
-                        }
-                    } ?: run {
-                        addOption("drop " + thing.listName()) {
-                            App.player.queue(Drop(thing, groundAtPlayer()))
-                        }
-                    }
-                }
-            }
-
-            addOption("examine " + thing.name()) {
-                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW))
-            }
-
-            if (parent.withContainer == null && parent.parentModal == null) {
-                thing.uses().values.forEach {
-                    if (it.canDo(App.player)) {
-                        addOption(it.command) {
-                            App.player.queue(Use(thing, it.duration, it.toDo))
-                        }
-                    }
-                }
-                if (thing.thingTag() != App.player.thrownTag) {
-                    addOption("ready " + thing.name().plural() + " for throwing") {
-                        App.player.readyForThrowing(thing.thingTag())
-                    }
-                }
-            }
+            addInventoryOptions(this, grouped[ourSelection][0], grouped[ourSelection],
+                parent.withContainer, parent.parentModal)
         })
     }
 

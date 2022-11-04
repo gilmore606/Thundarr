@@ -32,7 +32,7 @@ class ContextMenu(
     var succeeded = false
 
     val options = mutableListOf<Option>()
-    private var maxOptionWidth = 0
+    var maxOptionWidth = 0
 
     init {
         this.padding = 10
