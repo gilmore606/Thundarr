@@ -130,6 +130,7 @@ class StepMap() {
             val oldVisible = visibleEntities
             visibleEntities = scratchVisible
             scratchVisible = oldVisible
+            scratchVisible.clear()
         }
     }
 
