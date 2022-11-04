@@ -2,6 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Equip
+import actors.actions.Move
 import actors.actions.Unequip
 import actors.animations.Animation
 import actors.animations.Step
@@ -288,6 +289,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (this is Player) StatusPanel.refillCache()
     }
 
+    ///// action generators
+
+    protected fun stepToward(target: Entity): Move? {
+        Pather.nextStep(this, target)?.also { s ->
+            return Move(XY(s.x - xy.x, s.y - xy.y))
+        }
+        return null
+    }
+
     ///// useful utilities
 
     protected fun doWeHave(thingTag: String): Thing? {
@@ -301,7 +311,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
-    protected fun entitiesSeen() = caster.entitiesSeenBy(this)
+    protected fun entitiesSeen(matching: ((Entity)->Boolean)? = null) = caster.entitiesSeenBy(this, matching)
 
     protected fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()

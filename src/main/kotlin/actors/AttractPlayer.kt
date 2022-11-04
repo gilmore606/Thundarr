@@ -53,7 +53,7 @@ class AttractPlayer : Player() {
                         return Melee(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                     if (entity is Ox || entity is MuskOx) {
-                        return Converse(entity as Actor)
+                        if (Dice.flip()) return Converse(entity as Actor)
                     }
                     if (entity is Apple || entity is Pear) {
                         return Move(XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))

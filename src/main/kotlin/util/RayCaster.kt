@@ -238,17 +238,19 @@ class RayCaster {
         }
     }
 
-    fun entitiesSeenBy(actor: Actor): Set<Entity> {
+    fun entitiesSeenBy(actor: Actor, matching: ((Entity)->Boolean)? = null): Set<Entity> {
         val entities = mutableSetOf<Entity>()
         actor.level?.also { level ->
             lineCache.forEach { line ->
-                seenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange())
+                seenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange(), matching)
             }
         }
         return entities
     }
 
-    private fun seenOctant(level: Level, resultSet: MutableSet<Entity>, line: ShadowLine, povX: Int, povY: Int, distance: Float) {
+    private fun seenOctant(level: Level, resultSet: MutableSet<Entity>, line: ShadowLine, povX: Int, povY: Int, distance: Float,
+                           matching: ((Entity)->Boolean)? = null)
+    {
         line.reset()
         var fullShadow = false
         var row = 0
@@ -281,7 +283,9 @@ class RayCaster {
                             } else {
                                 // collect targets
                                 level.actorAt(castX, castY)?.also { resultSet.add(it) }
-                                resultSet.addAll(level.thingsAt(castX, castY))
+                                level.thingsAt(castX, castY).forEach {
+                                    if (matching == null || matching(it)) resultSet.add(it)
+                                }
                                 line.discard(projection)
                             }
                         }

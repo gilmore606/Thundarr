@@ -28,6 +28,11 @@ class Ox : NPC() {
         if (awareness == Awareness.AWARE && Dice.chance(0.3f)) {
             wander()?.also { return it }
         }
+        if (Dice.flip()) {
+            entitiesSeen { it is Ox || it is MuskOx }.randomOrNull()?.also { ox ->
+                stepToward(ox)?.also { return it }
+            }
+        }
         return super.pickAction()
     }
 

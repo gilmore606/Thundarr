@@ -1,14 +1,22 @@
 package actors
 
 import actors.actions.Action
+import actors.actions.Converse
+import actors.actions.Melee
+import actors.actions.Move
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Apple
+import things.Pear
 import util.Dice
 import util.LightColor
+import util.XY
+import util.isEveryFrame
 import world.Entity
+import world.path.Pather
 import kotlin.random.Random
 
 @Serializable
@@ -35,8 +43,22 @@ class Herder : NPC() {
     )
 
     override fun pickAction(): Action {
-        if (awareness != Awareness.HIBERNATED && Dice.chance(0.7f)) {
+        // talk or fight or grab nearby stuff
+        entitiesNextToUs().forEach { entity ->
+            if (entity is Player && isHostile()) {
+                return Melee(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+            }
+            if (entity is Ox || entity is MuskOx) {
+                if (Dice.flip()) return Converse(entity as Actor)
+            }
+        }
+        if (Dice.chance(0.6f)) {
             wander()?.also { return it }
+        }
+        if (Dice.flip()) {
+            entitiesSeen { it is Ox || it is MuskOx }.randomOrNull()?.also { ox ->
+                stepToward(ox)?.also { return it }
+            }
         }
         return super.pickAction()
     }
@@ -45,7 +67,7 @@ class Herder : NPC() {
     private var flicker = 1f
     override fun flicker() = flicker
     override fun doOnRender(delta: Float) {
-        if (awareness != Awareness.HIBERNATED && System.currentTimeMillis() % 5 == 1L) {
+        if (awareness != Awareness.HIBERNATED && isEveryFrame(5)) {
             flicker = Random.nextFloat() * 0.12f + 0.88f
         }
     }

@@ -28,7 +28,7 @@ class WorldCarto(
     val scale = 0.02
     val fullness = 0.002
 
-    fun carveWorldChunk(offset: Double = 0.0) {
+    fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
         forEachCell { x, y ->
             val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
                     Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
@@ -52,7 +52,7 @@ class WorldCarto(
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
-                    if (Dice.chance(0.005f)) {
+                    if (Dice.chance(if (forAttract) 0.010f else 0.005f)) {
                         KtxAsync.launch {
                             if (Dice.chance(0.8f)) {
                                 (if (Dice.flip()) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)

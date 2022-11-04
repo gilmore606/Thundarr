@@ -130,7 +130,7 @@ class Chunk(
     fun generateAttractLevel(level: Level) {
         generating = true
         WorldCarto(0, 0, AttractLevel.dimension - 1, AttractLevel.dimension - 1, this, level).apply {
-            carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0)
+            carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0, forAttract = true)
         }
         generating = false
     }
