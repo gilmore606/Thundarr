@@ -23,6 +23,7 @@ import util.XY
 import util.filterAnd
 import util.log
 import world.*
+import world.weather.Weather
 import kotlin.system.exitProcess
 
 const val RESOURCE_FILE_DIR = "src/main/resources/"
@@ -34,6 +35,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val levelId: String,
         val player: Player,
         val time: Double,
+        val weather: Weather,
         val consoleLines: List<String>
     )
 
@@ -58,6 +60,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     lateinit var player: Player
     lateinit var level: Level
     lateinit var save: SaveState
+    var weather = Weather()
 
     var time: Double = 200.0
     var lastHour = -1
@@ -104,6 +107,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.addPanel(TimeButtons)
 
         level = LevelKeeper.getLevel("attract")
+        weather = Weather()
         player = AttractPlayer()
 
         updateTime(Dice.range(700, 1200).toDouble())
@@ -151,6 +155,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     levelId = level.levelId(),
                     player = player,
                     time = time,
+                    weather = weather,
                     consoleLines = Console.lines
                 )
             )
@@ -188,19 +193,15 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             val state = save.getWorldState()
 
-
-
             level = LevelKeeper.getLevel(state.levelId)
             if (level !is WorldLevel) LevelKeeper.getLevel("world")
 
             player = state.player
             player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
-
-
-            Console.restoreLines(state.consoleLines)
-
+            weather = state.weather
             updateTime(state.time)
+            Console.restoreLines(state.consoleLines)
 
             while (!level.isReady()) {
                 log.info("Waiting for level...")
@@ -290,6 +291,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun enterLevelFromWorld(levelId: String) {
         val oldLevelId = level.levelId()
         level = LevelKeeper.getLevel(levelId)
+        Speaker.requestSong(Speaker.Song.DUNGEON)
         KtxAsync.launch {
             while (!level.isReady()) {
                 log.debug("Waiting for level...")
@@ -303,6 +305,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     fun enterWorldFromLevel(dest: XY) {
         level = LevelKeeper.getWarmedWorld(dest)
+        Speaker.requestSong(Speaker.Song.WORLD)
 
         KtxAsync.launch {
             while (!level.isReady()) {

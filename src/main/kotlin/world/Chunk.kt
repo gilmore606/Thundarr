@@ -390,7 +390,11 @@ class Chunk(
 
     // Force all cells to re-sum light on next frame.
     private fun dirtyAllLightCacheCells() {
-        forEachCell { x,y -> lightCacheDirty[x][y] = true }
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                lightCacheDirty[x][y] = true
+            }
+        }
     }
 
     private fun refreshLightCacheAt(x: Int, y: Int) {
@@ -410,9 +414,7 @@ class Chunk(
     fun removeLightSource(lightSource: LightSource) {
         if (lightSource in lightsTouching) {
             forEachCell { x, y ->
-                if (lights[x][y].remove(lightSource) != null) {
-                    lightCacheDirty[x][y] = true
-                }
+                lights[x][y].remove(lightSource)
             }
             lightSourceLocations.remove(lightSource)
             lightsTouching.remove(lightSource)
@@ -420,7 +422,7 @@ class Chunk(
     }
 
     fun onRender(delta: Float) {
-        dirtyAllLightCacheCells()
+        if (isEveryFrame(3)) dirtyAllLightCacheCells()
         sparks.filterOut({ it.done }) { it.onRender(delta) }
     }
 

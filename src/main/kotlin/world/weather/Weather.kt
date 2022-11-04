@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
 import util.LightColor
+import util.isEveryFrame
 import world.Level
 import java.lang.Float.max
 import java.lang.Float.min
@@ -43,18 +44,21 @@ class Weather {
 
     fun onRender(delta: Float) {
         weatherIntensity = if (weatherIntensity < weatherIntensityTarget) {
-            java.lang.Float.min(weatherIntensityTarget, weatherIntensity + 0.25f * delta)
+            min(weatherIntensityTarget, weatherIntensity + 0.25f * delta)
         } else {
-            java.lang.Float.max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
+            max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
         }
 
         var bolt = max(0f, lightning.r - 3.8f * delta)
+
         val boltChance = (rainIntensity - 0.4f) * 0.4f
-        val extraChance = boltChance * 0.6f
-        if (Dice.chance(delta * boltChance)) {
-            bolt = 0.4f + Dice.float(0f, rainIntensity)
+        if (isEveryFrame(5)) {
+            if (Dice.chance(delta * boltChance * 5f)) {
+                bolt = 0.4f + Dice.float(0f, rainIntensity)
+            }
         }
         if (bolt > 0.01f) {
+            val extraChance = boltChance * 0.6f
             if (Dice.chance(delta * extraChance)) {
                 bolt += Dice.float(0.1f, 0.4f)
             }
@@ -70,8 +74,8 @@ class Weather {
             updateWeather(hour, minute, level)
         }
         val cloudLight = min(1f, (level.ambientLight.brightness() - 0.5f) * 2f)
-        cloudIntensity = java.lang.Float.max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
-        rainIntensity = java.lang.Float.max(0f, (weatherIntensity - 0.5f) * 2f)
+        cloudIntensity = max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
+        rainIntensity = max(0f, (weatherIntensity - 0.5f) * 2f)
     }
 
     private fun updateWeather(hour: Int, minute: Int, level: Level) {

@@ -2,7 +2,6 @@ package util
 
 import mu.KotlinLogging
 import things.Thing
-import world.Chunk
 import world.Entity
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -164,6 +163,8 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
     }
     return str
 }
+
+fun isEveryFrame(frames: Int): Boolean = (System.currentTimeMillis() % frames.toLong() == 0L)
 
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
 

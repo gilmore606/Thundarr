@@ -73,7 +73,6 @@ class StepMap() {
 
     suspend fun update() {
         targetEntity?.level()?.also { level ->
-            log.debug("updating map $this")
             inSurgery = true
             clearScratch()
             var step = 0

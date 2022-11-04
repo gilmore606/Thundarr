@@ -30,6 +30,9 @@ sealed class Level {
 
     val director = Director(this)
 
+    val weather: Weather
+        get() = App.weather
+
     private val shadowCaster = RayCaster()
     var shadowDirty = true
 
@@ -50,7 +53,6 @@ sealed class Level {
 
     val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
     val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
-    val weather = Weather()
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.

@@ -77,7 +77,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     abstract fun hasActionJuice(): Boolean
     abstract fun wantsToAct(): Boolean
 
-    fun onRestore() {
+    open fun onRestore() {
         contents.forEach { it.onRestore(this) }
         isUnloading = false
     }

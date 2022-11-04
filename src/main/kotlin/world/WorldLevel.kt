@@ -58,6 +58,7 @@ class WorldLevel() : Level() {
     override fun onRestore() {
         super.onRestore()
         populateChunks()
+        log.info("restored world with weather $weather ${weather.weatherIntensity}")
     }
 
     private fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE + if (x < 0) -CHUNK_SIZE else 0

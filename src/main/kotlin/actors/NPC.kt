@@ -11,6 +11,7 @@ import render.tilesets.Glyph
 import ui.panels.Console
 import util.*
 import world.Level
+import world.path.Pather
 
 @Serializable
 sealed class NPC : Actor() {
@@ -52,8 +53,27 @@ sealed class NPC : Actor() {
         return pickAction()
     }
 
-    fun hibernate() { awareness = Awareness.HIBERNATED }
-    fun unHibernate() { awareness = Awareness.UNAWARE }
+    override fun onRestore() {
+        super.onRestore()
+        if (awareness != Awareness.HIBERNATED) {
+            startPathing()
+        }
+    }
+
+    private fun startPathing() { Pather.subscribe(this, this, 24f) }
+
+    fun hibernate() {
+        awareness = Awareness.HIBERNATED
+        Pather.unsubscribe(this, this)
+    }
+
+    fun unHibernate() {
+        if (awareness == Awareness.HIBERNATED) {
+            startPathing()
+            awareness = Awareness.UNAWARE
+        }
+    }
+
     fun noticePlayer() { awareness = Awareness.AWARE }
     fun forgetPlayer() { if (awareness == Awareness.AWARE) awareness = Awareness.UNAWARE }
 
