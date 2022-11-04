@@ -25,9 +25,9 @@ object Keyboard : KtxInputAdapter {
     private const val REPEAT_DELAY_MS = 300L
     const val REPEAT_MS = 90L
 
-    private var SHIFT = false
-    private var CTRL = false
-    private var ALT = false
+    var SHIFT = false
+    var CTRL = false
+    var ALT = false
 
     var CURSOR_MODE = false
 
@@ -50,6 +50,7 @@ object Keyboard : KtxInputAdapter {
             ALT = true
         } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
             CTRL = true
+            Screen.updateCursorLine()
         } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
             SHIFT = true
         } else {
@@ -68,6 +69,7 @@ object Keyboard : KtxInputAdapter {
                 ALT = false
             } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
                 CTRL = false
+                Screen.clearCursorLine()
             } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
                 SHIFT = false
             }

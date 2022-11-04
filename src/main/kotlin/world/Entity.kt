@@ -38,4 +38,5 @@ interface Entity {
     fun xy(): XY?
 
     fun onRender(delta: Float) { }
+
 }

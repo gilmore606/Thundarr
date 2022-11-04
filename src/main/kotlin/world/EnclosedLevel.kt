@@ -24,7 +24,6 @@ open class EnclosedLevel(
     override fun receiveChunk(chunk: Chunk) {
         this.chunk = chunk
         allChunks = setOf(chunk)
-        stepMap = makeStepMap()
         ready = true
     }
 
@@ -41,6 +40,8 @@ open class EnclosedLevel(
 
     override fun isReady() = ready
 
+    // Put the player next to the door he came in.
+    // TODO: find a better solution for this
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         if (isReady()) {
             for (x in 0 until width) {
@@ -63,11 +64,5 @@ open class EnclosedLevel(
 
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null
-
-    override fun makeStepMap() = StepMap(width, height,
-        { x, y -> chunk?.isWalkableAt(x, y) ?: false },
-        { 0 },
-        { 0 }
-    )
 
 }

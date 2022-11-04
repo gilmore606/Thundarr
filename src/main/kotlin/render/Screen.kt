@@ -437,7 +437,7 @@ object Screen : KtxScreen {
                         if (App.player.queuedActions.isEmpty()) {
                             val newCursor = XY(col, row)
                             cursorPosition = newCursor
-                            cursorLine = App.level.getPathToPOV(newCursor).toMutableList()
+                            if (Keyboard.CTRL) updateCursorLine()
                             return
                         }
                     }
@@ -445,6 +445,13 @@ object Screen : KtxScreen {
                 }
             }
         }
+    }
+
+    fun updateCursorLine() {
+        cursorPosition?.also { cursor -> cursorLine = App.level.getPathToPOV(cursor).toMutableList() }
+    }
+    fun clearCursorLine() {
+        cursorLine.clear()
     }
 
     fun mouseScrolled(amount: Float) {

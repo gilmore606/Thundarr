@@ -6,6 +6,7 @@ import actors.actions.Move
 import util.XY
 import util.log
 import world.Level
+import world.path.Pather
 
 class WalkTo(
     level: Level,
@@ -13,25 +14,19 @@ class WalkTo(
     val y: Int
 ) : Action(1f) {
 
-    // TODO: use the level's step map, this is stupid
-    private val stepMap = level.makeStepMap().apply { update(x, y) }
 
     private var done = false
+    private val dest = XY(x,y)
 
     private var lastStepTime = System.currentTimeMillis()
 
     override fun shouldContinueFor(actor: Actor): Boolean = !done && (actor.xy.x != x || actor.xy.y != y)
 
     override fun execute(actor: Actor, level: Level) {
-        stepMap.stepFrom(actor.xy)?.also { dir ->
-            Move(dir).execute(actor, level)
-            val steptime = System.currentTimeMillis() - lastStepTime
-            lastStepTime = System.currentTimeMillis()
-            log.info("step time $steptime ms")
-        } ?: run {
-            log.debug("Pathing failed for $actor to $x,$y.")
-            done = true
-        }
+        Pather.nextStep(actor, dest)?.also {
+            log.info("nextstep $it")
+            Move(XY(it.x - actor.xy.x, it.y - actor.xy.y)).execute(actor, level)
+        } ?: run { done = true }
     }
 
 }

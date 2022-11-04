@@ -50,7 +50,8 @@ object Speaker {
 
     enum class Song(val file: String) {
         ATTRACT("finitepool.ogg"),
-        WORLD("jacobsladder.ogg")
+        WORLD("jacobsladder.ogg"),
+        DUNGEON("equivalenttree.ogg")
     }
 
     enum class SFX(val file: String) {

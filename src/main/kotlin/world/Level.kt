@@ -16,6 +16,7 @@ import ui.modals.ContextMenu
 import ui.modals.ExamineModal
 import ui.panels.Console
 import util.*
+import world.path.Pather
 import world.stains.Stain
 import world.terrains.Terrain
 import world.terrains.TerrainData
@@ -32,7 +33,6 @@ sealed class Level {
     private val shadowCaster = RayCaster()
     var shadowDirty = true
 
-    protected lateinit var stepMap: StepMap
     private val noThing = mutableListOf<Thing>()
 
     val dirtyLights = mutableMapOf<LightSource,XY>()
@@ -151,7 +151,6 @@ sealed class Level {
         pov.y = y
         onSetPov()
         shadowDirty = true
-        updateStepMap()
         if (this == App.level) Screen.povMoved()
     }
 
@@ -180,13 +179,7 @@ sealed class Level {
     fun linkTemporal(temporal: Temporal) = director.linkTemporal(temporal)
     fun unlinkTemporal(temporal: Temporal) = director.unlinkTemporal(temporal)
 
-    abstract fun makeStepMap(): StepMap
-
     abstract fun isReady(): Boolean
-
-    open fun updateStepMap() {
-        //stepMap.update(this.pov.x, this.pov.y)
-    }
 
     protected open fun onSetPov() { }
 
@@ -218,7 +211,7 @@ sealed class Level {
 
     fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.BLANK
 
-    fun getPathToPOV(from: XY) = stepMap.pathFrom(from)
+    fun getPathToPOV(from: XY): List<XY> = Pather.buildPath(from, App.player)
 
     fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
 
@@ -226,7 +219,7 @@ sealed class Level {
 
     fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
-    fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y)
+    fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
 
     fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
@@ -335,16 +328,21 @@ sealed class Level {
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
         if (App.player.xy.x == x && App.player.xy.y == y) {
-            thingsAt(x,y).forEach {
-                if (it.isPortable()) {
-                    menu.addOption("take " + it.listName()) {
-                        App.player.queue(Get(it))
+            thingsAt(x,y).groupByTag().forEach { group ->
+                if (group[0].isPortable()) {
+                    if (group.size == 1) {
+                        menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
+                    } else {
+                        menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
+                        menu.addOption("take all " + group[0].name().plural()) {
+                            group.forEach { App.player.queue(Get(it)) }
+                        }
                     }
                 }
-                it.uses().forEach { use ->
+                group[0].uses().forEach { use ->
                     if (use.canDo(App.player)) {
                         menu.addOption(use.command) {
-                            App.player.queue(Use(it, use.duration, use.toDo))
+                            App.player.queue(Use(group[0], use.duration, use.toDo))
                         }
                     }
                 }

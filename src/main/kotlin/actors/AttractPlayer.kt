@@ -73,13 +73,13 @@ class AttractPlayer : Player() {
         val dirs = mutableListOf<XY>()
         level?.also { level ->
             lastDirs.forEach { dir ->
-                if (level.isWalkableAt(xy.x + dir.x, xy.y + dir.y)) {
+                if (level.isWalkableAt(xy.x + dir.x, xy.y + dir.y) && level.actorAt(xy.x + dir.x, xy.y + dir.y) == null) {
                     dirs.add(dir)
                 }
             }
             if (lastDirs.isEmpty() || Dice.chance(0.2f)) {
                 DIRECTIONS.forEach { dir ->
-                    if (level.isWalkableAt(xy.x + dir.x, xy.y + dir.y)) {
+                    if (level.isWalkableAt(xy.x + dir.x, xy.y + dir.y) && level.actorAt(xy.x + dir.x, xy.y + dir.y) == null) {
                         dirs.add(dir)
                     }
                 }

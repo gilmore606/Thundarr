@@ -23,6 +23,7 @@ import ui.panels.StatusPanel
 import util.*
 import world.Entity
 import world.Level
+import world.path.Pather
 import world.stains.Blood
 import java.lang.Float.max
 import java.lang.Integer.min
@@ -85,8 +86,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val oldX = this.xy.x
         val oldY = this.xy.y
         val oldLevel = this.level
+        this.level = level
         this.xy.x = x
         this.xy.y = y
+        Pather.onActorMove(this)
         oldLevel?.onActorMovedFrom(this, oldX, oldY)
         if (oldLevel != level) oldLevel?.director?.detachActor(this)
         level?.onActorMovedTo(this, x, y)
@@ -236,6 +239,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
 
         this.animation = null
+        Pather.unsubscribeAll(this)
         moveTo(null, 0, 0)
     }
 

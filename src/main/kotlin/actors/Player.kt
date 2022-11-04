@@ -12,6 +12,7 @@ import util.englishList
 import util.plural
 import world.Entity
 import world.Level
+import world.path.Pather
 
 @Serializable
 open class Player : Actor() {
@@ -26,6 +27,10 @@ open class Player : Actor() {
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
+
+    init {
+        Pather.subscribe(this, this, 100f)
+    }
 
     override fun statusGlyph(): Glyph? {
         if (willAggro) {

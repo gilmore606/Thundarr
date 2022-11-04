@@ -8,22 +8,19 @@ const val STEP_CHUNKS_AHEAD = 1
 
 class WorldLevel() : Level() {
 
-    private val CHUNKS_WIDE = CHUNKS_AHEAD * 2 + 1
+    private val chunksWide = CHUNKS_AHEAD * 2 + 1
 
-    private val chunks = Array(CHUNKS_WIDE) { Array<Chunk?>(CHUNKS_WIDE) { null } }
+    private val chunks = Array(chunksWide) { Array<Chunk?>(chunksWide) { null } }
     private val loadedChunks = mutableSetOf<Chunk>()
-    private val originChunkLocation = XY(0,0)
+    private val originChunkLocation = XY(0,0)   // upper-left corner of the upper-left corner chunk
 
     private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
-    init {
-        stepMap = makeStepMap()
-    }
 
     override fun allChunks() = loadedChunks
     override fun levelId() = "world"
 
-    override fun isReady() = loadedChunks.size >= CHUNKS_WIDE * CHUNKS_WIDE
+    override fun isReady() = loadedChunks.size >= chunksWide * chunksWide
 
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         if (fromLevelId == "world") {
@@ -61,7 +58,6 @@ class WorldLevel() : Level() {
     override fun onRestore() {
         super.onRestore()
         populateChunks()
-        updateStepMap()
     }
 
     private fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE + if (x < 0) -CHUNK_SIZE else 0
@@ -71,7 +67,7 @@ class WorldLevel() : Level() {
         if (x >= originChunkLocation.x && y >= originChunkLocation.y) {
             val cx = (x - originChunkLocation.x) / CHUNK_SIZE
             val cy = (y - originChunkLocation.y) / CHUNK_SIZE
-            if (cx >= 0 && cy >= 0 && cx < CHUNKS_WIDE && cy < CHUNKS_WIDE) {
+            if (cx >= 0 && cy >= 0 && cx < chunksWide && cy < chunksWide) {
                 return chunks[cx][cy]
             }
         }
@@ -118,7 +114,7 @@ class WorldLevel() : Level() {
         val originCy = yToChunkY(pov.y) - CHUNK_SIZE * CHUNKS_AHEAD
         val cx = (chunk.x - originCx) / CHUNK_SIZE
         val cy = (chunk.y - originCy) / CHUNK_SIZE
-        if (cx < 0 || cy < 0 || cx >= CHUNKS_WIDE || cy >= CHUNKS_WIDE) {
+        if (cx < 0 || cy < 0 || cx >= chunksWide || cy >= chunksWide) {
             log.error("Received outdated chunk intended for cx $cx cy $cy !")
             return
         }
@@ -133,8 +129,8 @@ class WorldLevel() : Level() {
 
     private fun hasAttachedChunk(chunk: Chunk): Boolean {
         var inUse = false
-        for (x in 0 until CHUNKS_WIDE) {
-            for (y in 0 until CHUNKS_WIDE) {
+        for (x in 0 until chunksWide) {
+            for (y in 0 until chunksWide) {
                 if (chunks[x][y] == chunk) {
                     inUse = true
                 }
@@ -153,11 +149,5 @@ class WorldLevel() : Level() {
             dirtyLightsTouching(chunk.x + chunk.width, y + chunk.y)
         }
     }
-
-    override fun makeStepMap() = StepMap(CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1), CHUNK_SIZE * (STEP_CHUNKS_AHEAD * 2 + 1),
-        { x, y -> isWalkableAt(x, y) },
-        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD]?.x ?: 0 },
-        { chunks[CHUNKS_AHEAD- STEP_CHUNKS_AHEAD][CHUNKS_AHEAD- STEP_CHUNKS_AHEAD]?.y ?: 0 }
-    )
 
 }

@@ -42,11 +42,12 @@ class Chunk(
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array<TerrainData?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
-    private val sparks = ArrayList<Spark>()
 
-    val savedActors: MutableSet<Actor> = mutableSetOf()
+    private val savedActors: MutableSet<Actor> = mutableSetOf()
     var generating = true
 
+    @Transient
+    private val sparks = ArrayList<Spark>()
     @Transient
     private val lights = Array(width) { Array(height) { mutableMapOf<LightSource, LightColor>() } }
     @Transient
@@ -184,13 +185,9 @@ class Chunk(
         if (thing is LightSource) { level.removeLightSource(thing) }
     }
 
-    fun onAddActor(x: Int, y: Int, actor: Actor) {
-        updateWalkable(x - this.x, y - this.y)
-    }
+    fun onAddActor(x: Int, y: Int, actor: Actor) { }
 
-    fun onRemoveActor(x: Int, y: Int, actor: Actor) {
-        updateWalkable(x - this.x, y - this.y)
-    }
+    fun onRemoveActor(x: Int, y: Int, actor: Actor) { }
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y].contents
@@ -271,7 +268,7 @@ class Chunk(
     private fun updateWalkable(x: Int, y: Int): Boolean {
         if (generating) return Terrain.get(terrains[x][y]).isWalkable()
         if (boundsCheck(x + this.x, y + this.y)) {
-            var v = (level.actorAt(x + this.x,y + this.y) == null) && Terrain.get(terrains[x][y]).isWalkable()
+            var v = Terrain.get(terrains[x][y]).isWalkable()
             if (v) {
                 var thingBlocking = false
                 things[x][y].contents.forEach { thing ->

@@ -1,6 +1,7 @@
 package util
 
 import mu.KotlinLogging
+import things.Thing
 import world.Chunk
 import world.Entity
 import java.io.ByteArrayInputStream
@@ -62,6 +63,21 @@ fun <T> MutableList<T>.iterateAndEmpty(iteration: (T)->Unit) {
         iteration(first)
         remove(first)
     }
+}
+
+fun MutableList<Thing>.groupByTag(): List<List<Thing>> {
+    val groups = ArrayList<ArrayList<Thing>>()
+    forEach {
+        var found = false
+        groups.forEach { group ->
+            if (group[0].thingTag() == it.thingTag()) {
+                group.add(it)
+                found = true
+            }
+        }
+        if (!found) groups.add(ArrayList<Thing>().apply { add(it) })
+    }
+    return groups
 }
 
 fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
@@ -166,5 +182,5 @@ val SOUTHWEST = XY(-1, 1)
 val NO_DIRECTION = XY(0, 0)
 
 val CARDINALS = listOf(NORTH, SOUTH, WEST, EAST)
-val CORNERS = listOf(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST)
+val DIAGONALS = listOf(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST)
 val DIRECTIONS = listOf(NORTH, SOUTH, WEST, EAST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)

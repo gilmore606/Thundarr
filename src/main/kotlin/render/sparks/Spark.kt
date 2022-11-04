@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
 
-@Serializable
 sealed class Spark {
 
     val xy = XY(0,0)
