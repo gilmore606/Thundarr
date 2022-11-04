@@ -20,7 +20,6 @@ class StepMap() {
     var offsetY = 0 // offset to level coords
 
     var outOfDate = true
-    var inSurgery = false
     var done = false
 
     private var scratch = Array(1) { Array(1) { -1 } }
@@ -73,7 +72,6 @@ class StepMap() {
 
     suspend fun update() {
         targetEntity?.level()?.also { level ->
-            inSurgery = true
             clearScratch()
             var step = 0
             val centerX = width / 2 + 1
@@ -107,7 +105,6 @@ class StepMap() {
             promoteScratch()
         }
         outOfDate = false
-        inSurgery = false
     }
 
     private fun clearScratch() {
@@ -134,12 +131,7 @@ class StepMap() {
             if (lx in 0 until width && ly in 0 until height) {
                 val nextstep = map[lx][ly] - 1
                 if (nextstep < 0) return null
-                CARDINALS.forEach { dir ->
-                    if (map[lx+dir.x][ly+dir.y] == nextstep) {
-                        return XY(lx+dir.x+offsetX, ly+dir.y+offsetY)
-                    }
-                }
-                DIAGONALS.forEach { dir ->
+                DIRECTIONS.forEach { dir ->
                     if (map[lx+dir.x][ly+dir.y] == nextstep) {
                         return XY(lx+dir.x+offsetX, ly+dir.y+offsetY)
                     }
@@ -159,14 +151,7 @@ class StepMap() {
                 var found = false
                 while (step > 0) {
                     step--
-                    CARDINALS.forEach { dir ->
-                        if (!found && map[lx+dir.x][ly+dir.y] == step) {
-                            feet.x = lx + dir.x
-                            feet.y = ly + dir.y
-                            found = true
-                        }
-                    }
-                    if (!found) DIAGONALS.forEach { dir ->
+                    DIRECTIONS.forEach { dir ->
                         if (!found && map[lx+dir.x][ly+dir.y] == step) {
                             feet.x = lx + dir.x
                             feet.y = ly + dir.y

@@ -33,20 +33,18 @@ object Pather {
                 maps.forEach { map ->
                     if (map.done) doneMap = map
                     else if (map.outOfDate) {
-                        updateMap(map)
+                        map.update()
                     }
                 }
-                doneMap?.also { it.dispose() ; maps.remove(it) }
+                doneMap?.also {
+                    log.info("pruning done map $it")
+                    it.dispose()
+                    maps.remove(it)
+                }
                 delay(1L)
             }
         }
     }
-
-    private suspend fun updateMap(map: StepMap) {
-        map.update()
-    }
-
-    // Get next cell from here to target, if possible.
 
     fun nextStep(from: Entity, to: Entity): XY? = from.xy()?.let { xy -> maps.firstNotNullOfOrNull { it.nextStep(xy, to) } }
 
