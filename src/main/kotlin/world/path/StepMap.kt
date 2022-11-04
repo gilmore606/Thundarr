@@ -142,9 +142,11 @@ class StepMap() {
                 val nextstep = map[lx][ly] - 1
                 if (nextstep < 0) return null
                 DIRECTIONS.forEach { dir ->
-                    if (lx+dir.x in 0 until width && lx+dir.y in 0 until height) {
-                        if (map[lx + dir.x][ly + dir.y] == nextstep) {
-                            return XY(lx + dir.x + offsetX, ly + dir.y + offsetY)
+                    val tx = lx + dir.x
+                    val ty = ly + dir.y
+                    if (tx in 0 until width && ty in 0 until height) {
+                        if (map[tx][ty] == nextstep) {
+                            return XY(tx + offsetX, ty + offsetY)
                         }
                     }
                 }

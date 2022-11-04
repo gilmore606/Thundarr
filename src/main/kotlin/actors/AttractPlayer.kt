@@ -38,9 +38,9 @@ class AttractPlayer : Player() {
                 // Yeet apples at herders
                 if (Dice.chance(0.2f)) {
                     val seen = entitiesSeen { it is Herder }
-                    seen.keys.forEach { target ->
-                        target as Herder
-                        doWeHave("apple")?.also {
+                    doWeHave("apple")?.also {
+                        if (seen.isNotEmpty()) {
+                            val target = seen.keys.random() as Herder
                             return Throw(it, target.xy.x, target.xy.y)
                         }
                     }

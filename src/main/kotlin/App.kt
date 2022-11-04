@@ -104,7 +104,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
         attractMode = true
         Speaker.requestSong(Speaker.Song.ATTRACT)
-        Screen.addPanel(TimeButtons)
 
         level = LevelKeeper.getLevel("attract")
         weather = Weather()
@@ -115,13 +114,13 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.recenterCamera()
         movePlayerIntoLevel(70, 70)
 
-        //TimeButtons.state = TimeButtons.State.PLAY
         Screen.brightnessTarget = 1f
         KtxAsync.launch {
             delay(500)
             Screen.addModal(AttractMenu().apply { populate() })
             val sunsword = Sunsword()
             sunsword.moveTo(player)
+            repeat (20) { Apple().moveTo(player) }
             player.useThing(sunsword, Thing.UseTag.SWITCH)?.also { player.queue(it) }
         }
     }
@@ -138,6 +137,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.addPanel(LookPanel)
         Screen.addPanel(ActorPanel)
         Screen.addPanel(LeftButtons)
+        Screen.addPanel(TimeButtons)
     }
 
     override fun dispose() {

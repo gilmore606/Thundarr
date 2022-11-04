@@ -273,10 +273,7 @@ class RayCaster {
                         if (!fullShadow) {
                             val projection = line.projectTile(row, col)
                             val visible = !line.isInShadow(projection)
-                            if (visible && level.isOpaqueAt(castX, castY)) {
-                                line.add(projection)
-                                fullShadow = line.isFullShadow()
-                            } else {
+                            if (visible) {
                                 // collect targets
                                 level.actorAt(castX, castY)?.also {
                                     resultSet[it] = distance
@@ -284,6 +281,11 @@ class RayCaster {
                                 level.thingsAt(castX, castY).forEach {
                                     resultSet[it] = distance
                                 }
+                            }
+                            if (visible && level.isOpaqueAt(castX, castY)) {
+                                line.add(projection)
+                                fullShadow = line.isFullShadow()
+                            } else {
                                 line.discard(projection)
                             }
                         }

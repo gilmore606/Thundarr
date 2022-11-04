@@ -8,13 +8,14 @@ class AttractLevel() : EnclosedLevel("attract") {
     companion object {
         val dimension = 120
     }
-    val povBuffer = 40
+    val povBufferX = 60
+    val povBufferY = 40
 
     override fun timeScale() = 5f
 
     override fun setPov(x: Int, y: Int) {
-        val cx = max(povBuffer, min(x, dimension - povBuffer))
-        val cy = max(povBuffer, min(y, dimension - povBuffer))
+        val cx = max(povBufferX, min(x, dimension - povBufferX))
+        val cy = max(povBufferY, min(y, dimension - povBufferY))
         super.setPov(cx, cy)
     }
 
