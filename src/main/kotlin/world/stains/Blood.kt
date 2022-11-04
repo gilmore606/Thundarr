@@ -9,7 +9,7 @@ class Blood : Stain() {
 
     override fun glyph() = Glyph.BLOODSTAIN
     override fun name() = "blood"
-    override fun lifespan() = 100.0
+    override fun lifespan() = 1000.0
     override fun stackType() = Type.BLOOD
 
     var spawned = false

@@ -25,10 +25,10 @@ class Ox : NPC() {
     }
 
     override fun pickAction(): Action {
-        if (awareness == Awareness.AWARE && Dice.chance(0.3f)) {
+        if (awareness == Awareness.AWARE && Dice.chance(0.1f)) {
             wander()?.also { return it }
         }
-        if (Dice.flip()) {
+        if (Dice.chance(0.16f)) {
             entitiesSeen { it is Ox || it is MuskOx }.randomOrNull()?.also { ox ->
                 stepToward(ox)?.also { return it }
             }

@@ -17,8 +17,8 @@ sealed class Consumable : Portable() {
     open fun consumeSelfMsg() = "You " + consumeVerb() + " all of %dd."
     open fun consumeOtherMsg() = "%Dn " + consumeVerb() + "s %in."
 
-    override fun uses() = setOf(
-        Use(consumeVerb() + " " + name(), consumeDuration(),
+    override fun uses() = mapOf(
+        UseTag.CONSUME to Use(consumeVerb() + " " + name(), consumeDuration(),
             canDo = { actor -> this in actor.contents },
             toDo = { actor, level ->
                 Console.sayAct(consumeSelfMsg(), consumeOtherMsg(), actor, this)

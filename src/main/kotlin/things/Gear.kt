@@ -54,33 +54,28 @@ open fun unequipSelfMsg() = "You take off your %d."
     open fun onEquip(actor: Actor) { known = true }
     open fun onUnequip(actor: Actor) { }
 
-    override fun uses(): Set<Use> {
-        val uses = mutableSetOf<Use>()
+    override fun uses(): Map<UseTag, Use> {
+        val uses = mutableMapOf<UseTag,Use>()
         val current = App.player.equippedOn(slot)
         if (current == this) {
-            uses.add(
-                Use(slot.unverb + " " + this.name(), 0f,
-                    canDo = { actor -> this in actor.contents },
-                    toDo = { actor, level ->
-                        actor.unequipGear(this)
-                    })
-            )
+            uses[UseTag.EQUIP] = Use(slot.unverb + " " + this.name(), 0f,
+                canDo = { actor -> this in actor.contents },
+                toDo = { actor, level ->
+                    actor.unequipGear(this)
+                })
         } else if (current != null) {
-            uses.add(
+            uses[UseTag.UNEQUIP] =
                 Use(current.slot.unverb + " " + current.name() + " and " + slot.verb + " " + name(), 0f,
                     canDo = { actor -> this in actor.contents },
                     toDo = { actor, level ->
                         actor.equipGear(this)
                     })
-            )
         } else {
-            uses.add(
-                Use(slot.verb + " " + this.name() + " " + slot.where, 0f,
-                    canDo = { actor -> this in actor.contents },
-                    toDo = { actor, level ->
-                        actor.equipGear(this)
-                    }
-                )
+            uses[UseTag.EQUIP] = Use(slot.verb + " " + this.name() + " " + slot.where, 0f,
+                canDo = { actor -> this in actor.contents },
+                toDo = { actor, level ->
+                    actor.equipGear(this)
+                }
             )
         }
         return uses

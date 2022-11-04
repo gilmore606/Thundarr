@@ -341,7 +341,7 @@ sealed class Level {
                         }
                     }
                 }
-                group[0].uses().forEach { use ->
+                group[0].uses().values.forEach { use ->
                     if (use.canDo(App.player)) {
                         menu.addOption(use.command) {
                             App.player.queue(Use(group[0], use.duration, use.toDo))

@@ -26,8 +26,8 @@ sealed class Tree : Scenery() {
     override fun isOpaque() = true
     override fun walkOnMsg() = "You hack through the dense trees."
 
-    override fun uses() = setOf(
-        Use("chop down " + name(), 3.0f,
+    override fun uses() = mapOf(
+        UseTag.DESTROY to Use("chop down " + name(), 3.0f,
             canDo = { it.weapon() is Axe },
             toDo = { actor, level ->
                 Log().moveTo(level, actor.xy.x, actor.xy.y)

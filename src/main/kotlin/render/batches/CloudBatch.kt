@@ -49,7 +49,7 @@ class CloudBatch : RenderBatch() {
 
         val windX = App.level.weather.windX
         val windY = App.level.weather.windY
-        val timeshift = App.time + ((System.currentTimeMillis() - startTime) / 256f)
+        val timeshift = ((System.currentTimeMillis() - startTime) / 128f) // + App.time
         val tcol = col.toFloat() + windX * timeshift
         val trow = row.toFloat() + windY * timeshift
         val tx0 = ((tcol % TILE_SCALE).toFloat() / TILE_SCALE)

@@ -37,8 +37,8 @@ sealed class Container : Portable(), ThingHolder {
         contents.remove(thing)
     }
 
-    override fun uses() = setOf(
-        Use(openVerb() + " " + name(), 1.5f, { it.xy.x == xy()?.x && it.xy.y == xy()?.y },
+    override fun uses() = mapOf(
+        UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f, { it.xy.x == xy()?.x && it.xy.y == xy()?.y },
             { actor, level ->
                 if (actor is Player) {
                     App.openInventory(withContainer = this@Container)

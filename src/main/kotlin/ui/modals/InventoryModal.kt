@@ -146,7 +146,7 @@ class InventoryModal(
             }
 
             if (parent.withContainer == null && parent.parentModal == null) {
-                thing.uses().forEach {
+                thing.uses().values.forEach {
                     if (it.canDo(App.player)) {
                         addOption(it.command) {
                             App.player.queue(Use(thing, it.duration, it.toDo))

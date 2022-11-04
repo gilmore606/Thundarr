@@ -50,8 +50,8 @@ class StepMap() {
         if (nextRange != range) {
             range = nextRange
             log.debug("map $map changing range to $range")
-            scratch = Array((range * 2f).toInt() + 1) { Array((range * 2f).toInt() + 1) { -1 } }
-            map = Array((range * 2f).toInt() + 1) { Array((range * 2f).toInt() + 1) { -1 } }
+            scratch = Array((range * 2f).toInt() + 2) { Array((range * 2f).toInt() + 2) { -1 } }
+            map = Array((range * 2f).toInt() + 2) { Array((range * 2f).toInt() + 2) { -1 } }
             width = (range * 2f).toInt()
             height = width
             outOfDate = true
@@ -76,8 +76,8 @@ class StepMap() {
             inSurgery = true
             clearScratch()
             var step = 0
-            val centerX = width / 2
-            val centerY = height / 2
+            val centerX = width / 2 + 1
+            val centerY = height / 2 + 1
             scratch[centerX][centerY] = 0
             offsetX = targetEntity!!.xy()!!.x - centerX
             offsetY = targetEntity!!.xy()!!.y - centerY

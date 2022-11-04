@@ -110,7 +110,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         weather = Weather()
         player = AttractPlayer()
 
-        updateTime(Dice.range(700, 1200).toDouble())
+        updateTime(Dice.range(200, 1200).toDouble())
         level.setPov(60, 60)
         Screen.recenterCamera()
         movePlayerIntoLevel(70, 70)
@@ -120,8 +120,9 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         KtxAsync.launch {
             delay(500)
             Screen.addModal(AttractMenu().apply { populate() })
-            Lightbulb().moveTo(player)
-            repeat (3) { Apple().moveTo(player) }
+            val sunsword = Sunsword()
+            sunsword.moveTo(player)
+            player.useThing(sunsword, Thing.UseTag.SWITCH)?.also { player.queue(it) }
         }
     }
 

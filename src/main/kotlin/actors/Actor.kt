@@ -1,9 +1,6 @@
 package actors
 
-import actors.actions.Action
-import actors.actions.Equip
-import actors.actions.Move
-import actors.actions.Unequip
+import actors.actions.*
 import actors.animations.Animation
 import actors.animations.Step
 import actors.stats.Speed
@@ -291,7 +288,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// action generators
 
-    protected fun stepToward(target: Entity): Move? {
+    fun useThing(thing: Thing, useTag: Thing.UseTag): Use? =
+        thing.uses()[useTag]?.let { use ->
+            if (use.canDo(this)) Use(thing, use.duration, use.toDo) else null
+        }
+
+    fun stepToward(target: Entity): Move? {
         Pather.nextStep(this, target)?.also { s ->
             return Move(XY(s.x - xy.x, s.y - xy.y))
         }

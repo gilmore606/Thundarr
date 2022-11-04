@@ -19,6 +19,10 @@ sealed class Thing : Entity {
 
     @Transient var holder: ThingHolder? = null
 
+    enum class UseTag {
+        SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
+    }
+
     class Use(
         val command: String,
         val duration: Float,
@@ -27,7 +31,7 @@ sealed class Thing : Entity {
     )
 
     open fun thingTag() = name()
-    open fun uses(): Set<Use> = setOf()
+    open fun uses(): Map<UseTag, Use> = mapOf()
 
     override fun description() =  ""
     open fun listTag() = if (thingTag() == App.player.thrownTag) "(throwing)" else ""

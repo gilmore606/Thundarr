@@ -33,7 +33,7 @@ sealed class LitThing : Portable(), LightSource {
 
     override fun light(): LightColor? = lightColor
 
-    protected fun becomeLit() {
+    fun becomeLit() {
         active = true
         holder?.also { holder ->
             holder.xy()?.also { xy ->
@@ -97,8 +97,8 @@ class Sunsword : LitThing() {
 
     override fun light() = if (active) lightColor else null
 
-    override fun uses() = setOf(
-        Use("switch " + (if (active) "off" else "on"), 0.2f,
+    override fun uses() = mapOf(
+        UseTag.SWITCH to Use("switch " + (if (active) "off" else "on"), 0.2f,
             canDo = { actor ->
                 this in actor.contents
             },
@@ -145,8 +145,8 @@ class Torch : LitThing(), Temporal {
         }
     }
 
-    override fun uses() = mutableSetOf<Use>().apply {
-        if (!active) add(Use("light " + name(), 0.5f,
+    override fun uses() = mutableMapOf<UseTag, Use>().apply {
+        if (!active) set(UseTag.SWITCH, Use("light " + name(), 0.5f,
                 canDo = { true },
                 toDo = { actor, level ->
                     active = true
