@@ -17,6 +17,8 @@ class ContextMenu(
     companion object {
         val boxBatch = QuadBatch(UITileSet())
     }
+    override fun openSound() = null
+    override fun closeSound() = null
 
     override fun newBoxBatch() = ContextMenu.boxBatch
     override fun newThingBatch() = null

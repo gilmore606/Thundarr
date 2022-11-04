@@ -3,6 +3,7 @@ package ui.modals
 import actors.actions.Drop
 import actors.actions.Get
 import actors.actions.Use
+import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
@@ -42,6 +43,9 @@ abstract class Modal(
     protected open fun newBoxBatch(): QuadBatch = QuadBatch(UITileSet())
     protected open fun newThingBatch(): QuadBatch? = QuadBatch(ThingTileSet())
     protected open fun newActorBatch(): QuadBatch? = QuadBatch(ActorTileSet())
+
+    open fun openSound(): Speaker.SFX? = Speaker.SFX.UIOPEN
+    open fun closeSound(): Speaker.SFX? = Speaker.SFX.UICLOSE
 
     var sidecar: Modal? = null
     var isSidecar = false

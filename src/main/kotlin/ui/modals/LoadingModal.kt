@@ -10,6 +10,8 @@ class LoadingModal(text: String) : SplashModal(text) {
     companion object {
         val boxBatch = QuadBatch(UITileSet())
     }
+    override fun openSound() = null
+    override fun closeSound() = null
 
     override fun newBoxBatch() = LoadingModal.boxBatch
     override fun newThingBatch() = null

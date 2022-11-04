@@ -55,7 +55,7 @@ class WorldCarto(
                     if (Dice.chance(if (forAttract) 0.010f else 0.005f)) {
                         KtxAsync.launch {
                             if (Dice.chance(0.8f)) {
-                                (if (Dice.flip()) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
+                                (if (Dice.chance(0.7f)) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
                             } else {
                                 Herder().spawnAt(level, x + x0, y + y0)
                             }

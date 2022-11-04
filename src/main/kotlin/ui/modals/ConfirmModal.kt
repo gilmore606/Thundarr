@@ -25,6 +25,9 @@ class ConfirmModal(
     override fun newThingBatch() = null
     override fun newActorBatch() = null
 
+    override fun openSound() = null
+    override fun closeSound() = null
+
     companion object {
         fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(Screen.font, it).width }.toInt()
         val boxBatch = QuadBatch(UITileSet())

@@ -3,6 +3,8 @@ package ui.modals
 open class SplashModal(private val text: String) : Modal(260, 60, null, Position.CENTER_LOW) {
 
     private val padding = 24
+    override fun openSound() = null
+    override fun closeSound() = null
 
     override fun onResize(width: Int, height: Int) {
         this.width = measure(text) + padding * 2
