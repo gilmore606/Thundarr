@@ -16,6 +16,8 @@ object Speaker {
     var volumeMusic = 1.0
     var volumeUI = 1.0
 
+    private val maxVolumeUI = 0.7
+
     private val audio = Gdx.audio
 
     class Deck(
@@ -77,7 +79,7 @@ object Speaker {
     }
 
     fun ui(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, screenX: Int = screenCenterX) {
-        val volume = (vol * volumeMaster * volumeUI).toFloat()
+        val volume = (vol * volumeMaster * volumeUI * maxVolumeUI).toFloat()
         val pan = (screenX.toFloat() / screenWidth.toFloat())
         sfxFiles[sfx]?.play(volume, pitch, pan)
     }

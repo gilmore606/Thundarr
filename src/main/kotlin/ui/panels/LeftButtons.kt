@@ -1,5 +1,6 @@
 package ui.panels
 
+import audio.Speaker
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
@@ -128,6 +129,7 @@ object LeftButtons : Panel() {
                     newHover = i
                 }
             }
+            if (newHover != hovered) Speaker.ui(Speaker.SFX.UIMOVE)
             hovered = newHover
             buttons.forEachIndexed { n, button ->
                 button.targetSize = if (n == hovered) 56.0 else 36.0
@@ -147,6 +149,7 @@ object LeftButtons : Panel() {
                 if (hovered >= 0) {
                     mouseInside = false
                     KtxAsync.launch {
+                        Speaker.ui(Speaker.SFX.UISELECT)
                         buttons[hovered].onPress()
                     }
                 }

@@ -1,6 +1,7 @@
 package ui.panels
 
 import actors.actions.Wait
+import audio.Speaker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
@@ -130,6 +131,7 @@ object TimeButtons : Panel() {
                     newHover = i
                 }
             }
+            if (newHover != hovered) Speaker.ui(Speaker.SFX.UIMOVE)
             hovered = newHover
             buttons.forEachIndexed { n, button ->
                 button.targetSize = if (n == hovered) iconSizeHovered.toDouble() else iconSize.toDouble()
@@ -147,6 +149,7 @@ object TimeButtons : Panel() {
         if (ly < this.height + wakeSlop && lx >=0 && lx < this.width) {
             if (button == Mouse.Button.LEFT) {
                 if (hovered >= 0) {
+                    Speaker.ui(Speaker.SFX.UISELECT)
                     changeState(buttons[hovered].toState)
                 }
             }
