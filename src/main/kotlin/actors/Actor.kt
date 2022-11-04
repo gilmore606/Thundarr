@@ -29,10 +29,6 @@ import java.lang.Integer.min
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
-    companion object {
-        val caster = RayCaster()
-    }
-
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
@@ -313,7 +309,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
-    protected fun entitiesSeen(matching: ((Entity)->Boolean)? = null) = caster.entitiesSeenBy(this, matching)
+    protected fun entitiesSeen(matching: ((Entity)->Boolean)? = null) = Pather.entitiesSeenBy(this, matching)
 
     protected fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()

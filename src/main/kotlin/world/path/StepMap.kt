@@ -25,6 +25,9 @@ class StepMap() {
     private var scratch = Array(1) { Array(1) { -1 } }
     var map = Array(1) { Array(1) { -1 } }
 
+    var visibleEntities: MutableMap<Entity, Float> = mutableMapOf()
+    var scratchVisible: MutableMap<Entity, Float> = mutableMapOf()
+
     suspend fun addSubscriber(subscriber: Entity, range: Float) {
         subscribers.add(subscriber)
         done = false
@@ -70,7 +73,7 @@ class StepMap() {
 
     override fun toString() = "StepMap(target=${targetEntity?.name()})"
 
-    suspend fun update() {
+    suspend fun update(caster: RayCaster) {
         targetEntity?.level()?.also { level ->
             clearScratch()
             var step = 0
@@ -89,9 +92,9 @@ class StepMap() {
                                 val tx = x + dir.x
                                 val ty = y + dir.y
                                 if (tx in 0 until width && ty in 0 until height) {
-                                    if (scratch[x + dir.x][y + dir.y] < 0) {
-                                        if (level.isWalkableAt(x + dir.x + offsetX, y + dir.y + offsetY)) {
-                                            scratch[x + dir.x][y + dir.y] = step + 1
+                                    if (scratch[tx][ty] < 0) {
+                                        if (level.isWalkableAt(tx + offsetX, ty + offsetY)) {
+                                            scratch[tx][ty] = step + 1
                                             dirty = true
                                         }
                                     }
@@ -101,6 +104,9 @@ class StepMap() {
                     }
                 }
                 step++
+            }
+            if (targetEntity is Actor) {
+                caster.populateSeenEntities(scratchVisible, targetEntity as Actor)
             }
             promoteScratch()
         }
@@ -120,6 +126,10 @@ class StepMap() {
             val old = map
             map = scratch
             scratch = old
+
+            val oldVisible = visibleEntities
+            visibleEntities = scratchVisible
+            scratchVisible = oldVisible
         }
     }
 
@@ -132,8 +142,10 @@ class StepMap() {
                 val nextstep = map[lx][ly] - 1
                 if (nextstep < 0) return null
                 DIRECTIONS.forEach { dir ->
-                    if (map[lx+dir.x][ly+dir.y] == nextstep) {
-                        return XY(lx+dir.x+offsetX, ly+dir.y+offsetY)
+                    if (lx+dir.x in 0 until width && lx+dir.y in 0 until height) {
+                        if (map[lx + dir.x][ly + dir.y] == nextstep) {
+                            return XY(lx + dir.x + offsetX, ly + dir.y + offsetY)
+                        }
                     }
                 }
             }
@@ -152,10 +164,12 @@ class StepMap() {
                 while (step > 0) {
                     step--
                     DIRECTIONS.forEach { dir ->
-                        if (!found && map[lx+dir.x][ly+dir.y] == step) {
-                            feet.x = lx + dir.x
-                            feet.y = ly + dir.y
-                            found = true
+                        if (lx+dir.x in 0 until width && lx+dir.y in 0 until height) {
+                            if (!found && map[lx + dir.x][ly + dir.y] == step) {
+                                feet.x = lx + dir.x
+                                feet.y = ly + dir.y
+                                found = true
+                            }
                         }
                     }
                     if (!found) {
@@ -170,6 +184,8 @@ class StepMap() {
         }
         return null
     }
+
+    fun entitiesSeenBy(entity: Entity): Map<Entity, Float>? = if (entity == targetEntity) visibleEntities else null
 
     fun canReach(to: Entity) = to == targetEntity
 }

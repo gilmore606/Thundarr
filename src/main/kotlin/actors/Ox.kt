@@ -29,7 +29,7 @@ class Ox : NPC() {
             wander()?.also { return it }
         }
         if (Dice.chance(0.16f)) {
-            entitiesSeen { it is Ox || it is MuskOx }.randomOrNull()?.also { ox ->
+            entitiesSeen { it is Ox || it is MuskOx }.keys.randomOrNull()?.also { ox ->
                 stepToward(ox)?.also { return it }
             }
         }

@@ -238,18 +238,15 @@ class RayCaster {
         }
     }
 
-    fun entitiesSeenBy(actor: Actor, matching: ((Entity)->Boolean)? = null): Set<Entity> {
-        val entities = mutableSetOf<Entity>()
+    fun populateSeenEntities(entities: MutableMap<Entity, Float>, actor: Actor) {
         actor.level?.also { level ->
             lineCache.forEach { line ->
-                seenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange(), matching)
+                populateSeenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange())
             }
         }
-        return entities
     }
 
-    private fun seenOctant(level: Level, resultSet: MutableSet<Entity>, line: ShadowLine, povX: Int, povY: Int, distance: Float,
-                           matching: ((Entity)->Boolean)? = null)
+    private fun populateSeenOctant(level: Level, resultSet: MutableMap<Entity, Float>, line: ShadowLine, povX: Int, povY: Int, range: Float)
     {
         line.reset()
         var fullShadow = false
@@ -260,7 +257,7 @@ class RayCaster {
             line.transformOctant(row, 0)
             var castX = povX + line.transform.x
             var castY = povY + line.transform.y
-            if (distanceBetween(povX, povY, castX, castY) > distance) {
+            if (distanceBetween(povX, povY, castX, castY) > range) {
                 done = true
             } else {
                 var doneRow = false
@@ -269,12 +266,11 @@ class RayCaster {
                     line.transformOctant(row, col)
                     castX = povX + line.transform.x
                     castY = povY + line.transform.y
-                    if (distanceBetween(povX, povY, castX, castY) > distance) {
+                    val distance = distanceBetween(povX, povY, castX, castY)
+                    if (distance > range) {
                         doneRow = true
                     } else {
-                        if (fullShadow) {
-                            // blocked cell
-                        } else {
+                        if (!fullShadow) {
                             val projection = line.projectTile(row, col)
                             val visible = !line.isInShadow(projection)
                             if (visible && level.isOpaqueAt(castX, castY)) {
@@ -282,9 +278,11 @@ class RayCaster {
                                 fullShadow = line.isFullShadow()
                             } else {
                                 // collect targets
-                                level.actorAt(castX, castY)?.also { resultSet.add(it) }
+                                level.actorAt(castX, castY)?.also {
+                                    resultSet[it] = distance
+                                }
                                 level.thingsAt(castX, castY).forEach {
-                                    if (matching == null || matching(it)) resultSet.add(it)
+                                    resultSet[it] = distance
                                 }
                                 line.discard(projection)
                             }

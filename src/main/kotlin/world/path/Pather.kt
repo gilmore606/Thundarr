@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.newSingleThreadAsyncContext
+import util.RayCaster
 import util.XY
 import util.log
 import world.Entity
@@ -20,6 +21,7 @@ object Pather {
     private var worker: Job? = null
     private var jobs = mutableSetOf<Job>()
 
+    private val caster = RayCaster()
 
     init {
         relaunchWorker()
@@ -33,7 +35,7 @@ object Pather {
                 maps.forEach { map ->
                     if (map.done) doneMap = map
                     else if (map.outOfDate) {
-                        map.update()
+                        map.update(caster)
                     }
                 }
                 doneMap?.also {
@@ -64,6 +66,17 @@ object Pather {
             }
             return this
         }
+    }
+
+    fun entitiesSeenBy(entity: Entity, matching: ((Entity)->Boolean)? = null): Map<Entity, Float> {
+        maps.firstNotNullOfOrNull { it.entitiesSeenBy(entity) }?.also { allVisible ->
+            matching?.also { matching ->
+                val filtered = mutableMapOf<Entity, Float>()
+                allVisible.keys.forEach { if (matching(it)) filtered[it] = allVisible[it]!! }
+                return filtered
+            } ?: run { return allVisible }
+        }
+        return mutableMapOf()
     }
 
     fun subscribe(subscriber: Entity, target: Entity, range: Float) {
