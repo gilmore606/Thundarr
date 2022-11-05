@@ -222,6 +222,7 @@ sealed class Level {
     fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
     fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
+    fun isWalkableFrom(x: Int, y: Int, toDir: XY) = isWalkableAt(x + toDir.x, y + toDir.y) && actorAt(x + toDir.x, y + toDir.y) == null
 
     fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
@@ -365,7 +366,7 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y)) {
+        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y) && visibilityAt(x,y) == 1f) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))

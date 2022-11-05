@@ -15,7 +15,7 @@ import java.lang.RuntimeException
 
 object Pather {
 
-    private val maps = mutableSetOf<StepMap>()
+    private val maps = mutableListOf<StepMap>()
     const val maxRange = 100f
 
     private val coroutineContext = newSingleThreadAsyncContext("pather")
@@ -36,10 +36,13 @@ object Pather {
         worker = coroutineScope.launch {
             while (true) {
                 var doneMap: StepMap? = null
-                maps.forEach { map ->
-                    if (map.done) doneMap = map
-                    else if (map.outOfDate) {
-                        map.update(caster)
+                for (i in 0 until maps.size) {
+                    if (i < maps.size) {
+                        val map = maps[i]
+                        if (map.done) doneMap = map
+                        else if (map.outOfDate) {
+                            map.update(caster)
+                        }
                     }
                 }
                 doneMap?.also {

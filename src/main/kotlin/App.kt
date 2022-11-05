@@ -125,7 +125,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             repeat (4) { Apple().moveTo(player) }
             Pickaxe().moveTo(player)
             repeat (40) { Torch().moveTo(player) }
-            player.useThing(sunsword, Thing.UseTag.SWITCH)?.also { player.queue(it) }
+            Console.clear()
         }
     }
 
@@ -288,6 +288,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
+            Console.clear()
             Console.say("You stride bravely into the dawn.")
             Screen.brightnessTarget = 1f
             addGamePanels()

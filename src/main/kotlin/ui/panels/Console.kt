@@ -15,9 +15,8 @@ object Console : Panel() {
     private val maxLines = 7
     private val lineSpacing = 21
     private val padding = 12
-    val lines: MutableList<String> = mutableListOf<String>().apply {
-        repeat(maxLines) { add("") }
-    }
+    val lines: MutableList<String> = mutableListOf<String>()
+
     private var lastLineMs = System.currentTimeMillis()
     private var scroll = 0f
     private var scrollSpeed = 90f
@@ -79,6 +78,16 @@ object Console : Panel() {
     }
 
     enum class Reach { VISUAL, AUDIBLE, LEVEL, WORLD }
+
+    init {
+        clear()
+    }
+
+    fun clear() {
+        lines.clear()
+        repeat (maxLines) { lines.add("") }
+        lines.add("Welcome to Numeria.")
+    }
 
     fun say(text: String) {
         if (text == "") return

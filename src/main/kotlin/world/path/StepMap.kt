@@ -1,10 +1,12 @@
 package world.path
 
 import actors.Actor
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import util.*
 import world.Entity
+import world.Level
 import java.lang.Float.min
 
 // This should be DijkstraMap but who wants to type that guy's name all the time?
@@ -91,7 +93,8 @@ class StepMap() {
                                 val ty = y + dir.y
                                 if (tx in 0 until width && ty in 0 until height) {
                                     if (scratch[tx][ty] < 0) {
-                                        if (level.isWalkableAt(tx + offsetX, ty + offsetY)) {
+                                        waitForActorLock(level)
+                                        if (level.isWalkableFrom(x + offsetX, y + offsetY, dir)) {
                                             scratch[tx][ty] = step + 1
                                             dirty = true
                                         }
@@ -111,6 +114,13 @@ class StepMap() {
             promoteScratch()
         }
         outOfDate = false
+    }
+
+    private suspend fun waitForActorLock(level: Level) {
+        while (level.director.actorsLocked) {
+            log.info("...stepMap waiting for actors lock...")
+            delay(0L)
+        }
     }
 
     private fun clearScratch() {
