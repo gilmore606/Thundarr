@@ -23,6 +23,7 @@ fun UITileSet() =
         setTile(Glyph.BUTTON_PAUSE, SimpleTile(this, 4, 0))
         setTile(Glyph.BUTTON_PLAY, SimpleTile(this, 4, 1))
         setTile(Glyph.BUTTON_FFWD, SimpleTile(this, 4, 2))
+        setTile(Glyph.BUTTON_BLANK, SimpleTile(this, 4, 4))
         setTile(Glyph.COLOR_BARS, SimpleTile(this, 0, 3))
         setTile(Glyph.HEALTH_ICON, SimpleTile(this, 1, 3))
         setTile(Glyph.ANGRY_THUNDARR, SimpleTile(this, 2, 3))

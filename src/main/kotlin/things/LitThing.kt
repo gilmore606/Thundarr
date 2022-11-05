@@ -95,6 +95,9 @@ class Sunsword : LitThing() {
     override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
     override val lightColor = LightColor(0.1f, 0.25f, 0.3f)
 
+    override fun toolbarName() = "switch sunsword"
+    override fun toolbarUseTag() = UseTag.SWITCH
+
     override fun light() = if (active) lightColor else null
 
     override fun uses() = mapOf(

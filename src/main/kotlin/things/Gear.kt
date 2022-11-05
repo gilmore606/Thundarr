@@ -4,8 +4,6 @@ import actors.Actor
 import actors.stats.Stat
 import actors.statuses.StatEffector
 import kotlinx.serialization.Serializable
-import render.tilesets.Glyph
-import util.aOrAn
 import util.toEnglishList
 
 @Serializable
@@ -54,32 +52,17 @@ open fun unequipSelfMsg() = "You take off your %d."
     open fun onEquip(actor: Actor) { known = true }
     open fun onUnequip(actor: Actor) { }
 
-    override fun uses(): Map<UseTag, Use> {
-        val uses = mutableMapOf<UseTag,Use>()
-        val current = App.player.equippedOn(slot)
-        if (current == this) {
-            uses[UseTag.EQUIP] = Use(slot.unverb + " " + this.name(), 0f,
-                canDo = { actor -> this in actor.contents },
-                toDo = { actor, level ->
-                    actor.unequipGear(this)
-                })
-        } else if (current != null) {
-            uses[UseTag.UNEQUIP] =
-                Use(current.slot.unverb + " " + current.name() + " and " + slot.verb + " " + name(), 0f,
-                    canDo = { actor -> this in actor.contents },
-                    toDo = { actor, level ->
-                        actor.equipGear(this)
-                    })
-        } else {
-            uses[UseTag.EQUIP] = Use(slot.verb + " " + this.name() + " " + slot.where, 0f,
-                canDo = { actor -> this in actor.contents },
-                toDo = { actor, level ->
-                    actor.equipGear(this)
-                }
-            )
-        }
-        return uses
-    }
+    override fun toolbarName() = (if (equipped) slot.unverb else slot.verb) + " " + this.name()
+    override fun toolbarUseTag() = if (equipped) UseTag.UNEQUIP else UseTag.EQUIP
+
+    override fun uses() = mapOf(
+        UseTag.EQUIP to Use(slot.verb + " " + name(), slot.duration,
+            canDo = { actor -> !this.equipped && this in actor.contents },
+            toDo = { actor, level -> actor.equipGear(this) }),
+        UseTag.UNEQUIP to Use(slot.unverb + " " + name(), slot.duration,
+            canDo = { actor -> this.equipped && this in actor.contents },
+            toDo = { actor, level -> actor.unequipGear(this) })
+    )
 
     override fun statEffects() = defaultStatEffects
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()

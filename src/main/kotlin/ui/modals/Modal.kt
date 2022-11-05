@@ -18,6 +18,7 @@ import render.tilesets.UITileSet
 import things.Container
 import things.Thing
 import ui.input.Mouse
+import ui.panels.Toolbar
 import util.groundAtPlayer
 import util.plural
 import java.lang.Float.min
@@ -235,6 +236,11 @@ abstract class Modal(
                 if (thing.thingTag() != App.player.thrownTag) {
                     addOption("ready " + thing.name().plural() + " for throwing") {
                         App.player.readyForThrowing(thing.thingTag())
+                    }
+                }
+                thing.toolbarName()?.also { hotbarName ->
+                    addOption("add to toolbar (" + hotbarName + ")") {
+                        Toolbar.beginAdd(thing)
                     }
                 }
             }

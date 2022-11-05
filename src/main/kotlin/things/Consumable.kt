@@ -27,6 +27,9 @@ sealed class Consumable : Portable() {
             })
     )
 
+    override fun toolbarName() = consumeVerb() + " " + this.name()
+    override fun toolbarUseTag() = UseTag.CONSUME
+
     open fun onConsume(actor: Actor) {
         statusEffect()?.also { actor.addStatus(it) }
     }

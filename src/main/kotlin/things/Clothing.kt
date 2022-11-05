@@ -16,6 +16,7 @@ sealed class Clothing : Gear() {
     override fun weight() = 1f
 
     open fun armor() = 0f
+
 }
 
 @Serializable

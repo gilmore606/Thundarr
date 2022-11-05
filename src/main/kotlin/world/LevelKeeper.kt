@@ -2,6 +2,7 @@ package world
 
 import kotlinx.coroutines.delay
 import render.Screen
+import ui.panels.Toolbar
 import util.XY
 import util.log
 import java.util.concurrent.ConcurrentSkipListSet
@@ -108,6 +109,7 @@ object LevelKeeper {
     fun advanceTime(turns: Float) {
         App.updateTime(App.time + turns.toDouble())
         Screen.advanceTime(turns)
+        Toolbar.refresh()
         liveLevels.forEach {
             it.level.advanceTime(turns)
         }

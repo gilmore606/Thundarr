@@ -134,7 +134,6 @@ class StepMap() {
         }
     }
 
-
     fun nextStep(from: XY, to: Entity): XY? {
         if (to == targetEntity) {
             val lx = from.x - offsetX

@@ -36,7 +36,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         val player: Player,
         val time: Double,
         val weather: Weather,
-        val consoleLines: List<String>
+        val consoleLines: List<String>,
+        val toolbarTags: List<String?>
     )
 
     @Serializable
@@ -137,6 +138,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.addPanel(LookPanel)
         Screen.addPanel(ActorPanel)
         Screen.addPanel(LeftButtons)
+        Screen.addPanel(Toolbar)
         Screen.addPanel(TimeButtons)
     }
 
@@ -157,7 +159,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     player = player,
                     time = time,
                     weather = weather,
-                    consoleLines = Console.lines
+                    consoleLines = Console.lines,
+                    toolbarTags = Toolbar.getTagsForSave()
                 )
             )
             delay(500)
@@ -203,6 +206,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             weather = state.weather
             updateTime(state.time)
             Console.restoreLines(state.consoleLines)
+            Toolbar.loadTagsFromSave(state.toolbarTags)
 
             while (!level.isReady()) {
                 log.info("Waiting for level...")

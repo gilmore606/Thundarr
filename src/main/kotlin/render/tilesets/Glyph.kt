@@ -34,6 +34,7 @@ enum class Glyph {
     BUTTON_PAUSE,
     BUTTON_PLAY,
     BUTTON_FFWD,
+    BUTTON_BLANK,
     COLOR_BARS,
 
     PLAYER,

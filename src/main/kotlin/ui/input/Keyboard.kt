@@ -12,6 +12,7 @@ import render.Screen
 import things.Lightbulb
 import things.PalmTree
 import ui.panels.DebugPanel
+import ui.panels.Toolbar
 import util.*
 
 object Keyboard : KtxInputAdapter {
@@ -119,7 +120,16 @@ object Keyboard : KtxInputAdapter {
                 Input.Keys.ESCAPE -> { App.openSystemMenu() }
                 Input.Keys.M -> { App.openMap() }
 
-                Input.Keys.NUM_1 -> { App.player.toggleAggro() }
+                192 -> { App.player.toggleAggro() }
+
+                Input.Keys.NUM_1 -> { Toolbar.onKey(1) }
+                Input.Keys.NUM_2 -> { Toolbar.onKey(2) }
+                Input.Keys.NUM_3 -> { Toolbar.onKey(3) }
+                Input.Keys.NUM_4 -> { Toolbar.onKey(4) }
+                Input.Keys.NUM_5 -> { Toolbar.onKey(5) }
+                Input.Keys.NUM_6 -> { Toolbar.onKey(6) }
+                Input.Keys.NUM_7 -> { Toolbar.onKey(7) }
+                Input.Keys.NUM_8 -> { Toolbar.onKey(8) }
 
                 Input.Keys.F1 -> {
                     App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

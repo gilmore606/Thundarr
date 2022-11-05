@@ -42,7 +42,7 @@ object TimeButtons : Panel() {
     private var spacing = 48
 
     private var contraction = height
-    private var speed = 12
+    private var speed = 10
     private var hovered = -1
     private var mouseInside = false
     private var playCount = 0
@@ -70,6 +70,8 @@ object TimeButtons : Panel() {
             }
         }
     }
+
+    fun isShown() = (this.contraction < 1)
 
     private fun canAdvance() = App.player.queuedActions.isEmpty() && Screen.topModal == null &&
             !LeftButtons.mouseInside && !this.mouseInside

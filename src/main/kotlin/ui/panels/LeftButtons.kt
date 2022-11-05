@@ -61,6 +61,8 @@ object LeftButtons : Panel() {
         }
     )
 
+    fun isShown() = (this.contraction < 1)
+
     private fun shouldShow(): Boolean {
         if (!mouseInside) return false
         if (Screen.topModal == null) return true

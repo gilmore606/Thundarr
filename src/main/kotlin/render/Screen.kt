@@ -20,9 +20,9 @@ import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
 import ui.modals.ContextMenu
-import ui.panels.Panel
 import ui.modals.Modal
-import ui.panels.ActorPanel
+import ui.modals.ToolbarAddModal
+import ui.panels.*
 import util.*
 import world.LevelKeeper
 import world.stains.Stain
@@ -416,9 +416,13 @@ object Screen : KtxScreen {
     }
 
     fun mouseMovedTo(screenX: Int, screenY: Int) {
-        topModal?.also { modal ->
-            modal.mouseMovedTo(screenX, screenY)
-        } ?: run {
+        if (topModal != null) {
+            topModal!!.mouseMovedTo(screenX, screenY)
+        }
+        if (topModal is ToolbarAddModal) {
+            Toolbar.mouseMovedTo(screenX, screenY)
+        }
+        if (topModal == null) {
             panels.forEach {
                 it.mouseMovedTo(screenX, screenY)
             }
@@ -435,7 +439,7 @@ object Screen : KtxScreen {
                 val col = screenXtoTileX(screenX + dragPixels.x)
                 val row = screenYtoTileY(screenY + dragPixels.y)
                 if (col != cursorPosition?.x || row != cursorPosition?.y) {
-                    if (App.level.isSeenAt(col, row)) {
+                    if (!buttonBarsShown() && App.level.isSeenAt(col, row)) {
                         if (App.player.queuedActions.isEmpty()) {
                             val newCursor = XY(col, row)
                             cursorPosition = newCursor
@@ -448,6 +452,8 @@ object Screen : KtxScreen {
             }
         }
     }
+
+    fun buttonBarsShown() = LeftButtons.isShown() || TimeButtons.isShown() || Toolbar.isShown()
 
     fun updateCursorLine() {
         cursorPosition?.also { cursor -> cursorLine = App.level.getPathToPOV(cursor).toMutableList() }
@@ -465,9 +471,13 @@ object Screen : KtxScreen {
             (if (!App.level.isRoofedAt(App.player.xy.x, App.player.xy.y)) (1.0 / worldZoom) else 1.0) }
 
     fun mouseDown(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        topModal?.also { modal ->
-            modal.mouseClicked(screenX, screenY, button)
-        } ?: run {
+        if (topModal != null) {
+            topModal!!.mouseClicked(screenX, screenY, button)
+        }
+        if (topModal is ToolbarAddModal) {
+            Toolbar.mouseClicked(screenX, screenY, button)
+        }
+        if (topModal == null) {
             mutableListOf<Panel>().apply { addAll(panels) }.forEach {
                 if (screenX >= it.x && screenX <= it.x + it.width && screenY >= it.y && screenY <= it.y + it.height) {
                     if (it.mouseClicked(screenX, screenY, button)) return true

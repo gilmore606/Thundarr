@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
-import util.aOrAn
 import world.Entity
 import world.Level
 import java.lang.Float.min
@@ -78,6 +77,17 @@ sealed class Thing : Entity {
             it.receiveAttack(thrower)
         }
         moveTo(level, x, y)
+    }
+
+    open fun toolbarName(): String? = null
+    open fun toolbarUseTag(): UseTag? = null
+    open fun toolbarAction(instance: Thing) {
+        toolbarUseTag()?.also { tag ->
+            val use = uses()[tag]!!
+            if (use.canDo(App.player)) {
+                App.player.queue(actors.actions.Use(instance, use.duration, use.toDo))
+            }
+        }
     }
 }
 
