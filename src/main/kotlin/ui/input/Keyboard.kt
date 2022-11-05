@@ -120,7 +120,7 @@ object Keyboard : KtxInputAdapter {
                 Input.Keys.ESCAPE -> { App.openSystemMenu() }
                 Input.Keys.M -> { App.openMap() }
 
-                192 -> { App.player.toggleAggro() }
+                Input.Keys.SLASH -> { App.player.toggleAggro() }
 
                 Input.Keys.NUM_1 -> { Toolbar.onKey(1) }
                 Input.Keys.NUM_2 -> { Toolbar.onKey(2) }

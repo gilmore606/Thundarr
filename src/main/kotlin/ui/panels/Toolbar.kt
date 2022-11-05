@@ -163,7 +163,6 @@ object Toolbar : Panel() {
         if (ly < this.height + wakeSlop && lx >=0 && lx < this.width) {
             if (button == Mouse.Button.LEFT) {
                 if (hovered >= 0) {
-                    Speaker.ui(Speaker.SFX.UISELECT)
                     doSelect(hovered)
                 }
             }
@@ -177,6 +176,7 @@ object Toolbar : Panel() {
     }
 
     private fun doSelect(buttonNumber: Int) {
+        Speaker.ui(Speaker.SFX.UISELECT)
         if (inSelectMode()) {
             replaceButton(buttons[buttonNumber], (Screen.topModal as ToolbarAddModal).newThing)
             (Screen.topModal as ToolbarAddModal).remoteClose()

@@ -1,6 +1,8 @@
 package ui.modals
 
+import com.badlogic.gdx.Input
 import things.Thing
+import ui.panels.Toolbar
 
 class ToolbarAddModal(
     val newThing: Thing,
@@ -18,6 +20,13 @@ class ToolbarAddModal(
 
     override fun drawModalText() {
         drawString(message, padding, padding)
+    }
+
+    override fun onKeyDown(keycode: Int) {
+        if (keycode in listOf(Input.Keys.NUM_1, Input.Keys.NUM_2, Input.Keys.NUM_3, Input.Keys.NUM_4,
+                Input.Keys.NUM_5, Input.Keys.NUM_6, Input.Keys.NUM_7, Input.Keys.NUM_8)) {
+            Toolbar.onKey(keycode - Input.Keys.NUM_1 + 1)
+        }
     }
 
     fun remoteClose() {
