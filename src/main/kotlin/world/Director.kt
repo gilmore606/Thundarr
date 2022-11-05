@@ -18,6 +18,8 @@ class Director(val level: Level) {
 
     private var playerTimePassed = 0f
 
+    var actorsLocked = false
+
     fun attachActor(actor: Actor) {
         if (actor is Player && actor != App.player) {
             throw RuntimeException("Duplicate player attached!")
@@ -26,11 +28,22 @@ class Director(val level: Level) {
         }
         actor.level = this@Director.level
         actor.juice = 0f
-        actors.add(actor)
+        addActor(actor)
+    }
+
+    private fun addActor(new: Actor) {
+        actorsLocked = true
+        actors.add(new)
+        actorsLocked = false
+    }
+    private fun removeActor(old: Actor) {
+        actorsLocked = true
+        actors.remove(old)
+        actorsLocked = false
     }
 
     fun detachActor(actor: Actor) {
-        actors.remove(actor)
+        removeActor(actor)
     }
 
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
@@ -59,6 +72,13 @@ class Director(val level: Level) {
         }
     }
 
+    fun actorAt(x: Int, y: Int): Actor? {
+        for (i in 0 until actors.size) {
+            if (i < actors.size && actors[i].xy.x == x && actors[i].xy.y == y) return actors[i]
+        }
+        return null
+    }
+
     // Execute actors' actions until it's the player's turn.
     // TODO: change to give juice to all active levels not just this one
 
@@ -82,7 +102,7 @@ class Director(val level: Level) {
                     }
                 }
             }
-            unloadingActor?.also { actors.remove(it) }
+            unloadingActor?.also { removeActor(it) }
             if (actor == null || !actor.hasActionJuice()) {  // no one had juice, we're done
                 triggerAdvanceTime()
                 return

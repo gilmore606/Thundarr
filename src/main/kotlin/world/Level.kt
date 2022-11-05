@@ -189,7 +189,7 @@ sealed class Level {
 
     open fun unload() { }
 
-    fun actorAt(x: Int, y: Int) = director.actors.firstOrNull { it.xy.x == x && it.xy.y == y }
+    fun actorAt(x: Int, y: Int) = director.actorAt(x, y)
 
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 

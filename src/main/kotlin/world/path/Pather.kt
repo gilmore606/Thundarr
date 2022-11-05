@@ -1,6 +1,7 @@
 package world.path
 
 import actors.Actor
+import actors.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -10,18 +11,21 @@ import util.RayCaster
 import util.XY
 import util.log
 import world.Entity
+import java.lang.RuntimeException
 
 object Pather {
 
-    val maps = mutableSetOf<StepMap>()
+    private val maps = mutableSetOf<StepMap>()
     const val maxRange = 100f
 
     private val coroutineContext = newSingleThreadAsyncContext("pather")
-    val coroutineScope = CoroutineScope(coroutineContext)
+    private val coroutineScope = CoroutineScope(coroutineContext)
     private var worker: Job? = null
     private var jobs = mutableSetOf<Job>()
 
     private val caster = RayCaster()
+
+    private var playerMap: StepMap? = null
 
     init {
         relaunchWorker()
@@ -86,6 +90,9 @@ object Pather {
                 setTargetToEntity(target)
                 changeRange(range)
                 maps.add(this@apply)
+                if (target is Player) {
+                    playerMap = this@apply
+                }
             }
             map.addSubscriber(subscriber, range)
         })
@@ -110,6 +117,12 @@ object Pather {
     // Hooks for hearing about relevant world changes.
 
     fun onActorMove(actor: Actor) {
-        maps.forEach { it.onActorMove(actor) }
+        if (worker?.isActive == false || worker == null) throw RuntimeException("Pather has crashed!")
+
+        coroutineScope.launch {
+            maps.forEach { it.onActorMove(actor) }
+        }
     }
+
+    fun debugStepAt(x: Int, y: Int): Int = playerMap?.debugStepAt(x, y) ?: 0
 }

@@ -303,6 +303,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return null
     }
 
+    protected fun doWeHave(test: (Thing)->Boolean): Thing? {
+        for (i in 0 until contents.size) if (test(contents[i])) return contents[i]
+        return null
+    }
+
     protected fun howManyWeHave(thingTag: String): Int {
         var c = 0
         for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) c++
@@ -320,5 +325,17 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             }
         }
         return entities
+    }
+
+    protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false
+
+    protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy()?.x ?: 0, entity.xy()?.y ?: 0, xy.x, xy.y)
+
+    protected fun forCardinals(doThis: (tx: Int, ty: Int, dir: XY)->Unit) {
+        CARDINALS.forEach { dir ->
+            val tx = xy.x + dir.x
+            val ty = xy.y + dir.y
+            doThis(tx, ty, dir)
+        }
     }
 }

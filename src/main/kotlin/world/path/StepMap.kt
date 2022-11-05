@@ -66,9 +66,7 @@ class StepMap() {
     }
 
     fun onActorMove(actor: Actor) {
-        if (actor == this.targetEntity) {
-            Pather.coroutineScope.launch { outOfDate = true }
-        }
+        if (actor == this.targetEntity) outOfDate = true
     }
 
     override fun toString() = "StepMap(target=${targetEntity?.name()})"
@@ -105,9 +103,11 @@ class StepMap() {
                 }
                 step++
             }
+            // Update visibility while we're here
             if (targetEntity is Actor) {
                 caster.populateSeenEntities(scratchVisible, targetEntity as Actor)
             }
+            // Buffer swap
             promoteScratch()
         }
         outOfDate = false
@@ -161,27 +161,27 @@ class StepMap() {
             val ly = to.y - offsetY
             if (lx in 0 until width && ly in 0 until height) {
                 val feet = XY(lx, ly)
-                var step = map[feet.x][feet.y]
-                var found = false
-                while (step > 0) {
-                    step--
+                var step = map[feet.x][feet.y] -1
+                var foundDir: XY? = null
+
+                while (step >= 0) {
+                    foundDir = null
                     DIRECTIONS.forEach { dir ->
-                        if (lx+dir.x in 0 until width && lx+dir.y in 0 until height) {
-                            if (!found && map[lx + dir.x][ly + dir.y] == step) {
-                                feet.x = lx + dir.x
-                                feet.y = ly + dir.y
-                                found = true
+                        val dx = feet.x + dir.x
+                        val dy = feet.y + dir.y
+                        if (dx in 0 until width && dy in 0 until height) {
+                            if (foundDir == null && map[dx][dy] == step) {
+                                feet.x = dx
+                                feet.y = dy
+                                foundDir = dir
                             }
                         }
                     }
-                    if (!found) {
-                        return null // lost our way??
-                    } else if (step == 1) {
-                        feet.x += offsetX
-                        feet.y += offsetY
-                        return feet
-                    }
+                    if (foundDir == null) { return null }
+                    step = map[feet.x][feet.y] - 1
                 }
+                if (foundDir == null) { return null }
+                return XY(-(foundDir!!.x), -(foundDir!!.y))
             }
         }
         return null
@@ -190,4 +190,13 @@ class StepMap() {
     fun entitiesSeenBy(entity: Entity): Map<Entity, Float>? = if (entity == targetEntity) visibleEntities else null
 
     fun canReach(to: Entity) = to == targetEntity
+
+    fun debugStepAt(x: Int, y: Int): Int {
+        val lx = x - offsetX
+        val ly = y - offsetY
+        if (lx in 0 until width && ly in 0 until height) {
+            return map[lx][ly]
+        }
+        return 0
+    }
 }

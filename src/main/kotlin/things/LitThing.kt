@@ -119,7 +119,7 @@ class Sunsword : LitThing() {
 
 @Serializable
 class Torch : LitThing(), Temporal {
-    private var fuel = 500f
+    private var fuel = 2000f
     override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"
     override fun description() = "A branch dipped in pitch tar."
@@ -161,10 +161,10 @@ class Torch : LitThing(), Temporal {
     override fun advanceTime(delta: Float) {
         if (fuel >= 0f) {
             fuel -= delta
-            if (fuel < 100f) {
-                lightColor.r = max(0.2f, lightColor.r - delta * 0.003f)
-                lightColor.g = max(0f, lightColor.g - delta * 0.007f)
-                lightColor.b = max(0f, lightColor.b - delta * 0.005f)
+            if (fuel < 200f) {
+                lightColor.r = max(0.15f, lightColor.r - delta * 0.0015f)
+                lightColor.g = max(0f, lightColor.g - delta * 0.0035f)
+                lightColor.b = max(0f, lightColor.b - delta * 0.0025f)
                 if (fuel < 0f) {
                     becomeDark()
                     moveTo(null)

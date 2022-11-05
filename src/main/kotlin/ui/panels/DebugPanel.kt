@@ -4,6 +4,7 @@ import App
 import render.Screen
 import ui.input.Keyboard
 import world.LevelKeeper
+import world.path.Pather
 import world.terrains.Terrain
 
 object DebugPanel : ShadedPanel() {
@@ -12,7 +13,7 @@ object DebugPanel : ShadedPanel() {
 
     init {
         this.width = 160
-        this.height = 200
+        this.height = 230
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -40,6 +41,9 @@ object DebugPanel : ShadedPanel() {
         val datatext = terrain.debugData(tdata)
         drawString(terrain.type.toString(), padding, padding + 140)
         drawString("  $datatext", padding, padding + 160)
+        Screen.cursorPosition?.also {
+            drawString("step : ${Pather.debugStepAt(it.x, it.y)} @ ${it.x} ${it.y}", padding, padding + 180)
+        }
     }
 
 }

@@ -11,6 +11,7 @@ import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.LightColor
+import util.log
 import world.Level
 
 sealed class Wall(
@@ -40,7 +41,6 @@ sealed class Wall(
                         level.setTerrainData(x, y, terrainData)
                         Console.sayAct("You tunnel through solid rock.", "%Dn digs furiously into the stone!", actor)
                     } else {
-                        Console.sayAct("You break through!", "%Dn digs furiously into the stone!", actor)
                         actor.level()?.also { level ->
                             level.setTerrain(x, y, Type.TERRAIN_STONEFLOOR, roofed = true)
                             digResult()?.also { it.moveTo(level, actor.xy.x, actor.xy.y) }

@@ -3,6 +3,7 @@ package actors.actions.processes
 import actors.Actor
 import actors.actions.Action
 import actors.actions.Move
+import kotlinx.coroutines.delay
 import util.XY
 import util.log
 import world.Level
@@ -18,14 +19,16 @@ class WalkTo(
     private var done = false
     private val dest = XY(x,y)
 
-    private var lastStepTime = System.currentTimeMillis()
-
     override fun shouldContinueFor(actor: Actor): Boolean = !done && (actor.xy.x != x || actor.xy.y != y)
 
     override fun execute(actor: Actor, level: Level) {
         Pather.nextStep(actor, dest)?.also {
-            log.info("nextstep $it")
-            Move(XY(it.x - actor.xy.x, it.y - actor.xy.y)).execute(actor, level)
+            if (level.isWalkableFrom(actor.xy, it)) {
+                Move(XY(it.x, it.y)).execute(actor, level)
+            } else {
+                log.info("walkTo failed at unwalkable step $it")
+                done = true
+            }
         } ?: run { done = true }
     }
 

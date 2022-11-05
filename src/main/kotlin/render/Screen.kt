@@ -25,6 +25,7 @@ import ui.modals.ToolbarAddModal
 import ui.panels.*
 import util.*
 import world.LevelKeeper
+import world.path.Pather
 import world.stains.Stain
 import java.lang.Double.max
 import java.lang.Double.min
@@ -90,6 +91,7 @@ object Screen : KtxScreen {
     val fullLight = LightColor(1f, 1f, 1f)
     val halfLight = LightColor(0.3f, 0.3f, 0.3f)
     val fullDark = LightColor(0f, 0f, 0f)
+    private val debugLight = LightColor(0f, 0f, 0f)
 
     const val fontSize = 16
     const val fontSizeSmall = 14
@@ -177,11 +179,27 @@ object Screen : KtxScreen {
     var actTime: Int = 0
     private val lastActTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     private var actTimeIndex = 0
+    private var lastActionTime = 0L
+    private var minActionInterval = 50L
 
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
+        var useLight: LightColor = light
+        if (App.DEBUG_VISIBLE) {
+            val step = Pather.debugStepAt(tx, ty)
+            if (step == -1) {
+                debugLight.r = 0f
+                debugLight.g = 0f
+                debugLight.b = 0f
+            } else {
+                debugLight.r = (step * 0.05f)
+                debugLight.g = (step * 0.05f)
+                debugLight.b = light.b
+            }
+            useLight = debugLight
+        }
         terrainBatch.addTileQuad(
-            tx, ty, textureIndex, vis, light
+            tx, ty, textureIndex, vis, useLight
         )
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
@@ -311,14 +329,17 @@ object Screen : KtxScreen {
         drawEverything(delta)
 
         val startTime = System.currentTimeMillis()
-        LevelKeeper.runActorQueues()
-        val thisActTime = System.currentTimeMillis() - startTime
-        if (thisActTime > 0) {
-            lastActTimes[actTimeIndex] = thisActTime.toInt()
-            actTimeIndex = if (actTimeIndex == 9) 0 else actTimeIndex + 1
-            actTime = 0
-            lastActTimes.forEach { actTime += it }
-            actTime /= 10
+        if (startTime - lastActionTime > minActionInterval || Keyboard.lastKeyTime > startTime + 20L || Keyboard.lastKey > -1) {
+            LevelKeeper.runActorQueues()
+            lastActionTime = startTime
+            val thisActTime = System.currentTimeMillis() - startTime
+            if (thisActTime > 0) {
+                lastActTimes[actTimeIndex] = thisActTime.toInt()
+                actTimeIndex = if (actTimeIndex == 9) 0 else actTimeIndex + 1
+                actTime = 0
+                lastActTimes.forEach { actTime += it }
+                actTime /= 10
+            }
         }
     }
 

@@ -72,10 +72,10 @@ object LeftButtons : Panel() {
 
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
-        yPadding = (height / 6)
+        this.height = min(700, max((height / 1.8).toInt(), 500))
+        yPadding = (height - this.height) / 2
         this.x = xPadding + xMargin
         this.y = yPadding
-        this.height = height / 3 * 2
         this.width = iconSize * 2
         this.spacing = (LeftButtons.height - iconSize * buttons.size) / (buttons.size - 1)
         this.contraction = this.width

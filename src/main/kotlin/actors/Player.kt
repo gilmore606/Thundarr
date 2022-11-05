@@ -5,6 +5,7 @@ import actors.actions.Action
 import actors.actions.Move
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Scenery
 import things.Thing
 import ui.panels.Console
 import util.XY
@@ -42,7 +43,7 @@ open class Player : Actor() {
     override fun onMove() {
         super.onMove()
         level?.also { level ->
-            val things = level.thingsAt(xy.x, xy.y)
+            val things = level.thingsAt(xy.x, xy.y).filter { it !is Scenery }
             if (things.isNotEmpty()) {
                 Console.say("You see " + things.englishList() + " here.")
             }

@@ -82,7 +82,7 @@ object Console : Panel() {
 
     fun say(text: String) {
         if (text == "") return
-        burst = min(burstMax, burst + burstOnSay)
+        burst = min(if (App.attractMode) burstMax * 0.5f else burstMax, burst + if (App.attractMode) burstOnSay * 0.5f else burstOnSay)
         burstFloor = 1f
         lastLineMs = System.currentTimeMillis()
         if (text == lines.last()) return
