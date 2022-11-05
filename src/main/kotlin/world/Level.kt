@@ -196,6 +196,7 @@ sealed class Level {
     fun stainAt(x: Int, y: Int): Stain? = chunkAt(x,y)?.stainAt(x,y)
 
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")
+    fun hasCellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y)
 
     fun onAddThing(x: Int, y: Int, thing: Thing) = chunkAt(x,y)?.onAddThing(x, y, thing)
 
@@ -366,7 +367,8 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y) && visibilityAt(x,y) == 1f) {
+        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y)
+                && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))

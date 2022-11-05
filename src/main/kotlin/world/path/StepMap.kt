@@ -94,6 +94,7 @@ class StepMap() {
                                 if (tx in 0 until width && ty in 0 until height) {
                                     if (scratch[tx][ty] < 0) {
                                         waitForActorLock(level)
+                                        waitForCellLock(level, tx, ty)
                                         if (level.isWalkableFrom(x + offsetX, y + offsetY, dir)) {
                                             scratch[tx][ty] = step + 1
                                             dirty = true
@@ -119,6 +120,12 @@ class StepMap() {
     private suspend fun waitForActorLock(level: Level) {
         while (level.director.actorsLocked) {
             log.info("...stepMap waiting for actors lock...")
+            delay(0L)
+        }
+    }
+    private suspend fun waitForCellLock(level: Level, x: Int, y: Int) {
+        while (level.hasCellContainerAt(x, y)?.locked == true) {
+            log.info("...stepMap waiting for cell lock...")
             delay(0L)
         }
     }

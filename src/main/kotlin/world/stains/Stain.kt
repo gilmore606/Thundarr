@@ -16,6 +16,8 @@ sealed class Stain : Temporal {
     var scale = 1.0
     var alpha = 1f
 
+    var done = false
+
     @Transient var holder: CellContainer? = null
     private var birthTime: Double = App.time
     protected var sizeMod: Float = 0f
@@ -50,8 +52,8 @@ sealed class Stain : Temporal {
         }
     }
 
-    fun expire() {
-        holder?.expireStain(this)
+    private fun expire() {
+        done = true
     }
 
     fun onRestore(holder: CellContainer) {

@@ -116,6 +116,7 @@ class WorldLevel() : Level() {
         val cx = (chunk.x - originCx) / CHUNK_SIZE
         val cy = (chunk.y - originCy) / CHUNK_SIZE
         if (cx < 0 || cy < 0 || cx >= chunksWide || cy >= chunksWide) {
+            log.error("**********WTF***********")
             log.error("Received outdated chunk intended for cx $cx cy $cy !")
             return
         }
