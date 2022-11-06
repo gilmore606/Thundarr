@@ -71,6 +71,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun stepSound(dir: XY): Speaker.SFX? = level?.let { level ->
         Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSound(this)
     }
+    open fun talkSound(actor: Actor) = Speaker.SFX.VOICE_MALEHIGH
 
     override fun level() = level
     override fun xy() = xy

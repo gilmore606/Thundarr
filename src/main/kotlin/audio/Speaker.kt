@@ -62,6 +62,7 @@ object Speaker {
     enum class SFX(
         val files: List<String>,
         val pitchVariance: Float = 0f,
+        val gain: Float = 1f
         ) {
         UIMOVE(listOf("ui/move.ogg")),
         UISELECT(listOf("ui/select.ogg")),
@@ -72,11 +73,17 @@ object Speaker {
         STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg"), 0.3f),
         STEPHARD(listOf("steps/stephard1.ogg", "steps/stephard2.ogg", "steps/stephard3.ogg"), 0.3f),
 
+        THUNDER_NEAR(listOf("weather/thundernear.ogg"), 0.4f),
+        THUNDER_DISTANT(listOf("weather/thunderdistant.ogg"), 0.2f),
+
         MISS(listOf("hits/miss1.ogg", "hits/miss2.ogg"), 0.2f),
         DIG(listOf("hits/dig1.ogg", "hits/dig2.ogg"), 0.3f),
         HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f),
 
-        MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.3f)
+        MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.3f),
+        VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.6f),
+        VOICE_MALELOW(listOf("voice/malelow1.ogg"), 0.1f),
+        VOICE_FEMALE(listOf("voice/female1.ogg", "voice/female2.ogg"), 0.06f),
     }
 
     private val sfxFiles = mutableMapOf<SFX, List<Sound>>()
@@ -98,15 +105,15 @@ object Speaker {
     }
 
     fun ui(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, screenX: Int = screenCenterX) {
-        val volume = (vol * volumeMaster * volumeUI * maxVolumeUI).toFloat()
+        val volume = (vol * volumeMaster * volumeUI * maxVolumeUI * sfx.gain).toFloat()
         val pan = (screenX.toFloat() / screenWidth.toFloat())
         playSFX(sfx, volume, pitch, pan)
     }
 
-    fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY) {
+    fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY? = null) {
         if (sfx == null) return
-        val distance = distanceBetween(source.x, source.y, App.player.xy.x, App.player.xy.y)
-        val volume = (vol * volumeMaster * volumeWorld * (1f - (distance / 16f))).toFloat()
+        val distance = source?.let { distanceBetween(it.x, it.y, App.player.xy.x, App.player.xy.y) } ?: 0f
+        val volume = (vol * volumeMaster * volumeWorld * sfx.gain * (1f - (distance / 16f))).toFloat()
         if (volume > 0f) {
             playSFX(sfx, volume, pitch)
         }

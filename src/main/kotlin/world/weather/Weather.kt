@@ -1,5 +1,6 @@
 package world.weather
 
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
@@ -55,6 +56,7 @@ class Weather {
         if (isEveryFrame(5)) {
             if (Dice.chance(delta * boltChance * 5f)) {
                 bolt = 0.4f + Dice.float(0f, rainIntensity)
+                Speaker.world(if (bolt > 0.8f) Speaker.SFX.THUNDER_NEAR else Speaker.SFX.THUNDER_DISTANT)
             }
         }
         if (bolt > 0.01f) {

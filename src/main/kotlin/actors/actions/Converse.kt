@@ -3,6 +3,7 @@ package actors.actions
 import actors.Actor
 import actors.Player
 import actors.animations.Hop
+import audio.Speaker
 import render.sparks.Speak
 import ui.panels.Console
 import world.Level
@@ -18,6 +19,8 @@ class Converse(
         if (actor is Player) {
             if (!target.onConverse(actor)) {
                 Console.say(target.dname().capitalize() + " seems uninterested in you.")
+            } else {
+                Speaker.world(target.talkSound(actor), source = target.xy)
             }
         }
     }
