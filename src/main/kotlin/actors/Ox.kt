@@ -1,9 +1,11 @@
 package actors
 
 import actors.actions.Action
+import actors.actions.Bark
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Corpse
@@ -34,6 +36,9 @@ class Ox : NPC() {
                 stepToward(ox)?.also { return it }
             }
         }
+        if (Dice.chance(0.1f)) {
+            return Bark(Speaker.SFX.MOO)
+        }
         return super.pickAction()
     }
 
@@ -59,6 +64,9 @@ class MuskOx : NPC() {
     override fun pickAction(): Action {
         if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
             wander()?.also { return it }
+        }
+        if (Dice.chance(0.1f)) {
+            return Bark(Speaker.SFX.MOO)
         }
         return super.pickAction()
     }

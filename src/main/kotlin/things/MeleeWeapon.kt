@@ -3,6 +3,7 @@ package things
 import actors.stats.Stat
 import actors.stats.skills.Dig
 import actors.stats.skills.Fight
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import world.terrains.Terrain
@@ -19,6 +20,10 @@ sealed class MeleeWeapon : Gear() {
     open fun hitOtherMsg() = "%Dn hits %dd with %p %i!"
     open fun missSelfMsg() = "You miss."
     open fun missOtherMsg() = "%Dn misses %dd."
+
+    open fun hitSound() = Speaker.SFX.HIT
+    open fun bounceSound() = Speaker.SFX.HIT
+    open fun missSound() = Speaker.SFX.MISS
 
     override fun thrownDamage() = damage()
 

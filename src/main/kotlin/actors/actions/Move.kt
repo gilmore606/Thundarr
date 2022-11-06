@@ -24,8 +24,7 @@ class Move(
                 actor.level?.addSpark(it.at(actor.xy.x, actor.xy.y))
             }
             actor.stepSound(dir)?.also {
-                val dist = if (actor is Player) 0f else distanceBetween(actor.xy.x, actor.xy.y, App.player.xy.x, App.player.xy.y)
-                Speaker.world(it, distance = dist)
+                Speaker.world(it, source = actor.xy)
             }
             actor.moveTo(level, actor.xy.x + dir.x, actor.xy.y + dir.y)
             actor.animation = actor.stepAnimation(dir)

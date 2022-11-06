@@ -3,6 +3,7 @@ package world.terrains
 import actors.Actor
 import actors.Player
 import actors.statuses.Dazed
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
@@ -29,7 +30,8 @@ sealed class Wall(
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level()?.also { level ->
             val weapon = actor.meleeWeapon()
-            if (weapon?.canDig(type) == true) {
+            if (weapon.canDig(type)) {
+                Speaker.world(Speaker.SFX.DIG, source = actor.xy)
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
                 if (actor is Player && !actor.willAggro) {
                     Console.say("Ow!  That almost made you mad enough to dig through it with your ${weapon.name()}.")

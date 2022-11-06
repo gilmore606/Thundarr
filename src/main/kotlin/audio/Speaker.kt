@@ -5,6 +5,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.files.FileHandle
+import util.Dice
+import util.XY
+import util.distanceBetween
 import util.filterAnd
 import java.lang.Double.max
 import java.lang.Double.min
@@ -56,15 +59,24 @@ object Speaker {
         DUNGEON("equivalenttree.ogg")
     }
 
-    enum class SFX(val files: List<String>) {
+    enum class SFX(
+        val files: List<String>,
+        val pitchVariance: Float = 0f,
+        ) {
         UIMOVE(listOf("ui/move.ogg")),
         UISELECT(listOf("ui/select.ogg")),
         UIOPEN(listOf("ui/open.ogg")),
         UICLOSE(listOf("ui/close.ogg")),
 
-        STEPDIRT(listOf("steps/stepdirt1.ogg", "steps/stepdirt2.ogg", "steps/stepdirt3.ogg")),
-        STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg")),
-        STEPHARD(listOf("steps/stephard1.ogg", "steps/stephard2.ogg", "steps/stephard3.ogg")),
+        STEPDIRT(listOf("steps/stepdirt1.ogg", "steps/stepdirt2.ogg", "steps/stepdirt3.ogg"), 0.3f),
+        STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg"), 0.3f),
+        STEPHARD(listOf("steps/stephard1.ogg", "steps/stephard2.ogg", "steps/stephard3.ogg"), 0.3f),
+
+        MISS(listOf("hits/miss1.ogg", "hits/miss2.ogg"), 0.2f),
+        DIG(listOf("hits/dig1.ogg", "hits/dig2.ogg"), 0.3f),
+        HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f),
+
+        MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.3f)
     }
 
     private val sfxFiles = mutableMapOf<SFX, List<Sound>>()
@@ -88,12 +100,21 @@ object Speaker {
     fun ui(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, screenX: Int = screenCenterX) {
         val volume = (vol * volumeMaster * volumeUI * maxVolumeUI).toFloat()
         val pan = (screenX.toFloat() / screenWidth.toFloat())
-        sfxFiles[sfx]?.random()?.play(volume, pitch, pan)
+        playSFX(sfx, volume, pitch, pan)
     }
 
-    fun world(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, distance: Float = 0f) {
+    fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY) {
+        if (sfx == null) return
+        val distance = distanceBetween(source.x, source.y, App.player.xy.x, App.player.xy.y)
         val volume = (vol * volumeMaster * volumeWorld * (1f - (distance / 16f))).toFloat()
-        if (volume > 0f) sfxFiles[sfx]?.random()?.play(volume, pitch, 0.5f)
+        if (volume > 0f) {
+            playSFX(sfx, volume, pitch)
+        }
+    }
+
+    fun playSFX(sfx: SFX, volume: Float, pitch: Float = 1f, pan: Float = 0.5f) {
+        val rpitch = pitch + Dice.float(-sfx.pitchVariance, sfx.pitchVariance)
+        sfxFiles[sfx]?.random()?.play(volume, rpitch, pan)
     }
 
     fun requestSong(request: Song) {
