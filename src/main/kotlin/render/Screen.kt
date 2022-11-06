@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import ktx.app.KtxScreen
 import render.batches.CloudBatch
+import render.batches.FireBatch
 import render.batches.QuadBatch
 import render.batches.RainBatch
 import render.tilesets.*
@@ -72,9 +73,9 @@ object Screen : KtxScreen {
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
     val terrainBatch = QuadBatch(terrainTileSet)
-    val overlapBatch = QuadBatch(terrainTileSet)
-    val actorBatch = QuadBatch(actorTileSet)
     val thingBatch = QuadBatch(thingTileSet)
+    val actorBatch = QuadBatch(actorTileSet)
+    val fireBatch = FireBatch()
     val uiWorldBatch = QuadBatch(uiTileSet)
     val uiBatch = QuadBatch(uiTileSet)
     val uiThingBatch = QuadBatch(thingTileSet)
@@ -82,7 +83,7 @@ object Screen : KtxScreen {
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
     private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
-    private val allBatches = listOf(terrainBatch, overlapBatch, thingBatch, actorBatch,
+    private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, fireBatch,
         uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
@@ -233,6 +234,10 @@ object Screen : KtxScreen {
         thingBatch.addTileQuad(
             tx, ty, thingBatch.getTextureIndex(thing.glyph(), App.level, tx, ty),
             vis, lightCache[lx][ly], hue = thing.hue())
+    }
+
+    private val renderFire: (Int, Int, Float, Float, Float)->Unit = { tx, ty, offset, offx, offy ->
+        fireBatch.addTileQuad(tx, ty, offset, offX = offx, offY = offy)
     }
 
     private val renderActor: (Int, Int, Actor)->Unit = { tx, ty, actor ->
@@ -611,13 +616,14 @@ object Screen : KtxScreen {
             doTile = renderTile,
             doQuad = renderQuad,
             doStain = renderStain,
+            doFire = renderFire,
             doWeather = renderWeather,
             delta = delta
         )
         if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }
 
-        App.level.forEachThingToRender(renderThing)
-        App.level.forEachActorToRender(renderActor)
+        App.level.forEachThingToRender(renderThing, delta)
+        App.level.forEachActorToRender(renderActor, renderFire, delta)
         App.level.forEachSparkToRender(renderSpark)
 
         uiWorldBatch.apply {

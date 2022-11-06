@@ -73,6 +73,7 @@ sealed class Level {
         doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                  vis: Float, glyph: Glyph, light: LightColor)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
+        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float) -> Unit,
         doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,
         delta: Float
     ) {
@@ -95,9 +96,9 @@ sealed class Level {
                             } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1))) {
                                 doWeather(x, y, weather.clouds(), weather.rain(), true)
                             }
-                            chunk.thingsAt(x, y).forEach { it.onRender(delta) }
-                            actorAt(x, y)?.onRender(delta)
-                            chunk.stainAt(x, y)?.also { doStain(x, y, it, light) }
+                            chunk.stainAt(x, y)?.also {
+                                doStain(x, y, it, light)
+                            }
                         }
                     }
                 }
@@ -106,28 +107,35 @@ sealed class Level {
     }
 
     fun forEachThingToRender(
-        doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit
+        doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit, delta: Float
     ) {
         for (x in pov.x - Screen.renderTilesWide/2 until pov.x + Screen.renderTilesWide/2) {
             for (y in pov.y - Screen.renderTilesHigh/2 until pov.y + Screen.renderTilesHigh/2) {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
-                    for (i in max(0, thingsAt.size - 2) until thingsAt.size)
-                    doThis(x, y, thingsAt[i], vis)
+                    for (i in max(0, thingsAt.size - 2) until thingsAt.size) {
+                        thingsAt[i].onRender(delta)
+                        doThis(x, y, thingsAt[i], vis)
+                    }
                 }
             }
         }
     }
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
-    fun forEachActorToRender(doThis: (x: Int, y: Int, actor: Actor) -> Unit) =
+    fun forEachActorToRender(
+        doThis: (x: Int, y: Int, actor: Actor) -> Unit,
+        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float) -> Unit,
+        delta: Float) =
         director.actors.forEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
             if (vis == 1f && chunkAt(x,y) != null) {
+                actor.onRender(delta)
                 doThis(x, y, actor)
+                //doFire(x, y, getRandom(x, y).toFloat(), actor.animOffsetX(), actor.animOffsetY())
             }
     }
 
