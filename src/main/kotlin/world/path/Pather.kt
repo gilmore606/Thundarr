@@ -91,18 +91,16 @@ object Pather {
     }
 
     fun subscribe(subscriber: Entity, target: Entity, range: Float) {
-        jobs.add(coroutineScope.launch {
-            log.info("subscribing $subscriber @ $range for target $target")
-            val map = maps.firstOrNull { it.targetEntity == target } ?: StepMap().apply {
-                setTargetToEntity(target)
-                changeRange(range)
-                maps.add(this@apply)
-                if (target is Player) {
-                    playerMap = this@apply
-                }
+        log.info("subscribing $subscriber @ $range for target $target")
+        val map = maps.firstOrNull { it.targetEntity == target } ?: StepMap().apply {
+            setTargetToEntity(target)
+            changeRange(range)
+            maps.add(this@apply)
+            if (target is Player) {
+                playerMap = this@apply
             }
-            map.addSubscriber(subscriber, range)
-        })
+        }
+        map.addSubscriber(subscriber, range)
     }
 
     fun unsubscribe(subscriber: Entity, target: Entity) {

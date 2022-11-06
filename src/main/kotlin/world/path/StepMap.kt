@@ -30,7 +30,7 @@ class StepMap() {
     var visibleEntities: MutableMap<Entity, Float> = mutableMapOf()
     var scratchVisible: MutableMap<Entity, Float> = mutableMapOf()
 
-    suspend fun addSubscriber(subscriber: Entity, range: Float) {
+    fun addSubscriber(subscriber: Entity, range: Float) {
         subscribers.add(subscriber)
         done = false
         if (range > this.range) {
@@ -49,7 +49,7 @@ class StepMap() {
         map = Array(1) { Array(1) { 0 } }
     }
 
-    suspend fun changeRange(newRange: Float) {
+    fun changeRange(newRange: Float) {
         val nextRange = min(Pather.maxRange, newRange)
         if (nextRange != range) {
             range = nextRange
@@ -62,7 +62,7 @@ class StepMap() {
         }
     }
 
-    suspend fun setTargetToEntity(newTarget: Entity) {
+    fun setTargetToEntity(newTarget: Entity) {
         targetEntity = newTarget
         outOfDate = true
     }

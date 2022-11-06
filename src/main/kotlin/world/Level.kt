@@ -183,6 +183,14 @@ sealed class Level {
         light?.also { removeLightSource(actor) }
     }
 
+    fun moveSpeedFor(actor: Actor, dir: XY): Float {
+        val destx = actor.xy.x + dir.x
+        val desty = actor.xy.y + dir.y
+        var speed = Terrain.get(getTerrain(destx, desty)).moveSpeed(actor)
+        thingsAt(destx, desty).forEach { it.moveSpeedPast(actor)?.also { speed *= it } }
+        return speed
+    }
+
     fun advanceTime(delta: Float) = director.advanceTime(delta)
     fun linkTemporal(temporal: Temporal) = director.linkTemporal(temporal)
     fun unlinkTemporal(temporal: Temporal) = director.unlinkTemporal(temporal)

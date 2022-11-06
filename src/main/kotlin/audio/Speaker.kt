@@ -56,16 +56,19 @@ object Speaker {
         DUNGEON("equivalenttree.ogg")
     }
 
-    enum class SFX(val file: String) {
-        UIMOVE("ui/move.ogg"),
-        UISELECT("ui/select.ogg"),
-        UIOPEN("ui/open.ogg"),
-        UICLOSE("ui/close.ogg")
+    enum class SFX(val files: List<String>) {
+        UIMOVE(listOf("ui/move.ogg")),
+        UISELECT(listOf("ui/select.ogg")),
+        UIOPEN(listOf("ui/open.ogg")),
+        UICLOSE(listOf("ui/close.ogg")),
+
+        STEPDIRT(listOf("steps/stepdirt1.ogg", "steps/stepdirt2.ogg", "steps/stepdirt3.ogg")),
+        STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg")),
+        STEPHARD(listOf("steps/stephard1.ogg", "steps/stephard2.ogg", "steps/stephard3.ogg")),
     }
 
-    private val sfxFiles = mutableMapOf<SFX, Sound>()
+    private val sfxFiles = mutableMapOf<SFX, List<Sound>>()
     private var screenWidth = 1
-    private var screenHeight = 1
     private var screenCenterX = 1
 
     fun init() {
@@ -73,15 +76,24 @@ object Speaker {
     }
 
     private fun loadSounds() {
-        SFX.values().forEach {
-            sfxFiles[it] = audio.newSound(FileHandle("${RESOURCE_FILE_DIR}/sounds/${it.file}"))
+        SFX.values().forEach { sfx ->
+            sfxFiles[sfx] = mutableListOf<Sound>().apply {
+                sfx.files.forEach { add(
+                    audio.newSound(FileHandle("${RESOURCE_FILE_DIR}/sounds/${it}"))
+                )}
+            }
         }
     }
 
     fun ui(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, screenX: Int = screenCenterX) {
         val volume = (vol * volumeMaster * volumeUI * maxVolumeUI).toFloat()
         val pan = (screenX.toFloat() / screenWidth.toFloat())
-        sfxFiles[sfx]?.play(volume, pitch, pan)
+        sfxFiles[sfx]?.random()?.play(volume, pitch, pan)
+    }
+
+    fun world(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, distance: Float = 0f) {
+        val volume = (vol * volumeMaster * volumeWorld * (1f - (distance / 16f))).toFloat()
+        if (volume > 0f) sfxFiles[sfx]?.random()?.play(volume, pitch, 0.5f)
     }
 
     fun requestSong(request: Song) {
@@ -101,14 +113,13 @@ object Speaker {
 
     fun onResize(width: Int, height: Int) {
         this.screenWidth = width
-        this.screenHeight = height
         this.screenCenterX = width / 2
     }
 
     fun dispose() {
         decks.forEach { it.dispose() }
-        sfxFiles.forEach { (_, file) ->
-            file.dispose()
+        sfxFiles.forEach { (_, files) ->
+            files.forEach { it.dispose() }
         }
     }
 

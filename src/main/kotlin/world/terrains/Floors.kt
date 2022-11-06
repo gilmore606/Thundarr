@@ -1,5 +1,7 @@
 package world.terrains
 
+import actors.Actor
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.LightColor
@@ -116,12 +118,18 @@ sealed class Floor(
 
 
 
-object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR)
+object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR) {
+    override fun moveSpeed(actor: Actor) = 0.8f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+}
 
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT) {
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR)
+    override fun moveSpeed(actor: Actor) = 0.9f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
 
 object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS) {
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT)
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }

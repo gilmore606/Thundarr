@@ -9,6 +9,7 @@ import actors.stats.skills.Dodge
 import actors.stats.skills.Skill
 import actors.statuses.StatEffector
 import actors.statuses.Status
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -25,6 +26,7 @@ import world.Entity
 import world.Level
 import world.path.Pather
 import world.stains.Blood
+import world.terrains.Terrain
 import java.lang.Float.max
 import java.lang.Integer.min
 
@@ -66,6 +68,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun bleedChance() = 0.6f
     open fun stepAnimation(dir: XY) = Step(dir)
     open fun stepSpark(dir: XY): Spark? = Scoot(dir)
+    open fun stepSound(dir: XY): Speaker.SFX? = level?.let { level ->
+        Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSound(this)
+    }
 
     override fun level() = level
     override fun xy() = xy

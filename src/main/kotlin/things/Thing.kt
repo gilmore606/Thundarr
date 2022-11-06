@@ -68,6 +68,9 @@ sealed class Thing : Entity {
 
     open fun onMoveTo(from: ThingHolder?, to: ThingHolder?) { }
 
+    // Move speed penalty to walk past/through this thing on the ground
+    open fun moveSpeedPast(actor: Actor): Float? = null
+
     open fun thrownDamage() = defaultThrownDamage()
     private fun defaultThrownDamage() = min(weight() / 0.1f, 4f)
 

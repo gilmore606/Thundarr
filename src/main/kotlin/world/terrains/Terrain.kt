@@ -2,6 +2,7 @@ package world.terrains
 
 import actors.Actor
 import actors.Player
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -61,8 +62,9 @@ sealed class Terrain(
                                        vis: Float, glyph: Glyph, light: LightColor)->Unit) { }
 
     open fun isWalkable() = this.walkable
-
     open fun isOpaque() = this.opaque
+    open fun moveSpeed(actor: Actor) = 1f
+    open fun stepSound(actor: Actor): Speaker.SFX? = null
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
 

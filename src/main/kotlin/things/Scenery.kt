@@ -25,6 +25,7 @@ sealed class Scenery : Thing() {
 sealed class Tree : Scenery() {
     override fun isOpaque() = true
     override fun walkOnMsg() = "You hack through the dense trees."
+    override fun moveSpeedPast(actor: Actor): Float? = 1.4f
 
     override fun uses() = mapOf(
         UseTag.DESTROY to Use("chop down " + name(), 3.0f,
