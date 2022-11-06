@@ -265,7 +265,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Throw.set(this, 4f)
                 Build.set(this, 1f)
                 Survive.set(this, 2f)
-                repeat(5) { Throw.improve(this) }
             }
             Sunsword().moveTo(player)
             repeat (20) { EnergyDrink().moveTo(player) }

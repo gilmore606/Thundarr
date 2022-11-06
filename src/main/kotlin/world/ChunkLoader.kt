@@ -14,13 +14,25 @@ object ChunkLoader {
     private val coroutineContext = newSingleThreadAsyncContext("chunkLoader")
     private val coroutineScope = CoroutineScope(coroutineContext)
     private var jobs = mutableSetOf<Job>()
+    private var locked = false
+    private var working = false
 
-    fun isWorking(): Boolean {
-        jobs = jobs.filter { it.isActive }.toMutableSet()
-        return jobs.isNotEmpty()
+    init {
+        coroutineScope.launch {
+            while (true) {
+                if (jobs.isNotEmpty()) {
+                    jobs = jobs.filter { it.isActive }.toMutableSet()
+                }
+                working = jobs.isNotEmpty()
+                delay(100L)
+            }
+        }
     }
+    
+    fun isWorking() = working
 
     fun getWorldChunkAt(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
+        locked = true
         jobs.add(coroutineScope.launch {
             if (App.save.hasWorldChunk(x, y)) {
                 log.debug("Loading chunk at $x $y")
@@ -30,6 +42,7 @@ object ChunkLoader {
                 makeWorldChunk(level, x, y, callback)
             }
         })
+        locked = false
     }
 
     private fun makeWorldChunk(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
@@ -44,20 +57,25 @@ object ChunkLoader {
     }
 
     fun saveWorldChunk(chunk: Chunk, callback: ()->Unit) {
+        locked = true
         jobs.add(coroutineScope.launch {
             log.debug("ChunkLoader saving chunk ${chunk.x} ${chunk.y}")
             App.save.putWorldChunk(chunk, callback)
         })
+        locked = false
     }
 
     fun saveLevelChunk(chunk: Chunk, levelId: String, callback: ()->Unit) {
+        locked = true
         jobs.add(coroutineScope.launch {
             log.debug("ChunkLoader saving level chunk $levelId")
             App.save.updateLevelChunk(chunk, levelId, callback)
         })
+        locked = false
     }
 
     fun getLevelChunk(level: Level, levelId: String, callback: (Chunk)->Unit) {
+        locked = true
         jobs.add(coroutineScope.launch {
             if (App.save.hasLevelChunk(levelId)) {
                 log.debug("Loading chunk $levelId")
@@ -67,6 +85,7 @@ object ChunkLoader {
                 makeLevelChunk(level, levelId, callback)
             }
         })
+        locked = false
     }
 
     private fun makeLevelChunk(level: Level, levelId: String, callback: (Chunk) -> Unit) {

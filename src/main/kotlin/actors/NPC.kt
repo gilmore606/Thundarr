@@ -130,8 +130,7 @@ sealed class NPC : Actor() {
         return d
     }
 
-    override fun receiveAttack(attacker: Actor) {
-        super.receiveAttack(attacker)
+    override fun receiveAggression(attacker: Actor) {
         if (attacker is Player && !hostile) {
             hostile = true
             val m = becomeHostileMsg().random()

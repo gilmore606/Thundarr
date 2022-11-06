@@ -28,7 +28,7 @@ sealed class Tree : Scenery() {
 
     override fun uses() = mapOf(
         UseTag.DESTROY to Use("chop down " + name(), 3.0f,
-            canDo = { it.weapon() is Axe },
+            canDo = { it.meleeWeapon() is Axe },
             toDo = { actor, level ->
                 Log().moveTo(level, actor.xy.x, actor.xy.y)
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))

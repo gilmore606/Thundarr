@@ -51,7 +51,7 @@ abstract class Carto(
     fun addThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)
         KtxAsync.launch {
-            dest.reconnect(level, x, y)
+            dest?.reconnect(level, x, y)
             thing.moveTo(dest)
         }
     }

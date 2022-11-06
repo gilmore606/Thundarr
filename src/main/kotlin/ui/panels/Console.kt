@@ -19,7 +19,7 @@ object Console : Panel() {
 
     private var lastLineMs = System.currentTimeMillis()
     private var scroll = 0f
-    private var scrollSpeed = 90f
+    private var scrollSpeed = 140f
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
 

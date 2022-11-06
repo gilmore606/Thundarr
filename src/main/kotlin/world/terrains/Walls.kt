@@ -11,7 +11,6 @@ import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.LightColor
-import util.log
 import world.Level
 
 sealed class Wall(
@@ -29,7 +28,7 @@ sealed class Wall(
 
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level()?.also { level ->
-            val weapon = actor.weapon()
+            val weapon = actor.meleeWeapon()
             if (weapon?.canDig(type) == true) {
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
                 if (actor is Player && !actor.willAggro) {

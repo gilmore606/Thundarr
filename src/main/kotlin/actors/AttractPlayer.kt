@@ -4,7 +4,6 @@ import actors.actions.*
 import render.tilesets.Glyph
 import things.*
 import util.*
-import world.terrains.BrickWall
 import world.terrains.Terrain
 import world.terrains.Wall
 import kotlin.random.Random
@@ -19,6 +18,7 @@ class AttractPlayer : Player() {
 
 
     override fun glyph() = Glyph.MOK
+    override fun name() = "Ookla"
 
     override fun nextAction() = super.nextAction() ?: defaultAction()
 
@@ -122,7 +122,7 @@ class AttractPlayer : Player() {
                             }
                         }
                     }
-                } ?: doWeHave { it is Weapon }?.also { weapon ->
+                } ?: doWeHave { it is MeleeWeapon }?.also { weapon ->
                     if (!(weapon as Gear).equipped) {
                         return Equip(weapon)
                     }
@@ -145,12 +145,12 @@ class AttractPlayer : Player() {
                 // talk or fight or grab nearby stuff
                 entitiesNextToUs().forEach { entity ->
                     if (entity is NPC && entity.isHostile()) {
-                        return Melee(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+                        return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                     if (entity is Ox || entity is MuskOx) {
                         if (Dice.flip()) return Converse(entity as Actor)
                     }
-                    if (entity is Consumable || entity is Weapon) {
+                    if (entity is Consumable || entity is MeleeWeapon) {
                         return Move(XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                 }

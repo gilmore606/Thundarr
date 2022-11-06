@@ -1,10 +1,9 @@
 package ui.modals
 
 import render.Screen
-import render.tilesets.Glyph
 import things.Clothing
 import things.Gear
-import things.Weapon
+import things.MeleeWeapon
 
 class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
 
@@ -69,9 +68,15 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
             drawStat("armor:", "", armor, x0, comp)
         }
 
-        if (gear is Weapon) {
+        if (gear is MeleeWeapon) {
+            val speed = gear.speed()
+            val speedcomp = (if (compareTo is MeleeWeapon) compareTo.speed() else speed) - speed
+            drawStat("speed:", "", speed, x0, speedcomp)
+            val acc = gear.accuracy()
+            val accomp = acc - (if (compareTo is MeleeWeapon) compareTo.accuracy() else acc)
+            drawStat("accuracy:", "", acc, x0, accomp)
             val damage = gear.damage()
-            val comp = damage - (if (compareTo is Weapon) compareTo.damage() else damage)
+            val comp = damage - (if (compareTo is MeleeWeapon) compareTo.damage() else damage)
             drawStat("damage:", "", damage, x0, comp)
         }
     }
@@ -80,11 +85,12 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
 
     private fun drawStat(statName: String, suffix: String, value: Float, x0: Int, comparison: Float) {
         drawString(statName, x0 + (120 - measure(statName, Screen.smallFont) - 8), padding + statY, font = Screen.smallFont, color = Screen.fontColorDull)
-        val valuestr = value.toString()
+        val valuestr = if (value.toInt().toFloat() == value) value.toInt().toString() else value.toString()
         drawString(valuestr, x0 + 120, padding + statY, font = Screen.font, color = Screen.fontColorBold)
         drawString(suffix, x0 + 120 + measure(valuestr), padding + statY, font = Screen.font, color = Screen.fontColor)
         if (comparison != 0f) {
-            val symbol = (if (comparison > 0f) "+" else "") + String.format("%.1f", comparison)
+            val txt = if (comparison.toInt().toFloat() == comparison) comparison.toInt().toString() else String.format("%.1f", comparison)
+            val symbol = (if (comparison > 0f) "+" else "") + txt
             val color = if (comparison > 0f) Screen.fontColorGreen else Screen.fontColorRed
             drawString(symbol, x0 + 190, padding + statY, font = Screen.font, color = color)
         }

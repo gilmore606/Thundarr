@@ -14,7 +14,6 @@ import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
 import ui.modals.ExamineModal
-import ui.panels.Console
 import util.*
 import world.path.Pather
 import world.stains.Stain
@@ -22,7 +21,6 @@ import world.terrains.Terrain
 import world.terrains.TerrainData
 import world.weather.Weather
 import java.lang.Integer.max
-import java.lang.Integer.min
 
 sealed class Level {
 
@@ -381,7 +379,7 @@ sealed class Level {
     fun bumpActionTo(x: Int, y: Int, dir: XY): Action? {
         actorAt(x + dir.x,y + dir.y)?.also { target ->
             if (App.player.willAggro(target) || target.willAggro(App.player)) {
-                return Melee(target, dir)
+                return Attack(target, dir)
             }
             return Converse(target)
         } ?: run {

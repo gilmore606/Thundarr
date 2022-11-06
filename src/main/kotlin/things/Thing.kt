@@ -73,8 +73,7 @@ sealed class Thing : Entity {
 
     open fun onThrownAt(thrower: Actor, level: Level, x: Int, y: Int) {
         level.actorAt(x, y)?.also {
-            it.takeDamage(thrownDamage())
-            it.receiveAttack(thrower)
+            it.receiveDamage(thrownDamage(), thrower)
         }
         moveTo(level, x, y)
     }

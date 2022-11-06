@@ -23,6 +23,7 @@ class Ox : NPC() {
         Speed.set(this, 8f)
         Brains.set(this, 5f)
     }
+    override fun armorTotal() = 2.5f
 
     override fun pickAction(): Action {
         if (awareness == Awareness.AWARE && Dice.chance(0.1f)) {

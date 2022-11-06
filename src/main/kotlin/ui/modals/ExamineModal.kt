@@ -4,7 +4,7 @@ import actors.Actor
 import render.Screen
 import things.Clothing
 import things.Thing
-import things.Weapon
+import things.MeleeWeapon
 import ui.input.Mouse
 import world.Entity
 
@@ -83,7 +83,9 @@ class ExamineModal(
         statY = 240
         if (entity is Thing) {
             drawStat("weight:", "lb", entity.weight(), padding)
-            if (entity is Weapon) {
+            if (entity is MeleeWeapon) {
+                drawStat("speed:", "", entity.speed(), padding)
+                drawStat("accuracy:", "", entity.accuracy(), padding)
                 drawStat("damage:", "", entity.damage(), padding)
             }
             if (entity is Clothing) {

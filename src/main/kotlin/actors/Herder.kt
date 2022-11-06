@@ -2,21 +2,18 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Converse
-import actors.actions.Melee
-import actors.actions.Move
+import actors.actions.Attack
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
+import actors.stats.skills.Dodge
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Apple
-import things.Pear
 import util.Dice
 import util.LightColor
 import util.XY
 import util.isEveryFrame
 import world.Entity
-import world.path.Pather
 import kotlin.random.Random
 
 @Serializable
@@ -32,6 +29,7 @@ class Herder : NPC() {
         Strength.set(this, 9f)
         Speed.set(this, 16f)
         Brains.set(this, 11f)
+        Dodge.set(this, 4f)
     }
     override fun becomeHostileMsg(): List<String> = listOf("%Dn yelps in dismay at your sudden brutality!")
     override fun converseLines() = listOf(
@@ -46,7 +44,7 @@ class Herder : NPC() {
         // talk or fight or grab nearby stuff
         entitiesNextToUs().forEach { entity ->
             if (entity is Player && isHostile()) {
-                return Melee(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+                return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
             }
             if (entity is Ox || entity is MuskOx) {
                 if (Dice.flip()) return Converse(entity as Actor)

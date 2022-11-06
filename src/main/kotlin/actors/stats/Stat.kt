@@ -17,7 +17,7 @@ abstract class Stat(
     private val ipPerImprove = 5f
 
     enum class Tag { STR, SPD, BRN,
-                     DIG, FIGHT, THROW, BUILD, SURVIVE }
+                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE }
 
     companion object {
         fun get(tag: Tag) = when (tag) {
@@ -26,6 +26,7 @@ abstract class Stat(
             Tag.BRN -> Brains
             Tag.DIG -> Dig
             Tag.FIGHT -> Fight
+            Tag.DODGE -> Dodge
             Tag.THROW -> Throw
             Tag.BUILD -> Build
             Tag.SURVIVE -> Survive
@@ -101,7 +102,7 @@ abstract class Stat(
 
     // Roll a skill check and return the +/- result, possibly improving the skill.
     fun resolve(actor: Actor, difficulty: Float, noImprove: Boolean = false): Float {
-        val effective = get(actor) - difficulty
+        val effective = get(actor) + difficulty
         if (!noImprove && effective in 8.0..14.0) {
             val improveChance = improveChance() * (1f + (15.0 - effective) * 0.1f)
             if (Dice.chance(improveChance.toFloat())) {
@@ -114,7 +115,8 @@ abstract class Stat(
 
     // Gain an improvement point, possibly gaining a base level.
     fun improve(actor: Actor) {
-        val value = actor.stats[tag] ?: Value(getDefaultBase(actor))
+        val value = actor.stats[tag] ?: Value(0f)
+        if (value.base < 0f) value.base = 0f
         value.ip += ipPerImprove
         if (value.ip >= 100f) {
             value.ip = value.ip - 100f
@@ -123,5 +125,7 @@ abstract class Stat(
         }
         actor.stats[tag] = value
     }
+
+    fun bonus(actor: Actor): Float = (10f - get(actor)) * 0.5f
 
 }

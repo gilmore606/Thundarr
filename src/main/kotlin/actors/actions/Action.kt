@@ -1,15 +1,16 @@
 package actors.actions
 
 import actors.Actor
-import kotlinx.serialization.Serializable
+import actors.stats.Speed
 import world.Level
+import java.lang.Float.max
 
 abstract class Action(
     val duration: Float
 ) {
 
     // How many turns will this action take?
-    open fun duration() = this.duration
+    open fun durationFor(actor: Actor) = this.duration * max(0.3f, (1f - (Speed.bonus(actor)) * 0.1f))
 
     open fun canQueueFor(actor: Actor) = true
 

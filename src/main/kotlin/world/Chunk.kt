@@ -199,7 +199,7 @@ class Chunk(
 
     fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y]
-    } else { throw RuntimeException("no cell container for $x $y") }
+    } else null
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]

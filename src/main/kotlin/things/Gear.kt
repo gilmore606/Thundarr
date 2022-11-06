@@ -10,8 +10,8 @@ import util.toEnglishList
 sealed class Gear : Portable(), StatEffector {
 
     enum class Slot(val duration: Float, val title: String, val where: String, val verb: String, val unverb: String) {
-        WEAPON(0.5f, "primary", "as weapon", "wield", "put away"),
-        SECONDARY(0.5f, "secondary", "as secondary", "ready", "unready"),
+        MELEE(0.5f, "primary", "as weapon", "wield", "put away"),
+        RANGED(0.5f, "secondary", "as secondary", "ready", "unready"),
         HEAD(0.6f, "head", "on head", "wear", "remove"),
         NECK(1.0f, "neck", "around neck", "wear", "remove"),
         HANDS(1.5f, "hands", "on hands", "wear", "remove"),
@@ -21,7 +21,7 @@ sealed class Gear : Portable(), StatEffector {
     }
 
     companion object {
-        val slots = listOf(Slot.WEAPON, Slot.SECONDARY, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.LEGS, Slot.FEET)
+        val slots = listOf(Slot.MELEE, Slot.RANGED, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.LEGS, Slot.FEET)
     }
 
     var equipped = false

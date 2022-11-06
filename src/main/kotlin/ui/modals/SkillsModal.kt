@@ -4,6 +4,7 @@ import actors.Actor
 import actors.stats.*
 import render.Screen
 import ui.input.Mouse
+import util.log
 
 class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
 
@@ -43,8 +44,10 @@ class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
             val total = skill.get(actor)
             val bonus = skillBonuses[n]
             val bonusString = skillBonusStrings[n]
-            drawRightText(skill.name, 280, header + skillSpacing * n)
-            drawString(skill.getBase(actor).toInt().toString(), 290, header + skillSpacing * n + 1, Screen.fontColorDull, Screen.smallFont)
+            val base = skill.getBase(actor).toInt()
+            val baseString = if (base < 1) "" else base.toString()
+            drawRightText(skill.name, 280, header + skillSpacing * n, if (base < 1) Screen.fontColorDull else Screen.fontColor)
+            drawString(baseString, 290, header + skillSpacing * n + 1, Screen.fontColorDull, Screen.smallFont)
             drawString((total - bonus).toInt().toString(), 310, header + skillSpacing * n, Screen.fontColorBold)
             drawString(bonusString, 332, header + skillSpacing * n,
                 if (bonusString.startsWith('+')) Screen.fontColorGreen else Screen.fontColorRed, Screen.font)

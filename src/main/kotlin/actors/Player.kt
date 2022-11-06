@@ -24,6 +24,8 @@ open class Player : Actor() {
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A stalwart blond barbarian in a leather tunic."
+    override fun dname() = name()
+    override fun iname() = name()
 
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true

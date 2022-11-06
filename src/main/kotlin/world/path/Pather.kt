@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import util.RayCaster
 import util.XY
@@ -16,6 +17,7 @@ import java.lang.RuntimeException
 object Pather {
 
     private val maps = mutableListOf<StepMap>()
+
     const val maxRange = 100f
 
     private val coroutineContext = newSingleThreadAsyncContext("pather")
@@ -48,7 +50,9 @@ object Pather {
                 doneMap?.also {
                     log.info("pruning done map $it")
                     it.dispose()
-                    maps.remove(it)
+                    KtxAsync.launch {
+                        maps.remove(it)
+                    }
                 }
                 delay(1L)
             }

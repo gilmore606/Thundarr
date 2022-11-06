@@ -109,7 +109,7 @@ class Director(val level: Level) {
             }
             // execute their action
             actor.nextAction()?.also { action ->
-                val duration = action.duration()
+                val duration = action.durationFor(actor)
                 action.execute(actor, level)
                 // pay the juice
                 if (actor is Player) {  // player pays juice to all actors
