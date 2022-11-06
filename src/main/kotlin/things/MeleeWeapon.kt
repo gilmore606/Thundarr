@@ -1,5 +1,6 @@
 package things
 
+import actors.Actor
 import actors.stats.Stat
 import actors.stats.skills.Dig
 import actors.stats.skills.Fight
@@ -25,7 +26,7 @@ sealed class MeleeWeapon : Gear() {
     open fun bounceSound() = Speaker.SFX.HIT
     open fun missSound() = Speaker.SFX.MISS
 
-    override fun thrownDamage() = damage()
+    override fun thrownDamage(thrower: Actor, roll: Float) = damage() * 0.5f
 
     open fun canDig(terrainType: Terrain.Type): Boolean = false
     open fun speed(): Float = 1f

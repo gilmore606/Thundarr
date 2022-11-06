@@ -21,9 +21,11 @@ class Attack(
         actor.animation = Whack(dir)
 
         val weapon = actor.meleeWeapon()
-        val bonus = weapon.accuracy() + weapon.skill().bonus(actor)
-        val dodgeMod = target.tryDodge(actor, weapon, bonus)
-        val roll = weapon.skill().resolve(actor, dodgeMod)
+        var bonus = weapon.accuracy()
+        if (target.canSee(actor)) {
+            bonus = target.tryDodge(actor, weapon, bonus + weapon.skill().bonus(actor))
+        }
+        val roll = weapon.skill().resolve(actor, bonus)
 
         if (roll >= 0) {
             val damage = weapon.damage() + Dice.float(0f, weapon.damage())

@@ -76,9 +76,10 @@ object Speaker {
         THUNDER_NEAR(listOf("weather/thundernear.ogg"), 0.4f),
         THUNDER_DISTANT(listOf("weather/thunderdistant.ogg"), 0.2f),
 
-        MISS(listOf("hits/miss1.ogg", "hits/miss2.ogg"), 0.2f),
+        MISS(listOf("hits/miss1.ogg", "hits/miss2.ogg"), 0.2f, 0.5f),
         DIG(listOf("hits/dig1.ogg", "hits/dig2.ogg"), 0.3f),
-        HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f),
+        HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f, 1.5f),
+        BRICKHIT(listOf("hits/brickhit.ogg"), 0.3f),
 
         MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.3f),
         VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.6f),

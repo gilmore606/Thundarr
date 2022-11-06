@@ -352,7 +352,7 @@ sealed class Level {
                         menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
                     } else {
                         menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
-                        menu.addOption("take all " + group[0].name().plural()) {
+                        menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
                             group.forEach { App.player.queue(Get(it)) }
                         }
                     }

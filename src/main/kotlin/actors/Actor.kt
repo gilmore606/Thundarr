@@ -301,7 +301,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// combat info
 
-    fun tryDodge(attacker: Actor, weapon: MeleeWeapon, bonus: Float): Float {
+    fun tryDodge(attacker: Actor, weapon: Thing, bonus: Float): Float {
         // skip this if we're under certain statuses
         val roll = Dodge.resolve(this, 0f - bonus)
         var result = 0f
@@ -357,6 +357,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     protected fun entitiesSeen(matching: ((Entity)->Boolean)? = null) = Pather.entitiesSeenBy(this, matching)
+    fun canSee(entity: Entity) = Pather.entitiesSeenBy(this).keys.contains(entity)
 
     protected fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()

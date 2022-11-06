@@ -51,9 +51,8 @@ sealed class Consumable : Portable() {
         level()?.also { level ->
             xy()?.also { xy ->
                 level.actorAt(xy.x, xy.y)?.also { target ->
-                    Console.announce(level, xy.x, xy.y, Console.Reach.VISUAL, m + ", splashing " + target.dname() + "!")
+
                     announced = true
-                    statusEffect()?.also { target.addStatus(it) }
                 }
                 if (!announced) Console.announce(level, xy.x, xy.y, Console.Reach.VISUAL, m + "!")
             }
@@ -61,9 +60,25 @@ sealed class Consumable : Portable() {
         moveTo(null)
     }
 
-    override fun onThrownAt(thrower: Actor, level: Level, x: Int, y: Int) {
-        super.onThrownAt(thrower, level, x, y)
-        if (breakOnThrow()) onBreak()
+    override fun onThrownAt(level: Level, x: Int, y: Int) {
+        super.onThrownAt(level, x, y)
+        if (breakOnThrow()) {
+            Console.announce(level, x, y, Console.Reach.VISUAL, dnamec() + "shatters.")
+            moveTo(null)
+        }
+    }
+
+    override fun onThrownOn(target: Actor) {
+        if (breakOnThrow()) {
+            Console.announce(
+                target.level, target.xy.x, target.xy.y, Console.Reach.VISUAL,
+                dnamec() + " shatters, splashing " + target.dname() + "!"
+            )
+            statusEffect()?.also { target.addStatus(it) }
+            moveTo(null)
+        } else {
+            super.onThrownOn(target)
+        }
     }
 }
 

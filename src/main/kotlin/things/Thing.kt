@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -37,7 +38,7 @@ sealed class Thing : Entity {
     fun listName() = name() + " " + listTag()
 
     override fun examineInfo(): String {
-        if (thrownDamage() > defaultThrownDamage()) {
+        if (thrownDamage(App.player, 6f) > defaultThrownDamage()) {
             return "It looks like it would do extra damage when thrown."
         }
         return super.examineInfo()
@@ -71,15 +72,12 @@ sealed class Thing : Entity {
     // Move speed penalty to walk past/through this thing on the ground
     open fun moveSpeedPast(actor: Actor): Float? = null
 
-    open fun thrownDamage() = defaultThrownDamage()
+    open fun thrownDamage(thrower: Actor, roll: Float) = defaultThrownDamage()
     private fun defaultThrownDamage() = min(weight() / 0.1f, 4f)
-
-    open fun onThrownAt(thrower: Actor, level: Level, x: Int, y: Int) {
-        level.actorAt(x, y)?.also {
-            it.receiveDamage(thrownDamage(), thrower)
-        }
-        moveTo(level, x, y)
-    }
+    open fun thrownAccuracy() = -1f
+    open fun onThrownOn(target: Actor) { moveTo(target.xy.x, target.xy.y) }
+    open fun onThrownAt(level: Level, x: Int, y: Int) { moveTo(level, x, y) }
+    open fun thrownHitSound() = Speaker.SFX.BRICKHIT
 
     open fun toolbarName(): String? = null
     open fun toolbarUseTag(): UseTag? = null
@@ -119,5 +117,5 @@ class Brick : Portable() {
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun glyph() = Glyph.BRICK
     override fun weight() = 0.4f
-    override fun thrownDamage() = super.thrownDamage() + 1f
+    override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
 }
