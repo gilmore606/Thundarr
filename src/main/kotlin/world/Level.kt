@@ -4,6 +4,9 @@ import actors.Actor
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
+import audio.Speaker
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.Raindrop
 import render.sparks.Spark
@@ -21,6 +24,7 @@ import world.terrains.Terrain
 import world.terrains.TerrainData
 import world.weather.Weather
 import java.lang.Integer.max
+import java.lang.Math.abs
 
 sealed class Level {
 
@@ -56,6 +60,7 @@ sealed class Level {
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
     // This is safe because one thread asks for these values serially and doesn't store the result directly.
     private val ambientResult = LightColor(0f,0f,0f)
+    protected var distanceFromOutdoors = 100
 
     open fun onPlayerEntered() { }
 
@@ -78,12 +83,15 @@ sealed class Level {
         doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,
         delta: Float
     ) {
+        var minOutdoorDist = 100
         for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
             for (y in pov.y - Screen.renderTilesHigh / 2 until pov.y + Screen.renderTilesHigh / 2) {
                 chunkAt(x, y)?.also { chunk ->
                     val vis = if (App.DEBUG_VISIBLE) 1f else chunk.visibilityAt(x, y)
                     val terrain = Terrain.get(chunk.getTerrain(x, y))
                     val glyph = terrain.glyph()
+                    val roofed = isRoofedAt(x, y)
+                    val walkable = isWalkableAt(x, y)
                     if (vis > 0f) {
                         val light = if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
                         doTile(
@@ -91,7 +99,7 @@ sealed class Level {
                         )
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doQuad)
                         if (vis == 1f) {
-                            if ((!isRoofedAt(x, y) && (!isOpaqueAt(x, y) || isWalkableAt(x, y)))) {
+                            if ((!roofed && (!isOpaqueAt(x, y) || walkable))) {
                                 doWeather(x, y, weather.clouds(), weather.rain(), false)
                                 if (weather.shouldRaindrop()) addSpark(Raindrop().at(x, y))
                             } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1))) {
@@ -102,9 +110,14 @@ sealed class Level {
                             }
                         }
                     }
+                    if (!roofed && walkable) {
+                        val dist = abs(App.player.xy.x - x) + abs(App.player.xy.y - y)
+                        if (dist < minOutdoorDist) minOutdoorDist = dist
+                    }
                 }
             }
         }
+        distanceFromOutdoors = minOutdoorDist
     }
 
     fun forEachThingToRender(
@@ -262,7 +275,8 @@ sealed class Level {
             }
         }
 
-        weather.onRender(delta)
+        if (this !is EnclosedLevel) weather.onRender(delta)
+
         allChunks().forEach { it.onRender(delta) }
         director.actors.forEach { it.onRender(delta) }
 
@@ -319,8 +333,7 @@ sealed class Level {
 
     fun updateTime(hour: Int, minute: Int) {
         updateAmbientLight(hour, minute)
-        weather.updateTime(hour, minute, this)
-        updateAmbientSound(hour, minute)
+        if (App.level == this) updateAmbientSound(hour, minute)
     }
 
     private fun updateAmbientLight(hour: Int, minute: Int) {

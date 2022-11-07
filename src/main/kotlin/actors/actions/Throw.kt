@@ -56,6 +56,7 @@ class Throw(
                 return
             } else {
                 Console.sayAct("%Di misses %dd.", "%Dn throws %ii at %dd, but misses.", actor, target, thing)
+                target.receiveAggression(actor)
             }
         }
         thing.onThrownAt(level, x, y)

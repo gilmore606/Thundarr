@@ -103,17 +103,16 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     private fun startAttract() {
         Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
         attractMode = true
-        Speaker.requestSong(Speaker.Song.ATTRACT)
         Screen.addPanel(Console)
 
         level = LevelKeeper.getLevel("attract")
         weather = Weather()
-        player = AttractPlayer()
-
-        updateTime(Dice.range(200, 1200).toDouble())
         level.setPov(60, 60)
+        player = AttractPlayer()
         Screen.recenterCamera()
         movePlayerIntoLevel(70, 70)
+        level.onPlayerEntered()
+        updateTime(Dice.range(200, 1200).toDouble())
 
         Screen.brightnessTarget = 1f
         KtxAsync.launch {
@@ -366,6 +365,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $realYear"
         lastHour = hour
+
+        weather.updateTime(hour, minute, level)
 
         LevelKeeper.forEachLiveLevel { it.updateTime(hour, minute) }
     }

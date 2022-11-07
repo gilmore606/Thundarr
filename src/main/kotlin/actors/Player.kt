@@ -82,8 +82,4 @@ open class Player : Actor() {
         if (thrownTag == "") return null
         return contents.firstOrNull { it.thingTag() == thrownTag }
     }
-
-    override fun die() {
-
-    }
 }

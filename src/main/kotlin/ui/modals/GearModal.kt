@@ -31,6 +31,7 @@ class GearModal(
         fillSlots()
 
         sidecar = CompareSidecar(this)
+        (sidecar as CompareSidecar).showGear1(slots[selection]?.current)
     }
 
     override fun drawModalText() {
@@ -61,6 +62,7 @@ class GearModal(
             padding + xMargin + 120, optionY(selection) - 16 - startPos * 26) { hoverOption ->
                 sidecar?.also {
                     val things = slots[ourSelection].things
+                    (it as CompareSidecar).showGear1(slots[ourSelection].current)
                     if (hoverOption >= 0 && hoverOption <= things.lastIndex && things[hoverOption] != slots[ourSelection].current) {
                         (it as CompareSidecar).showGear2(things[hoverOption])
                     } else {

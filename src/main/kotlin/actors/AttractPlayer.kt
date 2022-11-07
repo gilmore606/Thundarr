@@ -1,6 +1,13 @@
 package actors
 
 import actors.actions.*
+import actors.stats.skills.Dodge
+import actors.stats.skills.Fight
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
+import render.Screen
+import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
 import util.*
@@ -16,6 +23,12 @@ class AttractPlayer : Player() {
     var tunnelDir: XY? = null
     var noMiningUntil: Double = App.time
 
+    init {
+        Fight.set(this, 4f)
+        Dodge.set(this, 1f)
+        actors.stats.skills.Throw.set(this, 3f)
+        hp = 1
+    }
 
     override fun glyph() = Glyph.MOK
     override fun name() = "Ookla"
@@ -194,6 +207,22 @@ class AttractPlayer : Player() {
             return Move(dir)
         }
         return null
+    }
+
+    override fun die() {
+        makeCorpse(level!!)
+        Screen.brightnessTarget = 0f
+        KtxAsync.launch {
+            moveTo(level, 65, 70)
+            level!!.addSpark(Smoke().at(65, 70))
+            delay(1000L)
+            fakeRespawn()
+            Screen.brightnessTarget = 1f
+        }
+    }
+
+    private fun fakeRespawn() {
+        hp = hpMax
     }
 
 }

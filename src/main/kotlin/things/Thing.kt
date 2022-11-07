@@ -77,7 +77,7 @@ sealed class Thing : Entity {
     open fun thrownAccuracy() = -1f
     open fun onThrownOn(target: Actor) { moveTo(target.xy.x, target.xy.y) }
     open fun onThrownAt(level: Level, x: Int, y: Int) { moveTo(level, x, y) }
-    open fun thrownHitSound() = Speaker.SFX.BRICKHIT
+    open fun thrownHitSound() = Speaker.SFX.ROCKHIT
 
     open fun toolbarName(): String? = null
     open fun toolbarUseTag(): UseTag? = null

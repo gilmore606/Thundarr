@@ -56,7 +56,8 @@ class Weather {
         if (isEveryFrame(5)) {
             if (Dice.chance(delta * boltChance * 5f)) {
                 bolt = 0.4f + Dice.float(0f, rainIntensity)
-                Speaker.world(if (bolt > 0.8f) Speaker.SFX.THUNDER_NEAR else Speaker.SFX.THUNDER_DISTANT)
+                Speaker.world(if (bolt > 0.8f) Speaker.SFX.THUNDER_NEAR else Speaker.SFX.THUNDER_DISTANT,
+                    delayMs = java.lang.Long.max(0L, 20L + (600f - Dice.float(0f, bolt / 0.0015f)).toLong()) )
             }
         }
         if (bolt > 0.01f) {

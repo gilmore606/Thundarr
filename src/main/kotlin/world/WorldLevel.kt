@@ -48,7 +48,7 @@ class WorldLevel() : Level() {
     }
 
     override fun updateAmbientSound(hour: Int, minute: Int) {
-        val outdoors = 1f
+        val outdoors = max(0f, 1f - (distanceFromOutdoors * 0.06f))
         val day = max(0f, (ambientLight.brightness() - 0.5f) * 2f)
         val night = 1f - day
         val rain1 = min(1f, App.weather.rain() * 3f)

@@ -54,13 +54,15 @@ class RainBatch : RenderBatch() {
         val tx1 = x1 * scale
         val ty1 = y1 * scale
 
+        val falpha = alpha * Screen.brightness
+
         floats.apply {
-            addVertex(x0, y0, tx0, ty0, if (fadeTop) 0f else alpha)
-            addVertex(x0, y1, tx0, ty1, alpha)
-            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else alpha)
-            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else alpha)
-            addVertex(x0, y1, tx0, ty1, alpha)
-            addVertex(x1, y1, tx1, ty1, alpha)
+            addVertex(x0, y0, tx0, ty0, if (fadeTop) 0f else falpha)
+            addVertex(x0, y1, tx0, ty1, falpha)
+            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else falpha)
+            addVertex(x1, y0, tx1, ty0, if (fadeTop) 0f else falpha)
+            addVertex(x0, y1, tx0, ty1, falpha)
+            addVertex(x1, y1, tx1, ty1, falpha)
         }
     }
 

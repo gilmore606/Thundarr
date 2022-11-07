@@ -5,13 +5,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.files.FileHandle
-import util.Dice
-import util.XY
-import util.distanceBetween
-import util.filterAnd
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
+import ui.panels.TimeButtons
+import util.*
 import java.lang.Double.max
 import java.lang.Double.min
 import java.lang.RuntimeException
+import java.util.Collections.addAll
 
 object Speaker {
 
@@ -20,11 +22,10 @@ object Speaker {
     var volumeMusic = 1.0
     var volumeUI = 1.0
 
-
     enum class Song(
         val file: String
         ) {
-        ATTRACT("finitepool.ogg"),
+        ATTRACT("yeshallnot.ogg"),
         WORLD("jacobsladder.ogg"),
         DUNGEON("equivalenttree.ogg")
     }
@@ -50,6 +51,7 @@ object Speaker {
         DIG(listOf("hits/dig1.ogg", "hits/dig2.ogg"), 0.3f),
         HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f, 1.5f),
         BRICKHIT(listOf("hits/brickhit.ogg"), 0.3f),
+        ROCKHIT(listOf("hits/rockhit.ogg"), 0.3f),
 
         MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.4f),
         VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.7f),
@@ -61,7 +63,6 @@ object Speaker {
         val file: String
     ) {
         RAINLIGHT("weather/rainlight.ogg"),
-        RAINMEDIUM("weather/rainmed.ogg"),
         RAINHEAVY("weather/rainheavy.ogg"),
         INDUSTRIAL("ambi/industrial.ogg"),
         OUTDOORDAY("ambi/outdoorday.ogg"),
@@ -76,6 +77,7 @@ object Speaker {
         val song: Music,
         val isMusic: Boolean = true
     ) {
+        var doneAtZero = false
         var done = false
         var fader = 0.0
         var faderTarget = if (isMusic) 1.0 else 0.0
@@ -90,20 +92,25 @@ object Speaker {
         }
         fun requestVolume(newVolume: Float) {
             faderTarget = newVolume * localMaster()
-            if (newVolume > 0f) done = false
+            doneAtZero = false
+            done = false
         }
-        fun requestFadeout() { faderTarget = 0.0 }
+        fun requestFadeout() {
+            faderTarget = 0.0
+            doneAtZero = true
+        }
         fun onRender(delta: Float) {
             if (fader < faderTarget) {
                 fader = min(1.0, fader + faderSpeed * delta)
             } else if (fader > faderTarget) {
                 fader = max(0.0, fader - faderSpeed * delta)
-                if (fader == 0.0) done = true
             }
-            song.setVolume((fader * localMaster()).toFloat())
+            if (fader <= 0.0 && doneAtZero) done = true
+            song.volume = (fader * localMaster()).toFloat()
         }
         fun localMaster() = (if (isMusic) volumeMusic else volumeWorld) * volumeMaster
         fun dispose() { song.dispose() }
+        fun abortDone() { done = false ; doneAtZero = false }
     }
 
     private val musicDecks = mutableListOf<Deck>()
@@ -133,12 +140,19 @@ object Speaker {
         playSFX(sfx, volume, pitch, pan)
     }
 
-    fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY? = null) {
+    fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY? = null, delayMs: Long = 0L) {
         if (sfx == null) return
         val distance = source?.let { distanceBetween(it.x, it.y, App.player.xy.x, App.player.xy.y) } ?: 0f
         val volume = (vol * volumeMaster * volumeWorld * sfx.gain * (1f - (distance / 16f))).toFloat()
         if (volume > 0f) {
-            playSFX(sfx, volume, pitch)
+            if (TimeButtons.state != TimeButtons.State.FFWD) {
+                if (delayMs > 0L) {
+                    KtxAsync.launch {
+                        delay(delayMs)
+                        playSFX(sfx, volume, pitch)
+                    }
+                } else playSFX(sfx, volume, pitch)
+            }
         }
     }
 
@@ -147,9 +161,19 @@ object Speaker {
         sfxFiles[sfx]?.random()?.play(volume, rpitch, pan)
     }
 
+    private fun cleanDecks() {
+        musicDecks.filterAnd({ it.done }) { it.dispose() }
+        val ambiences = ArrayList<Ambience>().apply { addAll(ambiDecks.keys) }
+        ambiences.forEach { ambience ->
+            if (ambiDecks[ambience]?.done == true) {
+                ambiDecks[ambience]?.dispose()
+                ambiDecks.remove(ambience)
+            }
+        }
+    }
+
     fun requestSong(request: Song) {
         musicDecks.forEach { it.requestFadeout() }
-        musicDecks.filterAnd({ it.done }) { it.dispose() }
 
         musicDecks.add(Deck(audio.newMusic(FileHandle("${RESOURCE_FILE_DIR}/sounds/music/${request.file}"))))
     }
@@ -161,6 +185,8 @@ object Speaker {
     fun requestAmbience(request: Ambience) {
         if (request !in ambiDecks.keys) {
             ambiDecks[request] = Deck(audio.newMusic(FileHandle("${RESOURCE_FILE_DIR}/sounds/${request.file}")), false)
+        } else {
+            ambiDecks[request]?.abortDone()
         }
     }
 
@@ -168,10 +194,13 @@ object Speaker {
         ambiDecks[ambience]?.also { deck ->
             deck.requestVolume(volume)
         }
+        cleanDecks()
     }
 
     fun clearAmbience() {
-        ambiDecks.values.forEach { it.requestFadeout() }
+        ambiDecks.values.forEach {
+            it.requestFadeout()
+        }
     }
 
     fun onRender(delta: Float) {
@@ -186,6 +215,7 @@ object Speaker {
 
     fun dispose() {
         musicDecks.forEach { it.dispose() }
+        ambiDecks.values.forEach { it.dispose() }
         sfxFiles.forEach { (_, files) ->
             files.forEach { it.dispose() }
         }
