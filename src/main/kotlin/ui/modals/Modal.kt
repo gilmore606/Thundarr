@@ -3,6 +3,7 @@ package ui.modals
 import actors.actions.Drop
 import actors.actions.Get
 import actors.actions.Use
+import actors.statuses.Status
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -188,11 +189,13 @@ abstract class Modal(
                     }
                 } ?: run {
                     asWithParent?.also { parent ->
-                        addOption("take one " + thing.name()) {
-                            App.player.queue(Get(thing))
-                        }
-                        addOption("take all " + thing.name().plural()) {
-                            these.forEach { App.player.queue(Get(it)) }
+                        if (!App.player.hasStatus(Status.Tag.BURDENEND)) {
+                            addOption("take one " + thing.name()) {
+                                App.player.queue(Get(thing))
+                            }
+                            addOption("take all " + thing.name().plural()) {
+                                these.forEach { App.player.queue(Get(it)) }
+                            }
                         }
                     } ?: run {
                         addOption("drop one " + thing.name()) {
@@ -210,8 +213,10 @@ abstract class Modal(
                     }
                 } ?: run {
                     asWithParent?.also {
-                        addOption("take " + thing.name()) {
-                            App.player.queue(Get(thing))
+                        if (!App.player.hasStatus(Status.Tag.BURDENEND)) {
+                            addOption("take " + thing.name()) {
+                                App.player.queue(Get(thing))
+                            }
                         }
                     } ?: run {
                         addOption("drop " + thing.listName()) {

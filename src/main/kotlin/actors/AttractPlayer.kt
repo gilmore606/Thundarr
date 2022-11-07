@@ -52,10 +52,7 @@ class AttractPlayer : Player() {
                 val light = level.lightAt(xy.x, xy.y)
 
                 if (Dice.chance(0.2f)) {
-                    if (light.brightness() < 0.1f) {
-                        doWeHave("sunsword")?.also { return useThing(it, Thing.UseTag.SWITCH) }
-                    }
-                    if (light.brightness() == 1.0f && !roofedHere) {
+                    if (light.brightness() < 0.1f || (light.brightness() == 1.0f && !roofedHere)) {
                         doWeHave("sunsword")?.also { return useThing(it, Thing.UseTag.SWITCH) }
                     }
                 }
@@ -84,7 +81,7 @@ class AttractPlayer : Player() {
                     doWeHave("torch")?.also { torch ->
                         if ((torch as Torch).active) {
                             return Drop(torch, groundAtPlayer())
-                        } else if (light.r < 0.7f && Dice.chance(0.3f)) {
+                        } else if (light.r < 0.7f && Dice.chance(0.2f)) {
                             return useThing(torch, Thing.UseTag.SWITCH)
                         }
                     }

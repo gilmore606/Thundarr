@@ -13,7 +13,7 @@ class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
     private var affectorStrings = ArrayList<String>()
 
     private val padding = 18
-    private val fullWidth = 200
+    private val fullWidth = 250
 
     override fun myXmargin() = parentModal.let { (it.width + xMargin + 20) }
 
@@ -36,19 +36,34 @@ class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
 
     override fun drawModalText() {
         super.drawModalText()
+        var yc = padding + 35
         skill?.also { skill ->
             drawString(skill.name, padding, padding, font = Screen.subTitleFont)
-            drawWrappedText(skillDesc, padding, padding + 35, 20, Screen.smallFont)
+            drawWrappedText(skillDesc, padding, yc, 20, Screen.smallFont)
+            yc += skillDesc.size * 20 + 10
             if (skill is Skill) {  // i know, i know
-                drawString("Depends on:", padding, padding + 150)
-                skill.dependsOn.forEachIndexed { n, dep ->
-                    drawString(dep.name, padding + 12, padding + 175 + n * 20, Screen.fontColorDull, Screen.smallFont)
+                drawString("Depends on:", padding, yc)
+                yc += 22
+                skill.dependsOn.forEach { dep ->
+                    drawString(dep.name, padding + 12, yc, Screen.fontColorDull, Screen.smallFont)
+                    yc += 20
                 }
+                yc += 14
             }
             if (affectorStrings.isNotEmpty()) {
-                drawString("Affected by:", padding, padding + 245)
-                affectorStrings.forEachIndexed { n, aff ->
-                    drawString(aff, padding + 12, padding + 270 + n * 20, Screen.fontColorDull, Screen.smallFont)
+                drawString("Affected by:", padding, yc)
+                yc += 22
+                affectorStrings.forEach { aff ->
+                    drawString(aff, padding + 12, yc, Screen.fontColorDull, Screen.smallFont)
+                    yc += 20
+                }
+                yc += 14
+            }
+            skill.examineSpecialStat()?.also { specialName ->
+                drawString(specialName + ":", padding, yc)
+                yc += 22
+                skill.examineSpecialStatValue(App.player)?.also { value ->
+                    drawString(value, padding + 12, yc, Screen.fontColorDull, Screen.smallFont)
                 }
             }
             val ip = skill.getImprovement(App.player)

@@ -5,8 +5,11 @@ import actors.animations.Animation
 import actors.animations.Step
 import actors.stats.Speed
 import actors.stats.Stat
+import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Skill
+import actors.statuses.Burdened
+import actors.statuses.Encumbered
 import actors.statuses.StatEffector
 import actors.statuses.Status
 import audio.Speaker
@@ -137,6 +140,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             level?.removeLightSource(this)
             level?.addLightSource(xy.x, xy.y, this)
         }
+        updateEncumbrance()
     }
 
     override fun add(thing: Thing) {
@@ -145,7 +149,30 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             level?.removeLightSource(this)
             level?.addLightSource(xy.x, xy.y, this)
         }
+        updateEncumbrance()
     }
+
+    private fun updateEncumbrance() {
+        val carried = contents.total { it.weight() }
+        val capacity = carryingCapacity()
+        if (carried > capacity) {
+            removeStatus(Status.Tag.ENCUMBERED)
+            addStatus(Burdened())
+            if (this is Player) Console.say("You couldn't possibly carry any more.")
+        } else if (carried > capacity * 0.5f) {
+            if (hasStatus(Status.Tag.BURDENEND)) {
+                removeStatus(Status.Tag.BURDENEND)
+                if (this is Player) Console.say("Your burden feels somewhat lighter.")
+            } else if (this is Player && !hasStatus(Status.Tag.ENCUMBERED)) Console.say("You feel weighed down by possessions.")
+            addStatus(Encumbered())
+        } else {
+            if (hasStatus(Status.Tag.ENCUMBERED) || hasStatus(Status.Tag.BURDENEND)) Console.say("Your burden feels comfortable now.")
+            removeStatus(Status.Tag.ENCUMBERED)
+            removeStatus(Status.Tag.BURDENEND)
+        }
+    }
+
+    fun carryingCapacity() = 10f + Strength.get(this) * 2f
 
     override fun light(): LightColor? {
         var light: LightColor? = null
@@ -303,6 +330,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             onRemoveStatus(status)
         }
     }
+
+    fun hasStatus(statusTag: Status.Tag) = statuses.hasOneWhere { it.tag == statusTag }
 
     fun statEffectors(stat: Stat) = ArrayList<StatEffector>().apply {
         addAll(statuses.filter { it.statEffects().containsKey(stat.tag) })

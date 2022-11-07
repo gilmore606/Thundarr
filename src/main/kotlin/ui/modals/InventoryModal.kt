@@ -19,12 +19,13 @@ class InventoryModal(
     private val withContainer: Container? = null,
     private val parentModal: Modal? = null,
     sidecarTitle: String? = null
-    ) : SelectionModal(300, 700, default = 0,
+    ) : SelectionModal(400, 700, default = 0,
         title = sidecarTitle?.let { "- $sidecarTitle -" } ?: "- bACkPACk -",
         position = if (parentModal == null) Position.LEFT else Position.SIDECAR
     ), ContextMenu.ParentModal {
 
     var grouped = ArrayList<ArrayList<Thing>>()
+    var weights = ArrayList<String>()
 
     init {
         parentModal?.also { this.isSidecar = true ; changeSelection(0) }
@@ -56,14 +57,15 @@ class InventoryModal(
             return
         }
         var n = 0
-        grouped.forEach {
+        grouped.forEachIndexed { i, group ->
             var text = ""
-            text = if (it.size > 1) {
-                it.size.toString() + " " + it.first().name().plural() + " " + it.first().listTag()
+            val first = group.first()
+            text = if (group.size > 1) {
+                group.size.toString() + " " + first.name().plural() + " " + first.listTag()
             } else {
-                it.first().name() + " " + it.first().listTag()
+                first.name() + " " + first.listTag()
             }
-            drawOptionText(text, n, 30)
+            drawOptionText(text, n, 30, addCol = weights[i], colX = 300)
             n++
         }
     }
@@ -160,8 +162,12 @@ class InventoryModal(
                 }
             }
         }
+        weights.clear()
+        grouped.forEach { group ->
+            weights.add((group[0].weight() * group.size).toString() + "lb")
+        }
+
         maxSelection = grouped.size - 1
-        parentModal?.also { log.info("child max set to $maxSelection")}
         changeSelection(min(maxSelection, selection))
         adjustHeight()
         if (maxSelection < 0) {

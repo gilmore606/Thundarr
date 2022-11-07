@@ -47,6 +47,8 @@ abstract class Stat(
     abstract fun verb(): String
     open fun improveChance() = 0.2f
     open fun improveMsg() = "You gain new insights into " + verb() + "."
+    open fun examineSpecialStat(): String? = null
+    open fun examineSpecialStatValue(actor: Actor): String? = null
 
     // Set the base value for actor.  Probably only use this in initial NPC spawn.
     fun set(actor: Actor, base: Float) { actor.stats[tag] = Value(base) }

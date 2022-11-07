@@ -53,9 +53,14 @@ abstract class SelectionModal(
         Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
     }
 
-    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0, colorOverride: Color? = null) {
+    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0,
+                                 colorOverride: Color? = null, addCol: String? = null, colX: Int = 0) {
         drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,
             colorOverride ?: if (index == selection) Screen.fontColorBold else Screen.fontColor)
+        addCol?.also { addCol ->
+            drawString(addCol, padding + colX, headerPad + spacing * index - 2,
+                Screen.fontColorDull, Screen.smallFont)
+        }
     }
 
     protected fun drawOptionIcon(entity: Entity, index: Int) {

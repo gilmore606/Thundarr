@@ -4,6 +4,7 @@ import actors.Actor
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Stat
+import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
@@ -27,7 +28,7 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED, DAZED }
+    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED }
 
     abstract fun description(): String
     open fun panelTag(): String = ""
@@ -73,6 +74,32 @@ sealed class Status : StatEffector {
 }
 
 @Serializable
+class Encumbered() : Status() {
+    override val tag = Tag.ENCUMBERED
+    override fun name() = "encumbered"
+    override fun description() = "All your stuff is weighing you down, making you slow."
+    override fun panelTag() = "enc"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun statEffects() = mapOf(
+        Speed.tag to -2f,
+        Dodge.tag to -2f
+    )
+}
+
+@Serializable
+class Burdened() : Status() {
+    override val tag = Tag.BURDENEND
+    override fun name() = "burdened"
+    override fun description() = "You're carrying as much as you can, making you very slow."
+    override fun panelTag() = "burd"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun statEffects() = mapOf(
+        Speed.tag to -4f,
+        Dodge.tag to -3f
+    )
+}
+
+@Serializable
 sealed class TimeStatus : Status() {
     private var addTime = 0.0
     private var turnsLeft = 0f
@@ -112,10 +139,10 @@ class Wired : TimeStatus() {
     override fun onRemoveMsg() = "You feel your nerves relax and slow back down."
     override fun onRemoveOtherMsg() = "%Dn's movements slow down to normal."
     override fun onStackMsg() = "Ahh...that should keep the party going."
-    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
-        this[Speed.tag] = 4f
-        this[Fight.tag] = 1f
-    }
+    override fun statEffects() = mapOf(
+        Speed.tag to 4f,
+        Fight.tag to 1f
+    )
     override fun duration() = 10f
     override fun maxDuration() = 20f
 }
@@ -132,10 +159,10 @@ class Dazed : TimeStatus() {
     override fun onRemoveMsg() = "You shake out of your daze."
     override fun onRemoveOtherMsg() = "%Dn shakes out of %p daze."
     override fun onStackMsg() = "Whooaaa!"
-    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
-        this[Speed.tag] = -2f
-        this[Brains.tag] = -4f
-    }
+    override fun statEffects() = mapOf(
+        Speed.tag to -2f,
+        Brains.tag to -4f
+    )
     override fun duration() = 3f
     override fun maxDuration() = 5f
 }
