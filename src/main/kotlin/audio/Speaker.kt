@@ -52,6 +52,7 @@ object Speaker {
         HIT(listOf("hits/hit1.ogg", "hits/hit2.ogg"), 0.4f, 1.5f),
         BRICKHIT(listOf("hits/brickhit.ogg"), 0.3f),
         ROCKHIT(listOf("hits/rockhit.ogg"), 0.3f),
+        EXPLODE(listOf("hits/explode.ogg"), 0.1f),
 
         MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.4f),
         VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.7f),

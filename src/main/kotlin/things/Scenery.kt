@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.Dice
 
 
 @Serializable
@@ -24,7 +25,8 @@ sealed class Scenery : Thing() {
 @Serializable
 sealed class Tree : Scenery() {
     override fun isOpaque() = true
-    override fun walkOnMsg() = "You hack through the dense trees."
+    override fun walkOnMsg() = if (Dice.chance(0.3f)) treeMsg() else ""
+    open fun treeMsg() = "You hack through the dense trees."
     override fun moveSpeedPast(actor: Actor): Float? = 1.4f
 
     override fun uses() = mapOf(
@@ -43,19 +45,19 @@ sealed class Tree : Scenery() {
 class OakTree : Tree() {
     override fun glyph() = Glyph.TREE
     override fun name() = "oak tree"
-    override fun walkOnMsg() = "You hack through the dense trees."
+    override fun treeMsg() = "You hack through the dense trees."
 }
 
 @Serializable
 class PineTree : Tree() {
     override fun glyph() = Glyph.PINE_TREE
     override fun name() = "pine tree"
-    override fun walkOnMsg() = "You trudge through the bracken and pinecones."
+    override fun treeMsg() = "You trudge through the bracken and pinecones."
 }
 
 @Serializable
 class PalmTree : Tree() {
     override fun glyph() = Glyph.PALM_TREE
     override fun name() = "palm tree"
-    override fun walkOnMsg() = "You hack through the thick jungle growth."
+    override fun treeMsg() = "You hack through the thick jungle growth."
 }

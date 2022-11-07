@@ -148,15 +148,14 @@ class Torch : LitThing(), Temporal {
         }
     }
 
-    override fun uses() = mutableMapOf<UseTag, Use>().apply {
-        if (!active) set(UseTag.SWITCH, Use("light " + name(), 0.5f,
-                canDo = { true },
+    override fun uses() = mapOf(
+        UseTag.SWITCH to Use("light " + name(), 0.5f,
+                canDo = { !active },
                 toDo = { actor, level ->
                     active = true
                     level.addLightSource(actor.xy.x, actor.xy.y, (if (holder == actor) actor else this@Torch) as LightSource)
                     level.linkTemporal(this@Torch)
                 }))
-        }
 
     override fun advanceTime(delta: Float) {
         if (fuel >= 0f) {

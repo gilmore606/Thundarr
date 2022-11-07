@@ -219,6 +219,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             addGamePanels()
             level.onPlayerEntered()
             updateTime(time)
+
+            repeat(5) { Bomb().moveTo(player) }
         }
     }
 

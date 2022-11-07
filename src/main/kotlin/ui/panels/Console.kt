@@ -12,14 +12,15 @@ import java.lang.Float.min
 
 object Console : Panel() {
 
-    private val maxLines = 7
+    private val maxLines = 40
+    private val maxLinesShown = 7
     private val lineSpacing = 21
     private val padding = 12
     val lines: MutableList<String> = mutableListOf<String>()
 
     private var lastLineMs = System.currentTimeMillis()
     private var scroll = 0f
-    private var scrollSpeed = 140f
+    private var scrollSpeed = 180f
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
 
@@ -150,7 +151,7 @@ object Console : Panel() {
         super.onResize(width, height)
         this.height = (maxLines * lineSpacing) + padding * 2
         x = xMargin
-        y = height - this.height - yMargin
+        y = height - this.height - yMargin - padding
         this.width = width - (xMargin * 2)
     }
 
@@ -178,7 +179,7 @@ object Console : Panel() {
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         super.mouseMovedTo(screenX, screenY)
-        if (screenY > this.y) {
+        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing) {
             mouseInside = true
             this.burst = 1.2f
         } else mouseInside = false
@@ -187,8 +188,12 @@ object Console : Panel() {
     override fun drawText() {
         var offset = scroll.toInt() + padding
         lines.forEachIndexed { n, line ->
-            drawString(line, padding, offset,
-                if (n == lines.lastIndex) color else colorDull)
+            if (mouseInside || (n >= lines.size - maxLinesShown)) {
+                drawString(
+                    line, padding, offset,
+                    if (n == lines.lastIndex) color else colorDull
+                )
+            }
             offset += lineSpacing
         }
     }

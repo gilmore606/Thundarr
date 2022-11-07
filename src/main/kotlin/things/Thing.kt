@@ -6,8 +6,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
+import ui.panels.Console
 import world.Entity
 import world.Level
+import world.terrains.Terrain
 import java.lang.Float.min
 import java.lang.RuntimeException
 
@@ -118,4 +120,54 @@ class Brick : Portable() {
     override fun glyph() = Glyph.BRICK
     override fun weight() = 0.4f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
+}
+
+@Serializable
+class Bomb : Portable(), Temporal {
+    override fun name() = "bomb"
+    override fun description() = "A box of explosives."
+    override fun glyph() = Glyph.CHEST
+    override fun weight() = 1.5f
+
+    var active = false
+    var fuse = 0f
+
+    val radius = 4
+
+    override fun uses() = mapOf(
+        UseTag.SWITCH to Use("activate" + name(), 0.5f,
+            canDo = { !active },
+            toDo = { actor, level ->
+                active = true
+                Console.sayAct("You activate %dd.", "%Dn activates %dd.", actor, this)
+                level.linkTemporal(this@Bomb)
+                fuse = 15f
+            }))
+
+    override fun advanceTime(delta: Float) {
+        if (active) {
+            if (fuse > 0f) {
+                fuse -= delta
+            } else {
+                explode()
+            }
+        }
+    }
+
+    private fun explode() {
+        holder?.also { holder ->
+            holder.xy()?.also { xy ->
+                Speaker.world(Speaker.SFX.EXPLODE, source = xy)
+                val x0 = xy.x - radius
+                val y0 = xy.y - radius
+                for (ix in x0 .. x0 + radius * 2) {
+                    for (iy in y0 .. y0 + radius * 2) {
+                        holder.level?.setTerrain(ix, iy, Terrain.Type.TERRAIN_STONEFLOOR)
+                    }
+                }
+            }
+        }
+        active = false
+        moveTo(null)
+    }
 }
