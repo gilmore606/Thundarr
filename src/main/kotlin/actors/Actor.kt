@@ -254,7 +254,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             level.addSpark(Gore().at(xy.x, xy.y))
         }
         onDeath(corpse)
-        contents.forEach { it.moveTo(corpse) }
+        contents.safeForEach { it.moveTo(corpse) }
     }
 
     open fun corpse() = Corpse()

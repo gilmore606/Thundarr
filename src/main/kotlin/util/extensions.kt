@@ -45,6 +45,14 @@ fun <T> MutableList<T>.filterOut(condition: (T)->Boolean, elseDo: ((T)->Unit)? =
     }
 }
 
+fun <T> MutableList<T>.safeForEach(doThis: ((T)->Unit)) {
+    var n = size
+    while (n > 0) {
+        n--
+        doThis(this[n])
+    }
+}
+
 fun <T> MutableList<T>.filterAnd(condition: (T)->Boolean, thenDo: ((T)->Unit)? = null) {
     var n = 0
     while (n < size) {

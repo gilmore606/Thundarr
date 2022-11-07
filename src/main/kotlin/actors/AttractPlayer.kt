@@ -27,7 +27,6 @@ class AttractPlayer : Player() {
         Fight.set(this, 4f)
         Dodge.set(this, 1f)
         actors.stats.skills.Throw.set(this, 3f)
-        hp = 1
     }
 
     override fun glyph() = Glyph.MOK
@@ -107,7 +106,7 @@ class AttractPlayer : Player() {
                         finishDig?.also { return it }
 
                         if (digDirs.isNotEmpty() && Dice.chance(0.95f)) {
-                            if (isMining || (App.time > noMiningUntil) && Dice.chance(0.2f)) {
+                            if (isMining || (App.time > noMiningUntil) && Dice.chance(0.05f)) {
                                 isMining = true
                                 willAggro = true
                                 val dir = digDirs.random()
