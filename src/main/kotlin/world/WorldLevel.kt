@@ -1,6 +1,9 @@
 package world
 
+import audio.Speaker
 import util.*
+import java.lang.Float.max
+import java.lang.Float.min
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
@@ -30,10 +33,30 @@ class WorldLevel() : Level() {
                 loadedChunks.forEach { it.clearSeen() }
                 return start
             }
-        } else {
-
         }
         return null
+    }
+
+    override fun onPlayerEntered() {
+        Speaker.clearMusic()
+        Speaker.requestSong(Speaker.Song.WORLD)
+        Speaker.clearAmbience()
+        Speaker.requestAmbience(Speaker.Ambience.OUTDOORDAY)
+        Speaker.requestAmbience(Speaker.Ambience.OUTDOORNIGHT)
+        Speaker.requestAmbience(Speaker.Ambience.RAINLIGHT)
+        Speaker.requestAmbience(Speaker.Ambience.RAINHEAVY)
+    }
+
+    override fun updateAmbientSound(hour: Int, minute: Int) {
+        val outdoors = 1f
+        val day = max(0f, (ambientLight.brightness() - 0.5f) * 2f)
+        val night = 1f - day
+        val rain1 = min(1f, App.weather.rain() * 3f)
+        val rain2 = max(0f, (App.weather.rain() - 0.5f) * 2f)
+        Speaker.adjustAmbience(Speaker.Ambience.OUTDOORDAY, outdoors * day)
+        Speaker.adjustAmbience(Speaker.Ambience.OUTDOORNIGHT, outdoors * night)
+        Speaker.adjustAmbience(Speaker.Ambience.RAINLIGHT, outdoors * rain1)
+        Speaker.adjustAmbience(Speaker.Ambience.RAINHEAVY, outdoors * rain2)
     }
 
     override fun debugText(): String = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.let { "chunk ${it.x}x${it.y}" } ?: "???"

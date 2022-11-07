@@ -22,6 +22,8 @@ class Converse(
             } else {
                 Speaker.world(target.talkSound(actor), source = target.xy)
             }
+        } else {
+            Speaker.world(actor.talkSound(target), source = actor.xy)
         }
     }
 

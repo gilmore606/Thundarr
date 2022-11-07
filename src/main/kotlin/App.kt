@@ -3,7 +3,6 @@ import actors.Player
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
-import actors.statuses.Wired
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -152,7 +151,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     private fun saveStateAndReturnToMenu() {
         Screen.panels.filterAnd({ it !is Modal }) { Screen.removePanel(it) }
-        Speaker.requestMusicFade()
+        Speaker.clearMusic()
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.putWorldState(
@@ -219,7 +218,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(300)
             Screen.brightnessTarget = 1f
             addGamePanels()
-            Speaker.requestSong(Speaker.Song.WORLD)
+            level.onPlayerEntered()
+            updateTime(time)
         }
     }
 
@@ -276,7 +276,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Pickaxe().moveTo(player)
             Axe().moveTo(player)
 
-            updateTime(Dice.range(200, 600).toDouble())
             level.setPov(200, 200)
 
             var playerStart: XY? = null
@@ -291,14 +290,15 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Console.say("You stride bravely into the dawn.")
             Screen.brightnessTarget = 1f
             addGamePanels()
-            Speaker.requestSong(Speaker.Song.WORLD)
+            level.onPlayerEntered()
+            updateTime(Dice.range(200, 600).toDouble())
         }
     }
 
     fun enterLevelFromWorld(levelId: String) {
         val oldLevelId = level.levelId()
         level = LevelKeeper.getLevel(levelId)
-        Speaker.requestSong(Speaker.Song.DUNGEON)
+
         KtxAsync.launch {
             while (!level.isReady()) {
                 log.debug("Waiting for level...")
@@ -307,6 +307,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             val entrance = level.getPlayerEntranceFrom(oldLevelId)
             movePlayerIntoLevel(entrance!!.x, entrance!!.y)
             Console.say("You cautiously step inside...")
+            level.onPlayerEntered()
+            updateTime(time)
         }
     }
 
@@ -321,6 +323,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             movePlayerIntoLevel(dest.x, dest.y)
             Console.say("You step back outside to face the wilderness once again.")
+            level.onPlayerEntered()
+            updateTime(time)
         }
     }
 

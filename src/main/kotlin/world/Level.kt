@@ -57,6 +57,7 @@ sealed class Level {
     // This is safe because one thread asks for these values serially and doesn't store the result directly.
     private val ambientResult = LightColor(0f,0f,0f)
 
+    open fun onPlayerEntered() { }
 
     companion object {
         fun make(levelId: String) = if (levelId == "world") {
@@ -319,6 +320,7 @@ sealed class Level {
     fun updateTime(hour: Int, minute: Int) {
         updateAmbientLight(hour, minute)
         weather.updateTime(hour, minute, this)
+        updateAmbientSound(hour, minute)
     }
 
     private fun updateAmbientLight(hour: Int, minute: Int) {
@@ -343,6 +345,8 @@ sealed class Level {
         ambientLight.g = c1!!.g + (c2!!.g - c1.g) * fraction
         ambientLight.b = c1!!.b + (c2!!.b - c1.b) * fraction
     }
+
+    open fun updateAmbientSound(hour: Int, minute: Int) { }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
         if (App.player.xy.x == x && App.player.xy.y == y) {

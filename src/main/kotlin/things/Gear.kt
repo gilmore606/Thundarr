@@ -10,8 +10,8 @@ import util.toEnglishList
 sealed class Gear : Portable(), StatEffector {
 
     enum class Slot(val duration: Float, val title: String, val where: String, val verb: String, val unverb: String) {
-        MELEE(0.5f, "primary", "as weapon", "wield", "put away"),
-        RANGED(0.5f, "secondary", "as secondary", "ready", "unready"),
+        MELEE(0.5f, "melee", "as melee", "wield", "put away"),
+        RANGED(0.5f, "ranged", "as ranged", "ready", "unready"),
         HEAD(0.6f, "head", "on head", "wear", "remove"),
         NECK(1.0f, "neck", "around neck", "wear", "remove"),
         HANDS(1.5f, "hands", "on hands", "wear", "remove"),

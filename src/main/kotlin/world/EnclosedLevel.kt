@@ -1,5 +1,6 @@
 package world
 
+import audio.Speaker
 import util.*
 import world.terrains.PortalDoor
 import world.terrains.Terrain
@@ -60,6 +61,14 @@ open class EnclosedLevel(
         } else {
             return null
         }
+    }
+
+    override fun onPlayerEntered() {
+        Speaker.clearMusic()
+        Speaker.requestSong(Speaker.Song.DUNGEON)
+        Speaker.clearAmbience()
+        Speaker.requestAmbience(Speaker.Ambience.INDUSTRIAL)
+        Speaker.adjustAmbience(Speaker.Ambience.INDUSTRIAL, 1f)
     }
 
     override fun chunkAt(x: Int, y: Int) =
