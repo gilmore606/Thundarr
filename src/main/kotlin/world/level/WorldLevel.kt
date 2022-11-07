@@ -17,7 +17,8 @@ class WorldLevel() : Level() {
 
     private val chunks = Array(chunksWide) { Array<Chunk?>(chunksWide) { null } }
     private val loadedChunks = mutableSetOf<Chunk>()
-    private val originChunkLocation = XY(0,0)   // upper-left corner of the upper-left corner chunk
+    private var originChunkX = 0   // upper-left corner of the upper-left corner chunk
+    private var originChunkY = 0
 
     private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
@@ -90,9 +91,9 @@ class WorldLevel() : Level() {
     private fun yToChunkY(y: Int) = (y / CHUNK_SIZE) * CHUNK_SIZE + if (y < 0) -CHUNK_SIZE else 0
 
     override fun chunkAt(x: Int, y: Int): Chunk? {
-        if (x >= originChunkLocation.x && y >= originChunkLocation.y) {
-            val cx = (x - originChunkLocation.x) / CHUNK_SIZE
-            val cy = (y - originChunkLocation.y) / CHUNK_SIZE
+        if (x >= originChunkX && y >= originChunkY) {
+            val cx = (x - originChunkX) shr 6 // OPTIMIZATION: this hardcodes CHUNK_SIZE to 64
+            val cy = (y - originChunkY) shr 6
             if (cx >= 0 && cy >= 0 && cx < chunksWide && cy < chunksWide) {
                 return chunks[cx][cy]
             }
@@ -109,8 +110,8 @@ class WorldLevel() : Level() {
         log.info("Entered chunk $chunkX $chunkY")
         lastPovChunk.x = chunkX
         lastPovChunk.y = chunkY
-        originChunkLocation.x = chunkX - (CHUNK_SIZE * CHUNKS_AHEAD)
-        originChunkLocation.y = chunkY - (CHUNK_SIZE * CHUNKS_AHEAD)
+        originChunkX = chunkX - (CHUNK_SIZE * CHUNKS_AHEAD)
+        originChunkY = chunkY - (CHUNK_SIZE * CHUNKS_AHEAD)
 
         val oldChunks = mutableSetOf<Chunk>().apply { addAll(loadedChunks) }
         for (cx in -CHUNKS_AHEAD..CHUNKS_AHEAD) {
