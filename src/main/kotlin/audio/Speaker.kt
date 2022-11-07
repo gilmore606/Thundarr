@@ -119,6 +119,13 @@ object Speaker {
     private val ambiDecks = mutableMapOf<Ambience, Deck>()
     private val sfxFiles = mutableMapOf<SFX, List<Sound>>()
 
+    class QueuedSound(val sound: Sound, val volume: Float, val pitch: Float, val pan: Float)
+
+    private val sfxQueue = ArrayList<QueuedSound>()
+    private val sfxQueueMax = 4
+    private val sfxMinDelay = 0.01f
+    private var sfxDelay = 0f
+
     private var screenWidth = 1
     private var screenCenterX = 1
 
@@ -145,7 +152,7 @@ object Speaker {
     fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY? = null, delayMs: Long = 0L) {
         if (sfx == null) return
         val distance = source?.let { distanceBetween(it.x, it.y, App.player.xy.x, App.player.xy.y) } ?: 0f
-        val volume = (vol * volumeMaster * volumeWorld * sfx.gain * (1f - (distance / 16f))).toFloat()
+        val volume = (vol * volumeMaster * volumeWorld * sfx.gain * (1f - (distance / 20f))).toFloat()
         if (volume > 0f) {
             if (TimeButtons.state != TimeButtons.State.FFWD) {
                 if (delayMs > 0L) {
@@ -159,8 +166,11 @@ object Speaker {
     }
 
     private fun playSFX(sfx: SFX, volume: Float, pitch: Float = 1f, pan: Float = 0.5f) {
+        if (sfxQueue.size >= sfxQueueMax) return
         val rpitch = pitch + Dice.float(-sfx.pitchVariance, sfx.pitchVariance)
-        sfxFiles[sfx]?.random()?.play(volume, rpitch, pan)
+        sfxFiles[sfx]?.also { files ->
+            sfxQueue.add(QueuedSound(files.random(), volume, rpitch, pan))
+        }
     }
 
     private fun cleanDecks() {
@@ -208,6 +218,12 @@ object Speaker {
     fun onRender(delta: Float) {
         musicDecks.forEach { it.onRender(delta) }
         ambiDecks.values.forEach { it.onRender(delta) }
+        sfxDelay += delta
+        if (sfxDelay > sfxMinDelay && sfxQueue.isNotEmpty()) {
+            sfxDelay = 0f
+            val sfx = sfxQueue.removeAt(0)
+            sfx.sound.play(sfx.volume, sfx.pitch, sfx.pan)
+        }
     }
 
     fun onResize(width: Int, height: Int) {
