@@ -93,39 +93,6 @@ abstract class Panel {
             myBoxBatch().getTextureIndex(glyph))
     }
 
-    protected fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.smallFont): ArrayList<String> {
-        val wrapped = ArrayList<String>()
-        var remaining = text
-        var nextLine = ""
-        var linePixelsLeft = (width - padding * 2)
-        val spaceWidth = GlyphLayout(font, " ").width.toInt()
-        while (remaining.isNotEmpty() || remaining == " ") {
-            // get next word
-            val space = remaining.indexOf(' ')
-            var word = ""
-            if (space >= 0) {
-                word = remaining.substring(0, space)
-                remaining = remaining.substring(space + 1, remaining.length)
-            } else {
-                word = remaining
-                remaining = ""
-            }
-            if (word != " ") {
-                val wordWidth = GlyphLayout(font, word).width.toInt()
-                if (nextLine == "" || wordWidth <= linePixelsLeft) {
-                    nextLine += word + " "
-                    linePixelsLeft -= wordWidth + spaceWidth
-                } else {
-                    wrapped.add(nextLine)
-                    nextLine = word + " "
-                    linePixelsLeft = (width - padding * 2) - wordWidth - spaceWidth
-                }
-            }
-        }
-        if (nextLine != "") wrapped.add(nextLine)
-        return wrapped
-    }
-
     protected fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
                                   font: BitmapFont = Screen.smallFont,
                                   color: Color = Screen.fontColor) {

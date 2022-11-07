@@ -4,6 +4,7 @@ import actors.Player
 import render.Screen
 import ui.modals.InventoryModal
 import util.XY
+import util.wrapText
 import world.Entity
 
 object LookPanel : ShadedPanel() {

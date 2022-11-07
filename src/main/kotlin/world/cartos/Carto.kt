@@ -8,14 +8,13 @@ import kotlin.random.Random
 import things.Thing
 import util.*
 import world.Chunk
-import world.Level
+import world.level.Level
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
 import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.io.File
-import java.lang.Integer.max
 
 abstract class Carto(
     val x0: Int,

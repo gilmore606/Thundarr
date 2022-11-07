@@ -53,9 +53,10 @@ object Speaker {
         BRICKHIT(listOf("hits/brickhit.ogg"), 0.3f),
         ROCKHIT(listOf("hits/rockhit.ogg"), 0.3f),
         EXPLODE(listOf("hits/explode.ogg"), 0.1f),
+        TREEFALL(listOf("misc/treefall.ogg"), 0.1f, 0.8f),
 
         MOO(listOf("creature/moo1.ogg", "creature/moo2.ogg"), 0.4f),
-        VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.7f),
+        VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.8f),
         VOICE_MALELOW(listOf("voice/malelow1.ogg"), 0.1f),
         VOICE_FEMALE(listOf("voice/female1.ogg", "voice/female2.ogg"), 0.06f),
     }

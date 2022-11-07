@@ -4,6 +4,7 @@ import actors.stats.Stat
 import actors.stats.skills.Skill
 import actors.statuses.Status
 import render.Screen
+import util.wrapText
 
 class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
 

@@ -1,13 +1,11 @@
 package actors.actions
 
 import actors.Actor
-import actors.Player
 import things.Container
 import things.Thing
 import things.ThingHolder
 import ui.panels.Console
-import util.aOrAn
-import world.Level
+import world.level.Level
 
 class Drop(
     private val thing: Thing,

@@ -9,7 +9,6 @@ import com.badlogic.gdx.InputMultiplexer
 import kotlinx.coroutines.*
 import ui.input.Keyboard
 import ui.input.Mouse
-import kotlinx.serialization.Serializable
 import ktx.app.KtxGame
 import ktx.async.KTX
 import ktx.async.KtxAsync
@@ -21,7 +20,14 @@ import util.Dice
 import util.XY
 import util.filterAnd
 import util.log
-import world.*
+import world.journal.GameTime
+import world.journal.JournalEntry
+import world.level.Level
+import world.level.WorldLevel
+import world.persist.LevelKeeper
+import world.persist.PrefsState
+import world.persist.SaveSlot
+import world.persist.WorldState
 import world.weather.Weather
 import kotlin.system.exitProcess
 
@@ -29,43 +35,14 @@ const val RESOURCE_FILE_DIR = "src/main/resources/"
 
 object App : KtxGame<com.badlogic.gdx.Screen>() {
 
-    @Serializable
-    data class WorldState(
-        val levelId: String,
-        val player: Player,
-        val time: Double,
-        val weather: Weather,
-        val consoleLines: List<String>,
-        val toolbarTags: List<String?>
-    )
-
-    @Serializable
-    data class PrefsState(
-        val zoomIndex: Double,
-        val windowSize: XY,
-        val fullscreen: Boolean,
-        val worldZoom: Double,
-        val cameraSlack: Double,
-        val cameraMenuShift: Double,
-        val uiHue: Double,
-        val volumeMaster: Double,
-        val volumeWorld: Double,
-        val volumeMusic: Double,
-        val volumeUI: Double
-    )
-
-    private const val TURNS_PER_DAY = 2000.0
-    private const val YEAR_ZERO = 2994
-
     lateinit var player: Player
     lateinit var level: Level
-    lateinit var save: SaveState
+    lateinit var save: SaveSlot
     var weather = Weather()
 
     var time: Double = 200.0
+    var gameTime: GameTime = GameTime(time)
     var lastHour = -1
-    var timeString: String = "???"
-    var dateString: String = "???"
 
     private var pendingJob: Job? = null
 
@@ -89,7 +66,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         setupLog()
         Speaker.init()
 
-        save = SaveState("myworld")
+        save = SaveSlot("myworld")
         restorePrefs()
 
         addScreen(render.Screen)
@@ -118,11 +95,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         KtxAsync.launch {
             delay(500)
             Screen.addModal(AttractMenu().apply { populate() })
-            val sunsword = Sunsword()
-            sunsword.moveTo(player)
-            repeat (4) { Apple().moveTo(player) }
-            Pickaxe().moveTo(player)
-            repeat (40) { Torch().moveTo(player) }
+            player.onSpawn()
             Console.clear()
         }
     }
@@ -258,24 +231,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(400)
 
             level = LevelKeeper.getLevel("world")
-            player = Player().apply {
-                Strength.set(this, 14f)
-                Brains.set(this, 9f)
-                Dig.set(this, 2f)
-                Fight.set(this, 1f)
-                Throw.set(this, 4f)
-                Build.set(this, 1f)
-                Survive.set(this, 2f)
-            }
-            Sunsword().moveTo(player)
-            repeat (20) { EnergyDrink().moveTo(player) }
-            Torch().moveTo(player)
-            Apple().moveTo(player)
-            HornetHelmet().moveTo(player)
-            HardHat().moveTo(player)
-            RiotHelmet().moveTo(player)
-            Pickaxe().moveTo(player)
-            Axe().moveTo(player)
+            player = Player()
+            player.onSpawn()
 
             level.setPov(200, 200)
 
@@ -293,6 +250,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             addGamePanels()
             level.onPlayerEntered()
             updateTime(Dice.range(200, 600).toDouble())
+            player.journal.addEntry(JournalEntry(
+                "Freedom!",
+                "I broke the chains of enslavement to the evil wizard Madlibizus, and set out to find my destiny.  May the Lords of Light guide my Sunsword, and my path."
+            ))
         }
     }
 
@@ -337,40 +298,14 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.recenterCamera()
     }
 
+
     fun updateTime(newTime: Double) {
-        val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-
         time = newTime
-        val day = (time / TURNS_PER_DAY).toInt()
-        val timeOfDay = time - (day * TURNS_PER_DAY)
-        val minutes = (timeOfDay / TURNS_PER_DAY) * 1440.0
-        val hour = (minutes / 60).toInt()
-        val minute = minutes.toInt() - (hour * 60)
-        var ampm = "am"
-        var amhour = hour
-        if (hour >= 11) {
-            ampm = "pm"
-            if (hour >= 12) {
-                amhour -= 12
-            }
-        }
-        amhour += 1
-        val minstr = if (minute < 10) "0$minute" else "$minute"
+        gameTime = GameTime(time)
+        lastHour = gameTime.hour
 
-        val year = (day / 360)
-        val yearDay = day - (year * 360)
-        val month = yearDay / 30
-        val monthDay = (yearDay - month * 30) + 1
-        val monthName = monthNames[month]
-        val realYear = YEAR_ZERO + year
-
-        timeString = "$amhour:$minstr $ampm"
-        dateString = "$monthName $monthDay, $realYear"
-        lastHour = hour
-
-        weather.updateTime(hour, minute, level)
-
-        LevelKeeper.forEachLiveLevel { it.updateTime(hour, minute) }
+        weather.updateTime(gameTime.hour, gameTime.minute, level)
+        LevelKeeper.forEachLiveLevel { it.updateTime(gameTime.hour, gameTime.minute) }
     }
 
     fun saveAndReturnToMenu() {

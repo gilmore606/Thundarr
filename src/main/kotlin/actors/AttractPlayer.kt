@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.*
+import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import kotlinx.coroutines.delay
@@ -23,18 +24,24 @@ class AttractPlayer : Player() {
     var tunnelDir: XY? = null
     var noMiningUntil: Double = App.time
 
-    init {
-        Fight.set(this, 4f)
-        Dodge.set(this, 1f)
-        actors.stats.skills.Throw.set(this, 3f)
-    }
-
     override fun glyph() = Glyph.MOK
     override fun name() = "Ookla"
 
     override fun nextAction() = super.nextAction() ?: defaultAction()
 
     override fun hasActionJuice() = true
+
+    override fun onSpawn() {
+        Strength.set(this, 20f)
+        Fight.set(this, 4f)
+        Dodge.set(this, 1f)
+        actors.stats.skills.Throw.set(this, 3f)
+
+        Sunsword().moveTo(this)
+        repeat (4) { Apple().moveTo(this) }
+        Pickaxe().moveTo(this)
+        repeat (40) { Torch().moveTo(this) }
+    }
 
     override fun defaultAction(): Action? {
         if (System.currentTimeMillis() - lastActionMs > 350L) {

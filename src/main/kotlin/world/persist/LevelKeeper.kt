@@ -1,10 +1,13 @@
-package world
+package world.persist
 
 import kotlinx.coroutines.delay
 import render.Screen
 import ui.panels.Toolbar
 import util.XY
 import util.log
+import world.Building
+import world.level.Level
+import world.level.WorldLevel
 import java.util.concurrent.ConcurrentSkipListSet
 
 object LevelKeeper {
@@ -42,11 +45,13 @@ object LevelKeeper {
         }
 
         val level = Level.make(levelId)
-        liveLevels.add(LiveLevel(
+        liveLevels.add(
+            LiveLevel(
             level = level,
             addedAtMs = System.currentTimeMillis(),
             lastAccessedAt = System.currentTimeMillis()
-        ))
+        )
+        )
 
         pruneLevels()
         return level

@@ -4,6 +4,7 @@ import render.Screen
 import things.Clothing
 import things.Gear
 import things.MeleeWeapon
+import util.wrapText
 
 class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
 

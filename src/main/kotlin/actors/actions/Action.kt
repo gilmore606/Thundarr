@@ -2,7 +2,7 @@ package actors.actions
 
 import actors.Actor
 import actors.stats.Speed
-import world.Level
+import world.level.Level
 import java.lang.Float.max
 
 abstract class Action(

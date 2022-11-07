@@ -10,7 +10,7 @@ import render.sparks.Speak
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.*
-import world.Level
+import world.level.Level
 import world.path.Pather
 
 @Serializable

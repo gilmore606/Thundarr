@@ -1,9 +1,8 @@
 package world.cartos
 
-import render.tilesets.Glyph
 import util.*
 import world.Chunk
-import world.Level
+import world.level.Level
 import world.terrains.Terrain
 import kotlin.random.Random
 

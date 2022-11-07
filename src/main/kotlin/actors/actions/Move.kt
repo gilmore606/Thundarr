@@ -1,13 +1,10 @@
 package actors.actions
 
 import actors.Actor
-import actors.Player
 import audio.Speaker
 import util.XY
-import util.distanceBetween
 import util.log
-import world.Level
-import world.terrains.Terrain
+import world.level.Level
 
 class Move(
     private val dir: XY

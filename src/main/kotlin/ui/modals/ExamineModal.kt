@@ -6,6 +6,7 @@ import things.Clothing
 import things.Thing
 import things.MeleeWeapon
 import ui.input.Mouse
+import util.wrapText
 import world.Entity
 
 class ExamineModal(

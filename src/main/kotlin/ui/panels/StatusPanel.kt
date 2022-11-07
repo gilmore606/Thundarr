@@ -59,8 +59,8 @@ object StatusPanel : ShadedPanel() {
 
     override fun drawText() {
         drawString(App.level.statusText(), padding, padding)
-        drawString(App.timeString, padding, padding + 25, Screen.fontColorDull, Screen.smallFont)
-        drawString(App.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.gameTime.timeString, padding, padding + 25, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.gameTime.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
 
         drawString("hp", padding, padding + 70, Screen.fontColorDull, Screen.smallFont)
         drawString(App.player.hp.toString() + "/" + App.player.hpMax.toString(), padding + 20, padding + 70)

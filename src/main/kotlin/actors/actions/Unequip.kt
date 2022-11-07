@@ -1,10 +1,9 @@
 package actors.actions
 
 import actors.Actor
-import actors.Player
 import things.Gear
 import ui.panels.Console
-import world.Level
+import world.level.Level
 
 class Unequip(
     private val gear: Gear

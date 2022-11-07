@@ -1,7 +1,7 @@
 package actors.actions
 
 import actors.Actor
-import world.Level
+import world.level.Level
 
 class Wait(
     duration: Float

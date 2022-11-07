@@ -5,9 +5,8 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.LightColor
-import util.log
 import world.Chunk
-import world.Level
+import world.level.Level
 
 sealed class Floor(
     type: Terrain.Type,

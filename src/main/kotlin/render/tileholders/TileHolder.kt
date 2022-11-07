@@ -1,6 +1,6 @@
 package render.tileholders
 
-import world.Level
+import world.level.Level
 import render.tilesets.TileSet
 
 abstract class TileHolder(

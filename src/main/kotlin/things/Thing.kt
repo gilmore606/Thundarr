@@ -8,7 +8,7 @@ import render.Screen
 import render.tilesets.Glyph
 import ui.panels.Console
 import world.Entity
-import world.Level
+import world.level.Level
 import world.terrains.Terrain
 import java.lang.Float.min
 import java.lang.RuntimeException

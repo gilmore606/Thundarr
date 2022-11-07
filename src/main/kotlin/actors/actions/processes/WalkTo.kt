@@ -3,10 +3,9 @@ package actors.actions.processes
 import actors.Actor
 import actors.actions.Action
 import actors.actions.Move
-import kotlinx.coroutines.delay
 import util.XY
 import util.log
-import world.Level
+import world.level.Level
 import world.path.Pather
 
 class WalkTo(

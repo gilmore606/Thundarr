@@ -1,23 +1,25 @@
 package actors
 
-import App
 import actors.actions.Action
 import actors.actions.Move
+import actors.stats.Brains
+import actors.stats.Strength
+import actors.stats.skills.*
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Scenery
-import things.Thing
+import things.*
 import ui.panels.Console
 import util.XY
 import util.englishList
 import util.plural
 import world.Entity
-import world.Level
+import world.journal.Journal
 import world.path.Pather
 
 @Serializable
 open class Player : Actor() {
 
+    var journal: Journal = Journal()
     var willAggro: Boolean = false
     var thrownTag: String = ""
     override fun glyph() = Glyph.PLAYER
@@ -33,6 +35,26 @@ open class Player : Actor() {
 
     init {
         Pather.subscribe(this, this, 100f)
+    }
+
+    open fun onSpawn() {
+        Strength.set(this, 14f)
+        Brains.set(this, 9f)
+        Dig.set(this, 2f)
+        Fight.set(this, 1f)
+        Throw.set(this, 4f)
+        Build.set(this, 1f)
+        Survive.set(this, 2f)
+
+        Sunsword().moveTo(this)
+        repeat (20) { EnergyDrink().moveTo(this) }
+        Torch().moveTo(this)
+        Apple().moveTo(this)
+        HornetHelmet().moveTo(this)
+        HardHat().moveTo(this)
+        RiotHelmet().moveTo(this)
+        Pickaxe().moveTo(this)
+        Axe().moveTo(this)
     }
 
     override fun statusGlyph(): Glyph? {

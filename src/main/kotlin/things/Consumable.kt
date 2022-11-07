@@ -5,9 +5,8 @@ import actors.statuses.Status
 import actors.statuses.Wired
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import ui.input.Keyboard
 import ui.panels.Console
-import world.Level
+import world.level.Level
 
 
 @Serializable

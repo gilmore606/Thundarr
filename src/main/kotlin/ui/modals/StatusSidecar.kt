@@ -3,6 +3,7 @@ package ui.modals
 import actors.statuses.Status
 import render.Screen
 import ui.panels.StatusPanel
+import util.wrapText
 
 class StatusSidecar(private val parentPanel: StatusPanel) : Modal(0, 200) {
 

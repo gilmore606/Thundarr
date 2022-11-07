@@ -12,7 +12,7 @@ import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.LightColor
-import world.Level
+import world.level.Level
 
 sealed class Wall(
     type: Type,

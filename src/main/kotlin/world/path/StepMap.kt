@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import util.*
 import world.Entity
-import world.Level
+import world.level.Level
 import java.lang.Float.min
 
 // This should be DijkstraMap but who wants to type that guy's name all the time?

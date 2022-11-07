@@ -3,7 +3,7 @@ package util
 import actors.Actor
 import kotlinx.coroutines.delay
 import world.Entity
-import world.Level
+import world.level.Level
 import java.lang.RuntimeException
 
 const val MAX_LIGHT_RANGE = 24f

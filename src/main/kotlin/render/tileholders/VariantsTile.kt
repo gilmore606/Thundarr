@@ -1,8 +1,7 @@
 package render.tileholders
 
-import world.Level
+import world.level.Level
 import render.tilesets.TileSet
-import kotlin.random.Random
 
 open class VariantsTile(
     set: TileSet

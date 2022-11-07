@@ -3,7 +3,7 @@ package ui.modals
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import util.log
-import world.ChunkLoader
+import world.persist.ChunkLoader
 
 class LoadingModal(text: String) : SplashModal(text) {
 

@@ -2,7 +2,7 @@ package actors.actions
 
 import actors.Actor
 import audio.Speaker
-import world.Level
+import world.level.Level
 
 class Bark(
     val sfx: Speaker.SFX

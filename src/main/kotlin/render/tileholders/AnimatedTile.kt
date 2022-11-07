@@ -1,7 +1,7 @@
 package render.tileholders
 
 import render.tilesets.TileSet
-import world.Level
+import world.level.Level
 import kotlin.math.abs
 
 open class AnimatedTile(

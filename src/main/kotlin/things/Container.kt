@@ -4,7 +4,7 @@ import actors.Player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
-import world.Level
+import world.level.Level
 
 @Serializable
 sealed class Container : Portable(), ThingHolder {

@@ -25,7 +25,7 @@ import ui.modals.Modal
 import ui.modals.ToolbarAddModal
 import ui.panels.*
 import util.*
-import world.LevelKeeper
+import world.persist.LevelKeeper
 import world.path.Pather
 import world.stains.Stain
 import java.lang.Double.max

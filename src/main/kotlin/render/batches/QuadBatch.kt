@@ -10,7 +10,7 @@ import render.shaders.tileVertShader
 import render.tilesets.TileSet
 import render.tilesets.Glyph
 import util.*
-import world.Level
+import world.level.Level
 import java.lang.Float.min
 
 class QuadBatch(

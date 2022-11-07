@@ -8,7 +8,7 @@ import render.sparks.Smoke
 import ui.panels.Console
 import util.Dice
 import util.XY
-import world.Level
+import world.level.Level
 
 class Attack(
     private val target: Actor,

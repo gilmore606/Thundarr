@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import render.Screen
 import util.log
 import world.Entity
-import world.Level
+import world.level.Level
 import java.lang.Float.max
 import java.lang.Float.min
 

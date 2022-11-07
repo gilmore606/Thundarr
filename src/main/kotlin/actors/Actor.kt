@@ -23,7 +23,8 @@ import ui.panels.Console
 import ui.panels.StatusPanel
 import util.*
 import world.Entity
-import world.Level
+import world.level.Level
+import world.journal.JournalEntry
 import world.path.Pather
 import world.stains.Blood
 import world.terrains.Terrain
@@ -62,6 +63,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             value?.onStart()
         }
 
+    open fun isSentient() = true
+    open fun isHuman() = true
     open fun speed() = 0.5f + Speed.get(this) * 0.05f
     open fun visualRange() = 22f
 
@@ -230,11 +233,23 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             }
             hp = max(0f, hp - amount).toInt()
         }
-        if (hp < 1) die() else attacker?.also { receiveAggression(it) }
+        if (hp < 1) {
+            die()
+            attacker?.also { onKilledBy(it) }
+        } else attacker?.also { receiveAggression(it) }
         return amount
     }
 
     open fun receiveAggression(attacker: Actor) { }
+
+    open fun onKilledBy(killer: Actor) {
+        if (isHuman() && killer is Player) {
+            killer.journal.achieve(JournalEntry(
+                "Mortality",
+                "Today, I was forced to...kill a man.  I pray to the Lords of Light that it will be the last time.  But in my heart, I know it will not.  Not by a long shot."
+            ))
+        }
+    }
 
     open fun die() {
         level?.also { level ->

@@ -3,7 +3,7 @@ package ui.panels
 import App
 import render.Screen
 import ui.input.Keyboard
-import world.LevelKeeper
+import world.persist.LevelKeeper
 import world.path.Pather
 import world.terrains.Terrain
 

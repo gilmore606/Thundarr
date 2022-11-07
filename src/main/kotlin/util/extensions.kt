@@ -1,6 +1,9 @@
 package util
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import mu.KotlinLogging
+import render.Screen
 import things.Thing
 import world.Entity
 import java.io.ByteArrayInputStream
@@ -141,6 +144,10 @@ fun Int.toEnglish(): String {
     return str
 }
 
+fun Double.toGameTimeString() {
+
+}
+
 fun String.plural(): String {
     if (isNotEmpty()) {
         if (listOf(
@@ -175,6 +182,39 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
 fun isEveryFrame(frames: Int): Boolean = (System.currentTimeMillis() % frames.toLong() == 0L)
 
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
+
+fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.smallFont): ArrayList<String> {
+    val wrapped = ArrayList<String>()
+    var remaining = text
+    var nextLine = ""
+    var linePixelsLeft = (width - padding * 2)
+    val spaceWidth = GlyphLayout(font, " ").width.toInt()
+    while (remaining.isNotEmpty() || remaining == " ") {
+        // get next word
+        val space = remaining.indexOf(' ')
+        var word = ""
+        if (space >= 0) {
+            word = remaining.substring(0, space)
+            remaining = remaining.substring(space + 1, remaining.length)
+        } else {
+            word = remaining
+            remaining = ""
+        }
+        if (word != " ") {
+            val wordWidth = GlyphLayout(font, word).width.toInt()
+            if (nextLine == "" || wordWidth <= linePixelsLeft) {
+                nextLine += word + " "
+                linePixelsLeft -= wordWidth + spaceWidth
+            } else {
+                wrapped.add(nextLine)
+                nextLine = word + " "
+                linePixelsLeft = (width - padding * 2) - wordWidth - spaceWidth
+            }
+        }
+    }
+    if (nextLine != "") wrapped.add(nextLine)
+    return wrapped
+}
 
 val log = KotlinLogging.logger {}
 

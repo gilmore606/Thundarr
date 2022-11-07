@@ -2,7 +2,7 @@ package things
 
 import kotlinx.serialization.Transient
 import util.XY
-import world.Level
+import world.level.Level
 
 interface ThingHolder {
 

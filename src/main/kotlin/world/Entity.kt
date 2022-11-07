@@ -4,6 +4,7 @@ import render.batches.QuadBatch
 import render.tilesets.Glyph
 import util.XY
 import util.aOrAn
+import world.level.Level
 
 interface Entity {
 

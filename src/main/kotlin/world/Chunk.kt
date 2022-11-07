@@ -13,6 +13,9 @@ import things.Thing
 import util.*
 import world.cartos.LevelCarto
 import world.cartos.WorldCarto
+import world.level.AttractLevel
+import world.level.Level
+import world.persist.ChunkLoader
 import world.stains.Stain
 import world.terrains.Floor
 import world.terrains.Terrain

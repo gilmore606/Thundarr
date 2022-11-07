@@ -1,8 +1,7 @@
 package render.tileholders
 
 import render.tilesets.TileSet
-import util.Dice
-import world.Level
+import world.level.Level
 import kotlin.random.Random
 
 class WaterTile(

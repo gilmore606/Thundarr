@@ -1,4 +1,4 @@
-package world
+package world.persist
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -10,12 +10,14 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import util.gzipCompress
 import util.gzipDecompress
 import util.log
+import world.Building
+import world.Chunk
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.Connection
 import java.util.Base64
 
-class SaveState(
+class SaveSlot(
     private val id: String
 ) {
     object PrefsStateTable : Table() {
@@ -113,9 +115,9 @@ class SaveState(
         }
     }
 
-    fun getWorldState(): App.WorldState {
+    fun getWorldState(): WorldState {
         var result: ResultRow? = null
-        var state: App.WorldState? = null
+        var state: WorldState? = null
         transaction {
             result = WorldStateTable.selectAll().first()
         }
@@ -125,7 +127,7 @@ class SaveState(
         return state ?: throw RuntimeException("Could not get worldstate from db!")
     }
 
-    fun putWorldState(state: App.WorldState) {
+    fun putWorldState(state: WorldState) {
         transaction {
             WorldStateTable.deleteAll()
             WorldStateTable.insert {
@@ -135,12 +137,12 @@ class SaveState(
         log.info("Saved world state.")
     }
 
-    fun getPrefsState(): App.PrefsState? {
+    fun getPrefsState(): PrefsState? {
         val exists = transaction { PrefsStateTable.selectAll().count().toInt() }
         if (exists < 1) return null
 
         var result: ResultRow? = null
-        var state: App.PrefsState? = null
+        var state: PrefsState? = null
         transaction {
             result = PrefsStateTable.selectAll().first()
         }
@@ -150,7 +152,7 @@ class SaveState(
         return state
     }
 
-    fun putPrefsState(state: App.PrefsState) {
+    fun putPrefsState(state: PrefsState) {
         transaction {
             PrefsStateTable.deleteAll()
             PrefsStateTable.insert {

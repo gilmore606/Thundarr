@@ -6,7 +6,7 @@ import ui.panels.Console
 import util.Dice
 import util.LightColor
 import util.isEveryFrame
-import world.Level
+import world.level.Level
 import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.math.cos

@@ -6,7 +6,7 @@ import actors.animations.Hop
 import audio.Speaker
 import render.sparks.Speak
 import ui.panels.Console
-import world.Level
+import world.level.Level
 
 class Converse(
     private val target: Actor

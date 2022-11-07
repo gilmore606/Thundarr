@@ -3,9 +3,8 @@ package actors.actions
 import actors.Actor
 import things.Container
 import things.Thing
-import things.ThingHolder
 import ui.panels.Console
-import world.Level
+import world.level.Level
 
 class Get(
     private val thing: Thing

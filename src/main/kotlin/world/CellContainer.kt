@@ -2,13 +2,12 @@ package world
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import things.LightSource
 import things.Temporal
 import things.Thing
 import things.ThingHolder
 import util.XY
-import util.hasOneWhere
 import util.log
+import world.level.Level
 import world.stains.Stain
 
 @Serializable

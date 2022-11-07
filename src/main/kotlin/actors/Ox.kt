@@ -20,6 +20,7 @@ class Ox : NPC() {
     override fun shadowXOffset() = 0.2f
     override fun name() = "ox"
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
+    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 14f)
         Speed.set(this, 8f)
@@ -55,6 +56,7 @@ class MuskOx : NPC() {
     override fun shadowXOffset() = 0.2f
     override fun name() = "musk ox"
     override fun description() = "Predictably, it smells awful."
+    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 15f)
         Speed.set(this, 10f)

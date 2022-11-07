@@ -12,7 +12,7 @@ import ui.panels.Console
 import util.Dice
 import util.XY
 import util.distanceBetween
-import world.Level
+import world.level.Level
 
 class Throw(
     private val thing: Thing,

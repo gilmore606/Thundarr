@@ -1,7 +1,9 @@
-package world
+package world.level
 
 import audio.Speaker
 import util.*
+import world.Chunk
+import world.persist.ChunkLoader
 import java.lang.Float.max
 import java.lang.Float.min
 

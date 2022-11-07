@@ -2,7 +2,7 @@ package actors.actions
 
 import actors.Actor
 import things.Thing
-import world.Level
+import world.level.Level
 
 class Use(
     private val thing: Thing,

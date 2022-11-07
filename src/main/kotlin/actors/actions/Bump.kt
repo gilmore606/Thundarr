@@ -1,9 +1,8 @@
 package actors.actions
 
 import actors.Actor
-import actors.animations.Whack
 import util.XY
-import world.Level
+import world.level.Level
 import world.terrains.Terrain
 
 class Bump(

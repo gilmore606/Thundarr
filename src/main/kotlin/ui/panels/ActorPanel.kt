@@ -3,7 +3,6 @@ package ui.panels
 import actors.Actor
 import render.Screen
 import render.tilesets.Glyph
-import world.ChunkLoader
 
 object ActorPanel : ShadedPanel() {
 

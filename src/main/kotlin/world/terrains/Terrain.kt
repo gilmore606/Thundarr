@@ -1,18 +1,15 @@
 package world.terrains
 
 import actors.Actor
-import actors.Player
 import audio.Speaker
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import render.Screen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.panels.Console
 import util.LightColor
 import util.XY
-import world.Level
+import world.level.Level
 
 sealed class Terrain(
     val type: Type,

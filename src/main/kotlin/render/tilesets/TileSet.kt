@@ -4,7 +4,7 @@ import RESOURCE_FILE_DIR
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
-import world.Level
+import world.level.Level
 import render.tileholders.TileHolder
 import util.log
 

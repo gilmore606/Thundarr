@@ -2,6 +2,7 @@ package things
 
 import actors.Actor
 import actors.Player
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
@@ -36,6 +37,7 @@ sealed class Tree : Scenery() {
                 Log().moveTo(level, actor.xy.x, actor.xy.y)
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
                 this@Tree.moveTo(null)
+                Speaker.world(Speaker.SFX.TREEFALL, source = actor.xy)
                 Console.sayAct("%Dd comes crashing down!", "%Dn chops down %id.", actor, this@Tree)
             })
     )
