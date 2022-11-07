@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.Player
 import actors.statuses.Status
 import actors.statuses.Wired
 import kotlinx.serialization.Serializable
@@ -18,13 +19,15 @@ sealed class Consumable : Portable() {
 
     override fun uses() = mapOf(
         UseTag.CONSUME to Use(consumeVerb() + " " + name(), consumeDuration(),
-            canDo = { actor -> this in actor.contents },
+            canDo = { actor -> this in actor.contents && this.consumableBy(actor) },
             toDo = { actor, level ->
                 Console.sayAct(consumeSelfMsg(), consumeOtherMsg(), actor, this)
                 this.moveTo(null)
                 onConsume(actor)
             })
     )
+
+    open fun consumableBy(actor: Actor) = true
 
     override fun toolbarName() = consumeVerb() + " " + this.name()
     override fun toolbarUseTag() = UseTag.CONSUME
@@ -84,12 +87,12 @@ sealed class Consumable : Portable() {
 @Serializable
 sealed class Food : Consumable() {
     override fun consumeDuration() = 2f
-    override fun consumeSelfMsg() = "You wolf down %id.  That really hit the spot."
-
-    open fun nutrition() = 5f
+    override fun consumeSelfMsg() = "You wolf down %id."
+    override fun consumableBy(actor: Actor) = (actor !is Player || actor.couldEat())
+    open fun calories() = 200
 
     override fun onConsume(actor: Actor) {
-        actor.gainHealth(nutrition())
+        actor.ingestCalories(calories())
     }
 }
 
@@ -111,6 +114,7 @@ class Meat : Food() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw steak"
     override fun description() = "A bloody chunk of raw meat.  Your victim?  Sadly, this game does not keep track."
+    override fun calories() = 800
 }
 
 @Serializable

@@ -6,8 +6,11 @@ import kotlinx.serialization.Serializable
 data class GameTime(
     val time: Double
 ) {
-    private val TURNS_PER_DAY = 2000.0
-    private val YEAR_ZERO = 2994
+    companion object {
+        const val TURNS_PER_DAY = 2000.0
+        const val YEAR_ZERO = 2994
+    }
+
     private val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     val timeString: String
     val dateString: String

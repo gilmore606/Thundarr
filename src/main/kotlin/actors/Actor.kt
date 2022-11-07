@@ -248,9 +248,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     // Take damage and react to attacker if any.  Return damage that actually got through.
-    fun receiveDamage(raw: Float, attacker: Actor? = null): Float {
+    fun receiveDamage(raw: Float, attacker: Actor? = null, internal: Boolean = false): Float {
         val armor = armorTotal()
-        val amount = raw - armor
+        val amount = if (internal) raw else raw - armor
         if (amount > 0f) {
             if (Dice.chance(bleedChance() * amount * 0.35f)) {
                 level?.addStain(Blood(), xy.x, xy.y)
@@ -301,6 +301,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun corpse() = Corpse()
     open fun onDeath(corpse: Corpse) { }
+
+    open fun ingestCalories(cal: Int) { }
 
     override fun advanceTime(delta: Float) {
         statuses.forEach {

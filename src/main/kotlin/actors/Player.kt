@@ -5,6 +5,9 @@ import actors.actions.Move
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
+import actors.statuses.Hungry
+import actors.statuses.Starving
+import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.*
@@ -13,8 +16,10 @@ import util.XY
 import util.englishList
 import util.plural
 import world.Entity
+import world.journal.GameTime
 import world.journal.Journal
 import world.path.Pather
+import java.lang.Float.min
 
 @Serializable
 open class Player : Actor() {
@@ -32,6 +37,13 @@ open class Player : Actor() {
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
+
+    var calories = -1000f
+    private val caloriesMax = 2000f
+    private val caloriesEatMax = 1800f
+    private val caloriesPerDay = 2500f
+    private val caloriesHunger = -2000f
+    private val caloriesStarving = -5000f
 
     init {
         Pather.subscribe(this, this, 100f)
@@ -103,5 +115,46 @@ open class Player : Actor() {
     fun getThrown(): Thing? {
         if (thrownTag == "") return null
         return contents.firstOrNull { it.thingTag() == thrownTag }
+    }
+
+    override fun advanceTime(delta: Float) {
+        super.advanceTime(delta)
+        if (calories <= caloriesStarving) {
+            removeStatus(Status.Tag.HUNGRY)
+            if (!hasStatus(Status.Tag.STARVING)) {
+                Console.say("You're starving to death.")
+                addStatus(Starving())
+            }
+        } else {
+            calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
+            if (calories <= caloriesHunger) {
+                if (!hasStatus(Status.Tag.HUNGRY)) {
+                    Console.say("Your stomach grumbles loudly.  Time for a meal.")
+                    addStatus(Hungry())
+                }
+            }
+        }
+    }
+
+    fun couldEat() = calories < caloriesEatMax
+
+    override fun ingestCalories(cal: Int) {
+        calories += cal.toFloat()
+        if (calories > caloriesMax) {
+            calories = caloriesMax
+            Console.say("Oof, you're stuffed.")
+        }
+        if (calories > caloriesHunger) {
+            if (hasStatus(Status.Tag.HUNGRY) || hasStatus(Status.Tag.STARVING)) {
+                removeStatus(Status.Tag.HUNGRY)
+                removeStatus(Status.Tag.STARVING)
+                Console.say("That hit the spot.  You don't feel hungry anymore.")
+            }
+        } else if (calories > caloriesStarving) {
+            if (hasStatus(Status.Tag.STARVING)) {
+                removeStatus(Status.Tag.STARVING)
+                Console.say("That took the edge off.  You don't feel quite so hungry.")
+            }
+        }
     }
 }

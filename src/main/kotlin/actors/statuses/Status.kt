@@ -4,11 +4,13 @@ import actors.Actor
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Stat
+import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
 import ui.panels.Console
+import util.Dice
 import util.toEnglishList
 
 @Serializable
@@ -28,7 +30,7 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED }
+    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED, HUNGRY, STARVING }
 
     abstract fun description(): String
     open fun panelTag(): String = ""
@@ -97,6 +99,40 @@ class Burdened() : Status() {
         Speed.tag to -4f,
         Dodge.tag to -3f
     )
+}
+
+@Serializable
+class Hungry() : Status() {
+    override val tag = Tag.HUNGRY
+    override fun name() = "hungry"
+    override fun description() = "Lack of calories is making you weak and foggy."
+    override fun panelTag() = "hung"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -1f,
+        Brains.tag to -1f,
+        Speed.tag to -1f
+    )
+}
+
+@Serializable
+class Starving() : Status() {
+    override val tag = Tag.STARVING
+    override fun name() = "starving"
+    override fun description() = "Lack of calories is taking its toll.  You'll die soon without food."
+    override fun panelTag() = "starv"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -2f,
+        Brains.tag to -2f,
+        Speed.tag to -2f
+    )
+    override fun advanceTime(actor: Actor, delta: Float) {
+        if (Dice.chance(0.02f * delta)) {
+            Console.say("You're starving to death!")
+            actor.receiveDamage(1f, internal = true)
+        }
+    }
 }
 
 @Serializable
