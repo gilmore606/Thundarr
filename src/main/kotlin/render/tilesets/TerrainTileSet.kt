@@ -6,8 +6,7 @@ import render.Screen
 import render.tileholders.*
 
 fun TerrainTileSet() =
-    TileSet("tiles_terrain.png", 12, 4,
-            Screen.textureFilter).apply {
+    TileSet(SpriteSheets.Sheet.TerrainSprites).apply {
 
         setTile(Glyph.BLANK, SimpleTile(this, 2, 2))
 

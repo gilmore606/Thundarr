@@ -61,11 +61,11 @@ class InventoryModal(
             var text = ""
             val first = group.first()
             text = if (group.size > 1) {
-                group.size.toString() + " " + first.name().plural() + " " + first.listTag()
+                group.size.toString() + " " + first.name().plural()
             } else {
-                first.name() + " " + first.listTag()
+                first.name()
             }
-            drawOptionText(text, n, 30, addCol = weights[i], colX = 300)
+            drawOptionText(text, n, 30, addTag = first.listTag(), addCol = weights[i], colX = 270)
             n++
         }
     }
@@ -164,7 +164,7 @@ class InventoryModal(
         }
         weights.clear()
         grouped.forEach { group ->
-            weights.add((group[0].weight() * group.size).toString() + "lb")
+            weights.add(String.format("%.1f", (group[0].weight() * group.size)) + "lb")
         }
 
         maxSelection = grouped.size - 1

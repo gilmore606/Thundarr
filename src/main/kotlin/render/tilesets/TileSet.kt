@@ -1,7 +1,5 @@
 package render.tilesets
 
-import RESOURCE_FILE_DIR
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
 import world.level.Level
@@ -10,25 +8,15 @@ import util.log
 
 
 class TileSet(
-    textureFileName: String,
-    val tilesPerRow: Int,
-    val tilesPerColumn: Int,
-    filter: Texture.TextureFilter = Texture.TextureFilter.Nearest
+    spriteSheet: SpriteSheets.Sheet
 ) {
     var tileHolders: HashMap<Glyph, TileHolder> = HashMap()
-    var tileRowStride = 0.0
-    var tileColumnStride = 0.0
 
-    val texture: Texture
-
-    init {
-        texture = Texture(FileHandle("${RESOURCE_FILE_DIR}$textureFileName"), true).apply {
-            setFilter(filter, filter)
-        }
-        log.info("Loaded texture $textureFileName (${texture.width} x ${texture.height})")
-        tileRowStride = (1.0 / tilesPerRow)
-        tileColumnStride = (1.0 / tilesPerColumn)
-    }
+    val tilesPerRow = spriteSheet.tilesPerRow
+    val tilesPerColumn = spriteSheet.tilesPerColumn
+    val tileRowStride = (1.0 / tilesPerRow)
+    val tileColumnStride = (1.0 / tilesPerColumn)
+    val texture: Texture = SpriteSheets.sheets[spriteSheet]!!
 
     fun setTile(glyph: Glyph, holder: TileHolder) {
         tileHolders[glyph] = holder
@@ -44,7 +32,7 @@ class TileSet(
     ) = tileHolders[glyph]?.getTextureIndex(level, x, y) ?: 0
 
     fun dispose() {
-        texture.dispose()
+        // nothing to do anymore
     }
 
     // Return all texture indices a QuadBatch can safely cache on startup (because they're SimpleTile or other unchanging tile).

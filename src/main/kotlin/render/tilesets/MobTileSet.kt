@@ -6,8 +6,7 @@ import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
 fun ActorTileSet() =
-    TileSet("tiles_mob.png", 4, 4,
-        Screen.textureFilter).apply {
+    TileSet(SpriteSheets.Sheet.ActorSprites).apply {
 
         setTile(Glyph.MOB_SHADOW, SimpleTile(this, 3, 1))
 

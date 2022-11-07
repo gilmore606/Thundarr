@@ -14,8 +14,9 @@ import world.level.Level
 import java.lang.Float.min
 
 class QuadBatch(
-    val tileSet: TileSet
-) : RenderBatch() {
+    val tileSet: TileSet,
+    maxQuads: Int = 40000
+) : RenderBatch(maxQuads) {
 
     override fun vertShader() = tileVertShader()
     override fun fragShader() = tileFragShader()

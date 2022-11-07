@@ -7,8 +7,7 @@ import render.tileholders.SimpleTile
 import render.tileholders.VariantsTile
 
 fun ThingTileSet() =
-    TileSet("tiles_thing.png", 8, 8,
-        Screen.textureFilter).apply {
+    TileSet(SpriteSheets.Sheet.ThingSprites).apply {
 
         setTile(Glyph.TREE, VariantsTile(this).apply {
             add(0.4f, 0, 1)

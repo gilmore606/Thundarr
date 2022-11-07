@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
 
 fun UITileSet() =
-    TileSet("tiles_ui.png", 5, 5,
-            Texture.TextureFilter.Nearest).apply {
+    TileSet(SpriteSheets.Sheet.UISprites).apply {
         setTile(Glyph.CURSOR, SimpleTile(this, 0, 0))
         setTile(Glyph.BOX_BG, SimpleTile(this, 1, 0))
         setTile(Glyph.BOX_SHADOW, SimpleTile(this, 0, 1))

@@ -42,9 +42,9 @@ abstract class Modal(
     protected val textBatch = SpriteBatch()
     protected val thingBatch: QuadBatch? = newThingBatch()
     protected val actorBatch: QuadBatch? = newActorBatch()
-    protected open fun newBoxBatch(): QuadBatch = QuadBatch(UITileSet())
-    protected open fun newThingBatch(): QuadBatch? = QuadBatch(ThingTileSet())
-    protected open fun newActorBatch(): QuadBatch? = QuadBatch(ActorTileSet())
+    protected open fun newBoxBatch(): QuadBatch = QuadBatch(UITileSet(), maxQuads = 1000)
+    protected open fun newThingBatch(): QuadBatch? = QuadBatch(ThingTileSet(), maxQuads = 1000)
+    protected open fun newActorBatch(): QuadBatch? = QuadBatch(ActorTileSet(), maxQuads = 1000)
 
     open fun openSound(): Speaker.SFX? = Speaker.SFX.UIOPEN
     open fun closeSound(): Speaker.SFX? = Speaker.SFX.UICLOSE

@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 
-abstract class RenderBatch {
+abstract class RenderBatch(
+    maxQuads: Int = 40000
+) {
 
     abstract fun vertexAttributes(): List<VertexAttribute>
     abstract fun vertShader(): String
@@ -17,9 +19,8 @@ abstract class RenderBatch {
         it.forEach { fpv += it.numComponents }
         fpv
     }
-    private val MAX_QUADS = 40000
-    private val mesh = Mesh(true, MAX_QUADS * 6, 0, *vertexAttributes().toTypedArray())
-    val floats: FloatArray = FloatArray(MAX_QUADS * floatsPerVertex * 4 * 4)
+    private val mesh = Mesh(true, maxQuads * 6, 0, *vertexAttributes().toTypedArray())
+    val floats: FloatArray = FloatArray(maxQuads * floatsPerVertex * 4 * 4)
     protected val shader = ShaderProgram(vertShader(), fragShader()).apply {
         if (!isCompiled) throw RuntimeException("Can't compile shader: $log")
     }

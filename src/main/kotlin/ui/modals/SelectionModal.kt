@@ -54,12 +54,17 @@ abstract class SelectionModal(
     }
 
     protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0,
-                                 colorOverride: Color? = null, addCol: String? = null, colX: Int = 0) {
+                                 colorOverride: Color? = null, addCol: String? = null, colX: Int = 0,
+                                 addTag: String? = null) {
         drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,
             colorOverride ?: if (index == selection) Screen.fontColorBold else Screen.fontColor)
         addCol?.also { addCol ->
-            drawString(addCol, padding + colX, headerPad + spacing * index - 2,
+            drawString(addCol, padding + spaceForIcon + colX, headerPad + spacing * index - 2,
                 Screen.fontColorDull, Screen.smallFont)
+        }
+        addTag?.also { tag ->
+            val x = measure(text) + 6
+            drawString(tag, padding + spaceForIcon + x, headerPad + spacing * index - 1, Screen.fontColorDull, Screen.smallFont)
         }
     }
 
