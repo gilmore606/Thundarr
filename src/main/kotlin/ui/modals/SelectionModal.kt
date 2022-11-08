@@ -133,7 +133,7 @@ abstract class SelectionModal(
         val localX = screenX - x
         val localY = screenY - y + (spacing / 2)
         if (localX in 1 until width) {
-            val hoverOption = (localY - headerPad) / spacing
+            val hoverOption = (localY - headerPad - 5) / spacing
             if (hoverOption in 0..maxSelection) {
                 return hoverOption
             }
