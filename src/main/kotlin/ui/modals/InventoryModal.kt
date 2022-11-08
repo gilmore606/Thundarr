@@ -72,8 +72,10 @@ class InventoryModal(
             drawOptionText(text, n, 30, addTag = first.listTag(), addCol = weights[i], colX = 270)
             n++
         }
-        drawString("Capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
-        drawString(maxText, padding + 75, height - 31, Screen.fontColor, Screen.font)
+        if (!isSidecar) {
+            drawString("Capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
+            drawString(maxText, padding + 75, height - 31, Screen.fontColor, Screen.font)
+        }
         drawString("Total ", padding + 252, height - 30, Screen.fontColorDull, Screen.smallFont)
         drawString(totalText, padding + 300, height - 31, Screen.fontColor, Screen.font)
     }

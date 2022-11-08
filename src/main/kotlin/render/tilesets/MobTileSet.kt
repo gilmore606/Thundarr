@@ -25,4 +25,5 @@ fun ActorTileSet() =
             add(3, 2)
         })
         setTile(Glyph.HERDER, SimpleTile(this, 1, 0))
+        setTile(Glyph.WOLFMAN, SimpleTile(this, 0, 3))
     }
