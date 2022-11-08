@@ -19,7 +19,7 @@ object ChunkLoader {
 
     init {
         coroutineScope.launch {
-            while (true) {
+            while (!App.isExiting) {
                 if (jobs.isNotEmpty()) {
                     jobs = jobs.filter { it.isActive }.toMutableSet()
                 }

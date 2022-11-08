@@ -3,6 +3,8 @@ package ui.input
 import App
 import actors.Herder
 import actors.Ox
+import actors.actions.Wait
+import actors.statuses.Asleep
 import com.badlogic.gdx.Input
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -106,6 +108,9 @@ object Keyboard : KtxInputAdapter {
                 Input.Keys.NUMPAD_6, Input.Keys.D -> { if (CURSOR_MODE) Screen.moveCursor(EAST) else App.player.tryMove(EAST) }
                 Input.Keys.NUMPAD_9, Input.Keys.E -> { if (CURSOR_MODE) Screen.moveCursor(NORTHEAST) else App.player.tryMove(NORTHEAST) }
                 Input.Keys.NUMPAD_5, Input.Keys.S -> { Screen.rightClickCursorTile() }
+
+                Input.Keys.SPACE -> { App.player.queue(Wait(1f)) }
+                Input.Keys.PERIOD -> { App.player.toggleSleep() }
 
                 Input.Keys.NUMPAD_DIVIDE -> { toggleCursorMode() }
                 Input.Keys.PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextActor(-1) }

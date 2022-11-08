@@ -9,6 +9,7 @@ import world.level.Level
 class Get(
     private val thing: Thing
 ) : Action(0.5f) {
+    override fun name() = "get things"
 
     override fun execute(actor: Actor, level: Level) {
         var wasContainer: Container? = null

@@ -1,8 +1,5 @@
 import actors.AttractPlayer
 import actors.Player
-import actors.stats.Brains
-import actors.stats.Strength
-import actors.stats.skills.*
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -50,6 +47,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     var DEBUG_PANEL = false
 
     var attractMode = true
+    var isExiting = false
 
     private fun setupLog() {
         Dispatchers.KTX.mainThread.name = "main"
@@ -117,6 +115,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     override fun dispose() {
         log.info("Thundarr shutting down.")
+        isExiting = true
         Screen.dispose()
         Speaker.dispose()
     }

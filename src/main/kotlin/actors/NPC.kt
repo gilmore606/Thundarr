@@ -117,9 +117,9 @@ sealed class NPC : Actor() {
         return false
     }
 
-    override fun statusGlyph(): Glyph? {
-        if (isHostile()) return Glyph.HOSTILE_ICON
-        return null
+    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+        super.drawStatusGlyphs(drawIt)
+        if (isHostile()) drawIt(Glyph.HOSTILE_ICON)
     }
 
     override fun examineDescription(): String {

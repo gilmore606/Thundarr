@@ -65,7 +65,8 @@ class QuadBatch(
     fun addTileQuad(col: Int, row: Int, // global tile XY
                     textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f,
-                    scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f, grayBlend: Float? = null, mirror: Boolean = false) {
+                    scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f,
+                    grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false) {
         val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
@@ -77,7 +78,7 @@ class QuadBatch(
         val grayOut = grayBlend ?: if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
         val itx0 = if (mirror) 1f else 0f
         val itx1 = if (mirror) 0f else 1f
-        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
+        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate)
     }
 
     fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,
@@ -131,7 +132,7 @@ class QuadBatch(
     private inline fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double, // GL screen float XY
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f,
-                               grayOut: Float = 0f, hue: Float = 0f
+                               grayOut: Float = 0f, hue: Float = 0f, rotate: Boolean = false
     ) {
         val x0 = ix0.toFloat() - quadEdgePadX
         val y0 = -iy0.toFloat() - quadEdgePadY
@@ -141,13 +142,25 @@ class QuadBatch(
         val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + textureEdgePad
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - textureEdgePad
         val ty1 = (((textureIndex / tileSet.tilesPerRow) + ity1) * tileSet.tileColumnStride).toFloat() - textureEdgePad
-        floats.apply {
-            addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-            addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-            addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-            addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+
+        if (rotate) {
+            floats.apply {
+                addVertex(x1, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x1, y1, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x0, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x0, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x0, y0, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x1, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+            }
+        } else {
+            floats.apply {
+                addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+            }
         }
     }
 

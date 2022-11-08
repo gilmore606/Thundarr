@@ -9,6 +9,7 @@ class Use(
     duration: Float,
     private val toDo: (Actor, Level)->Unit
 ): Action(duration) {
+    override fun name() = "use things"
 
     override fun execute(actor: Actor, level: Level) {
         toDo(actor, level)

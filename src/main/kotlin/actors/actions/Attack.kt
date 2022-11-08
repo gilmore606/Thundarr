@@ -14,6 +14,7 @@ class Attack(
     private val target: Actor,
     private val dir: XY
 ): Action(1.0f) {
+    override fun name() = "attack"
 
     override fun durationFor(actor: Actor) = super.durationFor(actor) * actor.meleeWeapon().speed()
 

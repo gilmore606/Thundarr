@@ -1,6 +1,9 @@
 package actors.statuses
 
 import actors.Actor
+import actors.Player
+import actors.actions.*
+import actors.actions.processes.WalkTo
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Stat
@@ -9,6 +12,7 @@ import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
 import util.toEnglishList
@@ -30,11 +34,13 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED, HUNGRY, STARVING }
+    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED, HUNGRY, STARVING, STUNNED, ASLEEP }
 
     abstract fun description(): String
     open fun panelTag(): String = ""
     open fun panelTagColor(): Color = tagColors[TagColor.NORMAL]!!
+    open fun statusGlyph(actor: Actor): Glyph? = null
+    open fun proneGlyph(): Boolean = false
 
     override fun statEffects() = defaultStatEffects
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
@@ -54,6 +60,8 @@ sealed class Status : StatEffector {
     }
     open fun onRemoveMsg() = ""
     open fun onRemoveOtherMsg() = ""
+
+    open fun preventedAction(action: Action, actor: Actor) = false
 
     open fun panelInfo(): String {
         val effects = statEffects()
@@ -136,6 +144,27 @@ class Starving() : Status() {
 }
 
 @Serializable
+class Asleep() : Status() {
+    override val tag = Tag.ASLEEP
+    override fun name() = "asleep"
+    override fun description() = "Sleeping gives your wounds a chance to heal and your spirit to renew."
+    override fun panelTag() = "zzz"
+    override fun panelTagColor() = tagColors[TagColor.GOOD]!!
+    override fun statusGlyph(actor: Actor) = Glyph.SLEEP_ICON
+    override fun proneGlyph() = true
+    override fun statEffects() = mapOf(
+        Speed.tag to -10f
+    )
+    override fun preventedAction(action: Action, actor: Actor): Boolean {
+        if (action !is Sleep) {
+            if (actor is Player) Console.say("You can't do anything in your sleep.")
+            return true
+        }
+        return false
+    }
+}
+
+@Serializable
 sealed class TimeStatus : Status() {
     private var addTime = 0.0
     private var turnsLeft = 0f
@@ -161,6 +190,30 @@ sealed class TimeStatus : Status() {
     }
     open fun onStackMsg() = ""
     open fun onStackOtherMsg() = ""
+}
+
+@Serializable
+class Stunned() : TimeStatus() {
+    override val tag = Tag.STUNNED
+    override fun name() = "stunned"
+    override fun description() = "You're too stunned to move or attack."
+    override fun onAddMsg() = "You're stunned!"
+    override fun onAddOtherMsg() = "%Dn looks stunned!"
+    override fun panelTag() = "stun"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun statEffects() = mapOf(
+        Speed.tag to -4f,
+        Dodge.tag to -8f
+    )
+    override fun duration() = 1f
+    override fun maxDuration() = 2f
+    override fun preventedAction(action: Action, actor: Actor): Boolean {
+        if (action is Move || action is WalkTo || action is Attack || action is Throw) {
+            if (actor is Player) Console.say("You're too stunned to " + action.name() + "!")
+            return true
+        }
+        return false
+    }
 }
 
 @Serializable

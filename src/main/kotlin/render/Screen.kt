@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.math.MathUtils.sin
 import ktx.app.KtxScreen
 import render.batches.CloudBatch
 import render.batches.FireBatch
@@ -183,6 +184,8 @@ object Screen : KtxScreen {
     private var lastActionTime = 0L
     private var minActionInterval = 50L
 
+    private var sinBob = 0f
+
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
         var useLight: LightColor = light
@@ -253,13 +256,14 @@ object Screen : KtxScreen {
         actorBatch.addTileQuad(
             tx, ty,
             actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(), mirror = actor.mirrorGlyph
+            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(),
+            mirror = actor.mirrorGlyph, rotate = actor.rotateGlyph
         )
-        actor.statusGlyph()?.also { statusGlyph ->
+        actor.drawStatusGlyphs { statusGlyph ->
             uiWorldBatch.addTileQuad(
                 tx, ty,
                 uiBatch.getTextureIndex(statusGlyph), 1f, fullLight,
-                offsetX = actor.animOffsetX(), offsetY = -0.4f + actor.animOffsetY()
+                offsetX = actor.animOffsetX(), offsetY = -0.4f + actor.animOffsetY() + sinBob * 0.13f
             )
         }
     }
@@ -354,6 +358,8 @@ object Screen : KtxScreen {
     }
 
     private fun animateCamera(delta: Float) {
+        sinBob = sin(((System.currentTimeMillis() % 1000L).toFloat() * 0.001f) * 6.283f)
+
         if (brightness < brightnessTarget) {
             brightness = kotlin.math.min(brightnessTarget, brightness + delta * 0.6f)
         } else if (brightness > brightnessTarget) {

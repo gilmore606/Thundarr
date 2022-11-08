@@ -5,13 +5,16 @@ import actors.actions.Move
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
+import actors.statuses.Asleep
 import actors.statuses.Hungry
 import actors.statuses.Starving
 import actors.statuses.Status
 import kotlinx.serialization.Serializable
+import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
 import ui.panels.Console
+import ui.panels.TimeButtons
 import util.XY
 import util.englishList
 import util.plural
@@ -69,11 +72,9 @@ open class Player : Actor() {
         Axe().moveTo(this)
     }
 
-    override fun statusGlyph(): Glyph? {
-        if (willAggro) {
-            return Glyph.HOSTILE_ICON
-        }
-        return null
+    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+        super.drawStatusGlyphs(drawIt)
+        if (willAggro) drawIt(Glyph.HOSTILE_ICON)
     }
 
     override fun onMove() {
@@ -105,6 +106,19 @@ open class Player : Actor() {
             Console.say("You boil over with rage, ready to smash the next creature you approach!")
         }
         willAggro = !willAggro
+    }
+
+    fun toggleSleep() {
+        level?.addSpark(Smoke().at(xy.x, xy.y))
+        if (hasStatus(Status.Tag.ASLEEP)) {
+            removeStatus(Status.Tag.ASLEEP)
+            TimeButtons.changeState(TimeButtons.State.PAUSE)
+            Console.say("You wake up.")
+        } else {
+            Console.say("You lie down to sleep.")
+            addStatus(Asleep())
+            TimeButtons.changeState(TimeButtons.State.PLAY)
+        }
     }
 
     fun readyForThrowing(tag: String) {

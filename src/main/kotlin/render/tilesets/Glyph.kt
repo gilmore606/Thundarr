@@ -69,6 +69,7 @@ enum class Glyph {
     SMOKE_PUFF,
     DUST_PUFF,
     HEALTH_ICON,
+    SLEEP_ICON,
     ANGRY_THUNDARR,
     SPEECH_BUBBLE,
     POW_ICON,

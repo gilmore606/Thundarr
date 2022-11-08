@@ -10,6 +10,7 @@ class Bump(
     private val y: Int,
     private val dir: XY
 ) : Action(0.1f) {
+    override fun name() = "move"
 
     override fun execute(actor: Actor, level: Level) {
         actor.animation = actors.animations.Bump(dir)

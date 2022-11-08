@@ -11,6 +11,7 @@ import world.level.Level
 class Converse(
     private val target: Actor
 ) : Action(2.0f) {
+    override fun name() = "speak"
 
     override fun execute(actor: Actor, level: Level) {
         actor.level?.addSpark(Speak().at(actor.xy.x, actor.xy.y))

@@ -9,6 +9,7 @@ import world.level.Level
 class Move(
     private val dir: XY
 ) : Action(1.0f) {
+    override fun name() = "move"
 
     override fun durationFor(actor: Actor) = super.durationFor(actor) * (actor.level?.moveSpeedFor(actor, dir) ?: 1f)
 

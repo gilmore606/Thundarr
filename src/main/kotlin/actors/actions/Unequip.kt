@@ -8,6 +8,7 @@ import world.level.Level
 class Unequip(
     private val gear: Gear
 ) : Action(gear.slot.duration) {
+    override fun name() = "unequip gear"
 
     override fun execute(actor: Actor, level: Level) {
         if (gear.holder == actor) {

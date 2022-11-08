@@ -8,10 +8,7 @@ import actors.stats.Stat
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Skill
-import actors.statuses.Burdened
-import actors.statuses.Encumbered
-import actors.statuses.StatEffector
-import actors.statuses.Status
+import actors.statuses.*
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -68,7 +65,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun isSentient() = true
     open fun isHuman() = true
-    open fun speed() = 0.5f + Speed.get(this) * 0.05f
+    open fun actionSpeed() = 1.5f - Speed.get(this) * 0.05f
     open fun visualRange() = 22f
 
     open fun bleedChance() = 0.6f
@@ -85,6 +82,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun glyphBatch() = Screen.actorBatch
     override fun uiBatch() = Screen.uiActorBatch
     var mirrorGlyph = false
+    var rotateGlyph = false
 
     abstract fun hasActionJuice(): Boolean
     abstract fun wantsToAct(): Boolean
@@ -113,7 +111,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun onConverse(actor: Actor): Boolean = false
 
-    open fun statusGlyph(): Glyph? = null
+    open fun drawStatusGlyphs(drawIt: (Glyph)->Unit) {
+        statuses.forEach { it.statusGlyph(this)?.also { drawIt(it) } }
+    }
 
     open fun willAggro(target: Actor) = false
 
@@ -132,6 +132,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     // Queue an action to be executed next.
     fun queue(action: Action) {
         if (action.canQueueFor(this)) queuedActions.add(action)
+    }
+
+    fun doAction(action: Action) {
+        level?.also {  level ->
+            statuses.forEach { status ->
+                if (status.preventedAction(action, this)) return
+            }
+            action.execute(this, level)
+        }
     }
 
     override fun remove(thing: Thing) {
@@ -191,7 +200,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun animOffsetX() = animation?.offsetX() ?: 0f
-    fun animOffsetY() = animation?.offsetY() ?: 0f
+    fun animOffsetY() = animation?.offsetY() ?: if (rotateGlyph) 0.3f else 0f
 
     final override fun onRender(delta: Float) {
         animation?.also { if (it.done) animation = null else it.onRender(delta) }
@@ -259,6 +268,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
                 }
             }
             hp = max(0f, hp - amount).toInt()
+            if (Dice.chance(amount * 0.1f)) {
+                addStatus(Stunned())
+            }
         }
         if (hp < 1) {
             die()
@@ -272,7 +284,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun onKilledBy(killer: Actor) {
         if (isHuman() && killer is Player) {
             killer.journal.achieve(JournalEntry(
-                "Mortality",
+                "Mortality.",
                 "Today, I was forced to...kill a man.  I pray to the Lords of Light that it will be the last time.  But in my heart, I know it will not.  Not by a long shot."
             ))
         }
@@ -305,9 +317,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun ingestCalories(cal: Int) { }
 
     override fun advanceTime(delta: Float) {
-        statuses.forEach {
-            it.advanceTime(this, delta)
-        }
+        statuses.safeForEach { it.advanceTime(this, delta) }
         statuses.filterAnd({ it.done }) { onRemoveStatus(it) }
     }
 
@@ -323,6 +333,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         status.statEffects().forEach { (tag, _) ->
             Stat.get(tag).touch(this)
         }
+        if (status.proneGlyph()) updateRotateGlyph()
         if (this is Player) StatusPanel.refillCache()
     }
 
@@ -330,7 +341,13 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         statuses.firstOrNull { it.tag == statusTag }?.also { status ->
             statuses.remove(status)
             onRemoveStatus(status)
+            if (status.proneGlyph()) updateRotateGlyph()
         }
+    }
+
+    private fun updateRotateGlyph() {
+        this.rotateGlyph = false
+        statuses.safeForEach { if (it.proneGlyph()) this.rotateGlyph = true }
     }
 
     fun hasStatus(statusTag: Status.Tag) = statuses.hasOneWhere { it.tag == statusTag }

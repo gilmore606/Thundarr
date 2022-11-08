@@ -7,6 +7,7 @@ import world.level.Level
 class Bark(
     val sfx: Speaker.SFX
     ) : Action(0.5f) {
+    override fun name() = "bark"
 
     override fun execute(actor: Actor, level: Level) {
         Speaker.world(sfx, source = actor.xy)

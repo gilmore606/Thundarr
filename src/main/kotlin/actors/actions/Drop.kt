@@ -11,6 +11,7 @@ class Drop(
     private val thing: Thing,
     private val dest: ThingHolder
 ) : Action(0.3f) {
+    override fun name() = "drop things"
 
     override fun execute(actor: Actor, level: Level) {
         thing.moveTo(dest)

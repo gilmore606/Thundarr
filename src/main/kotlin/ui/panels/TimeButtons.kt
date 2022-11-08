@@ -1,6 +1,8 @@
 package ui.panels
 
+import actors.actions.Sleep
 import actors.actions.Wait
+import actors.statuses.Status
 import audio.Speaker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,21 +57,23 @@ object TimeButtons : Panel() {
 
     init {
         KtxAsync.launch {
-            while (true) {
+            while (!App.isExiting) {
                 delay(ffwdDelay)
                 if (state == State.FFWD && canAdvance()) {
-                    App.player.queue(Wait(1f))
+                    App.player.queue(waitAction())
                 }
                 playCount++
                 if (playCount >= playDivider) {
                     if (state == State.PLAY && canAdvance()) {
-                        App.player.queue(Wait(1f))
+                        App.player.queue(waitAction())
                     }
                     playCount = 0
                 }
             }
         }
     }
+
+    fun waitAction() = if (App.player.hasStatus(Status.Tag.ASLEEP)) Sleep() else Wait(3f)
 
     fun isShown() = (this.contraction < 1)
 
@@ -160,10 +164,17 @@ object TimeButtons : Panel() {
         return false
     }
 
-    private fun changeState(newState: State) {
+    fun changeState(newState: State) {
         if (newState == state) return
 
         state = newState
+        buttons.forEach {
+            if (it.toState == state) {
+                it.targetSize = iconSizeHovered.toDouble()
+            } else {
+                it.targetSize = iconSize.toDouble()
+            }
+        }
     }
 
 }

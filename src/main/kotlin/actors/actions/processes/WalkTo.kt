@@ -13,7 +13,7 @@ class WalkTo(
     val x: Int,
     val y: Int
 ) : Action(1f) {
-
+    override fun name() = "move"
 
     private var done = false
     private val dest = XY(x,y)

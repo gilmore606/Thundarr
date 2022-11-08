@@ -82,8 +82,6 @@ class Director(val level: Level) {
     }
 
     // Execute actors' actions until it's the player's turn.
-    // TODO: change to give juice to all active levels not just this one
-
     fun runQueue(level: Level) {
         while (true) {
             if (level.hasBlockingSpark()) return
@@ -98,7 +96,7 @@ class Director(val level: Level) {
                 } else if (checkActor.wantsToAct()) {
                     if ((checkActor.juice > (actor?.juice ?: 0f)) ||
                         ((checkActor is Player) && (checkActor.juice == (actor?.juice ?: 0f))) ||
-                        ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.speed() > (actor?.speed() ?: 0f)))
+                        ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.actionSpeed() < (actor?.actionSpeed() ?: 0f)))
                     ) {
                         actor = checkActor
                     }
@@ -112,7 +110,9 @@ class Director(val level: Level) {
             // execute their action
             actor.nextAction()?.also { action ->
                 val duration = action.durationFor(actor)
-                action.execute(actor, level)
+
+                actor.doAction(action)
+
                 // pay the juice
                 if (actor is Player) {  // player pays juice to all actors
                     LevelKeeper.advanceJuice(duration)

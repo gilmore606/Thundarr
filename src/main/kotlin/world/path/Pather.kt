@@ -36,7 +36,7 @@ object Pather {
     private fun relaunchWorker() {
         worker?.cancel()
         worker = coroutineScope.launch {
-            while (true) {
+            while (!App.isExiting) {
                 var doneMap: StepMap? = null
                 for (i in 0 until maps.size) {
                     if (i < maps.size) {

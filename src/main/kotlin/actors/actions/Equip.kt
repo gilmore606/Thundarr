@@ -8,6 +8,7 @@ import world.level.Level
 class Equip(
     private val gear: Gear
 ) : Action(gear.slot.duration) {
+    override fun name() = "equip gear"
 
     override fun canQueueFor(actor: Actor): Boolean {
         if (gear.holder == actor) {

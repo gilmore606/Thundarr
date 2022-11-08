@@ -19,6 +19,7 @@ class Throw(
     private var x: Int,
     private var y: Int
 ) : Action(1.0f) {
+    override fun name() = "throw"
 
     override fun execute(actor: Actor, level: Level) {
         actor.animation = Hop()
