@@ -189,7 +189,7 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
     return str
 }
 
-fun isEveryFrame(frames: Int): Boolean = (System.currentTimeMillis() % frames.toLong() == 0L)
+fun isEveryFrame(frames: Int): Boolean = (Screen.timeMs % frames.toLong() == 0L)
 
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)
 

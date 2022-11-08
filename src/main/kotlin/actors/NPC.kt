@@ -60,7 +60,8 @@ sealed class NPC : Actor() {
         }
     }
 
-    private fun startPathing() { Pather.subscribe(this, this, 24f) }
+    private fun startPathing() { Pather.subscribe(this, this, defaultPathDistance()) }
+    protected fun defaultPathDistance() = 12f
 
     fun hibernate() {
         awareness = Awareness.HIBERNATED

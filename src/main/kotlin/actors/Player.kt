@@ -9,7 +9,11 @@ import actors.statuses.Asleep
 import actors.statuses.Hungry
 import actors.statuses.Starving
 import actors.statuses.Status
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import ktx.async.KtxAsync
+import render.Screen
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
@@ -70,6 +74,15 @@ open class Player : Actor() {
         RiotHelmet().moveTo(this)
         Pickaxe().moveTo(this)
         Axe().moveTo(this)
+    }
+
+    override fun die() {
+        super.die()
+        KtxAsync.launch {
+            delay(1000L)
+            Screen.brightnessTarget = 0f
+            App.saveStateAndReturnToMenu()
+        }
     }
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {

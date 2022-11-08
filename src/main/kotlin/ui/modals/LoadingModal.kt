@@ -1,5 +1,6 @@
 package ui.modals
 
+import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import util.log
@@ -30,7 +31,7 @@ class LoadingModal(text: String) : SplashModal(text) {
     override fun onRender(delta: Float) {
         super.onRender(delta)
         if (dismissed) return
-        val time = System.currentTimeMillis()
+        val time = Screen.timeMs
         if (time > launchTime + minDelayMs) {
             if (lastCheckTime < time + checkMs) {
                 if (!isLoading()) {

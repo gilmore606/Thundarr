@@ -1,5 +1,7 @@
 package actors.animations
 
+import render.Screen
+
 
 abstract class Animation(
     val durationMs: Long,
@@ -13,11 +15,11 @@ abstract class Animation(
     open fun shadowOffsetY(): Float = 0f
 
     open fun onStart() {
-        startMs = System.currentTimeMillis()
+        startMs = Screen.timeMs
     }
 
     fun onRender(delta: Float) {
-        if (System.currentTimeMillis() - startMs > durationMs) {
+        if (Screen.timeMs - startMs > durationMs) {
             done = true
         } else {
             doOnRender(delta)
@@ -26,6 +28,6 @@ abstract class Animation(
 
     open fun doOnRender(delta: Float) { }
 
-    fun progress() = (System.currentTimeMillis() - startMs).toFloat() / durationMs.toFloat()
+    fun progress() = (Screen.timeMs - startMs).toFloat() / durationMs.toFloat()
 
 }

@@ -158,7 +158,7 @@ object Console : Panel() {
     override fun onRender(delta: Float) {
         scroll = max(0f, scroll - (scrollSpeed * delta * scroll * 0.05f))
 
-        if (burstFloor == 1f && System.currentTimeMillis() - dimDelayMs > lastLineMs) {
+        if (burstFloor == 1f && Screen.timeMs - dimDelayMs > lastLineMs) {
             burstFloor = dimLevel
         }
         if (!mouseInside) burst = max(burstFloor, burst - burstDecay * delta)

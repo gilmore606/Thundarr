@@ -46,7 +46,7 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
     override fun drawModalText() {
         if (isAnimating()) return
         drawCenterText("the bARbARiAn", 0, 54, width, Screen.fontColor, Screen.subTitleFont)
-        if ((System.currentTimeMillis() - launchTimeMs) > animTime * 2f) {
+        if ((Screen.timeMs - launchTimeMs) > animTime * 2f) {
             options.keys.forEachIndexed { n, optionText ->
                 drawOptionText(optionText, n)
             }

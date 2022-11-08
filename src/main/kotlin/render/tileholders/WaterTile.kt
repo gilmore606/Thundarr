@@ -1,5 +1,6 @@
 package render.tileholders
 
+import render.Screen
 import render.tilesets.TileSet
 import world.level.Level
 import kotlin.random.Random
@@ -15,7 +16,7 @@ class WaterTile(
     }
 
     override fun getTextureIndex(level: Level?, x: Int, y: Int): Int {
-        val seed = x * 10 + y + (System.currentTimeMillis() / (400 + Random(x*10+y).nextInt(200))).toInt()
+        val seed = x * 10 + y + (Screen.timeMs / (400 + Random(x*10+y).nextInt(200))).toInt()
         val dice = Random(seed).nextFloat()
         var chance = 0f
         variants.forEach { v ->

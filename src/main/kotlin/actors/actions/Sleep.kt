@@ -6,7 +6,7 @@ import ui.panels.Console
 import util.Dice
 import world.level.Level
 
-class Sleep : Action(3f) {
+class Sleep : Action(2f) {
 
     override fun name() = "sleep"
 

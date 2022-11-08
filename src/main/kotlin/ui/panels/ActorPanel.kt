@@ -29,9 +29,9 @@ object ActorPanel : ShadedPanel() {
 
     override fun drawBackground() {
         if (actors.isNotEmpty()) super.drawBackground()
-        if ((lastTime < App.time || lastCheckMs + checkInterval < System.currentTimeMillis())) {
+        if ((lastTime < App.time || lastCheckMs + checkInterval < Screen.timeMs)) {
             lastTime = App.time
-            lastCheckMs = System.currentTimeMillis()
+            lastCheckMs = Screen.timeMs
             updateActors()
         }
     }

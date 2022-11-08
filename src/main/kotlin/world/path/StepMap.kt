@@ -24,8 +24,8 @@ class StepMap() {
     var outOfDate = true
     var done = false
 
-    private var scratch = Array(1) { Array(1) { -1 } }
-    var map = Array(1) { Array(1) { -1 } }
+    private var scratch = Array(1) { IntArray(1) { -1 } }
+    var map = Array(1) { IntArray(1) { -1 } }
 
     var visibleEntities: MutableMap<Entity, Float> = mutableMapOf()
     var scratchVisible: MutableMap<Entity, Float> = mutableMapOf()
@@ -45,8 +45,8 @@ class StepMap() {
 
     suspend fun dispose() {
         targetEntity = null
-        scratch = Array(1) { Array(1) { 0 } }
-        map = Array(1) { Array(1) { 0 } }
+        scratch = Array(1) { IntArray(1) { 0 } }
+        map = Array(1) { IntArray(1) { 0 } }
     }
 
     fun changeRange(newRange: Float) {
@@ -54,8 +54,8 @@ class StepMap() {
         if (nextRange != range) {
             range = nextRange
             log.debug("map $map changing range to $range")
-            scratch = Array((range * 2f).toInt() + 2) { Array((range * 2f).toInt() + 2) { -1 } }
-            map = Array((range * 2f).toInt() + 2) { Array((range * 2f).toInt() + 2) { -1 } }
+            scratch = Array((range * 2f).toInt() + 2) { IntArray((range * 2f).toInt() + 2) { -1 } }
+            map = Array((range * 2f).toInt() + 2) { IntArray((range * 2f).toInt() + 2) { -1 } }
             width = (range * 2f).toInt()
             height = width
             outOfDate = true

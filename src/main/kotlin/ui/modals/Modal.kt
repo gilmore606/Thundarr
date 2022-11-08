@@ -35,7 +35,7 @@ abstract class Modal(
     var dismissible = true
     protected val launchTimeMs = System.currentTimeMillis()
     protected var animTime = 80f
-    protected fun isAnimating() = (System.currentTimeMillis() - launchTimeMs) < animTime
+    protected fun isAnimating() = (Screen.timeMs - launchTimeMs) < animTime
     var dismissOnClickOutside = true
 
     protected val boxBatch = newBoxBatch()
@@ -90,7 +90,7 @@ abstract class Modal(
     }
 
     override fun drawBackground() {
-        val anim = min(1f, (System.currentTimeMillis() - launchTimeMs) / animTime)
+        val anim = min(1f, (Screen.timeMs - launchTimeMs) / animTime)
         val xSquish = ((1f - anim) * width / 2f).toInt()
         val ySquish = ((1f - anim) * height / 2f).toInt()
         drawBox(x - xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)

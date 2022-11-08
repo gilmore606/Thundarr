@@ -93,7 +93,6 @@ object Screen : KtxScreen {
     val fullLight = LightColor(1f, 1f, 1f)
     val halfLight = LightColor(0.3f, 0.3f, 0.3f)
     val fullDark = LightColor(0f, 0f, 0f)
-    private val debugLight = LightColor(0f, 0f, 0f)
 
     const val fontSize = 16
     const val fontSizeSmall = 14
@@ -185,25 +184,12 @@ object Screen : KtxScreen {
     private var minActionInterval = 50L
 
     private var sinBob = 0f
+    var timeMs = System.currentTimeMillis()
 
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
-        var useLight: LightColor = light
-        if (App.DEBUG_VISIBLE) {
-            val step = Pather.debugStepAt(tx, ty)
-            if (step == -1) {
-                debugLight.r = 0f
-                debugLight.g = 0f
-                debugLight.b = 0f
-            } else {
-                debugLight.r = (step * 0.05f)
-                debugLight.g = (step * 0.05f)
-                debugLight.b = light.b
-            }
-            useLight = debugLight
-        }
         terrainBatch.addTileQuad(
-            tx, ty, textureIndex, vis, useLight
+            tx, ty, textureIndex, vis, light
         )
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
@@ -312,6 +298,7 @@ object Screen : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        timeMs = System.currentTimeMillis()
         animateCamera(delta)
         Speaker.onRender(delta)
         App.level.onRender(delta)
@@ -337,11 +324,11 @@ object Screen : KtxScreen {
 
         drawEverything(delta)
 
-        val startTime = System.currentTimeMillis()
+        val startTime = timeMs
         if (startTime - lastActionTime > minActionInterval || Keyboard.lastKeyTime > startTime + 20L || Keyboard.lastKey > -1) {
             LevelKeeper.runActorQueues()
             lastActionTime = startTime
-            val thisActTime = System.currentTimeMillis() - startTime
+            val thisActTime = timeMs - startTime
             if (thisActTime > 0) {
                 lastActTimes[actTimeIndex] = thisActTime.toInt()
                 actTimeIndex = if (actTimeIndex == 9) 0 else actTimeIndex + 1
@@ -358,7 +345,7 @@ object Screen : KtxScreen {
     }
 
     private fun animateCamera(delta: Float) {
-        sinBob = sin(((System.currentTimeMillis() % 1000L).toFloat() * 0.001f) * 6.283f)
+        sinBob = sin(((timeMs % 1000L).toFloat() * 0.001f) * 6.283f)
 
         if (brightness < brightnessTarget) {
             brightness = kotlin.math.min(brightnessTarget, brightness + delta * 0.6f)
@@ -612,7 +599,7 @@ object Screen : KtxScreen {
 
     private fun drawEverything(delta: Float) {
 
-        val startTime = System.currentTimeMillis()
+        val startTime = timeMs
         Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL_BLEND)
 
@@ -651,7 +638,7 @@ object Screen : KtxScreen {
         }
 
         // Calculate our render time before hitting the GPU
-        lastDrawTimes[drawTimeIndex] = (System.currentTimeMillis() - startTime).toInt()
+        lastDrawTimes[drawTimeIndex] = (timeMs - startTime).toInt()
         drawTimeIndex = if (drawTimeIndex == 9) 0 else drawTimeIndex + 1
         drawTime = 0
         lastDrawTimes.forEach { drawTime += it }

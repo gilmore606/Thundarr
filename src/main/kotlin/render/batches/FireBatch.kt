@@ -45,6 +45,6 @@ class FireBatch : RenderBatch() {
     }
 
     override fun bindTextures() {
-        shader.setUniformf("u_Time", ((System.currentTimeMillis() - startTime) % 1000L).toFloat())
+        shader.setUniformf("u_Time", ((Screen.timeMs - startTime) % 1000L).toFloat())
     }
 }

@@ -26,6 +26,8 @@ class InventoryModal(
 
     var grouped = ArrayList<ArrayList<Thing>>()
     var weights = ArrayList<String>()
+    var totalText: String = ""
+    var maxText: String = ""
 
     init {
         parentModal?.also { this.isSidecar = true ; changeSelection(0) }
@@ -33,6 +35,8 @@ class InventoryModal(
         adjustHeight()
         selectionBoxHeight = 18
         spacing = 28
+        padding = 18
+        headerPad += 10
         withContainer?.also {
             sidecar = InventoryModal(withContainer, parentModal = this, sidecarTitle = withContainer.name())
             moveToSidecar()
@@ -45,7 +49,7 @@ class InventoryModal(
         else if (selection > -1) grouped[selection].first() else null
 
     private fun adjustHeight() {
-        height = headerPad + max(1, grouped.size + 1) * spacing + padding * 2
+        height = headerPad + max(1, grouped.size + 1) * spacing + 60 + padding * 2
     }
 
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
@@ -68,6 +72,10 @@ class InventoryModal(
             drawOptionText(text, n, 30, addTag = first.listTag(), addCol = weights[i], colX = 270)
             n++
         }
+        drawString("Capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
+        drawString(maxText, padding + 75, height - 31, Screen.fontColor, Screen.font)
+        drawString("Total ", padding + 252, height - 30, Screen.fontColorDull, Screen.smallFont)
+        drawString(totalText, padding + 300, height - 31, Screen.fontColor, Screen.font)
     }
 
     override fun drawBackground() {
@@ -147,8 +155,10 @@ class InventoryModal(
     }
 
     private fun updateGrouped() {
+        var weightTotal = 0f
         grouped = ArrayList<ArrayList<Thing>>().apply {
             thingHolder.contents().forEach { thing ->
+                weightTotal += thing.weight()
                 val listName = thing.listName()
                 var placed = false
                 forEach {
@@ -166,6 +176,8 @@ class InventoryModal(
         grouped.forEach { group ->
             weights.add(String.format("%.1f", (group[0].weight() * group.size)) + "lb")
         }
+        totalText = String.format("%.1f", weightTotal) + "lb"
+        maxText = String.format("%.1f", App.player.carryingCapacity()) + "lb"
 
         maxSelection = grouped.size - 1
         changeSelection(min(maxSelection, selection))

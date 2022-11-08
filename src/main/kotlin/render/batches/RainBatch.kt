@@ -70,7 +70,7 @@ class RainBatch : RenderBatch() {
         Gdx.gl.glActiveTexture(GL_TEXTURE0)
         rainMask.bind()
         shader.setUniformi("u_RainMask", 0)
-        shader.setUniformf("u_Time", (System.currentTimeMillis() - startTime).toFloat())
+        shader.setUniformf("u_Time", (Screen.timeMs - startTime).toFloat())
         shader.setUniformf("u_Speed", 0.005f)
     }
 

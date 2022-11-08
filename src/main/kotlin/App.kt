@@ -120,7 +120,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Speaker.dispose()
     }
 
-    private fun saveStateAndReturnToMenu() {
+    fun saveStateAndReturnToMenu() {
         Screen.panels.filterAnd({ it !is Modal }) { Screen.removePanel(it) }
         Speaker.clearMusic()
         pendingJob = KtxAsync.launch {

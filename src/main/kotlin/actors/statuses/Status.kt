@@ -34,7 +34,10 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED, DAZED, BURDENED, ENCUMBERED, HUNGRY, STARVING, STUNNED, ASLEEP }
+    enum class Tag {
+        WIRED, DAZED, BURDENED, ENCUMBERED, HUNGRY, STARVING,
+        STUNNED, ASLEEP, BANDAGED
+    }
 
     abstract fun description(): String
     open fun panelTag(): String = ""
@@ -190,6 +193,21 @@ sealed class TimeStatus : Status() {
     }
     open fun onStackMsg() = ""
     open fun onStackOtherMsg() = ""
+}
+
+@Serializable
+class Bandaged(val quality: Float) : TimeStatus() {
+    override val tag = Tag.BANDAGED
+    override fun name() = "bandaged"
+    override fun description() = "Your wounds are bound and cleaned to assist healing."
+    override fun panelTag() = "band"
+    override fun panelTagColor() = tagColors[TagColor.GOOD]!!
+    override fun duration() = 500f + quality * 4f
+    override fun maxDuration() = 800f
+    override fun advanceTime(actor: Actor, delta: Float) {
+        super.advanceTime(actor, delta)
+
+    }
 }
 
 @Serializable
