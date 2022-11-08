@@ -38,8 +38,7 @@ object Keyboard : KtxInputAdapter {
         KtxAsync.launch {
             while (true) {
                 delay(REPEAT_MS)
-                if ((System.currentTimeMillis() > lastKeyTime + REPEAT_DELAY_MS) &&
-                    (Screen.topModal == null) && lastKey >= 0) {
+                if ((System.currentTimeMillis() > lastKeyTime + REPEAT_DELAY_MS) && lastKey >= 0) {
                     pressKey(lastKey)
                 }
             }

@@ -189,7 +189,7 @@ abstract class Modal(
                     }
                 } ?: run {
                     asWithParent?.also { parent ->
-                        if (!App.player.hasStatus(Status.Tag.BURDENEND)) {
+                        if (!App.player.hasStatus(Status.Tag.BURDENED)) {
                             addOption("take one " + thing.name()) {
                                 App.player.queue(Get(thing))
                             }
@@ -213,7 +213,7 @@ abstract class Modal(
                     }
                 } ?: run {
                     asWithParent?.also {
-                        if (!App.player.hasStatus(Status.Tag.BURDENEND)) {
+                        if (!App.player.hasStatus(Status.Tag.BURDENED)) {
                             addOption("take " + thing.name()) {
                                 App.player.queue(Get(thing))
                             }

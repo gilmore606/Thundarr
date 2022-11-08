@@ -7,6 +7,7 @@ import things.Thing
 import ui.input.Mouse
 import ui.modals.ContextMenu
 import ui.modals.ToolbarAddModal
+import java.lang.Float.max
 
 object Toolbar : Panel() {
 
@@ -52,12 +53,14 @@ object Toolbar : Panel() {
     private var speed = 10
     private var hovered = -1
     private var mouseInside = false
+    private var closeDelay = 0f
 
     fun isShown() = (this.contraction < 1)
 
     fun refresh() = buttons.forEach { it.updateNextThing() }
 
     private fun shouldShow(): Boolean {
+        if (closeDelay > 0f) return true
         if (Screen.topModal is ToolbarAddModal) return true
         if (!mouseInside) return false
         if (Screen.topModal == null) return true
@@ -77,6 +80,7 @@ object Toolbar : Panel() {
     override fun onRender(delta: Float) {
         super.onRender(delta)
         buttons.forEach { it.onRender(delta) }
+        closeDelay = max(0f, closeDelay - delta)
     }
 
     override fun drawText() {
@@ -90,7 +94,7 @@ object Toolbar : Panel() {
                 val text = if (inSelectMode()) (Screen.topModal as ToolbarAddModal).sampleText else buttons[n].text
                 text?.also { text ->
                     drawString(text, cx + (iconSize / 2) - (measure(text, Screen.smallFont) / 2), cy + (iconSize / 2) + 64,
-                    if (inSelectMode()) Screen.fontColorBold else Screen.fontColorDull, Screen.smallFont)
+                    if (inSelectMode()) Screen.fontColorBold else Screen.fontColor, Screen.smallFont)
                 }
             }
             cx += spacing
@@ -172,10 +176,17 @@ object Toolbar : Panel() {
     }
 
     fun onKey(keyNum: Int) {
+        if (buttons[keyNum - 1].nextThing == null && !inSelectMode()) return
+        contraction = 0
+        closeDelay = 0.75f
+        hovered = keyNum - 1
+        buttons[keyNum -1].size = iconSizeHovered.toDouble()
         doSelect(keyNum - 1)
     }
 
     private fun doSelect(buttonNumber: Int) {
+        if (buttons[buttonNumber].nextThing == null && !inSelectMode()) return
+
         Speaker.ui(Speaker.SFX.UISELECT)
         if (inSelectMode()) {
             replaceButton(buttons[buttonNumber], (Screen.topModal as ToolbarAddModal).newThing)

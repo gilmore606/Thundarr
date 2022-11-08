@@ -3,10 +3,12 @@ package ui.modals
 import audio.Speaker
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import render.Screen
 import things.Thing
 import ui.input.Mouse
-import util.log
 import world.Entity
 import java.lang.Integer.min
 
@@ -53,18 +55,19 @@ abstract class SelectionModal(
         Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
     }
 
-    protected fun drawOptionText(text: String, index: Int, spaceForIcon: Int = 0,
+    protected fun drawOptionText(text: String, index: Int, preSpace: Int = 0,
                                  colorOverride: Color? = null, addCol: String? = null, colX: Int = 0,
                                  addTag: String? = null) {
-        drawString(text, padding + spaceForIcon, headerPad + spacing * index - 2,
+        val lx = padding + preSpace
+        drawString(text, lx, headerPad + spacing * index - 2,
             colorOverride ?: if (index == selection) Screen.fontColorBold else Screen.fontColor)
         addCol?.also { addCol ->
-            drawString(addCol, padding + spaceForIcon + colX, headerPad + spacing * index - 2,
+            drawString(addCol, lx + colX, headerPad + spacing * index - 2,
                 Screen.fontColorDull, Screen.smallFont)
         }
         addTag?.also { tag ->
             val x = measure(text) + 6
-            drawString(tag, padding + spaceForIcon + x, headerPad + spacing * index - 1, Screen.fontColorDull, Screen.smallFont)
+            drawString(tag, padding + preSpace + x, headerPad + spacing * index - 1, Screen.fontColorDull, Screen.smallFont)
         }
     }
 
@@ -88,6 +91,25 @@ abstract class SelectionModal(
             Input.Keys.NUMPAD_8, Input.Keys.UP, Input.Keys.W -> { selectPrevious() }
             Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER, Input.Keys.S -> {
                 if (selection >= 0 ) doSelect()
+            }
+            Input.Keys.NUM_1 -> onShortcutSelect(0)
+            Input.Keys.NUM_2 -> onShortcutSelect(1)
+            Input.Keys.NUM_3 -> onShortcutSelect(2)
+            Input.Keys.NUM_4 -> onShortcutSelect(3)
+            Input.Keys.NUM_5 -> onShortcutSelect(4)
+            Input.Keys.NUM_6 -> onShortcutSelect(5)
+            Input.Keys.NUM_7 -> onShortcutSelect(6)
+            Input.Keys.NUM_8 -> onShortcutSelect(7)
+            Input.Keys.NUM_9 -> onShortcutSelect(8)
+        }
+    }
+
+    private fun onShortcutSelect(newSelection: Int) {
+        if (newSelection <= maxSelection) {
+            KtxAsync.launch {
+                changeSelection(newSelection)
+                delay(100L)
+                doSelect()
             }
         }
     }

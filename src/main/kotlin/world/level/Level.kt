@@ -364,7 +364,7 @@ sealed class Level {
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
         if (App.player.xy.x == x && App.player.xy.y == y) {
             thingsAt(x,y).groupByTag().forEach { group ->
-                if (group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENEND)) {
+                if (group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
                     if (group.size == 1) {
                         menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
                     } else {

@@ -14,5 +14,6 @@ class Sleep : Action(3f) {
         if (actor is Player && Dice.chance(0.1f)) {
             Console.say("You dream of large women.")
         }
+        actor.onSleep()
     }
 }

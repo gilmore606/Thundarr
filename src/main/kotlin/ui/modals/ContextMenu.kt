@@ -2,10 +2,8 @@ package ui.modals
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.Screen
 import render.batches.QuadBatch
-import render.tilesets.ThingTileSet
 import render.tilesets.UITileSet
 
 class ContextMenu(
@@ -53,7 +51,7 @@ class ContextMenu(
         val optionWidth = GlyphLayout(Screen.font, text).width.toInt()
         if (optionWidth > maxOptionWidth) {
             maxOptionWidth = optionWidth
-            width = optionWidth + padding * 2
+            width = optionWidth + padding * 2 + 8
         }
         height = options.size * spacing + headerPad
         this.maxSelection = options.size - 1
@@ -69,7 +67,11 @@ class ContextMenu(
 
     override fun drawModalText() {
         options.forEachIndexed { n, opt ->
-            drawOptionText(opt.name, n)
+            if (n < 9) {
+                drawOptionText(opt.name, n, preSpace = 18, colX = -18, addCol = (n + 1).toString())
+            } else {
+                drawOptionText(opt.name, n, preSpace = 18)
+            }
         }
     }
 

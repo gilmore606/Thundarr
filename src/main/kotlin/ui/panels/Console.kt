@@ -20,7 +20,7 @@ object Console : Panel() {
 
     private var lastLineMs = System.currentTimeMillis()
     private var scroll = 0f
-    private var scrollSpeed = 180f
+    private var scrollSpeed = 80f
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
 
@@ -156,7 +156,7 @@ object Console : Panel() {
     }
 
     override fun onRender(delta: Float) {
-        scroll = max(0f, scroll - (scrollSpeed * delta))
+        scroll = max(0f, scroll - (scrollSpeed * delta * scroll * 0.05f))
 
         if (burstFloor == 1f && System.currentTimeMillis() - dimDelayMs > lastLineMs) {
             burstFloor = dimLevel

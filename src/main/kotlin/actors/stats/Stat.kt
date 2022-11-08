@@ -17,7 +17,7 @@ abstract class Stat(
     private val ipPerImprove = 5f
 
     enum class Tag { STR, SPD, BRN,
-                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE }
+                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC }
 
     companion object {
         fun get(tag: Tag) = when (tag) {
@@ -30,6 +30,7 @@ abstract class Stat(
             Tag.THROW -> Throw
             Tag.BUILD -> Build
             Tag.SURVIVE -> Survive
+            Tag.MEDIC -> Medic
         }
     }
 

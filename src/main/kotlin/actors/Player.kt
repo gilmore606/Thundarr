@@ -41,7 +41,7 @@ open class Player : Actor() {
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
 
-    var calories = -1000f
+    var calories = 1000f
     private val caloriesMax = 2000f
     private val caloriesEatMax = 1800f
     private val caloriesPerDay = 2500f

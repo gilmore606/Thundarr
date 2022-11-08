@@ -34,7 +34,7 @@ sealed class Status : StatEffector {
     var done = false
 
     abstract val tag: Tag
-    enum class Tag { WIRED, DAZED, BURDENEND, ENCUMBERED, HUNGRY, STARVING, STUNNED, ASLEEP }
+    enum class Tag { WIRED, DAZED, BURDENED, ENCUMBERED, HUNGRY, STARVING, STUNNED, ASLEEP }
 
     abstract fun description(): String
     open fun panelTag(): String = ""
@@ -98,7 +98,7 @@ class Encumbered() : Status() {
 
 @Serializable
 class Burdened() : Status() {
-    override val tag = Tag.BURDENEND
+    override val tag = Tag.BURDENED
     override fun name() = "burdened"
     override fun description() = "You're carrying as much as you can, making you very slow."
     override fun panelTag() = "burd"
@@ -149,7 +149,7 @@ class Asleep() : Status() {
     override fun name() = "asleep"
     override fun description() = "Sleeping gives your wounds a chance to heal and your spirit to renew."
     override fun panelTag() = "zzz"
-    override fun panelTagColor() = tagColors[TagColor.GOOD]!!
+    override fun panelTagColor() = tagColors[TagColor.NORMAL]!!
     override fun statusGlyph(actor: Actor) = Glyph.SLEEP_ICON
     override fun proneGlyph() = true
     override fun statEffects() = mapOf(

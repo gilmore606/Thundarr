@@ -166,18 +166,20 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val capacity = carryingCapacity()
         if (carried > capacity) {
             removeStatus(Status.Tag.ENCUMBERED)
-            addStatus(Burdened())
-            if (this is Player) Console.say("You couldn't possibly carry any more.")
+            if (!hasStatus(Status.Tag.BURDENED)) {
+                addStatus(Burdened())
+                if (this is Player) Console.say("You couldn't possibly carry any more.")
+            }
         } else if (carried > capacity * 0.5f) {
-            if (hasStatus(Status.Tag.BURDENEND)) {
-                removeStatus(Status.Tag.BURDENEND)
+            if (hasStatus(Status.Tag.BURDENED)) {
+                removeStatus(Status.Tag.BURDENED)
                 if (this is Player) Console.say("Your burden feels somewhat lighter.")
             } else if (this is Player && !hasStatus(Status.Tag.ENCUMBERED)) Console.say("You feel weighed down by possessions.")
             addStatus(Encumbered())
         } else {
-            if (hasStatus(Status.Tag.ENCUMBERED) || hasStatus(Status.Tag.BURDENEND)) Console.say("Your burden feels comfortable now.")
+            if (hasStatus(Status.Tag.ENCUMBERED) || hasStatus(Status.Tag.BURDENED)) Console.say("Your burden feels comfortable now.")
             removeStatus(Status.Tag.ENCUMBERED)
-            removeStatus(Status.Tag.BURDENEND)
+            removeStatus(Status.Tag.BURDENED)
         }
     }
 
@@ -279,6 +281,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return amount
     }
 
+    fun healDamage(heal: Float, healer: Actor? = null) {
+        hp = min(hpMax, hp + heal.toInt())
+    }
+
     open fun receiveAggression(attacker: Actor) { }
 
     open fun onKilledBy(killer: Actor) {
@@ -342,6 +348,17 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             statuses.remove(status)
             onRemoveStatus(status)
             if (status.proneGlyph()) updateRotateGlyph()
+        }
+    }
+
+    open fun onSleep() {
+        if (hp < hpMax) {
+            if (!hasStatus(Status.Tag.STARVING)) {
+                if (Dice.chance(0.2f)) {
+                    val heal = Dice.range(1, 2)
+                    healDamage(heal.toFloat())
+                }
+            }
         }
     }
 
