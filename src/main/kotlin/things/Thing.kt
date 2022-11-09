@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
+import ui.modals.DirectionModal
 import ui.panels.Console
-import util.Dice
-import util.hasOneWhere
+import util.*
 import world.Entity
 import world.level.Level
 import world.stains.Fire
@@ -25,18 +25,27 @@ sealed class Thing : Entity {
     @Transient var holder: ThingHolder? = null
 
     enum class UseTag {
-        USE, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
+        USE, USE_ON, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
     }
 
     class Use(
         val command: String,
         val duration: Float,
-        val canDo: (Actor)->Boolean,
-        val toDo: (Actor, Level)->Unit
+        val canDo: ((Actor, Int, Int, Boolean)->Boolean) = { _,_,_,_ -> false },
+        val toDo: ((Actor, Level, Int, Int)->Unit) = { _,_,_,_ -> }
     )
 
     open fun thingTag() = name()
     open fun uses(): Map<UseTag, Use> = mapOf()
+
+    protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
+    protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false
+    protected fun isNextTo(actor: Actor) = holder?.let { it.xy()?.let { xy ->
+        Math.abs(xy.x - actor.xy.x) < 2 && Math.abs(xy.y - actor.xy.y) < 2
+    }} ?: false
+    protected fun isNextTo(x: Int, y: Int) = holder?.let { it.xy()?.let { xy ->
+        Math.abs(xy.x - x) < 2 && Math.abs(xy.y - y) < 2
+    }} ?: false
 
     override fun description() =  ""
     open fun listTag() = if (thingTag() == App.player.thrownTag) "(throwing)" else ""
@@ -98,8 +107,8 @@ sealed class Thing : Entity {
     open fun toolbarAction(instance: Thing) {
         toolbarUseTag()?.also { tag ->
             val use = uses()[tag]!!
-            if (use.canDo(App.player)) {
-                App.player.queue(actors.actions.Use(instance, use.duration, use.toDo))
+            if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
+                App.player.queue(actors.actions.Use(instance, use.duration, use.toDo, App.player.xy.x, App.player.xy.y))
             }
         }
     }
@@ -145,19 +154,37 @@ class Lighter : Portable() {
     override fun glyph() = Glyph.LIGHTER
     override fun weight() = 0.02f
     override fun uses() = mapOf(
-        UseTag.USE to Use("light a fire here", 2.0f,
-            canDo = { hasTarget(it) },
-            toDo = { actor, level ->
-                lightFireHere(actor, level)
-            }))
+        UseTag.USE to Use("light a fire", 2.0f,
+            canDo = { actor,x,y,targ ->
+                var canDo = false
+                if (actor.xy.x == x && actor.xy.y == y) {
+                    DIRECTIONS.forEach { if (hasTargetAt(it.x + x, it.y + y)) canDo = true }
+                } else canDo = hasTargetAt(x,y)
+                canDo && isHeldBy(actor)
+            },
+            toDo = { actor, level, x, y ->
+                if (actor.xy.x == x && actor.xy.y == y) askDirection(actor, level)
+                else lightFireAt(actor, level, XY(x,y))
+            })
+    )
     override fun toolbarName() = "light a fire"
     override fun toolbarUseTag() = UseTag.USE
 
-    private fun hasTarget(actor: Actor) =
-            (actor.level?.thingsAt(actor.xy.x, actor.xy.y)?.hasOneWhere { it.flammability() > 0f } ?: false)
+    private fun hasTargetAt(x: Int, y: Int): Boolean = holder?.level?.thingsAt(x, y)?.hasOneWhere { it.flammability() > 0f } ?: false
 
-    private fun lightFireHere(actor: Actor, level: Level) {
-        level.addStain(Fire(), actor.xy.x, actor.xy.y)
+    private fun askDirection(actor: Actor, level: Level) {
+        Screen.addModal(DirectionModal("Light a fire in which direction?")
+        { xy ->
+            if (xy == NO_DIRECTION) {
+                Console.say("Are you crazy?  You'd be standing in a fire!")
+            } else {
+                lightFireAt(actor, level, XY(actor.xy.x + xy.x, actor.xy.y + xy.y))
+            }
+        })
+    }
+    private fun lightFireAt(actor: Actor, level: Level, xy: XY) {
+        level.addStain(Fire(), xy.x, xy.y)
+        Console.sayAct("You start a fire.", "%Dn lights a fire.", actor)
     }
 }
 
@@ -174,9 +201,9 @@ class Bomb : Portable(), Temporal {
     val radius = 4
 
     override fun uses() = mapOf(
-        UseTag.SWITCH to Use("activate" + name(), 0.5f,
-            canDo = { !active },
-            toDo = { actor, level ->
+        UseTag.SWITCH to Use("activate " + name(), 0.5f,
+            canDo = { actor,x,y,targ -> !active && ((targ && isNextTo(actor)) || (targ && !isHeldBy(actor))) },
+            toDo = { actor, level, x, y ->
                 active = true
                 Console.sayAct("You activate %dd.", "%Dn activates %dd.", actor, this)
                 level.linkTemporal(this@Bomb)

@@ -371,38 +371,36 @@ sealed class Level {
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
         val isAdjacent = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
+        val isHere = App.player.xy.x == x && App.player.xy.y == y
 
-        if (App.player.xy.x == x && App.player.xy.y == y) {
-            thingsAt(x,y).groupByTag().forEach { group ->
-                if (group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
-                    if (group.size == 1) {
-                        menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
-                    } else {
-                        menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
-                        menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
-                            group.forEach { App.player.queue(Get(it)) }
-                        }
-                    }
-                    if (!App.player.autoPickUpTypes.contains(group[0].thingTag())) {
-                        menu.addOption("auto-pickup " + group[0].name().plural()) {
-                            App.player.addAutoPickUpType(group[0].thingTag())
-                            group.forEach { App.player.queue(Get(it)) }
-                        }
+        thingsAt(x,y).groupByTag().forEach { group ->
+            if (isHere && group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
+                if (group.size == 1) {
+                    menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
+                } else {
+                    menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
+                    menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
+                        group.forEach { App.player.queue(Get(it)) }
                     }
                 }
-                group[0].uses().values.forEach { use ->
-                    if (use.canDo(App.player)) {
-                        menu.addOption(use.command) {
-                            App.player.queue(Use(group[0], use.duration, use.toDo))
-                        }
+                if (!App.player.autoPickUpTypes.contains(group[0].thingTag())) {
+                    menu.addOption("auto-pickup " + group[0].name().plural()) {
+                        App.player.addAutoPickUpType(group[0].thingTag())
+                        group.forEach { App.player.queue(Get(it)) }
                     }
                 }
             }
-        } else {
-            if (isWalkableAt(x, y) && !isAdjacent) {
-                menu.addOption("walk here") {
-                    App.player.queue(WalkTo(this, x, y))
+            group[0].uses().values.forEach { use ->
+                if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
+                    menu.addOption(use.command) {
+                        App.player.queue(Use(group[0], use.duration, use.toDo, x, y))
+                    }
                 }
+            }
+        }
+        if (isWalkableAt(x, y) && !isAdjacent) {
+            menu.addOption("walk here") {
+                App.player.queue(WalkTo(this, x, y))
             }
         }
         var actorAt: Actor? = null
@@ -418,6 +416,17 @@ sealed class Level {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))
+                }
+            }
+        }
+        if (isAdjacent) {
+            App.player.contents.forEach { held ->
+                held.uses().values.forEach { heldUse ->
+                    if (heldUse.canDo(App.player, x, y, true)) {
+                        menu.addOption(heldUse.command) {
+                            App.player.queue(Use(held, heldUse.duration, heldUse.toDo, x, y))
+                        }
+                    }
                 }
             }
         }

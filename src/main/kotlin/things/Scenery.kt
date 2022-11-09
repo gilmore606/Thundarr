@@ -32,10 +32,10 @@ sealed class Tree : Scenery() {
 
     override fun uses() = mapOf(
         UseTag.DESTROY to Use("chop down " + name(), 3.0f,
-            canDo = { it.meleeWeapon() is Axe },
-            toDo = { actor, level ->
-                Log().moveTo(level, actor.xy.x, actor.xy.y)
-                level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
+            canDo = { actor,x,y,targ -> actor.meleeWeapon() is Axe && isNextTo(actor) },
+            toDo = { actor, level, x, y ->
+                Log().moveTo(level, x, y)
+                level.addSpark(Smoke().at(x, y))
                 this@Tree.moveTo(null)
                 Speaker.world(Speaker.SFX.TREEFALL, source = actor.xy)
                 Console.sayAct("%Dd comes crashing down!", "%Dn chops down %id.", actor, this@Tree)

@@ -19,8 +19,8 @@ sealed class Consumable : Portable() {
 
     override fun uses() = mapOf(
         UseTag.CONSUME to Use(consumeVerb() + " " + name(), consumeDuration(),
-            canDo = { actor -> this in actor.contents && this.consumableBy(actor) },
-            toDo = { actor, level ->
+            canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) && this.consumableBy(actor) },
+            toDo = { actor, level, x, y ->
                 Console.sayAct(consumeSelfMsg(), consumeOtherMsg(), actor, this)
                 this.moveTo(null)
                 onConsume(actor)

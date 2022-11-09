@@ -36,6 +36,34 @@ object Keyboard : KtxInputAdapter {
 
     var CURSOR_MODE = false
 
+    val moveKeys = mutableMapOf<Int, XY>().apply {
+        this[W] = NORTH
+        this[E] = NORTHEAST
+        this[D] = EAST
+        this[C] = SOUTHEAST
+        this[X] = SOUTH
+        this[Z] = SOUTHWEST
+        this[A] = WEST
+        this[Q] = NORTHWEST
+        this[S] = NO_DIRECTION
+
+        this[NUMPAD_8] = NORTH
+        this[NUMPAD_9] = NORTHEAST
+        this[NUMPAD_6] = EAST
+        this[NUMPAD_3] = SOUTHEAST
+        this[NUMPAD_2] = SOUTH
+        this[NUMPAD_1] = SOUTHWEST
+        this[NUMPAD_4] = WEST
+        this[NUMPAD_7] = NORTHWEST
+        this[NUMPAD_5] = NO_DIRECTION
+        this[NUMPAD_ENTER] = NO_DIRECTION
+
+        this[DPAD_UP] = NORTH
+        this[DPAD_RIGHT] = EAST
+        this[DPAD_DOWN] = SOUTH
+        this[DPAD_LEFT] = WEST
+    }
+
     init {
         KtxAsync.launch {
             while (true) {
@@ -121,16 +149,13 @@ object Keyboard : KtxInputAdapter {
         Screen.topModal?.also { modal ->
             modal.keyDown(keycode)
         } ?: run {
-            when (keycode) {
-                NUMPAD_8, W -> { processDir(NORTH) }
-                NUMPAD_7, Q -> { processDir(NORTHWEST) }
-                NUMPAD_4, A -> { processDir(WEST) }
-                NUMPAD_1, Z -> { processDir(SOUTHWEST) }
-                NUMPAD_2, X -> { processDir(SOUTH) }
-                NUMPAD_3, C -> { processDir(SOUTHEAST) }
-                NUMPAD_6, D -> { processDir(EAST) }
-                NUMPAD_9, E -> { processDir(NORTHEAST) }
-                NUMPAD_5, S -> { Screen.rightClickCursorTile() }
+            if (moveKeys.contains(keycode)) {
+
+                val dir = moveKeys[keycode]
+                if (dir == NO_DIRECTION) Screen.rightClickCursorTile()
+                else dir?.also { processDir(it) }
+
+            } else when (keycode) {
 
                 SPACE -> { App.player.queue(Wait(1f)) }
                 PERIOD -> { App.player.toggleSleep() }
@@ -142,22 +167,22 @@ object Keyboard : KtxInputAdapter {
                 EQUALS -> { Screen.mouseScrolled(-1.43f) }
                 MINUS -> { Screen.mouseScrolled(1.43f) }
 
-                Input.Keys.TAB -> { App.openInventory() }
-                Input.Keys.BACKSLASH -> { App.openGear() }
-                Input.Keys.BACKSPACE -> { App.openSkills() }
-                Input.Keys.ESCAPE -> { App.openSystemMenu() }
-                Input.Keys.M -> { App.openMap() }
+                TAB -> { App.openInventory() }
+                BACKSLASH -> { App.openGear() }
+                BACKSPACE -> { App.openSkills() }
+                ESCAPE -> { App.openSystemMenu() }
+                M -> { App.openMap() }
 
-                Input.Keys.SLASH -> { App.player.toggleAggro() }
+                SLASH -> { App.player.toggleAggro() }
 
-                Input.Keys.NUM_1 -> { Toolbar.onKey(1) }
-                Input.Keys.NUM_2 -> { Toolbar.onKey(2) }
-                Input.Keys.NUM_3 -> { Toolbar.onKey(3) }
-                Input.Keys.NUM_4 -> { Toolbar.onKey(4) }
-                Input.Keys.NUM_5 -> { Toolbar.onKey(5) }
-                Input.Keys.NUM_6 -> { Toolbar.onKey(6) }
-                Input.Keys.NUM_7 -> { Toolbar.onKey(7) }
-                Input.Keys.NUM_8 -> { Toolbar.onKey(8) }
+                NUM_1 -> { Toolbar.onKey(1) }
+                NUM_2 -> { Toolbar.onKey(2) }
+                NUM_3 -> { Toolbar.onKey(3) }
+                NUM_4 -> { Toolbar.onKey(4) }
+                NUM_5 -> { Toolbar.onKey(5) }
+                NUM_6 -> { Toolbar.onKey(6) }
+                NUM_7 -> { Toolbar.onKey(7) }
+                NUM_8 -> { Toolbar.onKey(8) }
 
                 Input.Keys.F1 -> {
                     App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE

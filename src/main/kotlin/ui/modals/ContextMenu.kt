@@ -100,6 +100,7 @@ class ContextMenu(
 
     override fun onDismiss() {
         super.onDismiss()
+        Screen.clearCursor()
         if (!succeeded) {
             parentModal?.childCancelled()
         } else {

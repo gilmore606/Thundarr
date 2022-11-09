@@ -103,10 +103,8 @@ class Sunsword : LitThing() {
 
     override fun uses() = mapOf(
         UseTag.SWITCH to Use("switch " + (if (active) "off" else "on"), 0.2f,
-            canDo = { actor ->
-                this in actor.contents
-            },
-            toDo = { actor, level ->
+            canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) },
+            toDo = { actor, level, x, y ->
                 if (active) {
                     becomeDark()
                     Console.sayAct("The shimmering blade vanishes.", "%Dn's sunsword turns off.", actor)
@@ -151,10 +149,10 @@ class Torch : LitThing(), Temporal {
 
     override fun uses() = mapOf(
         UseTag.SWITCH to Use("light " + name(), 0.5f,
-                canDo = { !active },
-                toDo = { actor, level ->
+                canDo = { actor,x,y,targ -> !targ && !active && (isHeldBy(actor) || isNextTo(actor)) },
+                toDo = { actor, level, x, y ->
                     active = true
-                    level.addLightSource(actor.xy.x, actor.xy.y, (if (holder == actor) actor else this@Torch) as LightSource)
+                    level.addLightSource(x, y, (if (holder == actor) actor else this@Torch) as LightSource)
                     level.linkTemporal(this@Torch)
                 }))
 

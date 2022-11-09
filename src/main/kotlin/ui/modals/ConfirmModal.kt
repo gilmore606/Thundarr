@@ -8,7 +8,11 @@ import ktx.async.KtxAsync
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
+import ui.input.Keyboard
 import ui.input.Mouse
+import util.EAST
+import util.NO_DIRECTION
+import util.WEST
 
 class ConfirmModal(
     val text: List<String>,
@@ -72,14 +76,14 @@ class ConfirmModal(
     }
 
     override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
-        when (keycode) {
-            Input.Keys.NUMPAD_8, Input.Keys.NUMPAD_2, Input.Keys.NUMPAD_4, Input.Keys.NUMPAD_6, Input.Keys.DOWN,
-            Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB, Input.Keys.A, Input.Keys.D, Input.Keys.W, Input.Keys.X -> {
-                selectNext()
-            }
-            Input.Keys.Y -> { changeSelection(1) }
-            Input.Keys.N -> { changeSelection(0) }
+        if (Keyboard.moveKeys.keys.contains(keycode) && Keyboard.moveKeys[keycode] !== NO_DIRECTION) {
+            selectNext()
+        } else if (keycode == Input.Keys.Y) {
+            changeSelection(1)
+        } else if (keycode == Input.Keys.N) {
+            changeSelection(0)
+        } else {
+            super.onKeyDown(keycode)
         }
     }
 

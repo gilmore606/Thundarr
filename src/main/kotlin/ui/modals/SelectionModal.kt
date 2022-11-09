@@ -8,7 +8,12 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
 import things.Thing
+import ui.input.Keyboard
 import ui.input.Mouse
+import util.NORTH
+import util.NO_DIRECTION
+import util.SOUTH
+import util.WEST
 import world.Entity
 import java.lang.Integer.min
 
@@ -86,12 +91,13 @@ abstract class SelectionModal(
 
     override fun onKeyDown(keycode: Int) {
         super.onKeyDown(keycode)
-        when (keycode) {
-            Input.Keys.NUMPAD_2, Input.Keys.DOWN, Input.Keys.X -> { selectNext() }
-            Input.Keys.NUMPAD_8, Input.Keys.UP, Input.Keys.W -> { selectPrevious() }
-            Input.Keys.SPACE, Input.Keys.NUMPAD_5, Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER, Input.Keys.S -> {
-                if (selection >= 0 ) doSelect()
-            }
+        if (Keyboard.moveKeys[keycode] == NORTH) {
+            selectPrevious()
+        } else if (Keyboard.moveKeys[keycode] == SOUTH) {
+            selectNext()
+        } else if (Keyboard.moveKeys[keycode] == NO_DIRECTION || keycode in listOf(Input.Keys.SPACE, Input.Keys.ENTER)) {
+            if (selection >= 0) doSelect()
+        } else when (keycode) {
             Input.Keys.NUM_1 -> onShortcutSelect(0)
             Input.Keys.NUM_2 -> onShortcutSelect(1)
             Input.Keys.NUM_3 -> onShortcutSelect(2)

@@ -38,8 +38,9 @@ sealed class Container : Portable(), ThingHolder {
     }
 
     override fun uses() = mapOf(
-        UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f, { it.xy.x == xy()?.x && it.xy.y == xy()?.y },
-            { actor, level ->
+        UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f,
+            canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) || isNextTo(actor) },
+            toDo = { actor, level, x, y ->
                 if (actor is Player) {
                     App.openInventory(withContainer = this@Container)
                 }

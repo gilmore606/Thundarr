@@ -57,11 +57,11 @@ open fun unequipSelfMsg() = "You take off your %d."
 
     override fun uses() = mapOf(
         UseTag.EQUIP to Use(slot.verb + " " + name(), slot.duration,
-            canDo = { actor -> !this.equipped && this in actor.contents },
-            toDo = { actor, level -> actor.equipGear(this) }),
+            canDo = { actor,x,y,targ -> !targ && !this.equipped && isHeldBy(actor) },
+            toDo = { actor,level,x,y -> actor.equipGear(this) }),
         UseTag.UNEQUIP to Use(slot.unverb + " " + name(), slot.duration,
-            canDo = { actor -> this.equipped && this in actor.contents },
-            toDo = { actor, level -> actor.unequipGear(this) })
+            canDo = { actor,x,y,targ -> !targ && this.equipped && isHeldBy(actor) },
+            toDo = { actor,level,x,y -> actor.unequipGear(this) })
     )
 
     override fun statEffects() = defaultStatEffects

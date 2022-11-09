@@ -564,9 +564,11 @@ object Screen : KtxScreen {
         ).apply {
             App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
         }
-        if (menu.options.isNotEmpty()) addModal(menu)
+        if (menu.options.isNotEmpty()) addModal(menu) else {
+            clearCursor()
+            Speaker.ui(Speaker.SFX.UIERROR)
+        }
     }
-
 
     fun povMoved() {
         clearCursor()
