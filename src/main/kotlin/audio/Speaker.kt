@@ -123,7 +123,7 @@ object Speaker {
 
     private val sfxQueue = ArrayList<QueuedSound>()
     private val sfxQueueMax = 4
-    private val sfxMinDelay = 0.01f
+    private val sfxMinDelay = 0.04f
     private var sfxDelay = 0f
 
     private var screenWidth = 1

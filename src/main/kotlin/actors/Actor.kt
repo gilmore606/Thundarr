@@ -84,6 +84,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var mirrorGlyph = false
     var rotateGlyph = false
 
+    open fun wantsToPickUp(thing: Thing): Boolean = false
+
     abstract fun hasActionJuice(): Boolean
     abstract fun wantsToAct(): Boolean
 
@@ -107,7 +109,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         onMove()
     }
 
-    open fun onMove() { }
+    open fun onMove() {
+        level?.thingsAt(xy.x, xy.y)?.forEach { thing ->
+            if (wantsToPickUp(thing)) queue(Get(thing))
+        }
+    }
 
     open fun onConverse(actor: Actor): Boolean = false
 
@@ -357,7 +363,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
                 if (Dice.chance(0.3f)) {
                     var healmax = 5 + if (hasStatus(Status.Tag.HUNGRY)) -1 else 0
                     healmax += (statuses.firstOrNull { it.tag == Status.Tag.BANDAGED } as Bandaged?)?.quality?.toInt() ?: -3
-                    val heal = Dice.range(1, Math.max(1, healmax))
+                    val heal = Dice.range(0, Math.max(1, healmax))
                     healDamage(heal.toFloat())
                 }
             }

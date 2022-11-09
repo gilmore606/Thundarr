@@ -248,6 +248,15 @@ abstract class Modal(
                         Toolbar.beginAdd(thing)
                     }
                 }
+                if (App.player.autoPickUpTypes.contains(thing.thingTag())) {
+                    addOption("stop auto-pickup of " + thing.name().plural()) {
+                        App.player.removeAutoPickUpType(thing.thingTag())
+                    }
+                } else {
+                    addOption("auto-pickup " + thing.name().plural()) {
+                        App.player.addAutoPickUpType(thing.thingTag())
+                    }
+                }
             }
         }
 

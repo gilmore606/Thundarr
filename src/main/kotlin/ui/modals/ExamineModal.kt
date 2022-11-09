@@ -6,6 +6,7 @@ import things.Clothing
 import things.Thing
 import things.MeleeWeapon
 import ui.input.Mouse
+import util.plural
 import util.wrapText
 import world.Entity
 
@@ -92,6 +93,9 @@ class ExamineModal(
             if (entity is Clothing) {
                 drawStat("armor:", "", entity.armor(), padding)
             }
+            if (App.player.autoPickUpTypes.contains(entity.thingTag())) {
+                drawStatFact("You'll pick up any " + entity.name().plural() + " you see.", padding)
+            }
         }
     }
 
@@ -103,6 +107,12 @@ class ExamineModal(
         val valuestr = value.toString()
         drawString(valuestr, x0 + 80, padding + statY, font = Screen.font, color = Screen.fontColorBold)
         drawString(suffix, x0 + 80 + measure(valuestr), padding + statY, font = Screen.font, color = Screen.fontColor)
+        statY += statSpacing
+    }
+
+    private fun drawStatFact(fact: String, x0: Int) {
+        statY += statSpacing
+        drawString(fact, x0, padding + statY, font = Screen.smallFont, color = Screen.fontColor)
         statY += statSpacing
     }
 

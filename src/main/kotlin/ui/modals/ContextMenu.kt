@@ -90,7 +90,10 @@ class ContextMenu(
     override fun onKeyDown(keycode: Int) {
         when (keycode) {
             Input.Keys.TAB -> dismissSuccess()
-            Input.Keys.NUMPAD_4 -> dismiss()
+            Input.Keys.NUMPAD_4, Input.Keys.CONTROL_LEFT -> {
+                Screen.clearCursor()
+                dismiss()
+            }
             else -> super.onKeyDown(keycode)
         }
     }

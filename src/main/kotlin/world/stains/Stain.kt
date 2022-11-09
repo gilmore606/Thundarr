@@ -4,12 +4,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
 import things.Temporal
+import things.ThingHolder
 import world.CellContainer
+import world.level.Level
 
 @Serializable
 sealed class Stain : Temporal {
 
-    enum class Type { BLOOD }
+    enum class Type { BLOOD, FIRE, SCORCH }
 
     var offsetX = 0f
     var offsetY = 0f
@@ -36,6 +38,8 @@ sealed class Stain : Temporal {
         birthTime = App.time
     }
 
+    open fun onAdd(level: Level, x: Int, y: Int) { }
+
     override fun advanceTime(delta: Float) {
         offsetX = posModX + sizeMod
         offsetY = posModY + sizeMod
@@ -52,11 +56,17 @@ sealed class Stain : Temporal {
         }
     }
 
-    private fun expire() {
+    protected fun expire() {
         done = true
+        onExpire()
+        holder?.cleanStains()
     }
 
-    fun onRestore(holder: CellContainer) {
+    open fun onExpire() {
+
+    }
+
+    open fun onRestore(holder: CellContainer) {
         this.holder = holder
         holder.level?.linkTemporal(this)
         advanceTime(0f)

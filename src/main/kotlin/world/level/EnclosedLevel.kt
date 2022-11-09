@@ -74,6 +74,6 @@ open class EnclosedLevel(
     }
 
     override fun chunkAt(x: Int, y: Int) =
-        if (!(x < 0 || y < 0 || x >= width || y >= height)) { chunk } else null
+        if (!(x < 0 || y < 0 || x >= (chunk?.width ?: 0) || y >= (chunk?.height ?: 0))) { chunk } else null
 
 }

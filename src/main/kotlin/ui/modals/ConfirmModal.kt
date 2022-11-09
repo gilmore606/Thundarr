@@ -75,7 +75,7 @@ class ConfirmModal(
         super.onKeyDown(keycode)
         when (keycode) {
             Input.Keys.NUMPAD_8, Input.Keys.NUMPAD_2, Input.Keys.NUMPAD_4, Input.Keys.NUMPAD_6, Input.Keys.DOWN,
-            Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB -> {
+            Input.Keys.UP, Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.TAB, Input.Keys.A, Input.Keys.D, Input.Keys.W, Input.Keys.X -> {
                 selectNext()
             }
             Input.Keys.Y -> { changeSelection(1) }

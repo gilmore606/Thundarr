@@ -52,6 +52,8 @@ open class Player : Actor() {
     private val caloriesHunger = -2000f
     private val caloriesStarving = -5000f
 
+    val autoPickUpTypes = mutableListOf<String>()
+
     init {
         Pather.subscribe(this, this, 100f)
     }
@@ -66,7 +68,7 @@ open class Player : Actor() {
         Survive.set(this, 2f)
 
         Sunsword().moveTo(this)
-        repeat (20) { EnergyDrink().moveTo(this) }
+        repeat (20) { Meat().moveTo(this) }
         Torch().moveTo(this)
         Apple().moveTo(this)
         HornetHelmet().moveTo(this)
@@ -74,6 +76,7 @@ open class Player : Actor() {
         RiotHelmet().moveTo(this)
         Pickaxe().moveTo(this)
         Axe().moveTo(this)
+        Lighter().moveTo(this)
     }
 
     override fun die() {
@@ -184,4 +187,16 @@ open class Player : Actor() {
             }
         }
     }
+
+    override fun wantsToPickUp(thing: Thing) = autoPickUpTypes.contains(thing.thingTag())
+
+    open fun addAutoPickUpType(type: String) {
+        autoPickUpTypes.add(type)
+        Console.say("You remind yourself to pick up any " + type.plural() + " you find.")
+    }
+    open fun removeAutoPickUpType(type: String) {
+        autoPickUpTypes.remove(type)
+        Console.say("You give up on your $type collection.")
+    }
+
 }

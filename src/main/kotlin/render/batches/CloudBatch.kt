@@ -52,8 +52,8 @@ class CloudBatch : RenderBatch() {
         val timeshift = ((Screen.timeMs - startTime) / 128f) // + App.time
         val tcol = col.toFloat() + windX * timeshift
         val trow = row.toFloat() + windY * timeshift
-        val tx0 = ((tcol % TILE_SCALE).toFloat() / TILE_SCALE)
-        val ty0 = ((trow % TILE_SCALE).toFloat() / TILE_SCALE)
+        val tx0 = ((tcol % TILE_SCALE) / TILE_SCALE)
+        val ty0 = ((trow % TILE_SCALE) / TILE_SCALE)
         val tx1 = tx0 + 1f / TILE_SCALE
         val ty1 = ty0 + 1f / TILE_SCALE
         floats.apply {

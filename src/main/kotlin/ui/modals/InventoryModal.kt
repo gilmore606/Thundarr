@@ -46,7 +46,7 @@ class InventoryModal(
     }
 
     fun shownThing(): Thing? = if (isInSidecar && sidecar is InventoryModal) (sidecar as InventoryModal).shownThing()
-        else if (selection > -1) grouped[selection].first() else null
+        else if (grouped.isEmpty()) null else if (selection > -1) grouped[selection].first() else null
 
     private fun adjustHeight() {
         height = headerPad + max(1, grouped.size + 1) * spacing + 60 + padding * 2

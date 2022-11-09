@@ -7,8 +7,11 @@ import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.Dice
+import util.hasOneWhere
 import world.Entity
 import world.level.Level
+import world.stains.Fire
 import world.terrains.Terrain
 import java.lang.Float.min
 import java.lang.RuntimeException
@@ -22,7 +25,7 @@ sealed class Thing : Entity {
     @Transient var holder: ThingHolder? = null
 
     enum class UseTag {
-        SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
+        USE, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
     }
 
     class Use(
@@ -52,6 +55,15 @@ sealed class Thing : Entity {
     override fun uiBatch() = Screen.uiThingBatch
 
     open fun weight() = 0.1f
+    open fun flammability() = 0f
+    open fun onBurn(delta: Float): Float { // return the amount of fuel we provided on this turn
+        if (Dice.chance(flammability())) {
+            moveTo(null)
+            return 0f
+        } else {
+            return 1f * delta
+        }
+    }
 
     open fun onWalkedOnBy(actor: Actor) { }
 
@@ -111,6 +123,10 @@ class Log : Portable() {
     override fun name() = "log"
     override fun description() = "Big, heavy, wood.  Better than bad.  Good."
     override fun glyph() = Glyph.LOG
+    override fun flammability() = 0.5f
+    override fun onBurn(delta: Float): Float {
+        return 2f * delta
+    }
 }
 
 @Serializable
@@ -120,6 +136,29 @@ class Brick : Portable() {
     override fun glyph() = Glyph.BRICK
     override fun weight() = 0.4f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
+}
+
+@Serializable
+class Lighter : Portable() {
+    override fun name() = "lighter"
+    override fun description() = "A brass cigarette lighter.  Handy for starting fires."
+    override fun glyph() = Glyph.LIGHTER
+    override fun weight() = 0.02f
+    override fun uses() = mapOf(
+        UseTag.USE to Use("light a fire here", 2.0f,
+            canDo = { hasTarget(it) },
+            toDo = { actor, level ->
+                lightFireHere(actor, level)
+            }))
+    override fun toolbarName() = "light a fire"
+    override fun toolbarUseTag() = UseTag.USE
+
+    private fun hasTarget(actor: Actor) = actor.contents.hasOneWhere { it.flammability() > 0f } ||
+            (actor.level?.thingsAt(actor.xy.x, actor.xy.y)?.hasOneWhere { it.flammability() > 0f } ?: false)
+
+    private fun lightFireHere(actor: Actor, level: Level) {
+        level.addStain(Fire(), actor.xy.x, actor.xy.y)
+    }
 }
 
 @Serializable

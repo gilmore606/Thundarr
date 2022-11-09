@@ -28,6 +28,7 @@ import ui.panels.*
 import util.*
 import world.persist.LevelKeeper
 import world.path.Pather
+import world.stains.Fire
 import world.stains.Stain
 import java.lang.Double.max
 import java.lang.Double.min
@@ -301,6 +302,7 @@ object Screen : KtxScreen {
         timeMs = System.currentTimeMillis()
         animateCamera(delta)
         Speaker.onRender(delta)
+        Fire.onRender(delta)
         App.level.onRender(delta)
         var dismissedPanel: Panel? = null
         var topModalFound: Modal? = null

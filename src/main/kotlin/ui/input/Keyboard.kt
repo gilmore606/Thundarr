@@ -2,11 +2,10 @@ package ui.input
 
 import App
 import actors.Herder
-import actors.Ox
 import actors.Wolfman
 import actors.actions.Wait
-import actors.statuses.Asleep
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Input.Keys.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.app.KtxInputAdapter
@@ -33,6 +32,8 @@ object Keyboard : KtxInputAdapter {
     var CTRL = false
     var ALT = false
 
+    var modKeyDown = 0
+
     var CURSOR_MODE = false
 
     init {
@@ -49,15 +50,19 @@ object Keyboard : KtxInputAdapter {
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == -1) return true
         Screen.releaseScrollLatch()
-        if (keycode == Input.Keys.ALT_LEFT || keycode == Input.Keys.ALT_RIGHT) {
+        if (keycode == ALT_LEFT || keycode == ALT_RIGHT) {
             ALT = true
-        } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+            modKeyDown = keycode
+        } else if (keycode == CONTROL_LEFT || keycode == CONTROL_RIGHT) {
             CTRL = true
+            modKeyDown = keycode
             Screen.updateCursorLine()
-        } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+        } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
             SHIFT = true
+            modKeyDown = keycode
         } else {
             lastKey = keycode
+            modKeyDown = 0
             lastKeyTime = System.currentTimeMillis()
             pressKey(keycode)
         }
@@ -65,19 +70,26 @@ object Keyboard : KtxInputAdapter {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        Screen.topModal?.also { modal ->
-            modal.keyUp(keycode)
-        } ?: run {
-            if (keycode == Input.Keys.ALT_LEFT || keycode == Input.Keys.ALT_RIGHT) {
-                ALT = false
-            } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
-                CTRL = false
-                Screen.clearCursorLine()
-            } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
-                SHIFT = false
-            }
+        var isMod = false
+        if (keycode == ALT_LEFT || keycode == ALT_RIGHT) {
+            ALT = false
+            isMod = true
+        } else if (keycode == CONTROL_LEFT || keycode == CONTROL_RIGHT) {
+            CTRL = false
+            isMod = true
+            Screen.clearCursorLine()
+        } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
+            SHIFT = false
+            isMod = true
         }
         lastKey = -1
+        if (isMod && modKeyDown > 0) {
+            pressKey(modKeyDown)
+            modKeyDown = 0
+        }
+        Screen.topModal?.also { modal ->
+            modal.keyUp(keycode)
+        }
         return true
     }
 
@@ -90,34 +102,45 @@ object Keyboard : KtxInputAdapter {
         }
     }
 
+    private fun processDir(dir: XY) {
+        if (CTRL) {
+            Screen.moveCursor(dir)
+            Screen.rightClickCursorTile()
+        } else if (CURSOR_MODE) {
+            Screen.moveCursor(dir)
+        } else {
+            App.player.tryMove(dir)
+        }
+    }
+
     private fun pressKey(keycode: Int) {
         when (keycode) {
-            Input.Keys.ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
+            ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
         }
 
         Screen.topModal?.also { modal ->
             modal.keyDown(keycode)
         } ?: run {
             when (keycode) {
-                Input.Keys.NUMPAD_8, Input.Keys.W -> { if (CURSOR_MODE) Screen.moveCursor(NORTH) else App.player.tryMove(NORTH) }
-                Input.Keys.NUMPAD_7, Input.Keys.Q -> { if (CURSOR_MODE) Screen.moveCursor(NORTHWEST) else App.player.tryMove(NORTHWEST) }
-                Input.Keys.NUMPAD_4, Input.Keys.A -> { if (CURSOR_MODE) Screen.moveCursor(WEST) else App.player.tryMove(WEST) }
-                Input.Keys.NUMPAD_1, Input.Keys.Z -> { if (CURSOR_MODE) Screen.moveCursor(SOUTHWEST) else App.player.tryMove(SOUTHWEST) }
-                Input.Keys.NUMPAD_2, Input.Keys.X -> { if (CURSOR_MODE) Screen.moveCursor(SOUTH) else App.player.tryMove(SOUTH) }
-                Input.Keys.NUMPAD_3, Input.Keys.C -> { if (CURSOR_MODE) Screen.moveCursor(SOUTHEAST) else App.player.tryMove(SOUTHEAST) }
-                Input.Keys.NUMPAD_6, Input.Keys.D -> { if (CURSOR_MODE) Screen.moveCursor(EAST) else App.player.tryMove(EAST) }
-                Input.Keys.NUMPAD_9, Input.Keys.E -> { if (CURSOR_MODE) Screen.moveCursor(NORTHEAST) else App.player.tryMove(NORTHEAST) }
-                Input.Keys.NUMPAD_5, Input.Keys.S -> { Screen.rightClickCursorTile() }
+                NUMPAD_8, W -> { processDir(NORTH) }
+                NUMPAD_7, Q -> { processDir(NORTHWEST) }
+                NUMPAD_4, A -> { processDir(WEST) }
+                NUMPAD_1, Z -> { processDir(SOUTHWEST) }
+                NUMPAD_2, X -> { processDir(SOUTH) }
+                NUMPAD_3, C -> { processDir(SOUTHEAST) }
+                NUMPAD_6, D -> { processDir(EAST) }
+                NUMPAD_9, E -> { processDir(NORTHEAST) }
+                NUMPAD_5, S -> { Screen.rightClickCursorTile() }
 
-                Input.Keys.SPACE -> { App.player.queue(Wait(1f)) }
-                Input.Keys.PERIOD -> { App.player.toggleSleep() }
+                SPACE -> { App.player.queue(Wait(1f)) }
+                PERIOD -> { App.player.toggleSleep() }
 
-                Input.Keys.NUMPAD_DIVIDE -> { toggleCursorMode() }
-                Input.Keys.PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextActor(-1) }
-                Input.Keys.PAGE_DOWN -> { CURSOR_MODE = true ; Screen.cursorNextActor(1) }
+                NUMPAD_DIVIDE -> { toggleCursorMode() }
+                PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextActor(-1) }
+                PAGE_DOWN -> { CURSOR_MODE = true ; Screen.cursorNextActor(1) }
 
-                Input.Keys.EQUALS -> { Screen.mouseScrolled(-1.43f) }
-                Input.Keys.MINUS -> { Screen.mouseScrolled(1.43f) }
+                EQUALS -> { Screen.mouseScrolled(-1.43f) }
+                MINUS -> { Screen.mouseScrolled(1.43f) }
 
                 Input.Keys.TAB -> { App.openInventory() }
                 Input.Keys.BACKSLASH -> { App.openGear() }

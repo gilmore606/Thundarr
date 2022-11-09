@@ -196,8 +196,8 @@ class Chunk(
         things[x - this.x][y - this.y].contents
     } else { noThing }
 
-    fun stainAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
-        things[x - this.x][y - this.y].topStain()
+    fun stainsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        things[x - this.x][y - this.y].stains
     } else null
 
     fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {

@@ -41,6 +41,16 @@ sealed class Tree : Scenery() {
                 Console.sayAct("%Dd comes crashing down!", "%Dn chops down %id.", actor, this@Tree)
             })
     )
+
+    override fun flammability() = 0.4f
+    override fun onBurn(delta: Float): Float {
+        if (Dice.chance(delta * 0.001f)) {
+            moveTo(null)
+            return 0f
+        } else {
+            return 4f * delta
+        }
+    }
 }
 
 @Serializable

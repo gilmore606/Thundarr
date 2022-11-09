@@ -19,6 +19,7 @@ import util.*
 import world.Chunk
 import world.Director
 import world.path.Pather
+import world.stains.Fire
 import world.stains.Stain
 import world.terrains.Terrain
 import world.terrains.TerrainData
@@ -105,8 +106,12 @@ sealed class Level {
                             } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1))) {
                                 doWeather(x, y, weather.clouds(), weather.rain(), true)
                             }
-                            chunk.stainAt(x, y)?.also {
-                                doStain(x, y, it, light)
+                            chunk.stainsAt(x, y)?.forEach { stain ->
+                                if (stain is Fire) {
+                                    doFire(x, y, getRandom(x,y).toFloat(), 0f, 0f)
+                                } else {
+                                    doStain(x, y, stain, light)
+                                }
                             }
                         }
                     }
@@ -221,7 +226,7 @@ sealed class Level {
 
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
-    fun stainAt(x: Int, y: Int): Stain? = chunkAt(x,y)?.stainAt(x,y)
+    fun stainsAt(x: Int, y: Int) = chunkAt(x,y)?.stainsAt(x,y)
 
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")
     fun hasCellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y)
@@ -260,7 +265,10 @@ sealed class Level {
     fun addSpark(spark: Spark) = chunkAt(spark.xy.x, spark.xy.y)?.addSpark(spark)
     fun hasBlockingSpark() = allChunks().hasOneWhere { it.sparks().hasOneWhere { it.pausesAction }}
 
-    fun addStain(stain: Stain, x: Int, y: Int) = chunkAt(x,y)?.addStain(stain, x, y)
+    fun addStain(stain: Stain, x: Int, y: Int) = chunkAt(x,y)?.also {
+        it.addStain(stain, x, y)
+        stain.onAdd(this, x, y)
+    }
 
     fun onRender(delta: Float) {
         if (dirtyLights.isNotEmpty()) {
@@ -370,6 +378,12 @@ sealed class Level {
                     } else {
                         menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
                         menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
+                            group.forEach { App.player.queue(Get(it)) }
+                        }
+                    }
+                    if (!App.player.autoPickUpTypes.contains(group[0].thingTag())) {
+                        menu.addOption("auto-pickup " + group[0].name().plural()) {
+                            App.player.addAutoPickUpType(group[0].thingTag())
                             group.forEach { App.player.queue(Get(it)) }
                         }
                     }

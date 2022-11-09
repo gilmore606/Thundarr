@@ -15,6 +15,8 @@ import kotlin.math.sin
 @Serializable
 class Weather {
 
+    val overallRaininess = 0f   // 0.4f
+
     var weatherIntensity = 0f
     var windX = 0f
     var windY = 0f
@@ -104,7 +106,7 @@ class Weather {
         windX = (cos(windRads) * windSpeed).toFloat()
         windY = (sin(windRads) * windSpeed).toFloat()
 
-        if (Dice.chance(0.4f + weatherIntensity * 0.3f)) {
+        if (Dice.chance(overallRaininess + weatherIntensity * 0.3f)) {
             // Rain more
             weatherIntensityTarget = min(1f, weatherIntensityTarget + 0.3f)
             if (!level.isRoofedAt(App.player.xy.x, App.player.xy.y)) {

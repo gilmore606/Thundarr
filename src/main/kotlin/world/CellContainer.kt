@@ -7,6 +7,7 @@ import things.Thing
 import things.ThingHolder
 import util.XY
 import util.log
+import util.safeForEach
 import world.level.Level
 import world.stains.Stain
 
@@ -27,11 +28,11 @@ class CellContainer : ThingHolder {
         xy.x = x
         xy.y = y
         this.level = level
-        contents.forEach { thing ->
+        contents.safeForEach { thing ->
             thing.onRestore(this)
             if (thing is Temporal) level.linkTemporal(thing)
         }
-        stains.forEach { stain ->2
+        stains.safeForEach { stain ->
             stain.onRestore(this)
         }
         locked = false
@@ -75,7 +76,7 @@ class CellContainer : ThingHolder {
         locked = false
     }
 
-    fun topStain(): Stain? {
+    fun cleanStains() {
         var found = false
         for (i in 0 until stains.size) {
             if (!found && stains[i].done) {
@@ -85,8 +86,6 @@ class CellContainer : ThingHolder {
                 locked = false
             }
         }
-        if (stains.isNotEmpty()) return stains[stains.lastIndex]
-        return null
     }
 
 }
