@@ -370,6 +370,8 @@ sealed class Level {
     open fun updateAmbientSound(hour: Int, minute: Int) { }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
+        val isAdjacent = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
+
         if (App.player.xy.x == x && App.player.xy.y == y) {
             thingsAt(x,y).groupByTag().forEach { group ->
                 if (group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
@@ -397,7 +399,7 @@ sealed class Level {
                 }
             }
         } else {
-            if (isWalkableAt(x, y)) {
+            if (isWalkableAt(x, y) && !isAdjacent) {
                 menu.addOption("walk here") {
                     App.player.queue(WalkTo(this, x, y))
                 }
@@ -412,8 +414,7 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != "" && (x != App.player.xy.x || y != App.player.xy.y)
-                && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
+        if (App.player.thrownTag != "" && !isAdjacent && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))

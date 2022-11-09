@@ -153,7 +153,7 @@ class Lighter : Portable() {
     override fun toolbarName() = "light a fire"
     override fun toolbarUseTag() = UseTag.USE
 
-    private fun hasTarget(actor: Actor) = actor.contents.hasOneWhere { it.flammability() > 0f } ||
+    private fun hasTarget(actor: Actor) =
             (actor.level?.thingsAt(actor.xy.x, actor.xy.y)?.hasOneWhere { it.flammability() > 0f } ?: false)
 
     private fun lightFireHere(actor: Actor, level: Level) {
