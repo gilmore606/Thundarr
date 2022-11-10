@@ -346,6 +346,14 @@ object Screen : KtxScreen {
         zoomTarget = zoomLevels[zoomIndex.toInt()]
     }
 
+    private fun currentZoomTarget(): Double {
+        var t = zoomTarget
+        if (topModal?.zoomWhenOpen == true) {
+            t *= 1.2f
+        }
+        return t
+    }
+
     private fun animateCamera(delta: Float) {
         sinBob = sin(((timeMs % 1000L).toFloat() * 0.001f) * 6.283f)
 
@@ -354,11 +362,12 @@ object Screen : KtxScreen {
         } else if (brightness > brightnessTarget) {
             brightness = kotlin.math.max(brightnessTarget, brightness - delta * 1.6f)
         }
-        val diff = min(3.0, max(0.04, abs(zoom - zoomTarget)))
-        if (zoom < zoomTarget) {
-            zoom = min(zoomTarget, zoom + diff * delta * ZOOM_SPEED)
-        } else if (zoom > zoomTarget) {
-            zoom = max(zoomTarget, zoom - diff * delta * ZOOM_SPEED)
+        val ztarget = currentZoomTarget()
+        val diff = min(3.0, max(0.04, abs(zoom - ztarget)))
+        if (zoom < ztarget) {
+            zoom = min(ztarget, zoom + diff * delta * ZOOM_SPEED)
+        } else if (zoom > ztarget) {
+            zoom = max(ztarget, zoom - diff * delta * ZOOM_SPEED)
         }
         if (scrollLatch) return
 

@@ -10,7 +10,7 @@ class ContextMenu(
     screenX: Int,
     screenY: Int,
     private val onHover: ((Int)->Unit)? = null
-): SelectionModal(100, 50, null, Position.CURSOR, 0) {
+): SelectionModal(0, 0, null, Position.CURSOR, 0) {
 
     companion object {
         val boxBatch = QuadBatch(UITileSet())
@@ -51,7 +51,7 @@ class ContextMenu(
         val optionWidth = GlyphLayout(Screen.font, text).width.toInt()
         if (optionWidth > maxOptionWidth) {
             maxOptionWidth = optionWidth
-            width = optionWidth + padding * 2 + 8
+            width = optionWidth + padding * 2 + 20
         }
         height = options.size * spacing + headerPad
         this.maxSelection = options.size - 1

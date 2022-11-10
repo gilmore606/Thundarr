@@ -49,6 +49,7 @@ abstract class Modal(
     open fun openSound(): Speaker.SFX? = Speaker.SFX.UIOPEN
     open fun closeSound(): Speaker.SFX? = Speaker.SFX.UICLOSE
 
+    var zoomWhenOpen = false
     var sidecar: Modal? = null
     var isSidecar = false
     var isInSidecar = false

@@ -39,7 +39,7 @@ class ExamineModal(
             ).apply {
                 this.parentModal = parent
                 addInventoryOptions(this, entity, forExamine = true)
-                x = this@ExamineModal.x - maxOptionWidth - 10
+                x = this@ExamineModal.x - maxOptionWidth - 30
             }
             if (menu.options.isNotEmpty()) {
                 Screen.addModal(menu)

@@ -30,6 +30,7 @@ class InventoryModal(
     var maxText: String = ""
 
     init {
+        zoomWhenOpen = true
         parentModal?.also { this.isSidecar = true ; changeSelection(0) }
         updateGrouped()
         adjustHeight()
@@ -107,6 +108,7 @@ class InventoryModal(
             width + (parentModal?.width ?: 0) - 2,
             optionY(ourSelection) - 4
         ).apply {
+            zoomWhenOpen = true
             this.parentModal = parent
             addInventoryOptions(this, grouped[ourSelection][0], grouped[ourSelection],
                 parent.withContainer, parent.parentModal)
