@@ -2,11 +2,13 @@ package things
 
 import actors.Actor
 import actors.Player
+import actors.statuses.Sick
 import actors.statuses.Status
 import actors.statuses.Wired
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.Dice
 import world.level.Level
 
 
@@ -88,7 +90,7 @@ sealed class Consumable : Portable() {
 sealed class Food : Consumable() {
     override fun consumeDuration() = 2f
     override fun consumeSelfMsg() = "You wolf down %id."
-    override fun consumableBy(actor: Actor) = (actor !is Player || actor.couldEat())
+    override fun consumableBy(actor: Actor) = true
     open fun calories() = 200
 
     override fun onConsume(actor: Actor) {
@@ -113,8 +115,15 @@ class Pear : Food() {
 class Meat : Food() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw steak"
-    override fun description() = "A bloody chunk of raw meat.  Your victim?  Sadly, this game does not keep track."
+    override fun description() = "A bloody chunk of raw meat.  Edible as-is, but not exactly appetizing; you're a barbarian, not a savage."
     override fun calories() = 800
+    override fun consumeSelfMsg() = "You choke down the raw meat, imagining how delicious it would be if you cooked it first.  Oh well."
+    override fun onConsume(actor: Actor) {
+        super.onConsume(actor)
+        if (Dice.chance(0.3f)) {
+            actor.addStatus(Sick())
+        }
+    }
 }
 
 @Serializable

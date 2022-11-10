@@ -394,10 +394,10 @@ sealed class Level {
                     }
                 }
             }
-            group[0].uses().values.forEach { use ->
+            group[0].uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
                     menu.addOption(use.command) {
-                        App.player.queue(Use(group[0], use.duration, use.toDo, x, y))
+                        App.player.queue(Use(tag, group[0], use.duration, use.toDo, x, y))
                     }
                 }
             }
@@ -429,10 +429,10 @@ sealed class Level {
         if (isAdjacentOrHere) {
             App.player.contents.groupByTag().forEach { group ->
                 val held = group.first()
-                held.uses().values.forEach { heldUse ->
+                held.uses().forEach { (tag, heldUse) ->
                     if (heldUse.canDo(App.player, x, y, true)) {
                         menu.addOption(heldUse.command) {
-                            App.player.queue(Use(held, heldUse.duration, heldUse.toDo, x, y))
+                            App.player.queue(Use(tag, held, heldUse.duration, heldUse.toDo, x, y))
                         }
                     }
                 }
@@ -444,10 +444,10 @@ sealed class Level {
                     if (ix != 0 || iy != 0) {
                         thingsAt(x+ix, y+iy).groupByTag().forEach { nearGroup ->
                             val near = nearGroup.first()
-                            near.uses().values.forEach { nearUse ->
+                            near.uses().forEach { (tag, nearUse) ->
                                 if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
                                     menu.addOption(nearUse.command) {
-                                        App.player.queue(Use(near, nearUse.duration, nearUse.toDo, x+ix, y+iy))
+                                        App.player.queue(Use(tag, near, nearUse.duration, nearUse.toDo, x+ix, y+iy))
                                     }
                                 }
                             }

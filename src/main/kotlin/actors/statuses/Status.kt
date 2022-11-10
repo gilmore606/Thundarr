@@ -13,6 +13,7 @@ import actors.stats.skills.Fight
 import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.toEnglishList
@@ -35,8 +36,8 @@ sealed class Status : StatEffector {
 
     abstract val tag: Tag
     enum class Tag {
-        WIRED, DAZED, BURDENED, ENCUMBERED, HUNGRY, STARVING,
-        STUNNED, ASLEEP, BANDAGED
+        WIRED, DAZED, BURDENED, ENCUMBERED, SATIATED, HUNGRY, STARVING,
+        STUNNED, ASLEEP, BANDAGED, SICK
     }
 
     abstract fun description(): String
@@ -110,6 +111,27 @@ class Burdened() : Status() {
         Speed.tag to -4f,
         Dodge.tag to -3f
     )
+}
+
+@Serializable
+class Satiated() : Status() {
+    override val tag = Tag.SATIATED
+    override fun name() = "satiated"
+    override fun description() = "Couldn't eat another bite, really."
+    override fun panelTag() = "sat"
+    override fun panelTagColor() = tagColors[TagColor.GOOD]!!
+    override fun onAddMsg() = "Oof, you're full."
+    override fun statEffects() = mapOf(
+        Speed.tag to -1f
+    )
+
+    override fun preventedAction(action: Action, actor: Actor): Boolean {
+        if (action is Use && action.useTag == Thing.UseTag.CONSUME) {
+            if (actor is Player) Console.say("You feel too full to eat or drink anything.")
+            return true
+        }
+        return false
+    }
 }
 
 @Serializable
@@ -207,6 +229,30 @@ class Bandaged(val quality: Float) : TimeStatus() {
     override fun advanceTime(actor: Actor, delta: Float) {
         super.advanceTime(actor, delta)
 
+    }
+}
+
+@Serializable
+class Sick(): TimeStatus() {
+    override val tag = Tag.SICK
+    override fun name() = "sick"
+    override fun description() = "You're too nauseous to eat."
+    override fun onAddMsg() = "Ugh, you must have eaten something bad.  You feel sick."
+    override fun onRemoveMsg() = "Your stomach feels better.  You could probably eat something."
+    override fun panelTag() = "sick"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -1f,
+        Brains.tag to -1f
+    )
+    override fun duration() = Dice.float(40f, 80f)
+    override fun maxDuration() = 300f
+    override fun preventedAction(action: Action, actor: Actor): Boolean {
+        if (action is Use && action.useTag == Thing.UseTag.CONSUME) {
+            if (actor is Player) Console.say("You feel too nauseous to eat or drink anything.")
+            return true
+        }
+        return false
     }
 }
 

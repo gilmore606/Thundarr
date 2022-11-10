@@ -5,10 +5,7 @@ import actors.actions.Move
 import actors.stats.Brains
 import actors.stats.Strength
 import actors.stats.skills.*
-import actors.statuses.Asleep
-import actors.statuses.Hungry
-import actors.statuses.Starving
-import actors.statuses.Status
+import actors.statuses.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -19,10 +16,7 @@ import render.tilesets.Glyph
 import things.*
 import ui.panels.Console
 import ui.panels.TimeButtons
-import util.XY
-import util.englishList
-import util.hasOneWhere
-import util.plural
+import util.*
 import world.Entity
 import world.journal.GameTime
 import world.journal.Journal
@@ -51,7 +45,7 @@ open class Player : Actor() {
     private val caloriesEatMax = 1800f
     private val caloriesPerDay = 2500f
     private val caloriesHunger = -2000f
-    private val caloriesStarving = -5000f
+    private val caloriesStarving = -4000f
 
     val autoPickUpTypes = mutableListOf<String>()
 
@@ -154,14 +148,18 @@ open class Player : Actor() {
 
     override fun advanceTime(delta: Float) {
         super.advanceTime(delta)
+        calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
+        if (calories < caloriesEatMax) {
+            removeStatus(Status.Tag.SATIATED)
+        }
         if (calories <= caloriesStarving) {
+            calories = caloriesStarving
             removeStatus(Status.Tag.HUNGRY)
             if (!hasStatus(Status.Tag.STARVING)) {
                 Console.say("You're starving to death.")
                 addStatus(Starving())
             }
         } else {
-            calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
             if (calories <= caloriesHunger) {
                 if (!hasStatus(Status.Tag.HUNGRY)) {
                     Console.say("Your stomach grumbles loudly.  Time for a meal.")
@@ -177,13 +175,13 @@ open class Player : Actor() {
         calories += cal.toFloat()
         if (calories > caloriesMax) {
             calories = caloriesMax
-            Console.say("Oof, you're stuffed.")
+            addStatus(Satiated())
         }
         if (calories > caloriesHunger) {
             if (hasStatus(Status.Tag.HUNGRY) || hasStatus(Status.Tag.STARVING)) {
                 removeStatus(Status.Tag.HUNGRY)
                 removeStatus(Status.Tag.STARVING)
-                Console.say("That hit the spot.  You don't feel hungry anymore.")
+                Console.say("That hit the spot.  You feel satisfied.")
             }
         } else if (calories > caloriesStarving) {
             if (hasStatus(Status.Tag.STARVING)) {

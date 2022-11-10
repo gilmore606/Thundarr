@@ -6,7 +6,8 @@ import util.XY
 import world.level.Level
 
 class Use(
-    private val thing: Thing,
+    val useTag: Thing.UseTag,
+    val thing: Thing,
     duration: Float,
     private val toDo: (Actor, Level, Int, Int)->Unit,
     private val x: Int,

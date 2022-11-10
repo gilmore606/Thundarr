@@ -419,7 +419,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun useThing(thing: Thing, useTag: Thing.UseTag): Use? =
         thing.uses()[useTag]?.let { use ->
-            if (use.canDo(this, xy.x, xy.y, false)) Use(thing, use.duration, use.toDo, xy.x, xy.y) else null
+            if (use.canDo(this, xy.x, xy.y, false)) Use(useTag, thing, use.duration, use.toDo, xy.x, xy.y) else null
         }
 
     fun stepToward(target: Entity): Move? {

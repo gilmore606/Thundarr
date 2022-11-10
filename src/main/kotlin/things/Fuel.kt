@@ -8,15 +8,17 @@ import ui.panels.Console
 import util.groupByTag
 import util.log
 import util.turnsToRoughTime
+import world.Entity
 
 @Serializable
-sealed class Fuel : Portable() {
+sealed interface Fuel {
 
-    override fun flammability() = 0.7f
-    open fun fuelPerTurn() = 1f
-    var fuel = 50f
+    fun fuelPerTurn() = 1f
+    var fuel: Float
+    fun moveTo(to: ThingHolder?)
+    fun name(): String
 
-    override fun onBurn(delta: Float): Float {
+    fun onBurn(delta: Float): Float {
         val burn = fuelPerTurn() * delta
         fuel -= burn
         if (fuel < 0f) {
@@ -29,18 +31,15 @@ sealed class Fuel : Portable() {
 }
 
 @Serializable
-class Log : Fuel() {
-    var spawned = false
-    init {
-        if (!spawned) {
-            spawned = true
-            fuel = 100f
-        }
-    }
+class Log : Portable(), Fuel {
+    override var fuel = 100f
+    override fun flammability() = 0.7f
     override fun name() = "log"
     override fun description() = "Big, heavy, wood.  Better than bad.  Good."
     override fun glyph() = Glyph.LOG
     override fun weight() = 3f
+    override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
+
     override fun uses() = mapOf(
         UseTag.TRANSFORM to Use("build campfire from ${name()} here", 8.0f,
             canDo = { actor,x,y,targ ->
@@ -55,10 +54,13 @@ class Log : Fuel() {
             }
         )
     )
+
 }
 
 @Serializable
-class Campfire : Fuel() {
+class Campfire : Portable(), Fuel {
+    override var fuel = 100f
+    override fun flammability() = 0.7f
     override fun name() = "campfire"
     override fun description() = "Logs expertly stacked for controlled burning."
     override fun examineInfo() = "The stack of wood looks like it'll burn for " + (fuel / 2f).turnsToRoughTime() + "."
@@ -66,11 +68,12 @@ class Campfire : Fuel() {
     override fun isPortable() = false
     override fun fuelPerTurn() = 2f
     override fun weight() = fuel / 60f
+    override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
 
     fun feedWith(log: Fuel, actor: Actor) {
         val bonus = Survive.bonus(actor) + Survive.resolve(actor, 0f) * 0.25f
         fuel += log.fuel * (2f + bonus * 2f)
-        Console.sayAct("You feed %ii to %dd.", "%Dn feeds %ii to %dd.", actor, this, log)
+        Console.sayAct("You feed %ii to %dd.", "%Dn feeds %ii to %dd.", actor, this, log as Entity)
         log.moveTo(null)
     }
 
@@ -92,4 +95,5 @@ class Campfire : Fuel() {
         }
         return uses
     }
+
 }
