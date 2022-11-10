@@ -161,8 +161,8 @@ object Keyboard : KtxInputAdapter {
                 PERIOD -> { App.player.toggleSleep() }
 
                 NUMPAD_DIVIDE -> { toggleCursorMode() }
-                PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextActor(-1) }
-                PAGE_DOWN -> { CURSOR_MODE = true ; Screen.cursorNextActor(1) }
+                PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextTarget(-1) }
+                PAGE_DOWN -> { CURSOR_MODE = true ; Screen.cursorNextTarget(1) }
 
                 EQUALS -> { Screen.mouseScrolled(-1.43f) }
                 MINUS -> { Screen.mouseScrolled(1.43f) }

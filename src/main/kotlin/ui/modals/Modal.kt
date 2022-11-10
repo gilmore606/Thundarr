@@ -236,9 +236,9 @@ abstract class Modal(
 
             if (asWithContainer == null && asWithParent == null) {
                 thing.uses().values.forEach {
-                    if (it.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
+                    if (it.canDo(App.player, thing.xy()!!.x, thing.xy()!!.y, false)) {
                         addOption(it.command) {
-                            App.player.queue(Use(thing, it.duration, it.toDo, App.player.xy.x, App.player.xy.y))
+                            App.player.queue(Use(thing, it.duration, it.toDo, thing.xy()!!.x, thing.xy()!!.y))
                         }
                     }
                 }

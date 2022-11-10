@@ -27,7 +27,6 @@ import ui.modals.ToolbarAddModal
 import ui.panels.*
 import util.*
 import world.persist.LevelKeeper
-import world.path.Pather
 import world.stains.Fire
 import world.stains.Stain
 import java.lang.Double.max
@@ -425,23 +424,23 @@ object Screen : KtxScreen {
         cursorPosition?.also { it.x = x ; it.y = y }
     }
 
-    fun cursorNextActor(dir: Int) {
+    fun cursorNextTarget(dir: Int) {
         cursorPosition?.also { cursor ->
             App.level.actorAt(cursor.x, cursor.y)?.also { actor ->
-                ActorPanel.actorAfter(actor, dir)?.also { nextActor ->
+                ActorPanel.targetAfter(actor, dir)?.also { nextActor ->
                     cursor.x = nextActor.xy.x
                     cursor.y = nextActor.xy.y
-                }
+                } ?: run { clearCursor() }
             } ?: run {
                 ActorPanel.firstActor()?.also { actor ->
                     cursor.x = actor.xy.x
                     cursor.y = actor.xy.y
-                }
+                } ?: run { clearCursor() }
             }
         } ?: run {
             ActorPanel.firstActor()?.also { actor ->
                 cursorPosition = XY(actor.xy.x, actor.xy.y)
-            }
+            } ?: run { clearCursor() }
         }
     }
 

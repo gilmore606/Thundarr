@@ -1,6 +1,7 @@
 package ui.panels
 
 import actors.Actor
+import actors.Player
 import render.Screen
 import render.tilesets.Glyph
 
@@ -71,16 +72,19 @@ object ActorPanel : ShadedPanel() {
         this.height = actors.size * spacing + padding
     }
 
-    fun actorAfter(actor: Actor, dir: Int): Actor? {
+    fun targetAfter(actor: Actor, dir: Int): Actor? {
         if (actors.isEmpty()) return null
-        val i = actors.indexOf(actor)
+        var i = actors.indexOf(actor)
+        var c = 0
         if (i < 0) return null
-        return if (dir == 1) {
-            if (i == actors.lastIndex) actors.first() else actors[i+1]
-        } else {
-            if (i == 0) actors.last() else actors[i-1]
+        while (!actors[i].willAggro(App.player) && !App.player.willAggro(actors[i])) {
+            i += dir
+            c++
+            if (i < 0) i = actors.lastIndex else if (i > actors.lastIndex) i = 0
+            if (c > actors.size) return null
         }
+        return actors[i]
     }
 
-    fun firstActor(): Actor? = if (actors.isNotEmpty()) actors.first() else null
+    fun firstActor(): Actor? = if (actors.isEmpty()) null else targetAfter(actors.first(), 1)
 }
