@@ -48,6 +48,10 @@ class Fist : MeleeWeapon() {
 
 @Serializable
 class Axe : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+    }
+    override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
@@ -57,6 +61,10 @@ class Axe : MeleeWeapon() {
 
 @Serializable
 class Pickaxe : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+    }
+    override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 5.2f
     override fun name() = "pickaxe"

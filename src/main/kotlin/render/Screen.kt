@@ -76,6 +76,7 @@ object Screen : KtxScreen {
     val terrainBatch = QuadBatch(terrainTileSet)
     val thingBatch = QuadBatch(thingTileSet)
     val actorBatch = QuadBatch(actorTileSet)
+    val gearBatch = QuadBatch(thingTileSet)
     val fireBatch = FireBatch()
     val uiWorldBatch = QuadBatch(uiTileSet)
     val uiBatch = QuadBatch(uiTileSet)
@@ -83,8 +84,8 @@ object Screen : KtxScreen {
     val uiActorBatch = QuadBatch(actorTileSet)
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
-    private val worldBatches = listOf(terrainBatch, actorBatch, thingBatch, uiWorldBatch)
-    private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, fireBatch,
+    private val worldBatches = listOf(terrainBatch, thingBatch,  actorBatch, gearBatch, uiWorldBatch)
+    private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, gearBatch, fireBatch,
         uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
@@ -245,6 +246,16 @@ object Screen : KtxScreen {
             offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(),
             mirror = actor.mirrorGlyph, rotate = actor.rotateGlyph
         )
+        actor.gear.values.forEach { gear ->
+            gear?.glyphTransform()?.also { trans ->
+                gearBatch.addTileQuad(
+                    tx, ty,
+                    gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), 1f, light,
+                    offsetX = actor.animOffsetX() + trans.x, offsetY = actor.animOffsetY() + trans.y,
+                    hue = gear.hue(), rotate = trans.rotate && actor.rotateGlyph, mirror = actor.mirrorGlyph
+                )
+            }
+        }
         actor.drawStatusGlyphs { statusGlyph ->
             uiWorldBatch.addTileQuad(
                 tx, ty,

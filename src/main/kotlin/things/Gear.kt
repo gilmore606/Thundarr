@@ -4,6 +4,7 @@ import actors.Actor
 import actors.stats.Stat
 import actors.statuses.StatEffector
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.toEnglishList
 
 @Serializable
@@ -20,8 +21,16 @@ sealed class Gear : Portable(), StatEffector {
         FEET(2.0f, "feet", "on feet", "wear", "remove")
     }
 
+    class GlyphTransform(
+        val glyph: Glyph,
+        val x: Float,
+        val y: Float,
+        val rotate: Boolean
+    )
+
     companion object {
         val slots = listOf(Slot.MELEE, Slot.RANGED, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.LEGS, Slot.FEET)
+        val glyphTransform = GlyphTransform(Glyph.BLANK, 0.0f, 0.0f, false)
     }
 
     var equipped = false
@@ -30,8 +39,10 @@ sealed class Gear : Portable(), StatEffector {
 
     open fun equipSelfMsg() = "You put on your %d."
     open fun equipOtherMsg() = "%Dn puts on %p %d."
-open fun unequipSelfMsg() = "You take off your %d."
+    open fun unequipSelfMsg() = "You take off your %d."
     open fun unequipOtherMsg() = "%Dn takes off %p %d."
+
+    open fun glyphTransform() = glyphTransform
 
     override fun listTag() = if (equipped) "(equipped)" else ""
 

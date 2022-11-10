@@ -21,6 +21,10 @@ sealed class Clothing : Gear() {
 
 @Serializable
 class HardHat : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.HARD_HAT, 0.0f, -0.6f, false)
+    }
+    override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HARD_HAT
     override fun name() = "hard hat"
     override fun description() = "A dented yellow plastic helmet labelled 'BEN LLI  ONSTRU TION'."
@@ -34,6 +38,10 @@ class HardHat : Clothing() {
 
 @Serializable
 class HornetHelmet : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.HORNED_HAT, 0.0f, -0.6f, false)
+    }
+    override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HORNED_HAT
     override fun name() = "horned helmet"
     override fun description() = "A fur-lined metal skullcap affixed with two large curved ox horns."
@@ -48,6 +56,10 @@ class HornetHelmet : Clothing() {
 
 @Serializable
 class RiotHelmet : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.HELMET, 0.0f, -0.5f, false)
+    }
+    override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HELMET
     override fun name() = "riot helmet"
     override fun description() = "A shiny blue-black helmet made of some high tech material."
