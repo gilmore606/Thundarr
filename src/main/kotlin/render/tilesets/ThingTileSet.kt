@@ -85,4 +85,5 @@ fun ThingTileSet() =
             add(7, 6)
         })
         setTile(Glyph.LIGHTER, SimpleTile(this, 6, 5))
+        setTile(Glyph.CAMPFIRE, SimpleTile(this, 7, 4))
     }

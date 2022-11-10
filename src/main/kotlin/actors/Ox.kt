@@ -32,12 +32,12 @@ class Ox : NPC() {
         if (awareness == Awareness.AWARE && Dice.chance(0.1f)) {
             wander()?.also { return it }
         }
-        if (Dice.chance(0.16f)) {
+        if (Dice.chance(0.14f)) {
             entitiesSeen { it is Ox || it is MuskOx }.keys.randomOrNull()?.also { ox ->
                 stepToward(ox)?.also { return it }
             }
         }
-        if (Dice.chance(0.1f)) {
+        if (Dice.chance(0.03f)) {
             return Bark(Speaker.SFX.MOO)
         }
         return super.pickAction()
@@ -67,7 +67,7 @@ class MuskOx : NPC() {
         if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
             wander()?.also { return it }
         }
-        if (Dice.chance(0.1f)) {
+        if (Dice.chance(0.02f)) {
             return Bark(Speaker.SFX.MOO)
         }
         return super.pickAction()

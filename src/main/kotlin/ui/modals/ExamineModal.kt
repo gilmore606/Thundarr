@@ -34,13 +34,16 @@ class ExamineModal(
     private fun deployUseMenu() {
         val parent = this
         if (entity is Thing) {
-            Screen.addModal(ContextMenu(
+            val menu = ContextMenu(
                 width - 150, y + 4
             ).apply {
                 this.parentModal = parent
                 addInventoryOptions(this, entity, forExamine = true)
                 x = this@ExamineModal.x - maxOptionWidth - 10
-            })
+            }
+            if (menu.options.isNotEmpty()) {
+                Screen.addModal(menu)
+            }
         }
     }
 
@@ -84,7 +87,7 @@ class ExamineModal(
 
         statY = 240
         if (entity is Thing) {
-            drawStat("weight:", "lb", entity.weight(), padding)
+            if (entity.isPortable()) drawStat("weight:", "lb", entity.weight(), padding)
             if (entity is MeleeWeapon) {
                 drawStat("speed:", "", entity.speed(), padding)
                 drawStat("accuracy:", "", entity.accuracy(), padding)
@@ -96,6 +99,9 @@ class ExamineModal(
             if (App.player.autoPickUpTypes.contains(entity.thingTag())) {
                 drawStatFact("You'll pick up any " + entity.name().plural() + " you see.", padding)
             }
+            if (App.player.thrownTag == entity.thingTag()) {
+                drawStatFact(entity.name().plural() + " are your preferred thrown weapon.", padding)
+            }
         }
     }
 
@@ -104,7 +110,7 @@ class ExamineModal(
             statName, x0 + (80 - measure(statName, Screen.smallFont) - 8), padding + statY,
             font = Screen.smallFont, color = Screen.fontColorDull
         )
-        val valuestr = value.toString()
+        val valuestr = String.format("%.1f", value)
         drawString(valuestr, x0 + 80, padding + statY, font = Screen.font, color = Screen.fontColorBold)
         drawString(suffix, x0 + 80 + measure(valuestr), padding + statY, font = Screen.font, color = Screen.fontColor)
         statY += statSpacing

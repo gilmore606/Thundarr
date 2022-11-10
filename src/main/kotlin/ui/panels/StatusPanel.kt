@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.tilesets.Glyph
 import ui.modals.StatusSidecar
-import util.log
 
 object StatusPanel : ShadedPanel() {
 
@@ -85,7 +84,7 @@ object StatusPanel : ShadedPanel() {
 
     override fun drawBackground() {
         super.drawBackground()
-        if (App.player.willAggro) {
+        if (App.player.dangerMode) {
             Screen.uiBatch.addPixelQuad(x - 46, y + 70, x - 46 + 31, y + 70 + 31,
                 Screen.uiBatch.getTextureIndex(Glyph.ANGRY_THUNDARR))
         }

@@ -58,7 +58,7 @@ fun fireFragShader() = """
         vec3 center = vec3(1.0, 0.5, 0.0) * amountCenter;
         vec3 inner = vec3(1.0, 1.0, 0.3) * amountInner;
         
-        gl_FragColor = vec4(outer + inner + center, amountOuter * 0.65);
+        gl_FragColor = vec4(outer + inner + center, amountOuter * 0.6);
     }
 
 """.trimIndent()

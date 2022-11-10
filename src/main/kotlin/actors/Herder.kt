@@ -47,13 +47,13 @@ class Herder : NPC() {
                 return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
             }
             if (entity is Ox || entity is MuskOx) {
-                if (Dice.flip()) return Converse(entity as Actor)
+                if (Dice.chance(0.2f)) return Converse(entity as Actor)
             }
         }
-        if (Dice.chance(0.6f)) {
+        if (Dice.chance(0.4f)) {
             wander()?.also { return it }
         }
-        if (Dice.flip()) {
+        if (Dice.chance(0.3f)) {
             entitiesSeen { it is Ox || it is MuskOx }.keys.randomOrNull()?.also { ox ->
                 stepToward(ox)?.also { return it }
             }

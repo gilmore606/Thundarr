@@ -16,6 +16,7 @@ import world.cartos.WorldCarto
 import world.level.AttractLevel
 import world.level.Level
 import world.persist.ChunkLoader
+import world.stains.Fire
 import world.stains.Stain
 import world.terrains.Floor
 import world.terrains.Terrain
@@ -194,7 +195,7 @@ class Chunk(
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y].contents
-    } else { noThing }
+    } else noThing
 
     fun stainsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y].stains
@@ -206,7 +207,7 @@ class Chunk(
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
-    } else { Terrain.Type.TERRAIN_STONEFLOOR }
+    } else Terrain.Type.TERRAIN_STONEFLOOR
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
         this.terrains[x - this.x][y - this.y] = type
@@ -258,15 +259,26 @@ class Chunk(
 
     fun isSeenAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         seen[x - this.x][y - this.y]
-    } else { false }
+    } else false
 
     fun isRoofedAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         roofed[x - this.x][y - this.y]
-    } else { false }
+    } else false
 
     fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         walkableCache[x - this.x][y - this.y] ?: updateWalkable(x - this.x, y - this.y)
-    } else { false }
+    } else false
+
+    fun isPathableBy(entity: Entity?, x: Int, y: Int): Boolean {
+        if (boundsCheck(x, y)) {
+            if (isWalkableAt(x, y)) {
+                if (level.stainsAt(x, y)?.hasOneWhere { it is Fire } != true) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 
     private fun updateWalkable(x: Int, y: Int): Boolean {
         if (generating) return Terrain.get(terrains[x][y]).isWalkable()
@@ -288,7 +300,7 @@ class Chunk(
     fun visibilityAt(x: Int, y: Int): Float = if (boundsCheck(x, y)) {
         (if (seen[x - this.x][y - this.y]) 0.5f else 0f) +
                 (if (visible[x - this.x][y - this.y]) 0.5f else 0f)
-    } else { 0f }
+    } else 0f
 
 
     fun setTileVisibility(x: Int, y: Int, vis: Boolean) {

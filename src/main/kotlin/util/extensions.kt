@@ -6,6 +6,8 @@ import mu.KotlinLogging
 import render.Screen
 import things.Thing
 import world.Entity
+import world.journal.GameTime
+import world.persist.LevelKeeper
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
@@ -113,6 +115,22 @@ fun String.aOrAn(): String {
         }
     }
     return "a " + this
+}
+
+fun Float.turnsToRoughTime(): String {
+    val turnsPerHour = GameTime.TURNS_PER_DAY / 24.0
+    val hours = (this / turnsPerHour).toInt()
+    if (hours < 1) return "under an hour"
+    else if (hours == 1) return "an hour or so"
+    else if (hours < 10) return "about " + hours.toEnglish() + " hours"
+    else if (hours < 14) return "half a day"
+    else if (hours < 21) return "better part of a day"
+    else if (hours < 24) return "almost a day"
+    else if (hours < 27) return "about a day"
+    else if (hours < 30) return "more than a day"
+    else if (hours < 39) return "a day and a half"
+    else if (hours < 50) return "a couple days"
+    else return (hours / 24).toEnglish() + " days"
 }
 
 fun Int.toEnglish(): String {

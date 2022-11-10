@@ -33,7 +33,7 @@ sealed class Wall(
             if (weapon.canDig(type)) {
                 Speaker.world(Speaker.SFX.DIG, source = actor.xy)
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
-                if (actor is Player && !actor.willAggro) {
+                if (actor is Player && !actor.dangerMode) {
                     Console.say("Ow!  That almost made you mad enough to dig through it with your ${weapon.name()}.")
                 } else {
                     val terrainData = data?.let { it as Data } ?: Data()

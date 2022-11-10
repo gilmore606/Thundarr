@@ -31,7 +31,7 @@ class FireBatch : RenderBatch() {
     inline fun addTileQuad(col: Int, row: Int, timeOffset: Float, offX: Float, offY: Float, size: Float) {
 
         val x0 = Screen.tileXtoGlx(col.toDouble() - (size - 1f) * 0.5f - 0.3f + offX).toFloat()
-        val y0 = 0f - Screen.tileYtoGly(row.toDouble() - (size - 1f) * 1.2f - 0.7 + offY).toFloat()
+        val y0 = 0f - Screen.tileYtoGly(row.toDouble() - (size - 1f) * 1.4f - 0.7 + offY).toFloat()
         val x1 = Screen.tileXtoGlx(col.toDouble() + (size - 1f) * 0.5f + 1.3 + offX).toFloat()
         val y1 = 0f - Screen.tileYtoGly(row.toDouble() + 1.0 + offY).toFloat()
 

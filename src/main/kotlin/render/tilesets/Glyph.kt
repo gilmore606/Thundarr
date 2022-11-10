@@ -85,6 +85,7 @@ enum class Glyph {
     BRICK,
     RAINDROP,
     LIGHTER,
+    CAMPFIRE,
 
     BLOODSTAIN,
     SCORCHMARK

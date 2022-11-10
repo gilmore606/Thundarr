@@ -93,9 +93,9 @@ class StepMap() {
                                 val ty = y + dir.y
                                 if (tx in 0 until width && ty in 0 until height) {
                                     if (scratch[tx][ty] < 0) {
-                                        //waitForActorLock(level)
+                                        //waitForActorLock(level) don't need this since actors don't block walkable
                                         waitForCellLock(level, tx, ty)
-                                        if (level.isWalkableAt(x + offsetX + dir.x, y + offsetY + dir.y)) {
+                                        if (level.isPathableBy(targetEntity, x + offsetX + dir.x, y + offsetY + dir.y)) {
                                             scratch[tx][ty] = step + 1
                                             dirty = true
                                         }

@@ -2,6 +2,7 @@ package things
 
 import actors.Actor
 import audio.Speaker
+import com.badlogic.gdx.graphics.glutils.ETC1
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -25,7 +26,8 @@ sealed class Thing : Entity {
     @Transient var holder: ThingHolder? = null
 
     enum class UseTag {
-        USE, USE_ON, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY
+        E0, E1, E2, E3, E4, E5, E6, E7, E8, E9,
+        USE, USE_ON, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
     }
 
     class Use(
@@ -33,7 +35,23 @@ sealed class Thing : Entity {
         val duration: Float,
         val canDo: ((Actor, Int, Int, Boolean)->Boolean) = { _,_,_,_ -> false },
         val toDo: ((Actor, Level, Int, Int)->Unit) = { _,_,_,_ -> }
-    )
+    ) {
+        companion object {
+            fun enumeratedTag(n: Int) = when (n) {
+                0 -> UseTag.E0
+                1 -> UseTag.E1
+                2 -> UseTag.E2
+                3 -> UseTag.E3
+                4 -> UseTag.E4
+                5 -> UseTag.E5
+                6 -> UseTag.E6
+                7 -> UseTag.E7
+                8 -> UseTag.E8
+                9 -> UseTag.E9
+                else -> UseTag.E1
+            }
+        }
+    }
 
     open fun thingTag() = name()
     open fun uses(): Map<UseTag, Use> = mapOf()
@@ -122,23 +140,6 @@ sealed class Portable : Thing() {
 }
 
 @Serializable
-sealed class Obstacle : Thing() {
-    override fun isBlocking() = true
-    override fun isPortable() = false
-}
-
-@Serializable
-class Log : Portable() {
-    override fun name() = "log"
-    override fun description() = "Big, heavy, wood.  Better than bad.  Good."
-    override fun glyph() = Glyph.LOG
-    override fun flammability() = 0.5f
-    override fun onBurn(delta: Float): Float {
-        return 1f * delta
-    }
-}
-
-@Serializable
 class Brick : Portable() {
     override fun name() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
@@ -154,7 +155,7 @@ class Lighter : Portable() {
     override fun glyph() = Glyph.LIGHTER
     override fun weight() = 0.02f
     override fun uses() = mapOf(
-        UseTag.USE to Use("light a fire", 2.0f,
+        UseTag.USE to Use("light fire nearby", 2.0f,
             canDo = { actor,x,y,targ ->
                 var canDo = false
                 if (actor.xy.x == x && actor.xy.y == y) {
@@ -167,7 +168,7 @@ class Lighter : Portable() {
                 else lightFireAt(actor, level, XY(x,y))
             })
     )
-    override fun toolbarName() = "light a fire"
+    override fun toolbarName() = "light fire nearby"
     override fun toolbarUseTag() = UseTag.USE
 
     private fun hasTargetAt(x: Int, y: Int): Boolean = holder?.level?.thingsAt(x, y)?.hasOneWhere { it.flammability() > 0f } ?: false

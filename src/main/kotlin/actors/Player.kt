@@ -21,18 +21,19 @@ import ui.panels.Console
 import ui.panels.TimeButtons
 import util.XY
 import util.englishList
+import util.hasOneWhere
 import util.plural
 import world.Entity
 import world.journal.GameTime
 import world.journal.Journal
 import world.path.Pather
-import java.lang.Float.min
+import world.stains.Fire
 
 @Serializable
 open class Player : Actor() {
 
     var journal: Journal = Journal()
-    var willAggro: Boolean = false
+    var dangerMode: Boolean = false
     var thrownTag: String = ""
     override fun glyph() = Glyph.PLAYER
     override fun name() = "Thundarr"
@@ -90,7 +91,7 @@ open class Player : Actor() {
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)
-        if (willAggro) drawIt(Glyph.HOSTILE_ICON)
+        if (dangerMode) drawIt(Glyph.HOSTILE_ICON)
     }
 
     override fun onMove() {
@@ -106,6 +107,10 @@ open class Player : Actor() {
     fun tryMove(dir: XY) {
         level?.also { level ->
             if (level.isWalkableFrom(xy, dir)) {
+                if (level.stainsAt(xy.x + dir.x, xy.y + dir.y)?.hasOneWhere { it is Fire } == true && !dangerMode) {
+                    Console.say("You reconsider your dangerous idea of running into a burning fire.")
+                    return
+                }
                 queue(Move(dir))
             } else {
                 level.bumpActionTo(xy.x, xy.y, dir)?.also { queue(it) }
@@ -113,15 +118,15 @@ open class Player : Actor() {
         }
     }
 
-    override fun willAggro(target: Actor) = willAggro
+    override fun willAggro(target: Actor) = dangerMode
 
     fun toggleAggro() {
-        if (willAggro) {
-            Console.say("You calm down.")
+        if (dangerMode) {
+            Console.say("You opt for a more careful approach.")
         } else {
-            Console.say("You boil over with rage, ready to smash the next creature you approach!")
+            Console.say("You throw caution to the wind!  (You'll now attack anyone you bump into, and can walk into danger.)")
         }
-        willAggro = !willAggro
+        dangerMode = !dangerMode
     }
 
     fun toggleSleep() {

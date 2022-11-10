@@ -85,7 +85,7 @@ class Fire : Stain(), LightSource {
                         level.thingsAt(lx, ly).forEach {
                             spreadChance += it.flammability()
                         }
-                        if (Dice.chance(spreadChance * 0.5f)) {
+                        if (Dice.chance(spreadChance * 0.6f)) {
                             level.addStain(Fire(), lx, ly)
                         }
                     }

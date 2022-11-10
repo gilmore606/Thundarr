@@ -15,9 +15,11 @@ import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
 import ui.modals.ExamineModal
+import ui.modals.Modal
 import util.*
 import world.Chunk
 import world.Director
+import world.Entity
 import world.path.Pather
 import world.stains.Fire
 import world.stains.Stain
@@ -255,6 +257,8 @@ sealed class Level {
 
     fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
+    fun isPathableBy(entity: Entity?, x: Int, y: Int) = chunkAt(x,y)?.isPathableBy(entity, x, y) ?: false
+
     fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
     fun isWalkableFrom(x: Int, y: Int, toDir: XY) = isWalkableAt(x + toDir.x, y + toDir.y) && actorAt(x + toDir.x, y + toDir.y) == null
 
@@ -370,7 +374,7 @@ sealed class Level {
     open fun updateAmbientSound(hour: Int, minute: Int) { }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
-        val isAdjacent = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
+        val isAdjacentOrHere = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
         val isHere = App.player.xy.x == x && App.player.xy.y == y
 
         thingsAt(x,y).groupByTag().forEach { group ->
@@ -397,8 +401,11 @@ sealed class Level {
                     }
                 }
             }
+            if (!group[0].isPortable()) {
+                menu.addOption("examine " + group[0].name()) { Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW)) }
+            }
         }
-        if (isWalkableAt(x, y) && !isAdjacent) {
+        if (isWalkableAt(x, y) && !isAdjacentOrHere) {
             menu.addOption("walk here") {
                 App.player.queue(WalkTo(this, x, y))
             }
@@ -412,19 +419,38 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != "" && !isAdjacent && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
+        if (App.player.thrownTag != "" && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))
                 }
             }
         }
-        if (isAdjacent) {
-            App.player.contents.forEach { held ->
+        if (isAdjacentOrHere) {
+            App.player.contents.groupByTag().forEach { group ->
+                val held = group.first()
                 held.uses().values.forEach { heldUse ->
                     if (heldUse.canDo(App.player, x, y, true)) {
                         menu.addOption(heldUse.command) {
                             App.player.queue(Use(held, heldUse.duration, heldUse.toDo, x, y))
+                        }
+                    }
+                }
+            }
+        }
+        if (isHere) {
+            for (ix in -1..1) {
+                for (iy in -1..1) {
+                    if (ix != 0 || iy != 0) {
+                        thingsAt(x+ix, y+iy).groupByTag().forEach { nearGroup ->
+                            val near = nearGroup.first()
+                            near.uses().values.forEach { nearUse ->
+                                if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
+                                    menu.addOption(nearUse.command) {
+                                        App.player.queue(Use(near, nearUse.duration, nearUse.toDo, x+ix, y+iy))
+                                    }
+                                }
+                            }
                         }
                     }
                 }

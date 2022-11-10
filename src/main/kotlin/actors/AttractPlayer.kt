@@ -100,7 +100,7 @@ class AttractPlayer : Player() {
                                 level.getTerrainData(tx, ty)?.also {
                                     if ((it as Wall.Data).damage > 0 && (App.time > noMiningUntil)) {
                                         finishDig = Bump(xy.x, xy.y, dir)
-                                        willAggro = true
+                                        dangerMode = true
                                         isMining = true
                                     }
                                 }
@@ -112,7 +112,7 @@ class AttractPlayer : Player() {
                         if (digDirs.isNotEmpty() && Dice.chance(0.95f)) {
                             if (isMining || (App.time > noMiningUntil) && Dice.chance(0.05f)) {
                                 isMining = true
-                                willAggro = true
+                                dangerMode = true
                                 val dir = digDirs.random()
                                 tunnelDir?.also { tunnelDir ->
                                     if (Dice.chance(0.1f)) this.tunnelDir = dir
@@ -179,7 +179,7 @@ class AttractPlayer : Player() {
 
     private fun stopMining() {
         isMining = false
-        willAggro = false
+        dangerMode = false
         noMiningUntil = App.time + Dice.range(10, 500)
         tunnelDir = null
     }

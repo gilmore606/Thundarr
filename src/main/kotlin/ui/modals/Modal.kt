@@ -179,48 +179,51 @@ abstract class Modal(
     protected fun addInventoryOptions(menu: ContextMenu, thing: Thing, these: List<Thing> = listOf(thing),
                                       asWithContainer: Container? = null, asWithParent: Modal? = null, forExamine: Boolean = false) {
         menu.apply {
-            if (these.size > 1) {
-                asWithContainer?.also { container ->
-                    addOption("put one " + thing.name() + " in " + container.name()) {
-                        App.player.queue(Drop(thing, container))
-                    }
-                    addOption("put all " + thing.name().plural() + " in " + container.name()) {
-                        these.forEach { App.player.queue(Drop(it, container)) }
-                    }
-                } ?: run {
-                    asWithParent?.also { parent ->
-                        if (!App.player.hasStatus(Status.Tag.BURDENED)) {
-                            addOption("take one " + thing.name()) {
-                                App.player.queue(Get(thing))
-                            }
-                            addOption("take all " + thing.name().plural()) {
-                                these.forEach { App.player.queue(Get(it)) }
-                            }
+            val portable = thing.isPortable()
+            if (portable) {
+                if (these.size > 1) {
+                    asWithContainer?.also { container ->
+                        addOption("put one " + thing.name() + " in " + container.name()) {
+                            App.player.queue(Drop(thing, container))
+                        }
+                        addOption("put all " + thing.name().plural() + " in " + container.name()) {
+                            these.forEach { App.player.queue(Drop(it, container)) }
                         }
                     } ?: run {
-                        addOption("drop one " + thing.name()) {
-                            App.player.queue(Drop(thing, groundAtPlayer()))
-                        }
-                        addOption("drop all " + thing.name().plural()) {
-                            these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
-                        }
-                    }
-                }
-            } else {
-                asWithContainer?.also { container ->
-                    addOption("put " + thing.name() + " in " + container.name()) {
-                        App.player.queue(Drop(thing, container))
-                    }
-                } ?: run {
-                    asWithParent?.also {
-                        if (!App.player.hasStatus(Status.Tag.BURDENED)) {
-                            addOption("take " + thing.name()) {
-                                App.player.queue(Get(thing))
+                        asWithParent?.also { parent ->
+                            if (!App.player.hasStatus(Status.Tag.BURDENED)) {
+                                addOption("take one " + thing.name()) {
+                                    App.player.queue(Get(thing))
+                                }
+                                addOption("take all " + thing.name().plural()) {
+                                    these.forEach { App.player.queue(Get(it)) }
+                                }
+                            }
+                        } ?: run {
+                            addOption("drop one " + thing.name()) {
+                                App.player.queue(Drop(thing, groundAtPlayer()))
+                            }
+                            addOption("drop all " + thing.name().plural()) {
+                                these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
                             }
                         }
+                    }
+                } else {
+                    asWithContainer?.also { container ->
+                        addOption("put " + thing.name() + " in " + container.name()) {
+                            App.player.queue(Drop(thing, container))
+                        }
                     } ?: run {
-                        addOption("drop " + thing.listName()) {
-                            App.player.queue(Drop(thing, groundAtPlayer()))
+                        asWithParent?.also {
+                            if (!App.player.hasStatus(Status.Tag.BURDENED)) {
+                                addOption("take " + thing.name()) {
+                                    App.player.queue(Get(thing))
+                                }
+                            }
+                        } ?: run {
+                            addOption("drop " + thing.listName()) {
+                                App.player.queue(Drop(thing, groundAtPlayer()))
+                            }
                         }
                     }
                 }
@@ -238,7 +241,7 @@ abstract class Modal(
                         }
                     }
                 }
-                if (thing.thingTag() != App.player.thrownTag) {
+                if (portable && thing.thingTag() != App.player.thrownTag) {
                     addOption("ready " + thing.name().plural() + " for throwing") {
                         App.player.readyForThrowing(thing.thingTag())
                     }
@@ -252,7 +255,7 @@ abstract class Modal(
                     addOption("stop auto-pickup of " + thing.name().plural()) {
                         App.player.removeAutoPickUpType(thing.thingTag())
                     }
-                } else {
+                } else if (portable) {
                     addOption("auto-pickup " + thing.name().plural()) {
                         App.player.addAutoPickUpType(thing.thingTag())
                     }
