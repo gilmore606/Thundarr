@@ -226,8 +226,8 @@ object Screen : KtxScreen {
             vis, lightCache[lx][ly], hue = thing.hue())
     }
 
-    private val renderFire: (Int, Int, Float, Float, Float)->Unit = { tx, ty, offset, offx, offy ->
-        fireBatch.addTileQuad(tx, ty, offset, offX = offx, offY = offy)
+    private val renderFire: (Int, Int, Float, Float, Float, Float)->Unit = { tx, ty, offset, offx, offy, size ->
+        fireBatch.addTileQuad(tx, ty, offset, offX = offx, offY = offy, size = size)
     }
 
     private val renderActor: (Int, Int, Actor)->Unit = { tx, ty, actor ->

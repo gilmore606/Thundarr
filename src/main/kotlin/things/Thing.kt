@@ -134,7 +134,7 @@ class Log : Portable() {
     override fun glyph() = Glyph.LOG
     override fun flammability() = 0.5f
     override fun onBurn(delta: Float): Float {
-        return 2f * delta
+        return 1f * delta
     }
 }
 

@@ -80,7 +80,7 @@ sealed class Level {
         doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                  vis: Float, glyph: Glyph, light: LightColor)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
-        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float) -> Unit,
+        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
         doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,
         delta: Float
     ) {
@@ -108,7 +108,7 @@ sealed class Level {
                             }
                             chunk.stainsAt(x, y)?.forEach { stain ->
                                 if (stain is Fire) {
-                                    doFire(x, y, getRandom(x,y).toFloat(), 0f, 0f)
+                                    doFire(x, y, getRandom(x,y).toFloat(), 0f, 0f, 0.2f + stain.size * 0.25f)
                                 } else {
                                     doStain(x, y, stain, light)
                                 }
@@ -145,7 +145,7 @@ sealed class Level {
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(
         doThis: (x: Int, y: Int, actor: Actor) -> Unit,
-        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float) -> Unit,
+        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
         delta: Float) =
         director.actors.forEach { actor ->
             val x = actor.xy.x

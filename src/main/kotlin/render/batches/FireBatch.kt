@@ -28,23 +28,24 @@ class FireBatch : RenderBatch() {
         vertexCount++
     }
 
-    inline fun addTileQuad(col: Int, row: Int, offset: Float, offX: Float, offY: Float) {
-        val x0 = Screen.tileXtoGlx(col.toDouble() - 0.3 + offX).toFloat()
-        val y0 = 0f - Screen.tileYtoGly(row.toDouble() - 1.2 + offY).toFloat()
-        val x1 = Screen.tileXtoGlx(col.toDouble() + 1.3 + offX).toFloat()
+    inline fun addTileQuad(col: Int, row: Int, timeOffset: Float, offX: Float, offY: Float, size: Float) {
+
+        val x0 = Screen.tileXtoGlx(col.toDouble() - (size - 1f) * 0.5f - 0.3f + offX).toFloat()
+        val y0 = 0f - Screen.tileYtoGly(row.toDouble() - (size - 1f) * 1.2f - 0.7 + offY).toFloat()
+        val x1 = Screen.tileXtoGlx(col.toDouble() + (size - 1f) * 0.5f + 1.3 + offX).toFloat()
         val y1 = 0f - Screen.tileYtoGly(row.toDouble() + 1.0 + offY).toFloat()
 
         floats.apply {
-            addVertex(x0, y0, 0f, 0f, offset)
-            addVertex(x0, y1, 0f, 1f, offset)
-            addVertex(x1, y0, 1f, 0f, offset)
-            addVertex(x1, y0, 1f, 0f, offset)
-            addVertex(x0, y1, 0f, 1f, offset)
-            addVertex(x1, y1, 1f, 1f, offset)
+            addVertex(x0, y0, 0f, 0f, timeOffset)
+            addVertex(x0, y1, 0f, 1f, timeOffset)
+            addVertex(x1, y0, 1f, 0f, timeOffset)
+            addVertex(x1, y0, 1f, 0f, timeOffset)
+            addVertex(x0, y1, 0f, 1f, timeOffset)
+            addVertex(x1, y1, 1f, 1f, timeOffset)
         }
     }
 
     override fun bindTextures() {
-        shader.setUniformf("u_Time", ((Screen.timeMs - startTime) % 1000L).toFloat())
+        shader.setUniformf("u_Time", ((Screen.timeMs - startTime) % 10000L).toFloat())
     }
 }
