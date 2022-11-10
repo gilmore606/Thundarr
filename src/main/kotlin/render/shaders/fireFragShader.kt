@@ -50,13 +50,15 @@ fun fireFragShader() = """
         vec2 p2 = (UV - vec2(0.5, 0.775)) + sdfNoise;
         vec2 p3 = (UV - vec2(0.5, 0.8)) + sdfNoise;
         
-        float amountOuter = step(sdfCircle(p1, 0.25), 0.0);
+        float sizVary = 0.0000004 * v_Offset;
+        float amountOuter = step(sdfCircle(p1, 0.25 + sizVary), 0.0);
         float amountCenter = step(sdfCircle(p2, 0.175), 0.0);
-        float amountInner = step(sdfCircle(p3, 0.1), 0.0);
+        float amountInner = step(sdfCircle(p3, 0.1 + sizVary), 0.0);
         
-        vec3 outer = vec3(1.0, 0.0, 0.0) * amountOuter;
-        vec3 center = vec3(1.0, 0.5, 0.0) * amountCenter;
-        vec3 inner = vec3(1.0, 1.0, 0.3) * amountInner;
+        float hueVary = 0.000004 * v_Offset;
+        vec3 outer = vec3(1.0, 0.0, hueVary) * amountOuter;
+        vec3 center = vec3(1.0, min(1.0, 0.4 + hueVary), 0.0) * amountCenter;
+        vec3 inner = vec3(1.0, max(0.0, 1.0 - hueVary), 0.3) * amountInner;
         
         gl_FragColor = vec4(outer + inner + center, amountOuter * 0.6);
     }

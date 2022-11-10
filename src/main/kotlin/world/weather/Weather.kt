@@ -15,7 +15,7 @@ import kotlin.math.sin
 @Serializable
 class Weather {
 
-    val overallRaininess = 0.0f   // 0.4f
+    val overallRaininess = 0.38f   // 0.4f
 
     var weatherIntensity = 0f
     var windX = 0f
@@ -47,9 +47,9 @@ class Weather {
 
     fun onRender(delta: Float) {
         weatherIntensity = if (weatherIntensity < weatherIntensityTarget) {
-            min(weatherIntensityTarget, weatherIntensity + 0.25f * delta)
+            min(weatherIntensityTarget, weatherIntensity + 0.1f * delta)
         } else {
-            max(weatherIntensityTarget, weatherIntensity - 0.25f * delta)
+            max(weatherIntensityTarget, weatherIntensity - 0.1f * delta)
         }
 
         var bolt = max(0f, lightning.r - 3.8f * delta)

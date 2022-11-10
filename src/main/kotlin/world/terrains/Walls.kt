@@ -49,8 +49,10 @@ sealed class Wall(
                     }
                 }
             } else {
-                if (actor is Player) Console.say(bumpMsg())
-                actor.addStatus(Dazed())
+                if (actor is Player) {
+                    Console.say(bumpMsg())
+                    if (actor.dangerMode) actor.addStatus(Dazed())
+                }
             }
         }
     }

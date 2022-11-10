@@ -58,7 +58,7 @@ class Fire : Stain(), LightSource {
 
             // burn fuel
             val fuels = holder.contents.filter { it.flammability() > 0f } as MutableList<Thing>
-            while (fuels.isNotEmpty() && needToBurn > 0f) {
+            while (fuels.isNotEmpty() && needToBurn > -1f) {
                 val fuel = fuels.random()
                 needToBurn -= fuel.onBurn(delta)
                 fuels.remove(fuel)
