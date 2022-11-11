@@ -90,7 +90,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     abstract fun wantsToAct(): Boolean
 
     open fun onRestore() {
-        contents.forEach { it.onRestore(this) }
+        contents.forEach {
+            it.onRestore(this)
+            if (it is Temporal) level?.linkTemporal(it)
+        }
         isUnloading = false
     }
 

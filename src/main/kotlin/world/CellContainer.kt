@@ -51,7 +51,6 @@ class CellContainer : ThingHolder {
         locked = true
         contents.add(thing)
         if (level == null) log.warn("adding thing to cell $xy but level is null!")
-        if (thing is Temporal) level?.linkTemporal(thing)
         level?.onAddThing(xy.x, xy.y, thing)
         locked = false
     }
@@ -59,7 +58,6 @@ class CellContainer : ThingHolder {
     override fun remove(thing: Thing) {
         locked = true
         contents.remove(thing)
-        if (thing is Temporal) level?.unlinkTemporal(thing)
         level?.onRemoveThing(xy.x, xy.y, thing)
         locked = false
     }

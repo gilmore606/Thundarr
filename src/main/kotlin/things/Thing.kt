@@ -101,8 +101,10 @@ sealed class Thing : Entity {
     fun moveTo(to: ThingHolder?) {
         val from = holder
         holder?.remove(this)
+        if (this is Temporal) holder?.level?.unlinkTemporal(this)
         this.holder = to
         to?.add(this)
+        if (this is Temporal) holder?.level?.linkTemporal(this)
         onMoveTo(from, to)
     }
     fun moveTo(x: Int, y: Int) = moveTo(level()?.cellContainerAt(x, y) ?: throw RuntimeException("moved $this to local coords but it wasn't in a level!"))

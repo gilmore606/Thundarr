@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
+import util.log
 import world.level.Level
 
 
@@ -112,7 +113,7 @@ class Pear : Food() {
 }
 
 @Serializable
-class Meat : Food() {
+class Meat : Rottable() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw meat"
     override fun thingTag() = "meat"
@@ -146,4 +147,35 @@ class EnergyDrink : Consumable() {
     override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
     override fun statusEffect() = Wired()
     override fun breakOnThrow() = true
+}
+
+@Serializable
+sealed class Rottable : Food(), Temporal {
+    private var rot = 0f
+    open fun maxRot() = 2000f
+    open fun onRot() { }
+
+    override fun examineDescription(): String {
+        var d = super.examineDescription()
+        val max = maxRot()
+        if (rot > max * 0.75f) {
+            d += " It smells pretty bad."
+        } else if (rot > max * 0.5f) {
+            d += " It smells a little off."
+        }
+        return d
+    }
+
+    override fun advanceTime(delta: Float) {
+        rot += delta
+        log.info("rot $rot")
+        if (rot > maxRot()) {
+            onRot()
+            doRot()
+        }
+    }
+    private fun doRot() {
+        if (holder is Player) Console.say("Your " + this.name() + " rots away.")
+        moveTo(null)
+    }
 }

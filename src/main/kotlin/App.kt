@@ -173,7 +173,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             if (level !is WorldLevel) LevelKeeper.getLevel("world")
 
             player = state.player
-            player.onRestore()
             level.setPov(player.xy.x, player.xy.y)
             weather = state.weather
             updateTime(state.time)
@@ -190,6 +189,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             Screen.brightnessTarget = 1f
             addGamePanels()
             level.onPlayerEntered()
+            player.onRestore()
             updateTime(time)
         }
     }
