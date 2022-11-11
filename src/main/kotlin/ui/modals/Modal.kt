@@ -184,11 +184,13 @@ abstract class Modal(
             if (portable) {
                 if (these.size > 1) {
                     asWithContainer?.also { container ->
-                        addOption("put one " + thing.name() + " in " + container.name()) {
-                            App.player.queue(Drop(thing, container))
-                        }
-                        addOption("put all " + thing.name().plural() + " in " + container.name()) {
-                            these.forEach { App.player.queue(Drop(it, container)) }
+                        if (container.contents().size < container.itemLimit()) {
+                            addOption("put one " + thing.name() + " in " + container.name()) {
+                                App.player.queue(Drop(thing, container))
+                            }
+                            addOption("put all " + thing.name().plural() + " in " + container.name()) {
+                                these.forEach { App.player.queue(Drop(it, container)) }
+                            }
                         }
                     } ?: run {
                         asWithParent?.also { parent ->
@@ -211,8 +213,10 @@ abstract class Modal(
                     }
                 } else {
                     asWithContainer?.also { container ->
-                        addOption("put " + thing.name() + " in " + container.name()) {
-                            App.player.queue(Drop(thing, container))
+                        if (container.contents().size < container.itemLimit()) {
+                            addOption("put " + thing.name() + " in " + container.name()) {
+                                App.player.queue(Drop(thing, container))
+                            }
                         }
                     } ?: run {
                         asWithParent?.also {
@@ -231,7 +235,7 @@ abstract class Modal(
             }
 
             if (!forExamine) addOption("examine " + thing.name()) {
-                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW))
+                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW).apply { zoomWhenOpen = true })
             }
 
             if (asWithContainer == null && asWithParent == null) {

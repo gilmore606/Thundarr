@@ -2,12 +2,15 @@ package ui.modals
 
 import actors.actions.Drop
 import actors.actions.Get
+import actors.actions.Make
 import actors.actions.Use
 import com.badlogic.gdx.Input
 import render.Screen
 import things.Container
 import things.Thing
 import things.ThingHolder
+import things.Workbench
+import util.difficultyDesc
 import util.groundAtPlayer
 import util.log
 import util.plural
@@ -28,6 +31,11 @@ class InventoryModal(
     var weights = ArrayList<String>()
     var totalText: String = ""
     var maxText: String = ""
+    var numRecipes: Int = 0
+    var firstRecipeSelection: Int = -1
+    var withBench = withContainer is Workbench
+    var isBench = (parentModal is InventoryModal && parentModal.withBench)
+    fun getBench() = if (isBench) ((parentModal as InventoryModal).withContainer as Workbench) else null
 
     init {
         zoomWhenOpen = true
@@ -35,9 +43,9 @@ class InventoryModal(
         updateGrouped()
         adjustHeight()
         selectionBoxHeight = 18
-        spacing = 28
+        spacing = 27
         padding = 18
-        headerPad += 10
+        headerPad = 80
         withContainer?.also {
             sidecar = InventoryModal(withContainer, parentModal = this, sidecarTitle = withContainer.name())
             moveToSidecar()
@@ -47,21 +55,22 @@ class InventoryModal(
     }
 
     fun shownThing(): Thing? = if (isInSidecar && sidecar is InventoryModal) (sidecar as InventoryModal).shownThing()
-        else if (grouped.isEmpty()) null else if (selection > -1) grouped[selection].first() else null
+        else if (grouped.isEmpty()) null else if (selection > -1 && selection < firstRecipeSelection) grouped[selection].first() else null
 
     private fun adjustHeight() {
-        height = headerPad + max(1, grouped.size + 1) * spacing + 60 + padding * 2
+        height = headerPad + max(1, grouped.size + 1) * (spacing + 2) + padding * 2
+        if (isBench) height += getBench()!!.possibleRecipes().size * spacing
+        onResize(Screen.width, Screen.height)
     }
 
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
 
     override fun drawModalText() {
         if (maxSelection < 0) {
-            drawOptionText(if (isSidecar) "It's empty." else "Your backpack is empty.", 0)
+            drawOptionText(if (isBench) ((parentModal as InventoryModal).withContainer?.isEmptyMsg() ?: "It's empty.") else "Your backpack is empty.", 0)
             changeSelection(-1)
             return
         }
-        var n = 0
         grouped.forEachIndexed { i, group ->
             var text = ""
             val first = group.first()
@@ -70,21 +79,46 @@ class InventoryModal(
             } else {
                 first.name()
             }
-            drawOptionText(text, n, 30, addTag = first.listTag(), addCol = weights[i], colX = 270)
-            n++
+            if (isBench) {
+                drawOptionText(text, i, 30)
+            } else {
+                drawOptionText(text, i, 30, addTag = first.listTag(), addCol = weights[i], colX = 270)
+            }
         }
         if (!isSidecar) {
             drawString("Capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
             drawString(maxText, padding + 75, height - 31, Screen.fontColor, Screen.font)
         }
-        drawString("Total ", padding + 252, height - 30, Screen.fontColorDull, Screen.smallFont)
-        drawString(totalText, padding + 300, height - 31, Screen.fontColor, Screen.font)
+        if (!isBench) {
+            drawString("Total ", padding + 252, height - 30, Screen.fontColorDull, Screen.smallFont)
+            drawString(totalText, padding + 300, height - 31, Screen.fontColor, Screen.font)
+        } else {
+            val bench = (parentModal as InventoryModal).withContainer as Workbench
+            val recipes = bench.possibleRecipes()
+            if (recipes.isEmpty()) {
+                drawString("You can't see anything to make out of this.", padding, height - 30, Screen.fontColor, Screen.smallFont)
+            } else {
+                var yc = height - padding - numRecipes * spacing
+                recipes.forEachIndexed { n, recipe ->
+                    val selected = (n == selection - firstRecipeSelection)
+                    val cmd = bench.useVerb().capitalize() + " " + recipe.product().iname()
+                    val difstr = " (" + recipe.difficulty().difficultyDesc(recipe.skill().get(App.player)) + ")"
+                    drawString(cmd, padding, yc + 8, if (selected) Screen.fontColorBold else Screen.fontColorDull, Screen.font)
+                    drawString(difstr, padding + 270, yc + 9, if (selected) Screen.fontColor else Screen.fontColorDull, Screen.smallFont)
+                    yc += spacing
+                }
+            }
+        }
     }
 
     override fun drawBackground() {
         super.drawBackground()
         if (!isAnimating()) {
-            if (selection > -1) drawOptionShade()
+            if (selection > -1 && selection < firstRecipeSelection) {
+                drawOptionShade()
+            } else if (selection >= firstRecipeSelection) {
+                drawOptionShade(forceY = height - (spacing * numRecipes) + (selection - firstRecipeSelection) * spacing - 6)
+            }
         }
     }
 
@@ -104,15 +138,21 @@ class InventoryModal(
         super.doSelect()
         val parent = this
         val ourSelection = selection
-        Screen.addModal(ContextMenu(
-            width + (parentModal?.width ?: 0) - 2,
-            optionY(ourSelection) - 4
-        ).apply {
-            zoomWhenOpen = true
-            this.parentModal = parent
-            addInventoryOptions(this, grouped[ourSelection][0], grouped[ourSelection],
-                parent.withContainer, parent.parentModal)
-        })
+        if (selection >= firstRecipeSelection) {
+            App.player.queue(Make(getBench()!!, getBench()!!.possibleRecipes()[selection - firstRecipeSelection]))
+        } else {
+            Screen.addModal(ContextMenu(
+                width + (parentModal?.width ?: 0) - 2,
+                optionY(ourSelection) - 4
+            ).apply {
+                zoomWhenOpen = true
+                this.parentModal = parent
+                addInventoryOptions(
+                    this, grouped[ourSelection][0], grouped[ourSelection],
+                    parent.withContainer, parent.parentModal
+                )
+            })
+        }
     }
 
     override fun childSucceeded() {
@@ -124,6 +164,23 @@ class InventoryModal(
         if (selection > 0) {
             parentModal?.moveToSidecar()
         }
+    }
+
+    override fun mouseToOption(screenX: Int, screenY: Int): Int? {
+        val localX = screenX - x
+        val localY = screenY - y + (spacing / 2)
+        if (localX in 1 until width) {
+            val hoverOption = (localY - headerPad - 5) / spacing
+            if (hoverOption in 0 until firstRecipeSelection) {
+                return hoverOption
+            }
+            height - padding - numRecipes * spacing
+            val recipeOption = (localY - (height - numRecipes * spacing)) / spacing
+            if (recipeOption in 0 until numRecipes) {
+                return recipeOption + firstRecipeSelection
+            }
+        }
+        return null
     }
 
     override fun onKeyDown(keycode: Int) {
@@ -150,6 +207,12 @@ class InventoryModal(
                 (it as SelectionModal).changeSelection(max(0, min(selection, it.maxSelection)))
                 changeSelection(-1)
             }
+        }
+    }
+
+    override fun onDismiss() {
+        if (withBench) {
+            (withContainer as Workbench).emptyOnClose()
         }
     }
 
@@ -183,7 +246,9 @@ class InventoryModal(
         totalText = String.format("%.1f", weightTotal) + "lb"
         maxText = String.format("%.1f", App.player.carryingCapacity()) + "lb"
 
-        maxSelection = grouped.size - 1
+        numRecipes = (getBench()?.possibleRecipes()?.size ?: 0)
+        firstRecipeSelection = grouped.size
+        maxSelection = grouped.size - 1 + numRecipes
         changeSelection(min(maxSelection, selection))
         adjustHeight()
         if (maxSelection < 0) {

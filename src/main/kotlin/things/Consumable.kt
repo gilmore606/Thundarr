@@ -114,9 +114,10 @@ class Pear : Food() {
 @Serializable
 class Meat : Food() {
     override fun glyph() = Glyph.MEAT
-    override fun name() = "raw steak"
+    override fun name() = "raw meat"
+    override fun thingTag() = "meat"
     override fun description() = "A bloody chunk of raw meat.  Edible as-is, but not exactly appetizing; you're a barbarian, not a savage."
-    override fun calories() = 800
+    override fun calories() = 600
     override fun consumeSelfMsg() = "You choke down the raw meat, imagining how delicious it would be if you cooked it first.  Oh well."
     override fun onConsume(actor: Actor) {
         super.onConsume(actor)
@@ -124,6 +125,17 @@ class Meat : Food() {
             actor.addStatus(Sick())
         }
     }
+}
+
+@Serializable
+class Steak : Food() {
+    override fun glyph() = Glyph.MEAT
+    override fun hue() = 0.5f
+    override fun name() = "seared steak"
+    override fun thingTag() = "steak"
+    override fun description() = "A delicious flame-grilled slab of steak.  From what animal, is not important.  It smells wonderful."
+    override fun calories() = 1200
+    override fun consumeSelfMsg() = "You feast on the steak, congratulating yourself for your domestic prowess."
 }
 
 @Serializable

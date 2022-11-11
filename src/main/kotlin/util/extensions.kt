@@ -133,6 +133,27 @@ fun Float.turnsToRoughTime(): String {
     else return (hours / 24).toEnglish() + " days"
 }
 
+fun Float.difficultyAdverb(skill: Float): String {
+    val diff = this + 10f - skill
+    return if (diff <= -5f) "almost certainly not"
+    else if (diff <= -3f) "conceivably"
+    else if (diff <= -1f) "possibly"
+    else if (diff <= 1f) "likely"
+    else if (diff <= 3f) "probably"
+    else if (diff <= 5f) "almost certainly"
+    else "trivially"
+}
+
+fun Float.difficultyDesc(skill: Float): String {
+    val diff = this + 10f - skill
+    return if (diff <= -6f) "impossible"
+    else if (diff <= -4f) "very hard"
+    else if (diff <= -2f) "hard"
+    else if (diff <= 2f) "moderate"
+    else if (diff <= 4f) "easy"
+    else "trivial"
+}
+
 fun Int.toEnglish(): String {
     if (this > 99) return this.toString()
     var str =  when (this % 10) {
@@ -158,14 +179,14 @@ fun Int.toEnglish(): String {
                 "five" -> "fifteen"
                 else -> str + "teen"
             }
-            2 -> "twenty-" + str
-            3 -> "thirty-" + str
-            4 -> "forty-" + str
-            5 -> "fifty-" + str
-            6 -> "sixty-" + str
-            7 -> "seventy-" + str
-            8 -> "eighty-" + str
-            9 -> "ninety-" + str
+            2 -> "twenty" + if (str != "") "-"+str else ""
+            3 -> "thirty" + if (str != "") "-"+str else ""
+            4 -> "forty" + if (str != "") "-"+str else ""
+            5 -> "fifty" + if (str != "") "-"+str else ""
+            6 -> "sixty" + if (str != "") "-"+str else ""
+            7 -> "seventy" + if (str != "") "-"+str else ""
+            8 -> "eighty" + if (str != "") "-"+str else ""
+            9 -> "ninety" + if (str != "") "-"+str else ""
             else -> "???" + str
         }
     }

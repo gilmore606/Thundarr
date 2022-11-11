@@ -10,10 +10,7 @@ import render.Screen
 import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
-import util.NORTH
-import util.NO_DIRECTION
-import util.SOUTH
-import util.WEST
+import util.*
 import world.Entity
 import java.lang.Integer.min
 
@@ -34,7 +31,7 @@ abstract class SelectionModal(
 
     override fun moveToSidecar() {
         super.moveToSidecar()
-        sidecar?.also { if (it is SelectionModal) it.selection = min(it.maxSelection, selection) }
+        sidecar?.also { if (it is SelectionModal && it.selection == -1) it.selection = min(it.maxSelection, selection) }
         changeSelection(-1)
     }
 
@@ -83,9 +80,10 @@ abstract class SelectionModal(
         batch?.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()), hue = entity.hue())
     }
 
-    protected fun drawOptionShade(space: Int = 0) {
+    protected fun drawOptionShade(space: Int = 0, forceY: Int? = null) {
         if (!isAnimating() && selection >= 0) {
-            drawSelectionBox(padding + space, headerPad + selection * spacing + 1, width - padding * 2 - 4 - space, selectionBoxHeight)
+            drawSelectionBox(padding + space,
+                forceY ?: (headerPad + selection * spacing + 1), width - padding * 2 - 4 - space, selectionBoxHeight)
         }
     }
 

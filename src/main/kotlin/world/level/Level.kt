@@ -387,12 +387,6 @@ sealed class Level {
                         group.forEach { App.player.queue(Get(it)) }
                     }
                 }
-                if (!App.player.autoPickUpTypes.contains(group[0].thingTag())) {
-                    menu.addOption("auto-pickup " + group[0].name().plural()) {
-                        App.player.addAutoPickUpType(group[0].thingTag())
-                        group.forEach { App.player.queue(Get(it)) }
-                    }
-                }
             }
             group[0].uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {

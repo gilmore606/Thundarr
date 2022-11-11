@@ -12,11 +12,13 @@ sealed class Container : Portable(), ThingHolder {
     private val contents = ArrayList<Thing>()
 
     override fun contents() = contents
-    override fun xy() = holder?.xy()
     @Transient
     override var level: Level? = null
 
     open fun openVerb() = "look inside"
+    open fun isEmptyMsg() = "It's empty."
+    open fun itemLimit() = 100
+    open fun isOpenable() = true
 
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)
@@ -31,21 +33,29 @@ sealed class Container : Portable(), ThingHolder {
 
     override fun add(thing: Thing) {
         contents.add(thing)
+        onAdd(thing)
     }
+    open fun onAdd(thing: Thing) { }
 
     override fun remove(thing: Thing) {
         contents.remove(thing)
+        onRemove(thing)
     }
+    open fun onRemove(thing: Thing) { }
 
-    override fun uses() = mapOf(
-        UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f,
-            canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) || isNextTo(actor) },
-            toDo = { actor, level, x, y ->
-                if (actor is Player) {
-                    App.openInventory(withContainer = this@Container)
-                }
-            })
-    )
+    override fun uses(): Map<UseTag, Use> {
+        if (isOpenable()) {
+            return mapOf(
+                UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f,
+                    canDo = { actor, x, y, targ -> !targ && isHeldBy(actor) || isNextTo(actor) },
+                    toDo = { actor, level, x, y ->
+                        if (actor is Player) {
+                            App.openInventory(withContainer = this@Container)
+                        }
+                    })
+            )
+        } else return mapOf()
+    }
 }
 
 @Serializable

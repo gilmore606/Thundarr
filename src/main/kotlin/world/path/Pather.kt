@@ -11,6 +11,7 @@ import ktx.async.newSingleThreadAsyncContext
 import util.RayCaster
 import util.XY
 import util.log
+import util.safeForEach
 import world.Entity
 import java.lang.RuntimeException
 
@@ -125,7 +126,7 @@ object Pather {
         if (worker?.isActive == false || worker == null) throw RuntimeException("Pather has crashed!")
 
         coroutineScope.launch {
-            maps.forEach { it.onActorMove(actor) }
+            maps.safeForEach { it.onActorMove(actor) }
         }
     }
 
