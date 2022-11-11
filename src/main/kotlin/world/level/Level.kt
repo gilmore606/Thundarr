@@ -57,6 +57,7 @@ sealed class Level {
     abstract fun allChunks(): Set<Chunk>
 
     val ambientLight = LightColor(0.4f, 0.3f, 0.7f)
+    val windowLight = LightColor(0.4f, 0.3f, 0.7f)
     val indoorLight = LightColor(0.1f, 0.2f, 0.5f)
     open fun timeScale() = 1.0f
     open val sunLightSteps = sunLights()
@@ -255,6 +256,10 @@ sealed class Level {
 
     fun isRoofedAt(x: Int, y: Int) = chunkAt(x,y)?.isRoofedAt(x,y) ?: false
 
+    fun roofedAt(x: Int, y: Int) = chunkAt(x,y)?.roofedAt(x,y) ?: Chunk.Roofed.OUTDOOR
+
+    fun setRoofedAt(x: Int, y: Int, roofed: Chunk.Roofed) = chunkAt(x,y)?.setRoofed(x, y, roofed)
+
     fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
 
     fun isPathableBy(entity: Entity?, x: Int, y: Int) = chunkAt(x,y)?.isPathableBy(entity, x, y) ?: false
@@ -316,8 +321,12 @@ sealed class Level {
 
     fun dirtyLightsTouching(x: Int, y: Int) = chunkAt(x,y)?.dirtyLightsTouching(x,y)
 
-    fun ambientLight(x: Int, y: Int, roofed: Boolean): LightColor {
-        val light = if (roofed) indoorLight else ambientLight
+    fun ambientLight(x: Int, y: Int, roofed: Chunk.Roofed): LightColor {
+        val light = when (roofed) {
+            Chunk.Roofed.INDOOR -> indoorLight
+            Chunk.Roofed.OUTDOOR -> ambientLight
+            Chunk.Roofed.WINDOW -> windowLight
+        }
         val brightness = light.brightness()
         val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
         val nearboost = if (distance < 1f) 1.3f else if (distance < 3f) 0.4f else if (distance < 4f) 0.2f else 0f
@@ -369,6 +378,10 @@ sealed class Level {
         ambientLight.r = c1!!.r + (c2!!.r - c1.r) * fraction
         ambientLight.g = c1!!.g + (c2!!.g - c1.g) * fraction
         ambientLight.b = c1!!.b + (c2!!.b - c1.b) * fraction
+
+        windowLight.r = ambientLight.r * 0.5f
+        windowLight.g = ambientLight.g * 0.5f
+        windowLight.b = ambientLight.b * 0.5f
     }
 
     open fun updateAmbientSound(hour: Int, minute: Int) { }

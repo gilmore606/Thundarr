@@ -237,7 +237,7 @@ abstract class Carto(
         for (y in y0  .. y1) {
             for (x in x0 .. x1) {
                 if (isRock(x, y) && neighborBlockerCount(x, y) < 8) {
-                    chunk.setRoofed(x, y, false)
+                    chunk.setRoofed(x, y, Chunk.Roofed.OUTDOOR)
                 }
             }
         }

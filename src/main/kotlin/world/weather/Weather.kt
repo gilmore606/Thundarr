@@ -15,7 +15,7 @@ import kotlin.math.sin
 @Serializable
 class Weather {
 
-    val overallRaininess = 0.0f   // 0.4f
+    val overallRaininess = 0.38f   // 0.4f
 
     var weatherIntensity = 0f
     var windX = 0f

@@ -40,9 +40,11 @@ class Chunk(
     private var x1: Int = -998
     private var y1: Int = -998
 
+    enum class Roofed { OUTDOOR, INDOOR, WINDOW }
+
     private val seen = Array(width) { Array(height) { false } }
     private val visible = Array(width) { Array(height) { false } }
-    private val roofed = Array(width) { Array(height) { true } }
+    private val roofed = Array(width) { Array(height) { Roofed.INDOOR } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array<TerrainData?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
@@ -116,6 +118,7 @@ class Chunk(
     // Carve myself into a chunk for the world.
     fun generateWorld(level: Level) {
         generating = true
+        connectLevel(level)
         WorldCarto(x, y, x+width-1,y+height-1,this, level)
             .carveWorldChunk()
         generating = false
@@ -124,6 +127,7 @@ class Chunk(
     // Carve myself into a chunk for a building level.
     fun generateLevel(level: Level, building: Building) {
         generating = true
+        connectLevel(level)
         LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this, level)
             .carveLevel(
                 worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
@@ -133,6 +137,7 @@ class Chunk(
 
     fun generateAttractLevel(level: Level) {
         generating = true
+        connectLevel(level)
         WorldCarto(0, 0, AttractLevel.dimension - 1, AttractLevel.dimension - 1, this, level).apply {
             carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0, forAttract = true)
         }
@@ -212,9 +217,33 @@ class Chunk(
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
         this.terrains[x - this.x][y - this.y] = type
         this.terrainData[x - this.x][y - this.y] = null
-        roofed?.also { this.roofed[x - this.x][y - this.y] = it }
         updateOpaque(x - this.x, y - this.y)
         updateWalkable(x - this.x, y - this.y)
+        roofed?.also {
+            var newRoof = Roofed.OUTDOOR
+            if (roofed) {
+                if (DIRECTIONS.hasOneWhere { dir ->
+                    level.roofedAt(x + dir.x, y + dir.y) == Roofed.OUTDOOR
+                } && !level.isOpaqueAt(x, y)) {
+                    // We're a window
+                    this.roofed[x - this.x][y - this.y] = Roofed.WINDOW
+                    newRoof = Roofed.WINDOW
+                    // We used to be outdoor.  Did we deprive any old window?
+                    DIRECTIONS.forEach { dir ->
+                        if (level.roofedAt(x + dir.x, y + dir.y) == Roofed.WINDOW) {
+                            if (!DIRECTIONS.hasOneWhere { dir2 ->
+                                    level.roofedAt(x + dir.x + dir2.x, y + dir.y + dir2.y) == Roofed.OUTDOOR
+                                }) {
+                                level.setRoofedAt(x + dir.x, y + dir.y, Roofed.INDOOR)
+                            }
+                        }
+                    }
+                } else {
+                    newRoof = Roofed.INDOOR
+                }
+            }
+            this.roofed[x - this.x][y - this.y] = newRoof
+        }
         for (i in (-1..1)) {
             for (j in (-1..1)) {
                 if (boundsCheck(x+i,y+j)) {
@@ -228,7 +257,7 @@ class Chunk(
         }
     }
 
-    fun setRoofed(x: Int, y: Int, newRoofed: Boolean) {
+    fun setRoofed(x: Int, y: Int, newRoofed: Roofed) {
         this.roofed[x - this.x][y - this.y] = newRoofed
     }
 
@@ -261,8 +290,12 @@ class Chunk(
         seen[x - this.x][y - this.y]
     } else false
 
-    fun isRoofedAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
+    fun roofedAt(x: Int, y: Int): Roofed = if (boundsCheck(x, y)) {
         roofed[x - this.x][y - this.y]
+    } else Roofed.OUTDOOR
+
+    fun isRoofedAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
+        roofed[x - this.x][y - this.y] != Roofed.OUTDOOR
     } else false
 
     fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {

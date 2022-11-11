@@ -168,7 +168,6 @@ sealed class Rottable : Food(), Temporal {
 
     override fun advanceTime(delta: Float) {
         rot += delta
-        log.info("rot $rot")
         if (rot > maxRot()) {
             onRot()
             doRot()
