@@ -3,6 +3,7 @@ package ui.panels
 import actors.Player
 import com.badlogic.gdx.graphics.Color
 import render.Screen
+import util.XY
 import util.log
 import world.Entity
 import world.level.Level
@@ -112,7 +113,8 @@ object Console : Panel() {
         }
     }
 
-    fun sayAct(playerMsg: String, otherMsg: String, subject: Entity, direct: Entity? = null, indirect: Entity? = null, reach: Reach = Reach.VISUAL) {
+    fun sayAct(playerMsg: String, otherMsg: String, subject: Entity, direct: Entity? = null, indirect: Entity? = null,
+               reach: Reach = Reach.VISUAL, source: XY? = null) {
         var out = ""
         var code = ""
         var inCode = false
@@ -137,8 +139,10 @@ object Console : Panel() {
         }
         if (code.isNotEmpty()) process()
 
+        val x = source?.x ?: subject.xy()?.x ?: 0
+        val y = source?.y ?: subject.xy()?.y ?: 0
         if (subject is Player) say(out) else {
-            announce(subject.level(), subject.xy()?.x ?: 0, subject.xy()?.y ?: 0, reach, out)
+            announce(subject.level(), x, y, reach, out)
         }
     }
 

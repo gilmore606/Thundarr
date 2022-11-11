@@ -86,4 +86,6 @@ fun ThingTileSet() =
         })
         setTile(Glyph.LIGHTER, SimpleTile(this, 6, 5))
         setTile(Glyph.CAMPFIRE, SimpleTile(this, 7, 4))
+        setTile(Glyph.DOOR_CLOSED, SimpleTile(this, 7, 0))
+        setTile(Glyph.DOOR_OPEN, SimpleTile(this, 7, 1))
     }

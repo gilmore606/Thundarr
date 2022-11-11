@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.actions.Action
 import audio.Speaker
 import com.badlogic.gdx.graphics.glutils.ETC1
 import kotlinx.serialization.Serializable
@@ -27,7 +28,7 @@ sealed class Thing : Entity {
 
     enum class UseTag {
         E0, E1, E2, E3, E4, E5, E6, E7, E8, E9,
-        USE, USE_ON, SWITCH, CONSUME, OPEN, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
+        USE, USE_ON, SWITCH, SWITCH_ON, SWITCH_OFF, CONSUME, OPEN, CLOSE, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
     }
 
     class Use(
@@ -93,6 +94,7 @@ sealed class Thing : Entity {
     }
 
     open fun onWalkedOnBy(actor: Actor) { }
+    open fun bumpAction(): Action? = null
 
     open fun onRestore(holder: ThingHolder) {
         this.holder = holder

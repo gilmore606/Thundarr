@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.*
+import actors.actions.processes.WalkTo
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
@@ -12,6 +13,7 @@ import render.Screen
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
+import ui.panels.Console
 import util.*
 import world.terrains.Terrain
 import world.terrains.Wall
@@ -24,6 +26,8 @@ class AttractPlayer : Player() {
     var isMining = false
     var tunnelDir: XY? = null
     var noMiningUntil: Double = App.time
+    var wasOutdoor = false
+    var lastOutdoor = XY(0,0)
 
     override fun glyph() = Glyph.MOK
     override fun name() = "Ookla"
@@ -127,13 +131,15 @@ class AttractPlayer : Player() {
                                     }
                                 } ?: run {
                                     if (Dice.chance(0.08f)) {
-                                        log.info("start tunnel")
+                                        Console.say("Diggin' it!")
                                         tunnelDir = dir
                                     }
                                 }
 
                                 if (Dice.chance(0.002f)) {
+                                    Console.say("Screw this.")
                                     stopMining()
+                                    return WalkTo(level, lastOutdoor.x, lastOutdoor.y)
                                 }
                                 return Bump(xy.x, xy.y, digDirs.random())
                             }
@@ -214,6 +220,19 @@ class AttractPlayer : Player() {
             return Move(dir)
         }
         return null
+    }
+
+    override fun onMove() {
+        super.onMove()
+        val roofed = level?.isRoofedAt(xy.x, xy.y) ?: false
+        if (wasOutdoor && roofed) {
+            lastOutdoor.x = xy.x
+            lastOutdoor.y = xy.y
+            wasOutdoor = false
+            Console.say("Here I go!")
+        } else if (!wasOutdoor && !roofed) {
+            wasOutdoor = true
+        }
     }
 
     override fun die() {

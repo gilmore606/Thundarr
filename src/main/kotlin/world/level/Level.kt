@@ -473,6 +473,9 @@ sealed class Level {
             }
             return Converse(target)
         } ?: run {
+            thingsAt(x + dir.x, y + dir.y).forEach { thing ->
+                thing.bumpAction()?.also { return it }
+            }
             return Bump(x, y, dir)
         }
         return null

@@ -12,6 +12,7 @@ import ktx.app.KtxInputAdapter
 import ktx.async.KtxAsync
 import render.Screen
 import things.Lightbulb
+import things.ModernDoor
 import things.PalmTree
 import ui.panels.DebugPanel
 import ui.panels.Toolbar
@@ -203,6 +204,9 @@ object Keyboard : KtxInputAdapter {
                 }
                 Input.Keys.F7 -> {
                     Wolfman().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
+                }
+                Input.Keys.F8 -> {
+                    ModernDoor().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
                 }
                 Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
