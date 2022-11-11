@@ -10,12 +10,13 @@ fun tileFragShader() = """
 
     void main()
     {
-        vec4 sample = texture2D(u_Texture, v_TexCoordinate) * v_Light;
+        vec4 simple = texture2D(u_Texture, v_TexCoordinate);
+        vec4 sample = vec4(simple.r, simple.g, simple.b, simple.a * v_Light.a);
         vec3 color = vec3(sample.r, sample.g, sample.b);
         
         const vec3 k = vec3(0.57735, 0.57735, 0.57735);
         float cosAngle = cos(v_Hue);
-        vec3 hueShifted = vec3(color * cosAngle + cross(k, color) * sin(v_Hue) + k * dot(k, color) * (1.0 - cosAngle));
+        vec3 hueShifted = vec3(color * cosAngle + cross(k, color) * sin(v_Hue) + k * dot(k, color) * (1.0 - cosAngle)) * v_Light;
         
         float grey = 0.21 * hueShifted.r + 0.71 * hueShifted.g + 0.07 * hueShifted.b;
         float white = max(0.0, v_Grayout - 1.0);

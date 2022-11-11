@@ -437,7 +437,7 @@ class Chunk(
     }
 
     fun onRender(delta: Float) {
-        if (isEveryFrame(3)) dirtyAllLightCacheCells()
+        if (isEveryFrame(4)) dirtyAllLightCacheCells()
         sparks.filterOut({ it.done }) { it.onRender(delta) }
     }
 

@@ -84,12 +84,12 @@ class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
         var newSelection = -1
         if (ly > header && ly < height && lx > padding && lx < width - padding) {
             if (lx < 180) {
-                val stati = (ly - header) / statSpacing
+                val stati = (ly - header + 12) / statSpacing
                 if (stati in stats.indices) {
                     newSelection = stati
                 }
             } else {
-                val skilli = (ly - header) / skillSpacing
+                val skilli = (ly - header + 1) / skillSpacing
                 if (skilli in skills.indices) {
                     newSelection = skilli + stats.size
                 }

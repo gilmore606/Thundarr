@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
 
-val allStats = listOf(Strength, Speed, Brains)
+val allStats = listOf(Strength, Speed, Brains, Heart)
 
 abstract class Stat(
     val tag: Tag,
@@ -16,7 +16,7 @@ abstract class Stat(
 
     private val ipPerImprove = 5f
 
-    enum class Tag { STR, SPD, BRN,
+    enum class Tag { STR, SPD, BRN, HRT,
                      DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC }
 
     companion object {
@@ -24,6 +24,7 @@ abstract class Stat(
             Tag.STR -> Strength
             Tag.SPD -> Speed
             Tag.BRN -> Brains
+            Tag.HRT -> Heart
             Tag.DIG -> Dig
             Tag.FIGHT -> Fight
             Tag.DODGE -> Dodge
