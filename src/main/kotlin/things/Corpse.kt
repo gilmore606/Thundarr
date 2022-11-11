@@ -17,6 +17,7 @@ class Corpse : Container(), Temporal {
     override fun glyph() = Glyph.CORPSE
     override fun isPortable(): Boolean = false
     override fun openVerb() = "search"
+    override fun isEmptyMsg() = "You find nothing useful."
 
     override fun advanceTime(delta: Float) {
         rot += delta

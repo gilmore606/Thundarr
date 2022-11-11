@@ -67,7 +67,7 @@ class InventoryModal(
 
     override fun drawModalText() {
         if (maxSelection < 0) {
-            drawOptionText(if (isBench) ((parentModal as InventoryModal).withContainer?.isEmptyMsg() ?: "It's empty.") else "Your backpack is empty.", 0)
+            drawOptionText((parentModal as InventoryModal).withContainer?.isEmptyMsg() ?: "It's empty.", 0)
             changeSelection(-1)
             return
         }
