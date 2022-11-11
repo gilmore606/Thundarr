@@ -175,6 +175,7 @@ object Keyboard : KtxInputAdapter {
 
                 SLASH -> { App.player.toggleAggro() }
 
+                GRAVE -> { Toolbar.onKey(-1)}
                 NUM_1 -> { Toolbar.onKey(1) }
                 NUM_2 -> { Toolbar.onKey(2) }
                 NUM_3 -> { Toolbar.onKey(3) }

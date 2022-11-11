@@ -30,4 +30,5 @@ fun UITileSet() =
         setTile(Glyph.SPEECH_BUBBLE, SimpleTile(this, 3, 3))
         setTile(Glyph.POW_ICON, SimpleTile(this, 0, 4))
         setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
+        setTile(Glyph.WINDOW_SHADE, SimpleTile(this, 2, 4))
     }

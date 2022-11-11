@@ -88,6 +88,11 @@ abstract class Panel {
             myBoxBatch().getTextureIndex(Glyph.BOX_BG))
     }
 
+    protected fun drawShade(x: Int, y: Int, width: Int, height: Int) {
+        myBoxBatch().addPixelQuad(x, y, x + width, y + height,
+            myBoxBatch().getTextureIndex(Glyph.WINDOW_SHADE))
+    }
+
     protected fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
         myBoxBatch().addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
             myBoxBatch().getTextureIndex(glyph))

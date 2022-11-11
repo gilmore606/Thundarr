@@ -176,7 +176,12 @@ object Toolbar : Panel() {
     }
 
     fun onKey(keyNum: Int) {
-        if (buttons[keyNum - 1].nextThing == null && !inSelectMode()) return
+        if (!inSelectMode() && (keyNum < 1 || buttons[keyNum-1].nextThing == null)) {
+            contraction = 0
+            closeDelay = 1.5f
+            return
+        }
+        if (inSelectMode() && keyNum < 1) return
         contraction = 0
         closeDelay = 0.75f
         hovered = keyNum - 1

@@ -36,6 +36,7 @@ enum class Glyph {
     BUTTON_FFWD,
     BUTTON_BLANK,
     COLOR_BARS,
+    WINDOW_SHADE,
 
     PLAYER,
     MOK,

@@ -95,6 +95,10 @@ abstract class Modal(
         val xSquish = ((1f - anim) * width / 2f).toInt()
         val ySquish = ((1f - anim) * height / 2f).toInt()
         drawBox(x - xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)
+        if (anim == 1f) {
+            drawShade(x + 4, y + 4, width - 8, height - 8)
+        }
+
         sidecar?.drawBackground()
     }
 

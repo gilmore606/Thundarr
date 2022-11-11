@@ -2,9 +2,13 @@ package ui.modals
 
 import actors.Actor
 import actors.stats.*
+import audio.Speaker
+import com.badlogic.gdx.Input
 import render.Screen
+import ui.input.Keyboard
 import ui.input.Mouse
-import util.log
+import util.*
+import java.lang.Integer.max
 
 class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
 
@@ -24,8 +28,17 @@ class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
         if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
     }
 
+    var selection = -1
+    val maxSelection = stats.size + skills.size - 1
+
     init {
         sidecar = SkillSidecar(this)
+        adjustHeight()
+    }
+
+    private fun adjustHeight() {
+        this.height = header + padding * 2 + max(5, skills.size) * skillSpacing + 10
+        onResize(Screen.width, Screen.height)
     }
 
     override fun drawModalText() {
@@ -54,25 +67,51 @@ class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
         }
     }
 
+    override fun drawBackground() {
+        super.drawBackground()
+        if (!isAnimating() && selection >= 0) {
+            if (selection < stats.size) {
+                drawSelectionBox(padding, header + statSpacing * selection + 2, 140, 18)
+            } else {
+                drawSelectionBox(210, header + skillSpacing * (selection - stats.size) + 6, 140, 15)
+            }
+        }
+    }
+
     override fun onMouseMovedTo(screenX: Int, screenY: Int) {
         val lx = screenX - x
         val ly = screenY - y
+        var newSelection = -1
         if (ly > header && ly < height && lx > padding && lx < width - padding) {
             if (lx < 180) {
                 val stati = (ly - header) / statSpacing
                 if (stati in stats.indices) {
-                    (sidecar as SkillSidecar).showSkill(stats[stati])
-                    return
+                    newSelection = stati
                 }
             } else {
                 val skilli = (ly - header) / skillSpacing
                 if (skilli in skills.indices) {
-                    (sidecar as SkillSidecar).showSkill(skills[skilli])
-                    return
+                    newSelection = skilli + stats.size
                 }
             }
         }
-        (sidecar as SkillSidecar).showSkill(null)
+        changeSelection(newSelection)
+    }
+
+    private fun changeSelection(newSelection: Int) {
+        if (newSelection == selection) return
+        Speaker.ui(Speaker.SFX.UIMOVE)
+        selection = newSelection
+        if (selection < 0) {
+            showSkill(null)
+            return
+        }
+        if (selection < stats.size) showSkill(stats[selection])
+        else showSkill(skills[selection - stats.size])
+    }
+
+    private fun showSkill(skill: Stat?) {
+        (sidecar as SkillSidecar).showSkill(skill)
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
@@ -81,7 +120,47 @@ class SkillsModal(val actor: Actor) : Modal(370, 400, "- ${actor.name()} -") {
     }
 
     override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
-        dismiss()
+        when (Keyboard.moveKeys[keycode]) {
+            NORTH -> selectPrevious()
+            SOUTH -> selectNext()
+            WEST, EAST -> switchSide()
+        }
+        when (keycode) {
+            Input.Keys.BACKSPACE, Input.Keys.ESCAPE -> dismiss()
+        }
+    }
+
+    private fun selectNext() {
+        var ns = selection
+        if (ns <= stats.size - 1) {
+            ns++
+            if (ns > stats.size - 1) ns = 0
+        } else {
+            ns++
+            if (ns > maxSelection) ns = stats.size
+        }
+        changeSelection(ns)
+    }
+
+    private fun selectPrevious() {
+        var ns = selection
+        if (ns <= stats.size - 1) {
+            ns--
+            if (ns < 0) ns = stats.size - 1
+        } else {
+            ns--
+            if (ns < stats.size) ns = maxSelection
+        }
+        changeSelection(ns)
+    }
+
+    private fun switchSide() {
+        var ns = selection
+        if (ns <= stats.size - 1) {
+            ns += stats.size
+        } else {
+            ns = max(0, ns - skills.size)
+        }
+        changeSelection(ns)
     }
 }

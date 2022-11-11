@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
+import ui.input.Keyboard
+import util.WEST
 
 class ContextMenu(
     screenX: Int,
@@ -88,13 +90,12 @@ class ContextMenu(
     }
 
     override fun onKeyDown(keycode: Int) {
-        when (keycode) {
-            Input.Keys.TAB -> dismissSuccess()
-            Input.Keys.NUMPAD_4, Input.Keys.CONTROL_LEFT -> {
-                Screen.clearCursor()
-                dismiss()
-            }
-            else -> super.onKeyDown(keycode)
+        if (keycode == Input.Keys.TAB) dismissSuccess()
+        else if (Keyboard.moveKeys[keycode] == WEST || keycode == Input.Keys.CONTROL_LEFT) {
+            Screen.clearCursor()
+            dismiss()
+        } else {
+            super.onKeyDown(keycode)
         }
     }
 
