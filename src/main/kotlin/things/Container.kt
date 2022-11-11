@@ -17,6 +17,7 @@ sealed class Container : Portable(), ThingHolder {
 
     open fun openVerb() = "look inside"
     open fun isEmptyMsg() = "It's empty."
+    open fun preposition() = "in"
     open fun itemLimit() = 100
     open fun isOpenable() = true
 

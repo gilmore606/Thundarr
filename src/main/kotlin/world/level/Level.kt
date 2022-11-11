@@ -11,6 +11,7 @@ import render.sparks.Spark
 import render.sunLights
 import render.tilesets.Glyph
 import things.LightSource
+import things.Smashable
 import things.Temporal
 import things.Thing
 import ui.modals.ContextMenu
@@ -136,7 +137,7 @@ sealed class Level {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {
-                    for (i in max(0, thingsAt.size - 2) until thingsAt.size) {
+                    for (i in max(0, thingsAt.size - 3) until thingsAt.size) {
                         thingsAt[i].onRender(delta)
                         doThis(x, y, thingsAt[i], vis)
                     }
@@ -408,6 +409,11 @@ sealed class Level {
                     }
                 }
             }
+            if (group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
+                menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
+                    App.player.queue(Smash(group[0] as Smashable))
+                }
+            }
             if (!group[0].isPortable()) {
                 menu.addOption("examine " + group[0].name()) { Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW)) }
             }
@@ -456,6 +462,11 @@ sealed class Level {
                                     menu.addOption(nearUse.command) {
                                         App.player.queue(Use(tag, near, nearUse.duration, nearUse.toDo, x+ix, y+iy))
                                     }
+                                }
+                            }
+                            if (near is Smashable && near.isSmashable()) {
+                                menu.addOption(near.smashVerbName() + " " + near.name()) {
+                                    App.player.queue(Smash(near))
                                 }
                             }
                         }

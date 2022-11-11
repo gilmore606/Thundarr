@@ -10,7 +10,7 @@ import ui.panels.Console
 import util.XY
 
 @Serializable
-sealed class Door : Thing() {
+sealed class Door : Thing(), Smashable {
 
     var isOpen = false
     var isLocked = false
@@ -39,11 +39,6 @@ sealed class Door : Thing() {
             canDo = { actor,x,y,targ -> isNextTo(actor) && isOpen && !isObstructed() },
             toDo = { actor,level,x,y ->
                 doClose()
-            }),
-        UseTag.DESTROY to Use("kick " + name(), 1.0f,
-            canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
-            toDo = { actor,level,x,y ->
-                doKick(actor)
             }),
         UseTag.USE to Use("knock on " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
@@ -89,8 +84,16 @@ sealed class Door : Thing() {
         Console.sayAct("You hear a knocking at %dn.", "", this, reach = Console.Reach.AUDIBLE, source = soundSource)
     }
 
-    private fun doKick(actor: Actor) {
-
+    override fun isSmashable() = !isOpen
+    override fun sturdiness() = 4f
+    override fun smashVerbName() = "kick"
+    override fun smashSuccessSelfMsg() = "You kick %dd open!"
+    override fun smashSuccessOtherMsg() = "%Dn kicks %dd open!"
+    override fun smashFailSelfMsg() = "You kick %dd, but it holds firm."
+    override fun smashFailOtherMsg() = "%Dn kicks impotently at %dd."
+    override fun smashDebris() = null
+    override fun onSmashSuccess() {
+        doOpen()
     }
 }
 

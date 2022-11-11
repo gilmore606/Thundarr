@@ -14,6 +14,7 @@ import render.Screen
 import things.Lightbulb
 import things.ModernDoor
 import things.PalmTree
+import things.Table
 import ui.panels.DebugPanel
 import ui.panels.Toolbar
 import util.*

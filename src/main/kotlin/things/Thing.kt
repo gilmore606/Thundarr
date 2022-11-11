@@ -82,6 +82,8 @@ sealed class Thing : Entity {
     override fun glyphBatch() = Screen.thingBatch
     override fun uiBatch() = Screen.uiThingBatch
 
+    open fun drawExtraGlyphs(toDraw: (Glyph,Float,Float,Float)->Unit) { }
+
     open fun weight() = 0.1f
     open fun flammability() = 0f
     open fun onBurn(delta: Float): Float { // return the amount of fuel we provided on this turn

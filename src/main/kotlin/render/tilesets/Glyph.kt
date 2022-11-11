@@ -89,6 +89,8 @@ enum class Glyph {
     CAMPFIRE,
     DOOR_CLOSED,
     DOOR_OPEN,
+    TABLE,
+    BOARD,
 
     BLOODSTAIN,
     SCORCHMARK

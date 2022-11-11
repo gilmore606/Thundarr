@@ -27,16 +27,11 @@ sealed interface Fuel {
         }
         return burn
     }
-
 }
 
 @Serializable
-class Log : Portable(), Fuel {
-    override var fuel = 100f
+sealed class FuelBlock : Portable(), Fuel {
     override fun flammability() = 0.7f
-    override fun name() = "log"
-    override fun description() = "Big, heavy, wood.  Better than bad.  Good."
-    override fun glyph() = Glyph.LOG
     override fun weight() = 3f
     override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
 
@@ -49,10 +44,26 @@ class Log : Portable(), Fuel {
                 Campfire().apply {
                     log.info("moving campfire to $level $x $y")
                     moveTo(level, x, y)
-                    feedWith(this@Log, actor)
+                    feedWith(this@FuelBlock, actor)
                 }
             }
         )
     )
+}
 
+@Serializable
+class Log() : FuelBlock() {
+    override fun name() = "log"
+    override fun description() = "Big, heavy, wood.  Better than bad.  Good."
+    override fun glyph() = Glyph.LOG
+    override var fuel = 120f
+}
+
+@Serializable
+class Board() : FuelBlock() {
+    override fun name() = "board"
+    override fun description() = "A length of 2x4 knotty pine."
+    override fun glyph() = Glyph.BOARD
+    override fun hue() = 0.1f
+    override var fuel = 80f
 }

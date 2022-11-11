@@ -189,10 +189,10 @@ abstract class Modal(
                 if (these.size > 1) {
                     asWithContainer?.also { container ->
                         if (container.contents().size < container.itemLimit()) {
-                            addOption("put one " + thing.name() + " in " + container.name()) {
+                            addOption("put one " + thing.name() + " " + container.preposition() + " " + container.name()) {
                                 App.player.queue(Drop(thing, container))
                             }
-                            addOption("put all " + thing.name().plural() + " in " + container.name()) {
+                            addOption("put all " + thing.name().plural() + " " + container.preposition() + " " + container.name()) {
                                 these.forEach { App.player.queue(Drop(it, container)) }
                             }
                         }
@@ -218,7 +218,7 @@ abstract class Modal(
                 } else {
                     asWithContainer?.also { container ->
                         if (container.contents().size < container.itemLimit()) {
-                            addOption("put " + thing.name() + " in " + container.name()) {
+                            addOption("put " + thing.name() + " " + container.preposition() + " " + container.name()) {
                                 App.player.queue(Drop(thing, container))
                             }
                         }

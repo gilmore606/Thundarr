@@ -224,6 +224,12 @@ object Screen : KtxScreen {
         thingBatch.addTileQuad(
             tx, ty, thingBatch.getTextureIndex(thing.glyph(), App.level, tx, ty),
             vis, lightCache[lx][ly], hue = thing.hue())
+        if (vis == 1f) {
+            thing.drawExtraGlyphs { glyph, hue, offX, offY ->
+                thingBatch.addTileQuad(tx, ty, thingBatch.getTextureIndex(glyph, App.level, tx, ty),
+                    vis, lightCache[lx][ly], hue = hue, offsetX = offX, offsetY = offY)
+            }
+        }
     }
 
     private val renderFire: (Int, Int, Float, Float, Float, Float)->Unit = { tx, ty, offset, offx, offy, size ->
