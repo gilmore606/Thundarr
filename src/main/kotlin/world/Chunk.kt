@@ -459,7 +459,7 @@ class Chunk(
         lightCache[x][y].g = ambient.g
         lightCache[x][y].b = ambient.b
         var floorLight: LightColor? = null
-        if (isOpaqueAt(x,y)) {  // wall light!  use the visible neighbor to avoid wall bleed
+        if (isOpaqueAt(x + this.x,y + this.y)) {  // wall light!  use the visible neighbor to avoid wall bleed
             DIRECTIONS.forEach { dir ->
                 val lx = x + this.x + dir.x
                 val ly = y + this.y + dir.y

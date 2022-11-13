@@ -294,15 +294,15 @@ sealed class Level {
             }
         }
 
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            updateVisibility()
+        }
         if (this !is EnclosedLevel) weather.onRender(delta)
 
         allChunks().forEach { it.onRender(delta) }
         director.actors.forEach { it.onRender(delta) }
 
-        if (shadowDirty) {
-            allChunks().forEach { it.clearVisibility() }
-            updateVisibility()
-        }
     }
 
     open fun updateVisibility() {
