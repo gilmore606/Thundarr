@@ -75,6 +75,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     private fun startAttract() {
 
+        repeat (30) { log.info(Madlib.wizardFullName(Madlib.wizardName()))}
+
         Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
         attractMode = true
         Screen.addPanel(Console)
@@ -227,6 +229,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(400)
 
             level = LevelKeeper.getLevel("world")
+
             player = Player()
             player.onSpawn()
 

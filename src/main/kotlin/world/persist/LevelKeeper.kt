@@ -45,13 +45,11 @@ object LevelKeeper {
         }
 
         val level = Level.make(levelId)
-        liveLevels.add(
-            LiveLevel(
+        liveLevels.add(LiveLevel(
             level = level,
             addedAtMs = System.currentTimeMillis(),
             lastAccessedAt = System.currentTimeMillis()
-        )
-        )
+        ))
 
         pruneLevels()
         return level

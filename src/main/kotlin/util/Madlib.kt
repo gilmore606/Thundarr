@@ -4,6 +4,42 @@ import world.Entity
 
 object Madlib {
 
+    fun escapeReason(): String {
+        val pres = listOf(
+            "Thanks to",
+            "With the help of",
+            "Using only",
+            "With just",
+        )
+        val helps = listOf(
+            "a pilfered fork from the cafeteria",
+            "a stolen bit of wire",
+            "a helpful scullery maid",
+            "a sympathetic guard",
+            "my keen sense of smell",
+            "a forgetful overseer",
+            "a distracted slavemaster",
+            "a temporary power outage",
+            "a fight in the guardhouse",
+            "a convenient distraction",
+            "some curious squirrels",
+            "very strange weather",
+            "a sleeping guard",
+            "a handmade lockpick",
+            "prayers to the Lords of Light",
+            "my keen sense of direction",
+            "my barbarian strength",
+            "my barbarian will",
+            "a complicated lie to the head warlock"
+        )
+        var h = pres.random() + " "
+        if (Dice.chance(0.3f)) {
+            return h + helps.random()
+        } else {
+            return h + helps.random() + " and " + helps.random()
+        }
+    }
+
     fun wizardName(gender: Entity.Gender = Entity.Gender.NEUTER): String {
         val syl1 = listOf(
             "Mo",
@@ -14,13 +50,18 @@ object Madlib {
             "Man",
             "Sar",
             "Zar",
+            "Ne",
             "Zan",
-            "Gron",
             "Gro",
+            "Kro",
+            "Ko",
+            "Ka",
+            "Kel",
             "Lo",
             "Ho",
             "Sor",
             "Sa",
+            "Si",
             "Za",
             "Ze",
             "Zol",
@@ -30,12 +71,16 @@ object Madlib {
             "A",
             "E",
             "O",
-            "Yee"
+            "Yee",
+            "Ye",
+            "U",
+            "Ul",
         )
         val conn = listOf(
             "ba",
             "sa",
             "da",
+            "ga",
             "ti",
             "da",
             "ma",
@@ -46,11 +91,18 @@ object Madlib {
             "tar",
             "kar",
             "kal",
-            "ka"
+            "ka",
+            "ni",
+            "'",
         )
         val syl2 = listOf(
             "tar",
+            "th",
+            "sh",
+            "star",
+            "stro",
             "gan",
+            "gar",
             "to",
             "do",
             "dan",
@@ -86,6 +138,9 @@ object Madlib {
         } else {
             name = syl1.random() + syl2.random()
         }
+        if (Dice.chance(0.7f - name.length * 0.1f)) {
+            name += " " + wizardName(gender)
+        }
         return name
     }
 
@@ -95,6 +150,7 @@ object Madlib {
             "Master",
             "King",
             "Emperor",
+            "Judge",
             "the Mighty",
             "the All-Powerful",
             "the Amazing",
@@ -104,6 +160,8 @@ object Madlib {
             "Almighty",
             "the God-King",
             "the Eternal",
+            "the Infamous",
+            "the Dark Lord",
             "Duke",
             "Doctor",
             "Doktor",
@@ -111,18 +169,54 @@ object Madlib {
             "Li'l",
             "Mr.",
             "Mister",
-            "President"
+            "President",
+            "A Pimp Called",
+            "Captain",
+            "Dark Lord",
+            "Dr.",
+            "Father",
+            "Brother",
+            "Overseer",
+            "Boss",
+            "Professor",
+            "Prince",
+            "Baron",
+            "Judge",
+            "Baron von",
+            "the Astounding",
+            "the World-Famous"
         )
         val post = listOf(
             "the Mighty",
+            "the Snake",
+            "the Tiger",
+            "the Witch-King",
+            "the Sorceror-Lord",
+            "the Sorceror",
+            "the Warlock",
+            "the Mind-Taker",
+            "the Three-Faced",
+            "the Two-Faced",
+            "the One-Faced",
+            "the Confusor",
+            "the Soul-Taker",
+            "the Soulstealer",
+            "the Enslaver",
+            "the Bloody",
             "the Terrible",
             "the Infinite",
+            "the Undying",
+            "the Unliving",
+            "the Soulless",
+            "the Cursed",
             "the Wise",
             "the Eternal",
             "the Great",
             "the Tempter",
             "the Stormbringer",
             "the Annihilator",
+            "the Ender",
+            "the World-Ender",
             "the Destroyer",
             "the Dark",
             "the Evil",
@@ -131,7 +225,10 @@ object Madlib {
             "the Tyrant",
             "of the Abyss",
             "of the Shadow",
+            "of the Dark",
             "of the Nine Hells",
+            "of the Seven Hells",
+            "of the One Hell",
             "the Survivor",
             "the Serpent",
             "the Impressive",
@@ -141,12 +238,20 @@ object Madlib {
             "the Slayer",
             "the Abjurer",
             "the Protector",
+            "the Unhelpful",
+            "the Unpleasant",
             "the All-Knowing",
             "the Betrayer",
-            "the Cracker-Jack Kid"
+            "the Cracker-Jack Kid",
+            "the Kid",
+            "the God-King",
+            "Jr.",
+            "III",
+            "IV",
+            "the First"
         )
 
-        val full = if (Dice.chance(0.05f)) {
+        val full = if (Dice.chance(0.06f)) {
             pre.random() + " " + name + " " + post.random()
         } else if (Dice.chance(0.4f)) {
             pre.random() + " " + name
