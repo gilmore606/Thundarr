@@ -444,7 +444,7 @@ class Chunk(
         lights[x - this.x][y - this.y] else null
 
     // Force all cells to re-sum light on next frame.
-    private fun dirtyAllLightCacheCells() {
+    fun dirtyAllLightCacheCells() {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 lightCacheDirty[x][y] = true
@@ -489,11 +489,12 @@ class Chunk(
             }
             lightSourceLocations.remove(lightSource)
             lightsTouching.remove(lightSource)
+            level.dirtyAllLightCacheCells()
         }
     }
 
     fun onRender(delta: Float) {
-        if (isEveryFrame(4)) dirtyAllLightCacheCells()
+        //if (isEveryFrame(4)) dirtyAllLightCacheCells()
         sparks.filterOut({ it.done }) { it.onRender(delta) }
     }
 
