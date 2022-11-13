@@ -19,6 +19,7 @@ class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
 
     fun showSkill(skill: Stat?) {
         this.skill = skill
+        adjustSize()
         skillDesc.clear()
         affectorStrings.clear()
         skill?.also {
@@ -27,7 +28,6 @@ class SkillSidecar(private val parentModal: SkillsModal) : Modal(0, 400) {
                 affectorStrings.add(it.name() + if (it is Status) " status" else "")
             }
         }
-        adjustSize()
     }
 
     fun adjustSize() {

@@ -204,7 +204,7 @@ object Keyboard : KtxInputAdapter {
                     Herder().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
                 }
                 Input.Keys.F7 -> {
-                    Wolfman().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
+                    Table().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
                 }
                 Input.Keys.F8 -> {
                     ModernDoor().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)

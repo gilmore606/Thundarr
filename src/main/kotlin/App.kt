@@ -13,12 +13,8 @@ import render.Screen
 import things.*
 import ui.modals.*
 import ui.panels.*
-import util.Dice
-import util.XY
-import util.filterAnd
-import util.log
+import util.*
 import world.journal.GameTime
-import world.journal.JournalEntry
 import world.level.Level
 import world.level.WorldLevel
 import world.persist.LevelKeeper
@@ -49,6 +45,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     var attractMode = true
     var isExiting = false
 
+    enum class StartType { ESCAPE, SURVIVE }
+
     private fun setupLog() {
         Dispatchers.KTX.mainThread.name = "main"
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO")
@@ -76,6 +74,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     private fun startAttract() {
+
         Screen.panels.filterAnd({true}) { Screen.removePanel(it) }
         attractMode = true
         Screen.addPanel(Console)
@@ -218,7 +217,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         }
     }
 
-    private fun createNewWorld() {
+    private fun createNewWorld(startType: StartType) {
         Screen.addModal(LoadingModal("The moon...it's breaking in god-damned half!"))
         Screen.brightnessTarget = 0f
         pendingJob = KtxAsync.launch {
@@ -242,15 +241,35 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
-            Console.say("You stride bravely into the dawn.")
+            Console.say(when (startType) {
+                    StartType.SURVIVE -> "You gather your resolve to survive."
+                    StartType.ESCAPE -> "Your bonds are loosed!  But how to escape this terrible place?"
+                })
             Screen.brightnessTarget = 1f
             addGamePanels()
             level.onPlayerEntered()
             updateTime(Dice.range(200, 600).toDouble())
-            player.journal.addEntry(JournalEntry(
-                "Freedom!",
-                "I broke the chains of enslavement to the evil wizard Madlibizus, and set out to find my destiny.  May the Lords of Light guide my Sunsword, and my path."
-            ))
+
+            val wizardName = Madlib.wizardName()
+            val wizardFullName = Madlib.wizardFullName(wizardName)
+
+            if (startType == StartType.ESCAPE) {
+                Screen.addModal(BigSplashModal(
+                    "Escape!",
+                    "For many years I have labored in chains for the evil wizard $wizardFullName.  Today it ends!  Thanks to a careless guard and a pilfered bit of wire, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
+                    "Lords of Light, protect me.",
+                    true,
+                    true
+                ))
+            } else {
+                Screen.addModal(BigSplashModal(
+                    "Survive!",
+                    "For many years I labored in chains.  But today, the Lords of Light smile on me -- on a work gang detail, I managed to slip away unnoticed and hide.  Now I must make my way alone in Numeria.",
+                    "Onward!",
+                    true,
+                    true
+                ))
+            }
         }
     }
 
@@ -295,7 +314,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         Screen.recenterCamera()
     }
 
-
     fun updateTime(newTime: Double) {
         time = newTime
         gameTime = GameTime(time)
@@ -308,8 +326,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun saveAndReturnToMenu() {
         Screen.addModal(
             ConfirmModal(
-                listOf("Exit the world?", "Your progress will be saved."),
-                "Exit", "Cancel"
+                listOf("Exit this world?", "Your progress will be saved."),
+                "Save and exit", "Cancel"
             ) { yes ->
                 if (yes) {
                     Screen.brightnessTarget = 0f
@@ -325,20 +343,17 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         )
     }
 
-    private fun restartWorld() {
+    private fun confirmCreateNewWorld(startType: StartType) {
         Screen.addModal(ConfirmModal(
             listOf(
-                "Abandon this world?",
+                "Abandon your current save?",
                 "All your progress will be lost."),
             "Abandon", "Cancel"
         ) { yes ->
             if (yes) {
-                Console.say("You abandon Numeria to its own devices.")
                 pendingJob?.cancel()
                 startGame()
-                createNewWorld()
-            } else {
-                Console.say("You gather your resolve and carry on.")
+                createNewWorld(startType)
             }
         }
         )
@@ -359,13 +374,13 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         restoreState()
     }
 
-    fun doStartNewGame() {
+    fun doStartNewWorld(startType: StartType) {
         if (save.worldExists()) {
-            restartWorld()
+            confirmCreateNewWorld(startType)
         } else {
             pendingJob?.cancel()
             startGame()
-            createNewWorld()
+            createNewWorld(startType)
         }
     }
 

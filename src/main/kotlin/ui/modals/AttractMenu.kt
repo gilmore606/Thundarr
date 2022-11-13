@@ -5,7 +5,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 
-class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
+class AttractMenu : SelectionModal(280, 230, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>()
     companion object {
@@ -29,7 +29,8 @@ class AttractMenu : SelectionModal(270, 230, "- ThUNdARR -", Position.LEFT) {
         if (App.save.worldExists()) {
             options.put("Continue") { App.doContinue() }
         }
-        options.put("Start new game") { App.doStartNewGame() }
+        options.put("Start new (Escape)") { App.doStartNewWorld(App.StartType.ESCAPE) }
+        options.put("Start new (Survive)") { App.doStartNewWorld(App.StartType.SURVIVE) }
         options.put("Settings") { App.openSettings() }
         options.put("Controls") { App.openControls() }
         options.put("Credits") { App.openCredits() }

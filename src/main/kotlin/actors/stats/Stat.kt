@@ -101,8 +101,11 @@ abstract class Stat(
     // Recalculate actor's final value, cache it, and return it
     private fun updateCached(actor: Actor): Float {
         actor.stats[tag]?.also { it.final = total(actor, it.base) }
-        return actor.stats[tag]?.final ?: throw RuntimeException("update found no stat")
+        onUpdate(actor, actor.stats[tag]!!.final!!)
+        return actor.stats[tag]!!.final!!
     }
+
+    open fun onUpdate(actor: Actor, newTotal: Float) { }
 
     // Roll a skill check and return the +/- result, possibly improving the skill.
     fun resolve(actor: Actor, difficulty: Float, noImprove: Boolean = false): Float {

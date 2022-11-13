@@ -1,6 +1,7 @@
 package things
 
 import util.XY
+import world.Entity
 
 interface Smashable {
 
