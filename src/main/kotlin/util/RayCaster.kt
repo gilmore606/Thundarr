@@ -168,24 +168,26 @@ class RayCaster {
             lightOctant(line, x, y, lightColor, br, isOpaqueAt, setLight)
         }
         // Bleed light into neighboring cells.
-        val bleeds = mutableSetOf<Triple<Int,Int,LightColor>>()
+        val bleeds = mutableSetOf<Triple<Int, Int, LightColor>>()
         for (ix in 0 until MAX_LIGHT_RANGE.toInt() * 2) {
             for (iy in 0 until MAX_LIGHT_RANGE.toInt() * 2) {
                 val tx = x + ix - MAX_LIGHT_RANGE.toInt()
                 val ty = y + iy - MAX_LIGHT_RANGE.toInt()
-                getThisLight(tx, ty) ?: run {
-                    var bleed: LightColor? = null
-                    CARDINALS.forEach { dir ->
-                        if (!isOpaqueAt(tx, ty)) {
-                            getThisLight(tx + dir.x, ty + dir.y)?.also { neighbor ->
-                                if (bleed == null) bleed = LightColor(0f, 0f, 0f)
-                                bleed!!.r += neighbor.r * LIGHT_BLEED
-                                bleed!!.g += neighbor.g * LIGHT_BLEED
-                                bleed!!.b += neighbor.b * LIGHT_BLEED
+                if (!isOpaqueAt(tx, ty)) {
+                    getThisLight(tx, ty) ?: run {
+                        var bleed: LightColor? = null
+                        CARDINALS.forEach { dir ->
+                            if (!isOpaqueAt(tx + dir.x, ty + dir.y)) {
+                                getThisLight(tx + dir.x, ty + dir.y)?.also { neighbor ->
+                                    if (bleed == null) bleed = LightColor(0f, 0f, 0f)
+                                    bleed!!.r += neighbor.r * LIGHT_BLEED
+                                    bleed!!.g += neighbor.g * LIGHT_BLEED
+                                    bleed!!.b += neighbor.b * LIGHT_BLEED
+                                }
                             }
                         }
+                        bleed?.also { bleeds.add(Triple(tx, ty, it)) }
                     }
-                    bleed?.also { bleeds.add(Triple(tx, ty, it)) }
                 }
             }
         }
@@ -225,8 +227,9 @@ class RayCaster {
                         val lightB = lightColor.b * falloff / brightness
                         val projection = line.projectTile(row, col)
                         val visible = !line.isInShadow(projection)
-                        if (visible) setLight(castX, castY, lightR, lightG, lightB)
-                        if (visible && isOpaqueAt(castX, castY)) {
+                        val opaque = isOpaqueAt(castX, castY)
+                        if (visible && !opaque) setLight(castX, castY, lightR, lightG, lightB)
+                        if (visible && opaque) {
                             line.add(projection)
                             fullShadow = line.isFullShadow()
                         } else {

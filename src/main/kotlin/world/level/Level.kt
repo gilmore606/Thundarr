@@ -343,6 +343,7 @@ sealed class Level {
     fun getSingleLight(x: Int, y: Int, source: LightSource) = chunkAt(x,y)?.getSingleLight(x, y, source)
 
     fun lightAt(x: Int, y: Int) = chunkAt(x,y)?.lightAt(x,y) ?: ambientLight
+    fun lightsAt(x: Int, y: Int) = chunkAt(x,y)?.lightsAt(x,y)
 
     fun lightSourceLocation(lightSource: LightSource): XY? = allChunks().firstNotNullOfOrNull {
         it.lightSourceLocation(lightSource)

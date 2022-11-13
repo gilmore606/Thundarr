@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
+import render.Screen
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
@@ -439,6 +440,9 @@ class Chunk(
         return level.ambientLight(x, y, roofed[x - this.x][y - this.y])
     }
 
+    fun lightsAt(x: Int, y: Int): MutableMap<LightSource, LightColor>? = if (boundsCheck(x, y))
+        lights[x - this.x][y - this.y] else null
+
     // Force all cells to re-sum light on next frame.
     private fun dirtyAllLightCacheCells() {
         for (x in 0 until width) {
@@ -453,11 +457,27 @@ class Chunk(
         lightCache[x][y].r = ambient.r
         lightCache[x][y].g = ambient.g
         lightCache[x][y].b = ambient.b
-        lights[x][y].forEach { (light, color) ->
-            val flicker = light.flicker()
-            lightCache[x][y].r = min(1f, (lightCache[x][y].r + max(0f, (color.r * flicker))))
-            lightCache[x][y].g = min(1f, (lightCache[x][y].g + max(0f, (color.g * flicker))))
-            lightCache[x][y].b = min(1f, (lightCache[x][y].b + max(0f, (color.b * flicker))))
+        var floorLight: LightColor? = null
+        if (isOpaqueAt(x,y)) {  // wall light!  use the visible neighbor to avoid wall bleed
+            DIRECTIONS.forEach { dir ->
+                val lx = x + this.x + dir.x
+                val ly = y + this.y + dir.y
+                if (floorLight == null && !level.isOpaqueAt(lx,ly) && level.visibilityAt(lx,ly) == 1f) {
+                    floorLight = level.lightAt(lx, ly)
+                }
+            }
+        }
+        floorLight?.also { floorLight ->
+            lightCache[x][y].r = floorLight.r
+            lightCache[x][y].g = floorLight.g
+            lightCache[x][y].b = floorLight.b
+        } ?: run {
+            lights[x][y].forEach { (light, color) ->
+                val flicker = light.flicker()
+                lightCache[x][y].r = min(1f, (lightCache[x][y].r + max(0f, (color.r * flicker))))
+                lightCache[x][y].g = min(1f, (lightCache[x][y].g + max(0f, (color.g * flicker))))
+                lightCache[x][y].b = min(1f, (lightCache[x][y].b + max(0f, (color.b * flicker))))
+            }
         }
         lightCacheDirty[x][y] = false
     }

@@ -12,8 +12,8 @@ object DebugPanel : ShadedPanel() {
     private val padding = 12
 
     init {
-        this.width = 160
-        this.height = 230
+        this.width = 250
+        this.height = 250
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -43,6 +43,14 @@ object DebugPanel : ShadedPanel() {
         drawString("  $datatext", padding, padding + 160)
         Screen.cursorPosition?.also {
             drawString("step : ${Pather.debugStepAt(it.x, it.y)} @ ${it.x} ${it.y}", padding, padding + 180)
+            App.player.level?.lightAt(it.x, it.y)?.also { light ->
+                drawString("light: ${light.r} ${light.g} ${light.b}", padding, padding + 200)
+            }
+            App.player.level?.roofedAt(it.x, it.y)?.also { roofed ->
+                App.player.level?.lightsAt(it.x, it.y)?.also { lights ->
+                    drawString("roofed: $roofed  lights: ${lights.size}", padding, padding + 220)
+                }
+            }
         }
     }
 
