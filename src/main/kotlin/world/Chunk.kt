@@ -227,7 +227,7 @@ class Chunk(
             var newRoof = Roofed.OUTDOOR
             if (roofed) {
                 if (DIRECTIONS.hasOneWhere { dir ->
-                    level.roofedAt(x + dir.x, y + dir.y) == Roofed.OUTDOOR
+                        (level.roofedAt(x + dir.x, y + dir.y) == Roofed.OUTDOOR) && !level.isOpaqueAt(x + dir.x, y + dir.y)
                 } && !level.isOpaqueAt(x, y)) {
                     // We're a window
                     this.roofed[x - this.x][y - this.y] = Roofed.WINDOW
@@ -236,7 +236,7 @@ class Chunk(
                     DIRECTIONS.forEach { dir ->
                         if (level.roofedAt(x + dir.x, y + dir.y) == Roofed.WINDOW) {
                             if (!DIRECTIONS.hasOneWhere { dir2 ->
-                                    level.roofedAt(x + dir.x + dir2.x, y + dir.y + dir2.y) == Roofed.OUTDOOR
+                                    level.roofedAt(x + dir.x + dir2.x, y + dir.y + dir2.y) == Roofed.OUTDOOR && !level.isOpaqueAt(x + dir.x + dir2.x, y + dir.y + dir2.y)
                                 }) {
                                 level.setRoofedAt(x + dir.x, y + dir.y, Roofed.INDOOR)
                             }

@@ -188,7 +188,6 @@ sealed class Level {
 
     fun onActorMovedTo(actor: Actor, x: Int, y: Int) {
         actor.light()?.also {
-            removeLightSource(actor)
             addLightSource(x, y, actor)
         }
         chunkAt(x, y)?.onAddActor(x, y, actor)

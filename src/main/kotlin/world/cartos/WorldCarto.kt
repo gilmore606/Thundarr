@@ -3,6 +3,7 @@ package world.cartos
 import actors.Herder
 import actors.MuskOx
 import actors.Ox
+import actors.Wolfman
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import things.*
@@ -56,6 +57,8 @@ class WorldCarto(
                         KtxAsync.launch {
                             if (Dice.chance(0.8f)) {
                                 (if (Dice.chance(0.7f)) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
+                            } else if (Dice.flip()) {
+                                Wolfman().spawnAt(level, x + x0, y + y0)
                             } else {
                                 Herder().spawnAt(level, x + x0, y + y0)
                             }
