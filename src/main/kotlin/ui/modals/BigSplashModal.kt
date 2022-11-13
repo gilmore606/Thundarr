@@ -28,7 +28,7 @@ class BigSplashModal(
     private var isHovered = false
 
     init {
-        zoomWhenOpen = zoomIn
+        zoomWhenOpen = 1.3f
         dismissible = false
     }
 

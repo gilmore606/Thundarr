@@ -23,7 +23,7 @@ class Equip(
 
     override fun execute(actor: Actor, level: Level) {
         gear.equipped = true
-        actor.gear[gear.slot] = gear
+        actor.setGearSlot(gear.slot, gear)
         actor.onEquip(gear)
         gear.onEquip(actor)
         Console.sayAct(gear.equipSelfMsg(), gear.equipOtherMsg(), actor, gear)

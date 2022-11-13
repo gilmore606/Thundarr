@@ -25,7 +25,7 @@ class GearModal(
     var childDeployed = false
 
     init {
-        zoomWhenOpen = true
+        zoomWhenOpen = 1.6f
         selectionBoxHeight = 18
         spacing = 32
         headerPad = 80
@@ -72,7 +72,7 @@ class GearModal(
                 }
             }
         .apply {
-            zoomWhenOpen = true
+            zoomWhenOpen = this@GearModal.zoomWhenOpen
             parentModal = this@GearModal
             val things = slots[ourSelection].things
             if (things.isNotEmpty()) {

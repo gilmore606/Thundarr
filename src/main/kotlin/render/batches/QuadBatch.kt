@@ -29,7 +29,7 @@ class QuadBatch(
     )
 
     val textureIndexCache = tileSet.getCache()
-    private val textureEdgePad = 0.0015f
+    private val textureEdgePad = 0.0002f
     private val quadEdgePadX = 0.0002f
     private val quadEdgePadY = -0.0024f
 

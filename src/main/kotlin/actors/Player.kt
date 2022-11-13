@@ -63,15 +63,20 @@ open class Player : Actor() {
         Survive.set(this, 2f)
 
         Sunsword().moveTo(this)
-        repeat (20) { Meat().moveTo(this) }
+        repeat (10) { Meat().moveTo(this) }
         Torch().moveTo(this)
         Apple().moveTo(this)
-        HornetHelmet().moveTo(this)
+        HornedHelmet().moveTo(this)
         HardHat().moveTo(this)
         RiotHelmet().moveTo(this)
         Pickaxe().moveTo(this)
         Axe().moveTo(this)
         Lighter().moveTo(this)
+        MokBoots().moveTo(this)
+        TravelBoots().moveTo(this)
+        FurTunic().moveTo(this)
+        FurJacket().moveTo(this)
+        SabretoothCharm().moveTo(this)
     }
 
     override fun die() {

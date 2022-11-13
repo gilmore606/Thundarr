@@ -49,7 +49,7 @@ abstract class Modal(
     open fun openSound(): Speaker.SFX? = Speaker.SFX.UIOPEN
     open fun closeSound(): Speaker.SFX? = Speaker.SFX.UICLOSE
 
-    var zoomWhenOpen = false
+    var zoomWhenOpen: Float = 1f
     var sidecar: Modal? = null
     var isSidecar = false
     var isInSidecar = false
@@ -239,7 +239,7 @@ abstract class Modal(
             }
 
             if (!forExamine) addOption("examine " + thing.name()) {
-                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW).apply { zoomWhenOpen = true })
+                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW).apply { zoomWhenOpen = asWithParent?.zoomWhenOpen ?: 1f })
             }
 
             if (asWithContainer == null && asWithParent == null) {

@@ -55,6 +55,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override var level: Level? = null
     @Transient
     val gear = mutableMapOf<Gear.Slot, Gear?>()
+    @Transient
+    val gearDrawList = ArrayList<Gear>()
 
     @Transient
     var animation: Animation? = null
@@ -259,6 +261,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     fun onUnequip(gear: Gear) {
         gear.statEffects().forEach { (tag, _) ->
             Stat.get(tag).touch(this)
+        }
+    }
+
+    fun setGearSlot(slot: Gear.Slot, newGear: Gear?) {
+        gear[slot]?.also { gearDrawList.remove(it) }
+        gear[slot] = newGear
+        newGear?.also { newGear ->
+            gearDrawList.add(newGear)
+            gearDrawList.sortByDescending { it.slot.drawOrder }
         }
     }
 

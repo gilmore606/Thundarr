@@ -38,7 +38,7 @@ class InventoryModal(
     fun getBench() = if (isBench) ((parentModal as InventoryModal).withContainer as Workbench) else null
 
     init {
-        zoomWhenOpen = true
+        zoomWhenOpen = 1.2f
         parentModal?.also { this.isSidecar = true ; changeSelection(0) }
         updateGrouped()
         adjustHeight()
@@ -145,7 +145,7 @@ class InventoryModal(
                 width + (parentModal?.width ?: 0) - 2,
                 optionY(ourSelection) - 4
             ).apply {
-                zoomWhenOpen = true
+                zoomWhenOpen = this@InventoryModal.zoomWhenOpen
                 this.parentModal = parent
                 addInventoryOptions(
                     this, grouped[ourSelection][0], grouped[ourSelection],

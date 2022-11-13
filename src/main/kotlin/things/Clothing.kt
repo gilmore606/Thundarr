@@ -22,7 +22,7 @@ sealed class Clothing : Gear() {
 @Serializable
 class HardHat : Clothing() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.HARD_HAT, 0.0f, -0.6f, false)
+        val glyphTransform = GlyphTransform(Glyph.HARD_HAT, 0.0f, -0.6f)
     }
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HARD_HAT
@@ -37,9 +37,9 @@ class HardHat : Clothing() {
 }
 
 @Serializable
-class HornetHelmet : Clothing() {
+class HornedHelmet : Clothing() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.HORNED_HAT, 0.0f, -0.6f, false)
+        val glyphTransform = GlyphTransform(Glyph.HORNED_HAT, 0.0f, -0.6f)
     }
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HORNED_HAT
@@ -57,7 +57,7 @@ class HornetHelmet : Clothing() {
 @Serializable
 class RiotHelmet : Clothing() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.HELMET, 0.0f, -0.5f, false)
+        val glyphTransform = GlyphTransform(Glyph.HELMET, 0.0f, -0.5f)
     }
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HELMET
@@ -66,4 +66,75 @@ class RiotHelmet : Clothing() {
     override val slot = Slot.HEAD
     override fun weight() = 0.7f
     override fun armor() = 4f
+}
+
+@Serializable
+class MokBoots : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.GRAY_BOOTS_WORN)
+    }
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.GRAY_BOOTS
+    override fun name() = "mok boots"
+    override fun description() = "Heavy stiff boots of tough leather pressed in layers."
+    override val slot = Slot.FEET
+    override fun weight() = 2f
+    override fun armor() = 2f
+}
+
+@Serializable
+class TravelBoots : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.BROWN_BOOTS_WORN)
+    }
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.BROWN_BOOTS
+    override fun name() = "travel boots"
+    override fun description() = "Fur-lined boots, ideal for long journeys."
+    override val slot = Slot.FEET
+    override fun weight() = 1.5f
+    override fun armor() = 1f
+}
+
+@Serializable
+class FurTunic : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.RED_TUNIC_WORN)
+    }
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.RED_TUNIC
+    override fun name() = "fur tunic"
+    override fun description() = "Despite the chic lack of arms, the thick fur seems quite cozy."
+    override val slot = Slot.TORSO
+    override fun weight() = 1f
+    override fun armor() = 1f
+}
+
+@Serializable
+class FurJacket : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.RED_JACKET_WORN)
+    }
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.RED_JACKET
+    override fun name() = "fur jacket"
+    override fun description() = "The innovation of arms makes this a sort of super-tunic, the ultimate in barbarian comfort."
+    override val slot = Slot.TORSO
+    override fun weight() = 2.5f
+    override fun armor() = 2f
+}
+
+@Serializable
+class SabretoothCharm : Clothing() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.NECK_CHARM_WORN)
+    }
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.NECK_CHARM
+    override fun name() = "sabretooth charm"
+    override fun description() = "A trophy from your first kill reminds you of your inner strength."
+    override val slot = Slot.NECK
+    override fun weight() = 0.1f
+    override fun armor() = 0f
+    override fun statEffects() = mapOf(Stat.Tag.STR to 1f)
 }

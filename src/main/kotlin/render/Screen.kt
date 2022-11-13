@@ -252,15 +252,14 @@ object Screen : KtxScreen {
             offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(),
             mirror = actor.mirrorGlyph, rotate = actor.rotateGlyph
         )
-        actor.gear.values.forEach { gear ->
-            gear?.glyphTransform()?.also { trans ->
-                gearBatch.addTileQuad(
-                    tx, ty,
-                    gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), 1f, light,
-                    offsetX = actor.animOffsetX() + trans.x, offsetY = actor.animOffsetY() + trans.y,
-                    hue = gear.hue(), rotate = trans.rotate && actor.rotateGlyph, mirror = actor.mirrorGlyph
-                )
-            }
+        actor.gearDrawList.forEach { gear ->
+            val trans = gear.glyphTransform()
+            gearBatch.addTileQuad(
+                tx, ty,
+                gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), 1f, light,
+                offsetX = actor.animOffsetX() + trans.x, offsetY = actor.animOffsetY() + trans.y,
+                hue = gear.hue(), rotate = trans.rotate && actor.rotateGlyph, mirror = actor.mirrorGlyph
+            )
         }
         actor.drawStatusGlyphs { statusGlyph ->
             uiWorldBatch.addTileQuad(
@@ -364,9 +363,7 @@ object Screen : KtxScreen {
 
     private fun currentZoomTarget(): Double {
         var t = zoomTarget
-        if (topModal?.zoomWhenOpen == true) {
-            t *= 1.2f
-        }
+        t *= topModal?.zoomWhenOpen ?: 1f
         return t
     }
 
