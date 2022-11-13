@@ -29,8 +29,8 @@ class QuadBatch(
     )
 
     val textureIndexCache = tileSet.getCache()
-    private val textureEdgePad = 0.0002f
-    private val quadEdgePadX = 0.0002f
+    private val textureEdgePad = 0.0012f
+    private val quadEdgePadX = 0.0000f
     private val quadEdgePadY = -0.0024f
 
 
@@ -134,10 +134,11 @@ class QuadBatch(
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f,
                                grayOut: Float = 0f, hue: Float = 0f, rotate: Boolean = false
     ) {
-        val x0 = ix0.toFloat() - quadEdgePadX
-        val y0 = -iy0.toFloat() - quadEdgePadY
-        val x1 = ix1.toFloat() + quadEdgePadX
-        val y1 = -iy1.toFloat() + quadEdgePadY
+        val z = 1f / Screen.zoom.toFloat()
+        val x0 = ix0.toFloat() - quadEdgePadX * z
+        val y0 = -iy0.toFloat() - quadEdgePadY * z
+        val x1 = ix1.toFloat() + quadEdgePadX * z
+        val y1 = -iy1.toFloat() + quadEdgePadY * z
         val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + textureEdgePad
         val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + textureEdgePad
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - textureEdgePad
