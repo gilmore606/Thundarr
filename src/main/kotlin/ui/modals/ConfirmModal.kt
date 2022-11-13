@@ -18,11 +18,12 @@ class ConfirmModal(
     val text: List<String>,
     val yesText: String = "OK",
     val noText: String = "Cancel",
-    val callback: (Boolean)->Unit
+    position: Position = Position.LEFT,
+    val callback: (Boolean)->Unit,
 ): SelectionModal(
     textWidth(text) + 48,
     text.size * 24 + 90,
-    position = Position.LEFT
+    position = position
 ) {
 
     override fun newBoxBatch() = ConfirmModal.boxBatch

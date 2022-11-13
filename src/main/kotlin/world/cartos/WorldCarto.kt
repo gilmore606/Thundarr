@@ -21,7 +21,8 @@ class WorldCarto(
     x1: Int,
     y1: Int,
     chunk: Chunk,
-    level: Level
+    level: Level,
+    val forStarter: Boolean = false
 ) : Carto(x0, y0, x1, y1, chunk, level) {
 
     val scale = 0.02
@@ -43,7 +44,7 @@ class WorldCarto(
             }
         }
 
-        if (Dice.chance(0.6f)) {
+        if (Dice.chance(0.6f) || forStarter) {
             carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
             assignDoors()
         }
@@ -95,10 +96,13 @@ class WorldCarto(
     }
 
     private fun assignDoors() {
+        if (forStarter) {
+            log.info("Looking for door for starter dungeon...")
+        }
         forEachCell { x, y ->
             if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
 
-                val building = BoringBuilding().at(x,y)
+                val building = if (forStarter) StarterDungeon().at(x,y) else BoringBuilding().at(x,y)
 
                 setTerrainData(x, y, PortalDoor.Data(
                     enterMsg = building.doorMsg(),

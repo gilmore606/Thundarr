@@ -174,8 +174,6 @@ open class Player : Actor() {
         }
     }
 
-    fun couldEat() = calories < caloriesEatMax
-
     override fun ingestCalories(cal: Int) {
         calories += cal.toFloat()
         if (calories > caloriesMax) {

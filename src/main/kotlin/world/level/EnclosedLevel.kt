@@ -65,6 +65,15 @@ open class EnclosedLevel(
         }
     }
 
+    override fun getNewPlayerEntranceFrom(): XY? {
+        chunk?.also {
+            if (!it.generating) {
+                return it.randomPlayerStart()
+            }
+        }
+        return null
+    }
+
     override fun onPlayerEntered() {
         Speaker.clearMusic()
         Speaker.requestSong(Speaker.Song.DUNGEON)

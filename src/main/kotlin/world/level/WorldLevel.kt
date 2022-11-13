@@ -14,6 +14,8 @@ class WorldLevel() : Level() {
 
     private val chunksWide = CHUNKS_AHEAD * 2 + 1
 
+    var needStarterDungeon = false
+
     private val chunks = Array(chunksWide) { Array<Chunk?>(chunksWide) { null } }
     private val loadedChunks = mutableSetOf<Chunk>()
     private var originChunkX = 0   // upper-left corner of the upper-left corner chunk
@@ -27,15 +29,17 @@ class WorldLevel() : Level() {
 
     override fun isReady() = loadedChunks.size >= chunksWide * chunksWide
 
-    override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
-        if (fromLevelId == "world") {
-            // Brand new start.
-            val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.randomPlayerStart()
-            if (start != null) {
-                loadedChunks.forEach { it.clearSeen() }
-                return start
-            }
+    override fun getNewPlayerEntranceFrom(): XY? {
+        // Brand new start.
+        val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.randomPlayerStart()
+        if (start != null) {
+            loadedChunks.forEach { it.clearSeen() }
+            return start
         }
+        return null
+    }
+
+    override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         return null
     }
 

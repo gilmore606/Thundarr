@@ -4,8 +4,10 @@ import kotlinx.coroutines.delay
 import render.Screen
 import ui.panels.Toolbar
 import util.XY
+import util.hasOneWhere
 import util.log
 import world.Building
+import world.level.EnclosedLevel
 import world.level.Level
 import world.level.WorldLevel
 import java.util.concurrent.ConcurrentSkipListSet
@@ -55,7 +57,29 @@ object LevelKeeper {
         return level
     }
 
-    fun getWarmedWorld(around: XY): Level = getLevel("world").apply { setPov(around.x, around.y) }
+    fun refreshLevel(level: Level) {
+        if (liveLevels.hasOneWhere { it.level == level }) return
+        if (liveLevels.hasOneWhere { it.level.levelId() == level.levelId() }) {
+            throw RuntimeException("refreshLevel - we had an old level with the same levelId (but different object)!")
+        }
+        liveLevels.add(LiveLevel(
+            level = level,
+            addedAtMs = System.currentTimeMillis(),
+            lastAccessedAt = System.currentTimeMillis()
+        ))
+    }
+
+    fun getWarmedWorld(around: XY, withStarterDungeon: Boolean = false): Level {
+        val level = (getLevel("world") as WorldLevel).apply {
+            log.info("Requesting warmed world level...")
+            if (withStarterDungeon) {
+                log.info("Asking WorldLevel for starter dungeon")
+                needStarterDungeon = true
+            }
+            setPov(around.x, around.y)
+        }
+        return level
+    }
 
     fun makeBuilding(building: Building) {
         App.save.putBuilding(building)

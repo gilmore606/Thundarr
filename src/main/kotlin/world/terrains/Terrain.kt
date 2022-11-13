@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import render.Screen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
+import ui.modals.Modal
 import ui.panels.Console
 import util.LightColor
 import util.XY
@@ -91,7 +92,7 @@ object PortalDoor : Terrain(
         if (data == null) throw RuntimeException("portalDoor had null terrain data!")
         val terrainData = data as Data
         Screen.addModal(ConfirmModal(
-            terrainData.enterMsg.split('\n'), "Travel", "Cancel"
+            terrainData.enterMsg.split('\n'), "Travel", "Cancel", position = Modal.Position.CENTER_LOW
         ) { yes ->
             if (yes) {
                 if (terrainData.levelId == "world") {

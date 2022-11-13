@@ -14,6 +14,7 @@ import things.*
 import ui.modals.*
 import ui.panels.*
 import util.*
+import world.StarterDungeon
 import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel
@@ -227,49 +228,66 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             save.eraseAll()
             delay(500)
 
-            level = LevelKeeper.getLevel("world")
-            level.setPov(200, 200)
+            if (startType == StartType.SURVIVE) {
+                level = LevelKeeper.getWarmedWorld(around = XY(200, 200))
+                finishCreateWorld(level, startType)
+            } else {
+                level = LevelKeeper.getWarmedWorld(around = XY(200, 200), withStarterDungeon = true)
+                // inshallah, StarterDungeon will call finishCreateWorld when warmed
+            }
+        }
+    }
+    fun finishCreateWorld(actualLevel: Level, startType: StartType, startDungeon: StarterDungeon? = null) {
+        KtxAsync.launch {
+            level = actualLevel
+            LevelKeeper.refreshLevel(level)
 
             player = Player()
             player.onSpawn()
 
             var playerStart: XY? = null
             while (playerStart == null) {
-                log.debug("Waiting for chunks...")
+                log.debug("Waiting for new level entrance...")
                 delay(200)
-                playerStart = level.getPlayerEntranceFrom(level.levelId())
+                playerStart = level.getNewPlayerEntranceFrom()
             }
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
-            Console.say(when (startType) {
+            Console.say(
+                when (startType) {
                     StartType.SURVIVE -> "You gather your wits and resolve to survive."
                     StartType.ESCAPE -> "Your bonds are loosed!  But how to escape this terrible place?"
-                })
+                }
+            )
             Screen.brightnessTarget = 1f
             addGamePanels()
             level.onPlayerEntered()
             updateTime(Dice.range(200, 600).toDouble())
 
-            val wizardName = Madlib.wizardName()
-            val wizardFullName = Madlib.wizardFullName(wizardName)
+            val wizardName = startDungeon?.wizardName ?: Madlib.wizardName()
+            val wizardFullName = startDungeon?.wizardFullName ?: Madlib.wizardFullName(wizardName)
 
             if (startType == StartType.ESCAPE) {
-                Screen.addModal(BigSplashModal(
-                    "Escape!",
-                    "For years I labored in chains for the evil wizard $wizardFullName.  Today it ends!  ${Madlib.escapeReason()}, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
-                    "Lords of Light, protect me.",
-                    true,
-                    true
-                ))
+                Screen.addModal(
+                    BigSplashModal(
+                        "Escape!",
+                        "For years I labored in chains for the evil wizard $wizardFullName.  Today it ends!  ${Madlib.escapeReason()}, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
+                        "Lords of Light, protect me.",
+                        true,
+                        true
+                    )
+                )
             } else {
-                Screen.addModal(BigSplashModal(
-                    "Survive!",
-                    "For many years I labored in chains.  But today, the Lords of Light smile on me -- on a work gang detail, I managed to slip away unnoticed and hide.  Now I must make my way alone in Numeria.",
-                    "Onward!",
-                    true,
-                    true
-                ))
+                Screen.addModal(
+                    BigSplashModal(
+                        "Survive!",
+                        "For many years I labored in chains.  But today, the Lords of Light smile on me -- on a work gang detail, I managed to slip away unnoticed and hide.  Now I must make my way alone in Numeria.",
+                        "Onward!",
+                        true,
+                        true
+                    )
+                )
             }
         }
     }

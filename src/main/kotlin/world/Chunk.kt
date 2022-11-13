@@ -15,6 +15,7 @@ import world.cartos.LevelCarto
 import world.cartos.WorldCarto
 import world.level.AttractLevel
 import world.level.Level
+import world.level.WorldLevel
 import world.persist.ChunkLoader
 import world.stains.Fire
 import world.stains.Stain
@@ -115,12 +116,17 @@ class Chunk(
         }
     }
 
-    // Carve myself into a chunk for the world.
+    // Carve myself into a chunk for the world.  Maybe with the starter dungeon.
     fun generateWorld(level: Level) {
         generating = true
         connectLevel(level)
-        WorldCarto(x, y, x+width-1,y+height-1,this, level)
-            .carveWorldChunk()
+        var withStarter = false
+        if ((level as WorldLevel).needStarterDungeon) {
+            withStarter = true
+            log.info("Generating world chunk $x $y for starter dungeon...")
+            level.needStarterDungeon = false  // only need to do this once!
+        }
+        WorldCarto(x, y, x+width-1,y+height-1,this, level, withStarter).carveWorldChunk()
         generating = false
     }
 
@@ -128,10 +134,7 @@ class Chunk(
     fun generateLevel(level: Level, building: Building) {
         generating = true
         connectLevel(level)
-        LevelCarto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, this, level)
-            .carveLevel(
-                worldExit = LevelCarto.WorldExit(NORTH, XY(building.xy.x, building.xy.y - 1))
-            )
+        building.generateLevelChunk(level, this)
         generating = false
     }
 

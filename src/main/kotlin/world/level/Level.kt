@@ -49,6 +49,7 @@ sealed class Level {
     abstract fun receiveChunk(chunk: Chunk)
 
     abstract fun getPlayerEntranceFrom(fromLevelId: String): XY?
+    abstract fun getNewPlayerEntranceFrom(): XY?
 
     abstract fun levelId(): String
     open fun debugText(): String = ""
