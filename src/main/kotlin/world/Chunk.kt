@@ -437,17 +437,18 @@ class Chunk(
             }
             return lightCache[x - this.x][y - this.y]
         }
-        return level.ambientLight(x, y, roofed[x - this.x][y - this.y])
+        return level.ambientLight(x, y, level.roofedAt(x, y))
     }
 
     fun lightsAt(x: Int, y: Int): MutableMap<LightSource, LightColor>? = if (boundsCheck(x, y))
         lights[x - this.x][y - this.y] else null
 
     // Force all cells to re-sum light on next frame.
-    fun dirtyAllLightCacheCells() {
+    fun dirtyEntireLightAndGlyphCaches() {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 lightCacheDirty[x][y] = true
+                glyphCache[x][y] = null
             }
         }
     }
