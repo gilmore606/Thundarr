@@ -188,7 +188,7 @@ object Screen : KtxScreen {
     var timeMs = System.currentTimeMillis()
 
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
-        val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, tx, ty)
+        val textureIndex = terrainBatch.getTerrainTextureIndex(glyph, App.level, tx, ty)
         terrainBatch.addTileQuad(
             tx, ty, textureIndex, vis, light
         )

@@ -6,6 +6,9 @@ import render.tilesets.TileSet
 abstract class TileHolder(
     val set: TileSet
 ) {
+
+    open val cacheable: Boolean = true
+
     abstract fun getTextureIndex(
         level: Level? = null,
         x: Int = 0,

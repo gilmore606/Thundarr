@@ -9,6 +9,8 @@ open class AnimatedTile(
     set: TileSet
 ): TileHolder(set) {
 
+    override val cacheable: Boolean = false
+
     private val frames = ArrayList<Pair<Int, Int>>()
 
     var frameMs = 350

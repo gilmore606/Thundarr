@@ -6,13 +6,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
-import render.Screen
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
-import world.cartos.LevelCarto
 import world.cartos.WorldCarto
 import world.level.AttractLevel
 import world.level.Level
@@ -71,6 +69,8 @@ class Chunk(
     @Transient
     private val debugLight = LightColor(0.8f, 0.8f, 0.8f)
 
+    @Transient
+    val glyphCache = Array(width) { Array<Int?>(height) { null } }
     @Transient
     private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
     @Transient
@@ -490,12 +490,12 @@ class Chunk(
             }
             lightSourceLocations.remove(lightSource)
             lightsTouching.remove(lightSource)
-            level.dirtyAllLightCacheCells()
+            level.dirtyEntireLightAndGlyphCaches()
         }
     }
 
     fun onRender(delta: Float) {
-        //if (isEveryFrame(4)) dirtyAllLightCacheCells()
+        //if (isEveryFrame(4)) dirtyEntireLightAndGlyphCaches()
         sparks.filterOut({ it.done }) { it.onRender(delta) }
     }
 

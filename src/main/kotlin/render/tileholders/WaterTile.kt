@@ -9,6 +9,8 @@ class WaterTile(
     set: TileSet
 ): TileHolder(set)  {
 
+    override val cacheable: Boolean = false
+
     private val variants = ArrayList<Triple<Float, Int, Int>>()
 
     fun add(frequency: Float, tx: Int, ty: Int) {

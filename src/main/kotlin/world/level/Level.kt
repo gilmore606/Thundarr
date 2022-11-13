@@ -313,11 +313,11 @@ sealed class Level {
         }, { x, y, vis ->
             setTileVisibility(x, y, vis)
         })
-        dirtyAllLightCacheCells()
+        dirtyEntireLightAndGlyphCaches()
         shadowDirty = false
     }
 
-    fun dirtyAllLightCacheCells() { allChunks().forEach { it.dirtyAllLightCacheCells() } }
+    fun dirtyEntireLightAndGlyphCaches() { allChunks().forEach { it.dirtyEntireLightAndGlyphCaches() } }
 
     private fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 

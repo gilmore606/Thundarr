@@ -168,4 +168,18 @@ class QuadBatch(
         return textureIndexCache[glyph] ?: tileSet.getIndex(glyph, level, x, y)
     }
 
+    inline fun getTerrainTextureIndex(glyph: Glyph, level: Level? = null, x: Int = 0, y: Int = 0): Int {
+        if (tileSet.tileHolders[glyph]?.cacheable != true) return getTextureIndex(glyph, level, x, y)
+        level?.chunkAt(x,y)?.also { chunk ->
+            val cx = x - chunk.x
+            val cy = y - chunk.y
+            chunk.glyphCache[cx][cy]?.also { return it } ?: run {
+                val index = tileSet.getIndex(glyph, level, x, y)
+                chunk.glyphCache[cx][cy] = index
+                return index
+            }
+        }
+        return tileSet.getIndex(glyph)
+    }
+
 }
