@@ -103,7 +103,7 @@ object ChunkLoader {
         }
 
         val building = App.save.getBuildingForLevel(levelId)
-        Chunk(building.floorWidth, building.floorHeight).apply {
+        Chunk(building.floorWidth(), building.floorHeight()).apply {
             onCreate(0, 0)
             generateLevel(level, building)
             App.save.putLevelChunk(this, levelId, building.id)

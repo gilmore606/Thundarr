@@ -215,8 +215,8 @@ class SaveSlot(
             BuildingsTable.deleteWhere { id eq building.id }
             BuildingsTable.insert {
                 it[id] = building.id
-                it[x] = building.x
-                it[y] = building.y
+                it[x] = building.xy.x
+                it[y] = building.xy.y
                 it[data] = toCompressed(building)
             }
             // Pre-create the LevelChunks row so the building id can be found for the level.

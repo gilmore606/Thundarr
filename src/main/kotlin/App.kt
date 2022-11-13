@@ -225,15 +225,13 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         pendingJob = KtxAsync.launch {
             LevelKeeper.hibernateAll()
             save.eraseAll()
-
-            delay(400)
+            delay(500)
 
             level = LevelKeeper.getLevel("world")
+            level.setPov(200, 200)
 
             player = Player()
             player.onSpawn()
-
-            level.setPov(200, 200)
 
             var playerStart: XY? = null
             while (playerStart == null) {
@@ -245,7 +243,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
             Console.say(when (startType) {
-                    StartType.SURVIVE -> "You gather your resolve to survive."
+                    StartType.SURVIVE -> "You gather your wits and resolve to survive."
                     StartType.ESCAPE -> "Your bonds are loosed!  But how to escape this terrible place?"
                 })
             Screen.brightnessTarget = 1f
@@ -259,7 +257,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             if (startType == StartType.ESCAPE) {
                 Screen.addModal(BigSplashModal(
                     "Escape!",
-                    "For many years I have labored in chains for the evil wizard $wizardFullName.  Today it ends!  Thanks to a careless guard and a pilfered bit of wire, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
+                    "For years I labored in chains for the evil wizard $wizardFullName.  Today it ends!  ${Madlib.escapeReason()}, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
                     "Lords of Light, protect me.",
                     true,
                     true
@@ -346,6 +344,16 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         )
     }
 
+    fun doStartNewWorld(startType: StartType) {
+        if (save.worldExists()) {
+            confirmCreateNewWorld(startType)
+        } else {
+            pendingJob?.cancel()
+            startGame()
+            createNewWorld(startType)
+        }
+    }
+
     private fun confirmCreateNewWorld(startType: StartType) {
         Screen.addModal(ConfirmModal(
             listOf(
@@ -375,16 +383,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun doContinue() {
         startGame()
         restoreState()
-    }
-
-    fun doStartNewWorld(startType: StartType) {
-        if (save.worldExists()) {
-            confirmCreateNewWorld(startType)
-        } else {
-            pendingJob?.cancel()
-            startGame()
-            createNewWorld(startType)
-        }
     }
 
     fun doQuit() {

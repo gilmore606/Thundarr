@@ -128,9 +128,9 @@ class Chunk(
     fun generateLevel(level: Level, building: Building) {
         generating = true
         connectLevel(level)
-        LevelCarto(0, 0, building.floorWidth - 1, building.floorHeight - 1, this, level)
+        LevelCarto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, this, level)
             .carveLevel(
-                worldExit = LevelCarto.WorldExit(NORTH, XY(building.x, building.y - 1))
+                worldExit = LevelCarto.WorldExit(NORTH, XY(building.xy.x, building.xy.y - 1))
             )
         generating = false
     }

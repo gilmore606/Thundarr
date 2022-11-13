@@ -9,7 +9,6 @@ import java.lang.Float.min
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
-const val STEP_CHUNKS_AHEAD = 1
 
 class WorldLevel() : Level() {
 

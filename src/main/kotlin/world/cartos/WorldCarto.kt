@@ -97,19 +97,11 @@ class WorldCarto(
     private fun assignDoors() {
         forEachCell { x, y ->
             if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-                val buildingId = UUID()
-                val building = Building(
-                    id = buildingId,
-                    x = x,
-                    y = y,
-                    floorCount = Random.nextInt(1, 6),
-                    floorWidth = 30 + Random.nextInt(0, 40),
-                    floorHeight = 30 + Random.nextInt(0, 40),
-                    firstLevelId = UUID(),
-                    doorMsg = "A door labelled $buildingId.\nOpen it and step inside?"
-                )
+
+                val building = BoringBuilding().at(x,y)
+
                 setTerrainData(x, y, PortalDoor.Data(
-                    enterMsg = building.doorMsg,
+                    enterMsg = building.doorMsg(),
                     levelId = building.firstLevelId
                 ))
                 LevelKeeper.makeBuilding(building)
