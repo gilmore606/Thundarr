@@ -281,6 +281,10 @@ sealed class Level {
     }
 
     fun onRender(delta: Float) {
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            updateVisibility()
+        }
         if (dirtyLights.isNotEmpty()) {
             shadowDirty = true
             mutableMapOf<LightSource,XY>().apply {
@@ -293,10 +297,6 @@ sealed class Level {
             }
         }
 
-        if (shadowDirty) {
-            allChunks().forEach { it.clearVisibility() }
-            updateVisibility()
-        }
         if (this !is EnclosedLevel) weather.onRender(delta)
 
         allChunks().forEach { it.onRender(delta) }
@@ -316,7 +316,10 @@ sealed class Level {
         shadowDirty = false
     }
 
-    fun dirtyEntireLightAndGlyphCaches() { allChunks().forEach { it.dirtyEntireLightAndGlyphCaches() } }
+    fun dirtyEntireLightAndGlyphCaches() {
+        allChunks().forEach { it.dirtyEntireLightAndGlyphCaches() }
+        shadowDirty = true
+    }
 
     private fun setTileVisibility(x: Int, y: Int, vis: Boolean) = chunkAt(x,y)?.setTileVisibility(x,y,vis) ?: Unit
 

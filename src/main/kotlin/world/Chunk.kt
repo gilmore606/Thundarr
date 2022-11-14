@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
+import render.Screen
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.LightSource
@@ -259,6 +260,7 @@ class Chunk(
                 }
             }
         }
+        level.dirtyLightsTouching(x, y)
     }
 
     fun setRoofed(x: Int, y: Int, newRoofed: Roofed) {
@@ -467,6 +469,7 @@ class Chunk(
                     floorLight = level.lightAt(lx, ly)
                 }
             }
+            if (floorLight == null) floorLight = Screen.fullDark
         }
         floorLight?.also { floorLight ->
             lightCache[x][y].r = floorLight.r
