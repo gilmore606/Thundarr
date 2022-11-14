@@ -23,6 +23,13 @@ sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
     var active: Boolean = true
 
+    open fun extinguishSelfMsg() = "Your %d sputters and dies."
+    open fun extinguishOtherMsg() = "%Dn's %d goes out."
+    open fun extinguishMsg() = "%Dn goes out."
+    open fun lightMsg() = "%Dn turns on."
+    open fun lightSelfMsg() = "Your %d turns on."
+    open fun lightOtherMsg() = "%Dn's %d turns on."
+
     override fun listTag() = if (active) "(lit)" else ""
 
     override fun onRestore(holder: ThingHolder) {
@@ -41,6 +48,11 @@ sealed class LitThing : Portable(), LightSource {
                 holder.level?.addLightSource(xy.x, xy.y,
                     if (holder is Actor) holder else this
                 )
+                if (holder is Actor) {
+                    Console.sayAct(lightSelfMsg(), lightOtherMsg(), holder, this)
+                } else {
+                    Console.sayAct("", lightMsg(), this, this)
+                }
             }
         }
     }
@@ -52,10 +64,10 @@ sealed class LitThing : Portable(), LightSource {
                 holder.xy()?.also { xy ->
                     level.removeLightSource(if (holder is Actor) holder else this )
                     if (holder is Actor) {
-                        Console.sayAct("Your torch sputters and dies.", "%Dn's torch goes out.", holder)
+                        Console.sayAct(extinguishSelfMsg(), extinguishOtherMsg(), holder, this)
                         holder.light()?.also { level.addLightSource(xy.x, xy.y, holder) }
                     } else {
-                        Console.sayAct("", "The torch sputters and dies.", this)
+                        Console.sayAct("", extinguishMsg(), this, this)
                     }
                 }
             }
@@ -80,6 +92,33 @@ class Lightbulb : LitThing() {
     override fun name() = "lightbulb"
     override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
+}
+
+@Serializable
+class CeilingLight : LitThing(), Smashable {
+    var broken = false
+    override fun glyph() = Glyph.BLANK
+    override fun name() = "ceiling light"
+    override fun description() = "An electric light panel installed in the ceiling behind a plastic grate."
+    override fun isPortable() = false
+    override val lightColor = LightColor(0f, 0f, 0f)
+    fun withColor(r: Float, g: Float, b: Float): CeilingLight {
+        lightColor.r = r
+        lightColor.g = g
+        lightColor.b = b
+        return this
+    }
+    override fun sturdiness() = -1f
+    override fun isSmashable() = !broken
+    override fun onSmashSuccess() {
+        becomeDark()
+        broken = true
+    }
+    override fun examineInfo() = when {
+        (!active && broken) -> "It's dark.  It looks broken, but could probably be repaired."
+        (!active) -> "It's dark."
+        else -> "It's turned on."
+    }
 }
 
 @Serializable
@@ -122,6 +161,9 @@ class Torch : LitThing(), Temporal {
     override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"
     override fun description() = "A branch dipped in pitch tar."
+    override fun extinguishMsg() = "%Dn sputters and dies."
+    override fun extinguishSelfMsg() = "Your %d sputters and dies."
+    override fun extinguishOtherMsg() = "%Dn's %d sputters and dies."
     override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
 
     private val smokeChance = 1.1f

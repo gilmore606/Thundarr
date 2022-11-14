@@ -10,6 +10,7 @@ import render.tileholders.VariantsTile
 fun ThingTileSet() =
     TileSet(SpriteSheets.Sheet.ThingSprites).apply {
 
+        setTile(Glyph.BLANK, SimpleTile(this, 4, 2))
         setTile(Glyph.TREE, VariantsTile(this).apply {
             add(0.4f, 0, 1)
             add(0.3f, 0, 0)

@@ -11,10 +11,7 @@ import kotlinx.coroutines.launch
 import ktx.app.KtxInputAdapter
 import ktx.async.KtxAsync
 import render.Screen
-import things.Lightbulb
-import things.ModernDoor
-import things.PalmTree
-import things.Table
+import things.*
 import ui.panels.DebugPanel
 import ui.panels.Toolbar
 import util.*
@@ -208,6 +205,10 @@ object Keyboard : KtxInputAdapter {
                 }
                 Input.Keys.F8 -> {
                     ModernDoor().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
+                }
+                F11 -> {
+                    CeilingLight().withColor(Dice.float(0f,1f), Dice.float(0f,1f), Dice.float(0f,1f))
+                        .moveTo(App.level, App.player.xy.x, App.player.xy.y)
                 }
                 Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 

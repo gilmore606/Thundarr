@@ -16,7 +16,7 @@ interface Smashable {
     fun smashSuccessOtherMsg() = "%Dn smashes %dd to bits!"
     fun smashFailSelfMsg() = "You slam %dd, but it holds firm."
     fun smashFailOtherMsg() = "%Dn slams %dd but it holds firm."
-    fun smashDebris(): Thing? = Board()
+    fun smashDebris(): Thing? = null
     fun onSmashFail() { }
     fun onSmashSuccess() {
         smashDebris()?.moveTo(holder)

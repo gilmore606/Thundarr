@@ -20,6 +20,7 @@ class Table : Container(), Smashable {
     override fun isEmptyMsg() = "There's nothing on " + dname() + "."
 
     override fun sturdiness() = 3f
+    override fun smashDebris() = Board()
     override fun flammability() = 0.6f
 
     override fun drawExtraGlyphs(toDraw: (Glyph, Float, Float, Float) -> Unit) {
