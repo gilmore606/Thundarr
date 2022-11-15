@@ -232,6 +232,8 @@ sealed class Level {
 
     fun stainsAt(x: Int, y: Int) = chunkAt(x,y)?.stainsAt(x,y)
 
+    fun exitAt(x: Int, y: Int) = chunkAt(x,y)?.exitAt(x,y)
+
     fun cellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y) ?: throw RuntimeException("no cell container for $x $y")
     fun hasCellContainerAt(x: Int, y: Int) = chunkAt(x,y)?.cellContainerAt(x,y)
 
@@ -398,7 +400,8 @@ sealed class Level {
         val isAdjacentOrHere = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
         val isHere = App.player.xy.x == x && App.player.xy.y == y
 
-        thingsAt(x,y).groupByTag().forEach { group ->
+        val groups = thingsAt(x,y).groupByTag()
+        groups.forEach { group ->
             if (isHere && group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
                 if (group.size == 1) {
                     menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
@@ -409,6 +412,8 @@ sealed class Level {
                     }
                 }
             }
+        }
+        groups.forEach { group ->
             group[0].uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
                     menu.addOption(use.command) {

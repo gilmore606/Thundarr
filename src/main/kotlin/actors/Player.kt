@@ -58,7 +58,7 @@ open class Player : Actor() {
         Brains.set(this, 9f)
         Dig.set(this, 2f)
         Fight.set(this, 1f)
-        Throw.set(this, 4f)
+        Throw.set(this, 5f)
         Build.set(this, 1f)
         Survive.set(this, 2f)
 
@@ -77,6 +77,7 @@ open class Player : Actor() {
         FurTunic().moveTo(this)
         FurJacket().moveTo(this)
         SabretoothCharm().moveTo(this)
+        repeat (10) { Brick().moveTo(this) }
     }
 
     override fun die() {

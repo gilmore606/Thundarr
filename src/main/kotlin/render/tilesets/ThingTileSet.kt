@@ -107,4 +107,5 @@ fun ThingTileSet() =
         setTile(Glyph.RED_JACKET_WORN, SimpleTile(this, 8, 6))
         setTile(Glyph.NECK_CHARM, SimpleTile(this, 9, 7))
         setTile(Glyph.NECK_CHARM_WORN, SimpleTile(this, 8, 7))
+        setTile(Glyph.CEILING_LIGHT, SimpleTile(this, 4, 3))
     }

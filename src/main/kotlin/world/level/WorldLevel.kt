@@ -128,6 +128,7 @@ class WorldLevel() : Level() {
             }
         }
         oldChunks.forEach { unloadChunk(it) }
+        chunkAt(pov.x, pov.y)?.onPlayerEntered()
     }
 
     private fun getExistingChunkAt(x: Int, y: Int): Chunk? =

@@ -200,15 +200,13 @@ class SaveSlot(
             BuildingsTable.select { BuildingsTable.id eq id }.singleOrNull()?.let {
                 fromCompressed<Building>(it[BuildingsTable.data])
             }
-        } ?: throw RuntimeException("No building $id found!")
+        }
 
-    fun getBuildingForLevel(levelId: String) = getBuilding(
-        transaction {
-            LevelChunksTable.select { LevelChunksTable.id eq levelId }.singleOrNull()?.let {
-                it[LevelChunksTable.building]
-            }
-        } ?: throw RuntimeException("No building found for level $levelId !")
-    )
+    fun getBuildingForLevel(levelId: String) = transaction {
+        LevelChunksTable.select { LevelChunksTable.id eq levelId }.singleOrNull()?.let {
+            it[LevelChunksTable.building]
+        }
+    }?.let { getBuilding(it) }
 
     fun putBuilding(building: Building) {
         transaction {

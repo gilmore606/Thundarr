@@ -45,7 +45,7 @@ class WorldCarto(
             }
         }
 
-        if (Dice.chance(0.2f) || forStarter) {
+        if (Dice.chance(0.4f) || forStarter) {
             carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
             assignDoors()
         }
@@ -104,14 +104,14 @@ class WorldCarto(
         }
         forEachCell { x, y ->
             if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-
                 val building = if (forStarter) StarterDungeon().at(x,y) else BoringBuilding().at(x,y)
-
-                setTerrainData(x, y, PortalDoor.Data(
-                    enterMsg = building.doorMsg(),
-                    levelId = building.firstLevelId
-                ))
                 LevelKeeper.makeBuilding(building)
+                chunk.exits.add(Chunk.ExitRecord(
+                    Chunk.ExitType.LEVEL, XY(x,y),
+                    building.doorMsg(),
+                    buildingId = building.id,
+                    buildingFirstLevelId = building.firstLevelId
+                ))
             }
         }
     }

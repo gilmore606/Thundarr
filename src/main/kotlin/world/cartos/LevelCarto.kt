@@ -5,6 +5,7 @@ import things.FilingCabinet
 import util.*
 import world.Building
 import world.Chunk
+import world.level.EnclosedLevel
 import world.level.Level
 import world.terrains.PortalDoor
 import world.terrains.Terrain
@@ -17,10 +18,9 @@ class LevelCarto(
     y0: Int,
     x1: Int,
     y1: Int,
-    chunk: Chunk,
-    level: Level,
+    level: EnclosedLevel,
     val building: Building
-) : Carto(x0, y0, x1, y1, chunk, level) {
+) : Carto(x0, y0, x1, y1, level.chunk!!, level) {
 
     class WorldExit(
         val edge: XY,
@@ -147,10 +147,10 @@ class LevelCarto(
     private fun addDoor(worldExit: WorldExit) {
         val door = findEdgeForDoor(worldExit.edge)
         carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
-        setTerrainData(door.x, door.y, PortalDoor.Data(
-                enterMsg = "The door leads outside to the wilderness.\nExit the building?",
-                levelId = "world",
-                xy = XY(worldExit.dest.x, worldExit.dest.y)
+        chunk.exits.add(Chunk.ExitRecord(
+            Chunk.ExitType.WORLD, door,
+            "The door leads outside to the wilderness.\nExit the building?",
+            worldDest = worldExit.dest
         ))
     }
 

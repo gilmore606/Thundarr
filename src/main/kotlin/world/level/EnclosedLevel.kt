@@ -2,6 +2,7 @@ package world.level
 
 import audio.Speaker
 import util.*
+import world.Building
 import world.Chunk
 import world.persist.ChunkLoader
 import world.terrains.PortalDoor
@@ -11,7 +12,7 @@ open class EnclosedLevel(
     val levelId: String
     ) : Level() {
 
-    protected var chunk: Chunk? = null
+    var chunk: Chunk? = null
     private var allChunks = setOf<Chunk>()
     private var ready = false
 
@@ -19,6 +20,8 @@ open class EnclosedLevel(
         get() = chunk?.width ?: 1
     protected val height: Int
         get() = chunk?.height ?: 1
+
+    protected val building: Building? = App.save.getBuildingForLevel(levelId)
 
     init {
         ChunkLoader.getLevelChunk(this, levelId) { receiveChunk(it) }
@@ -38,8 +41,8 @@ open class EnclosedLevel(
         chunk?.also { unloadChunk(it, levelId) }
     }
 
-    override fun debugText() = "level $levelId"
-    override fun statusText() = "level $levelId"
+    override fun debugText() = levelId
+    override fun statusText() = building?.shortName() ?: "mysterious lair"
 
     override fun allChunks() = allChunks
 
@@ -49,21 +52,15 @@ open class EnclosedLevel(
 
     // Put the player next to the door he came in.
     // TODO: find a better solution for this
+    // TODO: this changes when doors aren't all on north edge!
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         if (isReady()) {
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-                        val doorData = getTerrainData(x, y) as PortalDoor.Data
-                        if (doorData.levelId == fromLevelId) {
-                            // TODO: this changes when doors aren't all on north edge!
-                            return XY(x, y + 1)
-                        }
-                    }
+            chunk?.exits?.forEach { exit ->
+                if (fromLevelId == "world" && exit.type == Chunk.ExitType.WORLD) {
+                    return XY(exit.doorLocation.x, exit.doorLocation.y + 1)
                 }
             }
-            log.info("Failed to find world exit in level chunk -- dropping player in randomly!")
-            return chunk!!.randomPlayerStart()
+            throw RuntimeException("Failed to find world exit in level chunk!")
         } else {
             return null
         }

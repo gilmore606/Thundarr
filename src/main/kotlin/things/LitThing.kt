@@ -97,7 +97,7 @@ class Lightbulb : LitThing() {
 @Serializable
 class CeilingLight : LitThing(), Smashable {
     var broken = false
-    override fun glyph() = Glyph.BLANK
+    override fun glyph() = Glyph.CEILING_LIGHT
     override fun name() = "ceiling light"
     override fun description() = "An electric light panel installed in the ceiling behind a plastic grate."
     override fun isPortable() = false

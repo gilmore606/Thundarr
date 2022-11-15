@@ -173,6 +173,7 @@ fun Int.toEnglish(): String {
         str = when ((this / 10) % 10) {
             0 -> str
             1 -> when (str) {
+                "" -> "ten"
                 "one" -> "eleven"
                 "two" -> "twelve"
                 "three" -> "thirteen"

@@ -18,6 +18,7 @@ import world.level.EnclosedLevel
 import world.level.Level
 import world.level.WorldLevel
 import world.persist.ChunkLoader
+import world.persist.LevelKeeper
 import world.stains.Fire
 import world.stains.Stain
 import world.terrains.Floor
@@ -32,6 +33,21 @@ import kotlin.random.Random
 class Chunk(
     val width: Int, val height: Int
 ) {
+    @Serializable
+    enum class ExitType { WORLD, LEVEL }
+
+    @Serializable
+    class ExitRecord(
+        val type: ExitType,
+        val doorLocation: XY,
+        val enterMsg: String,
+        val buildingId: String = "na",
+        val buildingFirstLevelId: String = "na",
+        val worldDest: XY = XY(0,0)
+    )
+
+    val exits = mutableListOf<ExitRecord>()
+
     @Transient
     private lateinit var level: Level
     @Transient
@@ -50,6 +66,7 @@ class Chunk(
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array<TerrainData?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
+
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
     var generating = true
@@ -138,7 +155,7 @@ class Chunk(
         generating = true
         (level as EnclosedLevel).connectChunk(this)  // TODO: we need to just generically do this for both kinds
         connectLevel(level)
-        building.generateLevelChunk(level, this)
+        building.carveLevel(level)
         generating = false
     }
 
@@ -187,6 +204,16 @@ class Chunk(
         }
     }
 
+    fun onPlayerEntered() {
+        // Warm up any levels we have exits to.
+        exits.forEach { exit ->
+            when (exit.type) {
+                ExitType.LEVEL -> LevelKeeper.getLevel(exit.buildingFirstLevelId)
+                ExitType.WORLD -> LevelKeeper.getLevel("world")
+            }
+        }
+    }
+
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
 
     fun onAddThing(x: Int, y: Int, thing: Thing) {
@@ -211,6 +238,10 @@ class Chunk(
 
     fun stainsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
         things[x - this.x][y - this.y].stains
+    } else null
+
+    fun exitAt(x: Int, y: Int): ExitRecord? = if (boundsCheck(x, y)) {
+        exits.firstOrNull { it.doorLocation.x == x && it.doorLocation.y == y }
     } else null
 
     fun cellContainerAt(x: Int, y: Int) = if (boundsCheck(x, y)) {

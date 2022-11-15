@@ -102,7 +102,7 @@ object ChunkLoader {
             return
         }
 
-        val building = App.save.getBuildingForLevel(levelId)
+        val building = App.save.getBuildingForLevel(levelId) ?: throw RuntimeException("No building found for level $levelId !")
         Chunk(building.floorWidth(), building.floorHeight()).apply {
             onCreate(0, 0)
             generateLevel(level, building)

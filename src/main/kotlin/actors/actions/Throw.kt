@@ -7,6 +7,7 @@ import audio.Speaker
 import render.sparks.Projectile
 import render.sparks.ProjectileShadow
 import render.sparks.Smoke
+import things.Smashable
 import things.Thing
 import ui.panels.Console
 import util.Dice
@@ -58,6 +59,17 @@ class Throw(
             } else {
                 Console.sayAct("%Di misses %dd.", "%Dn throws %ii at %dd, but misses.", actor, target, thing)
                 target.receiveAggression(actor)
+            }
+        } ?: run {
+            if (roll >= 0) {
+                level.thingsAt(x, y).filter { it is Smashable }.randomOrNull()?.also { target ->
+                    if (roll > (target as Smashable).sturdiness()) {
+                        Console.sayAct("", "%Dn nails %dd, smashing it!", thing, target)
+                        target.onSmashSuccess()
+                    } else {
+                        Console.sayAct("", "%Dn bounces off %dd.", thing, target)
+                    }
+                }
             }
         }
         thing.onThrownAt(level, x, y)

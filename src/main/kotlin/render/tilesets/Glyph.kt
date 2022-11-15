@@ -101,6 +101,7 @@ enum class Glyph {
     RED_JACKET_WORN,
     NECK_CHARM,
     NECK_CHARM_WORN,
+    CEILING_LIGHT,
 
     BLOODSTAIN,
     SCORCHMARK

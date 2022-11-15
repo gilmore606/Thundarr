@@ -74,39 +74,6 @@ sealed class TerrainData(
     val forType: Terrain.Type
 )
 
-
-object PortalDoor : Terrain(
-    Type.TERRAIN_PORTAL_DOOR,
-    Glyph.PORTAL_DOOR,
-    false,
-    false,
-    true
-) {
-    @Serializable class Data(
-        val enterMsg: String,
-        val levelId: String,
-        val xy: XY? = null // only for doors to world
-    ) : TerrainData(Type.TERRAIN_PORTAL_DOOR)
-
-    override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
-        if (data == null) throw RuntimeException("portalDoor had null terrain data!")
-        val terrainData = data as Data
-        Screen.addModal(ConfirmModal(
-            terrainData.enterMsg.split('\n'), "Travel", "Cancel", position = Modal.Position.CENTER_LOW
-        ) { yes ->
-            if (yes) {
-                if (terrainData.levelId == "world") {
-                    App.enterWorldFromLevel(terrainData.xy ?: throw RuntimeException("Door to world with no XY dest!"))
-                } else {
-                    App.enterLevelFromWorld(terrainData.levelId)
-                }
-            } else {
-                Console.say("You reconsider and step away.")
-            }
-        })
-    }
-}
-
 object Water : Terrain(
     Type.TERRAIN_WATER,
     Glyph.WATER,

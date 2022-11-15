@@ -7,6 +7,7 @@ import util.XY
 import util.hasOneWhere
 import util.log
 import world.Building
+import world.StarterDungeon
 import world.level.EnclosedLevel
 import world.level.Level
 import world.level.WorldLevel
@@ -83,7 +84,8 @@ object LevelKeeper {
 
     fun makeBuilding(building: Building) {
         App.save.putBuilding(building)
-        getLevel(building.firstLevelId)
+        // If it's the StarterDungeon, we need to make it right now.
+        if (building is StarterDungeon) getLevel(building.firstLevelId)
     }
 
     // Discard old non-world levels if we're holding too many active.
