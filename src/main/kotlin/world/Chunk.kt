@@ -14,6 +14,7 @@ import things.Thing
 import util.*
 import world.cartos.WorldCarto
 import world.level.AttractLevel
+import world.level.EnclosedLevel
 import world.level.Level
 import world.level.WorldLevel
 import world.persist.ChunkLoader
@@ -135,6 +136,7 @@ class Chunk(
     // Carve myself into a chunk for a building level.
     fun generateLevel(level: Level, building: Building) {
         generating = true
+        (level as EnclosedLevel).connectChunk(this)  // TODO: we need to just generically do this for both kinds
         connectLevel(level)
         building.generateLevelChunk(level, this)
         generating = false

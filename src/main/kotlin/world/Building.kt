@@ -16,6 +16,14 @@ sealed class Building {
     var firstLevelId: String = UUID()
     open fun doorMsg() = "A non-descript door.  Go inside?"
 
+    open val lightColorHalls = LightColor(0.5f, 0.2f, 0.3f)
+    open val lightColorRooms = LightColor(0.1f, 0.6f, 0.4f)
+    open val lightColorSpecial = LightColor(0.6f, 0.3f, 0f)
+    open val lightColorVariance = 0.15f
+    open val lightVariance = 0.2f
+    open val lightAttempts = 2000
+
+
     open fun at(x: Int, y: Int): Building {
         xy.x = x
         xy.y = y
@@ -23,7 +31,7 @@ sealed class Building {
     }
 
     open fun generateLevelChunk(level: Level, chunk: Chunk) {
-        LevelCarto(0, 0, floorWidth() - 1, floorHeight() - 1, chunk, level)
+        LevelCarto(0, 0, floorWidth() - 1, floorHeight() - 1, chunk, level, this)
             .carveLevel(
                 worldExit = LevelCarto.WorldExit(NORTH, XY(xy.x, xy.y - 1))
             )

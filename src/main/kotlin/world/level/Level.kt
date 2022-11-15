@@ -336,7 +336,7 @@ sealed class Level {
         }
         val brightness = light.brightness()
         val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
-        val nearboost = if (distance < 1f) 1.3f else if (distance < 3f) 0.4f else if (distance < 4f) 0.2f else 0f
+        val nearboost = if (distance < 1f) 0.6f else if (distance < 3f) 0.3f else if (distance < 4f) 0.1f else 0f
         val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
         return ambientResult.apply {
             r = light.r * falloff
@@ -416,7 +416,7 @@ sealed class Level {
                     }
                 }
             }
-            if (group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
+            if (isAdjacentOrHere && group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
                 menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
                     App.player.queue(Smash(group[0] as Smashable))
                 }

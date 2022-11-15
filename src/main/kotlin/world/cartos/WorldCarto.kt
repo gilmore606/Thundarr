@@ -45,7 +45,7 @@ class WorldCarto(
             }
         }
 
-        if (Dice.chance(0.6f) || forStarter) {
+        if (Dice.chance(0.2f) || forStarter) {
             carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
             assignDoors()
         }

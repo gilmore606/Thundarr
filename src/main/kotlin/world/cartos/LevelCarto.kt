@@ -1,11 +1,15 @@
 package world.cartos
 
+import things.CeilingLight
 import things.FilingCabinet
 import util.*
+import world.Building
 import world.Chunk
 import world.level.Level
 import world.terrains.PortalDoor
 import world.terrains.Terrain
+import java.lang.Float.max
+import java.lang.Float.min
 import kotlin.random.Random
 
 class LevelCarto(
@@ -14,7 +18,8 @@ class LevelCarto(
     x1: Int,
     y1: Int,
     chunk: Chunk,
-    level: Level
+    level: Level,
+    val building: Building
 ) : Carto(x0, y0, x1, y1, chunk, level) {
 
     class WorldExit(
@@ -55,7 +60,7 @@ class LevelCarto(
             }
         }
 
-        connectRegions(Dice.float(0.05f, 0.7f))
+        connectRegions(Dice.float(0.1f, 0.7f))
 
         var deadEnds = true
         while (deadEnds) {
@@ -63,6 +68,8 @@ class LevelCarto(
         }
 
         addDoor(worldExit)
+
+        addLights()
 
         forEachCell { x, y -> chunk.setRoofed(x - chunk.x, y - chunk.y, Chunk.Roofed.INDOOR) }
     }
@@ -147,5 +154,38 @@ class LevelCarto(
         ))
     }
 
+    private fun addLights() {
+        val hallColor = building.lightColorHalls
+        val roomColor = building.lightColorRooms
+        val specialColor = building.lightColorSpecial
+        val colorVariance = building.lightColorVariance
+        val variance = building.lightVariance
+        val attempts = building.lightAttempts
+
+        var count = 0
+        repeat (attempts) {
+            val x = Dice.zeroTil(width)
+            val y = Dice.zeroTil(height)
+            if (chunk.isWalkableAt(x,y)) {
+                if (!chunk.thingsAt(x, y).hasOneWhere { it is CeilingLight }) {
+                    if (chunk.lightAt(x, y).brightness() < 0.3f) {
+                        val color = if ((!isWalkableAt(x,y-1) && !isWalkableAt(x, y+1)) || (!isWalkableAt(x-1,y) && !isWalkableAt(x+1, y))) {
+                            hallColor
+                        } else if (Dice.chance(0.2f)) {
+                            specialColor
+                        } else roomColor
+
+                        val v = Dice.float(1f - variance, 1f + variance)
+                        color.r = min(1f, max(0f, color.r * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
+                        color.g = min(1f, max(0f, color.g * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
+                        color.b = min(1f, max(0f, color.b * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
+                        addThing(x, y, CeilingLight().withColor(color.r, color.g, color.b))
+                        count++
+                    }
+                }
+            }
+        }
+        log.info("placed $count lights in dungeon level")
+    }
 
 }

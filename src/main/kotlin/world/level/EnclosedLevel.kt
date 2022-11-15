@@ -25,9 +25,13 @@ open class EnclosedLevel(
     }
 
     override fun receiveChunk(chunk: Chunk) {
+        connectChunk(chunk)
+        ready = true
+    }
+
+    fun connectChunk(chunk: Chunk) {
         this.chunk = chunk
         allChunks = setOf(chunk)
-        ready = true
     }
 
     override fun unload() {
