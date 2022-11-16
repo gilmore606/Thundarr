@@ -1,6 +1,7 @@
 package world.terrains
 
 import actors.Actor
+import actors.Player
 import kotlinx.serialization.Serializable
 import render.Screen
 import render.tilesets.Glyph
@@ -20,14 +21,24 @@ object PortalDoor : Terrain(
 ) {
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level?.exitAt(x, y)?.also { exitRecord ->
+            val oldLevel = actor.level!!
             Screen.addModal(ConfirmModal(
                 exitRecord.enterMsg.split('\n'), "Travel", "Cancel", position = Modal.Position.CENTER_LOW
             ) { yes ->
                 if (yes) {
+                    oldLevel.onPlayerExited()
                     if (exitRecord.type == Chunk.ExitType.WORLD) {
-                        App.enterWorldFromLevel(exitRecord.worldDest)
+                        if (actor is Player) {
+                            App.enterWorldFromLevel(exitRecord.worldDest)
+                        } else {
+                            // TODO: let NPCs use portal doors
+                        }
                     } else {
-                        App.enterLevelFromWorld(exitRecord.buildingFirstLevelId)
+                        if (actor is Player) {
+                            App.enterLevelFromWorld(exitRecord.buildingFirstLevelId)
+                        } else {
+                            // TODO
+                        }
                     }
                 } else {
                     Console.say("You reconsider and step away.")

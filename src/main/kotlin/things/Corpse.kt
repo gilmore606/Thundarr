@@ -2,18 +2,21 @@ package things
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.aOrAn
 import util.iterateAndEmpty
 
 @Serializable
-class Corpse : Container(), Temporal {
+class Corpse(
+    val departedName: String? = null
+) : Container(), Temporal {
 
     var rot = 0f
-    open fun rotTime() = 500f
+    private fun rotTime() = 500f
 
     override fun temporalDone() = holder == null
 
-    override fun name() = "corpse"
-    override fun description() = "The mangled body of some unfortunate creature.  It's so damaged you can hardly tell what it was."
+    override fun name() = departedName?.let { "$it corpse" } ?: "corpse"
+    override fun description() = "The mangled, lifeless organic remains of " + (departedName?.aOrAn() ?: "some unfortunate creature") + "."
     override fun glyph() = Glyph.CORPSE
     override fun isPortable(): Boolean = false
     override fun openVerb() = "search"
@@ -26,7 +29,7 @@ class Corpse : Container(), Temporal {
         }
     }
 
-    fun rot() {
+    private fun rot() {
         onRot()
         level()?.also { level ->
             xy()?.also { xy ->
@@ -38,5 +41,5 @@ class Corpse : Container(), Temporal {
         moveTo(null)
     }
 
-    open fun onRot() { }
+    private fun onRot() { }
 }

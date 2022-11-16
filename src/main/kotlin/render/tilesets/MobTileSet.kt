@@ -26,4 +26,9 @@ fun ActorTileSet() =
         })
         setTile(Glyph.HERDER, SimpleTile(this, 1, 0))
         setTile(Glyph.WOLFMAN, SimpleTile(this, 0, 3))
+        setTile(Glyph.SNAKEMAN, SimpleTile(this, 1, 3))
+        setTile(Glyph.KARROK, SimpleTile(this, 2, 3))
+        setTile(Glyph.THRALL, SimpleTile(this, 3, 3))
+        setTile(Glyph.RATMAN, SimpleTile(this, 0, 4))
+        setTile(Glyph.RATTHING, SimpleTile(this, 1, 4))
     }

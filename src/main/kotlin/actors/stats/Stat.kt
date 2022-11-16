@@ -3,6 +3,7 @@ package actors.stats
 import actors.Actor
 import actors.Player
 import actors.stats.skills.*
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
@@ -121,14 +122,17 @@ abstract class Stat(
     }
 
     // Gain an improvement point, possibly gaining a base level.
-    fun improve(actor: Actor) {
+    fun improve(actor: Actor, fullLevel: Boolean = false) {
         val value = actor.stats[tag] ?: Value(0f)
         if (value.base < 0f) value.base = 0f
-        value.ip += ipPerImprove
+        value.ip += if (fullLevel) 100f else ipPerImprove
         if (value.ip >= 100f) {
             value.ip = value.ip - 100f
             value.base += 1f
-            if (actor is Player) Console.say(improveMsg())
+            if (actor is Player) {
+                Console.say(improveMsg())
+                Speaker.ui(Speaker.SFX.UIAWARD)
+            }
         }
         actor.stats[tag] = value
     }

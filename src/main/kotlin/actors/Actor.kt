@@ -337,7 +337,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         contents.safeForEach { it.moveTo(corpse) }
     }
 
-    open fun corpse() = Corpse()
+    open fun corpse() = Corpse(name())
     open fun onDeath(corpse: Corpse) { }
 
     open fun ingestCalories(cal: Int) { }

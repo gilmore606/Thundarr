@@ -1,8 +1,11 @@
 package world
 
+import actors.stats.Heart
 import kotlinx.serialization.Serializable
+import render.Screen
 import util.*
 import world.cartos.LevelCarto
+import world.journal.JournalEntry
 import world.level.EnclosedLevel
 import kotlin.random.Random
 
@@ -43,6 +46,8 @@ sealed class Building {
                 worldDest = XY(xy.x + facing.x, xy.y + facing.y)
             )
     }
+
+    open fun onPlayerExited() { }
 }
 
 @Serializable
@@ -77,6 +82,14 @@ class StarterDungeon : WizardDungeon() {
         super.carveLevel(level)
         log.info("StarterDungeon $this exists - finishing create world")
         App.finishCreateWorld(level, App.StartType.ESCAPE, this)
+    }
+
+    override fun onPlayerExited() {
+        App.player.journal.achieve(JournalEntry(
+            "Freedom!",
+            "Today the sun shines on a free barbarian!  I've escaped the gates of ${wizardName}'s foul lair and cast off the bonds of slavery forever.  But what of those who remain?  I must gather my strength and return one day.  For the captive victims of $wizardName, and those of all the wizards, from Man-Hat to Los Fisgo!"
+        ), withModal = true)
+        Heart.improve(App.player, fullLevel = true)
     }
 
 }

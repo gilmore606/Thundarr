@@ -3,6 +3,8 @@ package actors
 import actors.actions.Action
 import actors.actions.Move
 import actors.stats.Brains
+import actors.stats.Heart
+import actors.stats.Speed
 import actors.stats.Strength
 import actors.stats.skills.*
 import actors.statuses.*
@@ -54,13 +56,13 @@ open class Player : Actor() {
     }
 
     open fun onSpawn() {
-        Strength.set(this, 14f)
-        Brains.set(this, 9f)
-        Dig.set(this, 2f)
+        Strength.set(this, 10f + Dice.zeroTo(4).toFloat())
+        Brains.set(this, 8f + Dice.zeroTo(4).toFloat())
+        Speed.set(this, 9f + Dice.zeroTo(3).toFloat())
+        Heart.set(this, 9f)
         Fight.set(this, 1f)
-        Throw.set(this, 5f)
-        Build.set(this, 1f)
-        Survive.set(this, 2f)
+        Throw.set(this, 1f)
+        Survive.set(this, 1f)
 
         Sunsword().moveTo(this)
         repeat (10) { Meat().moveTo(this) }

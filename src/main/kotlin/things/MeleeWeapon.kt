@@ -47,6 +47,16 @@ class Fist : MeleeWeapon() {
 }
 
 @Serializable
+class Teeth : MeleeWeapon() {
+    override fun glyph() = Glyph.BLANK
+    override fun name() = "teeth"
+    override fun description() = "Sharp teeth."
+    override fun hitSelfMsg() = "You bite %dd!"
+    override fun hitOtherMsg() = "%Dn bites %dd!"
+    override fun damage() = 1.5f
+}
+
+@Serializable
 class Axe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)

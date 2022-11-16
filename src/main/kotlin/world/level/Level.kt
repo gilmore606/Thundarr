@@ -66,9 +66,11 @@ sealed class Level {
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
     // This is safe because one thread asks for these values serially and doesn't store the result directly.
     private val ambientResult = LightColor(0f,0f,0f)
+    // The screen writes into this on render to let us know how close the player is to the outdoors.
     protected var distanceFromOutdoors = 100
 
     open fun onPlayerEntered() { }
+    open fun onPlayerExited() { }
 
     companion object {
         fun make(levelId: String) = if (levelId == "world") {
@@ -283,10 +285,6 @@ sealed class Level {
     }
 
     fun onRender(delta: Float) {
-        if (shadowDirty) {
-            allChunks().forEach { it.clearVisibility() }
-            updateVisibility()
-        }
         if (dirtyLights.isNotEmpty()) {
             shadowDirty = true
             mutableMapOf<LightSource,XY>().apply {
@@ -297,6 +295,10 @@ sealed class Level {
                     dirtyLights.remove(lightSource)
                 }
             }
+        }
+        if (shadowDirty) {
+            allChunks().forEach { it.clearVisibility() }
+            updateVisibility()
         }
 
         if (this !is EnclosedLevel) weather.onRender(delta)
@@ -426,7 +428,7 @@ sealed class Level {
                     App.player.queue(Smash(group[0] as Smashable))
                 }
             }
-            if (!group[0].isPortable()) {
+            if (!group[0].isPortable() || isHere) {
                 menu.addOption("examine " + group[0].name()) { Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW)) }
             }
         }

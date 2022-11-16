@@ -84,6 +84,10 @@ open class EnclosedLevel(
         Speaker.adjustAmbience(Speaker.Ambience.INDUSTRIAL, 1f)
     }
 
+    override fun onPlayerExited() {
+        building?.onPlayerExited()
+    }
+
     override fun chunkAt(x: Int, y: Int) =
         if (!(x < 0 || y < 0 || x >= (chunk?.width ?: 0) || y >= (chunk?.height ?: 0))) { chunk } else null
 

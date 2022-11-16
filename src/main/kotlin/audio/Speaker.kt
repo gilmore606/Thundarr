@@ -40,6 +40,7 @@ object Speaker {
         UIOPEN(listOf("ui/open.ogg")),
         UICLOSE(listOf("ui/close.ogg")),
         UIERROR(listOf("ui/error.ogg")),
+        UIAWARD(listOf("ui/award.ogg")),
 
         STEPDIRT(listOf("steps/stepdirt1.ogg", "steps/stepdirt2.ogg", "steps/stepdirt3.ogg"), 0.3f),
         STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg"), 0.3f, 0.7f),

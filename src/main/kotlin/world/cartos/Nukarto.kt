@@ -1,5 +1,6 @@
 package world.cartos
 
+import kotlinx.serialization.json.Json
 import util.*
 import world.Chunk
 import world.cartos.prefabs.Prefab
@@ -13,6 +14,16 @@ abstract class Nukarto(
     val floorType: Terrain.Type,
     val wallType: Terrain.Type
 ) {
+    val width
+        get() = chunk.width
+    val height
+        get() = chunk.height
+
+    protected val json = Json { ignoreUnknownKeys = true }
+
+    class Room(
+        x: Int, y: Int, width: Int, height: Int
+    )
 
     fun carveLevel() {
         doCarveLevel()
@@ -110,6 +121,31 @@ abstract class Nukarto(
                 }
             }
         }
+    }
+
+    protected fun findEdgeForDoor(facing: XY): XY {
+        for (ny in 0 until height) {
+            for (nx in 0 until width) {
+                val x = when (facing) {
+                    NORTH -> nx
+                    SOUTH -> nx
+                    EAST -> height - ny
+                    WEST -> ny
+                    else -> 0
+                }
+                val y = when (facing) {
+                    NORTH -> ny
+                    SOUTH -> height - ny
+                    EAST -> nx
+                    WEST -> width - nx
+                    else -> 0
+                }
+                if (!isWalkableAt(x, y) && cardinalBlockerCount(x, y) < 4 && isWalkableAt(x - facing.x, y - facing.y)) {
+                    return XY(x ,y)
+                }
+            }
+        }
+        throw RuntimeException("Can't find edge for door!")
     }
 
     private fun setTileOverlaps() {
