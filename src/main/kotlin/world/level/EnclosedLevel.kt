@@ -57,7 +57,7 @@ open class EnclosedLevel(
         if (isReady()) {
             chunk?.exits?.forEach { exit ->
                 if (fromLevelId == "world" && exit.type == Chunk.ExitType.WORLD) {
-                    return XY(exit.doorLocation.x, exit.doorLocation.y + 1)
+                    return XY(exit.doorLocation.x - building!!.facing.x, exit.doorLocation.y - building!!.facing.y)
                 }
             }
             throw RuntimeException("Failed to find world exit in level chunk!")
@@ -66,6 +66,7 @@ open class EnclosedLevel(
         }
     }
 
+    // TODO: obviously StarterDungeon should set this somehow, duh
     override fun getNewPlayerEntranceFrom(): XY? {
         chunk?.also {
             if (!it.generating) {

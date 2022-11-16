@@ -10,6 +10,7 @@ import kotlin.random.Random
 sealed class Building {
     val id: String = UUID()
     val xy = XY(0,0)
+    val facing = XY(0, 0)
     val floorDimensions = XY(0, 0)
     open fun shortName() = "boring building"
     open fun floorWidth() = floorDimensions.x
@@ -22,7 +23,7 @@ sealed class Building {
     open val lightColorSpecial = LightColor(0.6f, 0.3f, 0f)
     open val lightColorVariance = 0.15f
     open val lightVariance = 0.2f
-    open val lightAttempts = 2000
+    open val lightAttempts = 1000
 
 
     open fun at(x: Int, y: Int): Building {
@@ -30,11 +31,16 @@ sealed class Building {
         xy.y = y
         return this
     }
+    open fun facing(xy: XY): Building {
+        facing.x = xy.x
+        facing.y = xy.y
+        return this
+    }
 
     open fun carveLevel(level: EnclosedLevel) {
         LevelCarto(0, 0, floorWidth() - 1, floorHeight() - 1, level, this)
             .carveLevel(
-                worldExit = LevelCarto.WorldExit(NORTH, XY(xy.x, xy.y - 1))
+                worldDest = XY(xy.x + facing.x, xy.y + facing.y)
             )
     }
 }

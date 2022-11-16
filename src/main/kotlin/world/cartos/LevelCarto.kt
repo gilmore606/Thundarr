@@ -22,13 +22,8 @@ class LevelCarto(
     val building: Building
 ) : Carto(x0, y0, x1, y1, level.chunk!!, level) {
 
-    class WorldExit(
-        val edge: XY,
-        val dest: XY
-    )
-
     fun carveLevel(
-        worldExit: WorldExit
+        worldDest: XY
     ) {
         val rooms = ArrayList<Rect>()
 
@@ -67,7 +62,7 @@ class LevelCarto(
             deadEnds = removeDeadEnds()
         }
 
-        addDoor(worldExit)
+        addDoor(worldDest)
 
         addLights()
 
@@ -144,13 +139,13 @@ class LevelCarto(
         }
     }
 
-    private fun addDoor(worldExit: WorldExit) {
-        val door = findEdgeForDoor(worldExit.edge)
+    private fun addDoor(worldDest: XY) {
+        val door = findEdgeForDoor(building.facing)
         carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
         chunk.exits.add(Chunk.ExitRecord(
             Chunk.ExitType.WORLD, door,
             "The door leads outside to the wilderness.\nExit the building?",
-            worldDest = worldExit.dest
+            worldDest = worldDest
         ))
     }
 
@@ -169,7 +164,8 @@ class LevelCarto(
             if (chunk.isWalkableAt(x,y)) {
                 if (!chunk.thingsAt(x, y).hasOneWhere { it is CeilingLight }) {
                     if (chunk.lightAt(x, y).brightness() < 0.3f) {
-                        val color = if ((!isWalkableAt(x,y-1) && !isWalkableAt(x, y+1)) || (!isWalkableAt(x-1,y) && !isWalkableAt(x+1, y))) {
+                        val color = if ((!chunk.isWalkableAt(x,y-1) && !chunk.isWalkableAt(x, y+1)) ||
+                            (!chunk.isWalkableAt(x-1,y) && !chunk.isWalkableAt(x+1, y))) {
                             hallColor
                         } else if (Dice.chance(0.2f)) {
                             specialColor
@@ -185,7 +181,7 @@ class LevelCarto(
                 }
             }
         }
-        log.info("placed $count lights in dungeon level")
+        log.info("placed $count lights on $attempts attempts in dungeon level")
     }
 
 }

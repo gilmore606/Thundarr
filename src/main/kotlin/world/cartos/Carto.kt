@@ -27,7 +27,6 @@ abstract class Carto(
 
     protected var regions: Array<Array<Int?>> = Array(1+x1-x0) { Array(1+y1-y0) { null } }
 
-    protected val bounds = Rect(x0,y0,x1,y1)
     protected var innerBounds = Rect(x0+1,y0+1,x1-1,y1-1)
     protected val width = x1 - x0
     protected val height = y1 - y0
@@ -107,10 +106,24 @@ abstract class Carto(
         }
     }
 
-    protected fun carvePrefab(prefab: Prefab, atX: Int, atY: Int) {
-        for (x in 0 until prefab.width) {
-            for (y in 0 until prefab.height) {
-                prefab.terrain[x][y]?.also { type ->
+    protected fun carvePrefab(prefab: Prefab, atX: Int, atY: Int, facing: XY) {
+        for (nx in 0 until prefab.width) {
+            for (ny in 0 until prefab.height) {
+                val x = when (facing) {
+                    NORTH -> nx
+                    SOUTH -> prefab.width - nx - 1
+                    WEST -> ny
+                    EAST -> prefab.height - ny - 1
+                    else -> 0
+                }
+                val y = when (facing) {
+                    NORTH -> ny
+                    SOUTH -> prefab.height - ny - 1
+                    WEST -> nx
+                    EAST -> prefab.width - nx - 1
+                    else -> 0
+                }
+                prefab.terrain[nx][ny]?.also { type ->
                     setTerrain(x + atX, y + atY, type)
                 }
             }
@@ -220,10 +233,24 @@ abstract class Carto(
         return prefab
     }
 
-    protected fun findEdgeForDoor(edge: XY): XY {
-        for (y in y0 .. y1) {
-            for (x in x0..x1) {
-                if (isRock(x, y) && cardinalBlockerCount(x, y) < 4) {
+    protected fun findEdgeForDoor(facing: XY): XY {
+        for (ny in y0 .. y1) {
+            for (nx in x0..x1) {
+                val x = when (facing) {
+                    NORTH -> nx
+                    SOUTH -> nx
+                    EAST -> height - ny
+                    WEST -> ny
+                    else -> 0
+                }
+                val y = when (facing) {
+                    NORTH -> ny
+                    SOUTH -> height - ny
+                    EAST -> nx
+                    WEST -> width - nx
+                    else -> 0
+                }
+                if (isRock(x, y) && cardinalBlockerCount(x, y) < 4 && !isRock(x - facing.x, y - facing.y)) {
                     return XY(x ,y)
                 }
             }

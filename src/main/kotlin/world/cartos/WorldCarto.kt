@@ -45,9 +45,10 @@ class WorldCarto(
             }
         }
 
-        if (Dice.chance(0.4f) || forStarter) {
-            carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20))
-            assignDoors()
+        if (Dice.chance(0.8f) || forStarter) {
+            val facing = CARDINALS.random()
+            carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
+            assignDoor(facing)
         }
 
         for (x in 0 until width) {
@@ -98,13 +99,18 @@ class WorldCarto(
         setOverlaps()
     }
 
-    private fun assignDoors() {
+    private fun assignDoor(facing: XY) {
         if (forStarter) {
             log.info("Looking for door for starter dungeon...")
         }
         forEachCell { x, y ->
             if (getTerrain(x, y) == Terrain.Type.TERRAIN_PORTAL_DOOR) {
-                val building = if (forStarter) StarterDungeon().at(x,y) else BoringBuilding().at(x,y)
+
+                val building = if (forStarter)
+                    StarterDungeon().at(x,y).facing(facing)
+                else
+                    BoringBuilding().at(x,y).facing(facing)
+
                 LevelKeeper.makeBuilding(building)
                 chunk.exits.add(Chunk.ExitRecord(
                     Chunk.ExitType.LEVEL, XY(x,y),

@@ -465,7 +465,6 @@ class Chunk(
         if (boundsCheck(x, y)) lights[x - this.x][y - this.y][source] else null
 
     fun lightAt(x: Int, y: Int): LightColor {
-        if (App.DEBUG_VISIBLE) return debugLight
         if (boundsCheck(x, y)) {
             if (lightCacheDirty[x - this.x][y - this.y]) {
                 refreshLightCacheAt(x - this.x, y - this.y)

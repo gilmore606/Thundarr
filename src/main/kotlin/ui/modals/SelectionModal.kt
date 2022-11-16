@@ -27,8 +27,6 @@ abstract class SelectionModal(
     protected var spacing = 24
     protected var selectionBoxHeight = 20
 
-    protected var mouseSelection = true
-
     override fun moveToSidecar() {
         super.moveToSidecar()
         sidecar?.also { if (it is SelectionModal && it.selection == -1) it.selection = min(it.maxSelection, selection) }

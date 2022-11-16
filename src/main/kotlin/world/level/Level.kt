@@ -99,7 +99,7 @@ sealed class Level {
                     val roofed = isRoofedAt(x, y)
                     val walkable = isWalkableAt(x, y)
                     if (vis > 0f) {
-                        val light = if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
+                        val light = if (App.DEBUG_VISIBLE) Screen.fullLight else if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
                         doTile(
                             x, y, vis, glyph, light
                         )

@@ -44,12 +44,13 @@ class ConfirmModal(
     val noWidth: Int
 
     init {
-        mouseSelection = false
         yesWidth = GlyphLayout(Screen.font, yesText).width.toInt()
         noWidth = GlyphLayout(Screen.font, noText).width.toInt()
         val spaceWidth = (width - 48) - (yesWidth + noWidth)
         yesOffset = spaceWidth / 3
         noOffset = yesOffset + yesWidth + spaceWidth / 3
+
+        selection = 1
     }
 
     override fun drawModalText() {
