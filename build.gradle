@@ -24,11 +24,6 @@ application {
     applicationName = 'thundarr'
 }
 
-shadowJar {
-    include '*.png'
-    include '*.ogg'
-}
-
 runtime {
     javaHome.set(System.getProperty("java.home"))
 

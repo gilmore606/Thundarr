@@ -58,6 +58,8 @@ object Screen : KtxScreen {
     private val zoomLevels = listOf(0.5, 0.6, 0.75, 0.85, 1.0, 1.3, 1.6, 2.0)
     var zoomIndex = 2.0
 
+    var tiltAmount = 0f
+
     var width = 0
     var height = 0
     var FULLSCREEN = false
@@ -73,10 +75,10 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
-    val terrainBatch = QuadBatch(terrainTileSet)
-    val thingBatch = QuadBatch(thingTileSet)
-    val actorBatch = QuadBatch(actorTileSet)
-    val gearBatch = QuadBatch(thingTileSet)
+    val terrainBatch = QuadBatch(terrainTileSet, tilt = QuadBatch.Tilt.FLAT)
+    val thingBatch = QuadBatch(thingTileSet, tilt = QuadBatch.Tilt.POP)
+    val actorBatch = QuadBatch(actorTileSet, tilt = QuadBatch.Tilt.POP)
+    val gearBatch = QuadBatch(thingTileSet, tilt = QuadBatch.Tilt.POP)
     val fireBatch = FireBatch()
     val uiWorldBatch = QuadBatch(uiTileSet)
     val uiBatch = QuadBatch(uiTileSet)
@@ -104,7 +106,7 @@ object Screen : KtxScreen {
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val fontColorRed = Color(1f, 0f, 0f, 1f)
     val fontColorGreen = Color(0f, 1f, 0f, 1f)
-    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
+    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
             borderWidth = 2.3f
@@ -116,7 +118,7 @@ object Screen : KtxScreen {
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
-    val smallFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/amstrad.ttf"))
+    val smallFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSizeSmall
             borderWidth = 2f
@@ -128,7 +130,7 @@ object Screen : KtxScreen {
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
-    val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/worldOfWater.ttf"))
+    val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/worldOfWater.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = titleFontSize
             borderWidth = 3f
@@ -140,7 +142,7 @@ object Screen : KtxScreen {
             color = Color(1f, 0.9f, 0.2f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
-    val subTitleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("src/main/resources/font/worldOfWater.ttf"))
+    val subTitleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/worldOfWater.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = subTitleFontSize
             borderWidth = 2f
