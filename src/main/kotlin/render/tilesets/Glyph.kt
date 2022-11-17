@@ -134,6 +134,7 @@ enum class Glyph {
     KEY,
     STEW,
     BEDROLL,
+    FRIDGE,
 
     BLOODSTAIN,
     SCORCHMARK

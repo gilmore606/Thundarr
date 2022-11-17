@@ -5,6 +5,7 @@ import actors.Ratman
 import actors.Ratthing
 import things.CeilingLight
 import things.FilingCabinet
+import things.Fridge
 import util.*
 import world.Building
 import world.Chunk
@@ -40,8 +41,8 @@ class LevelCarto(
                 rooms.add(room)
                 carveRoom(room, nextRegion)
 
-                if (Dice.chance(0.3f)) {
-                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), FilingCabinet())
+                if (Dice.chance(0.6f)) {
+                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.flip()) FilingCabinet() else Fridge())
                 }
                 if (Dice.chance(0.7f)) {
                     Peeper().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))

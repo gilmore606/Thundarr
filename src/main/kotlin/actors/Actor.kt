@@ -387,7 +387,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (hp < hpMax) {
             if (!hasStatus(Status.Tag.STARVING)) {
                 if (Dice.chance(0.3f)) {
-                    var healmax = 5 + if (hasStatus(Status.Tag.HUNGRY)) -1 else 0
+                    var healmax = 5 + if (hasStatus(Status.Tag.HUNGRY)) -2 else if (hasStatus(Status.Tag.SATIATED)) 1 else 0
                     healmax += (statuses.firstOrNull { it.tag == Status.Tag.BANDAGED } as Bandaged?)?.quality?.toInt() ?: -3
                     val heal = Dice.range(0, Math.max(1, healmax))
                     healDamage(heal.toFloat())

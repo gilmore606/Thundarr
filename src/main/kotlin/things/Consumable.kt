@@ -167,6 +167,7 @@ sealed class Rottable : Food(), Temporal {
     }
 
     override fun advanceTime(delta: Float) {
+        if (holder is Fridge && (holder as Fridge).isRefrigerating()) return
         rot += delta
         if (rot > maxRot()) {
             onRot()

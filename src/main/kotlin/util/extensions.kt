@@ -250,7 +250,7 @@ fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.s
             word = remaining
             remaining = ""
         }
-        if (word != " ") {
+        if (word != " " && word != "") {
             val wordWidth = GlyphLayout(font, word).width.toInt()
             if (nextLine == "" || wordWidth <= linePixelsLeft) {
                 nextLine += word + " "

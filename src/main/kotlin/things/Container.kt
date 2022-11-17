@@ -61,11 +61,19 @@ sealed class Container : Portable(), ThingHolder {
 
 @Serializable
 class FilingCabinet : Container() {
-
     override fun name() = "filing cabinet"
     override fun description() = "You don't know what files are, but you know they went in here."
     override fun glyph() = Glyph.FILING_CABINET
     override fun isPortable() = false
     override fun openVerb() = "open"
+}
 
+@Serializable
+class Fridge : Container() {
+    override fun name() = "fridge"
+    override fun description() = "A box chilled by technology to preserve foods.  Astounding."
+    override fun glyph() = Glyph.FRIDGE
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+    fun isRefrigerating() = true  // TODO: invent electric power
 }
