@@ -5,7 +5,7 @@ import render.tilesets.Glyph
 import util.Dice
 
 @Serializable
-class Gore : Spark() {
+sealed class Gore : Spark() {
 
     val dirx = Dice.float(-2f, 2f)
     val diry = Dice.float(-2.5f, -0.2f)
@@ -30,4 +30,14 @@ class Gore : Spark() {
         if (offsetY > 0.4f) alpha = 0f
     }
 
+}
+
+@Serializable
+class BloodGore : Gore() {
+
+}
+
+@Serializable
+class GooGore : Gore() {
+    override fun hue() = 0.8f
 }

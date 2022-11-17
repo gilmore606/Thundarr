@@ -8,6 +8,7 @@ import actors.stats.Strength
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Container
 import things.Corpse
 import things.Meat
 import ui.input.Keyboard
@@ -43,8 +44,8 @@ class Ox : NPC() {
         return super.pickAction()
     }
 
-    override fun onDeath(corpse: Corpse) {
-        Meat().moveTo(corpse)
+    override fun onDeath(corpse: Container?) {
+        corpse?.also { Meat().moveTo(it) }
     }
 }
 
@@ -73,7 +74,7 @@ class MuskOx : NPC() {
         return super.pickAction()
     }
 
-    override fun onDeath(corpse: Corpse) {
-        Meat().moveTo(corpse)
+    override fun onDeath(corpse: Container?) {
+        corpse?.also { Meat().moveTo(it) }
     }
 }

@@ -31,4 +31,5 @@ fun UITileSet() =
         setTile(Glyph.POW_ICON, SimpleTile(this, 0, 4))
         setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
         setTile(Glyph.WINDOW_SHADE, SimpleTile(this, 2, 4))
+        setTile(Glyph.QUESTION_ICON, SimpleTile(this, 5, 4))
     }

@@ -31,4 +31,10 @@ fun ActorTileSet() =
         setTile(Glyph.THRALL, SimpleTile(this, 3, 3))
         setTile(Glyph.RATMAN, SimpleTile(this, 0, 4))
         setTile(Glyph.RATTHING, SimpleTile(this, 1, 4))
+        setTile(Glyph.RATLORD, SimpleTile(this, 3, 4))
+        setTile(Glyph.FLOATING_EYE, SimpleTile(this, 2, 4))
+        setTile(Glyph.WIZARD_SCYTHE, SimpleTile(this, 4, 0))
+        setTile(Glyph.WIZARD_SHIELD, SimpleTile(this, 4, 2))
+        setTile(Glyph.THRALL_ARCHER, SimpleTile(this, 4, 1))
+        setTile(Glyph.FURWORM, SimpleTile(this, 5, 3))
     }

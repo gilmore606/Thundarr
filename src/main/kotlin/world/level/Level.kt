@@ -167,13 +167,13 @@ sealed class Level {
 
     // DoThis for all spark glyphs.
     fun forEachSparkToRender(doThis: (x: Int, y: Int, glyph: Glyph, light: LightColor,
-                                      offsetX: Float, offsetY: Float, scale: Float, alpha: Float) -> Unit) {
+                                      offsetX: Float, offsetY: Float, scale: Float, alpha: Float, hue: Float) -> Unit) {
         allChunks().forEach { it.sparks().forEach { spark ->
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(spark.xy.x, spark.xy.y)
             if (vis == 1f && chunkAt(spark.xy.x, spark.xy.y) != null) {
                 val light = if (spark.isLit()) this.lightAt(spark.xy.x, spark.xy.y) else Screen.fullLight
                 doThis(
-                    spark.xy.x, spark.xy.y, spark.glyph(), light, spark.offsetX(), spark.offsetY(), spark.scale(), spark.alpha()
+                    spark.xy.x, spark.xy.y, spark.glyph(), light, spark.offsetX(), spark.offsetY(), spark.scale(), spark.alpha(), spark.hue()
                 )
             }
         }}

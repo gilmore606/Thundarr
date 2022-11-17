@@ -1,5 +1,6 @@
 package world.cartos
 
+import actors.Peeper
 import actors.Ratman
 import actors.Ratthing
 import things.CeilingLight
@@ -43,7 +44,7 @@ class LevelCarto(
                     addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), FilingCabinet())
                 }
                 if (Dice.chance(0.7f)) {
-                    Ratthing().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
+                    Peeper().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
                 }
                 if (Dice.chance(0.3f)) {
                     Ratman().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))

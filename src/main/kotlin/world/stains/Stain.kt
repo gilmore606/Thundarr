@@ -11,7 +11,7 @@ import world.level.Level
 @Serializable
 sealed class Stain : Temporal {
 
-    enum class Type { BLOOD, FIRE, SCORCH }
+    enum class Type { BLOOD, FIRE, SCORCH, GOO }
 
     var offsetX = 0f
     var offsetY = 0f
@@ -28,6 +28,7 @@ sealed class Stain : Temporal {
     protected var alphaMod: Float = 0f
 
     abstract fun glyph(): Glyph
+    open fun hue() = 0f
     abstract fun name(): String
     abstract fun lifespan(): Double
     abstract fun stackType(): Type
@@ -62,9 +63,7 @@ sealed class Stain : Temporal {
         holder?.cleanStains()
     }
 
-    open fun onExpire() {
-
-    }
+    open fun onExpire() { }
 
     open fun onRestore(holder: CellContainer) {
         this.holder = holder

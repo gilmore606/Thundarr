@@ -21,6 +21,7 @@ sealed class Spark {
     open fun isLit() = true
 
     open fun glyph() = Glyph.BLANK
+    open fun hue() = 0f
     open fun offsetX() = offsetX
     open fun offsetY() = offsetY
     open fun scale() = scale

@@ -13,10 +13,7 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
-import render.sparks.Gore
-import render.sparks.HealthUp
-import render.sparks.Scoot
-import render.sparks.Spark
+import render.sparks.*
 import render.tilesets.Glyph
 import things.*
 import ui.panels.Console
@@ -27,6 +24,7 @@ import world.level.Level
 import world.journal.JournalEntry
 import world.path.Pather
 import world.stains.Blood
+import world.stains.Stain
 import world.terrains.Terrain
 import java.lang.Float.max
 import java.lang.Integer.min
@@ -71,7 +69,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun visualRange() = 22f
 
     open fun bleedChance() = 0.6f
-    open fun stepAnimation(dir: XY) = Step(dir)
+    open fun stepAnimation(dir: XY): Animation = Step(dir)
     open fun stepSpark(dir: XY): Spark? = Scoot(dir)
     open fun stepSound(dir: XY): Speaker.SFX? = level?.let { level ->
         Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSound(this)
@@ -85,6 +83,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun uiBatch() = Screen.uiActorBatch
     var mirrorGlyph = false
     var rotateGlyph = false
+
+    open fun corpse(): Container? = Corpse(name())
+    open fun bloodstain(): Stain? = Blood()
+    open fun gore(): Spark? = BloodGore()
 
     open fun wantsToPickUp(thing: Thing): Boolean = false
 
@@ -212,8 +214,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return light
     }
 
-    fun animOffsetX() = animation?.offsetX() ?: 0f
-    fun animOffsetY() = animation?.offsetY() ?: if (rotateGlyph) 0.3f else 0f
+    open fun animOffsetX() = animation?.offsetX() ?: 0f
+    open fun animOffsetY() = animation?.offsetY() ?: if (rotateGlyph) 0.3f else 0f
 
     final override fun onRender(delta: Float) {
         animation?.also { if (it.done) animation = null else it.onRender(delta) }
@@ -284,10 +286,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val amount = if (internal) raw else raw - armor
         if (amount > 0f) {
             if (Dice.chance(bleedChance() * amount * 0.35f)) {
-                level?.addStain(Blood(), xy.x, xy.y)
-                if (Dice.chance(0.2f * amount)) {
-                    level?.addStain(Blood(), xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2))
+                bloodstain()?.also { stain ->
+                    level?.addStain(stain, xy.x, xy.y)
+                    if (Dice.chance(0.2f * amount)) {
+                        bloodstain()?.also { level?.addStain(it, xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2)) }
+                    }
                 }
+            }
+            repeat (amount.toInt()) {
+                gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
             }
             hp = max(0f, hp - amount).toInt()
             if (Dice.chance(amount * 0.1f)) {
@@ -328,17 +335,20 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     protected fun makeCorpse(level: Level) {
-        val corpse = corpse()
-        corpse.moveTo(level, xy.x, xy.y)
         repeat (6) {
-            level.addSpark(Gore().at(xy.x, xy.y))
+            gore()?.also { level.addSpark(it.at(xy.x, xy.y)) }
         }
-        onDeath(corpse)
-        contents.safeForEach { it.moveTo(corpse) }
+        corpse()?.also { corpse ->
+            corpse.moveTo(level, xy.x, xy.y)
+            onDeath(corpse)
+            contents.safeForEach { it.moveTo(corpse) }
+        } ?: run {
+            onDeath(null)
+            contents.safeForEach { it.moveTo(xy.x, xy.y) }
+        }
     }
 
-    open fun corpse() = Corpse(name())
-    open fun onDeath(corpse: Corpse) { }
+    open fun onDeath(corpse: Container?) { }
 
     open fun ingestCalories(cal: Int) { }
 

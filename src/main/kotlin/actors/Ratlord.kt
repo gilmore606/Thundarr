@@ -7,25 +7,26 @@ import actors.stats.Speed
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Teeth
 import util.Dice
 
-class Ratthing : NPC() {
+@Serializable
+class Ratlord : NPC() {
     companion object {
         val weapon = Teeth()
     }
-    override fun glyph() = Glyph.RATTHING
-    override fun name() = "rat-thing"
-    override fun description() = "A dog-sized shaggy gray rodent.  Its red eyes are full of hatred."
+    override fun glyph() = Glyph.RATLORD
+    override fun name() = "rat-lord"
+    override fun description() = "A man-sized hunched gray rodent wearing bronze armor.  It has an air of arrogant authority."
     override fun onSpawn() {
-        hpMax = 10
-        hp = 10
-        Strength.set(this, 8f)
-        Speed.set(this, 8f)
-        Brains.set(this, 3f)
-        Dodge.set(this, 1f)
-        Fight.set(this, 1f)
+        hpMax = 25
+        hp = 25
+        Strength.set(this, 11f)
+        Speed.set(this, 10f)
+        Brains.set(this, 9f)
+        Fight.set(this, 3f)
     }
     override fun meleeWeapon() = weapon
 

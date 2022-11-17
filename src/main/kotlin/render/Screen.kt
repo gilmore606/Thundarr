@@ -184,7 +184,7 @@ object Screen : KtxScreen {
     private var lastActionTime = 0L
     private var minActionInterval = 50L
 
-    private var sinBob = 0f
+    var sinBob = 0f
     var timeMs = System.currentTimeMillis()
 
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
@@ -214,7 +214,7 @@ object Screen : KtxScreen {
         thingBatch.addTileQuad(
             tx, ty,
             thingBatch.getTextureIndex(stain.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = stain.offsetX, offsetY = stain.offsetY, scale = stain.scale, alpha = stain.alpha
+            offsetX = stain.offsetX, offsetY = stain.offsetY, scale = stain.scale, alpha = stain.alpha, hue = stain.hue()
         )
     }
 
@@ -270,13 +270,13 @@ object Screen : KtxScreen {
         }
     }
 
-    private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float)->Unit =
-        { tx, ty, glyph, light, offsetX, offsetY, scale, alpha ->
+    private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float, Float)->Unit =
+        { tx, ty, glyph, light, offsetX, offsetY, scale, alpha, hue ->
         worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
             batch.addTileQuad(
                 tx, ty,
                 batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light,
-                offsetX, offsetY, scale.toDouble(), alpha
+                offsetX, offsetY, scale.toDouble(), alpha, hue = hue
             )
         }
     }
