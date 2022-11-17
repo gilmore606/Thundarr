@@ -59,7 +59,7 @@ object ActorPanel : ShadedPanel() {
                     Screen.uiBatch.getTextureIndex(Glyph.CURSOR))
             }
             Screen.uiBatch.addHealthBar(x0 + 38, y0 + 20,
-                x0 + width - padding * 2 - 38, y0 + 32, actor.hp, actor.hpMax)
+                x0 + width - padding * 2 - 38, y0 + 32, actor.hp.toInt(), actor.hpMax.toInt())
         }
     }
 

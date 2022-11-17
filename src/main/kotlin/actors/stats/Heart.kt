@@ -9,7 +9,7 @@ object Heart : Stat(Tag.HRT, "heart") {
     override fun examineSpecialStat() = "Health max"
     override fun examineSpecialStatValue(actor: Actor) = getHpMax(actor).toString()
 
-    fun getHpMax(actor: Actor, total: Float = get(actor)) = (total * 2f).toInt()
+    fun getHpMax(actor: Actor, total: Float = get(actor)) = (total * 2f)
 
     override fun onUpdate(actor: Actor, newTotal: Float) {
         actor.hpMax = getHpMax(actor, newTotal)

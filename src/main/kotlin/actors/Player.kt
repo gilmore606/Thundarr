@@ -79,7 +79,10 @@ open class Player : Actor() {
         FurTunic().moveTo(this)
         FurJacket().moveTo(this)
         SabretoothCharm().moveTo(this)
-        repeat (10) { Brick().moveTo(this) }
+        repeat (6) { Brick().moveTo(this) }
+        Bedroll().moveTo(this)
+        FirstAidKit().moveTo(this)
+        Bandages().moveTo(this)
     }
 
     override fun die() {

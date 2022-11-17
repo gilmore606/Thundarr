@@ -27,7 +27,7 @@ import world.stains.Blood
 import world.stains.Stain
 import world.terrains.Terrain
 import java.lang.Float.max
-import java.lang.Integer.min
+import java.lang.Float.min
 
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
@@ -46,8 +46,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     @Transient val queuedActions: MutableList<Action> = mutableListOf()
 
-    var hp = 20
-    var hpMax = 20
+    var hp: Float = 20f
+    var hpMax: Float = 20f
 
     @Transient
     override var level: Level? = null
@@ -276,7 +276,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun gainHealth(amount: Float) {
-        hp = min(hpMax, (hp + amount).toInt())
+        hp = min(hpMax, (hp + amount))
         level?.addSpark(HealthUp().at(xy.x, xy.y))
     }
 
@@ -296,7 +296,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             repeat (amount.toInt()) {
                 gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
             }
-            hp = max(0f, hp - amount).toInt()
+            hp = max(0f, hp - amount)
             if (Dice.chance(amount * 0.1f)) {
                 addStatus(Stunned())
             }
@@ -309,10 +309,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun healDamage(heal: Float, healer: Actor? = null) {
-        hp = min(hpMax, hp + heal.toInt())
+        hp = min(hpMax, hp + heal)
+        healer?.also { receiveAssistance(it) }
     }
 
     open fun receiveAggression(attacker: Actor) { }
+    open fun receiveAssistance(assister: Actor) { }
 
     open fun onKilledBy(killer: Actor) {
         if (isHuman() && killer is Player) {

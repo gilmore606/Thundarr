@@ -62,7 +62,7 @@ object StatusPanel : ShadedPanel() {
         drawString(App.gameTime.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
 
         drawString("hp", padding, padding + 70, Screen.fontColorDull, Screen.smallFont)
-        drawString(App.player.hp.toString() + "/" + App.player.hpMax.toString(), padding + 20, padding + 70)
+        drawString(App.player.hp.toInt().toString() + "/" + App.player.hpMax.toInt().toString(), padding + 20, padding + 70)
         for (i in 0 .. tagStrs.lastIndex) {
             drawString(tagStrs[i], tagXs[i], tagYs[i], tagColors[i], Screen.smallFont)
         }
@@ -93,7 +93,7 @@ object StatusPanel : ShadedPanel() {
     override fun drawEntities() {
         Screen.uiBatch.addHealthBar(x + padding + 75, y + padding + 71,
             x + width - padding * 2 + 2, y + padding + 71 + 12,
-            App.player.hp, App.player.hpMax)
+            App.player.hp.toInt(), App.player.hpMax.toInt())
     }
 
     override fun drawsSeparate() = true

@@ -133,6 +133,7 @@ enum class Glyph {
     BOOK_PURPLE,
     KEY,
     STEW,
+    BEDROLL,
 
     BLOODSTAIN,
     SCORCHMARK

@@ -21,8 +21,8 @@ class Ratman : NPC() {
     override fun name() = "rat-man"
     override fun description() = "A man-sized hunched gray rodent, its eyes glittering with hatred."
     override fun onSpawn() {
-        hpMax = 15
-        hp = 15
+        hpMax = 15f
+        hp = 15f
         Strength.set(this, 10f)
         Speed.set(this, 9f)
         Brains.set(this, 7f)

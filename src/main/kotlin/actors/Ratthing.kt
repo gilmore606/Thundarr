@@ -19,8 +19,8 @@ class Ratthing : NPC() {
     override fun name() = "rat-thing"
     override fun description() = "A dog-sized shaggy gray rodent.  Its red eyes are full of hatred."
     override fun onSpawn() {
-        hpMax = 10
-        hp = 10
+        hpMax = 10f
+        hp = 10f
         Strength.set(this, 8f)
         Speed.set(this, 8f)
         Brains.set(this, 3f)

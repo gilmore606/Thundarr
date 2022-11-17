@@ -22,8 +22,8 @@ class Peeper : NPC() {
     override fun name() = "peeper"
     override fun description() = "A floating eyeball.  Disgusting.  You wonder who's looking through it."
     override fun onSpawn() {
-        hpMax = 6
-        hp = 6
+        hpMax = 6f
+        hp = 6f
         Strength.set(this, 4f)
         Speed.set(this, 8f)
         Brains.set(this, 6f)

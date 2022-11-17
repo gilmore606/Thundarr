@@ -128,4 +128,5 @@ fun ThingTileSet() =
         setTile(Glyph.BOOK_PURPLE, SimpleTile(this, 9, 8))
         setTile(Glyph.KEY, SimpleTile(this, 0, 9))
         setTile(Glyph.STEW, SimpleTile(this, 1, 9))
+        setTile(Glyph.BEDROLL, SimpleTile(this, 2, 9))
     }

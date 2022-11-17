@@ -17,6 +17,7 @@ import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.toEnglishList
+import world.journal.GameTime
 
 @Serializable
 sealed class Status : StatEffector {
@@ -218,17 +219,20 @@ sealed class TimeStatus : Status() {
 }
 
 @Serializable
-class Bandaged(val quality: Float) : TimeStatus() {
+class Bandaged(
+    val quality: Float
+    ) : TimeStatus() {
     override val tag = Tag.BANDAGED
     override fun name() = "bandaged"
     override fun description() = "Your wounds are bound and cleaned to assist healing."
     override fun panelTag() = "band"
     override fun panelTagColor() = tagColors[TagColor.GOOD]!!
-    override fun duration() = 500f + quality * 4f
+    override fun duration() = 300f + quality * 15f
     override fun maxDuration() = 800f
     override fun advanceTime(actor: Actor, delta: Float) {
         super.advanceTime(actor, delta)
-
+        val healPerDay = 16f + quality * 2f
+        actor.healDamage((delta / GameTime.TURNS_PER_DAY).toFloat() * healPerDay)
     }
 }
 

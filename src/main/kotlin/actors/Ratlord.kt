@@ -21,8 +21,8 @@ class Ratlord : NPC() {
     override fun name() = "rat-lord"
     override fun description() = "A man-sized hunched gray rodent wearing bronze armor.  It has an air of arrogant authority."
     override fun onSpawn() {
-        hpMax = 25
-        hp = 25
+        hpMax = 25f
+        hp = 25f
         Strength.set(this, 11f)
         Speed.set(this, 10f)
         Brains.set(this, 9f)
