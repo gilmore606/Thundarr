@@ -25,8 +25,6 @@ import world.persist.WorldState
 import world.weather.Weather
 import kotlin.system.exitProcess
 
-const val RESOURCE_FILE_DIR = "src/main/resources/"
-
 object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     lateinit var player: Player

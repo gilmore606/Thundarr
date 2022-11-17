@@ -1,7 +1,5 @@
 package render.tilesets
 
-import RESOURCE_FILE_DIR
-import com.badlogic.gdx.graphics.Texture
 import render.tileholders.SimpleTile
 
 fun UITileSet() =

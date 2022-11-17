@@ -1,8 +1,6 @@
 package render.batches
 
-import RESOURCE_FILE_DIR
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
 import render.Screen
@@ -24,7 +22,7 @@ class CloudBatch : RenderBatch() {
 
     val startTime = System.currentTimeMillis()
 
-    private val cloudTexture = Texture(FileHandle("${RESOURCE_FILE_DIR}mask_clouds.png"), true).apply {
+    private val cloudTexture = Texture(Gdx.files.internal("mask_clouds.png"), true).apply {
         setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
         log.info("Loaded weather texture mask_clouds.png ($width x $height)")

@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.21'
     id 'application'
     id 'org.beryx.runtime' version '1.12.7'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'me.danbu'
@@ -21,6 +22,11 @@ allprojects {
 application {
     mainClass = "DesktopLauncher"
     applicationName = 'thundarr'
+}
+
+shadowJar {
+    include '*.png'
+    include '*.ogg'
 }
 
 runtime {
