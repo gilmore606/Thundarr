@@ -212,8 +212,8 @@ object Keyboard : KtxInputAdapter {
                 }
                 Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
-                Input.Keys.F9 -> { debugFloat += debugFloatStep }
-                Input.Keys.F10 -> { debugFloat -= debugFloatStep }
+                Input.Keys.F9 -> { Screen.tiltAmount += debugFloatStep }
+                Input.Keys.F10 -> { Screen.tiltAmount -= debugFloatStep }
 
                 else -> { lastKey = -1 }
             }
