@@ -31,6 +31,7 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:$gdxVersion"
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     api "io.github.libktx:ktx-collections:$ktxCollectionsVersion"
