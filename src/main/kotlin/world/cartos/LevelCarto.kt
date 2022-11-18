@@ -42,7 +42,7 @@ class LevelCarto(
                 carveRoom(room, nextRegion)
 
                 if (Dice.chance(0.6f)) {
-                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.flip()) FilingCabinet() else Fridge())
+                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.chance(0.7f)) FilingCabinet() else Fridge())
                 }
                 if (Dice.chance(0.7f)) {
                     Peeper().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))

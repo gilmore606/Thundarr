@@ -8,6 +8,7 @@ import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
 import util.LightColor
+import util.hasOneWhere
 import world.CellContainer
 import java.lang.Float.max
 import kotlin.random.Random
@@ -21,7 +22,7 @@ interface LightSource {
 @Serializable
 sealed class LitThing : Portable(), LightSource {
     abstract val lightColor: LightColor
-    var active: Boolean = true
+    var active: Boolean = false
 
     open fun extinguishSelfMsg() = "Your %d sputters and dies."
     open fun extinguishOtherMsg() = "%Dn's %d goes out."
@@ -92,6 +93,7 @@ class Lightbulb : LitThing() {
     override fun name() = "lightbulb"
     override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
+    override fun onSpawn() { active = true }
 }
 
 @Serializable
@@ -123,13 +125,6 @@ class CeilingLight : LitThing(), Smashable {
 
 @Serializable
 class Sunsword : LitThing() {
-    private var spawned = false
-    init {
-        if (!spawned) {
-            spawned = true
-            active = false
-        }
-    }
     override fun glyph() = if (active) Glyph.HILT_LIT else Glyph.HILT
     override fun name() = "sunsword"
     override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
@@ -139,6 +134,8 @@ class Sunsword : LitThing() {
     override fun toolbarUseTag() = UseTag.SWITCH
 
     override fun light() = if (active) lightColor else null
+
+    override fun onSpawn() { active = false }
 
     override fun uses() = mapOf(
         UseTag.SWITCH to Use("switch " + (if (active) "off" else "on"), 0.2f,
@@ -168,13 +165,7 @@ class Torch : LitThing(), Temporal {
 
     private val smokeChance = 1.1f
 
-    private var spawned = false
-    init {
-        if (!spawned) {
-            spawned = true
-            active = false
-        }
-    }
+    override fun onSpawn() { active = false }
 
     override fun light() = if (active) lightColor else null
 
@@ -191,7 +182,8 @@ class Torch : LitThing(), Temporal {
 
     override fun uses() = mapOf(
         UseTag.SWITCH to Use("light " + name(), 0.5f,
-                canDo = { actor,x,y,targ -> !targ && !active && (isHeldBy(actor) || isNextTo(actor)) },
+                canDo = { actor,x,y,targ -> !targ && !active && (isHeldBy(actor) || isNextTo(actor)) &&
+                        actor.contents.hasOneWhere { it is Lighter }},
                 toDo = { actor, level, x, y ->
                     active = true
                     level.addLightSource(x, y, (if (holder == actor) actor else this@Torch) as LightSource)

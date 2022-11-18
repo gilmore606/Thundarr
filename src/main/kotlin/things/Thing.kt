@@ -54,6 +54,17 @@ sealed class Thing : Entity {
         }
     }
 
+    private var spawned = false
+
+    init {
+        if (!spawned) {
+            spawned = true
+            onSpawn()
+        }
+    }
+
+    open fun onSpawn() { }
+
     open fun thingTag() = name()
     open fun uses(): Map<UseTag, Use> = mapOf()
 

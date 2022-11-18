@@ -9,9 +9,7 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
-import things.Corpse
-import things.Meat
-import ui.input.Keyboard
+import things.RawMeat
 import util.Dice
 
 @Serializable
@@ -45,7 +43,7 @@ class Ox : NPC() {
     }
 
     override fun onDeath(corpse: Container?) {
-        corpse?.also { Meat().moveTo(it) }
+        corpse?.also { RawMeat().moveTo(it) }
     }
 }
 
@@ -75,6 +73,6 @@ class MuskOx : NPC() {
     }
 
     override fun onDeath(corpse: Container?) {
-        corpse?.also { Meat().moveTo(it) }
+        corpse?.also { RawMeat().moveTo(it) }
     }
 }

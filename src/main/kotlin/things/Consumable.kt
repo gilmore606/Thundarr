@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
-import util.log
 import world.level.Level
 
 
@@ -92,6 +91,7 @@ sealed class Food : Consumable() {
     override fun consumeDuration() = 2f
     override fun consumeSelfMsg() = "You wolf down %id."
     override fun consumableBy(actor: Actor) = true
+    override fun weight() = 0.5f
     open fun calories() = 200
 
     override fun onConsume(actor: Actor) {
@@ -103,6 +103,7 @@ sealed class Food : Consumable() {
 class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
+    override fun weight() = 0.1f
 }
 
 @Serializable
@@ -110,10 +111,11 @@ class Pear : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun hue() = 0.9f
     override fun name() = "pear"
+    override fun weight() = 0.1f
 }
 
 @Serializable
-class Meat : Rottable() {
+class RawMeat : Rottable() {
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw meat"
     override fun thingTag() = "meat"
@@ -140,6 +142,33 @@ class Steak : Food() {
 }
 
 @Serializable
+class ChickenLeg : Food() {
+    override fun glyph() = Glyph.CHICKEN_LEG
+    override fun name() = "chicken leg"
+    override fun description() = "You're not sure it actually came from a chicken, but it's cooked and smells tasty."
+    override fun calories() = 1000
+    override fun consumeSelfMsg() = "You hungrily strip the meat from the bird leg."
+}
+
+@Serializable
+class Cheese : Food() {
+    override fun glyph() = Glyph.CHEESE
+    override fun name() = "cheese"
+    override fun description() = "A wedge of hard cheese.  It smells like Ookla."
+    override fun calories() = 1000
+    override fun consumeSelfMsg() = "You munch on the salty cheese."
+}
+
+@Serializable
+class Stew : Food() {
+    override fun glyph() = Glyph.STEW
+    override fun name() = "stew"
+    override fun description() = "A nutritious melange of meat and vegetables."
+    override fun calories() = 1600
+    override fun consumeSelfMsg() = "You wolf down every last bite of the tasty stew."
+}
+
+@Serializable
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"
@@ -147,6 +176,7 @@ class EnergyDrink : Consumable() {
     override fun description() = "Taurine and caffeine to keep you active 24/7.  Or so it says on the can."
     override fun statusEffect() = Wired()
     override fun breakOnThrow() = true
+    override fun weight() = 0.1f
 }
 
 @Serializable

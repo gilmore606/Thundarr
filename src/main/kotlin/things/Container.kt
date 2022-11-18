@@ -1,9 +1,12 @@
 package things
 
 import actors.Player
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import ktx.async.KtxAsync
 import render.tilesets.Glyph
+import util.Dice
 import world.level.Level
 
 @Serializable
@@ -66,6 +69,19 @@ class FilingCabinet : Container() {
     override fun glyph() = Glyph.FILING_CABINET
     override fun isPortable() = false
     override fun openVerb() = "open"
+
+    override fun onSpawn() {
+        KtxAsync.launch {
+            repeat (Dice.zeroTo(2)) {
+                when (Dice.zeroTo(3)) {
+                    0 -> BoysLife()
+                    1 -> Lighter()
+                    2 -> HardHat()
+                    else -> Paperback()
+                }.moveTo(this@FilingCabinet)
+            }
+        }
+    }
 }
 
 @Serializable
@@ -75,5 +91,25 @@ class Fridge : Container() {
     override fun glyph() = Glyph.FRIDGE
     override fun isPortable() = false
     override fun openVerb() = "open"
+
     fun isRefrigerating() = true  // TODO: invent electric power
+
+    override fun onSpawn() {
+        // Coroutine, because otherwise constructor hasn't finished and we don't have a contents.
+        // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
+        KtxAsync.launch {
+            repeat (Dice.oneTo(3)) {
+                when (Dice.zeroTo(7)) {
+                    0 -> RawMeat()
+                    1 -> ChickenLeg()
+                    2 -> Cheese()
+                    3 -> EnergyDrink()
+                    4 -> Steak()
+                    5 -> Apple()
+                    6 -> Pear()
+                    else -> Stew()
+                }.moveTo(this@Fridge)
+            }
+        }
+    }
 }
