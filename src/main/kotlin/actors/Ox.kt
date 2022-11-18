@@ -27,21 +27,6 @@ class Ox : NPC() {
     }
     override fun armorTotal() = 2.5f
 
-    override fun pickAction(): Action {
-        if (awareness == Awareness.AWARE && Dice.chance(0.1f)) {
-            wander()?.also { return it }
-        }
-        if (Dice.chance(0.14f)) {
-            entitiesSeen { it is Ox || it is MuskOx }.keys.randomOrNull()?.also { ox ->
-                stepToward(ox)?.also { return it }
-            }
-        }
-        if (Dice.chance(0.03f)) {
-            return Bark(Speaker.SFX.MOO)
-        }
-        return super.pickAction()
-    }
-
     override fun onDeath(corpse: Container?) {
         corpse?.also { RawMeat().moveTo(it) }
     }
@@ -60,16 +45,6 @@ class MuskOx : NPC() {
         Strength.set(this, 15f)
         Speed.set(this, 10f)
         Brains.set(this, 6f)
-    }
-
-    override fun pickAction(): Action {
-        if (awareness == Awareness.AWARE && Dice.chance(0.5f)) {
-            wander()?.also { return it }
-        }
-        if (Dice.chance(0.02f)) {
-            return Bark(Speaker.SFX.MOO)
-        }
-        return super.pickAction()
     }
 
     override fun onDeath(corpse: Container?) {

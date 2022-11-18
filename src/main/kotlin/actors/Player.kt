@@ -175,6 +175,7 @@ open class Player : Actor() {
                 }
             }
         }
+        log.info("player sees $seen")
     }
 
     override fun ingestCalories(cal: Int) {

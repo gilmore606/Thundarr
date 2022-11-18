@@ -1,6 +1,7 @@
 package util
 
 import actors.Actor
+import actors.Player
 import kotlinx.coroutines.delay
 import world.Entity
 import world.level.Level

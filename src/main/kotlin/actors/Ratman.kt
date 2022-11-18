@@ -30,10 +30,4 @@ class Ratman : NPC() {
     }
     override fun meleeWeapon() = weapon
 
-    override fun pickAction(): Action {
-        if (Dice.chance(0.4f)) {
-            wander()?.also { return it }
-        }
-        return Wait(1f)
-    }
 }

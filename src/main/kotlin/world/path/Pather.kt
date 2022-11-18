@@ -80,17 +80,6 @@ object Pather {
         }
     }
 
-    fun entitiesSeenBy(entity: Entity, matching: ((Entity)->Boolean)? = null): Map<Entity, Float> {
-        maps.firstNotNullOfOrNull { it.entitiesSeenBy(entity) }?.also { allVisible ->
-            matching?.also { matching ->
-                val filtered = mutableMapOf<Entity, Float>()
-                allVisible.keys.forEach { if (matching(it)) filtered[it] = allVisible[it]!! }
-                return filtered
-            } ?: run { return allVisible }
-        }
-        return mutableMapOf()
-    }
-
     fun subscribe(subscriber: Entity, target: Entity, range: Float) {
         log.info("subscribing $subscriber @ $range for target $target")
         val map = maps.firstOrNull { it.targetEntity == target } ?: StepMap().apply {
@@ -119,6 +108,14 @@ object Pather {
         })
     }
 
+    private suspend fun updateRetinaFor(actor: Actor) {
+        val scratchSeen = mutableMapOf<Entity, Float>()
+        caster.populateSeenEntities(scratchSeen, actor)
+        KtxAsync.launch {
+            actor.seen = scratchSeen
+            actor.seenUpdatedAt = App.time
+        }
+    }
 
     // Hooks for hearing about relevant world changes.
 
@@ -126,6 +123,15 @@ object Pather {
         if (worker?.isActive == false || worker == null) throw RuntimeException("Pather has crashed!")
 
         coroutineScope.launch {
+            var n = App.level.director.actors.size
+            while (n > 0) {
+                n--
+                val seer = App.level.director.actors[n]
+                if (seer.seenUpdatedAt < App.time) {
+                    updateRetinaFor(seer)
+                }
+            }
+
             maps.safeForEach { it.onActorMove(actor) }
         }
     }

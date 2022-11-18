@@ -38,10 +38,4 @@ class Peeper : NPC() {
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
 
-    override fun pickAction(): Action {
-        if (Dice.chance(0.4f)) {
-            wander()?.also { return it }
-        }
-        return Wait(1f)
-    }
 }

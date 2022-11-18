@@ -3,6 +3,8 @@ package world
 import actors.Actor
 import actors.NPC
 import actors.Player
+import actors.states.Hibernated
+import actors.states.Idle
 import things.Temporal
 import util.XY
 import util.distanceBetween
@@ -65,11 +67,11 @@ class Director(val level: Level) {
     fun wakeNPCsNear(xy: XY) {
         actors.forEach {
             if (it is NPC) {
-                if (it.awareness == NPC.Awareness.HIBERNATED &&
-                    it.xy.x >= xy.x - it.awareRadius && it.xy.y >= xy.y - it.awareRadius &&
-                    it.xy.x <= xy.x + it.awareRadius && it.xy.y <= xy.y + it.awareRadius &&
-                    distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.awareRadius) {
-                    it.unHibernate()
+                if (it.state is Hibernated &&
+                    it.xy.x >= xy.x - it.unhibernateRadius && it.xy.y >= xy.y - it.unhibernateRadius &&
+                    it.xy.x <= xy.x + it.unhibernateRadius && it.xy.y <= xy.y + it.unhibernateRadius &&
+                    distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.unhibernateRadius) {
+                    it.changeState(Idle())
                 }
             }
         }

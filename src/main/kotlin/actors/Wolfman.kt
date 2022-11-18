@@ -23,13 +23,4 @@ class Wolfman : NPC() {
         Brains.set(this, 6f)
         Fight.set(this, 4f)
     }
-
-    override fun pickAction(): Action {
-
-        if (Dice.chance(0.6f)) {
-            wander()?.also { return it }
-        }
-
-        return super.pickAction()
-    }
 }

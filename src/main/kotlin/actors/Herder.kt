@@ -3,6 +3,7 @@ package actors
 import actors.actions.Action
 import actors.actions.Converse
 import actors.actions.Attack
+import actors.states.Hibernated
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -31,7 +32,7 @@ class Herder : NPC() {
         Brains.set(this, 11f)
         Dodge.set(this, 4f)
     }
-    override fun becomeHostileMsg(): List<String> = listOf("%Dn yelps in dismay at your sudden brutality!")
+    override fun becomeHostileMsg() = listOf("%Dn yelps in dismay at your sudden brutality!").random()
     override fun converseLines() = listOf(
         "Shoveling ox poo all day for a wizard.  It's a living.",
         "The love of an ox, is not like that of a square.  You know what I mean?",
@@ -40,32 +41,11 @@ class Herder : NPC() {
         "They say ox vaginas are the most similar to human vaginas.  But it's not true, not at all."
     )
 
-    override fun pickAction(): Action {
-        // talk or fight or grab nearby stuff
-        entitiesNextToUs().forEach { entity ->
-            if (entity is Player && isHostile()) {
-                return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
-            }
-            if (entity is Ox || entity is MuskOx) {
-                if (Dice.chance(0.2f)) return Converse(entity as Actor)
-            }
-        }
-        if (Dice.chance(0.4f)) {
-            wander()?.also { return it }
-        }
-        if (Dice.chance(0.3f)) {
-            entitiesSeen { it is Ox || it is MuskOx }.keys.randomOrNull()?.also { ox ->
-                stepToward(ox)?.also { return it }
-            }
-        }
-        return super.pickAction()
-    }
-
     override fun light() = lantern
     private var flicker = 1f
     override fun flicker() = flicker
     override fun doOnRender(delta: Float) {
-        if (awareness != Awareness.HIBERNATED && isEveryFrame(5)) {
+        if (state !is Hibernated && isEveryFrame(5)) {
             flicker = Random.nextFloat() * 0.12f + 0.88f
         }
     }

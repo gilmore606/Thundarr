@@ -35,7 +35,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     companion object {
         val fist: MeleeWeapon = Fist()
     }
-
+    val id = UUID()
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
@@ -45,6 +45,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val statuses = mutableListOf<Status>()
 
     @Transient val queuedActions: MutableList<Action> = mutableListOf()
+
+    @Transient var seen = mutableMapOf<Entity, Float>()
+    @Transient var seenUpdatedAt = 0.0
 
     var hp: Float = 20f
     var hpMax: Float = 20f
@@ -457,6 +460,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// useful utilities
 
+    fun getActor(id: String) = level?.director?.actors?.firstOrNull { it.id == id }
+
     protected fun doWeHave(thingTag: String): Thing? {
         for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) return contents[i]
         return null
@@ -473,10 +478,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
-    protected fun entitiesSeen(matching: ((Entity)->Boolean)? = null) = Pather.entitiesSeenBy(this, matching)
-    fun canSee(entity: Entity) = Pather.entitiesSeenBy(this).keys.contains(entity)
+    fun canSee(entity: Entity?) = entitiesSeen().keys.contains(entity)
 
-    protected fun entitiesNextToUs(): Set<Entity> {
+    fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()
         level?.also { level ->
             DIRECTIONS.forEach { dir ->
@@ -485,6 +489,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             }
         }
         return entities
+    }
+
+    fun entitiesSeen(matching: ((Entity)->Boolean)? = null): Map<Entity, Float> {
+        matching?.also { matching ->
+            val filtered = mutableMapOf<Entity, Float>()
+            seen.keys.forEach { if (matching(it)) filtered[it] = seen[it]!! }
+            return filtered
+        }
+        return seen
     }
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false

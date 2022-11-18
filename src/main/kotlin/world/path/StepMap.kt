@@ -27,9 +27,6 @@ class StepMap() {
     private var scratch = Array(1) { IntArray(1) { -1 } }
     var map = Array(1) { IntArray(1) { -1 } }
 
-    var visibleEntities: MutableMap<Entity, Float> = mutableMapOf()
-    var scratchVisible: MutableMap<Entity, Float> = mutableMapOf()
-
     fun addSubscriber(subscriber: Entity, range: Float) {
         subscribers.add(subscriber)
         done = false
@@ -107,10 +104,6 @@ class StepMap() {
                 }
                 step++
             }
-            // Update visibility while we're here
-            if (targetEntity is Actor) {
-                caster.populateSeenEntities(scratchVisible, targetEntity as Actor)
-            }
             // Buffer swap
             promoteScratch()
         }
@@ -143,11 +136,6 @@ class StepMap() {
             val old = map
             map = scratch
             scratch = old
-
-            val oldVisible = visibleEntities
-            visibleEntities = scratchVisible
-            scratchVisible = oldVisible
-            scratchVisible.clear()
         }
     }
 
@@ -203,8 +191,6 @@ class StepMap() {
         }
         return null
     }
-
-    fun entitiesSeenBy(entity: Entity): Map<Entity, Float>? = if (entity == targetEntity) visibleEntities else null
 
     fun canReach(to: Entity) = to == targetEntity
 
