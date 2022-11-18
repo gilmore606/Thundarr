@@ -48,7 +48,7 @@ class SaveSlot(
     }
 
     // TODO: figure out why we have to know the full path?
-    private val saveFileFolder = "/githome/Thundarr/savegame"
+    private val saveFileFolder = "savegame"
     private val COMPRESS_ENABLED = true
 
     init {
