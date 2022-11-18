@@ -147,7 +147,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             PrefsState(
                 zoomIndex = Screen.zoomIndex,
                 windowSize = Screen.savedWindowSize(),
-                fullscreen = Screen.FULLSCREEN,
+                fullscreen = Screen.fullscreen,
                 cameraSlack = Screen.cameraSlack,
                 cameraMenuShift = Screen.cameraMenuShift,
                 worldZoom = Screen.worldZoom,

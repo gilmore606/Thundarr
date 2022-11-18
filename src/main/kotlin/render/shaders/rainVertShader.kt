@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun rainVertShader() = """
+    #version ${Screen.GLSL_VERSION}
     attribute vec3 a_Position;
     attribute vec2 a_RainUV;
     attribute float a_RainAlpha;

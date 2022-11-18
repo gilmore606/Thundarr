@@ -36,7 +36,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 object Screen : KtxScreen {
-
+    const val GLSL_VERSION = "120"
     var brightness = 0f
     var brightnessTarget = 1f
     val textureFilter = TextureFilter.MipMapLinearLinear
@@ -62,7 +62,7 @@ object Screen : KtxScreen {
 
     var width = 0
     var height = 0
-    var FULLSCREEN = false
+    var fullscreen = false
     private var savedWindowSize  = XY(0, 0)
     fun savedWindowSize() = if (savedWindowSize.x == 0) XY(width, height) else savedWindowSize
 
@@ -303,14 +303,14 @@ object Screen : KtxScreen {
         updateSurfaceParams()
     }
 
-    fun toggleFullscreen() = toggleFullscreen(!FULLSCREEN)
+    fun toggleFullscreen() = toggleFullscreen(!fullscreen)
     fun toggleFullscreen(newValue: Boolean) {
-        if (newValue && !FULLSCREEN) {
+        if (newValue && !fullscreen) {
             savedWindowSize = XY(width, height)
-            FULLSCREEN = true
+            fullscreen = true
             Gdx.graphics.setFullscreenMode(Gdx.graphics.displayMode)
-        } else if (!newValue && FULLSCREEN) {
-            FULLSCREEN = false
+        } else if (!newValue && fullscreen) {
+            fullscreen = false
             Gdx.graphics.setWindowedMode(savedWindowSize.x, savedWindowSize.y)
         }
     }

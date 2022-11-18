@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun fireFragShader() = """
+    #version ${Screen.GLSL_VERSION}
     uniform float u_Time;
     
     varying vec2 UV;

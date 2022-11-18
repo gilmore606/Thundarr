@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun tileFragShader() = """
+    #version ${Screen.GLSL_VERSION}
     uniform sampler2D u_Texture;
 
     varying vec2 v_TexCoordinate;
@@ -16,7 +19,8 @@ fun tileFragShader() = """
         
         const vec3 k = vec3(0.57735, 0.57735, 0.57735);
         float cosAngle = cos(v_Hue);
-        vec3 hueShifted = vec3(color * cosAngle + cross(k, color) * sin(v_Hue) + k * dot(k, color) * (1.0 - cosAngle)) * v_Light;
+        vec3 lightColor = vec3(v_Light.r, v_Light.g, v_Light.b);
+        vec3 hueShifted = vec3(color * cosAngle + cross(k, color) * sin(v_Hue) + k * dot(k, color) * (1.0 - cosAngle)) * lightColor;
         
         float grey = 0.21 * hueShifted.r + 0.71 * hueShifted.g + 0.07 * hueShifted.b;
         float white = max(0.0, v_Grayout - 1.0);

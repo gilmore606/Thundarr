@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun cloudVertShader() = """
+    #version ${Screen.GLSL_VERSION}
     attribute vec3 a_Position;
     attribute vec2 a_CloudUV;
     attribute float a_CloudAlpha;

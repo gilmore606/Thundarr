@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun fireVertShader() = """
+    #version ${Screen.GLSL_VERSION}
     attribute vec3 a_Position;
     attribute vec2 a_FireUV;
     attribute float a_Offset;

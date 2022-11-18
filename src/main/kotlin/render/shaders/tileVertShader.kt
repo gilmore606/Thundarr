@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun tileVertShader() = """
+    #version ${Screen.GLSL_VERSION}
     attribute vec3 a_Position;
     attribute vec2 a_TexCoordinate;
     attribute vec4 a_Light;

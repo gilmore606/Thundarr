@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun rainFragShader() = """
+    #version ${Screen.GLSL_VERSION}
     uniform sampler2D u_RainMask;
     uniform float u_Time;
     uniform float u_Speed;

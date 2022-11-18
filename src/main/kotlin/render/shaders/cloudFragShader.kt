@@ -1,6 +1,9 @@
 package render.shaders
 
+import render.Screen
+
 fun cloudFragShader() = """
+    #version ${Screen.GLSL_VERSION}
     uniform sampler2D u_CloudTexture;
 
     varying vec2 v_CloudUV;
