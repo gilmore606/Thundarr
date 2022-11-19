@@ -7,6 +7,7 @@ import actors.stats.Speed
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Teeth
@@ -29,5 +30,6 @@ class Ratlord : NPC() {
         Fight.set(this, 3f)
     }
     override fun meleeWeapon() = weapon
+    override fun talkSound(actor: Actor) = Speaker.SFX.RAT
 
 }

@@ -24,6 +24,7 @@ sealed class NPC : Actor() {
 
     var state: State = Hibernated()
     var hostile = false
+    var metPlayer = false
 
     fun spawnAt(level: Level, x: Int, y: Int): NPC {
         onSpawn()
@@ -34,6 +35,7 @@ sealed class NPC : Actor() {
     open fun onSpawn() { }
 
     open fun converseLines(): List<String> = listOf()
+    open fun meetPlayerMsg(): String? = null
 
     open fun isHostile(): Boolean = hostile
     override fun willAggro(target: Actor) = isHostile() && target is Player
@@ -96,6 +98,12 @@ sealed class NPC : Actor() {
             return Move(dir)
         }
         return null
+    }
+
+    fun say(text: String?) {
+        text?.also { text ->
+            Console.sayAct("", this.dnamec() + " says, \""  + text + "\"", this)
+        }
     }
 
     override fun onConverse(actor: Actor): Boolean {

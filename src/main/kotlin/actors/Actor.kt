@@ -34,7 +34,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     companion object {
         val fist: MeleeWeapon = Fist()
+        val caster = RayCaster()
     }
+
     val id = UUID()
     var isUnloading = false
     val xy = XY(0,0)
@@ -69,7 +71,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun isSentient() = true
     open fun isHuman() = true
     open fun actionSpeed() = 1.5f - Speed.get(this) * 0.05f
-    open fun visualRange() = 22f
+    open fun visualRange() = 10f
 
     open fun bleedChance() = 0.6f
     open fun stepAnimation(dir: XY): Animation = Step(dir)
@@ -77,7 +79,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun stepSound(dir: XY): Speaker.SFX? = level?.let { level ->
         Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSound(this)
     }
-    open fun talkSound(actor: Actor) = Speaker.SFX.VOICE_MALEHIGH
+    open fun talkSound(actor: Actor): Speaker.SFX? = null
 
     override fun level() = level
     override fun xy() = xy
@@ -478,7 +480,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
-    fun canSee(entity: Entity?) = entitiesSeen().keys.contains(entity)
+    open fun canSee(entity: Entity?): Boolean {
+        if (level == null) return false
+        if (entity == null) return false
+        if (entity.level() != level) return false
+        entity.xy()?.also { entityXY ->
+            if (distanceBetween(entityXY, xy) > visualRange()) return false
+        } ?: run { return false }
+
+        return entitiesSeen { it == entity }.isNotEmpty()
+    }
 
     fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()
@@ -492,12 +503,19 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun entitiesSeen(matching: ((Entity)->Boolean)? = null): Map<Entity, Float> {
+        if (seenUpdatedAt < App.time) updateSeen()
         matching?.also { matching ->
             val filtered = mutableMapOf<Entity, Float>()
             seen.keys.forEach { if (matching(it)) filtered[it] = seen[it]!! }
             return filtered
         }
         return seen
+    }
+
+    private fun updateSeen() {
+        seen.clear()
+        caster.populateSeenEntities(seen, this)
+        seenUpdatedAt = App.time
     }
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false

@@ -13,6 +13,7 @@ import util.XY
 import util.log
 import util.safeForEach
 import world.Entity
+import world.level.Level
 import java.lang.RuntimeException
 
 object Pather {
@@ -25,8 +26,6 @@ object Pather {
     private val coroutineScope = CoroutineScope(coroutineContext)
     private var worker: Job? = null
     private var jobs = mutableSetOf<Job>()
-
-    private val caster = RayCaster()
 
     private var playerMap: StepMap? = null
 
@@ -44,7 +43,7 @@ object Pather {
                         val map = maps[i]
                         if (map.done) doneMap = map
                         else if (map.outOfDate) {
-                            map.update(caster)
+                            map.update()
                         }
                     }
                 }
@@ -108,12 +107,10 @@ object Pather {
         })
     }
 
-    private suspend fun updateRetinaFor(actor: Actor) {
-        val scratchSeen = mutableMapOf<Entity, Float>()
-        caster.populateSeenEntities(scratchSeen, actor)
-        KtxAsync.launch {
-            actor.seen = scratchSeen
-            actor.seenUpdatedAt = App.time
+    private suspend fun waitForActorLock(level: Level) {
+        while (level.director.actorsLocked) {
+            log.info("...Pather waiting for actors lock...")
+            delay(0L)
         }
     }
 
@@ -123,15 +120,6 @@ object Pather {
         if (worker?.isActive == false || worker == null) throw RuntimeException("Pather has crashed!")
 
         coroutineScope.launch {
-            var n = App.level.director.actors.size
-            while (n > 0) {
-                n--
-                val seer = App.level.director.actors[n]
-                if (seer.seenUpdatedAt < App.time) {
-                    updateRetinaFor(seer)
-                }
-            }
-
             maps.safeForEach { it.onActorMove(actor) }
         }
     }

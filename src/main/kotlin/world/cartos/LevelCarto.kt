@@ -3,12 +3,14 @@ package world.cartos
 import actors.Peeper
 import actors.Ratman
 import actors.Ratthing
+import actors.Thrall
 import things.CeilingLight
 import things.FilingCabinet
 import things.Fridge
 import util.*
 import world.Building
 import world.Chunk
+import world.WizardDungeon
 import world.level.EnclosedLevel
 import world.level.Level
 import world.terrains.PortalDoor
@@ -47,8 +49,11 @@ class LevelCarto(
                 if (Dice.chance(0.7f)) {
                     Ratthing().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
                 }
-                if (Dice.chance(0.1f)) {
-                    Ratman().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
+                if (Dice.chance(0.4f) && building is WizardDungeon) {
+                    Thrall(building.wizardName).spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
+                }
+                if (Dice.chance(0.1f) && building is WizardDungeon) {
+                    Ratman(building.wizardName).spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
                 }
 
                 nextRegion++

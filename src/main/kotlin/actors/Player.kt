@@ -38,6 +38,7 @@ open class Player : Actor() {
     override fun dname() = name()
     override fun iname() = name()
 
+    override fun visualRange() = 18f
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
@@ -175,7 +176,6 @@ open class Player : Actor() {
                 }
             }
         }
-        log.info("player sees $seen")
     }
 
     override fun ingestCalories(cal: Int) {
@@ -209,4 +209,5 @@ open class Player : Actor() {
         Console.say("You give up on your $type collection.")
     }
 
+    override fun canSee(entity: Entity?) = entity != null && entity.level() == level && level!!.visibilityAt(entity.xy()!!.x, entity.xy()!!.y) == 1f
 }

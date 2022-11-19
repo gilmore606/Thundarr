@@ -243,7 +243,7 @@ class RayCaster {
         }
     }
 
-    suspend fun populateSeenEntities(entities: MutableMap<Entity, Float>, actor: Actor) {
+    fun populateSeenEntities(entities: MutableMap<Entity, Float>, actor: Actor) {
         actor.level?.also { level ->
             lineCache.forEach { line ->
                 populateSeenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange())
@@ -251,7 +251,7 @@ class RayCaster {
         }
     }
 
-    private suspend fun populateSeenOctant(level: Level, resultSet: MutableMap<Entity, Float>, line: ShadowLine, povX: Int, povY: Int, range: Float)
+    private fun populateSeenOctant(level: Level, resultSet: MutableMap<Entity, Float>, line: ShadowLine, povX: Int, povY: Int, range: Float)
     {
         line.reset()
         var fullShadow = false
@@ -280,18 +280,12 @@ class RayCaster {
                             val visible = !line.isInShadow(projection)
                             if (visible) {
                                 // collect targets
-
-                                while (level.director.actorsLocked) {
-                                    log.info("...waiting for director.actorsLocked...")
-                                    delay(1L)
-                                }
                                 level.actorAt(castX, castY)?.also {
                                     resultSet[it] = distance
                                 }
                                 level.thingsAt(castX, castY).forEach {
                                     resultSet[it] = distance
                                 }
-
                             }
                             if (visible && level.isOpaqueAt(castX, castY)) {
                                 line.add(projection)

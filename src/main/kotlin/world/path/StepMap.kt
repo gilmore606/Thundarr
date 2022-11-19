@@ -70,7 +70,7 @@ class StepMap() {
 
     override fun toString() = "StepMap(target=${targetEntity?.name()})"
 
-    suspend fun update(caster: RayCaster) {
+    suspend fun update() {
         targetEntity?.level()?.also { level ->
             clearScratch()
             var step = 0

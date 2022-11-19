@@ -7,13 +7,16 @@ import actors.stats.Speed
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Teeth
 import util.Dice
 
 @Serializable
-class Ratman : NPC() {
+class Ratman(
+    val wizardName: String
+) : NPC() {
     companion object {
         val weapon = Teeth()
     }
@@ -30,4 +33,12 @@ class Ratman : NPC() {
     }
     override fun meleeWeapon() = weapon
 
+    override fun converseLines() = listOf(
+        "Ttthhhee rebelliouthh one!  Killl him!",
+        "You dare to defy $wizardName?  Die!",
+        "The ethhcaped thhlave!  He itthh here!",
+        "The penalty for escape is death!"
+    )
+    override fun talkSound(actor: Actor) = Speaker.SFX.RAT
+    override fun meetPlayerMsg() = this.dnamec() + " says, \"" + converseLines().random() + "\""
 }

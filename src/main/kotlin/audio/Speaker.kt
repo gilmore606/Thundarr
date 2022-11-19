@@ -61,6 +61,7 @@ object Speaker {
         VOICE_MALEHIGH(listOf("voice/malehigh1.ogg", "voice/malehigh2.ogg"), 0.06f, 0.8f),
         VOICE_MALELOW(listOf("voice/malelow1.ogg"), 0.1f),
         VOICE_FEMALE(listOf("voice/female1.ogg", "voice/female2.ogg"), 0.06f),
+        RAT(listOf("creature/ratsqueak.ogg"), 0.3f)
     }
 
     enum class Ambience(
