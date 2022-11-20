@@ -1,5 +1,6 @@
 package actors
 
+import actors.states.IdleInRoom
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -12,9 +13,6 @@ import things.Fist
 class Thrall(
     val wizardName: String
 ) : NPC() {
-    companion object {
-        val weapon = Fist()
-    }
     override fun glyph() = Glyph.THRALL
     override fun name() = "thrall"
     override fun description() = "A pitiful human, enslaved by magic bonds to $wizardName.  ${gender().pp.capitalize()} eyes beg you for rescue."
@@ -26,7 +24,6 @@ class Thrall(
         Brains.set(this, 10f)
     }
 
-    override fun meleeWeapon() = weapon
     override fun converseLines() = listOf(
         "We slave all day for that wizard.  And for what?",
         "Your bonds are gone!  You've got to get out of here, before they see!",
@@ -36,6 +33,7 @@ class Thrall(
         "The wizard is so cruel to us.  How can we go on this way?"
     )
     override fun talkSound(actor: Actor) = Speaker.SFX.VOICE_MALEHIGH
-
     override fun meetPlayerMsg() = this.dnamec() + " says, \"" + converseLines().random() + "\""
+
+    override fun idleState() = IdleInRoom()
 }

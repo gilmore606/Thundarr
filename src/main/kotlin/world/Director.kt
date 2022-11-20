@@ -71,7 +71,7 @@ class Director(val level: Level) {
                     it.xy.x >= xy.x - it.unhibernateRadius && it.xy.y >= xy.y - it.unhibernateRadius &&
                     it.xy.x <= xy.x + it.unhibernateRadius && it.xy.y <= xy.y + it.unhibernateRadius &&
                     distanceBetween(xy.x, xy.y, it.xy.x, it.xy.y) < it.unhibernateRadius) {
-                    it.changeState(Idle())
+                    it.changeState(it.idleState())
                 }
             }
         }

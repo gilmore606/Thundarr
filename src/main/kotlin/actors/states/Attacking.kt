@@ -12,21 +12,21 @@ class Attacking(
 ) : State() {
 
     override fun considerState(npc: NPC) {
-        if (!npc.canSee(npc.getActor(targetId))) {
-            if (npc.willSeek()) {
-                npc.changeState(Seeking(targetId))
-            } else {
-                npc.changeState(Idle())
+        npc.apply {
+            if (!canSee(getActor(targetId))) {
+                changeState(hostileLossState(targetId))
             }
         }
     }
 
     override fun pickAction(npc: NPC): Action {
-        npc.getActor(targetId)?.also { target ->
-            if (npc.entitiesNextToUs().contains(target)) {
-                return Attack(target, XY(target.xy.x - npc.xy.x, target.xy.y - npc.xy.y))
-            } else {
-                npc.stepToward(target)?.also { return it }
+        npc.apply {
+            getActor(targetId)?.also { target ->
+                if (entitiesNextToUs().contains(target)) {
+                    return Attack(target, XY(target.xy.x - npc.xy.x, target.xy.y - npc.xy.y))
+                } else {
+                    stepToward(target)?.also { return it }
+                }
             }
         }
         return super.pickAction(npc)

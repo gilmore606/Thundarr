@@ -50,10 +50,10 @@ class LevelCarto(
                     Ratthing().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
                 }
                 if (Dice.chance(0.4f) && building is WizardDungeon) {
-                    Thrall(building.wizardName).spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
+                    Thrall(building.wizardName).spawnInRoom(level, room)
                 }
                 if (Dice.chance(0.1f) && building is WizardDungeon) {
-                    Ratman(building.wizardName).spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
+                    Ratman(building.wizardName).spawnInRoom(level, room)
                 }
 
                 nextRegion++

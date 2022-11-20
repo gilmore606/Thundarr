@@ -2,6 +2,7 @@ package actors
 
 import actors.states.Attacking
 import actors.states.Fleeing
+import actors.states.IdleInRoom
 import actors.states.State
 import actors.stats.Brains
 import actors.stats.Speed
@@ -39,5 +40,6 @@ class Ratthing : NPC() {
     override fun talkSound(actor: Actor) = Speaker.SFX.RAT
 
     override fun isHostile() = true
+    override fun idleState() = IdleInRoom()
 
 }

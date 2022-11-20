@@ -2,6 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Wait
+import actors.states.IdleInRoom
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -41,4 +42,8 @@ class Ratman(
     )
     override fun talkSound(actor: Actor) = Speaker.SFX.RAT
     override fun meetPlayerMsg() = this.dnamec() + " says, \"" + converseLines().random() + "\""
+
+
+    override fun idleState() = IdleInRoom()
+
 }

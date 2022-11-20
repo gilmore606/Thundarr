@@ -2,11 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Move
-import actors.actions.Wait
-import actors.states.Attacking
-import actors.states.Fleeing
-import actors.states.Hibernated
-import actors.states.State
+import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -19,17 +15,26 @@ import world.level.Level
 @Serializable
 sealed class NPC : Actor() {
 
-    @Transient val unhibernateRadius = 40f
-    @Transient val hibernateRadius = 80f
+    @Transient val unhibernateRadius = 30f
+    @Transient val hibernateRadius = 40f
 
     var state: State = Hibernated()
     var hostile = false
     var metPlayer = false
+    val placeMemory = mutableMapOf<String,XY>()
 
     fun spawnAt(level: Level, x: Int, y: Int): NPC {
         onSpawn()
         moveTo(level, x, y)
         return this
+    }
+
+    fun spawnInRoom(level: Level, room: Rect): NPC {
+        placeMemory["myRoom0"] = XY(room.x0, room.y0)
+        placeMemory["myRoom1"] = XY(room.x1, room.y1)
+        val x = Dice.range(room.x0, room.x1)
+        val y = Dice.range(room.y0, room.y1)
+        return spawnAt(level, x, y)
     }
 
     open fun onSpawn() { }
@@ -44,13 +49,14 @@ sealed class NPC : Actor() {
 
     open fun becomeHostileMsg(): String = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!").random()
 
+    open fun idleState(): Idle = IdleDoNothing()
     open fun hostileResponseState(targetId: String) = Attacking(targetId)   // State change on hostile sighted
-    open fun willSeek() = false  // Seek after losing hostile target?
+    open fun hostileLossState(targetId: String) = idleState()  // Seek after losing hostile target?
 
     final override fun hasActionJuice() = juice > 0f
     final override fun wantsToAct() = state.wantsToAct()
     final override fun defaultAction(): Action {
-        considerState()
+        doConsiderState()
         return state.pickAction(this)
     }
 
@@ -62,13 +68,20 @@ sealed class NPC : Actor() {
     protected fun distanceToPlayer() = if (level == App.player.level) distanceBetween(xy.x, xy.y, App.player.xy.x, App.player.xy.y) else 1000f
 
     // Observe our situation and possibly change states.
-    open fun considerState() {
+    private fun doConsiderState() {
         if (distanceToPlayer() > hibernateRadius) {
             changeState(Hibernated())
         } else {
-            state.considerState(this)
+            val oldState = state
+            considerState()
+            if (oldState == state) {
+                state.considerState(this)
+            }
         }
     }
+
+    // Do any special state changes for this kind of NPC
+    open fun considerState() { }
 
     fun changeState(newState: State) {
         state.leave(this)
@@ -82,22 +95,6 @@ sealed class NPC : Actor() {
         is Attacking -> "%Dn rushes toward you!"
         is Fleeing -> "%Dn turns to flee!"
         else -> null
-    }
-
-    fun wander(): Action? {
-        val dirs = mutableListOf<XY>()
-        level?.also { level ->
-            DIRECTIONS.forEach { dir ->
-                if (level.isWalkableAt(xy.x + dir.x, xy.y + dir.y) && level.actorAt(xy.x + dir.x, xy.y + dir.y) == null) {
-                    dirs.add(dir)
-                }
-            }
-        }
-        if (dirs.isNotEmpty()) {
-            val dir = dirs.random()
-            return Move(dir)
-        }
-        return null
     }
 
     fun say(text: String?) {
