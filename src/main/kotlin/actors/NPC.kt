@@ -19,6 +19,8 @@ sealed class NPC : Actor() {
     @Transient val hibernateRadius = 40f
 
     var state: State = Hibernated()
+    val stateStack = Stack<State>()
+
     var hostile = false
     var metPlayer = false
     val placeMemory = mutableMapOf<String,XY>()
@@ -73,9 +75,12 @@ sealed class NPC : Actor() {
             changeState(Hibernated())
         } else {
             val oldState = state
-            considerState()
+            statuses.forEach { it.considerState(this) }
             if (oldState == state) {
-                state.considerState(this)
+                considerState()
+                if (oldState == state) {
+                    state.considerState(this)
+                }
             }
         }
     }
@@ -89,6 +94,19 @@ sealed class NPC : Actor() {
         enterStateMsg(newState)?.also { Console.sayAct("", it, this) }
         log.info("NPC $this becomes $newState")
         newState.enter(this)
+    }
+
+    fun pushState(newState: State) {
+        stateStack.push(state)
+        changeState(newState)
+    }
+
+    fun popState() {
+        stateStack.pop()?.also {
+            changeState(it)
+        } ?: run {
+            changeState(idleState())
+        }
     }
 
     open fun enterStateMsg(newState: State): String? = when (newState) {

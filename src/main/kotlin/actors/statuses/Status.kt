@@ -1,6 +1,7 @@
 package actors.statuses
 
 import actors.Actor
+import actors.NPC
 import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
@@ -67,6 +68,8 @@ sealed class Status : StatEffector {
     open fun onRemoveOtherMsg() = ""
 
     open fun preventedAction(action: Action, actor: Actor) = false
+
+    open fun considerState(npc: NPC) { }
 
     open fun panelInfo(): String {
         val effects = statEffects()

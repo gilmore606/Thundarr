@@ -65,22 +65,13 @@ open class Player : Actor() {
         Throw.set(this, 1f)
         Survive.set(this, 1f)
 
-        Sunsword().moveTo(this)
-        Torch().moveTo(this)
-        HornedHelmet().moveTo(this)
-        RiotHelmet().moveTo(this)
         Pickaxe().moveTo(this)
         Axe().moveTo(this)
         Lighter().moveTo(this)
-        TravelBoots().moveTo(this)
-        FurTunic().moveTo(this)
-        FurJacket().moveTo(this)
-        SabretoothCharm().moveTo(this)
         repeat (6) { Brick().moveTo(this) }
         Bedroll().moveTo(this)
         FirstAidKit().moveTo(this)
-        Bandages().moveTo(this)
-        BoysLife().moveTo(this)
+        repeat (4) { Cheese().moveTo(this) }
     }
 
     override fun die() {

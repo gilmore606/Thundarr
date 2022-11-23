@@ -2,6 +2,7 @@ package world.path
 
 import actors.Actor
 import actors.Player
+import actors.Ratman
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -124,5 +125,5 @@ object Pather {
         }
     }
 
-    fun debugStepAt(x: Int, y: Int): Int = playerMap?.debugStepAt(x, y) ?: 0
+    fun debugStepAt(x: Int, y: Int): Int = maps.firstOrNull { it.targetEntity is Ratman }?.debugStepAt(x, y) ?: 0
 }

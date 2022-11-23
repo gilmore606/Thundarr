@@ -46,13 +46,13 @@ class LevelCarto(
                 if (Dice.chance(0.6f)) {
                     addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.chance(0.7f)) FilingCabinet() else Fridge())
                 }
-                if (Dice.chance(0.7f)) {
+                if (Dice.chance(0.1f)) {
                     Ratthing().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
                 }
                 if (Dice.chance(0.4f) && building is WizardDungeon) {
                     Thrall(building.wizardName).spawnInRoom(level, room)
                 }
-                if (Dice.chance(0.1f) && building is WizardDungeon) {
+                if (Dice.chance(0.8f) && building is WizardDungeon) {
                     Ratman(building.wizardName).spawnInRoom(level, room)
                 }
 

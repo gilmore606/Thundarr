@@ -61,6 +61,10 @@ class StepMap() {
 
     fun setTargetToEntity(newTarget: Entity) {
         targetEntity = newTarget
+        val centerX = width / 2 + 1
+        val centerY = height / 2 + 1
+        offsetX = targetEntity!!.xy()!!.x - centerX
+        offsetY = targetEntity!!.xy()!!.y - centerY
         outOfDate = true
     }
 
@@ -164,7 +168,9 @@ class StepMap() {
         if (from == targetEntity) {
             val lx = to.x - offsetX
             val ly = to.y - offsetY
+            log.info("path $lx $ly")
             if (lx in 0 until width && ly in 0 until height) {
+                log.info("pathing to $to")
                 val feet = XY(lx, ly)
                 var step = map[feet.x][feet.y] -1
                 var foundDir: XY? = null
