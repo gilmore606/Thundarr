@@ -151,17 +151,28 @@ sealed class Level {
 
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(
-        doThis: (x: Int, y: Int, actor: Actor) -> Unit,
+        doThis: (x: Int, y: Int, actor: Actor, vis: Float) -> Unit,
         doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
         delta: Float) =
         director.actors.forEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
-            if (vis == 1f && chunkAt(x,y) != null) {
-                actor.onRender(delta)
-                doThis(x, y, actor)
-                //doFire(x, y, getRandom(x, y).toFloat(), actor.animOffsetX(), actor.animOffsetY())
+            if (chunkAt(x,y) != null) {
+                if (vis == 1f) {
+                    actor.onRender(delta)
+                    actor.lastSeenLocation.x = x
+                    actor.lastSeenLocation.y = y
+                    doThis(x, y, actor, vis)
+                } else {
+                    val lastSeenVis = visibilityAt(actor.lastSeenLocation.x, actor.lastSeenLocation.y)
+                    if (lastSeenVis == 1f) {
+                        actor.lastSeenLocation.x = -9999
+                        actor.lastSeenLocation.y = -9999
+                    } else if (lastSeenVis > 0f) {
+                        doThis(actor.lastSeenLocation.x, actor.lastSeenLocation.y, actor, lastSeenVis)
+                    }
+                }
             }
     }
 

@@ -238,37 +238,45 @@ object Screen : KtxScreen {
         fireBatch.addTileQuad(tx, ty, offset, offX = offx, offY = offy, size = size)
     }
 
-    private val renderActor: (Int, Int, Actor)->Unit = { tx, ty, actor ->
+    private val renderActor: (Int, Int, Actor, Float)->Unit = { tx, ty, actor, vis ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
 
-        actor.renderShadow { x0, y0, x1, y1 ->
-            actorBatch.addPartialQuad(x0, y0, x1, y1, actorBatch.getTextureIndex(Glyph.MOB_SHADOW),
-                1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f)
+        if (vis == 1f) {
+            actor.renderShadow { x0, y0, x1, y1 ->
+                actorBatch.addPartialQuad(
+                    x0, y0, x1, y1, actorBatch.getTextureIndex(Glyph.MOB_SHADOW),
+                    1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f
+                )
+            }
         }
-
         actorBatch.addTileQuad(
             tx, ty,
-            actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), 1f, light,
-            offsetX = actor.animOffsetX(), offsetY = actor.animOffsetY(), hue = actor.hue(),
-            mirror = actor.mirrorGlyph, rotate = actor.rotateGlyph
+            actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), vis, light,
+            offsetX = if (vis == 1f) actor.animOffsetX() else 0f,
+            offsetY = if (vis == 1f) actor.animOffsetY() else 0f,
+            hue = actor.hue(),
+            mirror = if (vis == 1f) actor.mirrorGlyph else false,
+            rotate = if (vis == 1f) actor.rotateGlyph else false
         )
         actor.gearDrawList.forEach { gear ->
             val trans = gear.glyphTransform()
             gearBatch.addTileQuad(
                 tx, ty,
-                gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), 1f, light,
+                gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), vis, light,
                 offsetX = actor.animOffsetX() + trans.x, offsetY = actor.animOffsetY() + trans.y,
                 hue = gear.hue(), rotate = trans.rotate && actor.rotateGlyph, mirror = actor.mirrorGlyph
             )
         }
-        actor.drawStatusGlyphs { statusGlyph ->
-            uiWorldBatch.addTileQuad(
-                tx, ty,
-                uiBatch.getTextureIndex(statusGlyph), 1f, fullLight,
-                offsetX = actor.animOffsetX(), offsetY = -0.4f + actor.animOffsetY() + sinBob * 0.13f
-            )
+        if (vis == 1f) {
+            actor.drawStatusGlyphs { statusGlyph ->
+                uiWorldBatch.addTileQuad(
+                    tx, ty,
+                    uiBatch.getTextureIndex(statusGlyph), 1f, fullLight,
+                    offsetX = actor.animOffsetX(), offsetY = -0.4f + actor.animOffsetY() + sinBob * 0.13f
+                )
+            }
         }
     }
 

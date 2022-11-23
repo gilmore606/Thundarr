@@ -42,6 +42,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
     val contents = mutableListOf<Thing>()
+    val lastSeenLocation = XY(-9999,-9999)
 
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
     val statuses = mutableListOf<Status>()
@@ -64,8 +65,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     @Transient
     var animation: Animation? = null
         set(value) {
-            field = value
-            value?.onStart()
+            level?.also { level ->
+                if (level.visibilityAt(xy.x, xy.y) == 1f) {
+                    field = value
+                    value?.onStart()
+                }
+            }
         }
 
     open fun isSentient() = true
@@ -223,8 +228,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun animOffsetY() = animation?.offsetY() ?: if (rotateGlyph) 0.3f else 0f
 
     final override fun onRender(delta: Float) {
-        animation?.also { if (it.done) animation = null else it.onRender(delta) }
-        doOnRender(delta)
+        if (level?.visibilityAt(xy.x, xy.y) == 1f) {
+            animation?.also { if (it.done) animation = null else it.onRender(delta) }
+            doOnRender(delta)
+        } else {
+            animation = null
+        }
     }
     open fun doOnRender(delta: Float) { }
 
