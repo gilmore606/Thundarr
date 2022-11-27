@@ -17,7 +17,7 @@ object SpriteSheets {
             "tiles_mob.png", 5, 5, Screen.textureFilter
         ),
         TerrainSprites(
-            "tiles_terrain.png", 12, 4, Screen.textureFilter
+            "tiles_terrain.png", 12, 8, Screen.textureFilter
         ),
         ThingSprites(
             "tiles_thing.png", 10, 10, Screen.textureFilter

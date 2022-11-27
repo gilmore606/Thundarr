@@ -10,7 +10,9 @@ class WallTile(
     val neighborType: Glyph,
 ): TileHolder(set) {
 
-    enum class Slot { TOP, LEFT, LEFTBOTTOM, BOTTOM, RIGHTBOTTOM, RIGHT, OUTSIDE_LEFTBOTTOM, OUTSIDE_RIGHTBOTTOM, FULL }
+    enum class Slot { TOP, LEFT, LEFTBOTTOM, BOTTOM, RIGHTBOTTOM, RIGHT,
+        OUTSIDE_LEFTBOTTOM, OUTSIDE_RIGHTBOTTOM, LEFTTOP, RIGHTTOP, OUTSIDE_LEFTTOP, OUTSIDE_RIGHTTOP,
+        CAP_TOP, CAP_BOTTOM, CAP_LEFT, CAP_RIGHT, FULL }
 
     private val variants = HashMap<Slot, ArrayList<Triple<Float, Int, Int>>>()
 
@@ -21,11 +23,20 @@ class WallTile(
             variants[slot] = ArrayList<Triple<Float, Int, Int>>().apply { add(Triple(frequency, tx, ty)) }
         }
     }
+
     override fun getTextureIndex(level: Level?, x: Int, y: Int): Int {
         level?.also { level ->
             var bucket = variants[Slot.FULL]
             if (visibleAt(level, x, y)) {
-                if (!visibleTo(level, x, y, EAST)) {
+                if (!neighborTo(level,x,y,WEST) && !neighborTo(level,x,y,EAST) && !neighborTo(level,x,y,SOUTH) && neighborTo(level,x,y,NORTH)) {
+                    bucket = variants[Slot.CAP_BOTTOM]
+                } else if (!neighborTo(level,x,y,WEST) && !neighborTo(level,x,y,EAST) && !neighborTo(level,x,y,NORTH) && neighborTo(level,x,y,SOUTH)) {
+                    bucket = variants[Slot.CAP_TOP]
+                } else if (!neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && !neighborTo(level,x,y,WEST) && neighborTo(level,x,y,EAST)) {
+                    bucket = variants[Slot.CAP_LEFT]
+                } else if (!neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && !neighborTo(level,x,y,EAST) && neighborTo(level,x,y,WEST)) {
+                    bucket = variants[Slot.CAP_RIGHT]
+                } else if (!visibleTo(level, x, y, EAST)) {
                     if (visibleTo(level, x, y, SOUTH)) {
                         if (openTo(level, x, y, NORTH)) {
                             if (neighborTo(level,x,y,SOUTH)) {
@@ -34,7 +45,13 @@ class WallTile(
                                 bucket = variants[Slot.TOP]
                             }
                         } else if (!neighborTo(level,x,y,SOUTH)) {
-                            bucket = variants[Slot.TOP]
+                            if (neighborTo(level, x, y, NORTH)) {
+                                bucket = variants[Slot.LEFTTOP]
+                            } else {
+                                bucket = variants[Slot.TOP]
+                            }
+                        } else if (neighborTo(level,x,y,WEST)) {
+                            bucket = variants[Slot.OUTSIDE_RIGHTTOP]
                         } else {
                             bucket = variants[Slot.RIGHT]
                         }
@@ -50,7 +67,13 @@ class WallTile(
                                 bucket = variants[Slot.TOP]
                             }
                         } else if (!neighborTo(level,x,y,SOUTH)) {
-                            bucket = variants[Slot.TOP]
+                            if (neighborTo(level, x, y, NORTH)) {
+                                bucket = variants[Slot.RIGHTTOP]
+                            } else {
+                                bucket = variants[Slot.TOP]
+                            }
+                        } else if (neighborTo(level,x,y,EAST)) {
+                            bucket = variants[Slot.OUTSIDE_LEFTTOP]
                         } else {
                             bucket = variants[Slot.LEFT]
                         }
@@ -65,6 +88,10 @@ class WallTile(
                     bucket = variants[Slot.OUTSIDE_RIGHTBOTTOM]
                 } else if (!visibleTo(level, x, y, SOUTHWEST) && neighborTo(level, x, y, WEST) && neighborTo(level, x, y, SOUTH)) {
                     bucket = variants[Slot.OUTSIDE_LEFTBOTTOM]
+                } else if (!visibleTo(level, x, y, NORTHEAST) && neighborTo(level, x, y, NORTH) && neighborTo(level, x, y, EAST)) {
+                    bucket = variants[Slot.LEFTTOP]
+                } else if (!visibleTo(level, x, y, NORTHWEST) && neighborTo(level, x, y, NORTH) && neighborTo(level, x, y, WEST)) {
+                    bucket = variants[Slot.RIGHTTOP]
                 } else if (neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && (!visibleTo(level,x,y,NORTHEAST) || !visibleTo(level,x,y,NORTHWEST))) {
                     bucket = variants[Slot.TOP]
                 }

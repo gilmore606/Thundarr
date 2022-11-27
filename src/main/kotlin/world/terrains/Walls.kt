@@ -70,7 +70,7 @@ sealed class Wall(
     }
 }
 
-object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
+object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 3f) {
     override fun bumpMsg() = "You bump into a brick wall."
     override fun digResult() = if (Dice.chance(0.3f)) Brick() else null
 }

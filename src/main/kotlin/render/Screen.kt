@@ -652,7 +652,7 @@ object Screen : KtxScreen {
         if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }
 
         App.level.forEachThingToRender(renderThing, delta)
-        App.level.forEachActorToRender(renderActor, renderFire, delta)
+        App.level.forEachActorToRender(renderActor, delta)
         App.level.forEachSparkToRender(renderSpark)
 
         uiWorldBatch.apply {

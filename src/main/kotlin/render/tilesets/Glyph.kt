@@ -7,6 +7,8 @@ enum class Glyph {
     BLANK,
 
     BRICK_WALL,
+    CLIFF_WALL,
+    CAVE_FLOOR,
     STONE_FLOOR,
     DIRT,
     GRASS,

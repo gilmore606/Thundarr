@@ -152,7 +152,6 @@ sealed class Level {
     // DoThis for all actor glyphs relevant to rendering the frame around the POV.
     fun forEachActorToRender(
         doThis: (x: Int, y: Int, actor: Actor, vis: Float) -> Unit,
-        doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
         delta: Float) =
         director.actors.forEach { actor ->
             val x = actor.xy.x

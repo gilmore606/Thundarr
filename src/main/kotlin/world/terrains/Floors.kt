@@ -117,7 +117,7 @@ sealed class Floor(
 
 
 
-object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR) {
+object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.CAVE_FLOOR) {
     override fun moveSpeed(actor: Actor) = 0.8f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
 }
