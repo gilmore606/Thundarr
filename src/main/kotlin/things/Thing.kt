@@ -166,6 +166,15 @@ class Brick : Portable() {
 }
 
 @Serializable
+class Rock : Portable() {
+    override fun name() = "rock"
+    override fun description() = "A chunk of rock.  You could throw it at someone."
+    override fun glyph() = Glyph.ROCK
+    override fun weight() = 0.3f
+    override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
+}
+
+@Serializable
 class Lighter : Portable() {
     override fun name() = "lighter"
     override fun description() = "A brass cigarette lighter.  Handy for starting fires."

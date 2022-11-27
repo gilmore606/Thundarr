@@ -137,6 +137,11 @@ enum class Glyph {
     STEW,
     BEDROLL,
     FRIDGE,
+    GRAY_TUNIC,
+    GRAY_TUNIC_WORN,
+    STOVE,
+    SLINGSHOT,
+    ROCK,
 
     BLOODSTAIN,
     SCORCHMARK

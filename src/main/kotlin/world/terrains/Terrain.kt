@@ -24,6 +24,8 @@ sealed class Terrain(
     companion object {
         fun get(type: Type) = when (type) {
             Type.TERRAIN_BRICKWALL -> BrickWall
+            Type.TERRAIN_CAVEWALL -> CaveWall
+            Type.TERRAIN_CAVEFLOOR -> CaveFloor
             Type.TERRAIN_STONEFLOOR -> StoneFloor
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_GRASS -> Grass
@@ -46,7 +48,9 @@ sealed class Terrain(
         GENERIC_WALL,
         GENERIC_FLOOR,
         TERRAIN_BRICKWALL,
+        TERRAIN_CAVEWALL,
         TERRAIN_STONEFLOOR,
+        TERRAIN_CAVEFLOOR,
         TERRAIN_DIRT,
         TERRAIN_GRASS,
         TERRAIN_WATER,
