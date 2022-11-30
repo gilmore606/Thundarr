@@ -99,14 +99,15 @@ class Fridge : Container() {
         // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
         KtxAsync.launch {
             repeat (Dice.oneTo(3)) {
-                when (Dice.zeroTo(7)) {
-                    0 -> RawMeat()
+                when (Dice.zeroTo(13)) {
+                    0,8,9,10 -> RawMeat()
                     1 -> ChickenLeg()
                     2 -> Cheese()
                     3 -> EnergyDrink()
                     4 -> Steak()
                     5 -> Apple()
                     6 -> Pear()
+                    7,11 -> ThrallChow()
                     else -> Stew()
                 }.moveTo(this@Fridge)
             }

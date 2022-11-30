@@ -75,3 +75,16 @@ class IdleInRoom : Idle() {
     }
 
 }
+
+@Serializable
+class IdleWander(
+    val wanderChance: Float
+) : Idle() {
+
+    override fun pickAction(npc: NPC): Action {
+        if (Dice.chance(wanderChance)) {
+            return wander(npc) { true }
+        }
+        return super.pickAction(npc)
+    }
+}

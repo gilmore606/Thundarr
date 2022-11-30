@@ -28,7 +28,7 @@ class Ratman(
     }
     override fun glyph() = Glyph.RATMAN
     override fun name() = "rat-man"
-    override fun description() = "A man-sized hunched gray rodent, its eyes glittering with hatred."
+    override fun description() = "A man-sized hunched gray rodent. Its eyes glitter with hatred."
     override fun onSpawn() {
         hpMax = 15f
         hp = 15f
@@ -38,6 +38,8 @@ class Ratman(
         Fight.set(this, 2f)
     }
     override fun meleeWeapon() = weapon
+    override fun isHostile() = true
+    override fun idleState() = IdleInRoom()
 
     override fun converseLines() = listOf(
         "Ttthhhee rebelliouthh one!  Killl him!",
@@ -53,7 +55,6 @@ class Ratman(
         "Unclaimed cheethe!  I'll take that."
     )
 
-    override fun idleState() = IdleInRoom()
 
     override fun considerState() {
         if (state !is Looting) {

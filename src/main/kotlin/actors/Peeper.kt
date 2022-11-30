@@ -3,6 +3,7 @@ package actors
 import actors.actions.Action
 import actors.actions.Wait
 import actors.animations.Slide
+import actors.states.IdleWander
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -37,5 +38,7 @@ class Peeper : NPC() {
     override fun corpse() = null
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
+
+    override fun idleState() = IdleWander(0.6f)
 
 }

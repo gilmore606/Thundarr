@@ -104,6 +104,8 @@ enum class Glyph {
     CAMPFIRE,
     DOOR_CLOSED,
     DOOR_OPEN,
+    WOOD_DOOR_CLOSED,
+    WOOD_DOOR_OPEN,
     TABLE,
     BOARD,
     BROWN_BOOTS,
@@ -144,6 +146,8 @@ enum class Glyph {
     STOVE,
     SLINGSHOT,
     ROCK,
+    TRIDENT,
+    SPEAR,
 
     BLOODSTAIN,
     SCORCHMARK

@@ -12,6 +12,7 @@ import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
+import world.cartos.AttractCarto
 import world.cartos.WorldCarto
 import world.level.AttractLevel
 import world.level.EnclosedLevel
@@ -162,8 +163,8 @@ class Chunk(
     fun generateAttractLevel(level: Level) {
         generating = true
         connectLevel(level)
-        WorldCarto(0, 0, AttractLevel.dimension - 1, AttractLevel.dimension - 1, this, level).apply {
-            carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0, forAttract = true)
+        AttractCarto(0, 0, AttractLevel.dimension - 1, AttractLevel.dimension - 1, this, level).apply {
+            carveWorldChunk(Random.nextDouble() * 1000.0 + 500.0)
         }
         generating = false
     }

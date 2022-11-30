@@ -169,6 +169,15 @@ class Stew : Food() {
 }
 
 @Serializable
+class ThrallChow : Food() {
+    override fun glyph() = Glyph.PACKAGE_BAG
+    override fun name() = "thrall-chow"
+    override fun description() = "A plastic bag of Thrall-Chow(tm).  'For minimum Thrall sustenance,' says the colorful package."
+    override fun calories() = 1200
+    override fun consumeSelfMsg() = "You choke down the dry fibrous chow chips.  How depressing."
+}
+
+@Serializable
 class EnergyDrink : Consumable() {
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"

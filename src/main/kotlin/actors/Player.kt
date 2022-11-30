@@ -34,7 +34,7 @@ open class Player : Actor() {
     override fun glyph() = Glyph.PLAYER
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
-    override fun description() = "A stalwart blond barbarian in a leather tunic."
+    override fun description() = "A stalwart blond barbarian.  His good looks are somewhat marred by a permanent scowl."
     override fun dname() = name()
     override fun iname() = name()
 
@@ -53,7 +53,7 @@ open class Player : Actor() {
     val autoPickUpTypes = mutableListOf<String>()
 
     init {
-        Pather.subscribe(this, this, 100f)
+        Pather.subscribe(this, this, 60f)
     }
 
     open fun onSpawn() {
@@ -64,14 +64,6 @@ open class Player : Actor() {
         Fight.set(this, 1f)
         Throw.set(this, 1f)
         Survive.set(this, 1f)
-
-        Pickaxe().moveTo(this)
-        Axe().moveTo(this)
-        Lighter().moveTo(this)
-        repeat (6) { Brick().moveTo(this) }
-        Bedroll().moveTo(this)
-        FirstAidKit().moveTo(this)
-        repeat (4) { Cheese().moveTo(this) }
     }
 
     override fun die() {

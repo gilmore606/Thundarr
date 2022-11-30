@@ -20,7 +20,7 @@ object SpriteSheets {
             "tiles_terrain.png", 12, 8, Screen.textureFilter
         ),
         ThingSprites(
-            "tiles_thing.png", 10, 10, Screen.textureFilter
+            "tiles_thing.png", 10, 11, Screen.textureFilter
         ),
         UISprites(
             "tiles_ui.png", 6, 5, Texture.TextureFilter.Nearest

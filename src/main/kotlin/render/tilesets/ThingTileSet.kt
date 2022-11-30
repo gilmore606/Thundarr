@@ -135,4 +135,8 @@ fun ThingTileSet() =
         setTile(Glyph.STOVE, SimpleTile(this, 6, 9))
         setTile(Glyph.SLINGSHOT, SimpleTile(this, 7, 9))
         setTile(Glyph.ROCK, SimpleTile(this, 8, 9))
+        setTile(Glyph.WOOD_DOOR_CLOSED, SimpleTile(this, 0, 10))
+        setTile(Glyph.WOOD_DOOR_OPEN, SimpleTile(this, 1, 10))
+        setTile(Glyph.TRIDENT, SimpleTile(this, 2, 10))
+        setTile(Glyph.SPEAR, SimpleTile(this, 3, 10))
     }
