@@ -41,7 +41,7 @@ class WorldCarto(
             val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
                     Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
             if (n2 > 0.01) {
-                carve(x, y, 0, Terrain.Type.TERRAIN_CAVEWALL)
+                carve(x, y, 0, Terrain.Type.TERRAIN_FORESTWALL)
             }
         }
 

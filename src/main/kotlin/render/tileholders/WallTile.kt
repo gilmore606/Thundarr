@@ -28,29 +28,41 @@ class WallTile(
         level?.also { level ->
             var bucket = variants[Slot.FULL]
             if (visibleAt(level, x, y)) {
-                if (!neighborTo(level,x,y,WEST) && !neighborTo(level,x,y,EAST) && !neighborTo(level,x,y,SOUTH) && neighborTo(level,x,y,NORTH)) {
+                val nWest = neighborTo(level,x,y,WEST)
+                val nEast = neighborTo(level,x,y,EAST)
+                val nNorth = neighborTo(level,x,y,NORTH)
+                val nSouth = neighborTo(level,x,y,SOUTH)
+                val vWest = visibleTo(level,x,y,WEST)
+                val vEast = visibleTo(level,x,y,EAST)
+                val vNorth = visibleTo(level,x,y,NORTH)
+                val vSouth = visibleTo(level,x,y,SOUTH)
+                if (!nWest && !nEast && !nSouth && nNorth) {
                     bucket = variants[Slot.CAP_BOTTOM]
-                } else if (!neighborTo(level,x,y,WEST) && !neighborTo(level,x,y,EAST) && !neighborTo(level,x,y,NORTH) && neighborTo(level,x,y,SOUTH)) {
+                } else if (!nWest && !nEast && !nNorth && nSouth) {
                     bucket = variants[Slot.CAP_TOP]
-                } else if (!neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && !neighborTo(level,x,y,WEST) && neighborTo(level,x,y,EAST)) {
+                } else if (!nWest && !nSouth && !nNorth && nEast) {
                     bucket = variants[Slot.CAP_LEFT]
-                } else if (!neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && !neighborTo(level,x,y,EAST) && neighborTo(level,x,y,WEST)) {
+                } else if (!nEast && !nSouth && !nNorth && nWest) {
                     bucket = variants[Slot.CAP_RIGHT]
-                } else if (!visibleTo(level, x, y, EAST)) {
-                    if (visibleTo(level, x, y, SOUTH)) {
+                } else if (nNorth && !nSouth && nEast && !nWest && vSouth) {
+                    bucket = variants[Slot.LEFTTOP]
+                } else if (nNorth && !nSouth && !nEast && nWest && vSouth) {
+                    bucket = variants[Slot.RIGHTTOP]
+                } else if (!vEast) {
+                    if (vSouth) {
                         if (openTo(level, x, y, NORTH)) {
-                            if (neighborTo(level,x,y,SOUTH)) {
+                            if (nNorth) {
                                 bucket = variants[Slot.OUTSIDE_RIGHTBOTTOM]
                             } else {
                                 bucket = variants[Slot.TOP]
                             }
-                        } else if (!neighborTo(level,x,y,SOUTH)) {
-                            if (neighborTo(level, x, y, NORTH)) {
+                        } else if (!nSouth) {
+                            if (nNorth) {
                                 bucket = variants[Slot.LEFTTOP]
                             } else {
                                 bucket = variants[Slot.TOP]
                             }
-                        } else if (neighborTo(level,x,y,WEST)) {
+                        } else if (nWest) {
                             bucket = variants[Slot.OUTSIDE_RIGHTTOP]
                         } else {
                             bucket = variants[Slot.RIGHT]
@@ -58,21 +70,21 @@ class WallTile(
                     } else {
                         bucket = variants[Slot.RIGHTBOTTOM]
                     }
-                } else if (!visibleTo(level, x, y, WEST)) {
-                    if (visibleTo(level, x, y, SOUTH)) {
+                } else if (!vWest) {
+                    if (vSouth) {
                         if (openTo(level, x, y, NORTH)) {
-                            if (neighborTo(level,x,y,SOUTH)) {
+                            if (nSouth) {
                                 bucket = variants[Slot.OUTSIDE_LEFTBOTTOM]
                             } else {
                                 bucket = variants[Slot.TOP]
                             }
-                        } else if (!neighborTo(level,x,y,SOUTH)) {
-                            if (neighborTo(level, x, y, NORTH)) {
+                        } else if (!nSouth) {
+                            if (nNorth) {
                                 bucket = variants[Slot.RIGHTTOP]
                             } else {
                                 bucket = variants[Slot.TOP]
                             }
-                        } else if (neighborTo(level,x,y,EAST)) {
+                        } else if (nEast) {
                             bucket = variants[Slot.OUTSIDE_LEFTTOP]
                         } else {
                             bucket = variants[Slot.LEFT]
@@ -80,19 +92,19 @@ class WallTile(
                     } else {
                         bucket = variants[Slot.LEFTBOTTOM]
                     }
-                } else if (!visibleTo(level, x, y, NORTH)) {
+                } else if (!vNorth) {
                     bucket = variants[Slot.TOP]
-                } else if (!visibleTo(level, x, y, SOUTH)) {
+                } else if (!vSouth) {
                     bucket = variants[Slot.BOTTOM]
-                } else if (!visibleTo(level, x, y, SOUTHEAST) && neighborTo(level, x, y, EAST) && neighborTo(level, x, y, SOUTH)) {
+                } else if (!visibleTo(level, x, y, SOUTHEAST) && nEast && nSouth) {
                     bucket = variants[Slot.OUTSIDE_RIGHTBOTTOM]
-                } else if (!visibleTo(level, x, y, SOUTHWEST) && neighborTo(level, x, y, WEST) && neighborTo(level, x, y, SOUTH)) {
+                } else if (!visibleTo(level, x, y, SOUTHWEST) && nWest && nSouth) {
                     bucket = variants[Slot.OUTSIDE_LEFTBOTTOM]
-                } else if (!visibleTo(level, x, y, NORTHEAST) && neighborTo(level, x, y, NORTH) && neighborTo(level, x, y, EAST)) {
+                } else if (!visibleTo(level, x, y, NORTHEAST) && nNorth && nEast) {
                     bucket = variants[Slot.LEFTTOP]
-                } else if (!visibleTo(level, x, y, NORTHWEST) && neighborTo(level, x, y, NORTH) && neighborTo(level, x, y, WEST)) {
+                } else if (!visibleTo(level, x, y, NORTHWEST) && nNorth && nWest) {
                     bucket = variants[Slot.RIGHTTOP]
-                } else if (neighborTo(level,x,y,NORTH) && !neighborTo(level,x,y,SOUTH) && (!visibleTo(level,x,y,NORTHEAST) || !visibleTo(level,x,y,NORTHWEST))) {
+                } else if (nNorth && !nSouth && (!visibleTo(level,x,y,NORTHEAST) || !visibleTo(level,x,y,NORTHWEST))) {
                     bucket = variants[Slot.TOP]
                 }
             }

@@ -26,7 +26,7 @@ sealed class Scenery : Thing() {
 
 @Serializable
 sealed class Tree : Scenery() {
-    override fun isOpaque() = true
+    override fun isOpaque() = false
     override fun walkOnMsg() = if (Dice.chance(0.3f)) treeMsg() else ""
     open fun treeMsg() = "You hack through the dense trees."
     override fun moveSpeedPast(actor: Actor): Float? = 1.4f

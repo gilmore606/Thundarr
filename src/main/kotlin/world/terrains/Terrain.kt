@@ -25,10 +25,12 @@ sealed class Terrain(
         fun get(type: Type) = when (type) {
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
+            Type.TERRAIN_FORESTWALL -> ForestWall
             Type.TERRAIN_CAVEFLOOR -> CaveFloor
             Type.TERRAIN_STONEFLOOR -> StoneFloor
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_GRASS -> Grass
+            Type.TERRAIN_SWAMP -> Swamp
             Type.TERRAIN_WATER -> Water
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
@@ -49,10 +51,12 @@ sealed class Terrain(
         GENERIC_FLOOR,
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
+        TERRAIN_FORESTWALL,
         TERRAIN_STONEFLOOR,
         TERRAIN_CAVEFLOOR,
         TERRAIN_DIRT,
         TERRAIN_GRASS,
+        TERRAIN_SWAMP,
         TERRAIN_WATER,
         TERRAIN_PORTAL_DOOR,
     }

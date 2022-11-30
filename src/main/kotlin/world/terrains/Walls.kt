@@ -26,13 +26,14 @@ sealed class Wall(
     ) : TerrainData(Type.GENERIC_WALL)
 
     open fun bumpMsg() = "You bump into solid rock."
+    open fun isDiggable() = true
     open fun digResult(): Thing? = null
-    abstract fun digToFloorTerrain(): Terrain.Type
+    open fun digToFloorTerrain(): Terrain.Type = Terrain.Type.TERRAIN_CAVEFLOOR
 
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level()?.also { level ->
             val weapon = actor.meleeWeapon()
-            if (weapon.canDig(type)) {
+            if (isDiggable() && weapon.canDig(type)) {
                 Speaker.world(Speaker.SFX.DIG, source = actor.xy)
                 level.addSpark(Smoke().at(actor.xy.x, actor.xy.y))
                 if (actor is Player && !actor.dangerMode) {
@@ -82,4 +83,9 @@ object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
     override fun bumpMsg() = "You bump into a rock face."
     override fun digResult() = if (Dice.chance(0.4f)) Rock() else null
     override fun digToFloorTerrain() = Terrain.Type.TERRAIN_CAVEFLOOR
+}
+
+object ForestWall : Wall(Type.TERRAIN_FORESTWALL, Glyph.FOREST_WALL, 4f) {
+    override fun isDiggable() = false
+    override fun bumpMsg() = "The forest is too thick to pass this way."
 }

@@ -35,6 +35,12 @@ fun TerrainTileSet() =
             add(0.2f, 8, 2)
         })
 
+        setTile(Glyph.SWAMP, VariantsTile(this).apply {
+            add(0.4f, 6, 3)
+            add(0.3f, 7, 3)
+            add(0.3f, 8, 3)
+        })
+
         setTile(Glyph.BRICK_WALL, WallTile(this, Glyph.BRICK_WALL).apply {
             add(WallTile.Slot.TOP, 0.33f, 2, 0)
             add(WallTile.Slot.TOP, 0.33f, 3, 0)
@@ -83,7 +89,28 @@ fun TerrainTileSet() =
             add(WallTile.Slot.CAP_TOP, 1f, 5, 6)
             add(WallTile.Slot.CAP_LEFT, 1f, 5, 7)
             add(WallTile.Slot.CAP_RIGHT, 1f, 5, 7)
-            add(WallTile.Slot.FULL, 1f, 1, 4)
+            add(WallTile.Slot.FULL, 1f, 5, 3)
+        })
+
+        setTile(Glyph.FOREST_WALL, WallTile(this, Glyph.FOREST_WALL).apply {
+            add(WallTile.Slot.TOP, 1f, 10, 3)
+            add(WallTile.Slot.LEFTTOP, 1f, 9, 3)
+            add(WallTile.Slot.RIGHTTOP, 1f, 11, 3)
+            add(WallTile.Slot.OUTSIDE_LEFTTOP, 1f, 9, 1)
+            add(WallTile.Slot.OUTSIDE_RIGHTTOP, 1f, 11, 1)
+            add(WallTile.Slot.LEFT, 1f, 11, 2)
+            add(WallTile.Slot.RIGHT, 1f, 9, 2)
+            add(WallTile.Slot.LEFTBOTTOM, 1f, 10, 2)
+            add(WallTile.Slot.OUTSIDE_LEFTBOTTOM, 1f, 11, 1)
+            add(WallTile.Slot.BOTTOM, 1f, 10, 1)
+            add(WallTile.Slot.RIGHTBOTTOM, 1f, 10, 2)
+            add(WallTile.Slot.OUTSIDE_RIGHTBOTTOM, 1f, 9, 1)
+            add(WallTile.Slot.CAP_BOTTOM, 1f, 10, 3)
+            add(WallTile.Slot.CAP_TOP, 1f, 10, 1)
+            add(WallTile.Slot.CAP_LEFT, 1f, 9, 3)
+            add(WallTile.Slot.CAP_RIGHT, 1f, 11, 3)
+            add(WallTile.Slot.FULL, 1f, 10, 2)
+
         })
 
         setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))

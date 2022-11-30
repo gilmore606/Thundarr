@@ -74,7 +74,7 @@ class LevelCarto(
 
         var deadEnds = true
         while (deadEnds) {
-            deadEnds = removeDeadEnds()
+            deadEnds = removeDeadEnds(Terrain.Type.TERRAIN_BRICKWALL)
         }
 
         addDoor(worldDest)
@@ -82,6 +82,8 @@ class LevelCarto(
         addLights()
 
         forEachCell { x, y -> chunk.setRoofed(x - chunk.x, y - chunk.y, Chunk.Roofed.INDOOR) }
+
+        setOverlaps()
     }
 
     private fun growMaze(startX: Int, startY: Int, winding: Float, regionId: Int) {

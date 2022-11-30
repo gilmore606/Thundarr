@@ -213,12 +213,12 @@ abstract class Carto(
         return connections
     }
 
-    protected fun removeDeadEnds(): Boolean {
+    protected fun removeDeadEnds(type: Terrain.Type = Terrain.Type.TERRAIN_BRICKWALL): Boolean {
         var removed = false
         forEachCell { x, y ->
             if (!isRock(x, y)) {
                 if (cardinalBlockerCount(x, y) == 3) {
-                    setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
+                    setTerrain(x, y, type)
                     removed = true
                 }
             }
