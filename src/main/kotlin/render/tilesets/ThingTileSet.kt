@@ -12,9 +12,9 @@ fun ThingTileSet() =
 
         setTile(Glyph.BLANK, SimpleTile(this, 4, 2))
         setTile(Glyph.TREE, VariantsTile(this).apply {
-            add(0.4f, 0, 1)
-            add(0.3f, 0, 0)
+            add(0.3f, 0, 1)
             add(0.3f, 1, 1)
+            add(0.4f, 0, 0)
         })
 
         setTile(Glyph.LIGHTBULB, SimpleTile(this, 1, 0))
@@ -34,8 +34,7 @@ fun ThingTileSet() =
             add(0.5f, 2, 2)
         })
         setTile(Glyph.DEAD_TREE, VariantsTile(this).apply {
-            add(0.5f, 0, 2)
-            add(0.5f, 1, 2)
+            add(1f, 0, 2)
         })
         setTile(Glyph.BIG_ROCK, VariantsTile(this).apply {
             add(0.5f, 2, 2)

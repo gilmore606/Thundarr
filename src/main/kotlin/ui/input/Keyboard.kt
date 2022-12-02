@@ -133,6 +133,8 @@ object Keyboard : KtxInputAdapter {
         if (CTRL) {
             Screen.moveCursor(dir)
             Screen.rightClickCursorTile()
+        } else if (SHIFT) {
+            App.player.tryAutoMove(dir)
         } else if (CURSOR_MODE) {
             Screen.moveCursor(dir)
         } else {

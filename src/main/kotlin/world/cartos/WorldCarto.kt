@@ -68,7 +68,7 @@ class WorldCarto(
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 0.7f)) {
-                        addThing(x + this.x0, y + this.y0, if (Dice.flip()) OakTree() else PineTree())
+                        addThing(x + this.x0, y + this.y0, if (Dice.chance(0.93f)) OakTree() else DeadTree())
                         if (Dice.chance(0.2f)) {
                             var clear = true
                             CARDINALS.forEach { dir ->

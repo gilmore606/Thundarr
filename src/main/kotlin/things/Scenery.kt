@@ -83,3 +83,10 @@ class PalmTree : Tree() {
     override fun name() = "palm tree"
     override fun treeMsg() = "You hack through the thick jungle growth."
 }
+
+@Serializable
+class DeadTree : Tree() {
+    override fun glyph() = Glyph.DEAD_TREE
+    override fun name() = "dead tree"
+    override fun treeMsg() = "The dessicated skeleton of a once-mighty tree."
+}

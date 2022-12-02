@@ -104,6 +104,10 @@ open class Player : Actor() {
         }
     }
 
+    fun tryAutoMove(dir: XY) {
+
+    }
+
     override fun willAggro(target: Actor) = dangerMode
 
     fun toggleAggro() {
