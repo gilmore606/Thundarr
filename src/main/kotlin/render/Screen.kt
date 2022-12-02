@@ -184,7 +184,7 @@ object Screen : KtxScreen {
     private val lastActTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     private var actTimeIndex = 0
     private var lastActionTime = 0L
-    private var minActionInterval = 50L
+    private var minActionInterval = 60L
 
     var sinBob = 0f
     var timeMs = System.currentTimeMillis()
@@ -352,7 +352,7 @@ object Screen : KtxScreen {
         drawEverything(delta)
 
         val startTime = timeMs
-        if (startTime - lastActionTime > minActionInterval || Keyboard.lastKeyTime > startTime + 20L || Keyboard.lastKey > -1) {
+        if (startTime - lastActionTime > minActionInterval || Keyboard.lastKeyTime > startTime + 20L) {
             LevelKeeper.runActorQueues()
             lastActionTime = startTime
             val thisActTime = timeMs - startTime

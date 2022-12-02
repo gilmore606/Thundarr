@@ -11,7 +11,7 @@ import world.level.Level
 
 object ChunkLoader {
 
-    private val coroutineContext = newSingleThreadAsyncContext("chunkLoader")
+    private val coroutineContext = newSingleThreadAsyncContext("ChunkLoader")
     private val coroutineScope = CoroutineScope(coroutineContext)
     private var jobs = mutableSetOf<Job>()
     private var locked = false
@@ -45,7 +45,7 @@ object ChunkLoader {
         locked = false
     }
 
-    private fun makeWorldChunk(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
+    private suspend fun makeWorldChunk(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
         log.debug("Creating chunk at $x $y")
         Chunk(CHUNK_SIZE, CHUNK_SIZE).apply {
             onCreate(x, y)

@@ -25,13 +25,13 @@ abstract class Nukarto(
         x: Int, y: Int, width: Int, height: Int
     )
 
-    fun carveLevel() {
+    suspend fun carveLevel() {
         doCarveLevel()
 
         setTileOverlaps()  // create floor overlaps and wall shadows
     }
 
-    abstract fun doCarveLevel()
+    abstract suspend fun doCarveLevel()
 
     protected fun set(x: Int, y: Int, type: Terrain.Type) {
         chunk.setTerrain(x, y, type)

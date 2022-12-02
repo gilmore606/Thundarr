@@ -12,6 +12,7 @@ import util.gzipDecompress
 import util.log
 import world.Building
 import world.Chunk
+import world.ChunkMeta
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.Connection
@@ -34,6 +35,12 @@ class SaveSlot(
         val data = text("data")
     }
 
+    object WorldMetaTable : Table() {
+        val x = integer("x")
+        val y = integer("y")
+        val data = text("data")
+    }
+
     object LevelChunksTable : Table() {
         val id = varchar("id", 80)
         val building = varchar("building", 80)
@@ -47,7 +54,6 @@ class SaveSlot(
         val data = text("data")
     }
 
-    // TODO: figure out why we have to know the full path?
     private val saveFileFolder = "savegame"
     private val COMPRESS_ENABLED = true
 
@@ -56,16 +62,17 @@ class SaveSlot(
         Database.connect("jdbc:sqlite:$saveFileFolder/${id}.thundarr", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            SchemaUtils.create(PrefsStateTable, WorldStateTable, WorldChunksTable, LevelChunksTable, BuildingsTable)
+            SchemaUtils.create(PrefsStateTable, WorldStateTable, WorldMetaTable, WorldChunksTable, LevelChunksTable, BuildingsTable)
         }
     }
 
     fun worldExists() = transaction { WorldStateTable.selectAll().count().toInt() } > 0
 
-    fun eraseAll() {
+    suspend fun eraseAll() {
         transaction {
             WorldChunksTable.deleteAll()
             WorldStateTable.deleteAll()
+            WorldMetaTable.deleteAll()
             LevelChunksTable.deleteAll()
             BuildingsTable.deleteAll()
         }
@@ -102,7 +109,6 @@ class SaveSlot(
             } ?: run { throw RuntimeException("Could not load chunk at $x $y!")}
         } else throw RuntimeException("Could not find and load chunk at $x $y!")
 
-
     fun putWorldChunk(chunk: Chunk, callback: ()->Unit) {
         transaction {
             WorldChunksTable.deleteWhere { (x eq chunk.x) and (y eq chunk.y) }
@@ -112,6 +118,24 @@ class SaveSlot(
                 it[data] = toCompressed(chunk)
             }
             callback()
+        }
+    }
+
+    suspend fun getWorldMeta(x: Int, y: Int) = transaction {
+        WorldMetaTable.select {
+            (WorldMetaTable.x eq x) and (WorldMetaTable.y eq y)
+        }.singleOrNull()?.let {
+            fromCompressed<ChunkMeta>(it[WorldMetaTable.data])
+        }
+    }
+
+    suspend fun putWorldMetas(metas: Array<ChunkMeta>) = transaction {
+        metas.forEach { meta ->
+            WorldMetaTable.insert {
+                it[x] = meta.x
+                it[y] = meta.y
+                it[data] = toCompressed(meta)
+            }
         }
     }
 

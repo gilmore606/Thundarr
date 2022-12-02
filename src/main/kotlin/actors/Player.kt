@@ -2,6 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Move
+import actors.actions.processes.AutoMove
 import actors.stats.Brains
 import actors.stats.Heart
 import actors.stats.Speed
@@ -105,7 +106,7 @@ open class Player : Actor() {
     }
 
     fun tryAutoMove(dir: XY) {
-
+        queue(AutoMove(dir))
     }
 
     override fun willAggro(target: Actor) = dangerMode
@@ -185,7 +186,7 @@ open class Player : Actor() {
         }
     }
 
-    override fun wantsToPickUp(thing: Thing) = autoPickUpTypes.contains(thing.thingTag())
+    override fun wantsToPickUp(thing: Thing) = isAutoActionSafe() && autoPickUpTypes.contains(thing.thingTag())
 
     open fun addAutoPickUpType(type: String) {
         autoPickUpTypes.add(type)
@@ -197,4 +198,13 @@ open class Player : Actor() {
     }
 
     override fun canSee(entity: Entity?) = entity != null && entity.level() == level && level!!.visibilityAt(entity.xy()!!.x, entity.xy()!!.y) == 1f
+
+    // Is it safe to do auto-actions like auto-pickup, shift-move, etc?
+    // If we can see hostiles, it's not safe.
+    fun isAutoActionSafe(): Boolean {
+        if (entitiesSeen { it is NPC && it.isHostile() }.isNotEmpty()) {
+            return false
+        }
+        return true
+    }
 }

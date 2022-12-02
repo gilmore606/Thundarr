@@ -4,6 +4,7 @@ import App
 import actors.Herder
 import actors.Wolfman
 import actors.actions.Wait
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Keys.*
 import kotlinx.coroutines.delay
@@ -27,7 +28,6 @@ object Keyboard : KtxInputAdapter {
     private const val REPEAT_DELAY_MS = 300L
     const val REPEAT_MS = 90L
 
-    var SHIFT = false
     var CTRL = false
     var ALT = false
 
@@ -84,10 +84,7 @@ object Keyboard : KtxInputAdapter {
             CTRL = true
             modKeyDown = keycode
             Screen.updateCursorLine()
-        } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
-            SHIFT = true
-            modKeyDown = keycode
-        } else {
+        } else if (keycode != SHIFT_RIGHT && keycode != SHIFT_LEFT) {
             lastKey = keycode
             modKeyDown = 0
             lastKeyTime = System.currentTimeMillis()
@@ -105,9 +102,6 @@ object Keyboard : KtxInputAdapter {
             CTRL = false
             isMod = true
             Screen.clearCursorLine()
-        } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
-            SHIFT = false
-            isMod = true
         }
         lastKey = -1
         if (isMod && modKeyDown > 0) {
@@ -133,7 +127,9 @@ object Keyboard : KtxInputAdapter {
         if (CTRL) {
             Screen.moveCursor(dir)
             Screen.rightClickCursorTile()
-        } else if (SHIFT) {
+        } else if (Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT) || Gdx.input.isKeyPressed(
+                META_SHIFT_ON)) {
+            log.info("START EXPLORE")
             App.player.tryAutoMove(dir)
         } else if (CURSOR_MODE) {
             Screen.moveCursor(dir)
@@ -150,6 +146,9 @@ object Keyboard : KtxInputAdapter {
         Screen.topModal?.also { modal ->
             modal.keyDown(keycode)
         } ?: run {
+            if (App.player.isActing()) {
+                App.player.cancelAction()
+            }
             if (moveKeys.contains(keycode)) {
 
                 val dir = moveKeys[keycode]
@@ -167,6 +166,8 @@ object Keyboard : KtxInputAdapter {
 
                 EQUALS -> { Screen.mouseScrolled(-1.43f) }
                 MINUS -> { Screen.mouseScrolled(1.43f) }
+
+                V -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
                 TAB -> { App.openInventory() }
                 BACKSLASH -> { App.openGear() }
@@ -212,7 +213,6 @@ object Keyboard : KtxInputAdapter {
                     CeilingLight().withColor(Dice.float(0f,1f), Dice.float(0f,1f), Dice.float(0f,1f))
                         .moveTo(App.level, App.player.xy.x, App.player.xy.y)
                 }
-                Input.Keys.F12 -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
                 Input.Keys.F9 -> { Screen.tiltAmount += debugFloatStep }
                 Input.Keys.F10 -> { Screen.tiltAmount -= debugFloatStep }

@@ -5,6 +5,7 @@ import actors.NPC
 import actors.Player
 import actors.states.Hibernated
 import actors.states.Idle
+import kotlinx.coroutines.delay
 import things.Temporal
 import util.XY
 import util.distanceBetween

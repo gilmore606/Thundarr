@@ -102,6 +102,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     abstract fun hasActionJuice(): Boolean
     abstract fun wantsToAct(): Boolean
+    fun isActing() = queuedActions.isNotEmpty()
 
     open fun onRestore() {
         contents.forEach {
@@ -155,6 +156,13 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     // Queue an action to be executed next.
     fun queue(action: Action) {
         if (action.canQueueFor(this)) queuedActions.add(action)
+    }
+
+    fun cancelAction() {
+        if (queuedActions.isNotEmpty()) {
+            val action = queuedActions.removeAt(0)
+            action.onCancel(this)
+        }
     }
 
     fun doAction(action: Action) {

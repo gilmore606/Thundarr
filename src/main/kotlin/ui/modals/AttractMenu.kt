@@ -32,7 +32,7 @@ class AttractMenu : SelectionModal(280, 230, "- ThUNdARR -", Position.LEFT) {
         options.put("Start new (Escape)") { App.doStartNewWorld(App.StartType.ESCAPE) }
         options.put("Start new (Survive)") { App.doStartNewWorld(App.StartType.SURVIVE) }
         options.put("Settings") { App.openSettings() }
-        options.put("Controls") { App.openControls() }
+        options.put("Help") { App.openHelp() }
         options.put("Credits") { App.openCredits() }
         options.put("Quit") { App.doQuit() }
 

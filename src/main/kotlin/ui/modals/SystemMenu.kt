@@ -1,6 +1,5 @@
 package ui.modals
 
-import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 
@@ -17,8 +16,7 @@ class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Resume") { }
         put("Settings") { App.openSettings() }
-        put("Controls") { App.openControls() }
-        put("Credits") { App.openCredits() }
+        put("Help") { App.openHelp() }
         put("Save and exit") { App.saveAndReturnToMenu() }
     }
 

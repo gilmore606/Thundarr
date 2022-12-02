@@ -15,6 +15,7 @@ import ui.modals.*
 import ui.panels.*
 import util.*
 import world.StarterDungeon
+import world.cartos.Metamapper
 import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel
@@ -219,12 +220,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     private fun createNewWorld(startType: StartType) {
-        Screen.addModal(LoadingModal("The moon...it's breaking in god-damned half!"))
+        Screen.addModal(LoadingModal("Generating new world -- please wait a moment..."))
         Screen.brightnessTarget = 0f
         pendingJob = KtxAsync.launch {
+
             LevelKeeper.hibernateAll()
             save.eraseAll()
-            delay(500)
+
+            Metamapper.buildWorld()
+            while (Metamapper.isWorking) {
+                delay(250L)
+            }
+            log.info("Metamapper finished, time to complete the world...")
 
             if (startType == StartType.SURVIVE) {
                 level = LevelKeeper.getWarmedWorld(around = XY(200, 200))
@@ -235,6 +242,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
         }
     }
+
     fun finishCreateWorld(actualLevel: Level, startType: StartType, startDungeon: StarterDungeon? = null) {
         KtxAsync.launch {
             level = actualLevel
@@ -387,7 +395,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     fun openSettings() { Screen.addModal(SettingsModal()) }
-    fun openControls() { Screen.addModal(ControlsModal()) }
+    fun openHelp() { Screen.addModal(HelpModal()) }
     fun openCredits() { Screen.addModal(CreditsModal()) }
     fun openInventory(withContainer: Container? = null) { Screen.addModal(InventoryModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }

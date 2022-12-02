@@ -138,7 +138,7 @@ class Chunk(
     }
 
     // Carve myself into a chunk for the world.  Maybe with the starter dungeon.
-    fun generateWorld(level: Level) {
+    suspend fun generateWorld(level: Level) {
         generating = true
         connectLevel(level)
         var withStarter = false

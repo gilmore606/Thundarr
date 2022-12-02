@@ -11,7 +11,7 @@ class NuLevelKarto(
     wallType: Terrain.Type
 ) : Nukarto(level, chunk, floorType, wallType) {
 
-    override fun doCarveLevel() {
+    override suspend fun doCarveLevel() {
         fillBox(0, 0, chunk.width - 1, chunk.height - 1, wallType)
     }
 

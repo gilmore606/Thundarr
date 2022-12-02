@@ -1,5 +1,6 @@
 package world.cartos
 
+import App
 import actors.Herder
 import actors.MuskOx
 import actors.Ox
@@ -29,7 +30,13 @@ class WorldCarto(
     val scale = 0.02
     val fullness = 0.002
 
-    fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
+    suspend fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
+        App.save.getWorldMeta(x0, y0)?.also {
+            log.info("Found chunk metadata for $x0 $y0")
+        } ?: run {
+            log.info("ACK!  No chunk metadata for $x0 $y0")
+        }
+
         forEachCell { x, y ->
             val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
                     Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7

@@ -18,4 +18,6 @@ abstract class Action(
 
     // Should we do this again immediately?
     open fun shouldContinueFor(actor: Actor): Boolean = false
+
+    open fun onCancel(actor: Actor) { }
 }
