@@ -10,11 +10,17 @@ import ktx.async.KtxAsync
 import things.*
 import util.*
 import world.*
+import world.level.CHUNK_SIZE
 import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.PortalDoor
 import world.terrains.Terrain
+import java.lang.Integer.max
+import java.lang.Math.abs
+import java.lang.Math.min
+import java.lang.RuntimeException
 import kotlin.Exception
+import kotlin.math.sign
 import kotlin.random.Random
 
 class WorldCarto(
@@ -31,10 +37,10 @@ class WorldCarto(
     val fullness = 0.002
 
     suspend fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
-        App.save.getWorldMeta(x0, y0)?.also {
-            log.info("Found chunk metadata for $x0 $y0")
-        } ?: run {
-            log.info("ACK!  No chunk metadata for $x0 $y0")
+        val meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No chunk metadata found for $x0 $y0!")
+
+        if (meta.biome == Biome.OCEAN) {
+
         }
 
         forEachCell { x, y ->
@@ -52,7 +58,33 @@ class WorldCarto(
             }
         }
 
-        if (Dice.chance(0.8f) || forStarter) {
+        // River?
+        when (meta.riverExits.size) {
+            0 -> { }
+            1 -> {
+                val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
+                val end = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                drawRiver(start, end, meta.riverExits[0].width, 1, meta.riverWiggle)
+            }
+            2 -> {
+                val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
+                val end = dirToEdge(meta.riverExits[1].edge, meta.riverExits[1].offset)
+                drawRiver(start, end, meta.riverExits[0].width, meta.riverExits[1].width, meta.riverWiggle)
+            }
+            else -> {
+                val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
+                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val end = XY(centerX, centerY)
+                meta.riverExits.forEach { exit ->
+                    val start = dirToEdge(exit.edge, exit.offset)
+                    drawRiver(start, end, exit.width, exit.width, meta.riverWiggle)
+                }
+            }
+        }
+
+        // Building?
+        if (Dice.chance(0.05f) || forStarter) {
             val facing = CARDINALS.random()
             carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
             assignDoor(facing)
@@ -104,6 +136,7 @@ class WorldCarto(
 
         setRoofedInRock()
         setOverlaps()
+        //debugBorders()
     }
 
     private fun assignDoor(facing: XY) {

@@ -187,6 +187,11 @@ object Keyboard : KtxInputAdapter {
                 NUM_7 -> { Toolbar.onKey(7) }
                 NUM_8 -> { Toolbar.onKey(8) }
 
+                I -> { App.player.debugMove(NORTH) }
+                J -> { App.player.debugMove(WEST) }
+                K -> { App.player.debugMove(SOUTH) }
+                L -> { App.player.debugMove(EAST) }
+
                 Input.Keys.F1 -> {
                     App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
                 }

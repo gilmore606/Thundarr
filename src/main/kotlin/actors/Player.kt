@@ -207,4 +207,8 @@ open class Player : Actor() {
         }
         return true
     }
+
+    fun debugMove(dir: XY) {
+        moveTo(level, xy.x + (dir.x * 20), xy.y + (dir.y * 20))
+    }
 }

@@ -12,10 +12,12 @@ import world.Chunk
 import world.level.Level
 import world.cartos.prefabs.Prefab
 import world.cartos.prefabs.TiledFile
+import world.level.CHUNK_SIZE
 import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
 import java.io.File
+import java.lang.Math.abs
 
 abstract class Carto(
     val x0: Int,
@@ -98,11 +100,18 @@ abstract class Carto(
     }
 
     protected fun carveRoom(room: Rect, regionId: Int,
-                            type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
+                            type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
+                            skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
-                setTerrain(x, y, type)
-                setRegionAt(x, y, regionId)
+                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                        if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
+                            setTerrain(x, y, type)
+                            setRegionAt(x, y, regionId)
+                        }
+                    }
+                }
             }
         }
     }
@@ -280,5 +289,51 @@ abstract class Carto(
                 }
             }
         }
+    }
+
+    protected fun drawRiver(start: XY, end: XY, startWidth: Int, endWidth: Int, wiggle: Float) {
+        val stepX: Float
+        val stepY: Float
+        var stepsLeft: Int
+        var width = startWidth.toFloat()
+        if (start.x == 0) {
+            start.x += startWidth / 2
+        } else if (start.y == 0) {
+            start.y += startWidth / 2
+        } else if (start.x == CHUNK_SIZE - 1) {
+            start.x -= startWidth / 2
+        } else if (start.y == CHUNK_SIZE - 1) {
+            start.y -= startWidth / 2
+        }
+        val diff = end - start
+        if (abs(diff.x) > abs(diff.y)) {
+            stepX = diff.x / abs(diff.x).toFloat()
+            stepY = diff.y / abs(diff.x).toFloat()
+            stepsLeft = abs(diff.x)
+        } else {
+            stepX = diff.x / abs(diff.y).toFloat()
+            stepY = diff.y / abs(diff.y).toFloat()
+            stepsLeft = abs(diff.y)
+        }
+        val stepWidth = (endWidth - startWidth) / stepsLeft.toFloat()
+        var cursorX = start.x.toFloat()
+        var cursorY = start.y.toFloat()
+        while (stepsLeft > 0) {
+            carveRoom(Rect((x0 + cursorX - width / 2 - 1).toInt(), (y0 + cursorY - width / 2 - 1).toInt(),
+                x0 + cursorX.toInt() + width.toInt() + 2, y0 + cursorY.toInt() + width.toInt() + 2),
+                0, Terrain.Type.TERRAIN_GRASS, true, Terrain.Type.TERRAIN_WATER)
+            carveRoom(Rect((x0 + cursorX - width / 2).toInt(), (y0 + cursorY - width / 2).toInt(),
+                x0 + cursorX.toInt() + width.toInt(), y0 + cursorY.toInt() + width.toInt()),
+                0, Terrain.Type.TERRAIN_WATER, (width >= 3f))
+            cursorX += stepX
+            cursorY += stepY
+            stepsLeft--
+            width += stepWidth
+        }
+    }
+
+    protected fun debugBorders() {
+        carveRoom(Rect(x0, y0, x1, y0), 0, Terrain.Type.TERRAIN_STONEFLOOR)
+        carveRoom(Rect(x0, y0, x0, y1), 0, Terrain.Type.TERRAIN_STONEFLOOR)
     }
 }

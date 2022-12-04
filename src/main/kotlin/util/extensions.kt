@@ -7,6 +7,7 @@ import render.Screen
 import things.Thing
 import world.Entity
 import world.journal.GameTime
+import world.level.CHUNK_SIZE
 import world.persist.LevelKeeper
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -284,3 +285,15 @@ val NO_DIRECTION = XY(0, 0)
 val CARDINALS = listOf(NORTH, SOUTH, WEST, EAST)
 val DIAGONALS = listOf(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST)
 val DIRECTIONS = listOf(NORTH, SOUTH, WEST, EAST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
+
+fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
+    NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
+    SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)
+    WEST -> XY(0, CHUNK_SIZE / 2 + offset)
+    EAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE / 2 + offset)
+    NORTHEAST -> XY(CHUNK_SIZE - 1, 0)
+    SOUTHEAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE - 1)
+    NORTHWEST -> XY(0, 0)
+    SOUTHWEST -> XY(0, CHUNK_SIZE - 1)
+    else -> XY(0,0)
+}

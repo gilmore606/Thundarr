@@ -13,6 +13,7 @@ import util.log
 import world.Building
 import world.Chunk
 import world.ChunkMeta
+import world.ChunkScratch
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.Connection
@@ -129,12 +130,12 @@ class SaveSlot(
         }
     }
 
-    suspend fun putWorldMetas(metas: Array<ChunkMeta>) = transaction {
+    suspend fun putWorldMetas(metas: Array<ChunkScratch>) = transaction {
         metas.forEach { meta ->
             WorldMetaTable.insert {
                 it[x] = meta.x
                 it[y] = meta.y
-                it[data] = toCompressed(meta)
+                it[data] = toCompressed(meta.toChunkMeta())
             }
         }
     }
