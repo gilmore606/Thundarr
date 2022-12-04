@@ -23,6 +23,7 @@ sealed class Terrain(
 
     companion object {
         fun get(type: Type) = when (type) {
+            Type.BLANK -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
             Type.TERRAIN_FORESTWALL -> ForestWall
@@ -31,7 +32,9 @@ sealed class Terrain(
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_GRASS -> Grass
             Type.TERRAIN_SWAMP -> Swamp
-            Type.TERRAIN_WATER -> Water
+            Type.TERRAIN_SHALLOW_WATER -> ShallowWater
+            Type.TERRAIN_DEEP_WATER -> DeepWater
+            Type.GENERIC_WATER -> ScratchWater
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
@@ -47,8 +50,10 @@ sealed class Terrain(
     }
 
     enum class Type {
+        BLANK,
         GENERIC_WALL,
         GENERIC_FLOOR,
+        GENERIC_WATER,
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
         TERRAIN_FORESTWALL,
@@ -57,7 +62,8 @@ sealed class Terrain(
         TERRAIN_DIRT,
         TERRAIN_GRASS,
         TERRAIN_SWAMP,
-        TERRAIN_WATER,
+        TERRAIN_SHALLOW_WATER,
+        TERRAIN_DEEP_WATER,
         TERRAIN_PORTAL_DOOR,
     }
 
@@ -77,17 +83,9 @@ sealed class Terrain(
     open fun debugData(data: TerrainData?): String { return "none" }
 }
 
+object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false)
+
 @Serializable
 sealed class TerrainData(
     val forType: Terrain.Type
 )
-
-object Water : Terrain(
-    Type.TERRAIN_WATER,
-    Glyph.WATER,
-    false,
-    true,
-    false
-) {
-
-}

@@ -115,10 +115,15 @@ fun TerrainTileSet() =
 
         setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))
 
-        setTile(Glyph.WATER, WaterTile(this).apply {
+        setTile(Glyph.SHALLOW_WATER, WaterTile(this).apply {
             add(0.3f, 9, 0)
             add(0.4f, 11, 0)
             add(0.3f, 10, 0)
+        })
+        setTile(Glyph.DEEP_WATER, WaterTile(this).apply {
+            add(0.3f, 9, 4)
+            add(0.4f, 11, 4)
+            add(0.3f, 10, 4)
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))

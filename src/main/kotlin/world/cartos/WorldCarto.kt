@@ -82,6 +82,11 @@ class WorldCarto(
                 }
             }
         }
+        fuzzTerrain(Terrain.Type.GENERIC_WATER, meta.riverBlur * 0.5f)
+        fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_GRASS, meta.riverGrass)
+        fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_DIRT, meta.riverDirt)
+
+        deepenWater()
 
         // Building?
         if (Dice.chance(0.05f) || forStarter) {

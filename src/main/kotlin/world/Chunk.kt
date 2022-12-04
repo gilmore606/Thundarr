@@ -251,7 +251,7 @@ class Chunk(
 
     fun getTerrain(x: Int, y: Int) = if (boundsCheck(x, y)) {
         terrains[x - this.x][y - this.y]
-    } else Terrain.Type.TERRAIN_STONEFLOOR
+    } else Terrain.Type.BLANK
 
     fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
         this.terrains[x - this.x][y - this.y] = type

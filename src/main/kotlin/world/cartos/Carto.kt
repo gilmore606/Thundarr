@@ -161,6 +161,19 @@ abstract class Carto(
         return c
     }
 
+    protected fun neighborCount(x: Int, y: Int, match: (Terrain.Type)->Boolean): Int {
+        var c = 0
+        if (match(getTerrain(x-1,y))) c++
+        if (match(getTerrain(x+1,y))) c++
+        if (match(getTerrain(x,y-1))) c++
+        if (match(getTerrain(x,y+1))) c++
+        if (match(getTerrain(x-1,y-1))) c++
+        if (match(getTerrain(x-1,y+1))) c++
+        if (match(getTerrain(x+1,y-1))) c++
+        if (match(getTerrain(x+1,y+1))) c++
+        return c
+    }
+
     protected fun cardinalBlockerCount(x: Int, y: Int): Int {
         var c = 0
         if (!isWalkableAt(x-1,y)) c++
@@ -319,16 +332,75 @@ abstract class Carto(
         var cursorX = start.x.toFloat()
         var cursorY = start.y.toFloat()
         while (stepsLeft > 0) {
-            carveRoom(Rect((x0 + cursorX - width / 2 - 1).toInt(), (y0 + cursorY - width / 2 - 1).toInt(),
-                x0 + cursorX.toInt() + width.toInt() + 2, y0 + cursorY.toInt() + width.toInt() + 2),
-                0, Terrain.Type.TERRAIN_GRASS, true, Terrain.Type.TERRAIN_WATER)
             carveRoom(Rect((x0 + cursorX - width / 2).toInt(), (y0 + cursorY - width / 2).toInt(),
                 x0 + cursorX.toInt() + width.toInt(), y0 + cursorY.toInt() + width.toInt()),
-                0, Terrain.Type.TERRAIN_WATER, (width >= 3f))
+                0, Terrain.Type.GENERIC_WATER, (width >= 3f))
             cursorX += stepX
             cursorY += stepY
             stepsLeft--
             width += stepWidth
+        }
+    }
+
+    protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
+
+    protected fun fuzzTerrain(type: Terrain.Type, density: Float) {
+        forEachCell { x, y ->
+            if (getTerrain(x,y) == type) {
+                CARDINALS.forEach { dir ->
+                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
+                        if (Dice.chance(density)) {
+                            setTerrain(x + dir.x, y + dir.y, type)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float) {
+        forEachCell { x, y ->
+            if (getTerrain(x,y) == type) {
+                DIRECTIONS.forEach { dir ->
+                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
+                        if (Dice.chance(density)) {
+                            setTerrain(x + dir.x, y + dir.y, withType)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected fun deepenWater() {
+        val adds = mutableSetOf<XY>()
+        forEachCell { x, y ->
+            if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
+                val shores = neighborCount(x,y) { it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK }
+                if (Dice.chance(shores * 0.75f)) adds.add(XY(x,y))
+            }
+        }
+        adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
+        var extendChance = 0.4f
+        repeat (3) {
+            adds.clear()
+            forEachCell { x, y ->
+                if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
+                    val shallows = neighborCount(x,y) { it == Terrain.Type.TERRAIN_SHALLOW_WATER }
+                    if (shallows > 0) {
+                        if (Dice.chance(extendChance)) adds.add(XY(x,y))
+                    }
+                }
+            }
+            extendChance -= 0.15f
+            adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
+        }
+        adds.clear()
+        // Fill remainder with deep
+        forEachCell { x, y ->
+            if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
+                setTerrain(x,y, Terrain.Type.TERRAIN_DEEP_WATER)
+            }
         }
     }
 

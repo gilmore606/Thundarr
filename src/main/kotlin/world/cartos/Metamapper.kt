@@ -170,9 +170,12 @@ object Metamapper {
                 for (y in 0 until chunkRadius*2) {
                     val cell = metas[x][y]
                     if (cell.riverExits.isNotEmpty()) {
+
                         val wiggle = 0.2f  // TODO : get from perlin
                         cell.riverWiggle = wiggle
                         cell.riverBlur = 0.3f
+                        cell.riverGrass = 0.8f
+                        cell.riverDirt = 0.2f
 
                         var isNorth = false
                         var isSouth = false

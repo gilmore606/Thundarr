@@ -9,7 +9,7 @@ import world.Chunk
 import world.level.Level
 
 sealed class Floor(
-    type: Terrain.Type,
+    type: Type,
     glyph: Glyph
 ) : Terrain(type, glyph, true, true, false, dataType = Type.GENERIC_FLOOR) {
 
@@ -29,7 +29,7 @@ sealed class Floor(
         val ty1: Float
     )
 
-    open fun overlapsOn(): Set<Terrain.Type> = setOf()
+    open fun overlapsOn(): Set<Type> = setOf()
     open fun overlapSize() = 0.25f
     open fun overlapInset() = 0.1f
 

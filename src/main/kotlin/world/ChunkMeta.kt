@@ -25,6 +25,8 @@ class ChunkMeta(
     val riverExits: MutableList<RiverExit> = mutableListOf(),
     val riverWiggle: Float = 0f,
     val riverBlur: Float = 0f,
+    val riverGrass: Float = 0f,
+    val riverDirt: Float = 0f,
     val biome: Biome
 )
 
@@ -47,6 +49,8 @@ class ChunkScratch(
     var riverRun = false
     var riverWiggle = 0f
     var riverBlur = 0f
+    var riverGrass = 0f
+    var riverDirt = 0f
     var biome = Biome.OCEAN
 
     var riverExits: MutableList<RiverExit> = mutableListOf()
@@ -58,6 +62,8 @@ class ChunkScratch(
         riverExits = riverExits,
         riverWiggle = riverWiggle,
         riverBlur = riverBlur,
+        riverGrass = riverGrass,
+        riverDirt = riverDirt,
         biome = biome
     )
 }
