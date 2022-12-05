@@ -37,64 +37,82 @@ class WorldCarto(
     val fullness = 0.002
 
     suspend fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
-        val meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No chunk metadata found for $x0 $y0!")
+        val meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
 
         if (meta.biome == Biome.OCEAN) {
 
-        }
+            carveRoom(Rect(x0,y0,x1,y1), 0, Terrain.Type.TERRAIN_DEEP_WATER)
 
-        forEachCell { x, y ->
-            val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
-                    Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
-            if (n > fullness * scale - Dice.float(0f,0.18f).toDouble()) {
-                carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
-            } else {
-                carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
-            }
-            val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
-                    Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
-            if (n2 > 0.02) {
-                carve(x, y, 0, Terrain.Type.TERRAIN_FORESTWALL)
-            }
-        }
+        } else {
 
-        // River?
-        when (meta.riverExits.size) {
-            0 -> { }
-            1 -> {
-                val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
-                val end = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
-                drawRiver(start, end, meta.riverExits[0].width, 1, meta.riverWiggle)
-            }
-            2 -> {
-                val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
-                val end = dirToEdge(meta.riverExits[1].edge, meta.riverExits[1].offset)
-                drawRiver(start, end, meta.riverExits[0].width, meta.riverExits[1].width, meta.riverWiggle)
-            }
-            else -> {
-                val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
-                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val end = XY(centerX, centerY)
-                meta.riverExits.forEach { exit ->
-                    val start = dirToEdge(exit.edge, exit.offset)
-                    drawRiver(start, end, exit.width, exit.width, meta.riverWiggle)
+            forEachCell { x, y ->
+                val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
+                        Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
+                if (n > fullness * scale - Dice.float(0f, 0.18f).toDouble()) {
+                    carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
+                } else {
+                    carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
+                }
+                val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
+                        Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
+                if (n2 > 0.02) {
+                    carve(x, y, 0, Terrain.Type.TERRAIN_FORESTWALL)
                 }
             }
+
+            // River?
+            when (meta.riverExits.size) {
+                0 -> { }
+                1 -> {
+                    val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
+                    val end = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                    drawRiver(start, end, meta.riverExits[0].width, 1, meta.riverWiggle)
+                }
+                2 -> {
+                    val start1 = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
+                    val start2 = dirToEdge(meta.riverExits[1].edge, meta.riverExits[1].offset)
+                    val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
+                    val centerX = (start1.x + start2.x) / 2 + Dice.zeroTil(variance) - (variance / 2)
+                    val centerY = (start1.y + start2.y) / 2 + Dice.zeroTil(variance) - (variance / 2)
+                    val centerWidth = (meta.riverExits[0].width + meta.riverExits[1].width) / 2
+                    val end = XY(centerX, centerY)
+                    drawRiver(start1, end, meta.riverExits[0].width, centerWidth, meta.riverWiggle)
+                    drawRiver(start2, end, meta.riverExits[1].width, centerWidth, meta.riverWiggle)
+                }
+                else -> {
+                    val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
+                    val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                    val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                    val centerWidth = meta.riverExits.maxOf { it.width }
+                    val end = XY(centerX, centerY)
+                    meta.riverExits.forEach { exit ->
+                        val start = dirToEdge(exit.edge, exit.offset)
+                        drawRiver(start, end, exit.width, centerWidth, meta.riverWiggle)
+                    }
+                }
+            }
+            fuzzTerrain(Terrain.Type.GENERIC_WATER, meta.riverBlur * 0.4f)
+            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_GRASS, meta.riverGrass)
+            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_DIRT, meta.riverDirt)
+
+            deepenWater()
+
+            // Building?
+            if (Dice.chance(0.05f) || forStarter) {
+                val facing = CARDINALS.random()
+                carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
+                assignDoor(facing)
+            }
+
         }
-        fuzzTerrain(Terrain.Type.GENERIC_WATER, meta.riverBlur * 0.5f)
-        fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_GRASS, meta.riverGrass)
-        fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_DIRT, meta.riverDirt)
 
-        deepenWater()
+        setRoofedInRock()
+        setOverlaps()
+        //addJunk(forAttract)
+        //debugBorders()
+    }
 
-        // Building?
-        if (Dice.chance(0.05f) || forStarter) {
-            val facing = CARDINALS.random()
-            carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
-            assignDoor(facing)
-        }
-
+    private fun addJunk(forAttract: Boolean) {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (isWalkableAt(x + this.x0, y + this.y0)) {
@@ -138,10 +156,6 @@ class WorldCarto(
                 }
             }
         }
-
-        setRoofedInRock()
-        setOverlaps()
-        //debugBorders()
     }
 
     private fun assignDoor(facing: XY) {

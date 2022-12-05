@@ -27,7 +27,7 @@ class ChunkMeta(
     val riverBlur: Float = 0f,
     val riverGrass: Float = 0f,
     val riverDirt: Float = 0f,
-    val biome: Biome
+    val biome: Biome = Biome.OCEAN
 )
 
 @Serializable

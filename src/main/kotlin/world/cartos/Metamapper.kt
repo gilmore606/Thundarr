@@ -20,8 +20,8 @@ object Metamapper {
 
     var isWorking = false
 
-    val riverMouthDensity = 0.03f
-    val riverCount = 1500
+    val riverMouthDensity = 0.6f
+    val riverCount = 2500
     val inlandSeaCount = 2
     val maxRiverWidth = 10
 
@@ -134,15 +134,14 @@ object Metamapper {
                 while (!done) {
                     val cell = metas[head.x][head.y]
                     if (cell.height > 0 && !cell.riverRun) {
-
                         cell.riverRun = true
                         val childExit = RiverExit(
                             edge = XY(cell.riverParentX - head.x, cell.riverParentY - head.y),
-                            width = width
+                            width = if (cell.height > 1) width else (width * 2f).toInt()
                         )
                         cell.riverExits.add(childExit)
 
-                        if (width > 2 && Dice.chance(0.1f)) {
+                        if (width > 2 && Dice.chance(0.05f)) {
                             width--
                         } else if (width < maxRiverWidth && Dice.chance(0.2f)) {
                             width++
@@ -151,7 +150,7 @@ object Metamapper {
                         val parent = metas[cell.riverParentX][cell.riverParentY]
                         val parentExit = RiverExit(
                             edge = XY(head.x - cell.riverParentX, head.y - cell.riverParentY),
-                            width = width
+                            width = if (cell.height > 1) width else (width * 2f).toInt()
                         )
                         parent.riverExits.add(parentExit)
                         head.x = cell.riverParentX
@@ -159,7 +158,6 @@ object Metamapper {
 
                         childExit.otherSide = parentExit
                         parentExit.otherSide = childExit
-
                     } else {
                         done = true
                     }
@@ -171,7 +169,7 @@ object Metamapper {
                     val cell = metas[x][y]
                     if (cell.riverExits.isNotEmpty()) {
 
-                        val wiggle = 0.2f  // TODO : get from perlin
+                        val wiggle = 0.9f  // TODO : get from perlin
                         cell.riverWiggle = wiggle
                         cell.riverBlur = 0.3f
                         cell.riverGrass = 0.8f
