@@ -14,6 +14,7 @@ enum class Glyph {
     DIRT,
     GRASS,
     SWAMP,
+    BEACH,
     SHALLOW_WATER,
     DEEP_WATER,
     PORTAL_DOOR,

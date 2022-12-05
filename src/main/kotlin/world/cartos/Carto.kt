@@ -344,13 +344,15 @@ abstract class Carto(
 
     protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
 
-    protected fun fuzzTerrain(type: Terrain.Type, density: Float) {
+    protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
         forEachCell { x, y ->
             if (getTerrain(x,y) == type) {
                 CARDINALS.forEach { dir ->
                     if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
-                        if (Dice.chance(density)) {
-                            setTerrain(x + dir.x, y + dir.y, type)
+                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
+                            if (Dice.chance(density)) {
+                                setTerrain(x + dir.x, y + dir.y, type)
+                            }
                         }
                     }
                 }
@@ -358,13 +360,16 @@ abstract class Carto(
         }
     }
 
-    protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float) {
+    // TODO: make this better so it doesn't favor down-and-right
+    protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
         forEachCell { x, y ->
             if (getTerrain(x,y) == type) {
                 DIRECTIONS.forEach { dir ->
                     if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
-                        if (Dice.chance(density)) {
-                            setTerrain(x + dir.x, y + dir.y, withType)
+                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
+                            if (Dice.chance(density)) {
+                                setTerrain(x + dir.x, y + dir.y, withType)
+                            }
                         }
                     }
                 }

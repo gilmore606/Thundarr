@@ -60,6 +60,46 @@ class WorldCarto(
                 }
             }
 
+            // Coast?
+            if (meta.coasts.isNotEmpty()) {
+                meta.coasts.forEach { edge ->
+                    if (edge in CARDINALS) {
+                        for (i in 0 until CHUNK_SIZE) {
+                            when (edge) {
+                                NORTH -> setTerrain(x0+i,y0, Terrain.Type.TERRAIN_DEEP_WATER)
+                                SOUTH -> setTerrain(x0+i,y1, Terrain.Type.TERRAIN_DEEP_WATER)
+                                WEST -> setTerrain(x0, y0+i, Terrain.Type.TERRAIN_DEEP_WATER)
+                                EAST -> setTerrain(x1, y0+i, Terrain.Type.TERRAIN_DEEP_WATER)
+                            }
+                        }
+                    } else {
+                        when (edge) {
+                            NORTHWEST -> {
+                                setTerrain(x0,y0, Terrain.Type.TERRAIN_DEEP_WATER)
+                                setTerrain(x0+1,y0+1, Terrain.Type.TERRAIN_DEEP_WATER)
+                            }
+                            NORTHEAST -> {
+                                setTerrain(x1,y0, Terrain.Type.TERRAIN_DEEP_WATER)
+                                setTerrain(x1-1,y0+1, Terrain.Type.TERRAIN_DEEP_WATER)
+                            }
+                            SOUTHWEST -> {
+                                setTerrain(x0,y1, Terrain.Type.TERRAIN_DEEP_WATER)
+                                setTerrain(x0+1,y1-1, Terrain.Type.TERRAIN_DEEP_WATER)
+                            }
+                            SOUTHEAST -> {
+                                setTerrain(x1,y1, Terrain.Type.TERRAIN_DEEP_WATER)
+                                setTerrain(x1-1,y1-1, Terrain.Type.TERRAIN_DEEP_WATER)
+                            }
+                        }
+                    }
+                }
+            }
+            repeat (4) { fuzzTerrain(Terrain.Type.TERRAIN_DEEP_WATER, 0.3f) }
+            fringeTerrain(Terrain.Type.TERRAIN_DEEP_WATER, Terrain.Type.TERRAIN_SHALLOW_WATER, 1f)
+            repeat (2) { fuzzTerrain(Terrain.Type.TERRAIN_SHALLOW_WATER, 0.4f) }
+            fringeTerrain(Terrain.Type.TERRAIN_SHALLOW_WATER, Terrain.Type.TERRAIN_BEACH, 1f, Terrain.Type.TERRAIN_DEEP_WATER)
+            repeat (2) { fuzzTerrain(Terrain.Type.TERRAIN_BEACH, 0.5f, Terrain.Type.TERRAIN_SHALLOW_WATER) }
+
             // River?
             when (meta.riverExits.size) {
                 0 -> { }
@@ -92,8 +132,8 @@ class WorldCarto(
                 }
             }
             fuzzTerrain(Terrain.Type.GENERIC_WATER, meta.riverBlur * 0.4f)
-            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_GRASS, meta.riverGrass)
-            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_DIRT, meta.riverDirt)
+            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_GRASS, meta.riverGrass, Terrain.Type.TERRAIN_SHALLOW_WATER)
+            fringeTerrain(Terrain.Type.GENERIC_WATER, Terrain.Type.TERRAIN_DIRT, meta.riverDirt, Terrain.Type.TERRAIN_SHALLOW_WATER)
 
             deepenWater()
 

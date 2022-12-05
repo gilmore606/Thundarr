@@ -36,6 +36,8 @@ object Metamapper {
             return true
         }
 
+        fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) metas[x][y] else null
+
         fun setRiverOffset(exit: RiverExit, offset: Int) {
             if (exit.offset == -999) {
                 exit.offset = offset
@@ -212,6 +214,17 @@ object Metamapper {
                             }
                             cell.riverExits.firstOrNull { it.edge == EAST }?.also {
                                 setRiverOffset(it, cornerPush)
+                            }
+                        }
+                    }
+
+                    // Set coasts
+                    if (cell.height > 0) {
+                        DIRECTIONS.forEach { dir ->
+                            metaAt(x + dir.x, y + dir.y)?.also { neighbor ->
+                                if (neighbor.height == 0) {
+                                    cell.coasts.add(dir)
+                                }
                             }
                         }
                     }
