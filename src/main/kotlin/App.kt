@@ -15,7 +15,7 @@ import ui.modals.*
 import ui.panels.*
 import util.*
 import world.StarterDungeon
-import world.cartos.Metamapper
+import world.cartos.Metamap
 import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel
@@ -227,17 +227,17 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             LevelKeeper.hibernateAll()
             save.eraseAll()
 
-            Metamapper.buildWorld()
-            while (Metamapper.isWorking) {
+            Metamap.buildWorld()
+            while (Metamap.isWorking) {
                 delay(250L)
             }
             log.info("Metamapper finished, time to complete the world...")
 
             if (startType == StartType.SURVIVE) {
-                level = LevelKeeper.getWarmedWorld(around = XY(5500, 200))
+                level = LevelKeeper.getWarmedWorld(around = XY(-550, -500))
                 finishCreateWorld(level, startType)
             } else {
-                level = LevelKeeper.getWarmedWorld(around = XY(5500, 200), withStarterDungeon = true)
+                level = LevelKeeper.getWarmedWorld(around = XY(-550, -500), withStarterDungeon = true)
                 // inshallah, StarterDungeon will call finishCreateWorld when warmed
             }
         }

@@ -7,11 +7,12 @@ import ktx.async.newSingleThreadAsyncContext
 import ui.panels.Console
 import util.*
 import world.Biome
+import world.ChunkMeta
 import world.ChunkScratch
 import world.RiverExit
 import world.level.CHUNK_SIZE
 
-object Metamapper {
+object Metamap {
 
     private val chunkRadius = 100
 
@@ -20,23 +21,28 @@ object Metamapper {
 
     var isWorking = false
 
-    val riverMouthDensity = 0.6f
-    val riverCount = 2500
+    val riverCount = 4500
     val inlandSeaCount = 2
     val maxRiverWidth = 10
 
-    var metas = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
+    val outOfBoundsMeta = ChunkMeta(biome = Biome.OCEAN)
+
+    private var scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
+    val metas = ArrayList<ArrayList<ChunkMeta>>()
+
+    fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
+
+    fun boundsCheck(x: Int, y: Int): Boolean {
+        if (x < 0 || y < 0 || x >= chunkRadius * 2 || y >= chunkRadius * 2) return false
+        return true
+    }
 
     fun buildWorld() {
 
-        metas = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
+        scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
 
-        fun boundsCheck(x: Int, y: Int): Boolean {
-            if (x < 0 || y < 0 || x >= chunkRadius * 2 || y >= chunkRadius * 2) return false
-            return true
-        }
 
-        fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) metas[x][y] else null
+        fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
         fun setRiverOffset(exit: RiverExit, offset: Int) {
             if (exit.offset == -999) {
@@ -54,9 +60,59 @@ object Metamapper {
                 for (iy in -chunkRadius until chunkRadius) {
                     val chunkX = ix * CHUNK_SIZE
                     val chunkY = iy * CHUNK_SIZE
-                    metas[ix + chunkRadius][iy + chunkRadius].apply {
+                    scratches[ix + chunkRadius][iy + chunkRadius].apply {
                         x = chunkX
                         y = chunkY
+                    }
+                }
+            }
+
+            // CONTINENT
+            for (i in 0 until chunkRadius*2) {
+                scratches[i][0].height = 0
+                scratches[i][chunkRadius * 2 - 1].height = 0
+                scratches[0][i].height = 0
+                scratches[chunkRadius * 2 - 1][i].height = 0
+            }
+            repeat (50) {
+                val x0 = Dice.zeroTil(chunkRadius*2-10)
+                val y0 = Dice.zeroTil(chunkRadius*2-10)
+                var x1 = x0 + Dice.zeroTo(4)
+                var y1 = y0 + Dice.zeroTo(4)
+                if (Dice.chance(0.3f)) {
+                    x1 = (x1 - x0) * (2 + Dice.oneTo(5)) + x0
+                    y1 = (y1 - y0) * (2 + Dice.oneTo(5)) + y0
+                }
+                for (x in x0 until x1) {
+                    for (y in y0 until y1) {
+                        if (boundsCheck(x,y)) scratches[x][y].height = 0
+                    }
+                }
+            }
+            for (density in listOf(0.2f, 0.6f, 0.1f, 0.5f, 0.6f, 0.2f, 0.2f)) {
+                for (x in 0 until chunkRadius * 2) {
+                    for (y in 0 until chunkRadius * 2) {
+                        if (scratches[x][y].height == 0) {
+                            CARDINALS.forEach { dir ->
+                                if (boundsCheck(x+dir.x, y+dir.y)) {
+                                    val neighbor = scratches[x + dir.x][y + dir.y]
+                                    if ((neighbor.height == -1) && Dice.chance(density)) {
+                                        neighbor.height = -2
+                                        CARDINALS.forEach { ndir ->
+                                            if (boundsCheck(x+dir.x+ndir.x, y+dir.y+ndir.y)) {
+                                                val nn = scratches[x+dir.x+ndir.x][y+dir.y+ndir.y]
+                                                if (Dice.chance(density * 0.7f)) nn.height = -2
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                for (x in 0 until chunkRadius * 2) {
+                    for (y in 0 until chunkRadius * 2) {
+                        if (scratches[x][y].height == -2) scratches[x][y].height = 0
                     }
                 }
             }
@@ -68,30 +124,18 @@ object Metamapper {
             val springs = ArrayList<XY>()
             val mouths = ArrayList<XY>()
 
-            // Set the initial sea bottom and river mouths around outer edges
-            for (i in 0 until chunkRadius*2) {
-                metas[i][0].height = 0
-                metas[i][chunkRadius*2-1].height = 0
-                metas[0][i].height = 0
-                metas[chunkRadius*2-1][i].height = 0
-                if (Dice.chance(riverMouthDensity)) {
-                    val mouth = when (Dice.zeroTil(4)) {
-                        0 -> XY(i, 1)
-                        1 -> XY(1, i)
-                        2 -> XY(i, chunkRadius*2-2)
-                        else -> XY(chunkRadius*2-2, i)
+            // Set river mouths at all coast water
+            for (x in 0 until chunkRadius * 2) {
+                for (y in 0 until chunkRadius * 2) {
+                    if (scratches[x][y].height == 0) {
+                        if (CARDINALS.hasOneWhere {
+                            boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height == -1
+                            }) {
+                            mouths.add(XY(x,y))
+                            opens.add(XY(x,y))
+                        }
                     }
-                    metas[mouth.x][mouth.y].height = 0
-                    opens.add(mouth)
-                    mouths.add(mouth)
                 }
-            }
-            // Add inland sea river mouths
-            for (i in 0 until inlandSeaCount) {
-                val sea = XY(Dice.zeroTil(chunkRadius*2-20) + 10, Dice.zeroTil(chunkRadius*2-20) + 10)
-                metas[sea.x][sea.y].height = 0
-                opens.add(sea)
-                mouths.add(sea)
             }
 
             // Run slopes up from bottoms
@@ -102,10 +146,10 @@ object Metamapper {
                     while (!added && dirs.isNotEmpty()) {
                         val dir = dirs.removeFirst()
                         if (boundsCheck(open.x + dir.x, open.y + dir.y)) {
-                            val neighbor = metas[open.x + dir.x][open.y + dir.y]
+                            val neighbor = scratches[open.x + dir.x][open.y + dir.y]
                             if (neighbor.height == -1) {
-                                metas[open.x][open.y].hasRiverChildren = true
-                                neighbor.height = metas[open.x][open.y].height + 1
+                                scratches[open.x][open.y].hasRiverChildren = true
+                                neighbor.height = scratches[open.x][open.y].height + 1
                                 neighbor.riverParentX = open.x
                                 neighbor.riverParentY = open.y
                                 opens.add(XY(open.x + dir.x, open.y + dir.y))
@@ -120,7 +164,7 @@ object Metamapper {
             }
             for (ix in 0 until chunkRadius*2) {
                 for (iy in 0 until chunkRadius*2) {
-                    if (!metas[ix][iy].hasRiverChildren) {
+                    if (!scratches[ix][iy].hasRiverChildren) {
                         springs.add(XY(ix,iy))
                     }
                 }
@@ -134,7 +178,7 @@ object Metamapper {
                 var done = false
                 var width = 2
                 while (!done) {
-                    val cell = metas[head.x][head.y]
+                    val cell = scratches[head.x][head.y]
                     if (cell.height > 0 && !cell.riverRun) {
                         cell.riverRun = true
                         val childExit = RiverExit(
@@ -149,7 +193,7 @@ object Metamapper {
                             width++
                         }
 
-                        val parent = metas[cell.riverParentX][cell.riverParentY]
+                        val parent = scratches[cell.riverParentX][cell.riverParentY]
                         val parentExit = RiverExit(
                             edge = XY(head.x - cell.riverParentX, head.y - cell.riverParentY),
                             width = if (cell.height > 1) width else (width * 2f).toInt()
@@ -168,7 +212,7 @@ object Metamapper {
             // Set wiggles and offsets now that we know every river connection
             for (x in 0 until chunkRadius*2) {
                 for (y in 0 until chunkRadius*2) {
-                    val cell = metas[x][y]
+                    val cell = scratches[x][y]
                     if (cell.riverExits.isNotEmpty()) {
 
                         val wiggle = 0.9f  // TODO : get from perlin
@@ -242,14 +286,20 @@ object Metamapper {
 
             // END STAGE : WRITE ALL DATA
 
-            Console.sayFromThread("Saving generated world to database...")
+            Console.sayFromThread("Saving generated world...")
             for (ix in -chunkRadius until chunkRadius) {
-                App.save.putWorldMetas(metas[ix + chunkRadius])
-                if (ix % 100 == 0) {
-                    Console.sayFromThread("wrote latitude ${ix * CHUNK_SIZE}...")
+                App.save.putWorldMetas(scratches[ix + chunkRadius])
+                ArrayList<ChunkMeta>().also {
+                    for (iy in -chunkRadius until chunkRadius) {
+                        it.add(scratches[ix + chunkRadius][iy + chunkRadius].toChunkMeta())
+                    }
+                    metas.add(it)
+                }
+                if (ix % 50 == 0) {
+                    Console.sayFromThread("...wrote latitude ${ix * CHUNK_SIZE}...")
                 }
             }
-            metas = Array(1) { Array(1) { ChunkScratch() } }
+            scratches = Array(1) { Array(1) { ChunkScratch() } }
 
             log.info("Metamapper completed!")
             isWorking = false

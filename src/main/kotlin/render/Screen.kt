@@ -22,6 +22,7 @@ import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
 import ui.modals.ContextMenu
+import ui.modals.MapModal
 import ui.modals.Modal
 import ui.modals.ToolbarAddModal
 import ui.panels.*
@@ -75,6 +76,7 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
+    val mapTileSet = MapTileSet()
     val terrainBatch = QuadBatch(terrainTileSet, tilt = QuadBatch.Tilt.FLAT)
     val thingBatch = QuadBatch(thingTileSet, tilt = QuadBatch.Tilt.POP)
     val actorBatch = QuadBatch(actorTileSet, tilt = QuadBatch.Tilt.POP)
@@ -86,6 +88,7 @@ object Screen : KtxScreen {
     val uiActorBatch = QuadBatch(actorTileSet)
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
+    val mapBatch = QuadBatch(mapTileSet, tilt = QuadBatch.Tilt.NONE)
     private val worldBatches = listOf(terrainBatch, thingBatch,  actorBatch, gearBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, gearBatch, fireBatch,
         uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)
@@ -640,6 +643,7 @@ object Screen : KtxScreen {
         Gdx.gl.glEnable(GL_BLEND)
 
         allBatches.forEach { it.clear() }
+        mapBatch.clear()
 
         App.level.forEachCellToRender(
             doTile = renderTile,
@@ -671,6 +675,9 @@ object Screen : KtxScreen {
                 panel.renderBackground()
                 panel.renderEntities()
             }
+            if (panel is MapModal) {
+                panel.renderMap(mapBatch)
+            }
         }
 
         // Calculate our render time before hitting the GPU
@@ -699,6 +706,10 @@ object Screen : KtxScreen {
                 panel.drawEverything()
             }
         }
+
+        Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL_BLEND)
+        mapBatch.draw()
     }
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio

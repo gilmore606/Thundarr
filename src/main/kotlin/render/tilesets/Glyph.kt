@@ -152,5 +152,22 @@ enum class Glyph {
     SPEAR,
 
     BLOODSTAIN,
-    SCORCHMARK
+    SCORCHMARK,
+
+    MAP_FOREST,
+    MAP_PLAIN,
+    MAP_WATER,
+    MAP_SWAMP,
+    MAP_DESERT,
+    MAP_RIVER_NSE,
+    MAP_RIVER_NSW,
+    MAP_RIVER_NWE,
+    MAP_RIVER_NS,
+    MAP_RIVER_WE,
+    MAP_RIVER_WES,
+    MAP_RIVER_WN,
+    MAP_RIVER_NE,
+    MAP_RIVER_WS,
+    MAP_RIVER_SE,
+    MAP_PLAYER
 }

@@ -1,20 +1,23 @@
 package world
 
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.XY
 
 // Metadata about how to construct a chunk.  Generated at worldgen.
 
 @Serializable
-enum class Biome {
-    OCEAN,
-    PLAIN,
-    FOREST,
-    MOUNTAIN,
-    SWAMP,
-    DESERT,
-    TUNDRA,
-    RUIN
+enum class Biome(
+    val mapGlyph: Glyph
+) {
+    OCEAN(Glyph.MAP_WATER),
+    PLAIN(Glyph.MAP_PLAIN),
+    FOREST(Glyph.MAP_FOREST),
+    MOUNTAIN(Glyph.MAP_PLAIN),
+    SWAMP(Glyph.MAP_SWAMP),
+    DESERT(Glyph.MAP_DESERT),
+    TUNDRA(Glyph.MAP_PLAIN),
+    RUIN(Glyph.MAP_PLAIN)
 }
 
 @Serializable

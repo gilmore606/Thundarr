@@ -4,7 +4,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import util.log
-import world.cartos.Metamapper
+import world.cartos.Metamap
 import world.persist.ChunkLoader
 
 class LoadingModal(text: String) : SplashModal(text) {
@@ -44,7 +44,7 @@ class LoadingModal(text: String) : SplashModal(text) {
         }
     }
 
-    private fun isLoading() = ChunkLoader.isWorking() || Metamapper.isWorking
+    private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking
 
     override fun dispose() {
         textBatch.dispose()
