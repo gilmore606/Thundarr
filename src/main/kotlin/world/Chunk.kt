@@ -120,7 +120,7 @@ class Chunk(
         while (tries > 0) {
             val x = Dice.range(x, x + width - 1)
             val y = Dice.range(y, y + height - 1)
-            if (isWalkableAt(x, y)) return XY(x,y)
+            return XY(x,y)
             tries--
         }
         throw RuntimeException("No space to put player in level!")

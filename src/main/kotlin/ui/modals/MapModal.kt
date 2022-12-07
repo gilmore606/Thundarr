@@ -7,9 +7,10 @@ import render.tilesets.Glyph
 import ui.input.Keyboard
 import ui.input.Mouse
 import util.*
+import world.Biome
 import world.cartos.Metamap
 
-class MapModal : Modal(860, 600, "- yOUr tRAvELs -") {
+class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     var mapx = 0
     var mapy = 0
@@ -41,8 +42,8 @@ class MapModal : Modal(860, 600, "- yOUr tRAvELs -") {
         if (isAnimating()) return
         val x0 = x + 30
         val y0 = y + 70
-        for (x in 0 until 50) {
-            for (y in 0 until 32) {
+        for (x in 0 until 70) {
+            for (y in 0 until 50) {
                 val meta = Metamap.metaAt(x+mapx, y+mapy)
                 val ox = x * cellSize
                 val oy = y * cellSize
@@ -51,7 +52,7 @@ class MapModal : Modal(860, 600, "- yOUr tRAvELs -") {
                 val px1 = px0 + cellSize
                 val py1 = py0 + cellSize / 4
                 batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.biome.mapGlyph))
-                if (meta.riverExits.isNotEmpty()) {
+                if (meta.biome != Biome.OCEAN && meta.riverExits.isNotEmpty()) {
                     var isNorth = false
                     var isSouth = false
                     var isEast = false

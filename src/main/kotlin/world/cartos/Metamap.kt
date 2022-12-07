@@ -21,9 +21,9 @@ object Metamap {
 
     var isWorking = false
 
-    val riverCount = 4500
-    val inlandSeaCount = 2
+    val riverDensity = 0.1f
     val maxRiverWidth = 10
+    val minMountainHeight = 10
 
     val outOfBoundsMeta = ChunkMeta(biome = Biome.OCEAN)
 
@@ -37,10 +37,38 @@ object Metamap {
         return true
     }
 
+    fun xToChunkX(x: Int) = (x - chunkRadius) * CHUNK_SIZE
+    fun yToChunkY(y: Int) = (y - chunkRadius) * CHUNK_SIZE
+    fun chunkXtoX(x: Int) = (x / CHUNK_SIZE) + chunkRadius
+    fun chunkYtoY(y: Int) = (y / CHUNK_SIZE) + chunkRadius
+
+    fun forEachMeta(doThis: (x: Int, y: Int)->Unit) {
+        for (x in 0 until chunkRadius * 2) {
+            for (y in 0 until chunkRadius * 2) {
+                doThis(x,y)
+            }
+        }
+    }
+
+    fun loadWorld() {
+        isWorking = true
+        coroutineScope.launch {
+            Console.sayFromThread("Loading world map...")
+
+            for (x in 0 until chunkRadius*2) {
+                val col = ArrayList<ChunkMeta>()
+                App.save.getWorldMetaColumn(xToChunkX(x)).forEach { col.add(chunkYtoY(it.y), it) }
+                metas.add(col)
+            }
+
+            Console.sayFromThread("Load completed!")
+            isWorking = false
+        }
+    }
+
     fun buildWorld() {
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
-
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
@@ -74,35 +102,35 @@ object Metamap {
                 scratches[0][i].height = 0
                 scratches[chunkRadius * 2 - 1][i].height = 0
             }
-            repeat (50) {
-                val x0 = Dice.zeroTil(chunkRadius*2-10)
-                val y0 = Dice.zeroTil(chunkRadius*2-10)
-                var x1 = x0 + Dice.zeroTo(4)
-                var y1 = y0 + Dice.zeroTo(4)
-                if (Dice.chance(0.3f)) {
-                    x1 = (x1 - x0) * (2 + Dice.oneTo(5)) + x0
-                    y1 = (y1 - y0) * (2 + Dice.oneTo(5)) + y0
-                }
-                for (x in x0 until x1) {
-                    for (y in y0 until y1) {
-                        if (boundsCheck(x,y)) scratches[x][y].height = 0
+            repeat (80) {
+                val x0 = Dice.zeroTil(chunkRadius*2-5)
+                val y0 = Dice.zeroTil(chunkRadius*2-5)
+                if ((!(x0 in 16..chunkRadius*2-16) && !(y0 in 16 .. chunkRadius*2-16)) || Dice.flip()) {
+                    var x1 = x0 + Dice.zeroTo(4)
+                    var y1 = y0 + Dice.zeroTo(4)
+                    if (Dice.chance(0.3f)) {
+                        x1 = (x1 - x0) * (2 + Dice.oneTo(5)) + x0
+                        y1 = (y1 - y0) * (2 + Dice.oneTo(5)) + y0
+                    }
+                    for (x in x0 until x1) {
+                        for (y in y0 until y1) {
+                            if (boundsCheck(x, y)) scratches[x][y].height = 0
+                        }
                     }
                 }
             }
             for (density in listOf(0.2f, 0.6f, 0.1f, 0.5f, 0.6f, 0.2f, 0.2f)) {
-                for (x in 0 until chunkRadius * 2) {
-                    for (y in 0 until chunkRadius * 2) {
-                        if (scratches[x][y].height == 0) {
-                            CARDINALS.forEach { dir ->
-                                if (boundsCheck(x+dir.x, y+dir.y)) {
-                                    val neighbor = scratches[x + dir.x][y + dir.y]
-                                    if ((neighbor.height == -1) && Dice.chance(density)) {
-                                        neighbor.height = -2
-                                        CARDINALS.forEach { ndir ->
-                                            if (boundsCheck(x+dir.x+ndir.x, y+dir.y+ndir.y)) {
-                                                val nn = scratches[x+dir.x+ndir.x][y+dir.y+ndir.y]
-                                                if (Dice.chance(density * 0.7f)) nn.height = -2
-                                            }
+                forEachMeta { x,y ->
+                    if (scratches[x][y].height == 0) {
+                        CARDINALS.forEach { dir ->
+                            if (boundsCheck(x+dir.x, y+dir.y)) {
+                                val neighbor = scratches[x + dir.x][y + dir.y]
+                                if ((neighbor.height == -1) && Dice.chance(density)) {
+                                    neighbor.height = -2
+                                    CARDINALS.forEach { ndir ->
+                                        if (boundsCheck(x+dir.x+ndir.x, y+dir.y+ndir.y)) {
+                                            val nn = scratches[x+dir.x+ndir.x][y+dir.y+ndir.y]
+                                            if (Dice.chance(density * 0.7f)) nn.height = -2
                                         }
                                     }
                                 }
@@ -110,10 +138,8 @@ object Metamap {
                         }
                     }
                 }
-                for (x in 0 until chunkRadius * 2) {
-                    for (y in 0 until chunkRadius * 2) {
-                        if (scratches[x][y].height == -2) scratches[x][y].height = 0
-                    }
+                forEachMeta { x,y ->
+                    if (scratches[x][y].height == -2) scratches[x][y].height = 0
                 }
             }
 
@@ -125,15 +151,13 @@ object Metamap {
             val mouths = ArrayList<XY>()
 
             // Set river mouths at all coast water
-            for (x in 0 until chunkRadius * 2) {
-                for (y in 0 until chunkRadius * 2) {
-                    if (scratches[x][y].height == 0) {
-                        if (CARDINALS.hasOneWhere {
-                            boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height == -1
-                            }) {
-                            mouths.add(XY(x,y))
-                            opens.add(XY(x,y))
-                        }
+            forEachMeta { x,y ->
+                if (scratches[x][y].height == 0) {
+                    if (CARDINALS.hasOneWhere {
+                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height == -1
+                        }) {
+                        mouths.add(XY(x,y))
+                        opens.add(XY(x,y))
                     }
                 }
             }
@@ -161,16 +185,61 @@ object Metamap {
                         opens.remove(open)
                     }
                 }
+                if (opens.size > 1000) {
+                    repeat((opens.size * 0.1f).toInt()) {
+                        val kill = opens.random()
+                        opens.remove(kill)
+                    }
+                }
             }
             for (ix in 0 until chunkRadius*2) {
                 for (iy in 0 until chunkRadius*2) {
                     if (!scratches[ix][iy].hasRiverChildren) {
                         springs.add(XY(ix,iy))
                     }
+                    if (scratches[ix][iy].height < 0) {
+                        scratches[ix][iy].height = 1
+                        scratches[ix][iy].riverRun = true
+                    }
                 }
             }
 
+            // Set mountaintops
+            forEachMeta { x,y ->
+                val height = scratches[x][y].height
+                if (height > minMountainHeight) {
+                    if (!DIRECTIONS.hasOneWhere {
+                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height > height
+                        }) {
+                        scratches[x][y].biome = Biome.MOUNTAIN
+                    }
+                }
+            }
+
+            // Grow mountain ranges
+            val mountainAdds = ArrayList<XY>()
+            var density = 0.7f
+            repeat (4) {
+                forEachMeta { x, y ->
+                    if (scratches[x][y].biome != Biome.MOUNTAIN) {
+                        var nearMounts = 0
+                        DIRECTIONS.forEach { dir ->
+                            if (boundsCheck(x + dir.x, y + dir.y) &&
+                                scratches[x + dir.x][y + dir.y].biome == Biome.MOUNTAIN) {
+                                nearMounts++
+                            }
+                        }
+                        if (nearMounts > 1 && Dice.chance(density)) {
+                            mountainAdds.add(XY(x, y))
+                        }
+                    }
+                }
+                mountainAdds.forEach { scratches[it.x][it.y].biome = Biome.MOUNTAIN }
+                density -= 0.13f
+            }
+
             // Make some of our slope paths into rivers
+            val riverCount = (springs.size * riverDensity).toInt()
             Console.sayFromThread("Running $riverCount rivers from ${springs.size} possible springs...")
             repeat (riverCount) {
                 val head = springs.random()
@@ -209,78 +278,79 @@ object Metamap {
                     }
                 }
             }
+
             // Set wiggles and offsets now that we know every river connection
-            for (x in 0 until chunkRadius*2) {
-                for (y in 0 until chunkRadius*2) {
-                    val cell = scratches[x][y]
-                    if (cell.riverExits.isNotEmpty()) {
+            forEachMeta { x,y ->
+                val cell = scratches[x][y]
+                if (cell.riverExits.isNotEmpty()) {
 
-                        val wiggle = 0.9f  // TODO : get from perlin
-                        cell.riverWiggle = wiggle
-                        cell.riverBlur = 0.3f
-                        cell.riverGrass = 0.8f
-                        cell.riverDirt = 0.2f
+                    val wiggle = 0.9f  // TODO : get from perlin
+                    cell.riverWiggle = wiggle
+                    cell.riverBlur = 0.3f
+                    cell.riverGrass = 0.8f
+                    cell.riverDirt = 0.2f
 
-                        var isNorth = false
-                        var isSouth = false
-                        var isEast = false
-                        var isWest = false
+                    var isNorth = false
+                    var isSouth = false
+                    var isEast = false
+                    var isWest = false
+                    cell.riverExits.forEach { exit ->
+                        when (exit.edge) {
+                            NORTH -> isNorth = true
+                            SOUTH -> isSouth = true
+                            WEST -> isWest = true
+                            else -> isEast = true
+                        }
+                    }
+                    val cornerPush = 8
+                    if (cell.riverExits.size != 2 || (isNorth && isSouth) || (isEast && isWest)) {
                         cell.riverExits.forEach { exit ->
-                            when (exit.edge) {
-                                NORTH -> isNorth = true
-                                SOUTH -> isSouth = true
-                                WEST -> isWest = true
-                                else -> isEast = true
-                            }
+                            setRiverOffset(exit, Dice.zeroTil((CHUNK_SIZE / 2f * wiggle).toInt()) - CHUNK_SIZE / 4)
                         }
-                        val cornerPush = 8
-                        if (cell.riverExits.size != 2 || (isNorth && isSouth) || (isEast && isWest)) {
-                            cell.riverExits.forEach { exit ->
-                                setRiverOffset(exit, Dice.zeroTil((CHUNK_SIZE / 2f * wiggle).toInt()) - CHUNK_SIZE / 4)
-                            }
-                        } else if ((isNorth && isEast) || (isSouth && isWest)) {
-                            cell.riverExits.firstOrNull { it.edge == NORTH || it.edge == WEST }?.also {
-                                setRiverOffset(it, cornerPush)
-                            }
-                            cell.riverExits.firstOrNull { it.edge == EAST || it.edge == SOUTH }?.also {
-                                setRiverOffset(it, -cornerPush)
-                            }
-                        } else if ((isNorth && isWest)) {
-                            cell.riverExits.firstOrNull { it.edge == NORTH }?.also {
-                                setRiverOffset(it, -cornerPush)
-                            }
-                            cell.riverExits.firstOrNull { it.edge == WEST }?.also {
-                                setRiverOffset(it, -cornerPush)
-                            }
-                        } else if ((isSouth && isEast)) {
-                            cell.riverExits.firstOrNull { it.edge == SOUTH }?.also {
-                                setRiverOffset(it,  cornerPush)
-                            }
-                            cell.riverExits.firstOrNull { it.edge == EAST }?.also {
-                                setRiverOffset(it, cornerPush)
+                    } else if ((isNorth && isEast) || (isSouth && isWest)) {
+                        cell.riverExits.firstOrNull { it.edge == NORTH || it.edge == WEST }?.also {
+                            setRiverOffset(it, cornerPush)
+                        }
+                        cell.riverExits.firstOrNull { it.edge == EAST || it.edge == SOUTH }?.also {
+                            setRiverOffset(it, -cornerPush)
+                        }
+                    } else if ((isNorth && isWest)) {
+                        cell.riverExits.firstOrNull { it.edge == NORTH }?.also {
+                            setRiverOffset(it, -cornerPush)
+                        }
+                        cell.riverExits.firstOrNull { it.edge == WEST }?.also {
+                            setRiverOffset(it, -cornerPush)
+                        }
+                    } else if ((isSouth && isEast)) {
+                        cell.riverExits.firstOrNull { it.edge == SOUTH }?.also {
+                            setRiverOffset(it,  cornerPush)
+                        }
+                        cell.riverExits.firstOrNull { it.edge == EAST }?.also {
+                            setRiverOffset(it, cornerPush)
+                        }
+                    }
+                }
+
+                // Set coasts
+                if (cell.height > 0) {
+                    DIRECTIONS.forEach { dir ->
+                        metaAt(x + dir.x, y + dir.y)?.also { neighbor ->
+                            if (neighbor.height == 0) {
+                                cell.coasts.add(dir)
                             }
                         }
                     }
+                }
 
-                    // Set coasts
-                    if (cell.height > 0) {
-                        DIRECTIONS.forEach { dir ->
-                            metaAt(x + dir.x, y + dir.y)?.also { neighbor ->
-                                if (neighbor.height == 0) {
-                                    cell.coasts.add(dir)
-                                }
-                            }
-                        }
-                    }
-
-                    // Set biome
+                // Set biome
+                if (cell.biome == Biome.BLANK) {
                     if (cell.height == 0) {
                         cell.biome = Biome.OCEAN
                     } else {
                         cell.biome = Biome.PLAIN
                     }
-
                 }
+
             }
 
 
@@ -301,7 +371,7 @@ object Metamap {
             }
             scratches = Array(1) { Array(1) { ChunkScratch() } }
 
-            log.info("Metamapper completed!")
+            Console.sayFromThread("The world is new.")
             isWorking = false
         }
     }

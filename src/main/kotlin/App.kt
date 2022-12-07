@@ -169,6 +169,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             LevelKeeper.hibernateAll()
 
             val state = save.getWorldState()
+            Metamap.loadWorld()
+            while (Metamap.isWorking) {
+                delay(250L)
+            }
 
             level = LevelKeeper.getLevel(state.levelId)
             if (level !is WorldLevel) LevelKeeper.getLevel("world")

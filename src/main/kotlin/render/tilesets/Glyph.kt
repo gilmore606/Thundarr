@@ -159,6 +159,7 @@ enum class Glyph {
     MAP_WATER,
     MAP_SWAMP,
     MAP_DESERT,
+    MAP_MOUNTAIN,
     MAP_RIVER_NSE,
     MAP_RIVER_NSW,
     MAP_RIVER_NWE,

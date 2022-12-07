@@ -10,10 +10,11 @@ import util.XY
 enum class Biome(
     val mapGlyph: Glyph
 ) {
+    BLANK(Glyph.BLANK),
     OCEAN(Glyph.MAP_WATER),
     PLAIN(Glyph.MAP_PLAIN),
     FOREST(Glyph.MAP_FOREST),
-    MOUNTAIN(Glyph.MAP_PLAIN),
+    MOUNTAIN(Glyph.MAP_MOUNTAIN),
     SWAMP(Glyph.MAP_SWAMP),
     DESERT(Glyph.MAP_DESERT),
     TUNDRA(Glyph.MAP_PLAIN),
@@ -31,7 +32,7 @@ class ChunkMeta(
     val riverGrass: Float = 0f,
     val riverDirt: Float = 0f,
     val coasts: MutableList<XY> = mutableListOf(),
-    val biome: Biome = Biome.OCEAN
+    val biome: Biome = Biome.BLANK
 )
 
 @Serializable
@@ -56,7 +57,7 @@ class ChunkScratch(
     var riverGrass = 0f
     var riverDirt = 0f
     var coasts: MutableList<XY> = mutableListOf()
-    var biome = Biome.OCEAN
+    var biome = Biome.BLANK
 
     var riverExits: MutableList<RiverExit> = mutableListOf()
 

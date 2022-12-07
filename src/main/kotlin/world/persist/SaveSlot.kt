@@ -130,6 +130,12 @@ class SaveSlot(
         }
     }
 
+    suspend fun getWorldMetaColumn(x: Int) = transaction {
+        WorldMetaTable.select {
+            WorldMetaTable.x eq x
+        }.map { fromCompressed<ChunkMeta>(it[WorldMetaTable.data]) }
+    }
+
     suspend fun putWorldMetas(metas: Array<ChunkScratch>) = transaction {
         metas.forEach { meta ->
             WorldMetaTable.insert {
