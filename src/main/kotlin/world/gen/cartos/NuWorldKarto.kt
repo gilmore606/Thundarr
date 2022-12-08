@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen.cartos
 
 import App
 import world.Chunk

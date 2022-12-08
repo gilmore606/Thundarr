@@ -4,7 +4,7 @@ import actors.stats.Heart
 import kotlinx.serialization.Serializable
 import render.Screen
 import util.*
-import world.cartos.LevelCarto
+import world.gen.cartos.LevelCarto
 import world.journal.JournalEntry
 import world.level.EnclosedLevel
 import kotlin.random.Random

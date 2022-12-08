@@ -1,4 +1,4 @@
-package world.cartos.prefabs
+package world.gen.prefabs
 
 import kotlinx.serialization.Serializable
 import world.terrains.Terrain

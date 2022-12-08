@@ -3,24 +3,11 @@ package world
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
+import world.gen.biomes.Biome
+import world.gen.biomes.Blank
 
 // Metadata about how to construct a chunk.  Generated at worldgen.
 
-@Serializable
-enum class Biome(
-    val mapGlyph: Glyph
-) {
-    BLANK(Glyph.BLANK),
-    OCEAN(Glyph.MAP_WATER),
-    GLACIER(Glyph.MAP_GLACIER),
-    PLAIN(Glyph.MAP_PLAIN),
-    FOREST(Glyph.MAP_FOREST),
-    MOUNTAIN(Glyph.MAP_MOUNTAIN),
-    SWAMP(Glyph.MAP_SWAMP),
-    DESERT(Glyph.MAP_DESERT),
-    TUNDRA(Glyph.MAP_PLAIN),
-    RUIN(Glyph.MAP_PLAIN)
-}
 
 @Serializable
 class ChunkMeta(
@@ -33,7 +20,7 @@ class ChunkMeta(
     val riverGrass: Float = 0f,
     val riverDirt: Float = 0f,
     val coasts: MutableList<XY> = mutableListOf(),
-    val biome: Biome = Biome.BLANK
+    val biome: Biome = Blank
 )
 
 @Serializable
@@ -62,7 +49,7 @@ class ChunkScratch(
     var dryness = -1
     var heat = -1
     var coasts: MutableList<XY> = mutableListOf()
-    var biome = Biome.BLANK
+    var biome: Biome = Blank
 
     fun toChunkMeta() = ChunkMeta(
         x = x,

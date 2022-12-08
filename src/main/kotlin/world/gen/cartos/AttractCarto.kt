@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen.cartos
 
 import actors.Herder
 import actors.MuskOx

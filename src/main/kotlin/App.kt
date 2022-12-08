@@ -15,7 +15,7 @@ import ui.modals.*
 import ui.panels.*
 import util.*
 import world.StarterDungeon
-import world.cartos.Metamap
+import world.gen.Metamap
 import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel

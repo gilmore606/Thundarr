@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen.cartos
 
 import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.launch
@@ -10,8 +10,8 @@ import things.Thing
 import util.*
 import world.Chunk
 import world.level.Level
-import world.cartos.prefabs.Prefab
-import world.cartos.prefabs.TiledFile
+import world.gen.prefabs.Prefab
+import world.gen.prefabs.TiledFile
 import world.level.CHUNK_SIZE
 import world.terrains.Floor
 import world.terrains.Terrain

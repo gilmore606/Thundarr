@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen.cartos
 
 import App
 import actors.Herder
@@ -10,6 +10,7 @@ import ktx.async.KtxAsync
 import things.*
 import util.*
 import world.*
+import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.persist.LevelKeeper
@@ -39,7 +40,7 @@ class WorldCarto(
     suspend fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
         val meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
 
-        if (meta.biome == Biome.OCEAN) {
+        if (meta.biome == Ocean) {
 
             carveRoom(Rect(x0,y0,x1,y1), 0, Terrain.Type.TERRAIN_DEEP_WATER)
 

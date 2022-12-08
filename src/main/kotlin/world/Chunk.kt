@@ -12,8 +12,8 @@ import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
-import world.cartos.AttractCarto
-import world.cartos.WorldCarto
+import world.gen.cartos.AttractCarto
+import world.gen.cartos.WorldCarto
 import world.level.AttractLevel
 import world.level.EnclosedLevel
 import world.level.Level

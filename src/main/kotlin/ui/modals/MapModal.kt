@@ -7,8 +7,8 @@ import render.tilesets.Glyph
 import ui.input.Keyboard
 import ui.input.Mouse
 import util.*
-import world.Biome
-import world.cartos.Metamap
+import world.gen.Metamap
+import world.gen.biomes.Ocean
 import java.lang.Integer.max
 import java.lang.Integer.min
 
@@ -56,7 +56,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                 val px1 = px0 + cellSize
                 val py1 = py0 + cellSize / 4
                 batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.biome.mapGlyph))
-                if (meta.biome != Biome.OCEAN && meta.riverExits.isNotEmpty()) {
+                if (meta.biome != Ocean && meta.riverExits.isNotEmpty()) {
                     var isNorth = false
                     var isSouth = false
                     var isEast = false

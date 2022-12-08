@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen
 
 import App
 import kotlinx.coroutines.CoroutineScope
@@ -6,11 +6,13 @@ import kotlinx.coroutines.launch
 import ktx.async.newSingleThreadAsyncContext
 import ui.panels.Console
 import util.*
-import world.Biome
 import world.ChunkMeta
 import world.ChunkScratch
 import world.RiverExit
+import world.gen.biomes.Biome
+import world.gen.biomes.*
 import world.level.CHUNK_SIZE
+import java.lang.Integer.min
 
 object Metamap {
 
@@ -21,13 +23,15 @@ object Metamap {
 
     var isWorking = false
 
-    val riverDensity = 0.4f
+    val bigRiverDensity = 0.4f
+    val smallRiverDensity = 0.1f
     val riverBranching = 0.25f
     val maxRiverWidth = 10
+    val riverWidth = 0.15f
     val minMountainHeight = 20
     val isolatedMountainDensity = 0.2f
 
-    val outOfBoundsMeta = ChunkMeta(biome = Biome.OCEAN)
+    val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
     private var scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
     val metas = ArrayList<ArrayList<ChunkMeta>>()
@@ -47,7 +51,7 @@ object Metamap {
     fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
         for (x in 0 until chunkRadius * 2) {
             for (y in 0 until chunkRadius * 2) {
-                doThis(x,y,scratches[x][y])
+                doThis(x,y, scratches[x][y])
             }
         }
     }
@@ -57,7 +61,7 @@ object Metamap {
         coroutineScope.launch {
             Console.sayFromThread("Loading world map...")
 
-            for (x in 0 until chunkRadius*2) {
+            for (x in 0 until chunkRadius *2) {
                 val col = ArrayList<ChunkMeta>()
                 App.save.getWorldMetaColumn(xToChunkX(x)).forEach { col.add(chunkYtoY(it.y), it) }
                 metas.add(col)
@@ -98,36 +102,36 @@ object Metamap {
             }
 
             // CONTINENT
-            for (i in 0 until chunkRadius*2) {
+            for (i in 0 until chunkRadius *2) {
                 scratches[i][0].height = 0
                 scratches[i][chunkRadius * 2 - 1].height = 0
                 scratches[0][i].height = 0
                 scratches[chunkRadius * 2 - 1][i].height = 0
             }
             // Cut squares out of edge coast
-            for (i in 0 until chunkRadius*2) {
+            for (i in 0 until chunkRadius *2) {
                 if (Dice.chance(0.1f)) {
                     val w = Dice.range(4,25)
                     val h = Dice.range(4,25)
                     val edge = CARDINALS.random()
                     val x0 = when (edge) {
                         NORTH, SOUTH -> i
-                        EAST -> (chunkRadius*2-1)-w
+                        EAST -> (chunkRadius *2-1)-w
                         else -> 0
                     }
                     val x1 = when (edge) {
                         NORTH, SOUTH -> i + w
-                        EAST -> chunkRadius*2-1
+                        EAST -> chunkRadius *2-1
                         else -> w
                     }
                     val y0 = when (edge) {
                         NORTH -> 0
-                        SOUTH -> (chunkRadius*2-1)-h
+                        SOUTH -> (chunkRadius *2-1)-h
                         else -> i
                     }
                     val y1 = when (edge) {
                         NORTH -> h
-                        SOUTH -> (chunkRadius*2-1)
+                        SOUTH -> (chunkRadius *2-1)
                         else -> i + h
                     }
                     for (x in x0 until x1) {
@@ -140,9 +144,9 @@ object Metamap {
             }
             // Cut square seas, preferably around the edge
             repeat (100) {
-                val x0 = Dice.zeroTil(chunkRadius*2-5)
-                val y0 = Dice.zeroTil(chunkRadius*2-5)
-                if ((!(x0 in 32..chunkRadius*2-32) && !(y0 in 32 .. chunkRadius*2-32)) || Dice.chance(0.15f)) {
+                val x0 = Dice.zeroTil(chunkRadius *2-5)
+                val y0 = Dice.zeroTil(chunkRadius *2-5)
+                if ((!(x0 in 32..chunkRadius *2-32) && !(y0 in 32 .. chunkRadius *2-32)) || Dice.chance(0.15f)) {
                     var x1 = x0 + Dice.range(3, 12)
                     var y1 = y0 + Dice.range(3, 12)
                     if (Dice.chance(0.3f)) {
@@ -186,10 +190,9 @@ object Metamap {
             Console.sayFromThread("Stirring the face of the waters...")
 
             val opens = ArrayList<XY>()
-            val springs = ArrayList<XY>()
             val coasts = ArrayList<XY>()
 
-            // Set river mouths at all coast water
+            // Set coasts at all coast water
             forEachMeta { x,y,cell ->
                 if (cell.height == 0) {
                     if (CARDINALS.hasOneWhere {
@@ -231,12 +234,9 @@ object Metamap {
                     }
                 }
             }
-            // Find all river springs
-            for (ix in 0 until chunkRadius*2) {
-                for (iy in 0 until chunkRadius*2) {
-                    if (scratches[ix][iy].riverChildren.isEmpty()) {
-                        springs.add(XY(ix,iy))
-                    }
+            // Fix any height=-1 cells that got missed somehow in sloping
+            for (ix in 0 until chunkRadius *2) {
+                for (iy in 0 until chunkRadius *2) {
                     if (scratches[ix][iy].height < 0) scratches[ix][iy].height = 1
                 }
             }
@@ -248,7 +248,7 @@ object Metamap {
                     if (!DIRECTIONS.hasOneWhere {
                         boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height > height
                         }) {
-                        scratches[x][y].biome = Biome.MOUNTAIN
+                        scratches[x][y].biome = Mountain
                     }
                 }
             }
@@ -258,21 +258,21 @@ object Metamap {
             var density = 0.8f
             repeat (3) {
                 forEachMeta { x,y,cell ->
-                    if (cell.biome != Biome.MOUNTAIN) {
-                        var nearMounts = biomeNeighbors(x,y,Biome.MOUNTAIN, true)
+                    if (cell.biome != Mountain) {
+                        var nearMounts = biomeNeighbors(x,y,Mountain, true)
                         if (nearMounts > 1 && Dice.chance(density)) {
                             mountainAdds.add(XY(x, y))
                         }
                     }
                 }
-                mountainAdds.forEach { scratches[it.x][it.y].biome = Biome.MOUNTAIN }
+                mountainAdds.forEach { scratches[it.x][it.y].biome = Mountain }
                 density *= 0.5f
             }
 
             // Filter out most isolated mountain cells
             forEachMeta { x,y,cell ->
-                if ((cell.biome == Biome.MOUNTAIN) && biomeNeighbors(x,y,Biome.MOUNTAIN) < 1) {
-                    if (!Dice.chance(isolatedMountainDensity)) cell.biome = Biome.PLAIN
+                if ((cell.biome == Mountain) && biomeNeighbors(x,y,Mountain) < 1) {
+                    if (!Dice.chance(isolatedMountainDensity)) cell.biome = Plain
                 }
             }
 
@@ -280,29 +280,31 @@ object Metamap {
             Console.sayFromThread("Freezing ice cap..")
             forEachMeta { x,y,cell ->
                 if (y < 20 && cell.height == 0) {
-                    cell.biome = Biome.GLACIER
-                    springs.removeIf { it.x == x && it.y == y }
+                    cell.biome = Glacier
                 }
             }
             for (y in 20..30) {
-                for (x in 0 until chunkRadius*2) {
-                    if ((scratches[x][y-1].biome == Biome.GLACIER) && Dice.chance(1f - (y - 20) * 0.09f)) {
-                        scratches[x][y].biome = Biome.GLACIER
+                for (x in 0 until chunkRadius *2) {
+                    if ((scratches[x][y-1].biome == Glacier) && Dice.chance(1f - (y - 20) * 0.09f)) {
+                        scratches[x][y].biome = Glacier
                     }
                 }
             }
 
-            // Pick some river mouths from coast cells
+            // Run rivers from coast cells
             val mouths = mutableListOf<XY>()
             coasts.forEach { coast ->
-                if (Dice.chance(riverDensity) && scratches[coast.x][coast.y].biome != Biome.GLACIER) mouths.add(coast)
+                if (scratches[coast.x][coast.y].biome != Glacier) {
+                    countRiverDescendants(coast)
+                    if (scratches[coast.x][coast.y].riverDescendantCount > 30) {
+                        if (Dice.chance(bigRiverDensity)) mouths.add(coast)
+                    } else {
+                        if (Dice.chance(smallRiverDensity)) mouths.add(coast)
+                    }
+                }
             }
-            // Recurse up each mouth, marking all branching river exits
             Console.sayFromThread("Running ${mouths.size} rivers from ${coasts.size} possible coasts...")
-            mouths.forEach { mouth ->
-                countRiverDescendantsAndSetWidths(mouth)
-                runRiver(mouth)
-            }
+            mouths.forEach { runRiver(it) }
 
             // Calculate moisture
             Console.sayFromThread("Moisturizing biomes...")
@@ -395,13 +397,13 @@ object Metamap {
                 }
 
                 // Set biome
-                if (cell.biome == Biome.BLANK) {
+                if (cell.biome == Blank) {
                     if (cell.height == 0) {
-                        cell.biome = Biome.OCEAN
+                        cell.biome = Ocean
                     } else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
-                        cell.biome = Biome.DESERT
+                        cell.biome = Desert
                     } else {
-                        cell.biome = Biome.PLAIN
+                        cell.biome = Plain
                     }
                 }
 
@@ -430,7 +432,7 @@ object Metamap {
         }
     }
 
-    private fun countRiverDescendantsAndSetWidths(mouth: XY) {
+    private fun countRiverDescendants(mouth: XY) {
         val springs = findRiverSprings(mouth)
         springs.forEach { spring ->
             var done = false
@@ -473,8 +475,9 @@ object Metamap {
             cell.riverChildren.forEachIndexed { n, child ->
                 if (child == longest || Dice.chance(riverBranching)) {
                     val childCell = scratches[child.x][child.y]
-                    val myExit = RiverExit(dest = child, edge = XY(child.x - cursor.x, child.y - cursor.y))
-                    val childExit = RiverExit(dest = cursor, edge = XY(cursor.x - child.x, cursor.y - child.y))
+                    val width = min(1 + (childCell.riverDescendantCount * riverWidth).toInt(), maxRiverWidth)
+                    val myExit = RiverExit(dest = child, edge = XY(child.x - cursor.x, child.y - cursor.y), width = width)
+                    val childExit = RiverExit(dest = cursor, edge = XY(cursor.x - child.x, cursor.y - child.y), width = width)
                     childExit.otherSide = myExit
                     myExit.otherSide = childExit
                     cell.riverExits.add(myExit)

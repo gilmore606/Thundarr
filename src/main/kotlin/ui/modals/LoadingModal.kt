@@ -4,7 +4,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import util.log
-import world.cartos.Metamap
+import world.gen.Metamap
 import world.persist.ChunkLoader
 
 class LoadingModal(text: String) : SplashModal(text) {

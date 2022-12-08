@@ -1,9 +1,9 @@
-package world.cartos
+package world.gen.cartos
 
 import kotlinx.serialization.json.Json
 import util.*
 import world.Chunk
-import world.cartos.prefabs.Prefab
+import world.gen.prefabs.Prefab
 import world.level.Level
 import world.terrains.Floor
 import world.terrains.Terrain

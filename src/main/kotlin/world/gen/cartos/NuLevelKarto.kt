@@ -1,4 +1,4 @@
-package world.cartos
+package world.gen.cartos
 
 import world.Chunk
 import world.level.Level
