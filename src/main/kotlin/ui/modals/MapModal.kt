@@ -9,12 +9,14 @@ import ui.input.Mouse
 import util.*
 import world.Biome
 import world.cartos.Metamap
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     var mapx = 0
     var mapy = 0
-    var cellSize = 16
+    var cellSize = 10
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -26,6 +28,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     override fun onKeyDown(keycode: Int) {
         if (keycode == Input.Keys.ESCAPE) dismiss()
+        else if (keycode == Input.Keys.MINUS) cellSize = max(6, cellSize - 1)
+        else if (keycode == Input.Keys.EQUALS) cellSize = min(20, cellSize + 1)
         else when (Keyboard.moveKeys[keycode]) {
             NORTH -> mapy--
             SOUTH -> mapy++
@@ -42,8 +46,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         if (isAnimating()) return
         val x0 = x + 30
         val y0 = y + 70
-        for (x in 0 until 70) {
-            for (y in 0 until 50) {
+        for (x in 0 until (1120 / cellSize)) {
+            for (y in 0 until (800 / cellSize)) {
                 val meta = Metamap.metaAt(x+mapx, y+mapy)
                 val ox = x * cellSize
                 val oy = y * cellSize

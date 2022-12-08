@@ -12,6 +12,7 @@ enum class Biome(
 ) {
     BLANK(Glyph.BLANK),
     OCEAN(Glyph.MAP_WATER),
+    GLACIER(Glyph.MAP_GLACIER),
     PLAIN(Glyph.MAP_PLAIN),
     FOREST(Glyph.MAP_FOREST),
     MOUNTAIN(Glyph.MAP_MOUNTAIN),
@@ -38,7 +39,8 @@ class ChunkMeta(
 @Serializable
 class RiverExit(
     var edge: XY,
-    var width: Int,
+    var dest: XY,
+    var width: Int = 4,
     var offset: Int = -999,
     var otherSide: RiverExit? = null  // only used during scratch metamapper gen
 )
@@ -50,16 +52,17 @@ class ChunkScratch(
     var height = -1
     var riverParentX = -1
     var riverParentY = -1
-    var hasRiverChildren = false
-    var riverRun = false
+    var riverChildren: MutableList<XY> = mutableListOf()
+    var riverDescendantCount = 0
+    var riverExits: MutableList<RiverExit> = mutableListOf()
     var riverWiggle = 0f
     var riverBlur = 0f
     var riverGrass = 0f
     var riverDirt = 0f
+    var dryness = -1
+    var heat = -1
     var coasts: MutableList<XY> = mutableListOf()
     var biome = Biome.BLANK
-
-    var riverExits: MutableList<RiverExit> = mutableListOf()
 
     fun toChunkMeta() = ChunkMeta(
         x = x,
