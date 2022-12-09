@@ -146,3 +146,9 @@ object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH) {
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
+
+object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH) {
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS)
+    override fun moveSpeed(actor: Actor) = 1.3f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+}

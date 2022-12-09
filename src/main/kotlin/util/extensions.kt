@@ -231,6 +231,11 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
     return str
 }
 
+fun <T>MutableSet<Pair<T,Float>>.addIfHeavier(item: T, weight: Float) {
+    removeIf { it.first == item && it.second < weight }
+    add(Pair(item, weight))
+}
+
 fun isEveryFrame(frames: Int): Boolean = (Screen.timeMs % frames.toLong() == 0L)
 
 fun groundAtPlayer() = App.level.cellContainerAt(App.player.xy.x, App.player.xy.y)

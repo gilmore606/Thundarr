@@ -10,6 +10,7 @@ import ktx.async.KtxAsync
 import things.*
 import util.*
 import world.*
+import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.level.Level
@@ -34,10 +35,10 @@ class WorldCarto(
     val forStarter: Boolean = false
 ) : Carto(x0, y0, x1, y1, chunk, level) {
 
-    val scale = 0.02
-    val fullness = 0.002
+    val chunkBlendWidth = 6
+    val chunkBlendCornerRadius = 4
 
-    suspend fun carveWorldChunk(offset: Double = 0.0, forAttract: Boolean = false) {
+    suspend fun carveWorldChunk() {
         val meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
 
         if (meta.biome == Ocean) {
@@ -46,18 +47,83 @@ class WorldCarto(
 
         } else {
 
-            forEachCell { x, y ->
-                val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
-                        Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
-                if (n > fullness * scale - Dice.float(0f, 0.18f).toDouble()) {
-                    carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
-                } else {
-                    carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
+//            forEachCell { x, y ->
+//                val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) +
+//                        Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
+//                if (n > fullness * scale - Dice.float(0f, 0.18f).toDouble()) {
+//                    carve(x, y, 0, Terrain.Type.TERRAIN_DIRT)
+//                } else {
+//                    carve(x, y, 0, Terrain.Type.TERRAIN_GRASS)
+//                }
+//                val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
+//                        Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
+//                if (n2 > 0.02) {
+//                    carve(x, y, 0, Terrain.Type.TERRAIN_FORESTWALL)
+//                }
+//            }
+
+            // Carve base terrain (blend chunk edges if necessary)
+            var hasBlends = false
+            val neighborMetas = mutableMapOf<XY,ChunkMeta?>().apply {
+                DIRECTIONS.forEach { dir ->
+                    val neighbor = App.save.getWorldMeta(x0 + dir.x * CHUNK_SIZE, y0 + dir.y * CHUNK_SIZE)
+                    if (neighbor == null || neighbor.biome == Ocean || neighbor.biome == meta.biome) {
+                        set(dir, null)
+                    } else {
+                        set(dir, neighbor)
+                        hasBlends = true
+                    }
                 }
-                val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) +
-                        Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
-                if (n2 > 0.02) {
-                    carve(x, y, 0, Terrain.Type.TERRAIN_FORESTWALL)
+            }
+            if (!hasBlends) {
+                forEachCell { x,y ->
+                    carve(x, y, 0, meta.biome.terrainAt(x,y))
+                }
+            } else {
+                val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>().apply {
+                    add(Pair(meta.biome, 1f))
+                } } }
+                // Blend sides
+                for (i in 0 until CHUNK_SIZE) {
+                    for (j in 0 until chunkBlendWidth) {
+                        val neighborWeight = 1f - (j * (1f / chunkBlendWidth))
+                        neighborMetas[NORTH]?.also { blendMap[i][j].add(Pair(it.biome, neighborWeight)) }
+                        neighborMetas[SOUTH]?.also { blendMap[i][CHUNK_SIZE-j-1].add(Pair(it.biome, neighborWeight)) }
+                        neighborMetas[WEST]?.also { blendMap[j][i].add(Pair(it.biome, neighborWeight)) }
+                        neighborMetas[EAST]?.also { blendMap[CHUNK_SIZE-j-1][i].add(Pair(it.biome, neighborWeight)) }
+                    }
+                }
+                // Blend corners
+                val maxWidth = chunkBlendWidth + chunkBlendCornerRadius
+                for (i in 0 until maxWidth) {
+                    for (j in 0 until maxWidth) {
+                        val neighborWeight = 1f - (i+j).toFloat()/(maxWidth*2).toFloat()
+                        val outsideCornerWeight = kotlin.math.max(0f, neighborWeight - 0.5f)
+                        neighborMetas[NORTHWEST]?.also { blendMap[i][j].addIfHeavier(it.biome,
+                            if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                        neighborMetas[NORTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][j].addIfHeavier(it.biome,
+                            if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                        neighborMetas[SOUTHWEST]?.also { blendMap[i][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
+                            if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                        neighborMetas[SOUTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
+                            if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                    }
+                }
+                // Execute the blend map
+                forEachCell { x,y ->
+                    val weights = blendMap[x-x0][y-y0]
+                    var weightTotal = 0f
+                    weights.forEach { weightTotal += it.second }
+                    var roll = Dice.float(0f, weightTotal)
+                    var biome: Biome? = null
+                    weights.forEach {
+                        if (biome == null && roll <= it.second) {
+                            biome = it.first
+                        } else {
+                            roll -= it.second
+                        }
+                    }
+                    carve(x, y, 0, (biome ?: meta.biome).terrainAt(x,y))
                 }
             }
 

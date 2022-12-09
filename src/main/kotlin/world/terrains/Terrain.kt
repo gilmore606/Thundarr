@@ -33,6 +33,7 @@ sealed class Terrain(
             Type.TERRAIN_GRASS -> Grass
             Type.TERRAIN_SWAMP -> Swamp
             Type.TERRAIN_BEACH -> Beach
+            Type.TERRAIN_SAND -> Sand
             Type.TERRAIN_SHALLOW_WATER -> ShallowWater
             Type.TERRAIN_DEEP_WATER -> DeepWater
             Type.GENERIC_WATER -> ScratchWater
@@ -64,6 +65,7 @@ sealed class Terrain(
         TERRAIN_GRASS,
         TERRAIN_SWAMP,
         TERRAIN_BEACH,
+        TERRAIN_SAND,
         TERRAIN_SHALLOW_WATER,
         TERRAIN_DEEP_WATER,
         TERRAIN_PORTAL_DOOR,
