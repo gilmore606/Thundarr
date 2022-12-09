@@ -4,6 +4,10 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
 import util.Perlin
+import util.Rect
+import util.XY
+import world.gen.cartos.Carto
+import world.gen.cartos.WorldCarto
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 
@@ -13,6 +17,7 @@ sealed class Biome(
     val baseTerrain: Terrain.Type
 ) {
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
+    open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
 }
 
 @Serializable
@@ -44,6 +49,15 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
+
+
+}
+
+@Serializable
+object Forest : Biome(
+    Glyph.MAP_FOREST,
+    TERRAIN_GRASS
+) {
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val offset = 0.0
         val scale = 0.02
@@ -56,14 +70,20 @@ object Plain : Biome(
         }
         return TERRAIN_DIRT
     }
-}
 
-@Serializable
-object Forest : Biome(
-    Glyph.MAP_FOREST,
-    TERRAIN_GRASS
-) {
-
+    override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
+        for (x in bounds.x0 .. bounds.x1) {
+            for (y in bounds.y0 .. bounds.y1) {
+                val wx = x + carto.chunk.x
+                val wy = y + carto.chunk.y
+                if (carto.getTerrain(wx, wy) == Terrain.Type.TERRAIN_FORESTWALL) {
+                    if (carto.neighborCount(wx,wy, Terrain.Type.TERRAIN_FORESTWALL) < 1) {
+                        carto.setTerrain(wx,wy,TERRAIN_GRASS)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Serializable

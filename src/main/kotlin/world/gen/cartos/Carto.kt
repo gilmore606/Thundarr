@@ -44,8 +44,8 @@ abstract class Carto(
         }
     }
 
-    protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
-    protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
+    fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
+    fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
@@ -148,7 +148,7 @@ abstract class Carto(
         }
     }
 
-    protected fun neighborCount(x: Int, y: Int, type: Terrain.Type): Int {
+    fun neighborCount(x: Int, y: Int, type: Terrain.Type): Int {
         var c = 0
         if (getTerrain(x-1,y) == type) c++
         if (getTerrain(x+1,y) == type) c++
@@ -161,7 +161,7 @@ abstract class Carto(
         return c
     }
 
-    protected fun neighborCount(x: Int, y: Int, match: (Terrain.Type)->Boolean): Int {
+    fun neighborCount(x: Int, y: Int, match: (Terrain.Type)->Boolean): Int {
         var c = 0
         if (match(getTerrain(x-1,y))) c++
         if (match(getTerrain(x+1,y))) c++
@@ -304,7 +304,7 @@ abstract class Carto(
         }
     }
 
-    protected fun drawRiver(start: XY, end: XY, startWidth: Int, endWidth: Int, wiggle: Float) {
+    protected fun oldDrawRiver(start: XY, end: XY, startWidth: Int, endWidth: Int, wiggle: Float) {
         val stepX: Float
         val stepY: Float
         var stepsLeft: Int
