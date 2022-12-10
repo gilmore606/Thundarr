@@ -22,4 +22,6 @@ object Dice {
     fun range(min: Int, max: Int) = random.nextInt(max - min) + min
 
     fun skillCheck() = (random.nextInt(6) + random.nextInt(6) + random.nextInt(6) + 3).toFloat()
+
+    fun sign() = if (flip()) -1 else 1
 }

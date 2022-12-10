@@ -78,14 +78,6 @@ object Metamap {
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
-        fun setRiverOffset(exit: RiverExit, offset: Int) {
-            if (exit.offset == -999) {
-                exit.offset = offset
-                exit.otherSide?.offset = offset
-                exit.otherSide = null
-            }
-        }
-
         isWorking = true
         coroutineScope.launch {
             Console.sayFromThread("Breaking the moon in half...")
@@ -304,7 +296,7 @@ object Metamap {
                 }
             }
             Console.sayFromThread("Running ${mouths.size} rivers from ${coasts.size} possible coasts...")
-            mouths.forEach { runRiver(it) }
+            mouths.forEach { runRiver(it, wiggle = 0.5f) }
 
             // Calculate moisture
             Console.sayFromThread("Moisturizing biomes...")
@@ -334,57 +326,13 @@ object Metamap {
             }
             log.info("max cell dryness: $maxDry")
 
-            // Set wiggles and offsets now that we know every river connection
+            // Post-processing
             forEachMeta { x,y,cell ->
                 if (cell.riverExits.isNotEmpty()) {
-
-                    val wiggle = 0.9f  // TODO : get from perlin
-                    cell.riverWiggle = wiggle
                     cell.riverBlur = 0.3f
                     cell.riverGrass = 0.8f
                     cell.riverDirt = 0.2f
-
-                    var isNorth = false
-                    var isSouth = false
-                    var isEast = false
-                    var isWest = false
-                    cell.riverExits.forEach { exit ->
-                        when (exit.edge) {
-                            NORTH -> isNorth = true
-                            SOUTH -> isSouth = true
-                            WEST -> isWest = true
-                            else -> isEast = true
-                        }
-                    }
-                    val cornerPush = 8
-                    if (cell.riverExits.size != 2 || (isNorth && isSouth) || (isEast && isWest)) {
-                        cell.riverExits.forEach { exit ->
-                            setRiverOffset(exit, Dice.zeroTil((CHUNK_SIZE / 2f * wiggle).toInt()) - CHUNK_SIZE / 4)
-                        }
-                    } else if ((isNorth && isEast) || (isSouth && isWest)) {
-                        cell.riverExits.firstOrNull { it.edge == NORTH || it.edge == WEST }?.also {
-                            setRiverOffset(it, cornerPush)
-                        }
-                        cell.riverExits.firstOrNull { it.edge == EAST || it.edge == SOUTH }?.also {
-                            setRiverOffset(it, -cornerPush)
-                        }
-                    } else if ((isNorth && isWest)) {
-                        cell.riverExits.firstOrNull { it.edge == NORTH }?.also {
-                            setRiverOffset(it, -cornerPush)
-                        }
-                        cell.riverExits.firstOrNull { it.edge == WEST }?.also {
-                            setRiverOffset(it, -cornerPush)
-                        }
-                    } else if ((isSouth && isEast)) {
-                        cell.riverExits.firstOrNull { it.edge == SOUTH }?.also {
-                            setRiverOffset(it,  cornerPush)
-                        }
-                        cell.riverExits.firstOrNull { it.edge == EAST }?.also {
-                            setRiverOffset(it, cornerPush)
-                        }
-                    }
                 }
-
                 // Set coasts
                 if (cell.height > 0) {
                     DIRECTIONS.forEach { dir ->
@@ -395,7 +343,6 @@ object Metamap {
                         }
                     }
                 }
-
                 // Set biome
                 if (cell.biome == Blank) {
                     if (cell.height == 0) {
@@ -406,12 +353,9 @@ object Metamap {
                         cell.biome = Plain
                     }
                 }
-
             }
 
-
             // END STAGE : WRITE ALL DATA
-
             Console.sayFromThread("Saving generated world...")
             for (ix in -chunkRadius until chunkRadius) {
                 App.save.putWorldMetas(scratches[ix + chunkRadius])
@@ -463,7 +407,7 @@ object Metamap {
         return springs
     }
 
-    private fun runRiver(cursor: XY) {
+    private fun runRiver(cursor: XY, wiggle: Float) {
         val cell = scratches[cursor.x][cursor.y]
         if (cell.riverChildren.isNotEmpty()) {
             var longest = cell.riverChildren[0]
@@ -476,13 +420,25 @@ object Metamap {
                 if (child == longest || Dice.chance(riverBranching)) {
                     val childCell = scratches[child.x][child.y]
                     val width = min(1 + (childCell.riverDescendantCount * riverWidth).toInt(), maxRiverWidth)
-                    val myExit = RiverExit(dest = child, edge = XY(child.x - cursor.x, child.y - cursor.y), width = width)
-                    val childExit = RiverExit(dest = cursor, edge = XY(cursor.x - child.x, cursor.y - child.y), width = width)
-                    childExit.otherSide = myExit
-                    myExit.otherSide = childExit
+                    val edgeDir = XY(child.x - cursor.x, child.y - cursor.y)
+                    val edgePos = randomChunkEdgePos(edgeDir, wiggle)
+                    val myExit = RiverExit(
+                        pos = edgePos,
+                        edge = edgeDir,
+                        control = edgePos + (edgeDir * -1 * Dice.range(4,20) + (edgeDir.rotated() * Dice.range(-12,12))),
+                        width = width
+                    )
+                    val childEdgePos = flipChunkEdgePos(edgePos)
+                    val childEdgeDir = XY(cursor.x - child.x, cursor.y - child.y)
+                    val childExit = RiverExit(
+                        pos = childEdgePos,
+                        edge = childEdgeDir,
+                        control = childEdgePos + (edgeDir * Dice.range(4,20)) + (edgeDir.rotated() * Dice.range(-12,12)),
+                        width = width
+                    )
                     cell.riverExits.add(myExit)
                     childCell.riverExits.add(childExit)
-                    runRiver(child)
+                    runRiver(child, wiggle)
                 }
             }
         }

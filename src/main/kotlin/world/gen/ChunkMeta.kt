@@ -15,7 +15,6 @@ class ChunkMeta(
     val y: Int = 0,
     val height: Int = 0,
     val riverExits: MutableList<RiverExit> = mutableListOf(),
-    val riverWiggle: Float = 0f,
     val riverBlur: Float = 0f,
     val riverGrass: Float = 0f,
     val riverDirt: Float = 0f,
@@ -25,11 +24,10 @@ class ChunkMeta(
 
 @Serializable
 class RiverExit(
+    var pos: XY,
     var edge: XY,
-    var dest: XY,
     var width: Int = 4,
-    var offset: Int = -999,
-    var otherSide: RiverExit? = null  // only used during scratch metamapper gen
+    var control: XY
 )
 
 class ChunkScratch(
@@ -42,7 +40,6 @@ class ChunkScratch(
     var riverChildren: MutableList<XY> = mutableListOf()
     var riverDescendantCount = 0
     var riverExits: MutableList<RiverExit> = mutableListOf()
-    var riverWiggle = 0f
     var riverBlur = 0f
     var riverGrass = 0f
     var riverDirt = 0f
@@ -56,7 +53,6 @@ class ChunkScratch(
         y = y,
         height = height,
         riverExits = riverExits,
-        riverWiggle = riverWiggle,
         riverBlur = riverBlur,
         riverGrass = riverGrass,
         riverDirt = riverDirt,

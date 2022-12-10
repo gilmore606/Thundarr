@@ -34,4 +34,23 @@ data class XY(var x: Int, var y: Int) {
         result = 31 * result + y
         return result
     }
+
+    fun toXYf() = XYf(x.toFloat(), y.toFloat())
+
+    fun rotated() = XY(y, x)
+}
+
+data class XYf(var x: Float, var y: Float) {
+    operator fun plus(b: XYf): XYf {
+        return XYf(x + b.x, y + b.y)
+    }
+    operator fun minus(b: XYf): XYf {
+        return XYf(x - b.x, y - b.y)
+    }
+    operator fun times(b: Float): XYf {
+        return XYf(x * b, y * b)
+    }
+    override fun equals(other: Any?): Boolean {
+        return (other is XYf) && (x == other.x && y == other.y)
+    }
 }

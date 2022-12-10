@@ -173,30 +173,22 @@ class WorldCarto(
     private fun digRivers(meta: ChunkMeta) {
         when (meta.riverExits.size) {
             1 -> {
-                val start = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
-                val end = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
-                drawRiver(start, end, meta.riverExits[0].width, 1, meta.riverWiggle)
+                val start = meta.riverExits[0]
+                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                val end = RiverExit(pos = endPos, control = endPos, width = 1, edge = XY(0,0))
+                drawRiver(start, end)
             }
             2 -> {
-                val start1 = dirToEdge(meta.riverExits[0].edge, meta.riverExits[0].offset)
-                val start2 = dirToEdge(meta.riverExits[1].edge, meta.riverExits[1].offset)
-                val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
-                val centerX = (start1.x + start2.x) / 2 + Dice.zeroTil(variance) - (variance / 2)
-                val centerY = (start1.y + start2.y) / 2 + Dice.zeroTil(variance) - (variance / 2)
-                val centerWidth = (meta.riverExits[0].width + meta.riverExits[1].width) / 2
-                val end = XY(centerX, centerY)
-                drawRiver(start1, end, meta.riverExits[0].width, centerWidth, meta.riverWiggle)
-                drawRiver(start2, end, meta.riverExits[1].width, centerWidth, meta.riverWiggle)
+                drawRiver(meta.riverExits[0], meta.riverExits[1])
             }
             else -> {
-                val variance = ((CHUNK_SIZE / 2) * meta.riverWiggle).toInt()
+                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
                 val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
                 val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
                 val centerWidth = meta.riverExits.maxOf { it.width }
-                val end = XY(centerX, centerY)
+                val center = RiverExit(pos = XY(centerX, centerY), control = XY(centerX, centerY), width = centerWidth, edge = XY(0,0))
                 meta.riverExits.forEach { exit ->
-                    val start = dirToEdge(exit.edge, exit.offset)
-                    drawRiver(start, end, exit.width, centerWidth, meta.riverWiggle)
+                    drawRiver(exit, center)
                 }
             }
         }
@@ -206,10 +198,18 @@ class WorldCarto(
         deepenWater()
     }
 
-    private fun drawRiver(start: XY, end: XY, startWidth: Int, endWidth: Int, wiggle: Float) {
-        class Head(var pos: XY, var angle: Float)
-        val heads = listOf(Head(start, 0f), Head(end, 0f))
-
+    private fun drawRiver(start: RiverExit, end: RiverExit) {
+        var t = 0f
+        var width = start.width.toFloat()
+        val step = 0.02f
+        val widthStep = (end.width - start.width) * step
+        while (t < 1f) {
+            val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
+            carveRoom(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), 0, GENERIC_WATER, (width >= 3f))
+            t += step
+            width += widthStep
+        }
     }
 
     private fun buildBuilding() {

@@ -8,7 +8,6 @@ import things.Thing
 import world.Entity
 import world.journal.GameTime
 import world.level.CHUNK_SIZE
-import world.persist.LevelKeeper
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
@@ -301,4 +300,31 @@ fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
     NORTHWEST -> XY(0, 0)
     SOUTHWEST -> XY(0, CHUNK_SIZE - 1)
     else -> XY(0,0)
+}
+
+fun getBezier(t: Float, start: XYf, startControl: XYf, endControl: XYf, end: XYf): XYf {
+    val u = 1 - t
+    val tt = t*t
+    val uu = u*u
+    val uuu = uu*u
+    val ttt = tt*t
+    var p = start * uuu
+    p += startControl * 3f * uu * t
+    p += endControl * 3f * u * tt
+    p += end * ttt
+    return p
+}
+
+fun randomChunkEdgePos(edge: XY, variance: Float) = when (edge) {
+    NORTH -> XY(CHUNK_SIZE/2 + (Dice.float(-CHUNK_SIZE/2f,CHUNK_SIZE/2f)*variance).toInt(), 0)
+    SOUTH -> XY(CHUNK_SIZE/2 + (Dice.float(-CHUNK_SIZE/2f,CHUNK_SIZE/2f)*variance).toInt(), CHUNK_SIZE - 1)
+    WEST -> XY(0, CHUNK_SIZE/2 +(Dice.float(-CHUNK_SIZE/2f,CHUNK_SIZE/2f)*variance).toInt())
+    else -> XY(CHUNK_SIZE - 1, CHUNK_SIZE/2 + (Dice.float(-CHUNK_SIZE/2f,CHUNK_SIZE/2f)*variance).toInt())
+}
+
+fun flipChunkEdgePos(edge: XY) = when {
+    edge.x == 0 -> XY(CHUNK_SIZE-1, edge.y)
+    edge.x == CHUNK_SIZE-1 -> XY(0, edge.y)
+    edge.y == 0 -> XY(edge.x, CHUNK_SIZE-1)
+    else -> XY(edge.x, 0)
 }
