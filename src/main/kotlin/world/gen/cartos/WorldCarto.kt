@@ -59,10 +59,12 @@ class WorldCarto(
             // Add features
             if (meta.coasts.isNotEmpty()) buildCoasts(meta)
             if (meta.riverExits.isNotEmpty()) digRivers(meta)
+            if (meta.hasLake) digLake()
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
         }
 
         // Post-processing
+        deepenWater()
         setRoofedInRock()
         setOverlaps()
         //addJunk(forAttract)
@@ -195,7 +197,6 @@ class WorldCarto(
         fuzzTerrain(GENERIC_WATER, meta.riverBlur * 0.4f)
         fringeTerrain(GENERIC_WATER, TERRAIN_GRASS, meta.riverGrass, TERRAIN_SHALLOW_WATER)
         fringeTerrain(GENERIC_WATER, TERRAIN_DIRT, meta.riverDirt, TERRAIN_SHALLOW_WATER)
-        deepenWater()
     }
 
     private fun drawRiver(start: RiverExit, end: RiverExit) {
@@ -210,6 +211,15 @@ class WorldCarto(
             t += step
             width += widthStep
         }
+    }
+
+    private fun digLake() {
+        val width = Dice.range(24, 60)
+        val height = Dice.range(24, 60)
+        val blob = growBlob(width, height)
+        val x = x0 + Dice.zeroTil(CHUNK_SIZE - width)
+        val y = y0 + Dice.zeroTil(CHUNK_SIZE - height)
+        printBlob(blob, x, y, GENERIC_WATER)
     }
 
     private fun buildBuilding() {

@@ -304,44 +304,6 @@ abstract class Carto(
         }
     }
 
-    protected fun oldDrawRiver(start: XY, end: XY, startWidth: Int, endWidth: Int, wiggle: Float) {
-        val stepX: Float
-        val stepY: Float
-        var stepsLeft: Int
-        var width = startWidth.toFloat()
-        if (start.x == 0) {
-            start.x += startWidth / 2
-        } else if (start.y == 0) {
-            start.y += startWidth / 2
-        } else if (start.x == CHUNK_SIZE - 1) {
-            start.x -= startWidth / 2
-        } else if (start.y == CHUNK_SIZE - 1) {
-            start.y -= startWidth / 2
-        }
-        val diff = end - start
-        if (abs(diff.x) > abs(diff.y)) {
-            stepX = diff.x / abs(diff.x).toFloat()
-            stepY = diff.y / abs(diff.x).toFloat()
-            stepsLeft = abs(diff.x)
-        } else {
-            stepX = diff.x / abs(diff.y).toFloat()
-            stepY = diff.y / abs(diff.y).toFloat()
-            stepsLeft = abs(diff.y)
-        }
-        val stepWidth = (endWidth - startWidth) / stepsLeft.toFloat()
-        var cursorX = start.x.toFloat()
-        var cursorY = start.y.toFloat()
-        while (stepsLeft > 0) {
-            carveRoom(Rect((x0 + cursorX - width / 2).toInt(), (y0 + cursorY - width / 2).toInt(),
-                x0 + cursorX.toInt() + width.toInt(), y0 + cursorY.toInt() + width.toInt()),
-                0, Terrain.Type.GENERIC_WATER, (width >= 3f))
-            cursorX += stepX
-            cursorY += stepY
-            stepsLeft--
-            width += stepWidth
-        }
-    }
-
     protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
 
     protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
@@ -405,6 +367,72 @@ abstract class Carto(
         forEachCell { x, y ->
             if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
                 setTerrain(x,y, Terrain.Type.TERRAIN_DEEP_WATER)
+            }
+        }
+    }
+
+    protected fun growBlob(width: Int, height: Int): Array<Array<Boolean>> {
+        val grid = Array(width) { Array(height) { true } }
+        for (x in 0 until width) {
+            grid[x][0] = false
+            grid[x][height-1] = false
+        }
+        for (y in 0 until height) {
+            grid[0][y] = false
+            grid[width-1][y] = false
+        }
+        grid[1][1] = false
+        grid[width-2][height-2] = false
+        grid[1][height-2] = false
+        grid[width-2][1] = false
+        val adds = mutableSetOf<XY>()
+        repeat ((height + width) / 4) {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    if (grid[x][y]) {
+                        var neighbors = 0
+                        for (ix in -1 .. 1) {
+                            for (iy in -1 .. 1) {
+                                val nx = ix + x
+                                val ny = iy + y
+                                if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
+                                    neighbors++
+                                }
+                            }
+                        }
+                        if (Dice.chance(0.06f * neighbors)) adds.add(XY(x, y))
+                    }
+                }
+            }
+            adds.forEach { grid[it.x][it.y] = false }
+            adds.clear()
+        }
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                var neighbors = 0
+                CARDINALS.forEach { dir ->
+                    val nx = dir.x + x
+                    val ny = dir.y + y
+                    if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
+                        neighbors++
+                    }
+                }
+                if (grid[x][y] && neighbors == 4) {
+                    grid[x][y] = false
+                } else if (!grid[x][y] && neighbors == 0) {
+                    grid[x][y] = true
+                }
+            }
+        }
+        return grid
+    }
+
+    protected fun printBlob(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
+        for (ix in x..x + blob.size - 1) {
+            for (iy in y .. y + blob[0].size - 1) {
+                if (blob[ix - x][iy - y]) {
+                    setTerrain(ix, iy, terrain)
+                }
             }
         }
     }

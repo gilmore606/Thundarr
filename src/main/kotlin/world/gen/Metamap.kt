@@ -23,6 +23,7 @@ object Metamap {
 
     var isWorking = false
 
+    val coastRoughness = 0.15f
     val bigRiverDensity = 0.4f
     val smallRiverDensity = 0.1f
     val riverBranching = 0.25f
@@ -102,7 +103,7 @@ object Metamap {
             }
             // Cut squares out of edge coast
             for (i in 0 until chunkRadius *2) {
-                if (Dice.chance(0.1f)) {
+                if (Dice.chance(coastRoughness)) {
                     val w = Dice.range(4,25)
                     val h = Dice.range(4,25)
                     val edge = CARDINALS.random()
@@ -351,6 +352,12 @@ object Metamap {
                         cell.biome = Desert
                     } else {
                         cell.biome = Plain
+                        cell.hasLake = Dice.chance(when (cell.riverExits.size) {
+                            0 -> 0.02f
+                            1 -> 0.3f
+                            2 -> 0.06f
+                            else -> 0.1f
+                        })
                     }
                 }
             }
