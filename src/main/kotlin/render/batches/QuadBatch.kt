@@ -23,6 +23,8 @@ class QuadBatch(
 
     enum class Tilt { NONE, FLAT, POP }
 
+    val startTime = System.currentTimeMillis()
+
     override fun vertShader() = tileVertShader()
     override fun fragShader() = tileFragShader()
     override fun vertexAttributes() = listOf(
@@ -30,7 +32,8 @@ class QuadBatch(
         VertexAttribute(Usage.TextureCoordinates, 2, "a_TexCoordinate"),
         VertexAttribute(Usage.ColorUnpacked, 4, "a_Light"),
         VertexAttribute(Usage.Generic, 1, "a_Grayout"),
-        VertexAttribute(Usage.Generic, 1, "a_Hue")
+        VertexAttribute(Usage.Generic, 1, "a_Hue"),
+        VertexAttribute(Usage.Generic, 1, "a_Waves")
     )
 
     val textureIndexCache = tileSet.getCache()
@@ -43,6 +46,10 @@ class QuadBatch(
         Gdx.gl.glActiveTexture(GL_TEXTURE0)
         tileSet.texture.bind()
         shader.setUniformi("u_Texture", 0)
+        shader.setUniformf("u_Time", (Screen.timeMs - startTime).toFloat() / 1000f)
+        shader.setUniformf("u_Zoom", Screen.zoom.toFloat())
+        shader.setUniformf("u_CameraX", Screen.cameraPovX.toFloat() / 7f)
+        shader.setUniformf("u_CameraY", Screen.cameraPovY.toFloat() / 8f)
     }
 
     override fun dispose() {
@@ -52,7 +59,7 @@ class QuadBatch(
 
     private inline fun FloatArray.addVertex(x: Float, y: Float, tx: Float, ty: Float,
                                             lightR: Float, lightG: Float, lightB: Float, lightA: Float,
-                                            grayOut: Float, hue: Float) {
+                                            grayOut: Float, hue: Float, waves: Float) {
         this[floatCount] = x
         this[floatCount+1] = y
         this[floatCount+2] = tx
@@ -63,6 +70,7 @@ class QuadBatch(
         this[floatCount+7] = lightA
         this[floatCount+8] = grayOut
         this[floatCount+9] = hue
+        this[floatCount+10] = waves
         floatCount += floatsPerVertex
         vertexCount++
     }
@@ -71,7 +79,7 @@ class QuadBatch(
                     textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f,
                     scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f,
-                    grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false) {
+                    grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false, waves: Float = 0f) {
         val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
         val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
@@ -83,7 +91,7 @@ class QuadBatch(
         val grayOut = grayBlend ?: if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
         val itx0 = if (mirror) 1f else 0f
         val itx1 = if (mirror) 0f else 1f
-        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate)
+        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate, waves)
     }
 
     fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,
@@ -137,7 +145,7 @@ class QuadBatch(
     private inline fun addQuad(ix0: Double, iy0: Double, ix1: Double, iy1: Double, // GL screen float XY
                         itx0: Float = 0f, ity0: Float = 0f, itx1: Float = 0f, ity1: Float = 0f,
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f,
-                               grayOut: Float = 0f, hue: Float = 0f, rotate: Boolean = false
+                               grayOut: Float = 0f, hue: Float = 0f, rotate: Boolean = false, waves: Float = 0f
     ) {
         val z = 1f / Screen.zoom.toFloat()
         val x00: Float
@@ -189,21 +197,21 @@ class QuadBatch(
 
         if (rotate) {
             floats.apply {
-                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x11, y1, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x00, y0, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x11, y1, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x00, y0, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
             }
         } else {
             floats.apply {
-                addVertex(x00, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
-                addVertex(x11, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue)
+                addVertex(x00, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x11, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
             }
         }
     }

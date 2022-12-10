@@ -168,10 +168,10 @@ object Screen : KtxScreen {
         get() = App.level.pov
     private val lastPov = XY(0,0)
 
-    private var cameraPovX = 0.0
-    private var cameraPovY = 0.0
-    private var cameraOffsetX = 0.0
-    private var cameraOffsetY = 0.0
+    var cameraPovX = 0.0
+    var cameraPovY = 0.0
+    var cameraOffsetX = 0.0
+    var cameraOffsetY = 0.0
     private var cameraLastMoveX = 0.0
     private var cameraLastMoveY = 0.0
 
@@ -195,7 +195,8 @@ object Screen : KtxScreen {
     private val renderTile: (Int, Int, Float, Glyph, LightColor)->Unit = { tx, ty, vis, glyph, light ->
         val textureIndex = terrainBatch.getTerrainTextureIndex(glyph, App.level, tx, ty)
         terrainBatch.addTileQuad(
-            tx, ty, textureIndex, vis, light
+            tx, ty, textureIndex, vis, light,
+            waves = if (glyph == Glyph.SHALLOW_WATER || glyph == Glyph.DEEP_WATER) 1f else 0f
         )
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
