@@ -98,12 +98,12 @@ sealed class Floor(
         Terrain.get(chunk.getTerrain(x, y)).let { (!it.isWalkable() && it.isOpaque()) }
 
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
-                                  doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
-                                           vis: Float, glyph: Glyph, light: LightColor)->Unit
+                                  doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,
+                                           vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit
     ) {
         level.getTerrainData(x, y)?.let { it as Data }?.also {
             it.extraQuads.forEach { quad ->
-                doQuad(quad.x0, quad.y0, quad.x1, quad.y1, quad.tx0, quad.ty0, quad.tx1, quad.ty1, vis, quad.glyph, light)
+                doQuad(quad.x0, quad.y0, quad.x1, quad.y1, quad.tx0, quad.ty0, quad.tx1, quad.ty1, vis, quad.glyph, light, false)
             }
         }
     }

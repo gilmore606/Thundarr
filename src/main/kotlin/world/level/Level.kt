@@ -85,7 +85,7 @@ sealed class Level {
     fun forEachCellToRender(
         doTile: (x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor) -> Unit,
         doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
-                 vis: Float, glyph: Glyph, light: LightColor)->Unit,
+                 vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
         doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
         doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,

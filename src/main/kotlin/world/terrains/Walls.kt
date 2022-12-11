@@ -62,12 +62,12 @@ sealed class Wall(
 
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
-                                           vis: Float, glyph: Glyph, light: LightColor)->Unit
+                                           vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit
     ) {
         level.getTerrainData(x, y)?.let { it as Data }?.also {
             if (it.damage > 0f) {
                 doQuad(x.toDouble(), y.toDouble(), (x+1).toDouble(), (y+1).toDouble(),
-                    0f, 0f, 1f, 1f, vis, Glyph.WALL_DAMAGE, light)
+                    0f, 0f, 1f, 1f, vis, Glyph.WALL_DAMAGE, light, false)
             }
         }
     }

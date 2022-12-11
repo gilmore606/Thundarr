@@ -205,10 +205,10 @@ object Screen : KtxScreen {
         lightCache[lx][ly].b = light.b
     }
 
-    private val renderQuad: (Double, Double, Double, Double, Float, Float, Float, Float, Float, Glyph, LightColor)->Unit =
-        { x0, y0, x1, y1, tx0, ty0, tx1, ty1, vis, glyph, light ->
+    private val renderQuad: (Double, Double, Double, Double, Float, Float, Float, Float, Float, Glyph, LightColor, Boolean)->Unit =
+        { x0, y0, x1, y1, tx0, ty0, tx1, ty1, vis, glyph, light, rotate ->
             val textureIndex = terrainBatch.getTextureIndex(glyph, App.level, x0.toInt(), y0.toInt())
-            terrainBatch.addPartialQuad(x0, y0, x1, y1, textureIndex, vis, light, tx0, ty0, tx1, ty1, 1f)
+            terrainBatch.addPartialQuad(x0, y0, x1, y1, textureIndex, vis, light, tx0, ty0, tx1, ty1, 1f, rotate = rotate)
     }
 
     private val renderWeather: (Int, Int, Float, Float, Boolean)->Unit = { tx, ty, cloudAlpha, rainAlpha, fadeUp ->

@@ -97,7 +97,7 @@ class QuadBatch(
     fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,
                        textureIndex: Int, visibility: Float, light: LightColor,
                        tx0: Float, ty0: Float, tx1: Float, ty1: Float,
-                       alpha: Float = 1f, hue: Float = 0f) {
+                       alpha: Float = 1f, hue: Float = 0f, rotate: Boolean = false) {
         val gx0 = Screen.tileXtoGlx(x0)
         val gy0 = Screen.tileYtoGly(y0)
         val gx1 = Screen.tileXtoGlx(x1)
@@ -106,7 +106,7 @@ class QuadBatch(
         val lightG = min(visibility, light.g + App.level.weather.lightning.g) * Screen.brightness
         val lightB = min(visibility, light.b + App.level.weather.lightning.b) * Screen.brightness
         val grayOut = if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
-        addQuad(gx0, gy0, gx1, gy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue)
+        addQuad(gx0, gy0, gx1, gy1, tx0, ty0, tx1, ty1, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate)
     }
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
