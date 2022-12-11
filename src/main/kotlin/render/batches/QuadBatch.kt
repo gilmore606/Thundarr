@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import render.Screen
+import render.Screen.aspectRatio
 import render.shaders.tileFragShader
 import render.shaders.tileVertShader
 import render.tilesets.TileSet
@@ -48,8 +49,8 @@ class QuadBatch(
         shader.setUniformi("u_Texture", 0)
         shader.setUniformf("u_Time", (Screen.timeMs - startTime).toFloat() / 1000f)
         shader.setUniformf("u_Zoom", Screen.zoom.toFloat())
-        shader.setUniformf("u_CameraX", Screen.cameraPovX.toFloat() / 7f)
-        shader.setUniformf("u_CameraY", Screen.cameraPovY.toFloat() / 8f)
+        shader.setUniformf("u_CameraX", Screen.cameraPovX.toFloat() / 8f)
+        shader.setUniformf("u_CameraY", Screen.cameraPovY.toFloat() / 6f)
     }
 
     override fun dispose() {

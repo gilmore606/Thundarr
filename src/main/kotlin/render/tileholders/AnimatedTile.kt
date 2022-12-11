@@ -21,7 +21,7 @@ open class AnimatedTile(
 
     override fun getTextureIndex(level: Level?, x: Int, y: Int): Int {
         level?.also { level ->
-            val frame = abs((Screen.timeMs / frameMs + level.getRandom(x,y)).toInt()) % frames.size
+            val frame = abs((Screen.timeMs + (level.getRandom(x,y) / 200)).toInt() / frameMs ) % frames.size
             return indexFromCoords(frames[frame].first, frames[frame].second)
         }
         return 0

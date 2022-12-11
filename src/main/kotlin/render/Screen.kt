@@ -67,7 +67,7 @@ object Screen : KtxScreen {
     private var savedWindowSize  = XY(0, 0)
     fun savedWindowSize() = if (savedWindowSize.x == 0) XY(width, height) else savedWindowSize
 
-    private var aspectRatio = 1.0
+    var aspectRatio = 1.0
     private var tileStride: Double = 0.01
     var renderTilesWide = 80
     var renderTilesHigh = 50

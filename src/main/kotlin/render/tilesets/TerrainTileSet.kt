@@ -10,10 +10,11 @@ fun TerrainTileSet() =
         setTile(Glyph.OCCLUSION_SHADOWS_V, SimpleTile(this, 6, 2))
         setTile(Glyph.OCCLUSION_SHADOWS_H, SimpleTile(this, 7, 2))
         setTile(Glyph.SURF, AnimatedTile(this).apply {
-            frameMs = 221
+            frameMs = 282
             add(11, 5)
             add(11, 6)
             add(11, 7)
+            add(11, 6)
         })
 
         setTile(Glyph.CAVE_FLOOR, VariantsTile(this).apply {
