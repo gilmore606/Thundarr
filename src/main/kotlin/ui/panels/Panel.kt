@@ -68,18 +68,18 @@ abstract class Panel {
 
     protected fun measure(text: String, font: BitmapFont = Screen.font) = GlyphLayout(font, text).width.toInt()
 
-    protected fun drawString(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+    fun drawString(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         font.color = color
         font.draw(myTextBatch(), text, ((x  + this.x) - (Screen.width / 2f)), 0f - ((y + this.y) - (Screen.height / 2f)))
     }
 
-    protected fun drawTitle(text: String) {
+    fun drawTitle(text: String) {
         val xOffset = (width - GlyphLayout(Screen.titleFont, text).width) / 2f
         val yOffset = 24f
         Screen.titleFont.draw(myTextBatch(), text, ((this.x + xOffset) - (Screen.width / 2f)), 0f - ((this.y + yOffset) - (Screen.height / 2f)))
     }
 
-    protected fun drawBox(x: Int, y: Int, width: Int, height: Int) {
+    fun drawBox(x: Int, y: Int, width: Int, height: Int) {
         myBoxBatch().addPixelQuad(x+ shadowOffset, y + (shadowOffset * 1.2).toInt(), x + width + shadowOffset, y + height + shadowOffset,
             myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW))
         myBoxBatch().addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
@@ -88,17 +88,17 @@ abstract class Panel {
             myBoxBatch().getTextureIndex(Glyph.BOX_BG))
     }
 
-    protected fun drawShade(x: Int, y: Int, width: Int, height: Int) {
+    fun drawShade(x: Int, y: Int, width: Int, height: Int) {
         myBoxBatch().addPixelQuad(x, y, x + width, y + height,
             myBoxBatch().getTextureIndex(Glyph.WINDOW_SHADE))
     }
 
-    protected fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
+    fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
         myBoxBatch().addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
             myBoxBatch().getTextureIndex(glyph))
     }
 
-    protected fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
+    fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
                                   font: BitmapFont = Screen.smallFont,
                                   color: Color = Screen.fontColor) {
         text.forEachIndexed { n, line ->
@@ -106,11 +106,11 @@ abstract class Panel {
         }
     }
 
-    protected fun drawRightText(text: String, x0: Int, y0: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+    fun drawRightText(text: String, x0: Int, y0: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         drawString(text, x0 - GlyphLayout(font, text).width.toInt(), y0, color, font)
     }
 
-    protected fun drawCenterText(text: String, x0: Int, y0: Int, width: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+    fun drawCenterText(text: String, x0: Int, y0: Int, width: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
         drawString(text, x0 + (width - GlyphLayout(font, text).width.toInt()) / 2, y0, color, font)
     }
 

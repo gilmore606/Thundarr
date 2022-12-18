@@ -69,7 +69,7 @@ object Screen : KtxScreen {
 
     var aspectRatio = 1.0
     private var tileStride: Double = 0.01
-    var renderTilesWide = 100
+    var renderTilesWide = 120
     var renderTilesHigh = 50
 
     private val terrainTileSet = TerrainTileSet()
@@ -77,10 +77,10 @@ object Screen : KtxScreen {
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
     val mapTileSet = MapTileSet()
-    val terrainBatch = QuadBatch(terrainTileSet, tilt = QuadBatch.Tilt.FLAT)
-    val thingBatch = QuadBatch(thingTileSet, tilt = QuadBatch.Tilt.POP)
-    val actorBatch = QuadBatch(actorTileSet, tilt = QuadBatch.Tilt.POP)
-    val gearBatch = QuadBatch(thingTileSet, tilt = QuadBatch.Tilt.POP)
+    val terrainBatch = QuadBatch(terrainTileSet)
+    val thingBatch = QuadBatch(thingTileSet)
+    val actorBatch = QuadBatch(actorTileSet)
+    val gearBatch = QuadBatch(thingTileSet)
     val fireBatch = FireBatch()
     val uiWorldBatch = QuadBatch(uiTileSet)
     val uiBatch = QuadBatch(uiTileSet)
@@ -88,7 +88,7 @@ object Screen : KtxScreen {
     val uiActorBatch = QuadBatch(actorTileSet)
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
-    val mapBatch = QuadBatch(mapTileSet, tilt = QuadBatch.Tilt.NONE)
+    val mapBatch = QuadBatch(mapTileSet)
     private val worldBatches = listOf(terrainBatch, thingBatch,  actorBatch, gearBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, gearBatch, fireBatch,
         uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)

@@ -18,11 +18,8 @@ import kotlin.math.sign
 
 class QuadBatch(
     val tileSet: TileSet,
-    maxQuads: Int = 40000,
-    val tilt: Tilt = Tilt.NONE
+    maxQuads: Int = 80000,
 ) : RenderBatch(maxQuads) {
-
-    enum class Tilt { NONE, FLAT, POP }
 
     val startTime = System.currentTimeMillis()
 
@@ -39,8 +36,8 @@ class QuadBatch(
 
     val textureIndexCache = tileSet.getCache()
     private val textureEdgePad = 0.0012f
-    private val quadEdgePadX = 0.0000f
-    private val quadEdgePadY = -0.0024f
+    private val quadEdgePadX = 0.0002f
+    private val quadEdgePadY = 0f
 
 
     override fun bindTextures() {
@@ -148,49 +145,12 @@ class QuadBatch(
                         textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f, lightA: Float = 1f,
                                grayOut: Float = 0f, hue: Float = 0f, rotate: Boolean = false, waves: Float = 0f
     ) {
-        val z = 1f / Screen.zoom.toFloat()
-        val x00: Float
-        val x10: Float
-        val x01: Float
-        val x11: Float
-        val y0: Float
-        val y1: Float
-        val tiltAmount = Screen.tiltAmount
-        when (tilt) {
-            Tilt.NONE -> {
-                x00 = ix0.toFloat() - quadEdgePadX * z
-                x10 = x00
-                x01 = ix1.toFloat() + quadEdgePadX * z
-                x11 = x01
-                y0 = -iy0.toFloat() - quadEdgePadY * z
-                y1 = -iy1.toFloat() + quadEdgePadY * z
-            }
-            Tilt.FLAT -> {
-                y0 = (-iy0.toFloat() - quadEdgePadY * z) * (1f - tiltAmount) + ((1f + iy0).toFloat() * tiltAmount * 0.5f)
-                y1 = (-iy1.toFloat() + quadEdgePadY * z) * (1f - tiltAmount) + ((1f + iy1).toFloat() * tiltAmount * 0.5f)
-                val xtilt0 = (-y0) * tiltAmount
-                val xtilt1 = (-y1) * tiltAmount
-                val tiltx00 = sign(ix0) * (abs(ix0) + abs(ix0) * xtilt0)
-                val tiltx01 = sign(ix1) * (abs(ix1) + abs(ix1) * xtilt0)
-                val tiltx10 = sign(ix0) * (abs(ix0) + abs(ix0) * xtilt1)
-                val tiltx11 = sign(ix1) * (abs(ix1) + abs(ix1) * xtilt1)
-                x00 = tiltx00.toFloat() - quadEdgePadX * z
-                x10 = tiltx10.toFloat() - quadEdgePadX * z
-                x01 = tiltx01.toFloat() + quadEdgePadX * z
-                x11 = tiltx11.toFloat() + quadEdgePadX * z
-            }
-            Tilt.POP -> {
-                y1 = (-iy1.toFloat() + quadEdgePadY * z) * (1f - tiltAmount) + ((1f + iy1).toFloat() * tiltAmount * 0.5f)
-                y0 = y1 + (iy1 - iy0).toFloat()
-                val xtilt1 = (-y1) * tiltAmount
-                val tiltx10 = sign(ix0) * (abs(ix0) + abs(ix0) * xtilt1)
-                val tiltx11 = sign(ix1) * (abs(ix1) + abs(ix1) * xtilt1)
-                x00 = tiltx10.toFloat() - quadEdgePadX * z
-                x10 = x00
-                x01 = tiltx11.toFloat() + quadEdgePadX * z
-                x11 = x01
-            }
-        }
+        val z = Screen.zoom.toFloat()
+        val x0 = ix0.toFloat() - quadEdgePadX * z
+        val y0 = -iy0.toFloat() - quadEdgePadY * z
+        val x1 = ix1.toFloat() + quadEdgePadX * z
+        val y1 = -iy1.toFloat() + quadEdgePadY * z
+
         val tx0 = (((textureIndex % tileSet.tilesPerRow) + itx0) * tileSet.tileRowStride).toFloat() + textureEdgePad
         val ty0 = (((textureIndex / tileSet.tilesPerRow) + ity0) * tileSet.tileColumnStride).toFloat() + textureEdgePad
         val tx1 = (((textureIndex % tileSet.tilesPerRow) + itx1) * tileSet.tileRowStride).toFloat() - textureEdgePad
@@ -198,21 +158,21 @@ class QuadBatch(
 
         if (rotate) {
             floats.apply {
-                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x11, y1, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x10, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x00, y0, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x01, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y1, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y0, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
             }
         } else {
             floats.apply {
-                addVertex(x00, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x01, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x10, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
-                addVertex(x11, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y0, tx0, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y0, tx1, ty0, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x0, y1, tx0, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
+                addVertex(x1, y1, tx1, ty1, lightR, lightG, lightB, lightA, grayOut, hue, waves)
             }
         }
     }

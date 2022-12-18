@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.graphics.use
 
 abstract class RenderBatch(
-    maxQuads: Int = 40000
+    maxQuads: Int = 150000
 ) {
 
     abstract fun vertexAttributes(): List<VertexAttribute>
