@@ -41,6 +41,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     var DEBUG_VISIBLE = false
     var DEBUG_PANEL = false
+    var DEBUG_PERLIN: PerlinModal? = null
 
     var attractMode = true
     var isExiting = false
@@ -407,6 +408,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openMap() { Screen.addModal(MapModal()) }
     fun openSystemMenu() { Screen.addModal(SystemMenu()) }
     fun openJournal() { Screen.addModal(JournalModal()) }
+    fun openPerlinDebug() { Screen.addModal(PerlinModal()) }
 
     fun doContinue() {
         startGame()

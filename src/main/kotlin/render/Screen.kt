@@ -69,7 +69,7 @@ object Screen : KtxScreen {
 
     var aspectRatio = 1.0
     private var tileStride: Double = 0.01
-    var renderTilesWide = 80
+    var renderTilesWide = 100
     var renderTilesHigh = 50
 
     private val terrainTileSet = TerrainTileSet()
@@ -646,19 +646,25 @@ object Screen : KtxScreen {
         allBatches.forEach { it.clear() }
         mapBatch.clear()
 
-        App.level.forEachCellToRender(
-            doTile = renderTile,
-            doQuad = renderQuad,
-            doStain = renderStain,
-            doFire = renderFire,
-            doWeather = renderWeather,
-            delta = delta
-        )
+        if (App.DEBUG_PERLIN != null) {
+            App.DEBUG_PERLIN!!.forEachCellToRender(
+                doTile = renderTile
+            )
+        } else {
+            App.level.forEachCellToRender(
+                doTile = renderTile,
+                doQuad = renderQuad,
+                doStain = renderStain,
+                doFire = renderFire,
+                doWeather = renderWeather,
+                delta = delta
+            )
+            App.level.forEachThingToRender(renderThing, delta)
+            App.level.forEachActorToRender(renderActor, delta)
+            App.level.forEachSparkToRender(renderSpark)
+        }
         if (terrainBatch.vertexCount < 1) { log.debug("Davey!  terrainBatch had 0 vertices") }
 
-        App.level.forEachThingToRender(renderThing, delta)
-        App.level.forEachActorToRender(renderActor, delta)
-        App.level.forEachSparkToRender(renderSpark)
 
         uiWorldBatch.apply {
             cursorPosition?.also { cursorPosition ->

@@ -2,14 +2,15 @@ package world.gen.biomes
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.*
 import util.Dice
 import util.Perlin
 import util.Rect
-import util.XY
-import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import java.lang.Float.max
+import java.lang.Float.min
 
 @Serializable
 sealed class Biome(
@@ -17,6 +18,7 @@ sealed class Biome(
     val baseTerrain: Terrain.Type
 ) {
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
+    open fun getPlant(band: Float, fertility: Float): Thing? = null
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
 }
 
@@ -50,6 +52,18 @@ object Plain : Biome(
     TERRAIN_GRASS
 ) {
 
+    override fun getPlant(band: Float, fertility: Float): Thing? {
+        val chance = min(band, fertility + 0.2f) * 0.1f
+        if (Dice.chance(chance)) {
+            if (Dice.chance(0.05f)) {
+                if (Dice.flip()) return Flowers1() else return Flowers2()
+            }
+            if (band > 0.9f) return OakTree()
+            if (band > 0.7f) return Bush()
+            if (band > 0.4f) return Bush2()
+        }
+        return null
+    }
 
 }
 
@@ -106,6 +120,14 @@ object Swamp : Biome(
 object Desert : Biome(
     Glyph.MAP_DESERT,
     TERRAIN_SAND
+) {
+
+}
+
+@Serializable
+object Beach : Biome(
+    Glyph.MAP_DESERT,
+    TERRAIN_BEACH
 ) {
 
 }

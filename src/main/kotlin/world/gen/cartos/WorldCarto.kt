@@ -1,22 +1,16 @@
 package world.gen.cartos
 
 import App
-import actors.Herder
-import actors.MuskOx
-import actors.Ox
-import actors.Wolfman
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
-import things.*
 import util.*
 import world.*
+import world.gen.biomes.Beach
 import world.gen.biomes.Biome
+import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.Terrain.Type.*
-import kotlin.Exception
 import kotlin.random.Random
 
 class WorldCarto(
@@ -32,108 +26,164 @@ class WorldCarto(
     val chunkBlendWidth = 12
     val chunkBlendCornerRadius = 5
 
+    private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
+    private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
+    private var hasBlends = false
+    lateinit var meta: ChunkMeta
+
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
-        val meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
+        meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
 
         if (meta.biome == Ocean) {
             carveRoom(Rect(x0,y0,x1,y1), 0, TERRAIN_DEEP_WATER)
         } else {
+            // Build blending map for neighbor biomes if needed
+            buildBlendMap()
+
             // Carve base terrain, blending biomes if needed
-            var hasBlends = false
-            val neighborMetas = mutableMapOf<XY,ChunkMeta?>().apply {
-                DIRECTIONS.forEach { dir ->
-                    val neighbor = App.save.getWorldMeta(x0 + dir.x * CHUNK_SIZE, y0 + dir.y * CHUNK_SIZE)
-                    if (neighbor == null || neighbor.biome == Ocean || neighbor.biome == meta.biome) {
-                        set(dir, null)
-                    } else {
-                        set(dir, neighbor)
-                        hasBlends = true
-                    }
-                }
-            }
-            if (!hasBlends) {
-                forEachCell { x,y -> carve(x, y, 0, meta.biome.terrainAt(x,y)) }
-            } else blendBiomes(meta, neighborMetas)
+            carveBaseTerrain()
 
             // Add features
-            if (meta.coasts.isNotEmpty()) buildCoasts(meta)
-            if (meta.riverExits.isNotEmpty()) digRivers(meta)
+            if (meta.coasts.isNotEmpty()) buildCoasts()
+            if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.hasLake) digLake()
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
+
+            // Post-processing
+            deepenWater()
+            setRoofedInRock()
+            setOverlaps()
+            setGeneratedBiomes()
+
+            // Populate!
+            growPlants()
         }
 
-        // Post-processing
-        deepenWater()
-        setRoofedInRock()
-        setOverlaps()
-        //addJunk(forAttract)
         //debugBorders()
     }
 
-    private fun blendBiomes(meta: ChunkMeta, neighborMetas: MutableMap<XY,ChunkMeta?>) {
-        val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>().apply {
-            add(Pair(meta.biome, 1f))
-        } } }
-        // Blend sides
-        for (i in 0 until CHUNK_SIZE) {
-            for (j in 0 until chunkBlendWidth) {
-                val neighborWeight = 1f - (j * (1f / chunkBlendWidth))
-                neighborMetas[NORTH]?.also { blendMap[i][j].add(Pair(it.biome, neighborWeight)) }
-                neighborMetas[SOUTH]?.also { blendMap[i][CHUNK_SIZE-j-1].add(Pair(it.biome, neighborWeight)) }
-                neighborMetas[WEST]?.also { blendMap[j][i].add(Pair(it.biome, neighborWeight)) }
-                neighborMetas[EAST]?.also { blendMap[CHUNK_SIZE-j-1][i].add(Pair(it.biome, neighborWeight)) }
-            }
-        }
-        // Blend corners
-        val maxWidth = chunkBlendWidth + chunkBlendCornerRadius
-        for (i in 0 until maxWidth) {
-            for (j in 0 until maxWidth) {
-                val neighborWeight = 1f - (i+j).toFloat()/(maxWidth*2).toFloat()
-                val outsideCornerWeight = kotlin.math.max(0f, neighborWeight - 0.5f)
-                neighborMetas[NORTHWEST]?.also { blendMap[i][j].addIfHeavier(it.biome,
-                    if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
-                neighborMetas[NORTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][j].addIfHeavier(it.biome,
-                    if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
-                neighborMetas[SOUTHWEST]?.also { blendMap[i][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
-                    if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
-                neighborMetas[SOUTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
-                    if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
-            }
-        }
-        // Execute the blend map
+    // Set per-cell biomes for things we generate like rivers, coastal beach, etc
+    private fun setGeneratedBiomes() {
         forEachCell { x,y ->
-            val weights = blendMap[x-x0][y-y0]
-            var weightTotal = 0f
-            weights.forEach { weightTotal += it.second }
-            var roll = Dice.float(0f, weightTotal)
-            var biome: Biome? = null
-            weights.forEach {
-                if (biome == null && roll <= it.second) {
-                    biome = it.first
-                } else {
-                    roll -= it.second
+            getTerrain(x,y).also { terrain ->
+                when (terrain) {
+                    TERRAIN_BEACH -> Beach
+                    TERRAIN_SHALLOW_WATER -> Ocean
+                    TERRAIN_STONEFLOOR -> Blank
+                    else -> null
+                }?.also { newBiome ->
+                    blendMap[x-x0][y-y0].clear()
+                    blendMap[x-x0][y-y0].add(Pair(newBiome,1f))
                 }
             }
-            carve(x, y, 0, (biome ?: meta.biome).terrainAt(x,y))
-        }
-        // Biome-specific post-blend processing
-        neighborMetas.forEach { dir, neighborMeta ->
-            val bounds = when (dir) {
-                NORTH -> Rect(0,0,CHUNK_SIZE-1,chunkBlendWidth-1)
-                NORTHEAST -> Rect(CHUNK_SIZE-1-(chunkBlendWidth + chunkBlendCornerRadius), 0, CHUNK_SIZE-1,chunkBlendWidth-1)
-                EAST -> Rect(CHUNK_SIZE-1-chunkBlendWidth,0, CHUNK_SIZE-1, CHUNK_SIZE-1)
-                SOUTHEAST -> Rect(CHUNK_SIZE-1-(chunkBlendWidth + chunkBlendCornerRadius), CHUNK_SIZE-1-chunkBlendWidth, CHUNK_SIZE-1, CHUNK_SIZE-1)
-                SOUTH -> Rect(0, CHUNK_SIZE-1-chunkBlendWidth, CHUNK_SIZE-1, CHUNK_SIZE-1)
-                SOUTHWEST -> Rect(0,CHUNK_SIZE-1-chunkBlendWidth,chunkBlendWidth-1, CHUNK_SIZE-1)
-                WEST -> Rect(0,0,chunkBlendWidth-1, CHUNK_SIZE-1)
-                else -> Rect(0,0,chunkBlendWidth-1,chunkBlendWidth-1)
-            }
-            neighborMeta?.biome?.postBlendProcess(this, bounds)
         }
     }
 
-    private fun buildCoasts(meta: ChunkMeta) {
+    private fun growPlants() {
+        forEachBiome { x,y,biome ->
+            if (isWalkableAt(x,y)) {
+                val band = Simplex.noise(x.toDouble() / 30.0, y.toDouble() / 30.0).toFloat()
+                val fertility = (Simplex.noise(x.toDouble() / 856.0, y.toDouble() / 856.0).toFloat() +
+                        Simplex.noise(x.toDouble() / 481.0, y.toDouble() / 453.0).toFloat())
+                biome.getPlant(band, fertility)?.also { addThing(x, y, it) }
+            }
+        }
+    }
+
+    private suspend fun buildBlendMap() {
+        neighborMetas.apply {
+            DIRECTIONS.forEach { dir ->
+                val neighbor = App.save.getWorldMeta(x0 + dir.x * CHUNK_SIZE, y0 + dir.y * CHUNK_SIZE)
+                if (neighbor == null || neighbor.biome == Ocean || neighbor.biome == meta.biome) {
+                    set(dir, null)
+                } else {
+                    set(dir, neighbor)
+                    hasBlends = true
+                }
+            }
+        }
+        if (hasBlends) {
+            blendMap.forEach { it.forEach { it.add(Pair(meta.biome, 1f)) }}
+            // Blend sides
+            for (i in 0 until CHUNK_SIZE) {
+                for (j in 0 until chunkBlendWidth) {
+                    val neighborWeight = 1f - (j * (1f / chunkBlendWidth))
+                    neighborMetas[NORTH]?.also { blendMap[i][j].add(Pair(it.biome, neighborWeight)) }
+                    neighborMetas[SOUTH]?.also { blendMap[i][CHUNK_SIZE-j-1].add(Pair(it.biome, neighborWeight)) }
+                    neighborMetas[WEST]?.also { blendMap[j][i].add(Pair(it.biome, neighborWeight)) }
+                    neighborMetas[EAST]?.also { blendMap[CHUNK_SIZE-j-1][i].add(Pair(it.biome, neighborWeight)) }
+                }
+            }
+            // Blend corners
+            val maxWidth = chunkBlendWidth + chunkBlendCornerRadius
+            for (i in 0 until maxWidth) {
+                for (j in 0 until maxWidth) {
+                    val neighborWeight = 1f - (i+j).toFloat()/(maxWidth*2).toFloat()
+                    val outsideCornerWeight = kotlin.math.max(0f, neighborWeight - 0.5f)
+                    neighborMetas[NORTHWEST]?.also { blendMap[i][j].addIfHeavier(it.biome,
+                        if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                    neighborMetas[NORTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][j].addIfHeavier(it.biome,
+                        if (neighborMetas[NORTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                    neighborMetas[SOUTHWEST]?.also { blendMap[i][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
+                        if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[WEST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                    neighborMetas[SOUTHEAST]?.also { blendMap[CHUNK_SIZE-i-1][CHUNK_SIZE-j-1].addIfHeavier(it.biome,
+                        if (neighborMetas[SOUTH]?.biome == it.biome || neighborMetas[EAST]?.biome == it.biome) neighborWeight else outsideCornerWeight) }
+                }
+            }
+        }
+        // Roll each cell and set a specific biome by removing all other biome pairs from the blendmap
+        forEachCell { x,y ->
+            var biome: Biome? = null
+            if (hasBlends) {
+                val weights = blendMap[x - x0][y - y0]
+                var weightTotal = 0f
+                weights.forEach { weightTotal += it.second }
+                var roll = Dice.float(0f, weightTotal)
+                weights.forEach {
+                    if (biome == null && roll <= it.second) {
+                        biome = it.first
+                    } else {
+                        roll -= it.second
+                    }
+                }
+            }
+            blendMap[x - x0][y - y0].clear()
+            blendMap[x - x0][y - y0].add(Pair(biome ?: meta.biome, 1f))
+        }
+    }
+
+    private fun forEachBiome(doThis: (x: Int, y: Int, biome: Biome)->Unit) {
+        forEachCell { x,y ->
+            var biome = meta.biome
+            blendMap[x-x0][y-y0].also { if (it.isNotEmpty()) biome = it.first().first }
+            doThis(x, y, biome)
+        }
+    }
+
+    private fun carveBaseTerrain() {
+        forEachBiome { x,y,biome ->
+            carve(x, y, 0, biome.terrainAt(x,y))
+        }
+        // Biome-specific post-blend processing
+        if (hasBlends) {
+            neighborMetas.forEach { dir, neighborMeta ->
+                val bounds = when (dir) {
+                    NORTH -> Rect(0,0,CHUNK_SIZE-1,chunkBlendWidth-1)
+                    NORTHEAST -> Rect(CHUNK_SIZE-1-(chunkBlendWidth + chunkBlendCornerRadius), 0, CHUNK_SIZE-1,chunkBlendWidth-1)
+                    EAST -> Rect(CHUNK_SIZE-1-chunkBlendWidth,0, CHUNK_SIZE-1, CHUNK_SIZE-1)
+                    SOUTHEAST -> Rect(CHUNK_SIZE-1-(chunkBlendWidth + chunkBlendCornerRadius), CHUNK_SIZE-1-chunkBlendWidth, CHUNK_SIZE-1, CHUNK_SIZE-1)
+                    SOUTH -> Rect(0, CHUNK_SIZE-1-chunkBlendWidth, CHUNK_SIZE-1, CHUNK_SIZE-1)
+                    SOUTHWEST -> Rect(0,CHUNK_SIZE-1-chunkBlendWidth,chunkBlendWidth-1, CHUNK_SIZE-1)
+                    WEST -> Rect(0,0,chunkBlendWidth-1, CHUNK_SIZE-1)
+                    else -> Rect(0,0,chunkBlendWidth-1,chunkBlendWidth-1)
+                }
+                neighborMeta?.biome?.postBlendProcess(this, bounds)
+            }
+        }
+    }
+
+    private fun buildCoasts() {
         meta.coasts.forEach { edge ->
             if (edge in CARDINALS) {
                 for (i in 0 until CHUNK_SIZE) {
@@ -172,7 +222,7 @@ class WorldCarto(
         repeat (2) { fuzzTerrain(TERRAIN_BEACH, 0.5f, TERRAIN_SHALLOW_WATER) }
     }
 
-    private fun digRivers(meta: ChunkMeta) {
+    private fun digRivers() {
         when (meta.riverExits.size) {
             1 -> {
                 val start = meta.riverExits[0]
@@ -226,52 +276,6 @@ class WorldCarto(
         val facing = CARDINALS.random()
         carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
         assignDoor(facing)
-    }
-
-    private fun addJunk(forAttract: Boolean) {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                if (isWalkableAt(x + this.x0, y + this.y0)) {
-                    if (Dice.chance(if (forAttract) 0.010f else 0.005f)) {
-                        KtxAsync.launch {
-                            if (Dice.chance(0.8f)) {
-                                (if (Dice.chance(0.7f)) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
-                            } else if (Dice.flip()) {
-                                Wolfman().spawnAt(level, x + x0, y + y0)
-                            } else {
-                                Herder().spawnAt(level, x + x0, y + y0)
-                            }
-                        }
-                    }
-                    val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
-                            Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
-                    if (Dice.chance(n.toFloat() * 0.7f)) {
-                        addThing(x + this.x0, y + this.y0, if (Dice.chance(0.93f)) OakTree() else DeadTree())
-                        if (Dice.chance(0.2f)) {
-                            var clear = true
-                            CARDINALS.forEach { dir ->
-                                if (chunk.thingsAt(x + dir.x + this.x0,y + dir.y + this.y0).size > 0) {
-                                    clear = false
-                                }
-                            }
-                            if (clear) {
-                                val dir = CARDINALS.random()
-                                try {
-
-                                    addThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(4)) {
-                                        0 -> Apple()
-                                        1 -> Axe()
-                                        2 -> Pear()
-                                        3 -> Pickaxe()
-                                        else -> EnergyDrink()
-                                    })
-                                } catch (_: Exception) { }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun assignDoor(facing: XY) {

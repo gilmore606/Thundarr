@@ -214,13 +214,10 @@ object Keyboard : KtxInputAdapter {
                 Input.Keys.F8 -> {
                     ModernDoor().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
                 }
-                F11 -> {
-                    CeilingLight().withColor(Dice.float(0f,1f), Dice.float(0f,1f), Dice.float(0f,1f))
-                        .moveTo(App.level, App.player.xy.x, App.player.xy.y)
-                }
 
                 Input.Keys.F9 -> { Screen.tiltAmount += debugFloatStep }
                 Input.Keys.F10 -> { Screen.tiltAmount -= debugFloatStep }
+                F11 -> { App.openPerlinDebug() }
 
                 else -> { lastKey = -1 }
             }

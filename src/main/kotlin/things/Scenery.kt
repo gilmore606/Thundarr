@@ -90,3 +90,32 @@ class DeadTree : Tree() {
     override fun name() = "dead tree"
     override fun treeMsg() = "The dessicated skeleton of a once-mighty tree."
 }
+
+@Serializable
+class Bush : Tree() {
+    override fun glyph() = Glyph.BUSH_1
+    override fun name() = "bush"
+    override fun treeMsg() = "A bush."
+}
+
+@Serializable
+class Bush2 : Tree() {
+    override fun glyph() = Glyph.BUSH_2
+    override fun name() = "bush"
+    override fun treeMsg() = "A bush."
+}
+
+@Serializable
+class Flowers1 : Tree() {
+    override fun glyph() = Glyph.FLOWERS
+    override fun name() = "flowers"
+    override fun treeMsg() = "Flowers."
+}
+
+@Serializable
+class Flowers2 : Tree() {
+    override fun glyph() = Glyph.FLOWERS
+    override fun hue() = 0.6f
+    override fun name() = "flowers"
+    override fun treeMsg() = "Flowers."
+}
