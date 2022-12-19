@@ -4,6 +4,8 @@ import render.Screen
 import render.tilesets.Glyph
 import ui.input.Mouse
 import ui.modals.WidgetModal
+import java.lang.Double.max
+import java.lang.Double.min
 import java.lang.Math.abs
 
 class Slider(
@@ -19,14 +21,18 @@ class Slider(
     var held = false
 
     val thumbWidth = 12
+    val labelWidth = 80
+    val numberWidth = 65
+    val valueWidth = width - (labelWidth + numberWidth)
 
     override fun draw() {
-        drawQuad(0, 40, width, 4, Glyph.BOX_BORDER)
-        drawQuad(thumbX() - thumbWidth, 28, thumbWidth * 2, thumbWidth * 2, Glyph.BUTTON_SYSTEM)
+        drawQuad(labelWidth, 10, valueWidth, 4, Glyph.BOX_BORDER)
+        drawQuad(thumbX() - thumbWidth, 0, thumbWidth * 2, thumbWidth * 2, Glyph.BUTTON_SYSTEM)
     }
 
     override fun drawText() {
         drawString(label, 0, 0, Screen.fontColorDull, Screen.smallFont)
+        drawString("%.3f".format(value), width - numberWidth + 15, 0, Screen.fontColorBold, Screen.font)
     }
 
     override fun onMouseClicked(x: Int, y: Int, button: Mouse.Button) {
@@ -45,9 +51,9 @@ class Slider(
 
     override fun onMouseMovedTo(x: Int, y: Int) {
         if (!held) return
-        value = (x.toDouble() / width.toDouble()) * (valMax - valMin) + valMin
+        value = max(valMin, min(valMax, ((x - labelWidth).toDouble() / valueWidth.toDouble()) * (valMax - valMin) + valMin))
         onChange(value)
     }
 
-    fun thumbX() =(((value - valMin) / (valMax - valMin)) * width).toInt()
+    fun thumbX() =(((value - valMin) / (valMax - valMin)) * valueWidth).toInt() + labelWidth
 }

@@ -26,6 +26,10 @@ abstract class Widget(
         modal.drawString(text, x + this.x, y + this.y, color, font)
     }
 
+    fun drawCenterText(text: String, x0: Int, y0: Int, width: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+        modal.drawCenterText(text, x0 + x, y0 + y, width, color, font)
+    }
+
     fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
         modal.drawQuad(this.x + x, this.y + y, width, height, glyph)
     }
