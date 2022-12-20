@@ -46,9 +46,21 @@ class NoisePatch(
     var amp: Double = 1.0,
     var min: Double = 0.0
 ) {
-    fun value(x: Int, y: Int) = max(0.0, kotlin.math.min(1.0,
-        mode.combine(samples.first.value(x,y), samples.second.value(x,y))
-    ))
+    fun value(x: Int, y: Int): Double {
+        var raw = mode.combine(samples.first.value(x,y), samples.second.value(x,y)) * amp
+        raw = max(0.0, raw - min) / (1.0 - min)
+        if (quantize > 0) {
+            val steps = 9 - quantize
+            val step = 1.0 / steps
+            var quantized = 0.0
+            while (quantized < raw) {
+                quantized += step
+            }
+            quantized -= step
+            raw = quantized
+        }
+        return max(0.0, kotlin.math.min(1.0, raw))
+    }
 }
 
 object NoisePatches {

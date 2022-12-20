@@ -51,6 +51,10 @@ class Weather {
         } else {
             max(weatherIntensityTarget, weatherIntensity - 0.1f * delta)
         }
+        App.DEBUG_PERLIN?.also {
+            weatherIntensity = 0f
+            rainIntensity = 0f
+        }
 
         var bolt = max(0f, lightning.r - 3.8f * delta)
 
