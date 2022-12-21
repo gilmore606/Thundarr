@@ -18,8 +18,10 @@ enum class Glyph {
     SHALLOW_WATER,
     DEEP_WATER,
     PORTAL_DOOR,
-    WALL_DAMAGE,
+    HIGHWAY_V,
+    HIGHWAY_H,
 
+    WALL_DAMAGE,
     CURSOR,
     BOX_BG,
     BOX_BORDER,

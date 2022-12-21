@@ -18,7 +18,7 @@ object Metamap {
 
     private val chunkRadius = 100
 
-    private val coroutineContext = newSingleThreadAsyncContext("Metamapper")
+    private val coroutineContext = newSingleThreadAsyncContext("Metamap")
     private val coroutineScope = CoroutineScope(coroutineContext)
 
     var isWorking = false
@@ -351,7 +351,11 @@ object Metamap {
                     } else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
                         cell.biome = Desert
                     } else {
-                        cell.biome = Plain
+                        if (NoisePatches.get("metaForest", x, y) > 0.1f) {
+                            cell.biome = Forest
+                        } else {
+                            cell.biome = Plain
+                        }
                         cell.hasLake = Dice.chance(when (cell.riverExits.size) {
                             0 -> 0.02f
                             1 -> 0.3f

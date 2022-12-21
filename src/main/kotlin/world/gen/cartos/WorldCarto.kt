@@ -85,7 +85,7 @@ class WorldCarto(
         forEachBiome { x,y,biome ->
             if (isWalkableAt(x,y)) {
                 val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
-                biome.addPlant(fertility, { addThing(x, y, it) }, { setTerrain(x, y, it) })
+                biome.addPlant(fertility, meta.variance, { addThing(x, y, it) }, { setTerrain(x, y, it) })
             }
         }
     }

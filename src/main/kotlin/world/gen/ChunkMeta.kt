@@ -3,6 +3,7 @@ package world
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
+import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
 
@@ -20,7 +21,9 @@ class ChunkMeta(
     val riverDirt: Float = 0f,
     val hasLake: Boolean = false,
     val coasts: MutableList<XY> = mutableListOf(),
-    val biome: Biome = Blank
+    val biome: Biome = Blank,
+    val roadExits: MutableList<RoadExit> = mutableListOf(),
+    val variance: Float = 0f
 )
 
 @Serializable
@@ -29,6 +32,12 @@ class RiverExit(
     var edge: XY,
     var width: Int = 4,
     var control: XY
+)
+
+@Serializable
+class RoadExit(
+    var edge: XY,
+    var width: Int = 2
 )
 
 class ChunkScratch(
@@ -49,6 +58,7 @@ class ChunkScratch(
     var heat = -1
     var coasts: MutableList<XY> = mutableListOf()
     var biome: Biome = Blank
+    var roadExits: MutableList<RoadExit> = mutableListOf()
 
     fun toChunkMeta() = ChunkMeta(
         x = x,
@@ -60,6 +70,7 @@ class ChunkScratch(
         riverDirt = riverDirt,
         hasLake = hasLake,
         coasts = coasts,
-        biome = biome
+        biome = biome,
+        variance = NoisePatches.get("metaVariance",x,y).toFloat()
     )
 }

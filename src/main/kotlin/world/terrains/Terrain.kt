@@ -38,6 +38,8 @@ sealed class Terrain(
             Type.TERRAIN_DEEP_WATER -> DeepWater
             Type.GENERIC_WATER -> ScratchWater
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
+            Type.TERRAIN_HIGHWAY_H -> HighwayH
+            Type.TERRAIN_HIGHWAY_V -> HighwayV
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
@@ -56,6 +58,7 @@ sealed class Terrain(
         GENERIC_WALL,
         GENERIC_FLOOR,
         GENERIC_WATER,
+        GENERIC_HIGHWAY,
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
         TERRAIN_FORESTWALL,
@@ -69,6 +72,8 @@ sealed class Terrain(
         TERRAIN_SHALLOW_WATER,
         TERRAIN_DEEP_WATER,
         TERRAIN_PORTAL_DOOR,
+        TERRAIN_HIGHWAY_H,
+        TERRAIN_HIGHWAY_V,
     }
 
     open fun glyph() = this.glyph

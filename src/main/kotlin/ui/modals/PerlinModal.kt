@@ -39,7 +39,7 @@ class PerlinModal : WidgetModal(410, 750, "nOisE LAb"), ContextMenu.ParentModal 
 
         val sliderWidth = width - (padding * 2)
         add(Slider(
-            "A scale", patch.samples.first.scale.toDouble(), 0.0001, 0.04, this, padding, 70, sliderWidth, 35
+            "A scale", patch.samples.first.scale.toDouble(), 0.0001, 0.08, this, padding, 70, sliderWidth, 35
         ) { patch.samples.first.scale = it.toFloat() })
         add(Slider(
             "A octaves", patch.samples.first.octaves.toDouble(), 1.0, 8.0, this, padding, 105, sliderWidth, 35

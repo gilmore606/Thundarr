@@ -152,3 +152,16 @@ object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH) {
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
+
+sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H) {
+    override fun moveSpeed(actor: Actor) = 0.7f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+}
+
+object HighwayH : Highway() {
+    override fun glyph() = Glyph.HIGHWAY_H
+}
+
+object HighwayV : Highway() {
+    override fun glyph() = Glyph.HIGHWAY_V
+}

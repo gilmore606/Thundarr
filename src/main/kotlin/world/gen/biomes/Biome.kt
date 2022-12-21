@@ -6,6 +6,7 @@ import things.*
 import util.Dice
 import util.Perlin
 import util.Rect
+import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
@@ -20,7 +21,7 @@ sealed class Biome(
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
 
-    open fun addPlant(fertility: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
+    open fun addPlant(fertility: Float, variance: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
 }
 
 @Serializable
@@ -52,11 +53,15 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
-    val forestMin = 0.7f
+    val forestMin = 0.97f
+    val grassMin = 0f
 
-    override fun addPlant(fertility: Float, addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility > forestMin) {
+    override fun addPlant(fertility: Float, variance: Float,
+                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
+        if (fertility > forestMin + (variance * 0.03f)) {
             addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
+        } else if (fertility < grassMin + (variance * 0.003f)) {
+            if (Dice.chance(1f - fertility * 800f)) addTerrain(Terrain.Type.TERRAIN_DIRT)
         } else {
             if (Dice.chance(fertility * 0.3f)) {
                 val type = fertility + Dice.float(-0.3f, 0.3f)
@@ -78,17 +83,32 @@ object Forest : Biome(
     Glyph.MAP_FOREST,
     TERRAIN_GRASS
 ) {
+    val forestMin = 0.7f
+    val treeChance = 0.05f
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
-        val offset = 0.0
-        val scale = 0.02
-        val fullness = 0.002
-        val n2 = Perlin.noise(x * 0.02, y * 0.03, 8.12) + Perlin.noise(x * 0.041, y * 0.018, 11.17) * 0.8
-        if (n2 > 0.02) return TERRAIN_FORESTWALL
-        val n = Perlin.noise((x.toDouble() + offset) * scale, y.toDouble() * scale, 59.0) + Perlin.noise((x.toDouble() + offset) * scale * 0.4, y.toDouble() * scale * 0.4, 114.0) * 0.7
-        if (n > fullness * scale - Dice.float(0f, 0.18f).toDouble()) {
-            return TERRAIN_GRASS
+        if (NoisePatches.get("extraForest", x, y) > 0.2f) {
+            return Terrain.Type.TERRAIN_FORESTWALL
         }
-        return TERRAIN_DIRT
+        return super.terrainAt(x, y)
+    }
+
+    override fun addPlant(fertility: Float, variance: Float,
+                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
+        if (fertility > forestMin) {
+            addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
+        } else if (Dice.chance(treeChance)) {
+            addThing(OakTree())
+        } else {
+            if (Dice.chance(fertility * 1f)) {
+                val type = fertility + Dice.float(-0.3f, 0.3f)
+                addThing(
+                    if (type > 0.5f) OakTree()
+                    else if (type > 0.2f) Bush()
+                    else  Bush2()
+                )
+            }
+        }
     }
 
     override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
@@ -111,7 +131,26 @@ object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
     TERRAIN_DIRT
 ) {
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val v = NoisePatches.get("mountainShapes", x, y)
+        if (v > 0.65f) return Terrain.Type.TERRAIN_CAVEWALL
+        else if (v < 0.01f) return Terrain.Type.TERRAIN_SAND
+        else return Terrain.Type.TERRAIN_DIRT
+    }
 
+    override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
+        for (x in bounds.x0 .. bounds.x1) {
+            for (y in bounds.y0 .. bounds.y1) {
+                val wx = x + carto.chunk.x
+                val wy = y + carto.chunk.y
+                if (carto.getTerrain(wx, wy) == Terrain.Type.TERRAIN_CAVEWALL) {
+                    if (carto.neighborCount(wx,wy, Terrain.Type.TERRAIN_CAVEWALL) < 1) {
+                        carto.setTerrain(wx,wy,TERRAIN_DIRT)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Serializable

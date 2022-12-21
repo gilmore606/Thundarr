@@ -134,4 +134,20 @@ fun TerrainTileSet() =
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))
+
+        setTile(Glyph.HIGHWAY_H, HighwayTile(this).apply {
+            isHorizontal = true
+            add(HighwayTile.Slot.PLAIN, 0.5f, 8, 7)
+            add(HighwayTile.Slot.PLAIN, 0.5f, 9, 7)
+            add(HighwayTile.Slot.STRIPED, 0.5f, 6, 7)
+            add(HighwayTile.Slot.STRIPED, 0.5f, 7, 7)
+        })
+
+        setTile(Glyph.HIGHWAY_V, HighwayTile(this).apply {
+            isHorizontal = false
+            add(HighwayTile.Slot.PLAIN, 0.5f, 8, 7)
+            add(HighwayTile.Slot.PLAIN, 0.5f, 9, 7)
+            add(HighwayTile.Slot.STRIPED, 0.5f, 6, 6)
+            add(HighwayTile.Slot.STRIPED, 0.5f, 7, 6)
+        })
     }
