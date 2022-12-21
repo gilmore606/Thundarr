@@ -15,7 +15,7 @@ import world.level.CHUNK_SIZE
 class PerlinModal : WidgetModal(410, 750, "nOisE LAb"), ContextMenu.ParentModal {
 
     val padding = 18
-    var patchName = "init"
+    var patchName = NoisePatches.patches.keys.first()
     var patch = NoisePatches.patches[patchName] ?: throw RuntimeException("No such patch $patchName !")
 
     private val lightCache = LightColor(0f,0f,0f)

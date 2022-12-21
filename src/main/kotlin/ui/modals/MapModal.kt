@@ -54,7 +54,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                 val px0 = x0 + ox
                 val py0 = y0 + oy
                 val px1 = px0 + cellSize
-                val py1 = py0 + cellSize / 4
+                val py1 = py0 + cellSize
                 batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.biome.mapGlyph))
                 if (meta.biome != Ocean && meta.riverExits.isNotEmpty()) {
                     var isNorth = false

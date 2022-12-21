@@ -3,6 +3,7 @@ package world.gen.cartos
 import App
 import util.*
 import world.*
+import world.gen.NoisePatches
 import world.gen.biomes.Beach
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
@@ -83,10 +84,8 @@ class WorldCarto(
     private fun growPlants() {
         forEachBiome { x,y,biome ->
             if (isWalkableAt(x,y)) {
-                val band = Simplex.noise(x.toDouble() / 30.0, y.toDouble() / 30.0).toFloat()
-                val fertility = (Simplex.noise(x.toDouble() / 856.0, y.toDouble() / 856.0).toFloat() +
-                        Simplex.noise(x.toDouble() / 481.0, y.toDouble() / 453.0).toFloat())
-                biome.getPlant(band, fertility)?.also { addThing(x, y, it) }
+                val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
+                biome.addPlant(fertility, { addThing(x, y, it) }, { setTerrain(x, y, it) })
             }
         }
     }

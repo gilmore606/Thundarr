@@ -69,6 +69,8 @@ object NoisePatches {
         Gdx.files.internal("noisepatches.json").readString()
     )
 
+    fun get(patch: String, x: Int, y: Int) = patches[patch]?.value(x,y) ?: throw RuntimeException("Non-existent noise patch $patch !")
+
     fun save() {
         File("src/main/resources/noisepatches.json").printWriter().use { out ->
             out.println(

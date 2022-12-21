@@ -18,8 +18,9 @@ sealed class Biome(
     val baseTerrain: Terrain.Type
 ) {
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
-    open fun getPlant(band: Float, fertility: Float): Thing? = null
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
+
+    open fun addPlant(fertility: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
 }
 
 @Serializable
@@ -51,18 +52,23 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
+    val forestMin = 0.7f
 
-    override fun getPlant(band: Float, fertility: Float): Thing? {
-        val chance = min(band, fertility + 0.2f) * 0.1f
-        if (Dice.chance(chance)) {
-            if (Dice.chance(0.05f)) {
-                if (Dice.flip()) return Flowers1() else return Flowers2()
+    override fun addPlant(fertility: Float, addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
+        if (fertility > forestMin) {
+            addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
+        } else {
+            if (Dice.chance(fertility * 0.3f)) {
+                val type = fertility + Dice.float(-0.3f, 0.3f)
+                addThing(
+                    if (type > 0.7f) OakTree()
+                    else if (type > 0.5f) Bush()
+                    else if (type > 0.2f) Bush2()
+                    else if (Dice.flip()) Flowers1()
+                    else Flowers2()
+                )
             }
-            if (band > 0.9f) return OakTree()
-            if (band > 0.7f) return Bush()
-            if (band > 0.4f) return Bush2()
         }
-        return null
     }
 
 }
