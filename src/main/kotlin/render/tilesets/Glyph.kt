@@ -183,5 +183,17 @@ enum class Glyph {
     MAP_RIVER_NE,
     MAP_RIVER_WS,
     MAP_RIVER_SE,
-    MAP_PLAYER
+    MAP_PLAYER,
+    MAP_MARKER,
+    MAP_ROAD_NSE,
+    MAP_ROAD_NSW,
+    MAP_ROAD_NWE,
+    MAP_ROAD_NS,
+    MAP_ROAD_WE,
+    MAP_ROAD_WES,
+    MAP_ROAD_WN,
+    MAP_ROAD_NE,
+    MAP_ROAD_WS,
+    MAP_ROAD_SE,
+    MAP_ROAD_NSEW
 }

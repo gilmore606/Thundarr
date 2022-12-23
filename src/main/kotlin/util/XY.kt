@@ -38,6 +38,13 @@ data class XY(var x: Int, var y: Int) {
     fun toXYf() = XYf(x.toFloat(), y.toFloat())
 
     fun rotated() = XY(y, x)
+
+    fun isFarEnoughFromAll(dist: Int, all: List<XY>): Boolean {
+        all.forEach { other ->
+            if (distanceTo(other.x, other.y) < dist) return false
+        }
+        return true
+    }
 }
 
 data class XYf(var x: Float, var y: Float) {

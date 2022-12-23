@@ -56,11 +56,11 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                 val px1 = px0 + cellSize
                 val py1 = py0 + cellSize
                 batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.biome.mapGlyph))
+                var isNorth = false
+                var isSouth = false
+                var isEast = false
+                var isWest = false
                 if (meta.biome != Ocean && meta.riverExits.isNotEmpty()) {
-                    var isNorth = false
-                    var isSouth = false
-                    var isEast = false
-                    var isWest = false
                     meta.riverExits.forEach { exit ->
                         when (exit.edge) {
                             NORTH -> isNorth = true
@@ -85,6 +85,36 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                         else -> Glyph.MAP_RIVER_SE
                     }
                     batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(river))
+                }
+                if (meta.roadExits.isNotEmpty()) {
+                    meta.roadExits.forEach { exit ->
+                        when (exit.edge) {
+                            NORTH -> isNorth = true
+                            SOUTH -> isSouth = true
+                            WEST -> isWest = true
+                            EAST -> isEast = true
+                        }
+                    }
+                    val road = when {
+                        isNorth && isSouth && isWest && isEast -> Glyph.MAP_ROAD_NSEW
+                        isNorth && isSouth && isWest -> Glyph.MAP_ROAD_NSW
+                        isNorth && isSouth && isEast -> Glyph.MAP_ROAD_NSE
+                        isWest && isEast && isSouth -> Glyph.MAP_ROAD_WES
+                        isWest && isEast && isNorth -> Glyph.MAP_ROAD_NWE
+                        isNorth && isSouth -> Glyph.MAP_ROAD_NS
+                        isWest && isEast -> Glyph.MAP_ROAD_WE
+                        isNorth && isWest -> Glyph.MAP_ROAD_WN
+                        isSouth && isWest -> Glyph.MAP_ROAD_WS
+                        isSouth && isEast -> Glyph.MAP_ROAD_SE
+                        isNorth && isEast -> Glyph.MAP_ROAD_NE
+                        isNorth || isSouth -> Glyph.MAP_ROAD_NS
+                        isWest || isEast -> Glyph.MAP_ROAD_WE
+                        else -> Glyph.MAP_ROAD_SE
+                    }
+                    batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(road))
+                }
+                if (meta.hasCity) {
+                    batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_MARKER))
                 }
             }
         }

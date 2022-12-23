@@ -8,7 +8,7 @@ fun MapTileSet() =
         setTile(Glyph.MAP_FOREST, SimpleTile(this, 0, 0))
         setTile(Glyph.MAP_PLAIN, SimpleTile(this, 1, 0))
         setTile(Glyph.MAP_WATER, SimpleTile(this, 2, 0))
-        setTile(Glyph.MAP_GLACIER, SimpleTile(this, 4, 1))
+        setTile(Glyph.MAP_GLACIER, SimpleTile(this, 4, 2))
         setTile(Glyph.MAP_SWAMP, SimpleTile(this, 3, 0))
         setTile(Glyph.MAP_DESERT, SimpleTile(this, 0, 1))
         setTile(Glyph.MAP_MOUNTAIN, SimpleTile(this, 4, 0))
@@ -24,5 +24,18 @@ fun MapTileSet() =
         setTile(Glyph.MAP_RIVER_WS, SimpleTile(this, 1, 3))
         setTile(Glyph.MAP_RIVER_SE, SimpleTile(this, 2, 3))
 
+        setTile(Glyph.MAP_ROAD_NSE, SimpleTile(this, 4, 4))
+        setTile(Glyph.MAP_ROAD_NSW, SimpleTile(this, 4, 5))
+        setTile(Glyph.MAP_ROAD_NWE, SimpleTile(this, 0, 4))
+        setTile(Glyph.MAP_ROAD_NS, SimpleTile(this, 3, 5))
+        setTile(Glyph.MAP_ROAD_WE, SimpleTile(this, 0, 5))
+        setTile(Glyph.MAP_ROAD_WES, SimpleTile(this, 2, 5))
+        setTile(Glyph.MAP_ROAD_WN, SimpleTile(this, 2, 4))
+        setTile(Glyph.MAP_ROAD_NE, SimpleTile(this, 1, 4))
+        setTile(Glyph.MAP_ROAD_WS, SimpleTile(this, 1, 5))
+        setTile(Glyph.MAP_ROAD_SE, SimpleTile(this, 3, 4))
+        setTile(Glyph.MAP_ROAD_NSEW, SimpleTile(this, 4, 3))
+
         setTile(Glyph.MAP_PLAYER, SimpleTile(this, 3, 3))
+        setTile(Glyph.MAP_MARKER, SimpleTile(this, 4, 1))
     }

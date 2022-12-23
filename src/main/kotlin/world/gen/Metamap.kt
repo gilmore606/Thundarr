@@ -9,7 +9,6 @@ import util.*
 import world.ChunkMeta
 import world.ChunkScratch
 import world.RiverExit
-import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.level.CHUNK_SIZE
@@ -33,10 +32,17 @@ object Metamap {
     val minMountainHeight = 20
     val maxRangePeakDistance = 4
     val mountainRangeWetness = 6
+    val citiesRiverMouth = 10
+    val citiesRiver = 15
+    val citiesCoast = 15
+    val citiesInland = 15
+    val minCityDistance = 15
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
     private var scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
+    private var riverCells = ArrayList<XY>()
+    private var cityCells = ArrayList<XY>()
     val metas = ArrayList<ArrayList<ChunkMeta>>()
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
@@ -78,6 +84,8 @@ object Metamap {
     fun buildWorld() {
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
+        riverCells.clear()
+        cityCells.clear()
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
@@ -330,16 +338,31 @@ object Metamap {
             }
 
             // Place cities
+            val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland
+            Console.sayFromThread("Building $citiesTotal ancient cities...")
+            repeat (citiesRiverMouth) { placeCity(mouths) }
+            repeat (citiesCoast) { placeCity(coasts) }
+            repeat (citiesRiver) { placeCity(riverCells) }
+            val inlandSites = ArrayList<XY>().apply {
+                repeat(1000) {
+                    val x = Dice.range(10, chunkRadius*2 - 10)
+                    val y = Dice.range(10, chunkRadius*2 - 10)
+                    if ((scratches[x][y].height > 0)) {
+                        add(XY(x,y))
+                    }
+                }
+            }
+            repeat (citiesInland) { placeCity(inlandSites) }
 
             // Run roads between all cities
-            forEachMeta { x,y,cell ->
-                cell.roadExits = mutableListOf(
-                    RoadExit(edge = NORTH, width = 4),
-                    RoadExit(edge = SOUTH, width = 4),
-                    RoadExit(edge = EAST, width = 4),
-                    RoadExit(edge = WEST, width = 4)
-                )
-            }
+//            forEachMeta { x,y,cell ->
+//                cell.roadExits = mutableListOf(
+//                    RoadExit(edge = NORTH, width = 4),
+//                    RoadExit(edge = SOUTH, width = 4),
+//                    RoadExit(edge = EAST, width = 4),
+//                    RoadExit(edge = WEST, width = 4)
+//                )
+//            }
 
             // Post-processing
             forEachMeta { x,y,cell ->
@@ -433,6 +456,7 @@ object Metamap {
     }
 
     private fun runRiver(cursor: XY, wiggle: Float) {
+        riverCells.add(cursor)
         val cell = scratches[cursor.x][cursor.y]
         if (cell.riverChildren.isNotEmpty()) {
             var longest = cell.riverChildren[0]
@@ -464,6 +488,25 @@ object Metamap {
                     cell.riverExits.add(myExit)
                     childCell.riverExits.add(childExit)
                     runRiver(child, wiggle)
+                }
+            }
+        }
+    }
+
+    private fun placeCity(locations: List<XY>) {
+        var placed = false
+        while (!placed) {
+            locations.random().also { site ->
+                if (site.isFarEnoughFromAll(minCityDistance, cityCells)) {
+                    var actualSite = site
+                    if (scratches[site.x][site.y].height < 1) {
+                        DIRECTIONS.firstOrNull { scratches[site.x + it.x][site.y + it.y].height > 0 }?.also { dir ->
+                            actualSite = XY(site.x + dir.x, site.y + dir.y)
+                        }
+                    }
+                    cityCells.add(actualSite)
+                    scratches[actualSite.x][actualSite.y].hasCity = true
+                    placed = true
                 }
             }
         }
