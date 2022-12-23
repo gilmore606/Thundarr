@@ -18,6 +18,7 @@ sealed class Terrain(
     private val walkable: Boolean,
     private val flyable: Boolean,
     private val opaque: Boolean,
+    val canGrowPlants: Boolean,
     val dataType: Type = type  // should match TerrainData.forType
 ) {
 
@@ -92,7 +93,7 @@ sealed class Terrain(
     open fun debugData(data: TerrainData?): String { return "none" }
 }
 
-object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false)
+object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false, false)
 
 @Serializable
 sealed class TerrainData(

@@ -8,7 +8,7 @@ import world.level.Level
 sealed class Water(
     type: Type,
     glyph: Glyph
-) : Terrain(type, glyph, false, true, false, dataType = Type.GENERIC_WATER){
+) : Terrain(type, glyph, false, true, false, false, dataType = Type.GENERIC_WATER){
 
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,

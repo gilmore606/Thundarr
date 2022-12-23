@@ -10,6 +10,7 @@ import world.journal.GameTime
 import world.level.CHUNK_SIZE
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.lang.Math.abs
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import java.util.UUID
@@ -328,3 +329,36 @@ fun flipChunkEdgePos(edge: XY) = when {
     edge.y == 0 -> XY(edge.x, CHUNK_SIZE-1)
     else -> XY(edge.x, 0)
 }
+
+fun drawLine(start: XY, end: XY, setCell: (x: Int, y: Int)->Unit) {
+    val dx = abs(end.x - start.x)
+    val sx = if (start.x < end.x) 1 else -1
+    val dy = -abs(end.y - start.y)
+    val sy = if (start.y < end.y) 1 else -1
+    var error = dx + dy
+    var x = start.x
+    var y = start.y
+    var done = false
+    while (!done) {
+        setCell(x,y)
+        if (x == end.x && y == end.y) done = true
+        else {
+            val e2 = 2 * error
+            if (e2 >= dy) {
+                if (x == end.x) done = true
+                else {
+                    error += dy
+                    x += sx
+                }
+            }
+            if (e2 <= dx) {
+                if (y == end.y) done = true
+                else {
+                    error += dx
+                    y += sy
+                }
+            }
+        }
+    }
+}
+

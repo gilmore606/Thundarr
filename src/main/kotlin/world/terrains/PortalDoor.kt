@@ -17,7 +17,8 @@ object PortalDoor : Terrain(
     Glyph.PORTAL_DOOR,
     false,
     false,
-    true
+    true,
+    false
 ) {
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level?.exitAt(x, y)?.also { exitRecord ->

@@ -9,6 +9,7 @@ import util.*
 import world.ChunkMeta
 import world.ChunkScratch
 import world.RiverExit
+import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.level.CHUNK_SIZE
@@ -30,7 +31,8 @@ object Metamap {
     val maxRiverWidth = 10
     val riverWidth = 0.15f
     val minMountainHeight = 20
-    val isolatedMountainDensity = 0.2f
+    val maxRangePeakDistance = 4
+    val mountainRangeWetness = 6
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -235,37 +237,17 @@ object Metamap {
             }
 
             // Set mountaintops
+            Console.sayFromThread("Raising mountains...")
+            val peaks = ArrayList<XY>()
             forEachMeta { x,y,cell ->
                 val height = cell.height
                 if (height > minMountainHeight) {
                     if (!DIRECTIONS.hasOneWhere {
                         boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height > height
                         }) {
+                        peaks.add(XY(x, y))
                         scratches[x][y].biome = Mountain
                     }
-                }
-            }
-
-            // Grow mountain ranges
-            val mountainAdds = ArrayList<XY>()
-            var density = 0.8f
-            repeat (3) {
-                forEachMeta { x,y,cell ->
-                    if (cell.biome != Mountain) {
-                        var nearMounts = biomeNeighbors(x,y,Mountain, true)
-                        if (nearMounts > 1 && Dice.chance(density)) {
-                            mountainAdds.add(XY(x, y))
-                        }
-                    }
-                }
-                mountainAdds.forEach { scratches[it.x][it.y].biome = Mountain }
-                density *= 0.5f
-            }
-
-            // Filter out most isolated mountain cells
-            forEachMeta { x,y,cell ->
-                if ((cell.biome == Mountain) && biomeNeighbors(x,y,Mountain) < 1) {
-                    if (!Dice.chance(isolatedMountainDensity)) cell.biome = Plain
                 }
             }
 
@@ -325,7 +307,39 @@ object Metamap {
                 }
                 maxDry++
             }
-            log.info("max cell dryness: $maxDry")
+
+            // Link peaks into mountain ranges
+            peaks.shuffle()
+            while (peaks.isNotEmpty()) {
+                val peak = peaks.removeFirst()
+                if (scratches[peak.x][peak.y].dryness < mountainRangeWetness) {
+                    val connected = ArrayList<XY>()
+                    peaks.forEach { otherPeak ->
+                        if (distanceBetween(peak, otherPeak) < maxRangePeakDistance) {
+                            connected.add(otherPeak)
+                        }
+                    }
+                    connected.forEach { otherPeak ->
+                        drawLine(peak, otherPeak) { x, y ->
+                            scratches[x][y].biome = Mountain
+                            if (boundsCheck(x + 1, y)) scratches[x + 1][y].biome = Mountain
+                            if (boundsCheck(x, y + 1)) scratches[x][y + 1].biome = Mountain
+                        }
+                    }
+                }
+            }
+
+            // Place cities
+
+            // Run roads between all cities
+            forEachMeta { x,y,cell ->
+                cell.roadExits = mutableListOf(
+                    RoadExit(edge = NORTH, width = 4),
+                    RoadExit(edge = SOUTH, width = 4),
+                    RoadExit(edge = EAST, width = 4),
+                    RoadExit(edge = WEST, width = 4)
+                )
+            }
 
             // Post-processing
             forEachMeta { x,y,cell ->

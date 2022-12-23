@@ -11,6 +11,7 @@ import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.persist.LevelKeeper
+import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 import kotlin.random.Random
 
@@ -46,6 +47,7 @@ class WorldCarto(
             carveBaseTerrain()
 
             // Add features
+            if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.coasts.isNotEmpty()) buildCoasts()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.hasLake) digLake()
@@ -83,7 +85,7 @@ class WorldCarto(
 
     private fun growPlants() {
         forEachBiome { x,y,biome ->
-            if (isWalkableAt(x,y)) {
+            if (Terrain.get(getTerrain(x,y)).canGrowPlants) {
                 val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
                 biome.addPlant(fertility, meta.variance, { addThing(x, y, it) }, { setTerrain(x, y, it) })
             }
@@ -178,6 +180,29 @@ class WorldCarto(
                     else -> Rect(0,0,chunkBlendWidth-1,chunkBlendWidth-1)
                 }
                 neighborMeta?.biome?.postBlendProcess(this, bounds)
+            }
+        }
+    }
+
+    private fun buildRoads() {
+        fun buildRoadCell(x: Int, y: Int, width: Int, isVertical: Boolean) {
+            repeat (width) { n ->
+                val lx = if (isVertical) x + n + x0 else x + x0
+                val ly = if (isVertical) y + y0 else y + n + y0
+                val t = if (isVertical) TERRAIN_HIGHWAY_V else TERRAIN_HIGHWAY_H
+                if (NoisePatches.get("ruinWear", lx, ly) < 0.3f) {
+                    setTerrain(lx, ly, t)
+                }
+            }
+        }
+        val mid = CHUNK_SIZE/2
+        val end = CHUNK_SIZE-1
+        meta.roadExits.forEach { exit ->
+            when (exit.edge) {
+                NORTH -> drawLine(XY(mid, 0), XY(mid, mid)) { x,y -> buildRoadCell(x,y,exit.width,true) }
+                SOUTH -> drawLine(XY(mid, mid), XY(mid,end)) { x,y -> buildRoadCell(x,y,exit.width,true) }
+                WEST -> drawLine(XY(0,mid), XY(mid, mid)) { x,y -> buildRoadCell(x,y,exit.width,false) }
+                EAST -> drawLine(XY(mid, mid), XY(end, mid)) { x,y -> buildRoadCell(x,y,exit.width,false) }
             }
         }
     }

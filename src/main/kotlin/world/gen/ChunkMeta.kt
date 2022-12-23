@@ -55,7 +55,6 @@ class ChunkScratch(
     var riverDirt = 0f
     var hasLake = false
     var dryness = -1
-    var heat = -1
     var coasts: MutableList<XY> = mutableListOf()
     var biome: Biome = Blank
     var roadExits: MutableList<RoadExit> = mutableListOf()
@@ -71,6 +70,7 @@ class ChunkScratch(
         hasLake = hasLake,
         coasts = coasts,
         biome = biome,
-        variance = NoisePatches.get("metaVariance",x,y).toFloat()
+        variance = NoisePatches.get("metaVariance",x,y).toFloat(),
+        roadExits = roadExits
     )
 }

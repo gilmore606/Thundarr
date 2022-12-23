@@ -19,7 +19,7 @@ sealed class Wall(
     type: Type,
     glyph: Glyph,
     val damageToBreak: Float = 1f
-) : Terrain(type, glyph, false, false, true, dataType = Type.GENERIC_WALL) {
+) : Terrain(type, glyph, false, false, true, false, dataType = Type.GENERIC_WALL) {
 
     @Serializable class Data(
         var damage: Float = 0f
