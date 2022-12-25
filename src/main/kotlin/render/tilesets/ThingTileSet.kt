@@ -143,5 +143,5 @@ fun ThingTileSet() =
         setTile(Glyph.CACTUS_SMALL, SimpleTile(this, 5, 1))
         setTile(Glyph.CACTUS_BIG, SimpleTile(this, 5, 0))
         setTile(Glyph.HERB_PLANT_1, SimpleTile(this, 7, 10))
-        setTile(Glyph.HIGHWAY_SIGN, SimpleTile(this, 9, 9))
+        setTile(Glyph.HIGHWAY_SIGN, SimpleTile(this, 9, 10))
     }
