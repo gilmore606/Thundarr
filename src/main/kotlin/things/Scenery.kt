@@ -119,3 +119,13 @@ class Flowers2 : Tree() {
     override fun name() = "flowers"
     override fun treeMsg() = "Flowers."
 }
+
+class HighwaySign(
+    val text: String
+) : Scenery() {
+    override fun glyph() = Glyph.HIGHWAY_SIGN
+    override fun name() = "highway sign"
+    override fun isOpaque() = false
+    override fun walkOnMsg() = "\"$text\""
+    override fun description() = "An ancient faded highway information sign."
+}

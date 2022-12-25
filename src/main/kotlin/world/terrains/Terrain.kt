@@ -39,6 +39,7 @@ sealed class Terrain(
             Type.TERRAIN_DEEP_WATER -> DeepWater
             Type.GENERIC_WATER -> ScratchWater
             Type.TERRAIN_PORTAL_DOOR -> PortalDoor
+            Type.TERRAIN_PAVEMENT -> Pavement
             Type.TERRAIN_HIGHWAY_H -> HighwayH
             Type.TERRAIN_HIGHWAY_V -> HighwayV
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
@@ -73,6 +74,7 @@ sealed class Terrain(
         TERRAIN_SHALLOW_WATER,
         TERRAIN_DEEP_WATER,
         TERRAIN_PORTAL_DOOR,
+        TERRAIN_PAVEMENT,
         TERRAIN_HIGHWAY_H,
         TERRAIN_HIGHWAY_V,
     }

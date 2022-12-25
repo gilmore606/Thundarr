@@ -14,12 +14,20 @@ import java.lang.Integer.min
 
 class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
+
+    val playerX = Metamap.chunkXtoX(App.player.xy.x) - 1
+    val playerY = Metamap.chunkYtoY(App.player.xy.y) - 1
+
+    var cellSize = 20
     var mapx = 0
     var mapy = 0
-    var cellSize = 10
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
+
+    override fun onAdd() {
+        centerView()
+    }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()
@@ -28,8 +36,13 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     override fun onKeyDown(keycode: Int) {
         if (keycode == Input.Keys.ESCAPE) dismiss()
-        else if (keycode == Input.Keys.MINUS) cellSize = max(6, cellSize - 1)
-        else if (keycode == Input.Keys.EQUALS) cellSize = min(20, cellSize + 1)
+        else if (keycode == Input.Keys.MINUS) {
+            cellSize = max(6, cellSize - 2)
+            centerView()
+        } else if (keycode == Input.Keys.EQUALS) {
+            cellSize = min(20, cellSize + 2)
+            centerView()
+        }
         else when (Keyboard.moveKeys[keycode]) {
             NORTH -> mapy--
             SOUTH -> mapy++
@@ -40,6 +53,11 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
             SOUTHWEST -> { mapy++ ; mapx-- }
             SOUTHEAST -> { mapy++ ; mapx++ }
         }
+    }
+
+    fun centerView() {
+        mapx = playerX - (1200 / cellSize) / 2
+        mapy = playerY - (900 / cellSize) / 2
     }
 
     fun renderMap(batch: QuadBatch) {
@@ -115,6 +133,9 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                 }
                 if (meta.hasCity) {
                     batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_MARKER))
+                }
+                if (x+mapx == playerX && y+mapy == playerY) {
+                    batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
                 }
             }
         }

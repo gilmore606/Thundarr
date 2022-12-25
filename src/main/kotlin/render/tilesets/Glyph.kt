@@ -18,6 +18,7 @@ enum class Glyph {
     SHALLOW_WATER,
     DEEP_WATER,
     PORTAL_DOOR,
+    PAVEMENT,
     HIGHWAY_V,
     HIGHWAY_H,
 
@@ -162,6 +163,7 @@ enum class Glyph {
     CACTUS_SMALL,
     CACTUS_BIG,
     HERB_PLANT_1,
+    HIGHWAY_SIGN,
 
     BLOODSTAIN,
     SCORCHMARK,
@@ -173,6 +175,7 @@ enum class Glyph {
     MAP_SWAMP,
     MAP_DESERT,
     MAP_MOUNTAIN,
+    MAP_RUINS,
     MAP_RIVER_NSE,
     MAP_RIVER_NSW,
     MAP_RIVER_NWE,

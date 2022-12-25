@@ -13,6 +13,7 @@ import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.level.CHUNK_SIZE
+import java.lang.Integer.max
 import java.lang.Integer.min
 
 object Metamap {
@@ -38,6 +39,9 @@ object Metamap {
     val citiesCoast = 15
     val citiesInland = 15
     val minCityDistance = 15
+    val bigCityFraction = 0.2f
+    val ruinFalloff = 14f
+    val ruinsMax = 5f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -355,12 +359,23 @@ object Metamap {
             }
             repeat (citiesInland) { placeCity(inlandSites) }
 
-            // Run roads between all cities
+            // Build ruins on city sites, and run roads away
+            val numBigCities = citiesTotal * bigCityFraction
+            var n = 0
             for (city in cityCells) {
+                n++
+                scratches[city.x][city.y].biome = Ruins
+                if (n < numBigCities) {
+                    DIRECTIONS.forEach { dir ->
+                        if (Dice.chance(0.5f)) scratches[city.x + dir.x][city.y + dir.y].biome = Ruins
+                    }
+                }
                 CARDINALS.forEach { dir ->
                     runRoad(city, dir)
                 }
             }
+            growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
+            growBiome(Ruins, 2, 0.6f, true, listOf(Ocean))
 
             // Post-processing
             forEachMeta { x,y,cell ->
@@ -399,6 +414,21 @@ object Metamap {
                         })
                     }
                 }
+                if (cell.biome == Ruins) cell.roadExits.clear()
+                // Add city distance
+                cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
+                // Add ruins
+                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.roadExits.size * 0.1f
+                val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
+                cell.ruinedBuildings = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
+                if (cell.cityDistance <= 2f) cell.ruinedBuildings += 2
+                if (Dice.chance(0.01f)) cell.ruinedBuildings += 1
+                cell.ruinedBuildings += when (cell.biome) {
+                    Mountain -> -1
+                    Ruins -> -cell.ruinedBuildings
+                    else -> 0
+                }
+                cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
             }
 
             // END STAGE : WRITE ALL DATA
@@ -562,5 +592,19 @@ object Metamap {
             }
         }
         return c
+    }
+
+    private fun growBiome(biome: Biome, threshold: Int, chance: Float, allDirections: Boolean, exclude: List<Biome> = listOf()) {
+        val adds = ArrayList<XY>()
+        forEachMeta { x, y, cell ->
+            if (cell.biome != biome && !exclude.contains(cell.biome) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
+                if (Dice.chance(chance)) adds.add(XY(x,y))
+            }
+        }
+        adds.forEach {
+            scratches[it.x][it.y].biome = biome
+            if (scratches[it.x][it.y].height < 1) scratches[it.x][it.y].height = 1
+        }
+        adds.clear()
     }
 }

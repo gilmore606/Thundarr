@@ -12,6 +12,7 @@ fun MapTileSet() =
         setTile(Glyph.MAP_SWAMP, SimpleTile(this, 3, 0))
         setTile(Glyph.MAP_DESERT, SimpleTile(this, 0, 1))
         setTile(Glyph.MAP_MOUNTAIN, SimpleTile(this, 4, 0))
+        setTile(Glyph.MAP_RUINS, SimpleTile(this, 5, 0))
 
         setTile(Glyph.MAP_RIVER_NSE, SimpleTile(this, 1, 1))
         setTile(Glyph.MAP_RIVER_NSW, SimpleTile(this, 2, 1))

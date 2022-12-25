@@ -13,6 +13,7 @@ import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import java.lang.Integer.max
 import kotlin.math.sign
 import kotlin.random.Random
 
@@ -26,10 +27,9 @@ class WorldCarto(
     val forStarter: Boolean = false
 ) : Carto(x0, y0, x1, y1, chunk, level) {
 
-    val chunkBlendWidth = 12
-    val chunkBlendCornerRadius = 5
+    val chunkBlendWidth = 6
+    val chunkBlendCornerRadius = 4
 
-    val roadsideRuinChance = 0.5f
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -55,6 +55,7 @@ class WorldCarto(
             if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.hasLake) digLake()
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
+            repeat (meta.ruinedBuildings) { buildRandomRuin() }
 
             // Post-processing
             deepenWater()
@@ -214,7 +215,11 @@ class WorldCarto(
                 EAST -> drawLine(XY(mid, mid+1), XY(end, mid+1)) { x,y -> buildRoadCell(x,y,exit.width,false) }
             }
         }
-        if (Dice.chance(roadsideRuinChance)) {
+    }
+
+    private fun buildRandomRuin() {
+        val mid = CHUNK_SIZE/2
+        if (meta.roadExits.isNotEmpty()) {
             val offset = Dice.range(3, 8) * Dice.sign()
             val along = Dice.range(2, CHUNK_SIZE/2-2)
             val width = Dice.range(4, 10)
@@ -226,6 +231,8 @@ class WorldCarto(
                 WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
                 EAST -> buildRuin(CHUNK_SIZE-along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
             }
+        } else {
+            buildRuin(Dice.range(1, CHUNK_SIZE-10), Dice.range(1, CHUNK_SIZE-10), Dice.range(4, 10), Dice.range(4, 10))
         }
     }
 

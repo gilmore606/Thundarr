@@ -186,9 +186,9 @@ object Tundra: Biome(
 }
 
 @Serializable
-object Ruin : Biome(
-    Glyph.MAP_PLAIN,
-    TERRAIN_DIRT
+object Ruins : Biome(
+    Glyph.MAP_RUINS,
+    TERRAIN_PAVEMENT
 ) {
 
 }
