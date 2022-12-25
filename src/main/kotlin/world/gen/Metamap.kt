@@ -9,6 +9,7 @@ import util.*
 import world.ChunkMeta
 import world.ChunkScratch
 import world.RiverExit
+import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.level.CHUNK_SIZE
@@ -355,14 +356,11 @@ object Metamap {
             repeat (citiesInland) { placeCity(inlandSites) }
 
             // Run roads between all cities
-//            forEachMeta { x,y,cell ->
-//                cell.roadExits = mutableListOf(
-//                    RoadExit(edge = NORTH, width = 4),
-//                    RoadExit(edge = SOUTH, width = 4),
-//                    RoadExit(edge = EAST, width = 4),
-//                    RoadExit(edge = WEST, width = 4)
-//                )
-//            }
+            for (city in cityCells) {
+                CARDINALS.forEach { dir ->
+                    runRoad(city, dir)
+                }
+            }
 
             // Post-processing
             forEachMeta { x,y,cell ->
@@ -499,8 +497,8 @@ object Metamap {
             locations.random().also { site ->
                 if (site.isFarEnoughFromAll(minCityDistance, cityCells)) {
                     var actualSite = site
-                    if (scratches[site.x][site.y].height < 1) {
-                        DIRECTIONS.firstOrNull { scratches[site.x + it.x][site.y + it.y].height > 0 }?.also { dir ->
+                    if (!isLandAt(site)) {
+                        DIRECTIONS.firstOrNull { isLandAt(XY(site.x + it.x, site.y + it.y)) }?.also { dir ->
                             actualSite = XY(site.x + dir.x, site.y + dir.y)
                         }
                     }
@@ -509,6 +507,49 @@ object Metamap {
                     placed = true
                 }
             }
+        }
+    }
+
+    private fun runRoad(from: XY, toDir: XY) {
+        var done = false
+        var cursor = from
+        var length = 0
+        var dir = toDir
+        while (!done) {
+            val next = XY(cursor.x + dir.x, cursor.y + dir.y)
+            if (!boundsCheck(next.x, next.y)) done = true
+            else if (!isLandAt(next)) done = true
+            else if (scratches[next.x][next.y].hasCity) done = true
+            else if (scratches[cursor.x][cursor.y].roadExits.size > 2 && Dice.chance(0.7f)) done = true
+            else if (length > 15 && Dice.chance(length * 0.006f)) done = true
+            else {
+                connectRoadExits(cursor, next)
+                cursor = next
+                length++
+            }
+            if (Dice.chance(0.07f)) {
+                dir = XY(toDir.y, toDir.x)
+                if (Dice.flip()) {
+                    dir.x = -dir.x
+                    dir.y = -dir.y
+                }
+            }
+            if (Dice.chance(0.015f)) {
+                runRoad(cursor, XY(toDir.y, toDir.x))
+            }
+        }
+    }
+
+    private fun isLandAt(xy: XY) = boundsCheck(xy.x, xy.y) && scratches[xy.x][xy.y].height > 0
+
+    private fun connectRoadExits(source: XY, dest: XY) {
+        val sourceEdge = XY(dest.x - source.x, dest.y - source.y)
+        val destEdge = XY(source.x - dest.x, source.y - dest.y)
+        if (!scratches[source.x][source.y].roadExits.hasOneWhere { it.edge == sourceEdge }) {
+            scratches[source.x][source.y].roadExits.add(RoadExit(edge = sourceEdge))
+        }
+        if (!scratches[dest.x][dest.y].roadExits.hasOneWhere { it.edge == destEdge }) {
+            scratches[dest.x][dest.y].roadExits.add(RoadExit(edge = destEdge))
         }
     }
 

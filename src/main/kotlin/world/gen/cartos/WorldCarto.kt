@@ -13,6 +13,7 @@ import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import kotlin.math.sign
 import kotlin.random.Random
 
 class WorldCarto(
@@ -27,6 +28,8 @@ class WorldCarto(
 
     val chunkBlendWidth = 12
     val chunkBlendCornerRadius = 5
+
+    val roadsideRuinChance = 0.5f
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -47,9 +50,9 @@ class WorldCarto(
             carveBaseTerrain()
 
             // Add features
-            if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.coasts.isNotEmpty()) buildCoasts()
             if (meta.riverExits.isNotEmpty()) digRivers()
+            if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.hasLake) digLake()
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
 
@@ -186,12 +189,18 @@ class WorldCarto(
 
     private fun buildRoads() {
         fun buildRoadCell(x: Int, y: Int, width: Int, isVertical: Boolean) {
-            repeat (width) { n ->
-                val lx = if (isVertical) x + n + x0 else x + x0
-                val ly = if (isVertical) y + y0 else y + n + y0
-                val t = if (isVertical) TERRAIN_HIGHWAY_V else TERRAIN_HIGHWAY_H
-                if (NoisePatches.get("ruinWear", lx, ly) < 0.3f) {
-                    setTerrain(lx, ly, t)
+            repeat (width + 2) { n ->
+                val lx = if (isVertical) x + n + x0 - (width / 2) else x + x0
+                val ly = if (isVertical) y + y0 else y + n + y0 - (width / 2)
+                if (n == 0 || n == width + 1) {
+                    val current = getTerrain(lx, ly)
+                    if ((NoisePatches.get("ruinWear", lx, ly) < 0.001f) && current != TERRAIN_HIGHWAY_H && current != TERRAIN_HIGHWAY_V
+                        && current != GENERIC_WATER && current != TERRAIN_SHALLOW_WATER && current != TERRAIN_DEEP_WATER) {
+                        setTerrain(lx, ly, TERRAIN_DIRT)
+                    }
+                } else {
+                    val t = if (isVertical) TERRAIN_HIGHWAY_V else TERRAIN_HIGHWAY_H
+                    setRuinTerrain(lx, ly, 0.34f, t)
                 }
             }
         }
@@ -201,8 +210,46 @@ class WorldCarto(
             when (exit.edge) {
                 NORTH -> drawLine(XY(mid, 0), XY(mid, mid)) { x,y -> buildRoadCell(x,y,exit.width,true) }
                 SOUTH -> drawLine(XY(mid, mid), XY(mid,end)) { x,y -> buildRoadCell(x,y,exit.width,true) }
-                WEST -> drawLine(XY(0,mid), XY(mid, mid)) { x,y -> buildRoadCell(x,y,exit.width,false) }
-                EAST -> drawLine(XY(mid, mid), XY(end, mid)) { x,y -> buildRoadCell(x,y,exit.width,false) }
+                WEST -> drawLine(XY(0,mid+1), XY(mid, mid+1)) { x,y -> buildRoadCell(x,y,exit.width,false) }
+                EAST -> drawLine(XY(mid, mid+1), XY(end, mid+1)) { x,y -> buildRoadCell(x,y,exit.width,false) }
+            }
+        }
+        if (Dice.chance(roadsideRuinChance)) {
+            val offset = Dice.range(3, 8) * Dice.sign()
+            val along = Dice.range(2, CHUNK_SIZE/2-2)
+            val width = Dice.range(4, 10)
+            val height = Dice.range(4, 10)
+            val ruinEdge = meta.roadExits.random().edge
+            when (ruinEdge) {
+                NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height)
+                SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE-along, width, height)
+                WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
+                EAST -> buildRuin(CHUNK_SIZE-along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
+            }
+        }
+    }
+
+    private fun buildRuin(x: Int, y: Int, width: Int, height: Int) {
+        for (ix in x until x + width) {
+            for (iy in y until y + height) {
+                if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
+                    setRuinTerrain(ix + x0, iy + y0, 0.34f,
+                        if (Dice.chance(0.9f))
+                            TERRAIN_BRICKWALL else null)
+                } else {
+                    setRuinTerrain(ix + x0, iy + y0, 0.34f,
+                        if (Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
+                            null else TERRAIN_STONEFLOOR)
+                }
+            }
+        }
+    }
+
+    private fun setRuinTerrain(x: Int, y: Int, wear: Float, terrain: Terrain.Type?) {
+        if (terrain == null) return
+        if (NoisePatches.get("ruinWear", x, y) < wear) {
+            if (boundsCheck(x, y)) {
+                setTerrain(x, y, terrain)
             }
         }
     }
