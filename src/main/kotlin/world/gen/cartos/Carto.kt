@@ -307,36 +307,31 @@ abstract class Carto(
     fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
 
     protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
+        val adds = ArrayList<XY>()
         forEachCell { x, y ->
             if (getTerrain(x,y) == type) {
                 CARDINALS.forEach { dir ->
                     if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
                         if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
                             if (Dice.chance(density)) {
-                                setTerrain(x + dir.x, y + dir.y, type)
+                                adds.add(XY(x+dir.x, y+dir.y))
                             }
                         }
                     }
                 }
             }
         }
+        adds.forEach { setTerrain(it.x, it.y, type) }
     }
 
-    // TODO: make this better so it doesn't favor down-and-right
     protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
-        forEachCell { x, y ->
-            if (getTerrain(x,y) == type) {
-                DIRECTIONS.forEach { dir ->
-                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
-                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
-                            if (Dice.chance(density)) {
-                                setTerrain(x + dir.x, y + dir.y, withType)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        Evolver(CHUNK_SIZE, CHUNK_SIZE, false, { x,y ->
+            getTerrain(x+x0,y+y0) == type
+        }, { x,y ->
+            setTerrain(x+x0,y+y0,withType)
+        }, { x,y,n ->
+            n > 0 && Dice.chance(density) && getTerrain(x+x0,y+y0) != type
+        }).evolve(1)
     }
 
     protected fun deepenWater() {

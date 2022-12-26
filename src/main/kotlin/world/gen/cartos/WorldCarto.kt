@@ -266,42 +266,45 @@ class WorldCarto(
     }
 
     private fun buildCoasts() {
+        val cornerWater = growBlob(8, 8)
         meta.coasts.forEach { edge ->
             if (edge in CARDINALS) {
                 for (i in 0 until CHUNK_SIZE) {
                     when (edge) {
-                        NORTH -> setTerrain(x0+i,y0, TERRAIN_DEEP_WATER)
-                        SOUTH -> setTerrain(x0+i,y1, TERRAIN_DEEP_WATER)
-                        WEST -> setTerrain(x0, y0+i, TERRAIN_DEEP_WATER)
-                        EAST -> setTerrain(x1, y0+i, TERRAIN_DEEP_WATER)
+                        NORTH -> setTerrain(x0+i,y0, GENERIC_WATER)
+                        SOUTH -> setTerrain(x0+i,y1, GENERIC_WATER)
+                        WEST -> setTerrain(x0, y0+i, GENERIC_WATER)
+                        EAST -> setTerrain(x1, y0+i, GENERIC_WATER)
                     }
                 }
             } else {
                 when (edge) {
                     NORTHWEST -> {
-                        setTerrain(x0,y0, TERRAIN_DEEP_WATER)
-                        setTerrain(x0+1,y0+1, TERRAIN_DEEP_WATER)
+                        printBlob(cornerWater, x0, y0, GENERIC_WATER)
+                        setTerrain(x0,y0, GENERIC_WATER)
+                        setTerrain(x0+1,y0+1, GENERIC_WATER)
                     }
                     NORTHEAST -> {
-                        setTerrain(x1,y0, TERRAIN_DEEP_WATER)
-                        setTerrain(x1-1,y0+1, TERRAIN_DEEP_WATER)
+                        printBlob(cornerWater, x1-7, y0, GENERIC_WATER)
+                        setTerrain(x1,y0, GENERIC_WATER)
+                        setTerrain(x1-1,y0+1, GENERIC_WATER)
                     }
                     SOUTHWEST -> {
-                        setTerrain(x0,y1, TERRAIN_DEEP_WATER)
-                        setTerrain(x0+1,y1-1, TERRAIN_DEEP_WATER)
+                        printBlob(cornerWater, x0, y1-7, GENERIC_WATER)
+                        setTerrain(x0,y1, GENERIC_WATER)
+                        setTerrain(x0+1,y1-1, GENERIC_WATER)
                     }
                     SOUTHEAST -> {
-                        setTerrain(x1,y1, TERRAIN_DEEP_WATER)
-                        setTerrain(x1-1,y1-1, TERRAIN_DEEP_WATER)
+                        printBlob(cornerWater, x1-7, y1-7, GENERIC_WATER)
+                        setTerrain(x1,y1, GENERIC_WATER)
+                        setTerrain(x1-1,y1-1, GENERIC_WATER)
                     }
                 }
             }
         }
-        repeat (4) { fuzzTerrain(TERRAIN_DEEP_WATER, 0.3f) }
-        fringeTerrain(TERRAIN_DEEP_WATER, TERRAIN_SHALLOW_WATER, 1f)
-        repeat (2) { fuzzTerrain(TERRAIN_SHALLOW_WATER, 0.4f) }
-        fringeTerrain(TERRAIN_SHALLOW_WATER, TERRAIN_BEACH, 1f, TERRAIN_DEEP_WATER)
-        repeat (2) { fuzzTerrain(TERRAIN_BEACH, 0.5f, TERRAIN_SHALLOW_WATER) }
+        repeat (8) { fuzzTerrain(GENERIC_WATER, 0.3f) }
+        fringeTerrain(GENERIC_WATER, TERRAIN_BEACH, 1f)
+        repeat ((2 + 3 * meta.variance).toInt()) { fuzzTerrain(TERRAIN_BEACH, meta.variance, GENERIC_WATER) }
     }
 
     private fun digRivers() {
@@ -335,7 +338,7 @@ class WorldCarto(
             if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
                 DIRECTIONS.forEach { dir ->
                     if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != Terrain.Type.GENERIC_WATER) {
-                        if (getTerrain(x + dir.x, y + dir.y) != Terrain.Type.TERRAIN_SHALLOW_WATER) {
+                        if (getTerrain(x + dir.x, y + dir.y) != Terrain.Type.TERRAIN_BEACH) {
                             setTerrain(x + dir.x, y + dir.y, biome.riverBankTerrain(x,y))
                         }
                     }

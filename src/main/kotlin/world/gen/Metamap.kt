@@ -393,6 +393,14 @@ object Metamap {
                             }
                         }
                     }
+                    val adds = ArrayList<XY>()
+                    cell.coasts.forEach { when (it) {
+                        NORTH -> { adds.add(NORTHWEST) ; adds.add(NORTHEAST) }
+                        SOUTH -> { adds.add(SOUTHWEST) ; adds.add(SOUTHEAST) }
+                        WEST -> { adds.add(NORTHWEST) ; adds.add(SOUTHWEST) }
+                        EAST -> { adds.add(NORTHEAST) ; adds.add(SOUTHEAST) }
+                    } }
+                    adds.forEach { if (!cell.coasts.contains(it)) cell.coasts.add(it) }
                 }
                 // Set biome
                 if (cell.biome == Blank) {
