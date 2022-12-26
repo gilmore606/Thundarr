@@ -8,6 +8,7 @@ import util.Perlin
 import util.Rect
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
+import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 import java.lang.Float.max
@@ -20,8 +21,15 @@ sealed class Biome(
 ) {
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
-
+    open fun carveExtraTerrain(carto: WorldCarto) { }
+    open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun addPlant(fertility: Float, variance: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
+
+    protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
+        if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
+            carto.setTerrain(x + carto.x0, y + carto.y0, type)
+        }
+    }
 }
 
 @Serializable
@@ -138,6 +146,8 @@ object Mountain : Biome(
         else return Terrain.Type.TERRAIN_DIRT
     }
 
+    override fun riverBankTerrain(x: Int, y: Int) = if (Dice.flip()) Terrain.Type.TERRAIN_GRASS else TERRAIN_DIRT
+
     override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
         for (x in bounds.x0 .. bounds.x1) {
             for (y in bounds.y0 .. bounds.y1) {
@@ -166,7 +176,8 @@ object Desert : Biome(
     Glyph.MAP_DESERT,
     TERRAIN_SAND
 ) {
-
+    override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
+        TERRAIN_GRASS else TERRAIN_SAND
 }
 
 @Serializable
@@ -188,7 +199,71 @@ object Tundra: Biome(
 @Serializable
 object Ruins : Biome(
     Glyph.MAP_RUINS,
-    TERRAIN_PAVEMENT
+    Terrain.Type.TERRAIN_PAVEMENT
 ) {
 
+    override fun carveExtraTerrain(carto: WorldCarto) {
+        val gridsize = Dice.range(2, 4)
+        val cellsize = CHUNK_SIZE / gridsize
+        val variance = cellsize / 6
+        val padding = when (gridsize) {
+            2 -> 3
+            3 -> 2
+            else -> 1
+        }
+        for (ix in 0 until gridsize) {
+            for (iy in 0 until gridsize) {
+                val x0 = ix * cellsize + padding + Dice.range(1, variance)
+                val y0 = iy * cellsize + padding + Dice.range(1, variance)
+                val x1 = (ix+1) * cellsize - padding - Dice.range(1, variance)
+                val y1 = (iy+1) * cellsize - padding - Dice.range(1, variance)
+                if (Dice.chance(0.1f)) {
+                    val mid = x0 + (x1 - x0) / 2 - 1
+                    carveRuin(carto, x0, y0, x0 + mid - 1, y1)
+                    carveRuin(carto, x0 + mid + 1, y0, x1, y1)
+                } else if (Dice.chance(0.1f)) {
+                    val mid = y0 + (y1 - y0) / 2 - 1
+                    carveRuin(carto, x0, y0, x1, y0 + mid - 1)
+                    carveRuin(carto, x0, y0 + mid + 1, x1, y1)
+                } else if (Dice.chance(0.04f)) {
+                    digLake(carto, x0, y0, x1, y1)
+                } else if (Dice.chance(0.93f)) {
+                    carveRuin(carto, x0, y0, x1, y1)
+                }
+            }
+        }
+    }
+
+    private fun carveRuin(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
+        var clear = true
+        for (ix in x0 .. x1) {
+            for (iy in y0 .. y1) {
+                if (listOf(
+                        TERRAIN_DEEP_WATER, TERRAIN_SHALLOW_WATER, GENERIC_WATER
+                ).contains(carto.getTerrain(ix + carto.x0, iy + carto.y0))) clear = false
+            }
+        }
+        if (!clear) return
+        val filled = Dice.chance(0.3f)
+        for (ix in x0 .. x1) {
+            for (iy in y0 .. y1) {
+                val wear = NoisePatches.get("ruinWear", ix + carto.x0, iy + carto.y0).toFloat()
+                if (wear < 0.4f && Dice.chance(1.1f - wear * 0.5f)) {
+                    val microwear = NoisePatches.get("ruinMicro", ix + carto.x0, iy + carto.y0).toFloat()
+                    if (microwear > wear) {
+                        if (ix == x0 || ix == x1 || iy == y0 || iy == y1 || filled || microwear > 0.6f) {
+                            if (Dice.chance(0.9f)) setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_BRICKWALL)
+                        } else {
+                            setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_STONEFLOOR)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
+        val blob = carto.growBlob(x1-x0, y1-y0)
+        carto.printBlob(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
+    }
 }

@@ -304,7 +304,7 @@ abstract class Carto(
         }
     }
 
-    protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
+    fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
 
     protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
         forEachCell { x, y ->
@@ -371,7 +371,7 @@ abstract class Carto(
         }
     }
 
-    protected fun growBlob(width: Int, height: Int): Array<Array<Boolean>> {
+    fun growBlob(width: Int, height: Int): Array<Array<Boolean>> {
         val grid = Array(width) { Array(height) { true } }
         for (x in 0 until width) {
             grid[x][0] = false
@@ -427,7 +427,7 @@ abstract class Carto(
         return grid
     }
 
-    protected fun printBlob(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
+    fun printBlob(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         for (ix in x..x + blob.size - 1) {
             for (iy in y .. y + blob[0].size - 1) {
                 if (blob[ix - x][iy - y]) {

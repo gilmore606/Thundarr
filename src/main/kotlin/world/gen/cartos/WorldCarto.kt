@@ -54,6 +54,10 @@ class WorldCarto(
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.hasLake) digLake()
+
+            // Carve extra terrain with no biome edge blending
+            meta.biome.carveExtraTerrain(this)
+
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
 
@@ -323,8 +327,21 @@ class WorldCarto(
             }
         }
         fuzzTerrain(GENERIC_WATER, meta.riverBlur * 0.4f)
-        fringeTerrain(GENERIC_WATER, TERRAIN_GRASS, meta.riverGrass, TERRAIN_SHALLOW_WATER)
-        fringeTerrain(GENERIC_WATER, TERRAIN_DIRT, meta.riverDirt, TERRAIN_SHALLOW_WATER)
+        addRiverBanks()
+    }
+
+    protected fun addRiverBanks() {
+        forEachBiome { x, y, biome ->
+            if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
+                DIRECTIONS.forEach { dir ->
+                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != Terrain.Type.GENERIC_WATER) {
+                        if (getTerrain(x + dir.x, y + dir.y) != Terrain.Type.TERRAIN_SHALLOW_WATER) {
+                            setTerrain(x + dir.x, y + dir.y, biome.riverBankTerrain(x,y))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun drawRiver(start: RiverExit, end: RiverExit) {

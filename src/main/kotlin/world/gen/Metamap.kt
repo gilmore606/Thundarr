@@ -35,9 +35,9 @@ object Metamap {
     val maxRangePeakDistance = 4
     val mountainRangeWetness = 6
     val citiesRiverMouth = 10
-    val citiesRiver = 15
-    val citiesCoast = 15
-    val citiesInland = 15
+    val citiesRiver = 10
+    val citiesCoast = 10
+    val citiesInland = 8
     val minCityDistance = 15
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
