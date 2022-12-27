@@ -25,6 +25,8 @@ object Metamap {
 
     var isWorking = false
 
+    val minLand = 0.4f
+    val maxLand = 0.7f
     val coastRoughness = 0.15f
     val bigRiverDensity = 0.4f
     val smallRiverDensity = 0.1f
@@ -97,105 +99,116 @@ object Metamap {
 
         isWorking = true
         coroutineScope.launch {
-            Console.sayFromThread("Breaking the moon in half...")
-
-            for (ix in -chunkRadius until chunkRadius) {
-                for (iy in -chunkRadius until chunkRadius) {
-                    val chunkX = ix * CHUNK_SIZE
-                    val chunkY = iy * CHUNK_SIZE
-                    scratches[ix + chunkRadius][iy + chunkRadius].apply {
-                        x = chunkX
-                        y = chunkY
-                    }
-                }
-            }
 
             // CONTINENT
-            for (i in 0 until chunkRadius *2) {
-                scratches[i][0].height = 0
-                scratches[i][chunkRadius * 2 - 1].height = 0
-                scratches[0][i].height = 0
-                scratches[chunkRadius * 2 - 1][i].height = 0
-            }
-            // Cut squares out of edge coast
-            for (i in 0 until chunkRadius *2) {
-                if (Dice.chance(coastRoughness)) {
-                    val w = Dice.range(4,25)
-                    val h = Dice.range(4,25)
-                    val edge = CARDINALS.random()
-                    val x0 = when (edge) {
-                        NORTH, SOUTH -> i
-                        EAST -> (chunkRadius *2-1)-w
-                        else -> 0
-                    }
-                    val x1 = when (edge) {
-                        NORTH, SOUTH -> i + w
-                        EAST -> chunkRadius *2-1
-                        else -> w
-                    }
-                    val y0 = when (edge) {
-                        NORTH -> 0
-                        SOUTH -> (chunkRadius *2-1)-h
-                        else -> i
-                    }
-                    val y1 = when (edge) {
-                        NORTH -> h
-                        SOUTH -> (chunkRadius *2-1)
-                        else -> i + h
-                    }
-                    for (x in x0 until x1) {
-                        for (y in y0 until y1) {
-                            if (boundsCheck(x, y) && !((x == x0 || x == x1-1) && (y == y0 || y == y1-1)))
-                                scratches[x][y].height = 0
+            Console.sayFromThread("Breaking the moon in half...")
+            var landFraction = 0f
+            while (landFraction < minLand || landFraction > maxLand) {
+                if (landFraction > 0f) Console.sayFromThread("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
+                var landC = 0
+                var totalC = 0
+                for (ix in -chunkRadius until chunkRadius) {
+                    for (iy in -chunkRadius until chunkRadius) {
+                        val chunkX = ix * CHUNK_SIZE
+                        val chunkY = iy * CHUNK_SIZE
+                        scratches[ix + chunkRadius][iy + chunkRadius].apply {
+                            x = chunkX
+                            y = chunkY
+                            height = -1
                         }
                     }
                 }
-            }
-            // Cut square seas, preferably around the edge
-            repeat (100) {
-                val x0 = Dice.zeroTil(chunkRadius *2-5)
-                val y0 = Dice.zeroTil(chunkRadius *2-5)
-                if ((!(x0 in 32..chunkRadius *2-32) && !(y0 in 32 .. chunkRadius *2-32)) || Dice.chance(0.15f)) {
-                    var x1 = x0 + Dice.range(3, 12)
-                    var y1 = y0 + Dice.range(3, 12)
-                    if (Dice.chance(0.3f)) {
-                        x1 = (x1 - x0) * (2 + Dice.oneTo(5)) + x0
-                        y1 = (y1 - y0) * (2 + Dice.oneTo(5)) + y0
-                    }
-                    for (x in x0 until x1) {
-                        for (y in y0 until y1) {
-                            if (boundsCheck(x, y) && !((x == x0 || x == x1-1) && (y == y0 || y == y1-1)))
-                                scratches[x][y].height = 0
+                for (i in 0 until chunkRadius * 2) {
+                    scratches[i][0].height = 0
+                    scratches[i][chunkRadius * 2 - 1].height = 0
+                    scratches[0][i].height = 0
+                    scratches[chunkRadius * 2 - 1][i].height = 0
+                }
+                // Cut squares out of edge coast
+                for (i in 0 until chunkRadius * 2) {
+                    if (Dice.chance(coastRoughness)) {
+                        val w = Dice.range(4, 25)
+                        val h = Dice.range(4, 25)
+                        val edge = CARDINALS.random()
+                        val x0 = when (edge) {
+                            NORTH, SOUTH -> i
+                            EAST -> (chunkRadius * 2 - 1) - w
+                            else -> 0
+                        }
+                        val x1 = when (edge) {
+                            NORTH, SOUTH -> i + w
+                            EAST -> chunkRadius * 2 - 1
+                            else -> w
+                        }
+                        val y0 = when (edge) {
+                            NORTH -> 0
+                            SOUTH -> (chunkRadius * 2 - 1) - h
+                            else -> i
+                        }
+                        val y1 = when (edge) {
+                            NORTH -> h
+                            SOUTH -> (chunkRadius * 2 - 1)
+                            else -> i + h
+                        }
+                        for (x in x0 until x1) {
+                            for (y in y0 until y1) {
+                                if (boundsCheck(x, y) && !((x == x0 || x == x1 - 1) && (y == y0 || y == y1 - 1)))
+                                    scratches[x][y].height = 0
+                            }
                         }
                     }
                 }
-            }
-            // Grow the seas
-            for (density in listOf(0.2f, 0.6f, 0.1f, 0.5f, 0.6f, 0.2f, 0.2f)) {
-                forEachMeta { x,y,cell ->
-                    if (cell.height == 0) {
-                        CARDINALS.forEach { dir ->
-                            if (boundsCheck(x+dir.x, y+dir.y)) {
-                                val neighbor = scratches[x + dir.x][y + dir.y]
-                                if ((neighbor.height == -1) && Dice.chance(density)) {
-                                    neighbor.height = -2
-                                    CARDINALS.forEach { ndir ->
-                                        if (boundsCheck(x+dir.x+ndir.x, y+dir.y+ndir.y)) {
-                                            val nn = scratches[x+dir.x+ndir.x][y+dir.y+ndir.y]
-                                            if (Dice.chance(density * 0.7f)) nn.height = -2
+                // Cut square seas, preferably around the edge
+                repeat(100) {
+                    val x0 = Dice.zeroTil(chunkRadius * 2 - 5)
+                    val y0 = Dice.zeroTil(chunkRadius * 2 - 5)
+                    if ((!(x0 in 32..chunkRadius * 2 - 32) && !(y0 in 32..chunkRadius * 2 - 32)) || Dice.chance(0.15f)) {
+                        var x1 = x0 + Dice.range(3, 12)
+                        var y1 = y0 + Dice.range(3, 12)
+                        if (Dice.chance(0.3f)) {
+                            x1 = (x1 - x0) * (2 + Dice.oneTo(5)) + x0
+                            y1 = (y1 - y0) * (2 + Dice.oneTo(5)) + y0
+                        }
+                        for (x in x0 until x1) {
+                            for (y in y0 until y1) {
+                                if (boundsCheck(x, y) && !((x == x0 || x == x1 - 1) && (y == y0 || y == y1 - 1)))
+                                    scratches[x][y].height = 0
+                            }
+                        }
+                    }
+                }
+                // Grow the seas
+                for (density in listOf(0.2f, 0.6f, 0.1f, 0.5f, 0.6f, 0.2f, 0.2f)) {
+                    forEachMeta { x, y, cell ->
+                        if (cell.height == 0) {
+                            CARDINALS.forEach { dir ->
+                                if (boundsCheck(x + dir.x, y + dir.y)) {
+                                    val neighbor = scratches[x + dir.x][y + dir.y]
+                                    if ((neighbor.height == -1) && Dice.chance(density)) {
+                                        neighbor.height = -2
+                                        CARDINALS.forEach { ndir ->
+                                            if (boundsCheck(x + dir.x + ndir.x, y + dir.y + ndir.y)) {
+                                                val nn = scratches[x + dir.x + ndir.x][y + dir.y + ndir.y]
+                                                if (Dice.chance(density * 0.7f)) nn.height = -2
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    forEachMeta { x, y, cell ->
+                        if (cell.height == -2) cell.height = 0
+                    }
                 }
-                forEachMeta { x,y,cell ->
-                    if (cell.height == -2) cell.height = 0
+                forEachMeta { x, y, cell ->
+                    if (cell.height != 0) landC++
+                    totalC++
                 }
+                landFraction = landC.toFloat() / totalC.toFloat()
             }
 
-            // WATER
+            // SLOPES
             Console.sayFromThread("Stirring the face of the waters...")
 
             val opens = ArrayList<XY>()
@@ -370,9 +383,14 @@ object Metamap {
 
             // Seed and grow swamps
             forEachMeta { x,y,cell ->
-                if (y > 70 && cell.height > 0 && cell.height < 8 && cell.biome == Blank && cell.riverExits.isNotEmpty()) {
-                    if (Dice.chance(0.03f)) {
-                        cell.biome = Swamp
+                if (y > 50 && cell.height > 0 && cell.height < 13 && cell.biome == Blank) {
+                    var chance = cell.riverExits.size * 0.015f +
+                            (if (cell.dryness < 7) 0.005f else 0f)
+                    chance *= 1f + (y * 0.0004f)
+                    if (Dice.chance(chance)) {
+                        if (NoisePatches.get("metaVariance2", x, y) > 0.4f) {
+                            cell.biome = Swamp
+                        }
                     }
                 }
             }
@@ -384,7 +402,16 @@ object Metamap {
                 }
             }, { x,y,n ->
                 n > 0 && Dice.chance(0.3f)
-            }).evolve(4)
+            }).evolve(3)
+            Evolver(chunkRadius*2, chunkRadius*2, false, { x,y ->
+                boundsCheck(x,y) && scratches[x][y].biome == Swamp
+            }, { x,y ->
+                if (boundsCheck(x,y) && scratches[x][y].biome == Blank && scratches[x][y].height > 0) {
+                    scratches[x][y].biome = Swamp
+                }
+            }, { x,y,n ->
+                n > 0 && Dice.chance(0.7f)
+            }).evolve(1)
 
             // Place cities
             val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland + citiesDesert
@@ -454,7 +481,7 @@ object Metamap {
                     } else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
                         cell.biome = Desert
                     } else {
-                        if (NoisePatches.get("metaForest", x, y) > 0.04f + (cell.dryness * 0.09f)) {
+                        if (NoisePatches.get("metaForest", x, y) > 0.04f + (cell.dryness * 0.08f) + max(0, 80 - y) * 0.005f) {
                             cell.biome = Forest
                         } else {
                             cell.biome = Plain
@@ -484,6 +511,22 @@ object Metamap {
                 cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
             }
 
+            // Clean up biome collisions
+            forEachMeta { x, y, cell ->
+                when (cell.biome) {
+                    Swamp -> {
+                        if (biomeNeighbors(x,y,Swamp,false) < 1) cell.biome = Plain
+                    }
+                    Forest -> {
+                        if (biomeNeighbors(x,y,Desert, true) > 0) cell.biome = Plain
+                    }
+                    Plain -> {
+                        if (biomeNeighbors(x,y,Swamp, false) == 4) cell.biome = Swamp
+                        if (biomeNeighbors(x,y,Desert, false) == 4) cell.biome = Desert
+                    }
+                }
+            }
+
             // END STAGE : WRITE ALL DATA
             Console.sayFromThread("Saving generated world...")
             for (ix in -chunkRadius until chunkRadius) {
@@ -493,9 +536,6 @@ object Metamap {
                         it.add(scratches[ix + chunkRadius][iy + chunkRadius].toChunkMeta())
                     }
                     metas.add(it)
-                }
-                if (ix % 50 == 0) {
-                    Console.sayFromThread("...wrote latitude ${ix * CHUNK_SIZE}...")
                 }
             }
             scratches = Array(1) { Array(1) { ChunkScratch() } }
