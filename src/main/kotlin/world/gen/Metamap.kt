@@ -34,10 +34,11 @@ object Metamap {
     val minMountainHeight = 20
     val maxRangePeakDistance = 4
     val mountainRangeWetness = 6
-    val citiesRiverMouth = 10
-    val citiesRiver = 10
-    val citiesCoast = 10
+    val citiesRiverMouth = 6
+    val citiesRiver = 8
+    val citiesCoast = 8
     val citiesInland = 8
+    val citiesDesert = 2
     val minCityDistance = 15
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
@@ -342,12 +343,56 @@ object Metamap {
                 }
             }
 
+            // Seed and grow deserts
+            val desertSites = ArrayList<XY>()
+            forEachMeta { x,y,cell ->
+                if (cell.dryness > (maxDry * 0.6f)) desertSites.add(XY(x,y))
+                if (cell.height > 1 && cell.biome == Blank && cell.riverExits.isEmpty() && cell.dryness >= (maxDry * 0.1f)) {
+                    val mountains = biomeNeighbors(x,y,Mountain)
+                    if (mountains > 1) {
+                        val deserts = biomeNeighbors(x,y,Desert)
+                        val chance = mountains * 0.06f + deserts * 0.3f
+                        if (Dice.chance(chance)) {
+                            cell.biome = Desert
+                        }
+                    }
+                }
+            }
+            Evolver(chunkRadius*2, chunkRadius*2, false, { x,y ->
+                boundsCheck(x,y) && scratches[x][y].biome == Desert
+            }, { x,y ->
+                if (boundsCheck(x,y) && scratches[x][y].biome != Mountain) {
+                    scratches[x][y].biome = Desert
+                }
+            }, { x,y,n ->
+                n > 0 && Dice.chance(0.6f)
+            }).evolve(5)
+
+            // Seed and grow swamps
+            forEachMeta { x,y,cell ->
+                if (y > 70 && cell.height > 0 && cell.height < 8 && cell.biome == Blank && cell.riverExits.isNotEmpty()) {
+                    if (Dice.chance(0.03f)) {
+                        cell.biome = Swamp
+                    }
+                }
+            }
+            Evolver(chunkRadius*2, chunkRadius*2, true, { x,y ->
+                boundsCheck(x,y) && scratches[x][y].biome == Swamp
+            }, { x,y ->
+                if (boundsCheck(x,y) && scratches[x][y].biome == Blank && scratches[x][y].height > 0) {
+                    scratches[x][y].biome = Swamp
+                }
+            }, { x,y,n ->
+                n > 0 && Dice.chance(0.3f)
+            }).evolve(4)
+
             // Place cities
-            val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland
+            val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland + citiesDesert
             Console.sayFromThread("Building $citiesTotal ancient cities...")
             repeat (citiesRiverMouth) { placeCity(mouths) }
             repeat (citiesCoast) { placeCity(coasts) }
             repeat (citiesRiver) { placeCity(riverCells) }
+            repeat (citiesDesert) { placeCity(desertSites) }
             val inlandSites = ArrayList<XY>().apply {
                 repeat(1000) {
                     val x = Dice.range(10, chunkRadius*2 - 10)
@@ -409,7 +454,7 @@ object Metamap {
                     } else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
                         cell.biome = Desert
                     } else {
-                        if (NoisePatches.get("metaForest", x, y) > 0.1f) {
+                        if (NoisePatches.get("metaForest", x, y) > 0.04f + (cell.dryness * 0.09f)) {
                             cell.biome = Forest
                         } else {
                             cell.biome = Plain
