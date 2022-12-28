@@ -4,15 +4,12 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.*
 import util.Dice
-import util.Perlin
 import util.Rect
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
-import java.lang.Float.max
-import java.lang.Float.min
 
 @Serializable
 sealed class Biome(
@@ -287,6 +284,6 @@ object Ruins : Biome(
 
     private fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
         val blob = carto.growBlob(x1-x0, y1-y0)
-        carto.printBlob(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
+        carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
     }
 }

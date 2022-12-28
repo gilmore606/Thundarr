@@ -13,8 +13,6 @@ import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
-import java.lang.Integer.max
-import kotlin.math.sign
 import kotlin.random.Random
 
 class WorldCarto(
@@ -281,7 +279,7 @@ class WorldCarto(
     }
 
     private fun buildCoasts() {
-        val cornerWater = growBlob(8, 8)
+        val cornerWater = growOblong(8, 8)
         meta.coasts.forEach { edge ->
             if (edge in CARDINALS) {
                 for (i in 0 until CHUNK_SIZE) {
@@ -295,22 +293,22 @@ class WorldCarto(
             } else {
                 when (edge) {
                     NORTHWEST -> {
-                        printBlob(cornerWater, x0, y0, GENERIC_WATER)
+                        printGrid(cornerWater, x0, y0, GENERIC_WATER)
                         setTerrain(x0,y0, GENERIC_WATER)
                         setTerrain(x0+1,y0+1, GENERIC_WATER)
                     }
                     NORTHEAST -> {
-                        printBlob(cornerWater, x1-7, y0, GENERIC_WATER)
+                        printGrid(cornerWater, x1-7, y0, GENERIC_WATER)
                         setTerrain(x1,y0, GENERIC_WATER)
                         setTerrain(x1-1,y0+1, GENERIC_WATER)
                     }
                     SOUTHWEST -> {
-                        printBlob(cornerWater, x0, y1-7, GENERIC_WATER)
+                        printGrid(cornerWater, x0, y1-7, GENERIC_WATER)
                         setTerrain(x0,y1, GENERIC_WATER)
                         setTerrain(x0+1,y1-1, GENERIC_WATER)
                     }
                     SOUTHEAST -> {
-                        printBlob(cornerWater, x1-7, y1-7, GENERIC_WATER)
+                        printGrid(cornerWater, x1-7, y1-7, GENERIC_WATER)
                         setTerrain(x1,y1, GENERIC_WATER)
                         setTerrain(x1-1,y1-1, GENERIC_WATER)
                     }
@@ -377,12 +375,12 @@ class WorldCarto(
     }
 
     private fun digLake() {
-        val width = Dice.range(24, 60)
-        val height = Dice.range(24, 60)
+        val width = Dice.range(12, 36)
+        val height = Dice.range(12, 36)
         val blob = growBlob(width, height)
         val x = x0 + Dice.zeroTil(CHUNK_SIZE - width)
         val y = y0 + Dice.zeroTil(CHUNK_SIZE - height)
-        printBlob(blob, x, y, GENERIC_WATER)
+        printGrid(blob, x, y, GENERIC_WATER)
     }
 
     private fun buildBuilding() {

@@ -1,10 +1,8 @@
 package world.gen.cartos
 
 import com.badlogic.gdx.Gdx
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import ktx.async.KtxAsync
 import kotlin.random.Random
 import things.Thing
 import util.*
@@ -16,8 +14,6 @@ import world.level.CHUNK_SIZE
 import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
-import java.io.File
-import java.lang.Math.abs
 
 abstract class Carto(
     val x0: Int,
@@ -367,6 +363,45 @@ abstract class Carto(
     }
 
     fun growBlob(width: Int, height: Int): Array<Array<Boolean>> {
+        val grid = Array(width) { Array(height) { false } }
+        grid[width/2][height/2] = true
+        repeat (10) { growBlobStep(grid, 1, 0.2f) }
+        var hitEdges = false
+        while (!hitEdges) {
+            for (x in 0 until width) if (grid[x][0] || grid[x][height-1]) hitEdges = true
+            for (y in 0 until height) if (grid[0][y] || grid[width-1][y]) hitEdges = true
+            growBlobStep(grid, 2, 0.5f)
+        }
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                var n = 0
+                CARDINALS.from(x,y) { dx, dy, _ ->
+                    if (dx >= 0 && dy >= 0 && dx < width && dy < height && grid[dx][dy]) n++
+                }
+                if (n == 4 && !grid[x][y]) grid[x][y] = true
+                if (n == 0 && grid[x][y]) grid[x][y] = false
+            }
+        }
+        return grid
+    }
+
+    private fun growBlobStep(grid: Array<Array<Boolean>>, threshold: Int, density: Float) {
+        val adds = ArrayList<XY>()
+        for (x in 0 until grid.size) {
+            for (y in 0 until grid[0].size) {
+                if (!grid[x][y]) {
+                    var n = 0
+                    DIRECTIONS.from(x, y) { dx, dy, _ ->
+                        if (dx >= 0 && dy >= 0 && dx < grid.size && dy < grid[0].size && grid[dx][dy]) n++
+                    }
+                    if (n >= threshold && Dice.chance(density)) adds.add(XY(x, y))
+                }
+            }
+        }
+        adds.forEach { grid[it.x][it.y] = true }
+    }
+
+    fun growOblong(width: Int, height: Int): Array<Array<Boolean>> {
         val grid = Array(width) { Array(height) { true } }
         for (x in 0 until width) {
             grid[x][0] = false
@@ -422,7 +457,7 @@ abstract class Carto(
         return grid
     }
 
-    fun printBlob(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
+    fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         for (ix in x..x + blob.size - 1) {
             for (iy in y .. y + blob[0].size - 1) {
                 if (blob[ix - x][iy - y]) {

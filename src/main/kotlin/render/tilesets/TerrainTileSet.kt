@@ -41,9 +41,9 @@ fun TerrainTileSet() =
         })
 
         setTile(Glyph.SWAMP, VariantsTile(this).apply {
-            add(0.4f, 6, 3)
-            add(0.3f, 7, 3)
-            add(0.3f, 8, 3)
+            add(0.8f, 6, 3)
+            add(0.1f, 7, 3)
+            add(0.1f, 8, 3)
         })
 
         setTile(Glyph.BEACH, SimpleTile(this, 6, 4))
