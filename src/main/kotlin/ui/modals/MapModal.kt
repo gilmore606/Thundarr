@@ -9,6 +9,7 @@ import ui.input.Mouse
 import util.*
 import world.gen.Metamap
 import world.gen.biomes.Ocean
+import world.gen.habitats.Blank
 import java.lang.Integer.max
 import java.lang.Integer.min
 
@@ -21,6 +22,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
     var cellSize = 20
     var mapx = 0
     var mapy = 0
+
+    var showHabitats = false
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -42,6 +45,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         } else if (keycode == Input.Keys.EQUALS) {
             cellSize = min(20, cellSize + 2)
             centerView()
+        } else if (keycode == Input.Keys.F1) {
+            showHabitats = !showHabitats
         }
         else when (Keyboard.moveKeys[keycode]) {
             NORTH -> mapy--
@@ -136,6 +141,9 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                 }
                 if (x+mapx == playerX && y+mapy == playerY) {
                     batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
+                }
+                if (showHabitats && meta.habitat != Blank) {
+                    batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.habitat.mapGlyph))
                 }
             }
         }

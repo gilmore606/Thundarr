@@ -6,6 +6,7 @@ import util.XY
 import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
+import world.gen.habitats.Habitat
 
 // Metadata about how to construct a chunk.  Generated at worldgen.
 
@@ -20,6 +21,7 @@ class ChunkMeta(
     val hasLake: Boolean = false,
     val coasts: MutableList<XY> = mutableListOf(),
     val biome: Biome = Blank,
+    val habitat: Habitat = world.gen.habitats.Blank,
     val roadExits: MutableList<RoadExit> = mutableListOf(),
     val variance: Float = 0f,
     var hasCity: Boolean = false,
@@ -57,6 +59,7 @@ class ChunkScratch(
     var dryness = -1
     var coasts: MutableList<XY> = mutableListOf()
     var biome: Biome = Blank
+    var habitat: Habitat = world.gen.habitats.Blank
     var roadExits: MutableList<RoadExit> = mutableListOf()
     var hasCity = false
     var cityDistance = 0f
@@ -71,6 +74,7 @@ class ChunkScratch(
         hasLake = hasLake,
         coasts = coasts,
         biome = biome,
+        habitat = habitat,
         variance = NoisePatches.get("metaVariance",x,y).toFloat(),
         roadExits = roadExits,
         hasCity = hasCity,

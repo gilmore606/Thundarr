@@ -12,6 +12,9 @@ import world.RiverExit
 import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
+import world.gen.habitats.ArcticA
+import world.gen.habitats.TemperateA
+import world.gen.habitats.TropicalA
 import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -46,6 +49,8 @@ object Metamap {
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
     val ruinsMax = 5f
+    val habitatArcticY = 50
+    val habitatTropicY = 150
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -552,6 +557,17 @@ object Metamap {
                     else -> 0
                 }
                 cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
+            }
+
+            // Distribute habitats
+            forEachMeta { x,y,cell ->
+                if (cell.biome != Ocean) {
+                    val arcticY = habitatArcticY + NoisePatches.get("metaVariance2", x, 0) * 40 - 20
+                    val tropicY = habitatTropicY + NoisePatches.get("metaVariance2", x, 100) * 40 - 20
+                    if (y < arcticY) cell.habitat = ArcticA
+                    else if (y > tropicY) cell.habitat = TropicalA
+                    else cell.habitat = TemperateA
+                }
             }
 
             // Name contiguous features

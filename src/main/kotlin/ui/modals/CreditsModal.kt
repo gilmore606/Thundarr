@@ -20,7 +20,7 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN", Position.CENTER
     }
 
     override fun drawModalText() {
-        drawString("a homofagge production", 132, 70)
+        drawString("a dlfsystems production", 132, 70)
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {

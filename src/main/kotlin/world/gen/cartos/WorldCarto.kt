@@ -361,10 +361,12 @@ class WorldCarto(
     }
 
     private fun drawRiver(start: RiverExit, end: RiverExit) {
+        val startWidth = if (start.edge in meta.coasts) start.width * 2f + 3f else start.width.toFloat()
+        val endWidth = if (end.edge in meta.coasts) end.width * 2f + 3f else end.width.toFloat()
         var t = 0f
-        var width = start.width.toFloat()
+        var width = startWidth
         val step = 0.02f
-        val widthStep = (end.width - start.width) * step
+        val widthStep = (endWidth - startWidth) * step
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRoom(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),

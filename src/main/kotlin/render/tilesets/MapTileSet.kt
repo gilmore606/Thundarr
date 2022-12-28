@@ -40,6 +40,13 @@ fun MapTileSet() =
         setTile(Glyph.MAP_ROAD_SE, SimpleTile(this, 3, 4))
         setTile(Glyph.MAP_ROAD_NSEW, SimpleTile(this, 4, 3))
 
+        setTile(Glyph.MAP_HABITAT_HOT_A, SimpleTile(this, 6, 0))
+        setTile(Glyph.MAP_HABITAT_HOT_B, SimpleTile(this, 6, 1))
+        setTile(Glyph.MAP_HABITAT_TEMP_A, SimpleTile(this, 6, 2))
+        setTile(Glyph.MAP_HABITAT_TEMP_B, SimpleTile(this, 6, 3))
+        setTile(Glyph.MAP_HABITAT_COLD_A, SimpleTile(this, 6, 4))
+        setTile(Glyph.MAP_HABITAT_COLD_B, SimpleTile(this, 6, 5))
+
         setTile(Glyph.MAP_PLAYER, SimpleTile(this, 3, 3))
         setTile(Glyph.MAP_MARKER, SimpleTile(this, 4, 1))
     }
