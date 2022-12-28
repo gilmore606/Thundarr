@@ -115,7 +115,7 @@ class Flowers1 : Tree() {
 @Serializable
 class Flowers2 : Tree() {
     override fun glyph() = Glyph.FLOWERS
-    override fun hue() = 0.6f
+    override fun hue() = 0.73f
     override fun name() = "flowers"
     override fun treeMsg() = "Flowers."
 }

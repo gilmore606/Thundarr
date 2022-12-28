@@ -15,6 +15,7 @@ import world.gen.biomes.*
 import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
+import java.lang.Math.abs
 
 object Metamap {
 
@@ -34,7 +35,7 @@ object Metamap {
     val maxRiverWidth = 10
     val riverWidth = 0.15f
     val minMountainHeight = 20
-    val maxRangePeakDistance = 4
+    val maxRangePeakDistance = 3f
     val mountainRangeWetness = 6
     val citiesRiverMouth = 6
     val citiesRiver = 8
@@ -54,6 +55,11 @@ object Metamap {
     val metas = ArrayList<ArrayList<ChunkMeta>>()
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
+    fun metaAtWorld(x: Int, y: Int): ChunkMeta {
+        val cx = chunkXtoX(x)
+        val cy = chunkYtoY(y)
+        return metaAt(cx,cy)
+    }
 
     fun boundsCheck(x: Int, y: Int): Boolean {
         if (x < 0 || y < 0 || x >= chunkRadius * 2 || y >= chunkRadius * 2) return false
@@ -62,8 +68,8 @@ object Metamap {
 
     fun xToChunkX(x: Int) = (x - chunkRadius) * CHUNK_SIZE
     fun yToChunkY(y: Int) = (y - chunkRadius) * CHUNK_SIZE
-    fun chunkXtoX(x: Int) = (x / CHUNK_SIZE) + chunkRadius
-    fun chunkYtoY(y: Int) = (y / CHUNK_SIZE) + chunkRadius
+    fun chunkXtoX(x: Int) = (x / CHUNK_SIZE) + chunkRadius + (if (x < 0) -1 else 0)
+    fun chunkYtoY(y: Int) = (y / CHUNK_SIZE) + chunkRadius + (if (y < 0) -1 else 0)
 
     fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
         for (x in 0 until chunkRadius * 2) {
@@ -321,9 +327,9 @@ object Metamap {
                 done = true
                 forEachMeta { x,y,cell ->
                     if (cell.dryness == maxDry) {
-                        DIRECTIONS.forEach { dir ->
-                            if (boundsCheck(x+dir.x,y+dir.y)) {
-                                val neighbor = scratches[x+dir.x][y+dir.y]
+                        DIRECTIONS.from(x,y) { dx, dy, _ ->
+                            if (boundsCheck(dx, dy)) {
+                                val neighbor = scratches[dx][dy]
                                 if (neighbor.dryness == -1) {
                                     neighbor.dryness = maxDry + 1
                                     done = false
@@ -342,7 +348,7 @@ object Metamap {
                 if (scratches[peak.x][peak.y].dryness < mountainRangeWetness) {
                     val connected = ArrayList<XY>()
                     peaks.forEach { otherPeak ->
-                        if (distanceBetween(peak, otherPeak) < maxRangePeakDistance) {
+                        if (abs(peak.x - otherPeak.x) < maxRangePeakDistance && abs(peak.y - otherPeak.y) < maxRangePeakDistance * 1.3f) {
                             connected.add(otherPeak)
                         }
                     }
@@ -449,67 +455,36 @@ object Metamap {
             growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
             growBiome(Ruins, 2, 0.6f, true, listOf(Ocean))
 
-            // Post-processing
+            // Biomes pass 1 -- dry deserts, grow forests on plains
             forEachMeta { x,y,cell ->
-                if (cell.riverExits.isNotEmpty()) {
-                    cell.riverBlur = 0.3f
-                    cell.riverGrass = 0.8f
-                    cell.riverDirt = 0.2f
-                }
-                // Set coasts
-                if (cell.height > 0) {
-                    DIRECTIONS.forEach { dir ->
-                        metaAt(x + dir.x, y + dir.y)?.also { neighbor ->
-                            if (neighbor.height == 0) {
-                                cell.coasts.add(dir)
-                            }
-                        }
-                    }
-                    val adds = ArrayList<XY>()
-                    cell.coasts.forEach { when (it) {
-                        NORTH -> { adds.add(NORTHWEST) ; adds.add(NORTHEAST) }
-                        SOUTH -> { adds.add(SOUTHWEST) ; adds.add(SOUTHEAST) }
-                        WEST -> { adds.add(NORTHWEST) ; adds.add(SOUTHWEST) }
-                        EAST -> { adds.add(NORTHEAST) ; adds.add(SOUTHEAST) }
-                    } }
-                    adds.forEach { if (!cell.coasts.contains(it)) cell.coasts.add(it) }
-                }
-                // Set biome
                 if (cell.biome == Blank) {
-                    if (cell.height == 0) {
-                        cell.biome = Ocean
-                    } else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
+                    if (cell.height == 0) cell.biome = Ocean
+                    else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
                         cell.biome = Desert
+                    } else if (NoisePatches.get("metaForest", x, y) > 0.04f + (cell.dryness * 0.08f) + max(0, 80 - y) * 0.005f) {
+                        cell.biome = Forest
                     } else {
-                        if (NoisePatches.get("metaForest", x, y) > 0.04f + (cell.dryness * 0.08f) + max(0, 80 - y) * 0.005f) {
-                            cell.biome = Forest
-                        } else {
-                            cell.biome = Plain
-                        }
-                        cell.hasLake = Dice.chance(when (cell.riverExits.size) {
-                            0 -> 0.02f
-                            1 -> 0.3f
-                            2 -> 0.06f
-                            else -> 0.1f
-                        })
+                        cell.biome = Plain
                     }
                 }
-                if (cell.biome == Ruins) cell.roadExits.clear()
-                // Add city distance
-                cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
-                // Add ruins
-                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.roadExits.size * 0.1f
-                val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
-                cell.ruinedBuildings = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
-                if (cell.cityDistance <= 2f) cell.ruinedBuildings += 2
-                if (Dice.chance(0.01f)) cell.ruinedBuildings += 1
-                cell.ruinedBuildings += when (cell.biome) {
-                    Mountain -> -1
-                    Ruins -> -cell.ruinedBuildings
-                    else -> 0
-                }
-                cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
             }
+
+            // Biomes pass 2 - insert intermediate biomes
+            forEachMeta { x,y,cell ->
+                when (cell.biome) {
+                    Plain -> {
+                        if (biomeNeighbors(x,y,Mountain,true) > 0) cell.biome = Hill
+                        if (biomeNeighbors(x,y,Desert, true) > 0) cell.biome = Scrub
+                        if (biomeNeighbors(x,y,Ruins, true) > 0) cell.biome = Suburb
+                        if ((biomeNeighbors(x,y,Forest,true) == 0) && Dice.chance(0.01f)) cell.biome = Scrub
+                    }
+                    else -> { }
+                }
+            }
+            repeat (3) { growBiome(Scrub, 1, 0.5f, false) { x,y,cell ->
+                cell.biome == Plain } }
+            growBiome(Suburb, 2, 0.5f, true) { x,y,cell ->
+                cell.biome == Plain }
 
             // Clean up biome collisions
             forEachMeta { x, y, cell ->
@@ -524,7 +499,112 @@ object Metamap {
                         if (biomeNeighbors(x,y,Swamp, false) == 4) cell.biome = Swamp
                         if (biomeNeighbors(x,y,Desert, false) == 4) cell.biome = Desert
                     }
+                    Desert -> {
+                        if (cell.riverExits.isNotEmpty()) cell.biome = Plain
+                    }
+                    else -> { }
                 }
+            }
+
+            // Post-processing
+            forEachMeta { x,y,cell ->
+                if (cell.riverExits.isNotEmpty()) {
+                    cell.riverBlur = 0.3f
+                }
+                // Set coasts
+                if (cell.height > 0) {
+                    DIRECTIONS.from(x, y) { dx, dy, dir ->
+                        metaAt(dx, dy)?.also { neighbor ->
+                            if (neighbor.height == 0) {
+                                cell.coasts.add(dir)
+                            }
+                        }
+                    }
+                    val adds = ArrayList<XY>()
+                    cell.coasts.forEach { when (it) {
+                        NORTH -> { adds.add(NORTHWEST) ; adds.add(NORTHEAST) }
+                        SOUTH -> { adds.add(SOUTHWEST) ; adds.add(SOUTHEAST) }
+                        WEST -> { adds.add(NORTHWEST) ; adds.add(SOUTHWEST) }
+                        EAST -> { adds.add(NORTHEAST) ; adds.add(SOUTHEAST) }
+                    } }
+                    adds.forEach { if (!cell.coasts.contains(it)) cell.coasts.add(it) }
+                }
+                // Add lake
+                if (cell.biome.canHaveLake()) {
+                    cell.hasLake = Dice.chance(when (cell.riverExits.size) {
+                        0 -> 0.02f
+                        1 -> 0.3f
+                        2 -> 0.06f
+                        else -> 0.1f
+                    })
+                }
+
+                // Add ruined buildings around cities
+                cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
+                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.roadExits.size * 0.1f
+                val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
+                cell.ruinedBuildings = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
+                if (cell.cityDistance <= 2f) cell.ruinedBuildings += 2
+                if (Dice.chance(0.01f)) cell.ruinedBuildings += 1
+                cell.ruinedBuildings += when (cell.biome) {
+                    Mountain -> -1
+                    Ruins -> -cell.ruinedBuildings
+                    else -> 0
+                }
+                cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
+            }
+
+            // Name contiguous features
+            Console.sayFromThread("Naming geography...")
+            val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
+            fun floodFill(x: Int, y: Int, id: Int, biome: Biome): Int {
+                var cells = 1
+                areaMap[x][y] = id
+                DIRECTIONS.from(x,y) { dx, dy, dir ->
+                    if (boundsCheck(dx,dy) && areaMap[dx][dy] == 0 && scratches[dx][dy].biome == biome) {
+                        cells += floodFill(dx,dy,id,biome)
+                    }
+                }
+                return cells
+            }
+            class BiomeArea(val areaID: Int, val size: Int)
+            val areas = mutableMapOf<Biome,ArrayList<BiomeArea>>()
+            var areaID = 1
+            forEachMeta { x,y,cell ->
+                if (areaMap[x][y] == 0) {
+                    val biome = scratches[x][y].biome
+                    if (listOf(Ruins, Suburb, Desert, Mountain, Swamp).contains(biome)) {
+                        val size = floodFill(x, y, areaID, biome)
+                        if (areas.containsKey(biome)) {
+                            areas[biome]?.add(BiomeArea(areaID, size))
+                        } else {
+                            areas[biome] = ArrayList<BiomeArea>().apply { add(BiomeArea(areaID, size)) }
+                        }
+                        areaID++
+                    }
+                }
+            }
+            fun nameArea(areaID: Int, name: String) {
+                forEachMeta { x,y,cell -> if (areaMap[x][y] == areaID) cell.title = name }
+            }
+            areas[Ruins]?.sortByDescending { it.size }
+            areas[Ruins]?.forEachIndexed { n, area ->
+                nameArea(area.areaID, if (n < 6) Madlib.bigCityName() else Madlib.smallCityName())
+            }
+            areas[Swamp]?.forEachIndexed { n, area ->
+                nameArea(area.areaID, Madlib.swampName())
+            }
+            areas[Desert]?.sortByDescending { it.size }
+            areas[Desert]?.forEachIndexed { n, area ->
+                if (n < 12) nameArea(area.areaID, Madlib.desertName())
+            }
+            areas[Mountain]?.sortByDescending { it.size }
+            areas[Mountain]?.forEachIndexed { n, area ->
+                if (n < 30) nameArea(area.areaID, Madlib.mountainRangeName())
+            }
+            areas[Forest]?.sortByDescending { it.size }
+            areas[Forest]?.forEachIndexed { n, area ->
+                if (n < 10) nameArea(area.areaID, Madlib.forestName())
             }
 
             // END STAGE : WRITE ALL DATA
@@ -678,9 +758,9 @@ object Metamap {
 
     private fun biomeNeighbors(x: Int, y: Int, biome: Biome, allDirections: Boolean = false): Int {
         var c = 0
-        (if (allDirections) DIRECTIONS else CARDINALS).forEach { dir ->
-            if (boundsCheck(x + dir.x, y + dir.y) &&
-                scratches[x + dir.x][y + dir.y].biome == biome) {
+        (if (allDirections) DIRECTIONS else CARDINALS).from(x, y) { dx, dy, dir ->
+            if (boundsCheck(dx, dy) &&
+                scratches[dx][dy].biome == biome) {
                 c++
             }
         }
@@ -690,7 +770,21 @@ object Metamap {
     private fun growBiome(biome: Biome, threshold: Int, chance: Float, allDirections: Boolean, exclude: List<Biome> = listOf()) {
         val adds = ArrayList<XY>()
         forEachMeta { x, y, cell ->
-            if (cell.biome != biome && !exclude.contains(cell.biome) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
+            if (cell.biome != biome && cell.height > 0 && !exclude.contains(cell.biome) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
+                if (Dice.chance(chance)) adds.add(XY(x,y))
+            }
+        }
+        adds.forEach {
+            scratches[it.x][it.y].biome = biome
+            if (scratches[it.x][it.y].height < 1) scratches[it.x][it.y].height = 1
+        }
+        adds.clear()
+    }
+
+    private fun growBiome(biome: Biome, threshold: Int, chance: Float, allDirections: Boolean, cellOK: (x: Int, y: Int, cell: ChunkScratch)->Boolean) {
+        val adds = ArrayList<XY>()
+        forEachMeta { x, y, cell ->
+            if (cell.biome != biome && cell.height > 0 && cellOK(x,y,cell) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
                 if (Dice.chance(chance)) adds.add(XY(x,y))
             }
         }

@@ -24,7 +24,8 @@ class ChunkMeta(
     val variance: Float = 0f,
     var hasCity: Boolean = false,
     var cityDistance: Float = 0f,
-    var ruinedBuildings: Int = 0
+    var ruinedBuildings: Int = 0,
+    var title: String = "the wilderness"
 )
 
 @Serializable
@@ -52,8 +53,6 @@ class ChunkScratch(
     var riverDescendantCount = 0
     var riverExits: MutableList<RiverExit> = mutableListOf()
     var riverBlur = 0f
-    var riverGrass = 0f
-    var riverDirt = 0f
     var hasLake = false
     var dryness = -1
     var coasts: MutableList<XY> = mutableListOf()
@@ -62,7 +61,7 @@ class ChunkScratch(
     var hasCity = false
     var cityDistance = 0f
     var ruinedBuildings = 0
-
+    var title = "the wilderness"
     fun toChunkMeta() = ChunkMeta(
         x = x,
         y = y,
@@ -76,6 +75,7 @@ class ChunkScratch(
         roadExits = roadExits,
         hasCity = hasCity,
         cityDistance = cityDistance,
-        ruinedBuildings = ruinedBuildings
+        ruinedBuildings = ruinedBuildings,
+        title = title
     )
 }

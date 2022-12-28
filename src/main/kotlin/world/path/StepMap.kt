@@ -150,15 +150,15 @@ class StepMap() {
             if (lx in 0 until width && ly in 0 until height) {
                 val nextstep = map[lx][ly] - 1
                 if (nextstep < 0) return null
-                DIRECTIONS.forEach { dir ->
-                    val tx = lx + dir.x
-                    val ty = ly + dir.y
+                var step: XY? = null
+                DIRECTIONS.from(lx, ly) { tx, ty, _ ->
                     if (tx in 0 until width && ty in 0 until height) {
                         if (map[tx][ty] == nextstep) {
-                            return XY(tx + offsetX, ty + offsetY)
+                            step = XY(tx + offsetX, ty + offsetY)
                         }
                     }
                 }
+                step?.also { return it }
             }
         }
         return null
@@ -177,9 +177,7 @@ class StepMap() {
 
                 while (step >= 0) {
                     foundDir = null
-                    DIRECTIONS.forEach { dir ->
-                        val dx = feet.x + dir.x
-                        val dy = feet.y + dir.y
+                    DIRECTIONS.from(feet.x, feet.y) { dx, dy, dir ->
                         if (dx in 0 until width && dy in 0 until height) {
                             if (foundDir == null && map[dx][dy] == step) {
                                 feet.x = dx

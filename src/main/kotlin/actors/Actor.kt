@@ -516,9 +516,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     fun entitiesNextToUs(): Set<Entity> {
         val entities = mutableSetOf<Entity>()
         level?.also { level ->
-            DIRECTIONS.forEach { dir ->
-                level.actorAt(xy.x + dir.x, xy.y + dir.y)?.also { entities.add(it) }
-                entities.addAll(level.thingsAt(xy.x + dir.x, xy.y + dir.y))
+            DIRECTIONS.from(xy.x, xy.y) { dx, dy, _ ->
+                level.actorAt(dx, dy)?.also { entities.add(it) }
+                entities.addAll(level.thingsAt(dx, dy))
             }
         }
         return entities

@@ -16,9 +16,7 @@ class Evolver(
             for (ix in 0 until width) {
                 for (iy in 0 until height) {
                     var n = 0
-                    (if (cardinalsOnly) CARDINALS else DIRECTIONS).forEach { dir ->
-                        val dx = ix + dir.x
-                        val dy = iy + dir.y
+                    (if (cardinalsOnly) CARDINALS else DIRECTIONS).from(ix, iy) { dx, dy, _ ->
                         if (readCell(dx, dy)) n++
                     }
                     if (rule(ix, iy, n)) {

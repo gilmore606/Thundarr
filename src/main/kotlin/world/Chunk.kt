@@ -268,12 +268,12 @@ class Chunk(
                     this.roofed[x - this.x][y - this.y] = Roofed.WINDOW
                     newRoof = Roofed.WINDOW
                     // We used to be outdoor.  Did we deprive any old window?
-                    DIRECTIONS.forEach { dir ->
-                        if (level.roofedAt(x + dir.x, y + dir.y) == Roofed.WINDOW) {
+                    DIRECTIONS.from(x, y) { dx, dy, _ ->
+                        if (level.roofedAt(dx, dy) == Roofed.WINDOW) {
                             if (!DIRECTIONS.hasOneWhere { dir2 ->
-                                    level.roofedAt(x + dir.x + dir2.x, y + dir.y + dir2.y) == Roofed.OUTDOOR && !level.isOpaqueAt(x + dir.x + dir2.x, y + dir.y + dir2.y)
+                                    level.roofedAt(dx + dir2.x, dy + dir2.y) == Roofed.OUTDOOR && !level.isOpaqueAt(dx + dir2.x, dy + dir2.y)
                                 }) {
-                                level.setRoofedAt(x + dir.x, y + dir.y, Roofed.INDOOR)
+                                level.setRoofedAt(dx, dy, Roofed.INDOOR)
                             }
                         }
                     }
@@ -495,9 +495,7 @@ class Chunk(
         lightCache[x][y].b = ambient.b
         var floorLight: LightColor? = null
         if (isOpaqueAt(x + this.x,y + this.y)) {  // wall light!  use the visible neighbor to avoid wall bleed
-            DIRECTIONS.forEach { dir ->
-                val lx = x + this.x + dir.x
-                val ly = y + this.y + dir.y
+            DIRECTIONS.from(x + this.x, y + this.y) { lx, ly, _ ->
                 if (floorLight == null && !level.isOpaqueAt(lx,ly) && level.visibilityAt(lx,ly) == 1f) {
                     floorLight = level.lightAt(lx, ly)
                 }

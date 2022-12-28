@@ -291,6 +291,12 @@ val CARDINALS = listOf(NORTH, SOUTH, WEST, EAST)
 val DIAGONALS = listOf(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST)
 val DIRECTIONS = listOf(NORTH, SOUTH, WEST, EAST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
 
+fun List<XY>.from(x: Int, y: Int, doThis: (dx: Int, dy: Int, dir: XY)->Unit) {
+    this.forEach { dir ->
+        doThis(x+dir.x, y+dir.y, dir)
+    }
+}
+
 fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
     NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
     SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)

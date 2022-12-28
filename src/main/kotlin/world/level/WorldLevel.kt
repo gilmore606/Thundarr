@@ -3,6 +3,7 @@ package world.level
 import audio.Speaker
 import util.*
 import world.Chunk
+import world.gen.Metamap
 import world.persist.ChunkLoader
 import java.lang.Float.max
 import java.lang.Float.min
@@ -66,7 +67,7 @@ class WorldLevel() : Level() {
     }
 
     override fun debugText(): String = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.let { "chunk ${it.x}x${it.y}" } ?: "???"
-    override fun statusText(): String = "the wilderness"
+    override fun statusText(): String = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).title
     override fun timeScale() = 2.0f
 
     override fun onSetPov() {

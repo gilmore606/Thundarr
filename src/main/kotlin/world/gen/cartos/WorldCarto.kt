@@ -61,14 +61,14 @@ class WorldCarto(
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
 
+            // Populate!
+            growPlants()
+
             // Post-processing
             deepenWater()
             setRoofedInRock()
-            setOverlaps()
             setGeneratedBiomes()
-
-            // Populate!
-            growPlants()
+            setOverlaps()
         }
 
         //debugBorders()
@@ -159,6 +159,21 @@ class WorldCarto(
             }
             blendMap[x - x0][y - y0].clear()
             blendMap[x - x0][y - y0].add(Pair(biome ?: meta.biome, 1f))
+        }
+        // Fill in orphaned single-cells in the blend with a neighbor
+        forEachBiome { x, y, biome ->
+            var switch: Biome? = null
+            var orphan = true
+            CARDINALS.from(x, y) { tx, ty, _ ->
+                if (boundsCheck(tx, ty)) {
+                    if (blendMap[tx-x0][ty-y0].first().first == biome) orphan = false
+                    else switch = blendMap[tx-x0][ty-y0].first().first
+                }
+            }
+            if (orphan) blendMap[x-x0][y-y0].apply {
+                clear()
+                add(Pair(switch!!, 1f))
+            }
         }
     }
 
@@ -336,10 +351,10 @@ class WorldCarto(
     protected fun addRiverBanks() {
         forEachBiome { x, y, biome ->
             if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
-                DIRECTIONS.forEach { dir ->
-                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != Terrain.Type.GENERIC_WATER) {
-                        if (getTerrain(x + dir.x, y + dir.y) != Terrain.Type.TERRAIN_BEACH) {
-                            setTerrain(x + dir.x, y + dir.y, biome.riverBankTerrain(x,y))
+                DIRECTIONS.from(x, y) { dx, dy, _ ->
+                    if (boundsCheck(dx, dy) && getTerrain(dx, dy) != Terrain.Type.GENERIC_WATER) {
+                        if (getTerrain(dx, dy) != Terrain.Type.TERRAIN_BEACH) {
+                            setTerrain(dx, dy, biome.riverBankTerrain(x,y))
                         }
                     }
                 }

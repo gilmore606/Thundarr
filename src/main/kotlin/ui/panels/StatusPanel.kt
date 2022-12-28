@@ -57,7 +57,7 @@ object StatusPanel : ShadedPanel() {
     }
 
     override fun drawText() {
-        drawString(App.level.statusText(), padding, padding)
+        drawString(App.level.statusText(), padding, padding, Screen.fontColorBold, Screen.smallFont)
         drawString(App.gameTime.timeString, padding, padding + 25, Screen.fontColorDull, Screen.smallFont)
         drawString(App.gameTime.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
 

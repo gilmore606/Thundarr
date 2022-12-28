@@ -15,8 +15,8 @@ import java.lang.Integer.min
 class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
 
-    val playerX = Metamap.chunkXtoX(App.player.xy.x) - 1
-    val playerY = Metamap.chunkYtoY(App.player.xy.y) - 1
+    val playerX = Metamap.chunkXtoX(App.player.xy.x)
+    val playerY = Metamap.chunkYtoY(App.player.xy.y)
 
     var cellSize = 20
     var mapx = 0

@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
-import util.DIRECTIONS
-import util.Dice
-import util.LightColor
-import util.log
+import util.*
 import world.CellContainer
 import world.level.Level
 import java.lang.Float.min
@@ -78,9 +75,7 @@ class Fire : Stain(), LightSource {
             // maybe spread nearby
             holder.level?.also { level ->
                 if (size > 1f && Dice.chance(size * 0.05f)) {
-                    DIRECTIONS.forEach { dir ->
-                        val lx = holder.xy.x + dir.x
-                        val ly = holder.xy.y + dir.y
+                    DIRECTIONS.from(holder.xy.x, holder.xy.y) { lx, ly, _ ->
                         var spreadChance = 0f
                         level.thingsAt(lx, ly).forEach {
                             spreadChance += it.flammability()

@@ -344,4 +344,90 @@ object Madlib {
         "Omoho",
         "Skaran-Ton",
     ).random()
+
+    fun mountainRangeName() = if (Dice.flip()) {
+        "Mountains of " + listOf(
+            "Mist",
+            "Dreams",
+            "the Moon",
+            "the Sun",
+            "Avarice",
+            "Nightmares",
+            "Hunger",
+            "Silence",
+            "Madness",
+            "Ending",
+            wizardName(),
+            wizardName(),
+            wizardName(),
+            wizardName(),
+            wizardName()
+        ).random()
+    } else {
+        listOf(
+            "Misty",
+            "Hazy",
+            "Foggy",
+            "Rocky",
+            "Stony",
+            "Frosty",
+            "Forgotten",
+            "Nameless",
+            "Spine",
+            wizardName(),
+            wizardName(),
+            wizardName(),
+            wizardName(),
+            wizardName()
+        ).random() + " Mountains"
+    }
+
+    fun desertName() = listOf(
+        "Mirrored",
+        "Painted",
+        "Forsaken",
+        "Forgotten",
+        "Forbidden",
+        "Lacquered",
+        "Blasted",
+        "Bleached",
+        "Skull",
+        wizardName(),
+        wizardName(),
+        wizardName(),
+        wizardName(),
+        wizardName()
+    ).random() + " " + listOf(
+        "Desert",
+        "Wastes",
+        "Wasteland"
+    ).random()
+
+    fun swampName() = listOf(
+        "Bog", "Fen", "Swamp"
+    ).random() + " of " + listOf(
+        "Despair",
+        "Drowning",
+        "Stench",
+        "Vapours",
+        "Regrets",
+        "Twilight",
+        "Howling",
+        "Weeping",
+        "Rashes",
+        wizardName(),
+        wizardName(),
+        wizardName(),
+        wizardName(),
+        wizardName()
+    ).random()
+
+    fun forestName(): String {
+        val adjs = listOf("Horror", "Fear", "Gloom", "Spider", "Beetle", "Death", "Moon", "Moss")
+        return when (Dice.oneTo(3)) {
+            1 -> { adjs.random() + "wood" }
+            2 -> { adjs.random() + "woods" }
+            else -> { adjs.random() + " Forest" }
+        }
+    }
 }

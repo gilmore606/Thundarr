@@ -17,8 +17,10 @@ import java.lang.Float.min
 @Serializable
 sealed class Biome(
     val mapGlyph: Glyph,
-    val baseTerrain: Terrain.Type
+    val baseTerrain: Terrain.Type,
 ) {
+    open fun canHaveLake() = true
+
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
@@ -45,7 +47,7 @@ object Ocean : Biome(
     Glyph.MAP_WATER,
     TERRAIN_DEEP_WATER
 ) {
-
+    override fun canHaveLake() = false
 }
 
 @Serializable
@@ -71,7 +73,7 @@ object Plain : Biome(
         } else if (fertility < grassMin + (variance * 0.003f)) {
             if (Dice.chance(1f - fertility * 800f)) addTerrain(Terrain.Type.TERRAIN_DIRT)
         } else {
-            if (Dice.chance(fertility * 0.3f)) {
+            if (Dice.chance(fertility * 0.2f)) {
                 val type = fertility + Dice.float(-0.3f, 0.3f)
                 addThing(
                     if (type > 0.7f) OakTree()
@@ -92,7 +94,7 @@ object Forest : Biome(
     TERRAIN_GRASS
 ) {
     val forestMin = 0.7f
-    val treeChance = 0.05f
+    val treeChance = 0.04f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         if (NoisePatches.get("extraForest", x, y) > 0.2f) {
@@ -108,7 +110,7 @@ object Forest : Biome(
         } else if (Dice.chance(treeChance)) {
             addThing(OakTree())
         } else {
-            if (Dice.chance(fertility * 1f)) {
+            if (Dice.chance(fertility * 0.7f)) {
                 val type = fertility + Dice.float(-0.3f, 0.3f)
                 addThing(
                     if (type > 0.5f) OakTree()
@@ -119,18 +121,18 @@ object Forest : Biome(
         }
     }
 
-    override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
-        for (x in bounds.x0 .. bounds.x1) {
-            for (y in bounds.y0 .. bounds.y1) {
-                val wx = x + carto.chunk.x
-                val wy = y + carto.chunk.y
-                if (carto.getTerrain(wx, wy) == Terrain.Type.TERRAIN_FORESTWALL) {
-                    if (carto.neighborCount(wx,wy, Terrain.Type.TERRAIN_FORESTWALL) < 1) {
-                        carto.setTerrain(wx,wy,TERRAIN_GRASS)
-                    }
-                }
-            }
-        }
+}
+
+@Serializable
+object Hill : Biome(
+    Glyph.MAP_HILL,
+    TERRAIN_GRASS
+) {
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val v = NoisePatches.get("mountainShapes", x, y)
+        if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
+        else if (v < 0.3f) return Terrain.Type.TERRAIN_DIRT
+        else return Terrain.Type.TERRAIN_GRASS
     }
 }
 
@@ -148,19 +150,6 @@ object Mountain : Biome(
 
     override fun riverBankTerrain(x: Int, y: Int) = if (Dice.flip()) Terrain.Type.TERRAIN_GRASS else TERRAIN_DIRT
 
-    override fun postBlendProcess(carto: WorldCarto, bounds: Rect) {
-        for (x in bounds.x0 .. bounds.x1) {
-            for (y in bounds.y0 .. bounds.y1) {
-                val wx = x + carto.chunk.x
-                val wy = y + carto.chunk.y
-                if (carto.getTerrain(wx, wy) == Terrain.Type.TERRAIN_CAVEWALL) {
-                    if (carto.neighborCount(wx,wy, Terrain.Type.TERRAIN_CAVEWALL) < 1) {
-                        carto.setTerrain(wx,wy,TERRAIN_DIRT)
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Serializable
@@ -169,6 +158,32 @@ object Swamp : Biome(
     TERRAIN_SWAMP
 ) {
 
+}
+
+@Serializable
+object Scrub : Biome(
+    Glyph.MAP_SCRUB,
+    TERRAIN_GRASS
+) {
+    val dirtMin = 0.1f
+    val grassMin = 0.4f
+
+    override fun addPlant(fertility: Float, variance: Float,
+                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
+        if (fertility < dirtMin + (variance * 0.003f)) {
+            addTerrain(Terrain.Type.TERRAIN_SAND)
+        } else if (fertility < grassMin + (variance * 0.004f)) {
+            addTerrain(Terrain.Type.TERRAIN_DIRT)
+        } else {
+            if (Dice.chance(fertility * 0.1f)) {
+                val type = fertility + Dice.float(-0.3f, 0.3f)
+                addThing(
+                    if (type > 0.5f) Bush()
+                    else  Bush2()
+                )
+            }
+        }
+    }
 }
 
 @Serializable
@@ -191,6 +206,14 @@ object Beach : Biome(
 @Serializable
 object Tundra: Biome(
     Glyph.MAP_PLAIN,
+    TERRAIN_DIRT
+) {
+
+}
+
+@Serializable
+object Suburb: Biome(
+    Glyph.MAP_SUBURB,
     TERRAIN_DIRT
 ) {
 
