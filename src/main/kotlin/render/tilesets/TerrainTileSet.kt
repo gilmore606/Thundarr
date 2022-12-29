@@ -34,6 +34,11 @@ fun TerrainTileSet() =
             add(0.5f, 1, 2)
         })
 
+        setTile(Glyph.ROCKS, VariantsTile(this).apply {
+            add(0.5f, 7, 4)
+            add(0.5f, 8, 4)
+        })
+
         setTile(Glyph.GRASS, VariantsTile(this).apply {
             add(0.4f, 8, 0)
             add(0.4f, 8, 1)

@@ -12,6 +12,7 @@ enum class Glyph {
     CAVE_FLOOR,
     STONE_FLOOR,
     DIRT,
+    ROCKS,
     GRASS,
     SWAMP,
     BEACH,

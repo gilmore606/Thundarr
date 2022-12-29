@@ -127,13 +127,18 @@ object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR, false) {
 }
 
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_PAVEMENT)
+    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
     override fun moveSpeed(actor: Actor) = 0.9f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
 
+object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, false) {
+    override fun moveSpeed(actor: Actor) = 1.4f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+}
+
 object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT)
+    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
@@ -144,15 +149,15 @@ object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true) {
 }
 
 object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT)
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
     override fun moveSpeed(actor: Actor) = 1.3f
-    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
 object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT)
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
     override fun moveSpeed(actor: Actor) = 1.3f
-    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
 object Pavement : Floor(Type.TERRAIN_PAVEMENT, Glyph.PAVEMENT, false) {

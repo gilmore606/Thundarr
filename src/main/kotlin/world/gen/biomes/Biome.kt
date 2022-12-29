@@ -139,10 +139,11 @@ object Mountain : Biome(
     TERRAIN_DIRT
 ) {
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
-        val v = NoisePatches.get("mountainShapes", x, y)
+        val v = NoisePatches.get("mountainShapes", x, y).toFloat()
         if (v > 0.65f) return Terrain.Type.TERRAIN_CAVEWALL
-        else if (v < 0.01f) return Terrain.Type.TERRAIN_SAND
-        else return Terrain.Type.TERRAIN_DIRT
+        else if (v < 0.2f) return Terrain.Type.TERRAIN_DIRT
+        else if (Dice.chance(1f - v * 2f)) return Terrain.Type.TERRAIN_DIRT
+        else return Terrain.Type.TERRAIN_ROCKS
     }
 
     override fun riverBankTerrain(x: Int, y: Int) = if (Dice.flip()) Terrain.Type.TERRAIN_GRASS else TERRAIN_DIRT

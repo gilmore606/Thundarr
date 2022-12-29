@@ -449,8 +449,11 @@ object Metamap {
                 n++
                 scratches[city.x][city.y].biome = Ruins
                 if (n < numBigCities) {
-                    DIRECTIONS.forEach { dir ->
-                        if (Dice.chance(0.5f)) scratches[city.x + dir.x][city.y + dir.y].biome = Ruins
+                    DIRECTIONS.from(city.x, city.y) { dx, dy, _ ->
+                        if (Dice.chance(0.5f)) {
+                            scratches[dx][dy].biome = Ruins
+                            scratches[dx][dy].height = 1
+                        }
                     }
                 }
                 CARDINALS.forEach { dir ->
@@ -792,7 +795,7 @@ object Metamap {
         }
         adds.forEach {
             scratches[it.x][it.y].biome = biome
-            if (scratches[it.x][it.y].height < 1) scratches[it.x][it.y].height = 1
+            if (scratches[it.x][it.y].height < 1 && biome != Ocean) scratches[it.x][it.y].height = 1
         }
         adds.clear()
     }

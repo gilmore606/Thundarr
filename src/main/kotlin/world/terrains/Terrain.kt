@@ -31,6 +31,7 @@ sealed class Terrain(
             Type.TERRAIN_CAVEFLOOR -> CaveFloor
             Type.TERRAIN_STONEFLOOR -> StoneFloor
             Type.TERRAIN_DIRT -> Dirt
+            Type.TERRAIN_ROCKS -> Rocks
             Type.TERRAIN_GRASS -> Grass
             Type.TERRAIN_SWAMP -> Swamp
             Type.TERRAIN_BEACH -> Beach
@@ -67,6 +68,7 @@ sealed class Terrain(
         TERRAIN_STONEFLOOR,
         TERRAIN_CAVEFLOOR,
         TERRAIN_DIRT,
+        TERRAIN_ROCKS,
         TERRAIN_GRASS,
         TERRAIN_SWAMP,
         TERRAIN_BEACH,
