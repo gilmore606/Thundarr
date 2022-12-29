@@ -461,7 +461,9 @@ abstract class Carto(
         for (ix in x..x + blob.size - 1) {
             for (iy in y .. y + blob[0].size - 1) {
                 if (blob[ix - x][iy - y]) {
-                    setTerrain(ix, iy, terrain)
+                    if (boundsCheck(ix, iy)) {
+                        setTerrain(ix, iy, terrain)
+                    }
                 }
             }
         }

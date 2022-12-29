@@ -49,7 +49,7 @@ object Metamap {
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
     val ruinsMax = 5f
-    val habitatArcticY = 50
+    val habitatArcticY = 70
     val habitatTropicY = 150
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
