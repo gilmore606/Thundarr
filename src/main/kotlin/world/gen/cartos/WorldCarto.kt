@@ -33,6 +33,7 @@ class WorldCarto(
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
     private var hasBlends = false
     lateinit var meta: ChunkMeta
+    private val riverIslandPoints = ArrayList<XY>()
 
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
@@ -51,7 +52,7 @@ class WorldCarto(
             if (meta.coasts.isNotEmpty()) buildCoasts()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
-            if (meta.hasLake || true) digLake()
+            if (meta.hasLake) digLake()
 
             // Carve extra terrain with no biome edge blending
             meta.biome.carveExtraTerrain(this)
@@ -342,6 +343,11 @@ class WorldCarto(
                 }
             }
         }
+        if (riverIslandPoints.isNotEmpty() && Dice.chance(0.7f)) {
+            riverIslandPoints.random().also { island ->
+                printGrid(growBlob(Dice.range(3,6), Dice.range(3,6)), island.x, island.y, meta.biome.baseTerrain)
+            }
+        }
         fuzzTerrain(GENERIC_WATER, meta.riverBlur * 0.4f)
         addRiverBanks()
     }
@@ -371,6 +377,9 @@ class WorldCarto(
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRoom(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
                 (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), 0, GENERIC_WATER, (width >= 3f))
+            if (t > 0.2f && t < 0.8f && width > 6 && Dice.chance(0.1f)) {
+                riverIslandPoints.add(XY((x0 + p.x).toInt(), (y0 + p.y).toInt()))
+            }
             t += step
             width += widthStep
         }
