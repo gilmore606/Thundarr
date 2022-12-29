@@ -177,6 +177,7 @@ enum class Glyph {
     MAP_DESERT,
     MAP_MOUNTAIN,
     MAP_HILL,
+    MAP_FORESTHILL,
     MAP_SCRUB,
     MAP_RUINS,
     MAP_SUBURB,

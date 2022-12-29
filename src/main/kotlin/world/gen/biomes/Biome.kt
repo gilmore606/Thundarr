@@ -134,6 +134,22 @@ object Hill : Biome(
 }
 
 @Serializable
+object ForestHill : Biome(
+    Glyph.MAP_FORESTHILL,
+    TERRAIN_GRASS
+) {
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        if (NoisePatches.get("extraForest", x, y) > 0.2f) {
+            return Terrain.Type.TERRAIN_FORESTWALL
+        }
+        val v = NoisePatches.get("mountainShapes", x, y)
+        if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
+        else if (v < 0.3f) return Terrain.Type.TERRAIN_DIRT
+        else return Terrain.Type.TERRAIN_GRASS
+    }
+}
+
+@Serializable
 object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
     TERRAIN_DIRT

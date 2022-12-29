@@ -39,6 +39,7 @@ object Metamap {
     val riverWidth = 0.15f
     val minMountainHeight = 20
     val maxRangePeakDistance = 3f
+    val isolatedMountainDensity = 0.4f
     val mountainRangeWetness = 6
     val citiesRiverMouth = 6
     val citiesRiver = 8
@@ -463,7 +464,7 @@ object Metamap {
             growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
             growBiome(Ruins, 2, 0.6f, true, listOf(Ocean))
 
-            // Biomes pass 1 -- dry deserts, grow forests on plains
+            // Biomes pass 1 -- dry deserts, grow forests on plains, remove some isolated mountains
             forEachMeta { x,y,cell ->
                 if (cell.biome == Blank) {
                     if (cell.height == 0) cell.biome = Ocean
@@ -474,6 +475,8 @@ object Metamap {
                     } else {
                         cell.biome = Plain
                     }
+                } else if (cell.biome == Mountain) {
+                    if (biomeNeighbors(x,y,Mountain,true) == 0 && !Dice.chance(isolatedMountainDensity)) cell.biome = Plain
                 }
             }
 
@@ -493,6 +496,33 @@ object Metamap {
                 cell.biome == Plain } }
             growBiome(Suburb, 2, 0.5f, true) { x,y,cell ->
                 cell.biome == Plain }
+
+            // Biomes pass 3 - forest some hills, add desert oases
+            forEachMeta { x,y,cell ->
+                when (cell.biome) {
+                    Hill -> {
+                        if (biomeNeighbors(x, y, Forest, true) > 0) cell.biome = ForestHill
+                        else if (NoisePatches.get("metaForest", x, y) > 0.02f + (cell.dryness * 0.08f)) cell.biome = ForestHill
+                    }
+                    Forest -> {
+                        if (Dice.chance(0.01f)) cell.biome = ForestHill
+                        else if (biomeNeighbors(x, y, Mountain) > 1 && Dice.chance(0.5f)) cell.biome = ForestHill
+                    }
+                    Plain -> {
+                        if (biomeNeighbors(x, y, Plain, true) == 8 && Dice.chance(0.01f)) cell.biome = if (Dice.flip()) Hill else ForestHill
+                    }
+                    Desert -> {
+                        if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(0.01f)) {
+                            cell.biome = if (Dice.flip()) Plain else Scrub
+                            cell.hasLake = true
+                        }
+                    }
+                    else -> { }
+                }
+            }
+            growBiome(ForestHill, 1, 0.5f, true) { x,y,cell ->
+                cell.biome == Hill || cell.biome == Plain
+            }
 
             // Clean up biome collisions
             forEachMeta { x, y, cell ->

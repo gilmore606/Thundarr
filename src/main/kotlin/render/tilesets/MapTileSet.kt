@@ -14,6 +14,7 @@ fun MapTileSet() =
         setTile(Glyph.MAP_MOUNTAIN, SimpleTile(this, 4, 0))
         setTile(Glyph.MAP_RUINS, SimpleTile(this, 5, 0))
         setTile(Glyph.MAP_HILL, SimpleTile(this, 5, 1))
+        setTile(Glyph.MAP_FORESTHILL, SimpleTile(this, 5, 4))
         setTile(Glyph.MAP_SCRUB, SimpleTile(this, 5, 2))
         setTile(Glyph.MAP_SUBURB, SimpleTile(this, 5, 3))
 
