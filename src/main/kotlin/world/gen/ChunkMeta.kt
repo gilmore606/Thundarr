@@ -16,6 +16,7 @@ class ChunkMeta(
     val x: Int = 0,
     val y: Int = 0,
     val height: Int = 0,
+    val temperature: Int = 0,
     val riverExits: MutableList<RiverExit> = mutableListOf(),
     val riverBlur: Float = 0f,
     val hasLake: Boolean = false,
@@ -49,6 +50,7 @@ class ChunkScratch(
     var y: Int = 0
 ) {
     var height = -1
+    var temperature = 60
     var riverParentX = -1
     var riverParentY = -1
     var riverChildren: MutableList<XY> = mutableListOf()
@@ -69,6 +71,7 @@ class ChunkScratch(
         x = x,
         y = y,
         height = height,
+        temperature = temperature,
         riverExits = riverExits,
         riverBlur = riverBlur,
         hasLake = hasLake,

@@ -12,9 +12,8 @@ import world.RiverExit
 import world.RoadExit
 import world.gen.biomes.Biome
 import world.gen.biomes.*
-import world.gen.habitats.ArcticA
-import world.gen.habitats.TemperateA
-import world.gen.habitats.TropicalA
+import world.gen.biomes.Blank
+import world.gen.habitats.*
 import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -592,14 +591,48 @@ object Metamap {
                 cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
             }
 
+            // Set temperatures
+            forEachMeta { x,y,cell ->
+                var temp = (y * 0.5f) + NoisePatches.get("metaVariance2", x, y) * 15
+                when (cell.biome) {
+                    Ocean -> temp += 10
+                    Desert -> {
+                        if (biomeNeighbors(x,y,Desert,true) == 8) temp += 15 + Dice.zeroTo(10) + (y/10) else temp += 15 + (y/15)
+                    }
+                    Mountain -> {
+                        if (biomeNeighbors(x,y,Mountain,false) == 4) temp -= 20 + Dice.zeroTo(10) else temp -= 10
+                    }
+                }
+                temp -= cell.height / 2
+                if (biomeNeighbors(x,y,Ocean,false) > 0) temp += 10 + (y / 7)
+
+                cell.temperature = temp.toInt()
+            }
+            repeat (3) {
+                forEachMeta { x, y, cell ->
+                    var total = 0
+                    DIRECTIONS.from(x, y) { x, y, _ -> if (boundsCheck(x, y)) total += scratches[x][y].temperature }
+                    total = total / 8
+                    cell.temperature = (cell.temperature + total) / 2
+                }
+            }
+
             // Distribute habitats
             forEachMeta { x,y,cell ->
                 if (cell.biome != Ocean) {
-                    val arcticY = habitatArcticY + NoisePatches.get("metaVariance2", x, 0) * 40 - 20
-                    val tropicY = habitatTropicY + NoisePatches.get("metaVariance2", x, 100) * 40 - 20
-                    if (y < arcticY) cell.habitat = ArcticA
-                    else if (y > tropicY) cell.habitat = TropicalA
-                    else cell.habitat = TemperateA
+                    cell.habitat = if (cell.temperature < 40) ArcticA
+                        else if (cell.temperature < 70) TemperateA
+                        else TropicalA
+                }
+            }
+            forEachMeta { x,y,cell ->
+                if (NoisePatches.get("metaHabitats", x, y) > 0.5f) {
+                    when (cell.habitat) {
+                        ArcticA -> cell.habitat = ArcticB
+                        TemperateA -> cell.habitat = TemperateB
+                        TropicalA -> cell.habitat = TropicalB
+                        else -> {}
+                    }
                 }
             }
 
