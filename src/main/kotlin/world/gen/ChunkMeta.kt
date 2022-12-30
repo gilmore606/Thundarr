@@ -24,6 +24,7 @@ class ChunkMeta(
     val biome: Biome = Blank,
     val habitat: Habitat = world.gen.habitats.Blank,
     val roadExits: MutableList<RoadExit> = mutableListOf(),
+    val trailExits: MutableList<TrailExit> = mutableListOf(),
     val variance: Float = 0f,
     var hasCity: Boolean = false,
     var cityDistance: Float = 0f,
@@ -45,6 +46,11 @@ class RoadExit(
     var width: Int = 2
 )
 
+@Serializable
+class TrailExit(
+    var edge: XY
+)
+
 class ChunkScratch(
     var x: Int = 0,
     var y: Int = 0
@@ -63,6 +69,7 @@ class ChunkScratch(
     var biome: Biome = Blank
     var habitat: Habitat = world.gen.habitats.Blank
     var roadExits: MutableList<RoadExit> = mutableListOf()
+    var trailExits: MutableList<TrailExit> = mutableListOf()
     var hasCity = false
     var cityDistance = 0f
     var ruinedBuildings = 0
@@ -80,6 +87,7 @@ class ChunkScratch(
         habitat = habitat,
         variance = NoisePatches.get("metaVariance",x,y).toFloat(),
         roadExits = roadExits,
+        trailExits = trailExits,
         hasCity = hasCity,
         cityDistance = cityDistance,
         ruinedBuildings = ruinedBuildings,

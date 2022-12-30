@@ -531,13 +531,14 @@ object Metamap {
                     }
                     Forest -> {
                         if (biomeNeighbors(x,y,Desert, true) > 0) cell.biome = Plain
+                        if (biomeNeighbors(x,y,Mountain,false) > 0) cell.biome = ForestHill
                     }
                     Plain -> {
                         if (biomeNeighbors(x,y,Swamp, false) == 4) cell.biome = Swamp
                         if (biomeNeighbors(x,y,Desert, false) == 4) cell.biome = Desert
                     }
                     Desert -> {
-                        if (cell.riverExits.isNotEmpty()) cell.biome = Plain
+                        if (cell.riverExits.isNotEmpty()) cell.biome = if (Dice.flip()) Plain else Scrub
                     }
                     else -> { }
                 }
@@ -593,18 +594,18 @@ object Metamap {
 
             // Set temperatures
             forEachMeta { x,y,cell ->
-                var temp = (y * 0.5f) + NoisePatches.get("metaVariance2", x, y) * 15
+                var temp = 10 + (y * 0.5f) + NoisePatches.get("metaVariance2", x, y) * 15
                 when (cell.biome) {
                     Ocean -> temp += 10
                     Desert -> {
-                        if (biomeNeighbors(x,y,Desert,true) == 8) temp += 15 + Dice.zeroTo(10) + (y/10) else temp += 15 + (y/15)
+                        if (biomeNeighbors(x,y,Desert,true) == 8) temp += Dice.zeroTo(10) + (y/6) else temp += (y/10)
                     }
                     Mountain -> {
-                        if (biomeNeighbors(x,y,Mountain,false) == 4) temp -= 20 + Dice.zeroTo(10) else temp -= 10
+                        if (biomeNeighbors(x,y,Mountain,false) > 2) temp -= 20 + Dice.zeroTo(10) else temp -= 10
                     }
                 }
                 temp -= cell.height / 2
-                if (biomeNeighbors(x,y,Ocean,false) > 0) temp += 10 + (y / 7)
+                if (biomeNeighbors(x,y,Ocean,false) > 0) temp += -10 + (y / 7)
 
                 cell.temperature = temp.toInt()
             }
@@ -620,15 +621,16 @@ object Metamap {
             // Distribute habitats
             forEachMeta { x,y,cell ->
                 if (cell.biome != Ocean) {
-                    cell.habitat = if (cell.temperature < 40) ArcticA
-                        else if (cell.temperature < 70) TemperateA
+                    cell.habitat = if (cell.temperature < 30) Arctic
+                        else if (cell.temperature < 50) AlpineA
+                        else if (cell.temperature < 75) TemperateA
                         else TropicalA
                 }
             }
             forEachMeta { x,y,cell ->
                 if (NoisePatches.get("metaHabitats", x, y) > 0.5f) {
                     when (cell.habitat) {
-                        ArcticA -> cell.habitat = ArcticB
+                        AlpineA -> cell.habitat = AlpineB
                         TemperateA -> cell.habitat = TemperateB
                         TropicalA -> cell.habitat = TropicalB
                         else -> {}

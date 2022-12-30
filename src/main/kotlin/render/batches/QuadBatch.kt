@@ -186,10 +186,12 @@ class QuadBatch(
         level?.chunkAt(x,y)?.also { chunk ->
             val cx = x - chunk.x
             val cy = y - chunk.y
-            chunk.glyphCache[cx][cy]?.also { return it } ?: run {
-                val index = tileSet.getIndex(glyph, level, x, y)
-                chunk.glyphCache[cx][cy] = index
-                return index
+            if (cx >= 0 && cy >= 0) {
+                chunk.glyphCache[cx][cy]?.also { return it } ?: run {
+                    val index = tileSet.getIndex(glyph, level, x, y)
+                    chunk.glyphCache[cx][cy] = index
+                    return index
+                }
             }
         }
         return tileSet.getIndex(glyph)

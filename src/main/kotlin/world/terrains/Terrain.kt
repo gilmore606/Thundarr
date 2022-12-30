@@ -33,6 +33,7 @@ sealed class Terrain(
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_ROCKS -> Rocks
             Type.TERRAIN_GRASS -> Grass
+            Type.TERRAIN_UNDERGROWTH -> Undergrowth
             Type.TERRAIN_SWAMP -> Swamp
             Type.TERRAIN_BEACH -> Beach
             Type.TERRAIN_SAND -> Sand
@@ -70,6 +71,7 @@ sealed class Terrain(
         TERRAIN_DIRT,
         TERRAIN_ROCKS,
         TERRAIN_GRASS,
+        TERRAIN_UNDERGROWTH,
         TERRAIN_SWAMP,
         TERRAIN_BEACH,
         TERRAIN_SAND,

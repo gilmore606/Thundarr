@@ -47,6 +47,7 @@ fun MapTileSet() =
         setTile(Glyph.MAP_HABITAT_TEMP_B, SimpleTile(this, 6, 3))
         setTile(Glyph.MAP_HABITAT_COLD_A, SimpleTile(this, 6, 4))
         setTile(Glyph.MAP_HABITAT_COLD_B, SimpleTile(this, 6, 5))
+        setTile(Glyph.MAP_HABITAT_ARCTIC, SimpleTile(this, 5, 5))
 
         setTile(Glyph.MAP_PLAYER, SimpleTile(this, 3, 3))
         setTile(Glyph.MAP_MARKER, SimpleTile(this, 4, 1))

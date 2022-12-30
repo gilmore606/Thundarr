@@ -94,8 +94,11 @@ object Forest : Biome(
     val treeChance = 0.04f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
-        if (NoisePatches.get("extraForest", x, y) > 0.2f) {
+        val ef = NoisePatches.get("extraForest", x, y)
+        if (ef > 0.2f) {
             return Terrain.Type.TERRAIN_FORESTWALL
+        } else if (ef > 0.01f) {
+            return Terrain.Type.TERRAIN_UNDERGROWTH
         }
         return super.terrainAt(x, y)
     }

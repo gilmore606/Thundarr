@@ -142,6 +142,12 @@ object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
+object Undergrowth : Floor(Type.TERRAIN_UNDERGROWTH, Glyph.UNDERGROWTH, true) {
+    override fun overlapsOn() = setOf(Type.TERRAIN_GRASS, Type.TERRAIN_DIRT)
+    override fun moveSpeed(actor: Actor) = 1.7f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
+}
+
 object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true) {
     override fun overlapsOn() = setOf(Type.TERRAIN_GRASS, Type.TERRAIN_DIRT)
     override fun moveSpeed(actor: Actor) = 1.8f

@@ -18,12 +18,17 @@ object Blank : Habitat(
 )
 
 @Serializable
-object ArcticA : Habitat(
+object Arctic : Habitat(
+    Glyph.MAP_HABITAT_ARCTIC
+)
+
+@Serializable
+object AlpineA : Habitat(
     Glyph.MAP_HABITAT_COLD_A
 )
 
 @Serializable
-object ArcticB : Habitat(
+object AlpineB : Habitat(
     Glyph.MAP_HABITAT_COLD_B
 )
 
