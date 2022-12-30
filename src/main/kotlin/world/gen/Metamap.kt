@@ -6,10 +6,7 @@ import kotlinx.coroutines.launch
 import ktx.async.newSingleThreadAsyncContext
 import ui.panels.Console
 import util.*
-import world.ChunkMeta
-import world.ChunkScratch
-import world.RiverExit
-import world.RoadExit
+import world.*
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.gen.biomes.Blank
@@ -638,6 +635,13 @@ object Metamap {
                 }
             }
 
+            // Run trails
+            forEachMeta { x,y,cell ->
+                if (Dice.chance(0.03f)) {
+                    runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
+                }
+            }
+
             // Name contiguous features
             Console.sayFromThread("Naming geography...")
             val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
@@ -773,6 +777,39 @@ object Metamap {
                     cell.riverExits.add(myExit)
                     childCell.riverExits.add(childExit)
                     runRiver(child, wiggle)
+                }
+            }
+        }
+    }
+
+    private fun runTrail(cursor: XY, turnChance: Float) {
+        var done = false
+        var direction = CARDINALS.random()
+        while (!done) {
+            if (!boundsCheck(cursor.x + direction.x, cursor.y + direction.y)) done = true
+            else {
+                val cell = scratches[cursor.x][cursor.y]
+                val childCell = scratches[cursor.x + direction.x][cursor.y + direction.y]
+                val edgePos = randomChunkEdgePos(direction, 0.8f)
+                val myExit = TrailExit(
+                    pos = edgePos,
+                    edge = direction,
+                    control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
+                )
+                val childEdgePos = flipChunkEdgePos(edgePos)
+                val childDirection = XY(-direction.x, -direction.y)
+                val childExit = TrailExit(
+                    pos = childEdgePos,
+                    edge = childDirection,
+                    control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
+                )
+                cell.trailExits.add(myExit)
+                childCell.trailExits.add(childExit)
+                if (childCell.height < 1 || Dice.chance(0.1f)) done = true
+                cursor.x += direction.x
+                cursor.y += direction.y
+                if (Dice.chance(turnChance)) {
+                    direction = CARDINALS.toMutableList().apply { remove(direction) }.random()
                 }
             }
         }

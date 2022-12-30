@@ -48,7 +48,9 @@ class RoadExit(
 
 @Serializable
 class TrailExit(
-    var edge: XY
+    var pos: XY,
+    var edge: XY,
+    var control: XY
 )
 
 class ChunkScratch(

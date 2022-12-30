@@ -31,6 +31,7 @@ class WorldCarto(
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
+    private val plantOkMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { true } }
     private var hasBlends = false
     lateinit var meta: ChunkMeta
     private val riverIslandPoints = ArrayList<XY>()
@@ -50,6 +51,7 @@ class WorldCarto(
 
             // Add features
             if (meta.coasts.isNotEmpty()) buildCoasts()
+            if (meta.trailExits.isNotEmpty()) buildTrails()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
             if (meta.hasLake) digLake()
@@ -92,7 +94,7 @@ class WorldCarto(
 
     private fun growPlants() {
         forEachBiome { x,y,biome ->
-            if (Terrain.get(getTerrain(x,y)).canGrowPlants) {
+            if (plantOkMap[x-x0][y-y0] && Terrain.get(getTerrain(x,y)).canGrowPlants) {
                 val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
                 biome.addPlant(fertility, meta.variance, { addThing(x, y, it) }, { setTerrain(x, y, it) })
             }
@@ -319,6 +321,58 @@ class WorldCarto(
         repeat (8) { fuzzTerrain(GENERIC_WATER, 0.3f) }
         fringeTerrain(GENERIC_WATER, TERRAIN_BEACH, 1f)
         repeat ((2 + 3 * meta.variance).toInt()) { fuzzTerrain(TERRAIN_BEACH, meta.variance, GENERIC_WATER) }
+    }
+
+    private fun buildTrails() {
+        when (meta.trailExits.size) {
+            1 -> {
+                val start = meta.trailExits[0]
+                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                val end = TrailExit(pos = endPos, control = endPos, edge = XY(0,0))
+                drawTrail(start, end)
+            }
+            2 -> {
+                drawTrail(meta.trailExits[0], meta.trailExits[1])
+            }
+            else -> {
+                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
+                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val center = TrailExit(pos = XY(centerX, centerY), control = XY(centerX, centerY), edge = XY(0,0))
+                meta.trailExits.forEach { exit ->
+                    drawTrail(exit, center)
+                }
+            }
+        }
+    }
+
+    private fun drawTrail(start: TrailExit, end: TrailExit) {
+        var t = 0f
+        val step = 0.02f
+        while (t < 1f) {
+            val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
+            carveTrailChunk(Rect((x0 + p.x).toInt(), (y0 + p.y).toInt(),
+                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), 0, meta.biome.trailTerrain((x0 + p.x).toInt(), (y0 + p.y).toInt()), false)
+            t += step
+        }
+    }
+
+    private fun carveTrailChunk(room: Rect, regionId: Int,
+                            type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
+                            skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
+        for (x in room.x0..room.x1) {
+            for (y in room.y0..room.y1) {
+                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                        if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
+                            setTerrain(x, y, type)
+                            setRegionAt(x, y, regionId)
+                            plantOkMap[x - x0][y - y0] = false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun digRivers() {

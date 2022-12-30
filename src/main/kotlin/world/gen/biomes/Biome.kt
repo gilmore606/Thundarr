@@ -22,6 +22,7 @@ sealed class Biome(
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = baseTerrain
+    open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
     open fun addPlant(fertility: Float, variance: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
