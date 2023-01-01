@@ -31,7 +31,7 @@ class WorldCarto(
     val autoBridgeChance = 0.5f
     val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
 
-    enum class CellFlag { NO_PLANTS, TRAIL, RIVER }
+    enum class CellFlag { NO_PLANTS, TRAIL, RIVER, RIVERBANK }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -57,9 +57,9 @@ class WorldCarto(
             // Add features
             if (meta.coasts.isNotEmpty()) buildCoasts()
             if (meta.trailExits.isNotEmpty()) buildTrails()
+            if (meta.hasLake) digLake()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
-            if (meta.hasLake) digLake()
 
             // Carve extra terrain with no biome edge blending
             meta.biome.carveExtraTerrain(this)
@@ -418,11 +418,30 @@ class WorldCarto(
                 DIRECTIONS.from(x, y) { dx, dy, _ ->
                     if (boundsCheck(dx, dy) && getTerrain(dx, dy) != Terrain.Type.GENERIC_WATER) {
                         if (getTerrain(dx, dy) != Terrain.Type.TERRAIN_BEACH) {
-                            setTerrain(dx, dy, biome.riverBankTerrain(x, y))
-                            flagsMap[x - x0][y - y0].add(CellFlag.RIVER)
+                            flagsMap[dx - x0][dy - y0].add(CellFlag.RIVERBANK)
                         }
                     }
                 }
+            }
+        }
+        repeat (3) {
+            val adds = ArrayList<XY>()
+            forEachBiome { x, y, biome ->
+                if (getTerrain(x, y) != GENERIC_WATER && !flagsMap[x - x0][y - y0].contains(CellFlag.RIVERBANK) &&
+                        !flagsMap[x-x0][y-y0].contains(CellFlag.TRAIL)) {
+                    var n = 0
+                    DIRECTIONS.from(x, y) { dx, dy, dir ->
+                        if (boundsCheck(dx,dy) && flagsMap[dx - x0][dy - y0].contains(CellFlag.RIVERBANK)) n++
+                    }
+                    val v = (NoisePatches.get("ruinMicro", x, y) * 3f).toInt()
+                    if (n > 1 && Dice.chance(n * 0.15f + v * 0.4f)) adds.add(XY(x,y))
+                }
+            }
+            adds.forEach { flagsMap[it.x - x0][it.y - y0].add(CellFlag.RIVERBANK) }
+        }
+        forEachBiome { x,y,biome ->
+            if (flagsMap[x-x0][y-y0].contains(CellFlag.RIVERBANK)) {
+                setTerrain(x,y,biome.riverBankTerrain(x,y))
             }
         }
     }

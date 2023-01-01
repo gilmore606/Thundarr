@@ -69,6 +69,8 @@ object Plain : Biome(
     val forestMin = 0.97f
     val grassMin = 0f
 
+    override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
+
     override fun addPlant(fertility: Float, variance: Float,
                           addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
         if (fertility > forestMin + (variance * 0.03f)) {
@@ -96,6 +98,8 @@ object Forest : Biome(
     Glyph.MAP_FOREST,
     TERRAIN_GRASS
 ) {
+    override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.6f) TERRAIN_SWAMP else TERRAIN_UNDERGROWTH
+
     val forestMin = 0.7f
     val treeChance = 0.04f
 
