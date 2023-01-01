@@ -28,10 +28,15 @@ class WorldCarto(
     val chunkBlendWidth = 6
     val chunkBlendCornerRadius = 4
 
+    val autoBridgeChance = 0.5f
+    val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
+
+    enum class CellFlag { NO_PLANTS, TRAIL, RIVER }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
-    private val plantOkMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { true } }
+    private val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
+
     private var hasBlends = false
     lateinit var meta: ChunkMeta
     private val riverIslandPoints = ArrayList<XY>()
@@ -67,6 +72,7 @@ class WorldCarto(
 
             // Post-processing
             deepenWater()
+            buildBridges()
             setRoofedInRock()
             setGeneratedBiomes()
             setOverlaps()
@@ -94,7 +100,7 @@ class WorldCarto(
 
     private fun growPlants() {
         forEachBiome { x,y,biome ->
-            if (plantOkMap[x-x0][y-y0] && Terrain.get(getTerrain(x,y)).canGrowPlants) {
+            if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && Terrain.get(getTerrain(x,y)).canGrowPlants) {
                 val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
                 biome.addPlant(fertility, meta.variance, { addThing(x, y, it) }, { setTerrain(x, y, it) })
             }
@@ -352,12 +358,12 @@ class WorldCarto(
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveTrailChunk(Rect((x0 + p.x).toInt(), (y0 + p.y).toInt(),
-                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), 0, meta.biome.trailTerrain((x0 + p.x).toInt(), (y0 + p.y).toInt()), false)
+                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), meta.biome.trailTerrain((x0 + p.x).toInt(), (y0 + p.y).toInt()), false)
             t += step
         }
     }
 
-    private fun carveTrailChunk(room: Rect, regionId: Int,
+    private fun carveTrailChunk(room: Rect,
                             type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
                             skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
         for (x in room.x0..room.x1) {
@@ -366,8 +372,8 @@ class WorldCarto(
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
                         if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
                             setTerrain(x, y, type)
-                            setRegionAt(x, y, regionId)
-                            plantOkMap[x - x0][y - y0] = false
+                            flagsMap[x - x0][y - y0].add(CellFlag.TRAIL)
+                            flagsMap[x - x0][y - y0].add(CellFlag.NO_PLANTS)
                         }
                     }
                 }
@@ -397,7 +403,7 @@ class WorldCarto(
                 }
             }
         }
-        if (riverIslandPoints.isNotEmpty() && Dice.chance(0.7f)) {
+        if (riverIslandPoints.isNotEmpty() && Dice.chance(0.5f)) {
             riverIslandPoints.random().also { island ->
                 printGrid(growBlob(Dice.range(3,6), Dice.range(3,6)), island.x, island.y, meta.biome.baseTerrain)
             }
@@ -406,13 +412,14 @@ class WorldCarto(
         addRiverBanks()
     }
 
-    protected fun addRiverBanks() {
+    private fun addRiverBanks() {
         forEachBiome { x, y, biome ->
             if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
                 DIRECTIONS.from(x, y) { dx, dy, _ ->
                     if (boundsCheck(dx, dy) && getTerrain(dx, dy) != Terrain.Type.GENERIC_WATER) {
                         if (getTerrain(dx, dy) != Terrain.Type.TERRAIN_BEACH) {
-                            setTerrain(dx, dy, biome.riverBankTerrain(x,y))
+                            setTerrain(dx, dy, biome.riverBankTerrain(x, y))
+                            flagsMap[x - x0][y - y0].add(CellFlag.RIVER)
                         }
                     }
                 }
@@ -429,13 +436,40 @@ class WorldCarto(
         val widthStep = (endWidth - startWidth) * step
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
-            carveRoom(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
-                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), 0, GENERIC_WATER, (width >= 3f))
+            carveRiverChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f))
             if (t > 0.2f && t < 0.8f && width > 6 && Dice.chance(0.1f)) {
                 riverIslandPoints.add(XY((x0 + p.x).toInt(), (y0 + p.y).toInt()))
             }
             t += step
             width += widthStep
+        }
+    }
+
+    private fun carveRiverChunk(room: Rect, skipCorners: Boolean) {
+        for (x in room.x0..room.x1) {
+            for (y in room.y0..room.y1) {
+                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                        setTerrain(x, y, GENERIC_WATER)
+                        flagsMap[x-x0][y-y0].add(CellFlag.RIVER)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun buildBridges() {
+        if (autoBridgesInThisChunk) {
+            var bridgeCellsLeft = Dice.range(4, 16)
+            forEachCell { x, y ->
+                if (flagsMap[x - x0][y - y0].contains(CellFlag.TRAIL) && flagsMap[x - x0][y - y0].contains(CellFlag.RIVER)) {
+                    if (bridgeCellsLeft > 0) {
+                        setTerrain(x, y, TERRAIN_PAVEMENT)
+                        bridgeCellsLeft--
+                    }
+                }
+            }
         }
     }
 

@@ -48,6 +48,7 @@ object Metamap {
     val ruinsMax = 5f
     val habitatArcticY = 70
     val habitatTropicY = 150
+    val trailDensity = 0.1f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -637,7 +638,7 @@ object Metamap {
 
             // Run trails
             forEachMeta { x,y,cell ->
-                if (Dice.chance(0.03f)) {
+                if (Dice.chance(trailDensity)) {
                     runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
                 }
             }
@@ -805,7 +806,9 @@ object Metamap {
                 )
                 cell.trailExits.add(myExit)
                 childCell.trailExits.add(childExit)
-                if (childCell.height < 1 || Dice.chance(0.1f)) done = true
+                if (childCell.height < 1 || Dice.chance(0.05f)) done = true
+                if (childCell.trailExits.size > 1) done = true
+                if (!childCell.biome.canHaveTrail()) done = true
                 cursor.x += direction.x
                 cursor.y += direction.y
                 if (Dice.chance(turnChance)) {

@@ -10,6 +10,7 @@ import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import world.terrains.Undergrowth
 
 @Serializable
 sealed class Biome(
@@ -17,12 +18,14 @@ sealed class Biome(
     val baseTerrain: Terrain.Type,
 ) {
     open fun canHaveLake() = true
+    open fun canHaveTrail() = true
+    open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
+    open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
+    open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
 
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
-    open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = baseTerrain
-    open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
     open fun addPlant(fertility: Float, variance: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
@@ -46,6 +49,7 @@ object Ocean : Biome(
     TERRAIN_DEEP_WATER
 ) {
     override fun canHaveLake() = false
+    override fun canHaveTrail() = false
 }
 
 @Serializable
@@ -53,7 +57,8 @@ object Glacier : Biome(
     Glyph.MAP_GLACIER,
     TERRAIN_DIRT
 ) {
-
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun trailTerrain(x: Int, y: Int) = TERRAIN_SAND
 }
 
 @Serializable
@@ -129,6 +134,8 @@ object Hill : Biome(
     Glyph.MAP_HILL,
     TERRAIN_GRASS
 ) {
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y)
         if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
@@ -142,6 +149,8 @@ object ForestHill : Biome(
     Glyph.MAP_FORESTHILL,
     TERRAIN_GRASS
 ) {
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         if (NoisePatches.get("extraForest", x, y) > 0.2f) {
             return Terrain.Type.TERRAIN_FORESTWALL
@@ -158,6 +167,9 @@ object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
     TERRAIN_DIRT
 ) {
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun trailTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) TERRAIN_SAND else TERRAIN_DIRT
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
         if (v > 0.65f) return Terrain.Type.TERRAIN_CAVEWALL
@@ -175,7 +187,8 @@ object Swamp : Biome(
     Glyph.MAP_SWAMP,
     TERRAIN_SWAMP
 ) {
-
+    override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
+    override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
 }
 
 @Serializable
@@ -183,6 +196,9 @@ object Scrub : Biome(
     Glyph.MAP_SCRUB,
     TERRAIN_GRASS
 ) {
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT
+    override fun trailTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) TERRAIN_SAND else TERRAIN_DIRT
+
     val dirtMin = 0.1f
     val grassMin = 0.4f
 
@@ -234,7 +250,8 @@ object Suburb: Biome(
     Glyph.MAP_SUBURB,
     TERRAIN_DIRT
 ) {
-
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_GRASS
+    override fun canHaveTrail() = false
 }
 
 @Serializable
@@ -242,6 +259,8 @@ object Ruins : Biome(
     Glyph.MAP_RUINS,
     Terrain.Type.TERRAIN_PAVEMENT
 ) {
+    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT
+    override fun canHaveTrail() = false
 
     override fun carveExtraTerrain(carto: WorldCarto) {
         val gridsize = Dice.range(2, 4)
