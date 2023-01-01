@@ -31,7 +31,7 @@ class WorldCarto(
     val autoBridgeChance = 0.5f
     val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
 
-    enum class CellFlag { NO_PLANTS, TRAIL, RIVER, RIVERBANK }
+    enum class CellFlag { NO_PLANTS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -327,6 +327,15 @@ class WorldCarto(
         repeat (8) { fuzzTerrain(GENERIC_WATER, 0.3f) }
         fringeTerrain(GENERIC_WATER, TERRAIN_BEACH, 1f)
         repeat ((2 + 3 * meta.variance).toInt()) { fuzzTerrain(TERRAIN_BEACH, meta.variance, GENERIC_WATER) }
+        forEachCell { x,y ->
+            if (getTerrain(x,y) == GENERIC_WATER) {
+                flagsMap[x-x0][y-y0].add(CellFlag.OCEAN)
+                flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
+            } else if (getTerrain(x,y) == TERRAIN_BEACH) {
+                flagsMap[x-x0][y-y0].add(CellFlag.BEACH)
+                flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
+            }
+        }
     }
 
     private fun buildTrails() {
@@ -370,10 +379,12 @@ class WorldCarto(
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
-                            setTerrain(x, y, type)
-                            flagsMap[x - x0][y - y0].add(CellFlag.TRAIL)
-                            flagsMap[x - x0][y - y0].add(CellFlag.NO_PLANTS)
+                        if (!flagsMap[x-x0][y-y0].contains(CellFlag.OCEAN) && !flagsMap[x-x0][y-y0].contains(CellFlag.BEACH)) {
+                            if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
+                                setTerrain(x, y, type)
+                                flagsMap[x - x0][y - y0].add(CellFlag.TRAIL)
+                                flagsMap[x - x0][y - y0].add(CellFlag.NO_PLANTS)
+                            }
                         }
                     }
                 }

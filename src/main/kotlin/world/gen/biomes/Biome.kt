@@ -33,6 +33,10 @@ sealed class Biome(
             carto.setTerrain(x + carto.x0, y + carto.y0, type)
         }
     }
+    protected fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
+        val blob = carto.growOblong(x1-x0, y1-y0)
+        carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
+    }
 }
 
 @Serializable
@@ -193,6 +197,14 @@ object Swamp : Biome(
 ) {
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
+
+    override fun carveExtraTerrain(carto: WorldCarto) {
+        repeat(Dice.oneTo(6)) {
+            val x = Dice.zeroTil(CHUNK_SIZE-13)
+            val y = Dice.zeroTil(CHUNK_SIZE-13)
+            digLake(carto, x, y, x + Dice.range(7, 12), y + Dice.range(7, 12))
+        }
+    }
 }
 
 @Serializable
@@ -201,14 +213,14 @@ object Scrub : Biome(
     TERRAIN_GRASS
 ) {
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT
-    override fun trailTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) TERRAIN_SAND else TERRAIN_DIRT
+    override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
 
     val dirtMin = 0.1f
     val grassMin = 0.4f
 
     override fun addPlant(fertility: Float, variance: Float,
                           addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility < dirtMin + (variance * 0.003f)) {
+        if (fertility < dirtMin + (variance * 0.002f)) {
             addTerrain(Terrain.Type.TERRAIN_SAND)
         } else if (fertility < grassMin + (variance * 0.004f)) {
             addTerrain(Terrain.Type.TERRAIN_DIRT)
@@ -326,8 +338,4 @@ object Ruins : Biome(
         }
     }
 
-    private fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
-        val blob = carto.growOblong(x1-x0, y1-y0)
-        carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
-    }
 }
