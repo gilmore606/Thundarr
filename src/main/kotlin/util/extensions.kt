@@ -107,6 +107,10 @@ fun distanceBetween(x0: Int, y0: Int, x1: Int, y1: Int): Float =
     sqrt((x1-x0).toFloat().pow(2) + (y1-y0).toFloat().pow(2))
 fun distanceBetween(xy0: XY, xy1: XY) = distanceBetween(xy0.x, xy0.y, xy1.x, xy1.y)
 
+fun manhattanDistance(x0: Int, y0: Int, x1: Int, y1: Int): Float =
+    (abs(x1-x0) + abs(y1-y0)).toFloat()
+fun manhattanDistance(xy0: XY, xy1: XY) = manhattanDistance(xy0.x, xy0.y, xy1.x, xy1.y)
+
 fun UUID() = UUID.randomUUID().toString()
 fun shortID() = Random.nextInt(100000000).toString()
 

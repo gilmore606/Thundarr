@@ -176,7 +176,7 @@ object Mountain : Biome(
     TERRAIN_DIRT
 ) {
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
-    override fun trailTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) TERRAIN_SAND else TERRAIN_DIRT
+    override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -212,7 +212,7 @@ object Scrub : Biome(
     Glyph.MAP_SCRUB,
     TERRAIN_GRASS
 ) {
-    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT
+    override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
 
     val dirtMin = 0.1f
@@ -221,7 +221,7 @@ object Scrub : Biome(
     override fun addPlant(fertility: Float, variance: Float,
                           addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
         if (fertility < dirtMin + (variance * 0.002f)) {
-            addTerrain(Terrain.Type.TERRAIN_SAND)
+            addTerrain(Terrain.Type.TERRAIN_HARDPAN)
         } else if (fertility < grassMin + (variance * 0.004f)) {
             addTerrain(Terrain.Type.TERRAIN_DIRT)
         } else {
@@ -242,7 +242,23 @@ object Desert : Biome(
     TERRAIN_SAND
 ) {
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
-        TERRAIN_GRASS else TERRAIN_SAND
+        TERRAIN_GRASS else TERRAIN_HARDPAN
+
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val v = NoisePatches.get("desertRocks",x,y).toFloat()
+        if (v > 0.45f) return TERRAIN_CAVEWALL
+        else if (v > 0.35f && Dice.chance((v - 0.35f) * 10f)) return TERRAIN_ROCKS
+        return super.terrainAt(x,y)
+    }
+
+    val sandMin = 0.1f
+
+    override fun addPlant(fertility: Float, variance: Float,
+                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
+        if (fertility < sandMin + (variance * 0.006f)) {
+            addTerrain(Terrain.Type.TERRAIN_HARDPAN)
+        }
+    }
 }
 
 @Serializable

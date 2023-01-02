@@ -138,7 +138,7 @@ object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, false) {
 }
 
 object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
+    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
@@ -155,15 +155,21 @@ object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true) {
 }
 
 object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
 
 object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH, true) {
-    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
+}
+
+object Hardpan : Floor(Type.TERRAIN_HARDPAN, Glyph.HARDPAN, false) {
+    override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_ROCKS)
+    override fun moveSpeed(actor: Actor) = 0.8f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
 
 object Pavement : Floor(Type.TERRAIN_PAVEMENT, Glyph.PAVEMENT, false) {

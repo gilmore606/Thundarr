@@ -56,6 +56,8 @@ fun TerrainTileSet() =
             add(0.5f, 7, 5)
         })
 
+        setTile(Glyph.HARDPAN, SimpleTile(this, 8, 5))
+
         setTile(Glyph.BEACH, SimpleTile(this, 6, 4))
 
         setTile(Glyph.BRICK_WALL, WallTile(this, Glyph.BRICK_WALL).apply {

@@ -25,8 +25,8 @@ object Metamap {
 
     var isWorking = false
 
-    val minLand = 0.4f
-    val maxLand = 0.7f
+    val minLand = 0.55f
+    val maxLand = 0.8f
     val coastRoughness = 0.15f
     val bigRiverDensity = 0.4f
     val smallRiverDensity = 0.1f
@@ -46,15 +46,16 @@ object Metamap {
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
     val ruinsMax = 5f
-    val habitatArcticY = 70
-    val habitatTropicY = 150
     val trailDensity = 0.1f
+    val minStepsBetweenSideRoads = 4
+    val sideRoadChance = 0.2f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
     private var scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
     private var riverCells = ArrayList<XY>()
     private var cityCells = ArrayList<XY>()
+    private var roadCells = ArrayList<XY>()
     val metas = ArrayList<ArrayList<ChunkMeta>>()
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
@@ -103,6 +104,7 @@ object Metamap {
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
         riverCells.clear()
         cityCells.clear()
+        roadCells.clear()
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
@@ -440,7 +442,7 @@ object Metamap {
             }
             repeat (citiesInland) { placeCity(inlandSites) }
 
-            // Build ruins on city sites, and run roads away
+            // Build ruins on city sites
             val numBigCities = citiesTotal * bigCityFraction
             var n = 0
             for (city in cityCells) {
@@ -453,9 +455,6 @@ object Metamap {
                             scratches[dx][dy].height = 1
                         }
                     }
-                }
-                CARDINALS.forEach { dir ->
-                    runRoad(city, dir)
                 }
             }
             growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
@@ -640,6 +639,13 @@ object Metamap {
             forEachMeta { x,y,cell ->
                 if (Dice.chance(trailDensity)) {
                     runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
+                }
+            }
+
+            // Run roads
+            cityCells.forEach { city ->
+                cityCells.forEach { ocity ->
+                    if (ocity != city) connectCityToRoads(city, ocity)
                 }
             }
 
@@ -837,39 +843,80 @@ object Metamap {
         }
     }
 
-    private fun runRoad(from: XY, toDir: XY) {
+    private fun connectCityToRoads(city: XY, targetCity: XY) {
+        val cursor = XY(city.x, city.y)
+        val targets = ArrayList<XY>().apply {
+            addAll(cityCells)
+            addAll(roadCells)
+            remove(city)
+        }
+        val newRoads = ArrayList<XY>()
         var done = false
-        var cursor = from
-        var length = 0
-        var dir = toDir
+        var stepsSinceSideRoad = 0
         while (!done) {
-            val next = XY(cursor.x + dir.x, cursor.y + dir.y)
-            if (!boundsCheck(next.x, next.y)) done = true
-            else if (!isLandAt(next)) done = true
-            else if (scratches[next.x][next.y].hasCity) done = true
-            else if (scratches[cursor.x][cursor.y].roadExits.size > 2 && Dice.chance(0.7f)) done = true
-            else if (length > 15 && Dice.chance(length * 0.006f)) done = true
-            else {
-                connectRoadExits(cursor, next)
-                cursor = next
-                length++
-            }
-            if (Dice.chance(0.07f)) {
-                dir = XY(toDir.y, toDir.x)
-                if (Dice.flip()) {
-                    dir.x = -dir.x
-                    dir.y = -dir.y
+            // Find target closest to cursor which is closer to targetCity than cursor
+            var nearestTarget = targetCity
+            val cursorToTargetCity = manhattanDistance(cursor, targetCity)
+            var nearestTargetDistance = cursorToTargetCity
+            targets.forEach { choice ->
+                val cursorToChoice = manhattanDistance(cursor, choice)
+                val choiceToTargetCity = manhattanDistance(choice, targetCity)
+                if (cursorToChoice < 0.5f) done = true
+                else if (choiceToTargetCity < cursorToTargetCity) {
+                    if (cursorToChoice < nearestTargetDistance) {
+                        nearestTargetDistance = cursorToChoice
+                        nearestTarget = choice
+                    }
                 }
             }
-            if (Dice.chance(0.015f)) {
-                runRoad(cursor, XY(toDir.y, toDir.x))
+            if (!done) {
+                // Pick a direction that moves closer to it
+                var moveDir = XY(0, 0)
+                CARDINALS.shuffled().from(cursor.x, cursor.y) { dx, dy, dir ->
+                    if (boundsCheck(dx, dy) && manhattanDistance(nearestTarget.x, nearestTarget.y, dx, dy) < nearestTargetDistance) {
+                        moveDir = dir
+                    }
+                }
+                if (moveDir == XY(0,0)) done = true
+                else {
+                    connectRoadExits(cursor, XY(cursor.x + moveDir.x, cursor.y + moveDir.y))
+                    if (cursor != city) newRoads.add(XY(cursor.x, cursor.y))
+                    stepsSinceSideRoad++
+                    if (stepsSinceSideRoad >= minStepsBetweenSideRoads && Dice.chance(sideRoadChance)) {
+                        var sideRoadDir = moveDir.rotated()
+                        if (Dice.flip()) sideRoadDir = sideRoadDir.flipped()
+                        runSideRoad(XY(cursor.x, cursor.y), sideRoadDir)
+                        stepsSinceSideRoad = 0
+                    }
+                    cursor.x += moveDir.x
+                    cursor.y += moveDir.y
+                }
             }
+        }
+        roadCells.addAll(newRoads)
+    }
+
+    private fun runSideRoad(start: XY, dir: XY) {
+        var done = false
+        val cursor = XY(start.x,start.y)
+        while (!done) {
+            if (Dice.chance(0.05f)) done = true
+            val next = XY(cursor.x + dir.x, cursor.y + dir.y)
+            if (scratches[next.x][next.y].roadExits.isNotEmpty()) done = true
+            if (scratches[next.x][next.y].height < 1) done = true
+            if (scratches[next.x][next.y].biome == Mountain) done = true
+            connectRoadExits(cursor, next)
+            roadCells.add(XY(cursor.x, cursor.y))
+            cursor.x = next.x
+            cursor.y = next.y
         }
     }
 
     private fun isLandAt(xy: XY) = boundsCheck(xy.x, xy.y) && scratches[xy.x][xy.y].height > 0
 
     private fun connectRoadExits(source: XY, dest: XY) {
+        if (scratches[dest.x][dest.y].biome == Ocean) return
+        if (scratches[dest.x][dest.y].height < 1) return
         val sourceEdge = XY(dest.x - source.x, dest.y - source.y)
         val destEdge = XY(source.x - dest.x, source.y - dest.y)
         if (!scratches[source.x][source.y].roadExits.hasOneWhere { it.edge == sourceEdge }) {
