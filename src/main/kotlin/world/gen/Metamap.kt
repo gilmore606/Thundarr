@@ -872,13 +872,23 @@ object Metamap {
             if (!done) {
                 // Pick a direction that moves closer to it
                 var moveDir = XY(0, 0)
-                CARDINALS.shuffled().from(cursor.x, cursor.y) { dx, dy, dir ->
-                    if (boundsCheck(dx, dy) && manhattanDistance(nearestTarget.x, nearestTarget.y, dx, dy) < nearestTargetDistance) {
+                val possDirs = ArrayList<XY>()
+                CARDINALS.from(cursor.x, cursor.y) { dx, dy, dir ->
+                    if (boundsCheck(dx, dy) && scratches[dx][dy].biome != Mountain) {
+                        if (!newRoads.contains(XY(dx,dy))) {
+                            possDirs.add(dir)
+                        }
+                    }
+                }
+                possDirs.shuffled().from(cursor.x, cursor.y) { dx, dy, dir ->
+                    if (manhattanDistance(nearestTarget.x, nearestTarget.y, dx, dy) < nearestTargetDistance) {
                         moveDir = dir
                     }
                 }
-                if (moveDir == XY(0,0)) done = true
-                else {
+                if (moveDir == XY(0,0)) {
+                    if (possDirs.isEmpty()) done = true else moveDir = possDirs.random()
+                }
+                if (!done) {
                     connectRoadExits(cursor, XY(cursor.x + moveDir.x, cursor.y + moveDir.y))
                     if (cursor != city) newRoads.add(XY(cursor.x, cursor.y))
                     stepsSinceSideRoad++
@@ -899,16 +909,24 @@ object Metamap {
     private fun runSideRoad(start: XY, dir: XY) {
         var done = false
         val cursor = XY(start.x,start.y)
+        var currentDir = XY(dir.x, dir.y)
         while (!done) {
             if (Dice.chance(0.05f)) done = true
-            val next = XY(cursor.x + dir.x, cursor.y + dir.y)
+            val next = XY(cursor.x + currentDir.x, cursor.y + currentDir.y)
             if (scratches[next.x][next.y].roadExits.isNotEmpty()) done = true
-            if (scratches[next.x][next.y].height < 1) done = true
-            if (scratches[next.x][next.y].biome == Mountain) done = true
-            connectRoadExits(cursor, next)
-            roadCells.add(XY(cursor.x, cursor.y))
-            cursor.x = next.x
-            cursor.y = next.y
+            else if (scratches[next.x][next.y].height < 1) done = true
+            else if (scratches[next.x][next.y].biome == Mountain) {
+                if (Dice.chance(0.2f)) done = true
+                else {
+                    currentDir = currentDir.rotated()
+                    if (Dice.flip()) currentDir = currentDir.flipped()
+                }
+            } else {
+                connectRoadExits(cursor, next)
+                roadCells.add(XY(cursor.x, cursor.y))
+                cursor.x = next.x
+                cursor.y = next.y
+            }
         }
     }
 
