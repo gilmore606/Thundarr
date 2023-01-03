@@ -192,6 +192,10 @@ class WorldCarto(
         }
     }
 
+    private fun biomeAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
+        blendMap[x-x0][y-y0].let { if (it.isNotEmpty()) it.first().first else meta.biome }
+    } else meta.biome
+
     private fun carveBaseTerrain() {
         forEachBiome { x,y,biome ->
             carve(x, y, 0, biome.terrainAt(x,y))
@@ -219,15 +223,22 @@ class WorldCarto(
             repeat (width + 2) { n ->
                 val lx = if (isVertical) x + n + x0 - (width / 2) else x + x0
                 val ly = if (isVertical) y + y0 else y + n + y0 - (width / 2)
+                val wear = NoisePatches.get("ruinWear", lx, ly).toFloat()
+                val current = getTerrain(lx, ly)
                 if (n == 0 || n == width + 1) {
-                    val current = getTerrain(lx, ly)
-                    if ((NoisePatches.get("ruinWear", lx, ly) < 0.001f) && current != TERRAIN_HIGHWAY_H && current != TERRAIN_HIGHWAY_V
-                        && current != GENERIC_WATER && current != TERRAIN_SHALLOW_WATER && current != TERRAIN_DEEP_WATER) {
-                        setTerrain(lx, ly, TERRAIN_DIRT)
+                    if (current != TERRAIN_HIGHWAY_H && current != TERRAIN_HIGHWAY_V && current != GENERIC_WATER) {
+                        if (wear < 0.001f || Dice.chance(1f - wear)) {
+                            setTerrain(lx, ly, biomeAt(lx, ly).trailTerrain(lx, ly))
+                        }
                     }
                 } else {
                     val t = if (isVertical) TERRAIN_HIGHWAY_V else TERRAIN_HIGHWAY_H
-                    setRuinTerrain(lx, ly, 0.34f, t)
+                    if (wear < 0.34f || (current != GENERIC_WATER && Dice.chance(0.7f - wear))) {
+                        setTerrain(lx, ly, t)
+                    } else if (current != GENERIC_WATER) {
+                        setTerrain(lx, ly, biomeAt(lx, ly).trailTerrain(lx, ly))
+                        flagsMap[lx-x0][ly-y0].add(CellFlag.NO_PLANTS)
+                    }
                 }
             }
         }
