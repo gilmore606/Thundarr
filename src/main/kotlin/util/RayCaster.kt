@@ -126,7 +126,7 @@ class RayCaster {
             line.transformOctant(row, 0)
             var castX = povX + line.transform.x
             var castY = povY + line.transform.y
-            if (distanceBetween(povX, povY, castX, castY) > distance) {
+            if (squareDistance(povX, povY, castX, castY) > distance) {
                 done = true
             } else {
                 var doneRow = false
@@ -135,7 +135,7 @@ class RayCaster {
                     line.transformOctant(row, col)
                     castX = povX + line.transform.x
                     castY = povY + line.transform.y
-                    if (distanceBetween(povX, povY, castX, castY) > distance) {
+                    if (squareDistance(povX, povY, castX, castY) > distance) {
                         doneRow = true
                     } else {
                         if (fullShadow) {

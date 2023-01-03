@@ -39,7 +39,7 @@ open class Player : Actor() {
     override fun dname() = name()
     override fun iname() = name()
 
-    override fun visualRange() = 24f
+    override fun visualRange() = 40f
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
