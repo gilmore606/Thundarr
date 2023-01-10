@@ -20,6 +20,7 @@ enum class Glyph {
     BEACH,
     SHALLOW_WATER,
     DEEP_WATER,
+    LAVA,
     PORTAL_DOOR,
     PAVEMENT,
     HIGHWAY_V,

@@ -46,9 +46,9 @@ object Metamap {
     val bigCityFraction = 0.2f
     val ruinFalloff = 14f
     val ruinsMax = 5f
-    val trailDensity = 0.1f
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
+    val volcanoPeaks = 100
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -56,7 +56,8 @@ object Metamap {
     private var riverCells = ArrayList<XY>()
     private var cityCells = ArrayList<XY>()
     private var roadCells = ArrayList<XY>()
-    val metas = ArrayList<ArrayList<ChunkMeta>>()
+    private var isolatedPeaks = ArrayList<XY>()
+    val metas = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
     fun metaAtWorld(x: Int, y: Int): ChunkMeta {
@@ -87,10 +88,13 @@ object Metamap {
         isWorking = true
         coroutineScope.launch {
             Console.sayFromThread("Loading world map...")
-
+            metas.clear()
             for (x in 0 until chunkRadius *2) {
-                val col = ArrayList<ChunkMeta>()
-                App.save.getWorldMetaColumn(xToChunkX(x)).forEach { col.add(chunkYtoY(it.y), it) }
+                val col = ArrayList<ChunkMeta>(chunkRadius*2)
+                App.save.getWorldMetaColumn(xToChunkX(x)).forEach {
+                    val i = chunkYtoY(it.y)
+                    if (i >= 0 && i < chunkRadius*2) col.add(it)
+                }
                 metas.add(col)
             }
 
@@ -105,6 +109,7 @@ object Metamap {
         riverCells.clear()
         cityCells.clear()
         roadCells.clear()
+        isolatedPeaks.clear()
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
@@ -472,8 +477,20 @@ object Metamap {
                         cell.biome = Plain
                     }
                 } else if (cell.biome == Mountain) {
-                    if (biomeNeighbors(x,y,Mountain,true) == 0 && !Dice.chance(isolatedMountainDensity)) cell.biome = Plain
+                    if (biomeNeighbors(x,y,Mountain,true) == 0) {
+                        if (!Dice.chance(isolatedMountainDensity)) {
+                            cell.biome = Plain
+                        } else {
+                            isolatedPeaks.add(XY(x,y))
+                        }
+                    }
                 }
+            }
+
+            // Volcanoes
+            repeat (volcanoPeaks) {
+                val volcano = isolatedPeaks.random()
+                scratches[volcano.x][volcano.y].hasVolcano = true
             }
 
             // Biomes pass 2 - insert intermediate biomes
@@ -637,7 +654,7 @@ object Metamap {
 
             // Run trails
             forEachMeta { x,y,cell ->
-                if (Dice.chance(trailDensity)) {
+                if (Dice.chance(cell.biome.trailChance())) {
                     runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
                 }
             }
@@ -814,7 +831,7 @@ object Metamap {
                 childCell.trailExits.add(childExit)
                 if (childCell.height < 1 || Dice.chance(0.05f)) done = true
                 if (childCell.trailExits.size > 1) done = true
-                if (!childCell.biome.canHaveTrail()) done = true
+                if (childCell.biome.trailChance() <= 0f) done = true
                 cursor.x += direction.x
                 cursor.y += direction.y
                 if (Dice.chance(turnChance)) {

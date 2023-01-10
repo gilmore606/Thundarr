@@ -145,6 +145,13 @@ fun TerrainTileSet() =
             add(0.3f, 10, 4)
         })
 
+        setTile(Glyph.LAVA, AnimatedTile(this).apply {
+            frameMs = 500
+            add(10, 5)
+            add(10, 6)
+            add(10, 7)
+        })
+
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))
 
         setTile(Glyph.PAVEMENT, VariantsTile(this).apply {
