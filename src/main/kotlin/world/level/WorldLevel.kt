@@ -78,6 +78,9 @@ class WorldLevel() : Level() {
         if (rain2 > 0.2f) {
             ambiences.add(Pair(Speaker.Ambience.RAINHEAVY, rain2 * outdoors))
         }
+        pointAmbienceCache.forEach { (ambience, volume) ->
+            ambiences.add(Pair(ambience, volume))
+        }
         Speaker.setAmbiences(ambiences)
     }
 

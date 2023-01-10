@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import ktx.async.KtxAsync
 import ui.panels.TimeButtons
 import util.*
@@ -64,6 +65,7 @@ object Speaker {
         RAT(listOf("creature/ratsqueak.ogg"), 0.3f)
     }
 
+    @Serializable
     enum class Ambience(
         val file: String
     ) {
@@ -77,8 +79,18 @@ object Speaker {
         MOUNTAIN("ambi/mountain.ogg"),
         RUINS("ambi/ruins.ogg"),
         SWAMP("ambi/swamp.ogg"),
-        OCEAN("ambi/ocean.ogg")
+        OCEAN("ambi/ocean.ogg"),
+        RIVER1("ambi/river1.ogg"),
+        RIVER2("ambi/river2.ogg"),
+        RIVER3("ambi/river3.ogg")
     }
+
+    @Serializable
+    class PointAmbience(
+        val ambience: Ambience,
+        val falloff: Float = 40f,
+        val volume: Float = 1f
+    )
 
 
     private val maxVolumeUI = 0.7

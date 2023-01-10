@@ -5,6 +5,7 @@ import actors.Player
 import actors.actions.*
 import actors.actions.processes.WalkTo
 import actors.statuses.Status
+import audio.Speaker
 import render.Screen
 import render.sparks.Raindrop
 import render.sparks.Spark
@@ -66,8 +67,10 @@ sealed class Level {
     // We write into this value to return per-cell ambient light with player falloff.  This is to avoid allocation.
     // This is safe because one thread asks for these values serially and doesn't store the result directly.
     private val ambientResult = LightColor(0f,0f,0f)
-    // The screen writes into this on render to let us know how close the player is to the outdoors.
+    // We write this on render to let us know how close the player is to the outdoors.
     protected var distanceFromOutdoors = 100
+    // We refill this cache on every pov update to track how loud nearby point ambiences are
+    protected val pointAmbienceCache = mutableMapOf<Speaker.Ambience, Float>()
 
     open fun onPlayerEntered() { }
     open fun onPlayerExited() { }
@@ -309,6 +312,7 @@ sealed class Level {
         if (shadowDirty) {
             allChunks().forEach { it.clearVisibility() }
             updateVisibility()
+            updatePointAmbienceCache()
         }
 
         if (this !is EnclosedLevel) weather.onRender(delta)
@@ -328,6 +332,22 @@ sealed class Level {
         })
         dirtyEntireLightAndGlyphCaches()
         shadowDirty = false
+    }
+
+    private fun updatePointAmbienceCache() {
+        pointAmbienceCache.clear()
+        for (x in pov.x - 60 .. pov.x + 60) {
+            for (y in pov.y - 60 .. pov.y + 60) {
+                chunkAt(x,y)?.getSound(x,y)?.also { pointAmbience ->
+                    val dist = manhattanDistance(x,y,pov.x,pov.y)
+                    if (dist < pointAmbience.falloff) {
+                        val volume = kotlin.math.min(1f,pointAmbience.volume * ((pointAmbience.falloff - dist) / pointAmbience.falloff) + 0.35f)
+                        pointAmbienceCache[pointAmbience.ambience] = kotlin.math.max(volume,
+                        pointAmbienceCache[pointAmbience.ambience] ?: 0f)
+                    }
+                }
+            }
+        }
     }
 
     fun dirtyEntireLightAndGlyphCaches() {

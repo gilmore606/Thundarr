@@ -1,6 +1,7 @@
 package world.gen.cartos
 
 import App
+import audio.Speaker
 import util.*
 import world.*
 import world.gen.NoisePatches
@@ -349,6 +350,7 @@ class WorldCarto(
             if (getTerrain(x,y) == GENERIC_WATER) {
                 flagsMap[x-x0][y-y0].add(CellFlag.OCEAN)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
+                chunk.setSound(x,y, Speaker.PointAmbience(Speaker.Ambience.OCEAN))
             } else if (getTerrain(x,y) == TERRAIN_BEACH) {
                 flagsMap[x-x0][y-y0].add(CellFlag.BEACH)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
@@ -489,6 +491,10 @@ class WorldCarto(
             if (t > 0.2f && t < 0.8f && width > 6 && Dice.chance(0.1f)) {
                 riverIslandPoints.add(XY((x0 + p.x).toInt(), (y0 + p.y).toInt()))
             }
+            chunk.setSound(x0 + p.x.toInt(), y0 + p.y.toInt(),
+                if (width < 4) Speaker.PointAmbience(Speaker.Ambience.RIVER1, 30f, 1f)
+                else if (width < 8) Speaker.PointAmbience(Speaker.Ambience.RIVER2, 40f, 1f)
+                else Speaker.PointAmbience(Speaker.Ambience.RIVER3, 50f, 1f))
             t += step
             width += widthStep
         }

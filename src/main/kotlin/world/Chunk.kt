@@ -1,6 +1,7 @@
 package world
 
 import actors.Actor
+import audio.Speaker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -66,6 +67,7 @@ class Chunk(
     private val roofed = Array(width) { Array(height) { Roofed.INDOOR } }
     private val terrains = Array(width) { Array(height) { Terrain.Type.TERRAIN_BRICKWALL } }
     private val terrainData = Array(width) { Array<TerrainData?>(height) { null } }
+    private val sounds = Array(width) { Array<Speaker.PointAmbience?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
 
 
@@ -295,6 +297,14 @@ class Chunk(
             }
         }
         level.dirtyLightsTouching(x, y)
+    }
+
+    fun getSound(x: Int, y: Int): Speaker.PointAmbience? = if (boundsCheck(x, y)) {
+        this.sounds[x-this.x][y-this.y]
+    } else null
+
+    fun setSound(x: Int, y: Int, newSound: Speaker.PointAmbience) {
+        this.sounds[x-this.x][y-this.y] = newSound
     }
 
     fun setRoofed(x: Int, y: Int, newRoofed: Roofed) {
