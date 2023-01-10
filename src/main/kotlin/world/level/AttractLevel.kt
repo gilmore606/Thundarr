@@ -39,7 +39,7 @@ class AttractLevel() : EnclosedLevel("attract") {
         Speaker.requestAmbience(Speaker.Ambience.RAINHEAVY)
     }
 
-    override fun updateAmbientSound(hour: Int, minute: Int) {
+    override fun updateAmbientSound() {
         val outdoors = Float.max(0f, 1f - (distanceFromOutdoors * 0.06f))
         val day = Float.max(0f, (ambientLight.brightness() - 0.5f) * 2f)
         val night = 1f - day

@@ -31,7 +31,7 @@ class WorldCarto(
     val autoBridgeChance = 0.5f
     val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
 
-    enum class CellFlag { NO_PLANTS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
+    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -66,6 +66,7 @@ class WorldCarto(
 
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
+            if (meta.hasVolcano) buildVolcano()
 
             // Populate!
             growPlants()
@@ -225,6 +226,7 @@ class WorldCarto(
                 val ly = if (isVertical) y + y0 else y + n + y0 - (width / 2)
                 val wear = NoisePatches.get("ruinWear", lx, ly).toFloat()
                 val current = getTerrain(lx, ly)
+                flagsMap[lx-x0][ly-y0].add(CellFlag.NO_BUILDINGS)
                 if (n == 0 || n == width + 1) {
                     if (current != TERRAIN_HIGHWAY_H && current != TERRAIN_HIGHWAY_V && current != GENERIC_WATER) {
                         if (wear < 0.001f || Dice.chance(1f - wear)) {
@@ -274,6 +276,11 @@ class WorldCarto(
     }
 
     private fun buildRuin(x: Int, y: Int, width: Int, height: Int) {
+        for (ix in x until x+width) {
+            for (iy in y until y+height) {
+                if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE && flagsMap[ix][iy].contains(CellFlag.NO_BUILDINGS)) return
+            }
+        }
         for (ix in x until x + width) {
             for (iy in y until y + height) {
                 if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
@@ -512,6 +519,12 @@ class WorldCarto(
                 }
             }
         }
+    }
+
+    private fun buildVolcano() {
+        val width = Dice.range(40,56)
+        val height = Dice.range(40,56)
+        printGrid(growBlob(width, height), x0 + Dice.range(3,6), y0 + Dice.range(3,6), TERRAIN_LAVA)
     }
 
     private fun digLake() {

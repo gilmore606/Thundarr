@@ -7,6 +7,7 @@ import world.gen.Metamap
 import world.persist.ChunkLoader
 import java.lang.Float.max
 import java.lang.Float.min
+import java.lang.Math.abs
 
 const val CHUNK_SIZE = 64
 const val CHUNKS_AHEAD = 3
@@ -22,8 +23,12 @@ class WorldLevel() : Level() {
     private var originChunkX = 0   // upper-left corner of the upper-left corner chunk
     private var originChunkY = 0
 
-    private val lastPovChunk = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
+    private val lastPovChunkXY = XY(-999,  -999)  // upper-left corner of the last chunk POV was in, to check chunk crossings
 
+    private var playerChunk: Chunk? = null   // chunk the player is currently in
+    private var ambienceChunk: Chunk? = null   // chunk the player has advanced into, for weather/ambient effects.  Changes later than playerChunk!
+    private var ambienceChunkXY = XY(-999,-999)
+    private val ambienceTransitionSlop = 4  // how many cells into a chunk do we go before transition?
 
     override fun allChunks() = loadedChunks
     override fun levelId() = "world"
@@ -48,22 +53,32 @@ class WorldLevel() : Level() {
         Speaker.clearMusic()
         Speaker.requestSong(Speaker.Song.WORLD)
         Speaker.clearAmbience()
-        Speaker.requestAmbience(Speaker.Ambience.OUTDOORDAY)
-        Speaker.requestAmbience(Speaker.Ambience.OUTDOORNIGHT)
-        Speaker.requestAmbience(Speaker.Ambience.RAINLIGHT)
-        Speaker.requestAmbience(Speaker.Ambience.RAINHEAVY)
+        updateAmbientSound()
     }
 
-    override fun updateAmbientSound(hour: Int, minute: Int) {
+    override fun updateAmbientSound() {
         val outdoors = max(0f, 1f - (distanceFromOutdoors * 0.06f))
         val day = max(0f, (ambientLight.brightness() - 0.5f) * 2f)
-        val night = 1f - day
         val rain1 = min(1f, App.weather.rain() * 3f)
         val rain2 = max(0f, (App.weather.rain() - 0.5f) * 2f)
-        Speaker.adjustAmbience(Speaker.Ambience.OUTDOORDAY, outdoors * day)
-        Speaker.adjustAmbience(Speaker.Ambience.OUTDOORNIGHT, outdoors * night)
-        Speaker.adjustAmbience(Speaker.Ambience.RAINLIGHT, outdoors * rain1)
-        Speaker.adjustAmbience(Speaker.Ambience.RAINHEAVY, outdoors * rain2)
+
+        val ambiences = ArrayList<Pair<Speaker.Ambience, Float>>()
+        ambienceChunk?.also { chunk ->
+            val meta = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y)
+            log.debug("Updating ambience for chunk $chunk with biome ${meta.biome}")
+            if (day > 0.5f) {
+                ambiences.add(Pair(meta.biome.ambientSoundDay(), 1f * outdoors))
+            } else {
+                ambiences.add(Pair(meta.biome.ambientSoundNight(), 1f * outdoors))
+            }
+        }
+        if (rain1 > 0.2f) {
+            ambiences.add(Pair(Speaker.Ambience.RAINLIGHT, rain1 * outdoors))
+        }
+        if (rain2 > 0.2f) {
+            ambiences.add(Pair(Speaker.Ambience.RAINHEAVY, rain2 * outdoors))
+        }
+        Speaker.setAmbiences(ambiences)
     }
 
     override fun debugText(): String = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.let { "chunk ${it.x}x${it.y}" } ?: "???"
@@ -72,6 +87,26 @@ class WorldLevel() : Level() {
 
     override fun onSetPov() {
         populateChunks()
+        // Have we moved far enough into a new chunk for transition?
+        val chunkX = xToChunkX(pov.x)
+        val chunkY = yToChunkY(pov.y)
+        chunkAt(pov.x, pov.y)?.also { chunk ->
+            playerChunk = chunk
+        } ?: run {
+            playerChunk = null
+        }
+        val slopx = abs(pov.x - chunkX)
+        val slopy = abs(pov.y - chunkY)
+        if (slopx >= ambienceTransitionSlop && slopx <= (CHUNK_SIZE - ambienceTransitionSlop) && slopy >= ambienceTransitionSlop && slopy <= (CHUNK_SIZE - ambienceTransitionSlop)) {
+            // If we have the current chunk do the transition
+            ambienceChunkXY.x = chunkX
+            ambienceChunkXY.y = chunkY
+            chunkAt(pov.x, pov.y)?.also { chunk ->
+                transitionAmbienceToChunk(chunk)
+            } ?: run {
+                ambienceChunk = null
+            }
+        }
     }
 
     // Save all live chunks and remove their actors.
@@ -88,7 +123,6 @@ class WorldLevel() : Level() {
     override fun onRestore() {
         super.onRestore()
         populateChunks()
-        log.info("restored world with weather $weather ${weather.weatherIntensity}")
     }
 
     private fun xToChunkX(x: Int) = (x / CHUNK_SIZE) * CHUNK_SIZE + if (x < 0) -CHUNK_SIZE else 0
@@ -108,12 +142,12 @@ class WorldLevel() : Level() {
     private fun populateChunks() {
         val chunkX = xToChunkX(pov.x)
         val chunkY = yToChunkY(pov.y)
-        if (chunkX == lastPovChunk.x && chunkY == lastPovChunk.y) {
+        if (chunkX == lastPovChunkXY.x && chunkY == lastPovChunkXY.y) {  // player hasn't moved
             return
         }
         log.info("Entered chunk $chunkX $chunkY")
-        lastPovChunk.x = chunkX
-        lastPovChunk.y = chunkY
+        lastPovChunkXY.x = chunkX
+        lastPovChunkXY.y = chunkY
         originChunkX = chunkX - (CHUNK_SIZE * CHUNKS_AHEAD)
         originChunkY = chunkY - (CHUNK_SIZE * CHUNKS_AHEAD)
 
@@ -147,8 +181,7 @@ class WorldLevel() : Level() {
         val cx = (chunk.x - originCx) / CHUNK_SIZE
         val cy = (chunk.y - originCy) / CHUNK_SIZE
         if (cx < 0 || cy < 0 || cx >= chunksWide || cy >= chunksWide) {
-            log.error("**********WTF***********")
-            log.error("Received outdated chunk intended for cx $cx cy $cy !")
+            log.error("Received outdated chunk intended for cx $cx cy $cy !  Dropping")
             return
         }
         log.debug("Received hot chunk $cx $cy !")
@@ -158,6 +191,12 @@ class WorldLevel() : Level() {
         shadowDirty = true
         dirtyLightsAroundChunk(chunk)
         oldChunk?.also { if (!hasAttachedChunk(it)) unloadChunk(it) }
+        if (playerChunk == null && xToChunkX(pov.x) == chunk.x && yToChunkY(pov.y) == chunk.y) {
+            playerChunk = chunk
+        }
+        if (ambienceChunk == null && chunk.x == ambienceChunkXY.x && chunk.y == ambienceChunkXY.y) {
+            transitionAmbienceToChunk(chunk)
+        }
     }
 
     private fun hasAttachedChunk(chunk: Chunk): Boolean {
@@ -181,6 +220,12 @@ class WorldLevel() : Level() {
             dirtyLightsTouching(chunk.x - 1, y + chunk.y)
             dirtyLightsTouching(chunk.x + chunk.width, y + chunk.y)
         }
+    }
+
+    private fun transitionAmbienceToChunk(chunk: Chunk) {
+        if (chunk == ambienceChunk) return
+        ambienceChunk = chunk
+        updateAmbientSound()
     }
 
 }

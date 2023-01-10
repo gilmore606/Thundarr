@@ -40,3 +40,5 @@ object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {
 
 // Only used in generation, should never appear in the world
 object ScratchWater : Water(Type.GENERIC_WATER, Glyph.BLANK) { }
+
+object Lava : Terrain(Type.TERRAIN_LAVA, Glyph.LAVA, false, true, false, false) { }

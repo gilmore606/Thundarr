@@ -71,7 +71,13 @@ object Speaker {
         RAINHEAVY("weather/rainheavy.ogg"),
         INDUSTRIAL("ambi/industrial.ogg"),
         OUTDOORDAY("ambi/outdoorday.ogg"),
-        OUTDOORNIGHT("ambi/outdoornight.ogg")
+        OUTDOORNIGHT("ambi/outdoornight.ogg"),
+        DESERT("ambi/desert_day.ogg"),
+        FOREST("ambi/forest.ogg"),
+        MOUNTAIN("ambi/mountain.ogg"),
+        RUINS("ambi/ruins.ogg"),
+        SWAMP("ambi/swamp.ogg"),
+        OCEAN("ambi/ocean.ogg")
     }
 
 
@@ -141,7 +147,6 @@ object Speaker {
             sfxFiles[sfx] = mutableListOf<Sound>().apply {
                 sfx.files.forEach { add(
                     audio.newSound(Gdx.files.internal("sounds/${it}"))
-                    //audio.newSound(FileHandle("${RESOURCE_FILE_DIR}/sounds/${it}"))
                 )}
             }
         }
@@ -210,13 +215,38 @@ object Speaker {
         ambiDecks[ambience]?.also { deck ->
             deck.requestVolume(volume)
         }
-        cleanDecks()
     }
 
     fun clearAmbience() {
         ambiDecks.values.forEach {
             it.requestFadeout()
         }
+    }
+
+    fun setAmbiences(ambiences: List<Pair<Ambience, Float>>) {
+        val unplayed = ambiences.toMutableList()
+        ambiDecks.keys.forEach { currentTrack ->
+            var wanted = false
+            var removeAt = -1
+            unplayed.forEachIndexed { n, unplayedTrack ->
+                if (unplayedTrack.first == currentTrack) {
+                    wanted = true
+                    removeAt = n
+                    adjustAmbience(currentTrack, unplayedTrack.second)
+                }
+            }
+            if (!wanted) {
+                ambiDecks[currentTrack]?.requestFadeout()
+            } else {
+                unplayed.removeAt(removeAt)
+            }
+        }
+        unplayed.forEach { unplayedTrack ->
+            log.info("adding new ambience ${unplayedTrack.first} ${unplayedTrack.second}")
+            requestAmbience(unplayedTrack.first)
+            adjustAmbience(unplayedTrack.first, unplayedTrack.second)
+        }
+        cleanDecks()
     }
 
     fun onRender(delta: Float) {

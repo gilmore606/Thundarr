@@ -376,7 +376,7 @@ sealed class Level {
 
     fun updateTime(hour: Int, minute: Int) {
         updateAmbientLight(hour, minute)
-        if (App.level == this) updateAmbientSound(hour, minute)
+        if (App.level == this) updateAmbientSound()
     }
 
     private fun updateAmbientLight(hour: Int, minute: Int) {
@@ -406,7 +406,7 @@ sealed class Level {
         windowLight.b = ambientLight.b * 0.5f
     }
 
-    open fun updateAmbientSound(hour: Int, minute: Int) { }
+    open fun updateAmbientSound() { }
 
     fun makeContextMenu(x: Int, y: Int, menu: ContextMenu) {
         val isAdjacentOrHere = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
