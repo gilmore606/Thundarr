@@ -45,7 +45,7 @@ object Screen : KtxScreen {
     var cameraSlack = 0.3
     var cameraMenuShift = 0.8
     var uiHue = 0.0
-    var showSeenAreas = false
+    var showSeenAreas = true
     private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150

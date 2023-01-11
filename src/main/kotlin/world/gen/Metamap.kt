@@ -48,7 +48,7 @@ object Metamap {
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
-    val volcanoPeakCount = 100
+    val maxVolcanoes = 100
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -59,6 +59,7 @@ object Metamap {
     private var isolatedPeaks = ArrayList<XY>()
     private var volcanoPeaks = ArrayList<XY>()
     val metas = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
+    var suggestedPlayerStart = XY(-999,-999)
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
     fun metaAtWorld(x: Int, y: Int): ChunkMeta {
@@ -484,7 +485,7 @@ object Metamap {
                             cell.biome = Plain
                         } else {
                             isolatedPeaks.add(XY(x,y))
-                            if (biomeNeighbors(x,y,Desert,true) == 8) {
+                            if (biomeNeighbors(x,y,Desert,true) > 4) {
                                 volcanoPeaks.add(XY(x,y))
                             }
                         }
@@ -493,12 +494,21 @@ object Metamap {
             }
 
             // Volcanoes
-            repeat (volcanoPeakCount) {
-                val volcano = volcanoPeaks.random()
-                scratches[volcano.x][volcano.y].hasVolcano = true
-                CARDINALS.forEach { dir ->
-                    if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 8f))
+            if (volcanoPeaks.isNotEmpty()) {
+                var eruptions = 0
+                repeat(maxVolcanoes) {
+                    val volcano = volcanoPeaks.random()
+                    if (!scratches[volcano.x][volcano.y].hasVolcano) {
+                        scratches[volcano.x][volcano.y].hasVolcano = true
+                        CARDINALS.forEach { dir ->
+                            if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
+                        }
+                        eruptions++
+                        suggestedPlayerStart.x = xToChunkX(volcano.x)
+                        suggestedPlayerStart.y = yToChunkY(volcano.y)
+                    }
                 }
+                Console.sayFromThread("Erupted $eruptions volcanoes in desert peaks.")
             }
 
             // Biomes pass 2 - insert intermediate biomes
@@ -815,6 +825,7 @@ object Metamap {
     }
 
     private fun digLavaFlow(start: XY, startDir: XY, startWidth: Float) {
+        val branchChance = 0.4f
         val cursor = XY(start.x,start.y)
         val dir = XY(startDir.x,startDir.y)
         var width = startWidth
@@ -845,6 +856,10 @@ object Metamap {
                 cursor.y = next.y
                 width -= Dice.float(1f, 2.5f)
                 if (width <= 1f) done = true
+                if (Dice.chance(branchChance * (width / 5f))) {
+                    val branchDir = if (Dice.flip()) dir.rotated() else dir.rotated().flipped()
+                    digLavaFlow(cursor, branchDir, width * 0.7f)
+                }
             } else {
                 if (scratches[cursor.x][cursor.y].lavaExits.isNotEmpty()) scratches[cursor.x][cursor.y].lavaExits.last().width = 1
             }

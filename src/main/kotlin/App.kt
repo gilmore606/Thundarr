@@ -239,10 +239,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             log.info("Metamapper finished, time to complete the world...")
 
             if (startType == StartType.SURVIVE) {
-                level = LevelKeeper.getWarmedWorld(around = XY(-550, -500))
+                level = LevelKeeper.getWarmedWorld(around = Metamap.suggestedPlayerStart)
                 finishCreateWorld(level, startType)
             } else {
-                level = LevelKeeper.getWarmedWorld(around = XY(-550, -500), withStarterDungeon = true)
+                level = LevelKeeper.getWarmedWorld(around = Metamap.suggestedPlayerStart, withStarterDungeon = true)
                 // inshallah, StarterDungeon will call finishCreateWorld when warmed
             }
         }

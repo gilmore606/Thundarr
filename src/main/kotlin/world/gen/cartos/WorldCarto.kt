@@ -61,13 +61,13 @@ class WorldCarto(
             if (meta.hasLake) digLake()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
-            if (meta.lavaExits.isNotEmpty()) buildLava()
 
             // Carve extra terrain with no biome edge blending
             meta.biome.carveExtraTerrain(this)
 
             if (Dice.chance(0.05f) || forStarter) buildBuilding()
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
+            if (meta.lavaExits.isNotEmpty()) buildLava()
             if (meta.hasVolcano) buildVolcano()
 
             // Populate!
@@ -380,6 +380,7 @@ class WorldCarto(
                 }
             }
         }
+        fuzzTerrain(TERRAIN_LAVA, 0.5f)
     }
 
     private fun drawLava(start: LavaExit, end: LavaExit) {
@@ -389,8 +390,13 @@ class WorldCarto(
         val widthStep = (end.width.toFloat() - start.width.toFloat()) * step
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.pos.toXYf(), end.pos.toXYf(), end.pos.toXYf())
-            carveTrailChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
-                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), TERRAIN_LAVA, false)
+            val px = x0 + p.x
+            val py = y0 + p.y
+            carveTrailChunk(Rect((px - width/2).toInt(), (py - width/2).toInt(),
+                (px + width/2).toInt(), (py + width/2).toInt()), TERRAIN_LAVA, false)
+            val edgeWidth = width + 1.5f + width * (NoisePatches.get("metaVariance",px.toInt(),py.toInt()).toFloat()) * 1.5f
+            carveTrailChunk(Rect((px - edgeWidth / 2).toInt(), (py - edgeWidth / 2).toInt(),
+                (px + edgeWidth/2).toInt(), (py + edgeWidth/2).toInt()), TERRAIN_ROCKS, true, TERRAIN_LAVA)
             t += step
             width += widthStep
         }
@@ -569,6 +575,7 @@ class WorldCarto(
         val width = Dice.range(40,56)
         val height = Dice.range(40,56)
         printGrid(growBlob(width, height), x0 + Dice.range(3,6), y0 + Dice.range(3,6), TERRAIN_LAVA)
+        fringeTerrain(TERRAIN_LAVA, TERRAIN_ROCKS, 0.7f)
     }
 
     private fun digLake() {

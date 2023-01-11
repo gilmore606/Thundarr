@@ -37,12 +37,7 @@ class WorldLevel() : Level() {
 
     override fun getNewPlayerEntranceFrom(): XY? {
         // Brand new start.
-        val start = chunks[CHUNKS_AHEAD][CHUNKS_AHEAD]?.randomPlayerStart()
-        if (start != null) {
-            loadedChunks.forEach { it.clearSeen() }
-            return start
-        }
-        return null
+        return Metamap.suggestedPlayerStart
     }
 
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
