@@ -61,6 +61,7 @@ class WorldCarto(
             if (meta.hasLake) digLake()
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
+            if (meta.lavaExits.isNotEmpty()) buildLava()
 
             // Carve extra terrain with no biome edge blending
             meta.biome.carveExtraTerrain(this)
@@ -355,6 +356,43 @@ class WorldCarto(
                 flagsMap[x-x0][y-y0].add(CellFlag.BEACH)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
             }
+        }
+    }
+
+    private fun buildLava() {
+        when (meta.lavaExits.size) {
+            1 -> {
+                val start = meta.lavaExits[0]
+                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                val end = LavaExit(pos = endPos, edge = XY(0,0), width = 1)
+                drawLava(start, end)
+            }
+            2 -> {
+                drawLava(meta.lavaExits[0], meta.lavaExits[1])
+            }
+            else -> {
+                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
+                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                val center = LavaExit(pos = XY(centerX, centerY), edge = XY(0,0), width = meta.lavaExits[0].width + 1)
+                meta.lavaExits.forEach { exit ->
+                    drawLava(exit, center)
+                }
+            }
+        }
+    }
+
+    private fun drawLava(start: LavaExit, end: LavaExit) {
+        var t = 0f
+        val step = 0.02f
+        var width = start.width.toFloat()
+        val widthStep = (end.width.toFloat() - start.width.toFloat()) * step
+        while (t < 1f) {
+            val p = getBezier(t, start.pos.toXYf(), start.pos.toXYf(), end.pos.toXYf(), end.pos.toXYf())
+            carveTrailChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), TERRAIN_LAVA, false)
+            t += step
+            width += widthStep
         }
     }
 

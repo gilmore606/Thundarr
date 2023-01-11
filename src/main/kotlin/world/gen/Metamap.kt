@@ -48,7 +48,7 @@ object Metamap {
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
-    val volcanoPeaks = 100
+    val volcanoPeakCount = 100
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -57,6 +57,7 @@ object Metamap {
     private var cityCells = ArrayList<XY>()
     private var roadCells = ArrayList<XY>()
     private var isolatedPeaks = ArrayList<XY>()
+    private var volcanoPeaks = ArrayList<XY>()
     val metas = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
@@ -110,6 +111,7 @@ object Metamap {
         cityCells.clear()
         roadCells.clear()
         isolatedPeaks.clear()
+        volcanoPeaks.clear()
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
@@ -482,15 +484,21 @@ object Metamap {
                             cell.biome = Plain
                         } else {
                             isolatedPeaks.add(XY(x,y))
+                            if (biomeNeighbors(x,y,Desert,true) == 8) {
+                                volcanoPeaks.add(XY(x,y))
+                            }
                         }
                     }
                 }
             }
 
             // Volcanoes
-            repeat (volcanoPeaks) {
-                val volcano = isolatedPeaks.random()
+            repeat (volcanoPeakCount) {
+                val volcano = volcanoPeaks.random()
                 scratches[volcano.x][volcano.y].hasVolcano = true
+                CARDINALS.forEach { dir ->
+                    if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 8f))
+                }
             }
 
             // Biomes pass 2 - insert intermediate biomes
@@ -802,6 +810,43 @@ object Metamap {
                     childCell.riverExits.add(childExit)
                     runRiver(child, wiggle)
                 }
+            }
+        }
+    }
+
+    private fun digLavaFlow(start: XY, startDir: XY, startWidth: Float) {
+        val cursor = XY(start.x,start.y)
+        val dir = XY(startDir.x,startDir.y)
+        var width = startWidth
+        var done = false
+        while (!done) {
+            val next = XY(cursor.x + dir.x, cursor.y + dir.y)
+            if (scratches[next.x][next.y].height < 1) done = true
+            if (scratches[next.x][next.y].riverExits.isNotEmpty()) done = true
+            if (scratches[next.x][next.y].lavaExits.isNotEmpty()) done = true
+            if (!done) {
+                val edgePos = randomChunkEdgePos(dir, 0.8f)
+                val myExit = LavaExit(
+                    pos = edgePos,
+                    edge = dir,
+                    width = width.toInt()
+                )
+                val childEdgePos = flipChunkEdgePos(edgePos)
+                val childDir = XY(-dir.x, -dir.y)
+                val childExit = LavaExit(
+                    pos = childEdgePos,
+                    edge = childDir,
+                    width = width.toInt()
+                )
+                scratches[cursor.x][cursor.y].hasLake = false
+                scratches[cursor.x][cursor.y].lavaExits.add(myExit)
+                scratches[next.x][next.y].lavaExits.add(childExit)
+                cursor.x = next.x
+                cursor.y = next.y
+                width -= Dice.float(1f, 2.5f)
+                if (width <= 1f) done = true
+            } else {
+                if (scratches[cursor.x][cursor.y].lavaExits.isNotEmpty()) scratches[cursor.x][cursor.y].lavaExits.last().width = 1
             }
         }
     }
