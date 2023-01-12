@@ -360,6 +360,7 @@ class WorldCarto(
     }
 
     private fun buildLava() {
+        var bridgeDir: XY? = null
         when (meta.lavaExits.size) {
             1 -> {
                 val start = meta.lavaExits[0]
@@ -368,7 +369,16 @@ class WorldCarto(
                 drawLava(start, end)
             }
             2 -> {
-                drawLava(meta.lavaExits[0], meta.lavaExits[1])
+                val e1 = meta.lavaExits[0]
+                val e2 = meta.lavaExits[1]
+                drawLava(e1, e2)
+                if (e1.width <= 6) {
+                    if ((e1.edge == NORTH && e2.edge == SOUTH) || (e1.edge == SOUTH && e2.edge == NORTH)) {
+                        bridgeDir = EAST
+                    } else if ((e1.edge == EAST && e2.edge == WEST) || (e1.edge == WEST && e2.edge == EAST)) {
+                        bridgeDir = NORTH
+                    }
+                }
             }
             else -> {
                 val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
@@ -381,6 +391,7 @@ class WorldCarto(
             }
         }
         fuzzTerrain(TERRAIN_LAVA, 0.5f)
+        bridgeDir?.also { addLavaBridge(it) }
     }
 
     private fun drawLava(start: LavaExit, end: LavaExit) {
@@ -394,11 +405,23 @@ class WorldCarto(
             val py = y0 + p.y
             carveTrailChunk(Rect((px - width/2).toInt(), (py - width/2).toInt(),
                 (px + width/2).toInt(), (py + width/2).toInt()), TERRAIN_LAVA, false)
-            val edgeWidth = width + 1.5f + width * (NoisePatches.get("metaVariance",px.toInt(),py.toInt()).toFloat()) * 1.5f
+            val edgeWidth = width + 2.5f + width * (NoisePatches.get("metaVariance",px.toInt(),py.toInt()).toFloat()) * 1.5f
             carveTrailChunk(Rect((px - edgeWidth / 2).toInt(), (py - edgeWidth / 2).toInt(),
                 (px + edgeWidth/2).toInt(), (py + edgeWidth/2).toInt()), TERRAIN_ROCKS, true, TERRAIN_LAVA)
             t += step
             width += widthStep
+        }
+    }
+
+    private fun addLavaBridge(dir: XY) {
+        val cross = (CHUNK_SIZE / 4) + Dice.zeroTo(CHUNK_SIZE-30)
+        for (i in 0 until CHUNK_SIZE) {
+            val x = x0 + if (dir == NORTH) cross else i
+            val y = y0 + if (dir == NORTH) i else cross
+            if (getTerrain(x,y) == TERRAIN_LAVA) {
+                setTerrain(x,y,TERRAIN_ROCKS)
+                log.info("DING")
+            }
         }
     }
 
