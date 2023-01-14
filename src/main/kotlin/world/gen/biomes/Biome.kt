@@ -18,6 +18,7 @@ sealed class Biome(
     val mapGlyph: Glyph,
     val baseTerrain: Terrain.Type,
 ) {
+    open fun defaultTitle() = "the wilderness"
     open fun canHaveLake() = true
     open fun trailChance() = 0.1f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
@@ -56,6 +57,7 @@ object Ocean : Biome(
     Glyph.MAP_WATER,
     TERRAIN_DEEP_WATER
 ) {
+    override fun defaultTitle() = "ocean"
     override fun canHaveLake() = false
     override fun trailChance() = 0f
 }
@@ -65,6 +67,7 @@ object Glacier : Biome(
     Glyph.MAP_GLACIER,
     TERRAIN_DIRT
 ) {
+    override fun defaultTitle() = "glacier"
     override fun canHaveRain() = false
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_SAND
@@ -75,16 +78,17 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
-    val forestMin = 0.97f
+    val forestMin = 0.96f
     val grassMin = 0f
 
+    override fun defaultTitle() = "grassland"
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
 
     override fun addPlant(fertility: Float, variance: Float,
                           addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility > forestMin + (variance * 0.03f)) {
+        if (fertility > forestMin + (variance * 0.06f)) {
             addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
-        } else if (fertility < grassMin + (variance * 0.003f)) {
+        } else if (fertility < grassMin + (variance * 0.005f)) {
             if (Dice.chance(1f - fertility * 800f)) addTerrain(Terrain.Type.TERRAIN_DIRT)
         } else {
             if (Dice.chance(fertility * 0.2f)) {
@@ -107,6 +111,7 @@ object Forest : Biome(
     Glyph.MAP_FOREST,
     TERRAIN_GRASS
 ) {
+    override fun defaultTitle() = "forest"
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
@@ -150,14 +155,20 @@ object Hill : Biome(
     Glyph.MAP_HILL,
     TERRAIN_GRASS
 ) {
+    override fun defaultTitle() = "hills"
     override fun trailChance() = 0.2f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y)
         if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
-        else if (v < 0.3f) return Terrain.Type.TERRAIN_DIRT
-        else return Terrain.Type.TERRAIN_GRASS
+        else if (v < 0.3f) return Terrain.Type.TERRAIN_GRASS
+        else return Terrain.Type.TERRAIN_DIRT
+    }
+
+    override fun carveExtraTerrain(carto: WorldCarto) {
+        carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.7f, GENERIC_WATER)
+        repeat (2) { carto.varianceFuzzTerrain(TERRAIN_ROCKS, TERRAIN_CAVEWALL) }
     }
 }
 
@@ -166,6 +177,7 @@ object ForestHill : Biome(
     Glyph.MAP_FORESTHILL,
     TERRAIN_GRASS
 ) {
+    override fun defaultTitle() = "wooded hills"
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
@@ -180,6 +192,13 @@ object ForestHill : Biome(
         else if (v < 0.3f) return Terrain.Type.TERRAIN_DIRT
         else return Terrain.Type.TERRAIN_GRASS
     }
+
+    override fun carveExtraTerrain(carto: WorldCarto) {
+        carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.6f, TERRAIN_FORESTWALL)
+        carto.fringeTerrain(TERRAIN_FORESTWALL, TERRAIN_UNDERGROWTH, 0.6f, TERRAIN_CAVEWALL)
+        carto.varianceFuzzTerrain(TERRAIN_ROCKS, TERRAIN_CAVEWALL)
+        carto.varianceFuzzTerrain(TERRAIN_UNDERGROWTH, TERRAIN_FORESTWALL)
+    }
 }
 
 @Serializable
@@ -187,6 +206,7 @@ object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
     TERRAIN_DIRT
 ) {
+    override fun defaultTitle() = "mountains"
     override fun ambientSoundDay() = Speaker.Ambience.MOUNTAIN
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
@@ -194,7 +214,8 @@ object Mountain : Biome(
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
-        if (v > 0.65f) return Terrain.Type.TERRAIN_CAVEWALL
+        if (v > 0.55f) return Terrain.Type.TERRAIN_CAVEWALL
+        else if (NoisePatches.get("ruinMicro",x,y) > NoisePatches.get("metaVariance", x / 10, y / 10) * 2.5f) return Terrain.Type.TERRAIN_CAVEWALL
         else if (v < 0.2f) return Terrain.Type.TERRAIN_DIRT
         else if (Dice.chance(1f - v * 2f)) return Terrain.Type.TERRAIN_DIRT
         else return Terrain.Type.TERRAIN_ROCKS
@@ -209,6 +230,7 @@ object Swamp : Biome(
     Glyph.MAP_SWAMP,
     TERRAIN_SWAMP
 ) {
+    override fun defaultTitle() = "swamp"
     override fun ambientSoundDay() = Speaker.Ambience.SWAMP
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
@@ -241,6 +263,7 @@ object Scrub : Biome(
     Glyph.MAP_SCRUB,
     TERRAIN_GRASS
 ) {
+    override fun defaultTitle() = "plains"
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
 
@@ -270,6 +293,7 @@ object Desert : Biome(
     Glyph.MAP_DESERT,
     TERRAIN_SAND
 ) {
+    override fun defaultTitle() = "desert"
     override fun canHaveRain() = false
     override fun ambientSoundDay() = Speaker.Ambience.DESERT
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
@@ -306,6 +330,7 @@ object Tundra: Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_DIRT
 ) {
+    override fun defaultTitle() = "tundra"
     override fun canHaveRain() = false
 }
 
@@ -314,6 +339,7 @@ object Suburb: Biome(
     Glyph.MAP_SUBURB,
     TERRAIN_DIRT
 ) {
+    override fun defaultTitle() = "suburban ruins"
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun trailChance() = 0f
 }
@@ -323,6 +349,7 @@ object Ruins : Biome(
     Glyph.MAP_RUINS,
     Terrain.Type.TERRAIN_PAVEMENT
 ) {
+    override fun defaultTitle() = "urban ruins"
     override fun ambientSoundDay() = Speaker.Ambience.RUINS
     override fun ambientSoundNight() = Speaker.Ambience.RUINS
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT

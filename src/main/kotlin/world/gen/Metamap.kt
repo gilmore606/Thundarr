@@ -736,6 +736,9 @@ object Metamap {
             areas[Forest]?.forEachIndexed { n, area ->
                 if (n < 10) nameArea(area.areaID, Madlib.forestName())
             }
+            forEachMeta { x,y,cell ->
+                if (cell.title == "") cell.title = cell.biome.defaultTitle()
+            }
 
             // END STAGE : WRITE ALL DATA
             Console.sayFromThread("Saving generated world...")

@@ -86,7 +86,7 @@ class ChunkScratch(
     var hasVolcano = false
     var cityDistance = 0f
     var ruinedBuildings = 0
-    var title = "the wilderness"
+    var title = ""
     fun toChunkMeta() = ChunkMeta(
         x = x,
         y = y,

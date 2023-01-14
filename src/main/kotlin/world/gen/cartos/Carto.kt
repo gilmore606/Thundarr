@@ -321,7 +321,7 @@ abstract class Carto(
         adds.forEach { setTerrain(it.x, it.y, type) }
     }
 
-    protected fun varianceFuzzTerrain(type: Terrain.Type, exclude: Terrain.Type? = null) {
+    fun varianceFuzzTerrain(type: Terrain.Type, exclude: Terrain.Type? = null) {
         val adds = ArrayList<XY>()
         forEachCell { x, y ->
             if (getTerrain(x,y) == type) {
@@ -345,7 +345,7 @@ abstract class Carto(
         }
     }
 
-    protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
+    fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
         Evolver(CHUNK_SIZE, CHUNK_SIZE, false, { x,y ->
             getTerrain(x+x0,y+y0) == type
         }, { x,y ->
