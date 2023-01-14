@@ -7,6 +7,7 @@ import kotlin.random.Random
 import things.Thing
 import util.*
 import world.Chunk
+import world.gen.NoisePatches
 import world.level.Level
 import world.gen.prefabs.Prefab
 import world.gen.prefabs.TiledFile
@@ -318,6 +319,30 @@ abstract class Carto(
             }
         }
         adds.forEach { setTerrain(it.x, it.y, type) }
+    }
+
+    protected fun varianceFuzzTerrain(type: Terrain.Type, exclude: Terrain.Type? = null) {
+        val adds = ArrayList<XY>()
+        forEachCell { x, y ->
+            if (getTerrain(x,y) == type) {
+                CARDINALS.forEach { dir ->
+                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
+                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
+                            if (Dice.chance(NoisePatches.get("metaVariance", x, y).toFloat())) {
+                                adds.add(XY(x+dir.x, y+dir.y))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        adds.forEach { setTerrain(it.x, it.y, type) }
+    }
+
+    protected fun swapTerrain(oldType: Terrain.Type, newType: Terrain.Type) {
+        forEachCell { x,y ->
+            if (getTerrain(x,y) == oldType) setTerrain(x,y,newType)
+        }
     }
 
     protected fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {

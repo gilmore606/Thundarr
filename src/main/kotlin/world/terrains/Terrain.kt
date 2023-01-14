@@ -25,6 +25,9 @@ sealed class Terrain(
     companion object {
         fun get(type: Type) = when (type) {
             Type.BLANK -> Blank
+            Type.TEMP1 -> Blank
+            Type.TEMP2 -> Blank
+            Type.TEMP3 -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
             Type.TERRAIN_FORESTWALL -> ForestWall
@@ -61,6 +64,9 @@ sealed class Terrain(
 
     enum class Type {
         BLANK,
+        TEMP1,
+        TEMP2,
+        TEMP3,
         GENERIC_WALL,
         GENERIC_FLOOR,
         GENERIC_WATER,

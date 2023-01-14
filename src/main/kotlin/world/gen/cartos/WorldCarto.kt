@@ -471,6 +471,7 @@ class WorldCarto(
                                 setTerrain(x, y, type)
                                 flagsMap[x - x0][y - y0].add(CellFlag.TRAIL)
                                 flagsMap[x - x0][y - y0].add(CellFlag.NO_PLANTS)
+                                flagsMap[x - x0][y - y0].add(CellFlag.NO_BUILDINGS)
                             }
                         }
                     }
@@ -631,10 +632,18 @@ class WorldCarto(
             printGrid(growBlob((width * Dice.float(0.1f, 0.7f)).toInt(), (height * Dice.float(0.1f, 0.7f)).toInt()),
             x + Dice.range(3,15), y + Dice.range(3, 15), meta.biome.baseTerrain)
         }
+        fringeTerrain(TEMP1, TEMP2, 1f)
+        repeat (3) { varianceFuzzTerrain(TEMP2, TEMP1) }
+        swapTerrain(TEMP1, GENERIC_WATER)
+        forEachCell { x,y ->
+            if (getTerrain(x,y) == TEMP2) {
+                setTerrain(x,y,meta.biome.riverBankTerrain(x,y))
+            }
+        }
     }
 
     private fun digLakeBlobAt(x: Int, y: Int, width: Int, height: Int) {
-        printGrid(growBlob(width, height), x, y, GENERIC_WATER)
+        printGrid(growBlob(width, height), x, y, TEMP1)
     }
 
     private fun buildBuilding() {
