@@ -3,6 +3,7 @@ package world.persist
 import kotlinx.coroutines.*
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
+import util.XY
 import util.log
 import world.level.AttractLevel
 import world.level.CHUNK_SIZE

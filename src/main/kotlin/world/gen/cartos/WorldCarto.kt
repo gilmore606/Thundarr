@@ -44,7 +44,7 @@ class WorldCarto(
 
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
-        meta = App.save.getWorldMeta(x0, y0) ?: ChunkMeta()
+        meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
 
         if (meta.biome == Ocean) {
             carveRoom(Rect(x0,y0,x1,y1), 0, TERRAIN_DEEP_WATER)
@@ -81,7 +81,7 @@ class WorldCarto(
             setOverlaps()
         }
 
-        //debugBorders()
+        debugBorders()
     }
 
     // Set per-cell biomes for things we generate like rivers, coastal beach, etc
@@ -452,8 +452,9 @@ class WorldCarto(
         val step = 0.02f
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
+            val terrain = biomeAt(x0 + p.x.toInt(), y0 + p.y.toInt()).trailTerrain(x0 + p.x.toInt(), y0 + p.y.toInt())
             carveTrailChunk(Rect((x0 + p.x).toInt(), (y0 + p.y).toInt(),
-                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), meta.biome.trailTerrain((x0 + p.x).toInt(), (y0 + p.y).toInt()), false)
+                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), terrain, false)
             t += step
         }
     }

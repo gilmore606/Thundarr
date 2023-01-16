@@ -148,10 +148,8 @@ class SaveSlot(
     }
 
     suspend fun updateWorldMeta(meta: ChunkMeta) {
-        val cx = meta.x
-        val cy = meta.y
         transaction {
-            WorldMetaTable.deleteWhere { (x eq cx) and (y eq cy) }
+            WorldMetaTable.deleteWhere { (x eq meta.x) and (y eq meta.y) }
             WorldMetaTable.insert {
                 it[x] = meta.x
                 it[y] = meta.y

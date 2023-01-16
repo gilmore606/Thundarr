@@ -73,7 +73,7 @@ object Metamap {
         val cx = chunkXtoX(x)
         val cy = chunkYtoY(y)
         if (boundsCheck(cx,cy)) {
-            val meta = metaAt(cx,cy)
+            val meta = metaCache[cx][cy]
             if (!meta.mapped) {
                 meta.mapped = true
                 metaCache[cx][cy] = meta
@@ -91,10 +91,10 @@ object Metamap {
 
     fun xToChunkX(x: Int) = (x - chunkRadius) * CHUNK_SIZE
     fun yToChunkY(y: Int) = (y - chunkRadius) * CHUNK_SIZE
-    fun chunkXtoX(x: Int) = (x / CHUNK_SIZE) + chunkRadius + (if (x < 0) -1 else 0)
-    fun chunkYtoY(y: Int) = (y / CHUNK_SIZE) + chunkRadius + (if (y < 0) -1 else 0)
+    fun chunkXtoX(x: Int) = (x + (chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
+    fun chunkYtoY(y: Int) = (y + (chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
 
-    fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
+    private fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
         for (x in 0 until chunkRadius * 2) {
             for (y in 0 until chunkRadius * 2) {
                 doThis(x,y, scratches[x][y])
@@ -109,9 +109,10 @@ object Metamap {
             metaCache.clear()
             for (x in 0 until chunkRadius *2) {
                 val col = ArrayList<ChunkMeta>(chunkRadius*2)
+                repeat (chunkRadius*2) { col.add(outOfBoundsMeta) }
                 App.save.getWorldMetaColumn(xToChunkX(x)).forEach {
                     val i = chunkYtoY(it.y)
-                    if (i >= 0 && i < chunkRadius*2) col.add(it)
+                    if (i >= 0 && i < chunkRadius*2) col[i] = it
                 }
                 metaCache.add(col)
             }
