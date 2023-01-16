@@ -14,6 +14,7 @@ import world.Building
 import world.Chunk
 import world.ChunkMeta
 import world.ChunkScratch
+import world.gen.Metamap
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.sql.Connection
@@ -142,6 +143,19 @@ class SaveSlot(
                 it[x] = meta.x
                 it[y] = meta.y
                 it[data] = toCompressed(meta.toChunkMeta())
+            }
+        }
+    }
+
+    suspend fun updateWorldMeta(meta: ChunkMeta) {
+        val cx = meta.x
+        val cy = meta.y
+        transaction {
+            WorldMetaTable.deleteWhere { (x eq cx) and (y eq cy) }
+            WorldMetaTable.insert {
+                it[x] = meta.x
+                it[y] = meta.y
+                it[data] = toCompressed(meta)
             }
         }
     }

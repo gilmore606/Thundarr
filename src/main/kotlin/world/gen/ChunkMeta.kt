@@ -31,7 +31,8 @@ class ChunkMeta(
     var hasVolcano: Boolean = false,
     var cityDistance: Float = 0f,
     var ruinedBuildings: Int = 0,
-    var title: String = "the wilderness"
+    var title: String = "the wilderness",
+    var mapped: Boolean = false
 )
 
 @Serializable
@@ -106,6 +107,7 @@ class ChunkScratch(
         hasVolcano = hasVolcano,
         cityDistance = cityDistance,
         ruinedBuildings = ruinedBuildings,
-        title = title
+        title = title,
+        mapped = false
     )
 }

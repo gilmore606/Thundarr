@@ -351,7 +351,7 @@ class WorldCarto(
             if (getTerrain(x,y) == GENERIC_WATER) {
                 flagsMap[x-x0][y-y0].add(CellFlag.OCEAN)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
-                chunk.setSound(x,y, Speaker.PointAmbience(Speaker.Ambience.OCEAN))
+                if (neighborCount(x-x0,y-y0, GENERIC_WATER) < 8) chunk.setSound(x,y, Speaker.PointAmbience(Speaker.Ambience.OCEAN))
             } else if (getTerrain(x,y) == TERRAIN_BEACH) {
                 flagsMap[x-x0][y-y0].add(CellFlag.BEACH)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
@@ -420,7 +420,6 @@ class WorldCarto(
             val y = y0 + if (dir == NORTH) i else cross
             if (getTerrain(x,y) == TERRAIN_LAVA) {
                 setTerrain(x,y,TERRAIN_ROCKS)
-                log.info("DING")
             }
         }
     }

@@ -12,6 +12,7 @@ import world.gen.biomes.*
 import world.gen.biomes.Blank
 import world.gen.habitats.*
 import world.level.CHUNK_SIZE
+import world.persist.SaveSlot
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
@@ -58,14 +59,29 @@ object Metamap {
     private var roadCells = ArrayList<XY>()
     private var isolatedPeaks = ArrayList<XY>()
     private var volcanoPeaks = ArrayList<XY>()
-    val metas = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
+    val metaCache = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
     var suggestedPlayerStart = XY(-999,-999)
 
-    fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metas[x][y] else outOfBoundsMeta
+    fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metaCache[x][y] else outOfBoundsMeta
     fun metaAtWorld(x: Int, y: Int): ChunkMeta {
         val cx = chunkXtoX(x)
         val cy = chunkYtoY(y)
         return metaAt(cx,cy)
+    }
+
+    fun markChunkMappedAt(x: Int, y: Int) {
+        val cx = chunkXtoX(x)
+        val cy = chunkYtoY(y)
+        if (boundsCheck(cx,cy)) {
+            val meta = metaAt(cx,cy)
+            if (!meta.mapped) {
+                meta.mapped = true
+                metaCache[cx][cy] = meta
+                coroutineScope.launch {
+                    App.save.updateWorldMeta(meta)
+                }
+            }
+        }
     }
 
     fun boundsCheck(x: Int, y: Int): Boolean {
@@ -90,14 +106,14 @@ object Metamap {
         isWorking = true
         coroutineScope.launch {
             Console.sayFromThread("Loading world map...")
-            metas.clear()
+            metaCache.clear()
             for (x in 0 until chunkRadius *2) {
                 val col = ArrayList<ChunkMeta>(chunkRadius*2)
                 App.save.getWorldMetaColumn(xToChunkX(x)).forEach {
                     val i = chunkYtoY(it.y)
                     if (i >= 0 && i < chunkRadius*2) col.add(it)
                 }
-                metas.add(col)
+                metaCache.add(col)
             }
 
             Console.sayFromThread("Load completed!")
@@ -748,7 +764,7 @@ object Metamap {
                     for (iy in -chunkRadius until chunkRadius) {
                         it.add(scratches[ix + chunkRadius][iy + chunkRadius].toChunkMeta())
                     }
-                    metas.add(it)
+                    metaCache.add(it)
                 }
             }
             scratches = Array(1) { Array(1) { ChunkScratch() } }

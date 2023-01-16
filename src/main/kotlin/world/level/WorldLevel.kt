@@ -1,6 +1,7 @@
 package world.level
 
 import audio.Speaker
+import ktx.async.KtxAsync
 import util.*
 import world.Chunk
 import world.gen.Metamap
@@ -174,6 +175,7 @@ class WorldLevel() : Level() {
     }
 
     override fun receiveChunk(chunk: Chunk) {
+        Metamap.markChunkMappedAt(chunk.x, chunk.y)
         val originCx = xToChunkX(pov.x) - CHUNK_SIZE * CHUNKS_AHEAD
         val originCy = yToChunkY(pov.y) - CHUNK_SIZE * CHUNKS_AHEAD
         val cx = (chunk.x - originCx) / CHUNK_SIZE

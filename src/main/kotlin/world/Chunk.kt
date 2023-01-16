@@ -88,8 +88,6 @@ class Chunk(
     private val lightsTouching = ArrayList<LightSource>()
     @Transient
     private val lightCaster = RayCaster()
-    @Transient
-    private val debugLight = LightColor(0.8f, 0.8f, 0.8f)
 
     @Transient
     val glyphCache = Array(width) { Array<Int?>(height) { null } }
