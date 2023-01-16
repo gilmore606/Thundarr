@@ -404,8 +404,8 @@ class Chunk(
     } else { false }
 
     private fun updateOpaque(x: Int, y: Int): Boolean {
-        if (generating) return Terrain.get(terrains[x][y]).isOpaque()
         if (boundsCheck(x + this.x, y + this.y)) {
+            if (generating) return Terrain.get(terrains[x][y]).isOpaque()
             var v = Terrain.get(terrains[x][y]).isOpaque()
             if (!v) {
                 var thingBlocking = false

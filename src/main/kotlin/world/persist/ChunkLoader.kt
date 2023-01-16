@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import util.XY
+import util.hasOneWhere
 import util.log
 import world.level.AttractLevel
 import world.level.CHUNK_SIZE
@@ -15,6 +16,7 @@ object ChunkLoader {
     private val coroutineContext = newSingleThreadAsyncContext("ChunkLoader")
     private val coroutineScope = CoroutineScope(coroutineContext)
     private var jobs = mutableSetOf<Job>()
+    private val openRequests = mutableSetOf<XY>()
     private var locked = false
     private var working = false
 
@@ -33,12 +35,17 @@ object ChunkLoader {
     fun isWorking() = working
 
     fun getWorldChunkAt(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
+        if (openRequests.hasOneWhere { it.x == x && it.y == y }) {
+            log.info("Ignoring request for already-loading chunk at $x $y")
+            return
+        }
+        openRequests.add(XY(x,y))
         locked = true
         jobs.add(coroutineScope.launch {
             if (App.save.hasWorldChunk(x, y)) {
                 log.debug("Loading chunk at $x $y")
                 val chunk = App.save.getWorldChunk(x, y).apply { onRestore(level) }
-                KtxAsync.launch { callback(chunk) }
+                deliverChunk(chunk, callback)
             } else {
                 makeWorldChunk(level, x, y, callback)
             }
@@ -53,7 +60,14 @@ object ChunkLoader {
             connectLevel(level)
             generateWorld(level)
             val chunk = this
-            KtxAsync.launch { callback(chunk) }
+            deliverChunk(chunk, callback)
+        }
+    }
+
+    private fun deliverChunk(chunk: Chunk, callback: (Chunk)->Unit) {
+        KtxAsync.launch {
+            openRequests.removeIf { it.x == chunk.x && it.y == chunk.y }
+            callback(chunk)
         }
     }
 
