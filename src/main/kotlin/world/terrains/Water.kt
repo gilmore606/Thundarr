@@ -10,6 +10,8 @@ sealed class Water(
     glyph: Glyph
 ) : Terrain(type, glyph, false, true, false, false, dataType = Type.GENERIC_WATER){
 
+    override fun name() = "water"
+
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,
                                            vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean
@@ -31,6 +33,7 @@ sealed class Water(
 }
 
 object ShallowWater : Water(Type.TERRAIN_SHALLOW_WATER, Glyph.SHALLOW_WATER) {
+    override fun name() = "shallow water"
     override fun isWalkable() = true
 }
 
@@ -41,4 +44,6 @@ object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {
 // Only used in generation, should never appear in the world
 object ScratchWater : Water(Type.GENERIC_WATER, Glyph.BLANK) { }
 
-object Lava : Terrain(Type.TERRAIN_LAVA, Glyph.LAVA, false, true, false, false) { }
+object Lava : Terrain(Type.TERRAIN_LAVA, Glyph.LAVA, false, true, false, false) {
+    override fun name() = "lava"
+}

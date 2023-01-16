@@ -20,6 +20,7 @@ object PortalDoor : Terrain(
     true,
     false
 ) {
+    override fun name() = "door"
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level?.exitAt(x, y)?.also { exitRecord ->
             val oldLevel = actor.level!!

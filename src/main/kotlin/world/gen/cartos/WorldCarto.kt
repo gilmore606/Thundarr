@@ -81,7 +81,7 @@ class WorldCarto(
             setOverlaps()
         }
 
-        debugBorders()
+        //debugBorders()
     }
 
     // Set per-cell biomes for things we generate like rivers, coastal beach, etc

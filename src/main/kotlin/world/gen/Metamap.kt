@@ -720,7 +720,7 @@ object Metamap {
             forEachMeta { x,y,cell ->
                 if (areaMap[x][y] == 0) {
                     val biome = scratches[x][y].biome
-                    if (listOf(Ruins, Suburb, Desert, Mountain, Swamp).contains(biome)) {
+                    if (listOf(Ruins, Suburb, Desert, Mountain, Forest, Swamp).contains(biome)) {
                         val size = floodFill(x, y, areaID, biome)
                         if (areas.containsKey(biome)) {
                             areas[biome]?.add(BiomeArea(areaID, size))
@@ -751,7 +751,7 @@ object Metamap {
             }
             areas[Forest]?.sortByDescending { it.size }
             areas[Forest]?.forEachIndexed { n, area ->
-                if (n < 10) nameArea(area.areaID, Madlib.forestName())
+                if (n < 40) nameArea(area.areaID, Madlib.forestName())
             }
             forEachMeta { x,y,cell ->
                 if (cell.title == "") cell.title = cell.biome.defaultTitle()

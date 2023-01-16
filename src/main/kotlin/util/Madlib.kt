@@ -40,7 +40,7 @@ object Madlib {
         }
     }
 
-    fun wizardName(gender: Entity.Gender = Entity.Gender.NEUTER): String {
+    fun wizardNameWord(gender: Entity.Gender = Entity.Gender.NEUTER): String {
         val syl1 = listOf(
             "Mo",
             "Mol",
@@ -138,6 +138,11 @@ object Madlib {
         } else {
             name = syl1.random() + syl2.random()
         }
+        return name
+    }
+
+    fun wizardName(gender: Entity.Gender = Entity.Gender.NEUTER): String {
+        var name = wizardNameWord(gender)
         if (Dice.chance(0.7f - name.length * 0.1f)) {
             name += " " + wizardName(gender)
         }
@@ -357,11 +362,11 @@ object Madlib {
             "Silence",
             "Madness",
             "Ending",
-            wizardName(),
-            wizardName(),
-            wizardName(),
-            wizardName(),
-            wizardName()
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord()
         ).random()
     } else {
         listOf(
@@ -374,11 +379,11 @@ object Madlib {
             "Forgotten",
             "Nameless",
             "Spine",
-            wizardName(),
-            wizardName(),
-            wizardName(),
-            wizardName(),
-            wizardName()
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord(),
+            wizardNameWord()
         ).random() + " Mountains"
     }
 
@@ -392,11 +397,11 @@ object Madlib {
         "Blasted",
         "Bleached",
         "Skull",
-        wizardName(),
-        wizardName(),
-        wizardName(),
-        wizardName(),
-        wizardName()
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord()
     ).random() + " " + listOf(
         "Desert",
         "Wastes",
@@ -415,18 +420,21 @@ object Madlib {
         "Howling",
         "Weeping",
         "Rashes",
-        wizardName(),
-        wizardName(),
-        wizardName(),
-        wizardName(),
-        wizardName()
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord(),
+        wizardNameWord()
     ).random()
 
     fun forestName(): String {
-        val adjs = listOf("Horror", "Fear", "Gloom", "Spider", "Beetle", "Death", "Moon", "Moss")
-        return when (Dice.oneTo(3)) {
+        val adjs = listOf("Horror", "Fear", "Gloom", "Spider", "Beetle", "Death", "Moon", "Moss",
+            "Weeping", "Howling",
+            wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord())
+        return when (Dice.oneTo(4)) {
             1 -> { adjs.random() + "wood" }
             2 -> { adjs.random() + "woods" }
+            3 -> { "Forest of "  + adjs.random() }
             else -> { adjs.random() + " Forest" }
         }
     }

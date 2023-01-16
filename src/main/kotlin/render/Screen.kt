@@ -86,12 +86,13 @@ object Screen : KtxScreen {
     val uiBatch = QuadBatch(uiTileSet)
     val uiThingBatch = QuadBatch(thingTileSet)
     val uiActorBatch = QuadBatch(actorTileSet)
+    val uiTerrainBatch = QuadBatch(terrainTileSet)
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
     val mapBatch = QuadBatch(mapTileSet)
     private val worldBatches = listOf(terrainBatch, thingBatch,  actorBatch, gearBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, gearBatch, fireBatch,
-        uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, cloudBatch, rainBatch)
+        uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, uiTerrainBatch, cloudBatch, rainBatch)
     val textBatch = SpriteBatch()
     var textCamera = OrthographicCamera(100f, 100f)
 

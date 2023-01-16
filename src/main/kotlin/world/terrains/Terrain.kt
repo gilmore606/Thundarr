@@ -10,6 +10,7 @@ import ui.modals.Modal
 import ui.panels.Console
 import util.LightColor
 import util.XY
+import world.Entity
 import world.level.Level
 
 sealed class Terrain(
@@ -20,7 +21,7 @@ sealed class Terrain(
     private val opaque: Boolean,
     val canGrowPlants: Boolean,
     val dataType: Type = type  // should match TerrainData.forType
-) {
+) : Entity {
 
     companion object {
         fun get(type: Type) = when (type) {
@@ -93,7 +94,12 @@ sealed class Terrain(
         TERRAIN_LAVA
     }
 
-    open fun glyph() = this.glyph
+    override fun glyph() = this.glyph
+    override fun description() = ""
+    override fun glyphBatch() = Screen.terrainBatch
+    override fun uiBatch() = Screen.uiTerrainBatch
+    override fun level() = null
+    override fun xy() = null
 
     open fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                               doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
@@ -109,7 +115,9 @@ sealed class Terrain(
     open fun debugData(data: TerrainData?): String { return "none" }
 }
 
-object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false, false)
+object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false, false) {
+    override fun name() = "BLANK"
+}
 
 @Serializable
 sealed class TerrainData(

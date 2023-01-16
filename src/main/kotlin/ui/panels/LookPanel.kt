@@ -6,6 +6,7 @@ import ui.modals.InventoryModal
 import util.XY
 import util.wrapText
 import world.Entity
+import world.terrains.Terrain
 
 object LookPanel : ShadedPanel() {
 
@@ -91,7 +92,7 @@ object LookPanel : ShadedPanel() {
                 e = things[0]
             }
         }
-
-        return e
+        e?.also { return it }
+        return Terrain.get(App.level.getTerrain(App.player.xy.x, App.player.xy.y))
     }
 }

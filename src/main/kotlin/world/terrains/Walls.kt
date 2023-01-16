@@ -74,18 +74,21 @@ sealed class Wall(
 }
 
 object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
+    override fun name() = "brick wall"
     override fun bumpMsg() = "You bump into a brick wall."
     override fun digResult() = if (Dice.chance(0.4f)) Brick() else null
     override fun digToFloorTerrain() = Terrain.Type.TERRAIN_STONEFLOOR
 }
 
 object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
+    override fun name() = "rock face"
     override fun bumpMsg() = "You bump into a rock face."
     override fun digResult() = if (Dice.chance(0.4f)) Rock() else null
     override fun digToFloorTerrain() = Terrain.Type.TERRAIN_CAVEFLOOR
 }
 
 object ForestWall : Wall(Type.TERRAIN_FORESTWALL, Glyph.FOREST_WALL, 4f) {
+    override fun name() = "trees"
     override fun isDiggable() = false
     override fun bumpMsg() = "The forest is too thick to pass this way."
 }
