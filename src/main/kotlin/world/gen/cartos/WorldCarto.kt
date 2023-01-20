@@ -15,6 +15,8 @@ import world.level.Level
 import world.persist.LevelKeeper
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import java.lang.Float.max
+import java.lang.Float.min
 import kotlin.random.Random
 
 class WorldCarto(
@@ -33,7 +35,7 @@ class WorldCarto(
     val autoBridgeChance = 0.5f
     val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
 
-    val globalPlantDensity = 0.5f
+    val globalPlantDensity = 0.2f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
@@ -108,33 +110,44 @@ class WorldCarto(
 
     private fun buildFertilityMap() {
         forEachBiome { x,y,biome ->
-            if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && Terrain.get(getTerrain(x,y)).canGrowPlants) {
-                fertMap[x-x0][y-y0] = biome.fertilityAt(x, y)
+            val terrain = Terrain.get(getTerrain(x,y))
+            if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && terrain.canGrowPlants) {
+                var fert = biome.fertilityAt(x, y) + terrain.fertilityBonus()
+                var nearTrees = false
+                var nearWater = false
+                DIRECTIONS.from(x, y) { dx, dy, dir ->
+                    if (boundsCheck(dx,dy) && getTerrain(dx,dy) == TERRAIN_FORESTWALL) nearTrees = true
+                    if (boundsCheck(dx,dy) && getTerrain(dx,dy) == GENERIC_WATER) nearWater = true
+                }
+                if (nearTrees) fert += 0.4f
+                if (nearWater) fert += 0.4f
+                if (Dice.chance(0.2f)) fert += Dice.float(-0.3f, 0.3f)
+                fertMap[x-x0][y-y0] = max(0.0f, min(1.0f, fert))
             }
         }
-        // TODO: Boost around lakes/rivers?
-        // TODO: Random fuzz all values?
     }
 
     private fun growPlants() {
         val allSpawns = plantSpawns()
         forEachBiome { x,y,biome ->
             fertMap[x-x0][y-y0]?.also { fertility ->
-                val plantChance = biome.plantDensity() * globalPlantDensity * fertility.scaledTo(0.2f, 1f)
+                val plantChance = biome.plantDensity() * globalPlantDensity * max(0.2f, fertility)
                 if (Dice.chance(plantChance)) {
                     val plants = allSpawns.filter {
                         it.biomes.contains(biome) && it.habitats.contains(meta.habitat) &&
                                 fertility >= it.minFertility && fertility <= it.maxFertility
                     }
-                    val totalFreq = allSpawns.map { it.frequency }.reduce { t, f -> t + f }
-                    val spawnFreq = Dice.float(0f, totalFreq)
-                    var acc = 0f
-                    var spawned = false
-                    plants.forEach {
-                        acc += it.frequency
-                        if (!spawned && acc >= spawnFreq) {
-                            addThing(x, y, it.spawn())
-                            spawned = true
+                    if (plants.isNotEmpty()) {
+                        val totalFreq = plants.map { it.frequency }.reduce { t, f -> t + f }
+                        val spawnFreq = Dice.float(0f, totalFreq)
+                        var acc = 0f
+                        var spawned = false
+                        plants.forEach {
+                            acc += it.frequency
+                            if (!spawned && acc >= spawnFreq) {
+                                addThing(x, y, it.spawn())
+                                spawned = true
+                            }
                         }
                     }
                 }

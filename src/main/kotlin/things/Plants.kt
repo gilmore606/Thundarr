@@ -128,13 +128,13 @@ sealed class Bush : Plant() {
 
 @Serializable
 class ThornBush : Bush() {
-    override fun glyph() = Glyph.BUSH_1
+    override fun glyph() = Glyph.BUSH_2
     override fun name() = "thorn bush"
 }
 
 @Serializable
 class SageBush : Bush() {
-    override fun glyph() = Glyph.BUSH_2
+    override fun glyph() = Glyph.BUSH_1
     override fun name() = "sage bush"
 }
 

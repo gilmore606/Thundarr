@@ -105,7 +105,7 @@ object Forest : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
-    override fun plantDensity() = 1.0f
+    override fun plantDensity() = 1.4f
     override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (fertilityAt(x, y) > 0.6f) TERRAIN_SWAMP else TERRAIN_UNDERGROWTH
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) * 1.5f
@@ -155,7 +155,7 @@ object ForestHill : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
-    override fun plantDensity() = 0.8f
+    override fun plantDensity() = 0.7f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
@@ -189,7 +189,7 @@ object Mountain : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
-    override fun plantDensity() = 0.2f
+    override fun plantDensity() = 0.5f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -213,7 +213,7 @@ object Swamp : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.SWAMP
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
-    override fun plantDensity() = 0.7f
+    override fun plantDensity() = 1f
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
 
@@ -247,7 +247,7 @@ object Scrub : Biome(
     override fun defaultTitle() = "plains"
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
-    override fun plantDensity() = 0.3f
+    override fun plantDensity() = 0.25f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

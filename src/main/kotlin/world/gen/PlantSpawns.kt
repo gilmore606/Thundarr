@@ -19,52 +19,52 @@ fun plantSpawns() = listOf<PlantSpawn>(
     PlantSpawn({ OakTree() },
         setOf(Forest, ForestHill),
         setOf(TemperateA, TemperateB),
-        1f, 0.8f, 1f
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ TeakTree() },
         setOf(Forest, ForestHill),
         setOf(TropicalA, TropicalB),
-        1f, 0.8f, 1f
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ MapleTree() },
         setOf(Forest, ForestHill, Swamp),
         setOf(TemperateA, TemperateB),
-        1f, 0.8f, 1f
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ BirchTree() },
         setOf(Forest, Plain, Swamp),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
-        1f, 0.8f, 1f
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ AppleTree() },
         setOf(Forest, ForestHill, Plain),
         setOf(TemperateA, TemperateB),
-        0.3f, 0.7f, 1f
+        0.3f, 0.6f, 1f
     ),
     PlantSpawn({ PineTree() },
         setOf(Forest, ForestHill, Mountain, Hill),
-        setOf(AlpineA, AlpineB),
-        1f, 0.8f, 1f
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB),
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ SpruceTree() },
         setOf(Forest, ForestHill),
         setOf(AlpineA, AlpineB),
-        1f, 0.7f, 1f
+        1f, 0.6f, 1f
     ),
     PlantSpawn({ PalmTree() },
         setOf(Desert, Forest, Plain, Swamp),
         setOf(TropicalA, TropicalB),
-        1f, 0.8f, 1f
+        1f, 0.7f, 1f
     ),
     PlantSpawn({ CoconutTree() },
         setOf(Forest, ForestHill, Plain, Swamp),
-        setOf(TemperateA, TemperateB),
-        0.4f, 0.8f, 1f
+        setOf(TropicalA, TropicalB),
+        0.4f, 0.7f, 1f
     ),
     PlantSpawn({ DeadTree() },
         setOf(Mountain, Forest, ForestHill, Hill, Swamp),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB),
-        0.3f, 0.7f, 1f
+        0.3f, 0.6f, 1f
     ),
 
     // Bushes
@@ -74,7 +74,7 @@ fun plantSpawns() = listOf<PlantSpawn>(
         1f, 0f, 0.8f
     ),
     PlantSpawn({ SageBush() },
-        setOf(Plain, Scrub),
+        setOf(Plain, Scrub, Desert),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         1f, 0f, 0.8f
     ),
@@ -124,17 +124,17 @@ fun plantSpawns() = listOf<PlantSpawn>(
     // Cacti
     PlantSpawn({ Saguaro() },
         setOf(Desert),
-        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         1f, 0.7f, 1f
     ),
     PlantSpawn({ Cholla() },
         setOf(Desert, Scrub),
-        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         1f, 0.5f, 1f
     ),
     PlantSpawn({ Prickpear() },
         setOf(Desert),
-        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         0.3f, 0.5f, 1f
     ),
 
@@ -158,7 +158,7 @@ fun plantSpawns() = listOf<PlantSpawn>(
     // Mushrooms
     PlantSpawn({ WizardcapMushroom() },
         setOf(Hill, Mountain),
-        setOf(TemperateA, TemperateB),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB),
         0.03f, 0.6f, 1f
     ),
     PlantSpawn({ SpeckledMushroom() },
@@ -168,7 +168,7 @@ fun plantSpawns() = listOf<PlantSpawn>(
     ),
     PlantSpawn({ BloodcapMushroom() },
         setOf(ForestHill),
-        setOf(TemperateA, TemperateB),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
         0.05f, 0f, 0.2f
     )
 )
