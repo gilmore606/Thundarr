@@ -9,6 +9,7 @@ import world.gen.biomes.Beach
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
+import world.gen.plantSpawns
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.persist.LevelKeeper
@@ -32,11 +33,14 @@ class WorldCarto(
     val autoBridgeChance = 0.5f
     val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
 
+    val globalPlantDensity = 0.5f
+
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
     private val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
+    private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
 
     private var hasBlends = false
     lateinit var meta: ChunkMeta
@@ -71,6 +75,7 @@ class WorldCarto(
             if (meta.hasVolcano) buildVolcano()
 
             // Populate!
+            buildFertilityMap()
             growPlants()
 
             // Post-processing
@@ -101,11 +106,38 @@ class WorldCarto(
         }
     }
 
-    private fun growPlants() {
+    private fun buildFertilityMap() {
         forEachBiome { x,y,biome ->
             if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && Terrain.get(getTerrain(x,y)).canGrowPlants) {
-                val fertility = NoisePatches.get("plantsBasic", x, y).toFloat()
-                biome.addPlant(fertility, meta.variance, { addThing(x, y, it) }, { setTerrain(x, y, it) })
+                fertMap[x-x0][y-y0] = biome.fertilityAt(x, y)
+            }
+        }
+        // TODO: Boost around lakes/rivers?
+        // TODO: Random fuzz all values?
+    }
+
+    private fun growPlants() {
+        val allSpawns = plantSpawns()
+        forEachBiome { x,y,biome ->
+            fertMap[x-x0][y-y0]?.also { fertility ->
+                val plantChance = biome.plantDensity() * globalPlantDensity * fertility.scaledTo(0.2f, 1f)
+                if (Dice.chance(plantChance)) {
+                    val plants = allSpawns.filter {
+                        it.biomes.contains(biome) && it.habitats.contains(meta.habitat) &&
+                                fertility >= it.minFertility && fertility <= it.maxFertility
+                    }
+                    val totalFreq = allSpawns.map { it.frequency }.reduce { t, f -> t + f }
+                    val spawnFreq = Dice.float(0f, totalFreq)
+                    var acc = 0f
+                    var spawned = false
+                    plants.forEach {
+                        acc += it.frequency
+                        if (!spawned && acc >= spawnFreq) {
+                            addThing(x, y, it.spawn())
+                            spawned = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -177,7 +209,7 @@ class WorldCarto(
             CARDINALS.from(x, y) { tx, ty, _ ->
                 if (boundsCheck(tx, ty)) {
                     if (blendMap[tx-x0][ty-y0].first().first == biome) orphan = false
-                    else switch = blendMap[tx-x0][ty-y0].first().first
+                    else switch = blendMap[tx-x0][ty-y0].first().first // TODO: make this random!
                 }
             }
             if (orphan) blendMap[x-x0][y-y0].apply {

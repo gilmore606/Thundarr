@@ -30,9 +30,9 @@ sealed class Biome(
     open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
 
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
+    open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
-    open fun addPlant(fertility: Float, variance: Float, addThing: (Thing)->Unit, addTerrain: (Terrain.Type)->Unit) { }
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
         if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
@@ -79,31 +79,19 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
-    val forestMin = 0.96f
-    val grassMin = 0f
-
     override fun defaultTitle() = "grassland"
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
     override fun plantDensity() = 0.5f
 
-    override fun addPlant(fertility: Float, variance: Float,
-                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility > forestMin + (variance * 0.06f)) {
-            addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
-        } else if (fertility < grassMin + (variance * 0.005f)) {
-            if (Dice.chance(1f - fertility * 800f)) addTerrain(Terrain.Type.TERRAIN_DIRT)
-        } else {
-            if (Dice.chance(fertility * 0.2f)) {
-                val type = fertility + Dice.float(-0.3f, 0.3f)
-                addThing(
-                    if (type > 0.7f) OakTree()
-                    else if (type > 0.5f) Bush()
-                    else if (type > 0.2f) Bush2()
-                    else if (Dice.flip()) Flowers1()
-                    else Flowers2()
-                )
-            }
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val fert = fertilityAt(x, y)
+        val variance = NoisePatches.get("metaVariance", x, y).toFloat()
+        if (fert > 0.96f + (variance * 0.1f)) {
+            return TERRAIN_FORESTWALL
+        } else if (fert < (variance * 0.004f)) {
+            return TERRAIN_DIRT
         }
+        return super.terrainAt(x, y)
     }
 
 }
@@ -118,39 +106,19 @@ object Forest : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
     override fun plantDensity() = 1.0f
-    override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.6f) TERRAIN_SWAMP else TERRAIN_UNDERGROWTH
+    override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (fertilityAt(x, y) > 0.6f) TERRAIN_SWAMP else TERRAIN_UNDERGROWTH
 
-    val forestMin = 0.7f
-    val treeChance = 0.04f
-
+    override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) * 1.5f
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val fert = NoisePatches.get("plantsBasic", x, y)
         val ef = NoisePatches.get("extraForest", x, y)
-        if (ef > 0.2f) {
+        if (fert > 0.7f || ef > 0.2f) {
             return Terrain.Type.TERRAIN_FORESTWALL
         } else if (ef > 0.01f) {
             return Terrain.Type.TERRAIN_UNDERGROWTH
         }
         return super.terrainAt(x, y)
     }
-
-    override fun addPlant(fertility: Float, variance: Float,
-                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility > forestMin) {
-            addTerrain(Terrain.Type.TERRAIN_FORESTWALL)
-        } else if (Dice.chance(treeChance)) {
-            addThing(OakTree())
-        } else {
-            if (Dice.chance(fertility * 0.7f)) {
-                val type = fertility + Dice.float(-0.3f, 0.3f)
-                addThing(
-                    if (type > 0.5f) OakTree()
-                    else if (type > 0.2f) Bush()
-                    else  Bush2()
-                )
-            }
-        }
-    }
-
 }
 
 @Serializable
@@ -163,10 +131,12 @@ object Hill : Biome(
     override fun plantDensity() = 0.3f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 
+    override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) - NoisePatches.get("mountainShapes", x, y).toFloat() * 0.6f
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y)
         if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
-        else if (v < 0.3f) return Terrain.Type.TERRAIN_GRASS
+        else if (v < 0.35f) return Terrain.Type.TERRAIN_GRASS
         else return Terrain.Type.TERRAIN_DIRT
     }
 
@@ -187,6 +157,9 @@ object ForestHill : Biome(
     override fun trailChance() = 0.2f
     override fun plantDensity() = 0.8f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+
+    override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
+            (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 3f).toFloat()
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         if (NoisePatches.get("extraForest", x, y) > 0.2f) {
@@ -220,7 +193,7 @@ object Mountain : Biome(
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
-        if (v > 0.55f) return Terrain.Type.TERRAIN_CAVEWALL
+        if (v > 0.53f) return Terrain.Type.TERRAIN_CAVEWALL
         else if (NoisePatches.get("ruinMicro",x,y) > NoisePatches.get("metaVariance", x / 10, y / 10) * 2.5f) return Terrain.Type.TERRAIN_CAVEWALL
         else if (v < 0.2f) return Terrain.Type.TERRAIN_DIRT
         else if (Dice.chance(1f - v * 2f)) return Terrain.Type.TERRAIN_DIRT
@@ -244,16 +217,17 @@ object Swamp : Biome(
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
 
+    override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
+
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val localThresh = 0.35f + (NoisePatches.get("metaVariance", x, y) * 0.3f).toFloat()
-        val density = NoisePatches.get("swampForest", x, y).toFloat()
-        if (density > localThresh) {
+        val fert = NoisePatches.get("swampForest", x, y).toFloat()
+        if (fert > localThresh) {
             return Terrain.Type.TERRAIN_FORESTWALL
-        } else if (density > localThresh * 0.6f && Dice.chance(localThresh)) {
+        } else if (fert > localThresh * 0.6f && Dice.chance(localThresh)) {
             return TERRAIN_UNDERGROWTH
-        } else {
-            return super.terrainAt(x, y)
         }
+        return super.terrainAt(x, y)
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
@@ -275,24 +249,15 @@ object Scrub : Biome(
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
     override fun plantDensity() = 0.3f
 
-    val dirtMin = 0.1f
-    val grassMin = 0.4f
-
-    override fun addPlant(fertility: Float, variance: Float,
-                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility < dirtMin + (variance * 0.002f)) {
-            addTerrain(Terrain.Type.TERRAIN_HARDPAN)
-        } else if (fertility < grassMin + (variance * 0.004f)) {
-            addTerrain(Terrain.Type.TERRAIN_DIRT)
-        } else {
-            if (Dice.chance(fertility * 0.1f)) {
-                val type = fertility + Dice.float(-0.3f, 0.3f)
-                addThing(
-                    if (type > 0.5f) Bush()
-                    else  Bush2()
-                )
-            }
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val fert = fertilityAt(x, y)
+        val variance = NoisePatches.get("metaVariance", x, y).toFloat()
+        if (fert < 0.1f + (variance * 0.002f)) {
+            return TERRAIN_HARDPAN
+        } else if (fert < 0.4f + (variance * 0.004f)) {
+            return TERRAIN_DIRT
         }
+        return super.terrainAt(x, y)
     }
 }
 
@@ -310,19 +275,13 @@ object Desert : Biome(
     override fun plantDensity() = 0.1f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val fert = fertilityAt(x, y)
         val v = NoisePatches.get("desertRocks",x,y).toFloat()
+        val variance = NoisePatches.get("metaVariance", x, y).toFloat()
         if (v > 0.45f) return TERRAIN_CAVEWALL
         else if (v > 0.35f && Dice.chance((v - 0.35f) * 10f)) return TERRAIN_ROCKS
+        else if (fert > 0.5f + (variance * 0.006f)) return TERRAIN_HARDPAN
         return super.terrainAt(x,y)
-    }
-
-    val sandMin = 0.1f
-
-    override fun addPlant(fertility: Float, variance: Float,
-                          addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
-        if (fertility < sandMin + (variance * 0.006f)) {
-            addTerrain(Terrain.Type.TERRAIN_HARDPAN)
-        }
     }
 }
 

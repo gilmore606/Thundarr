@@ -376,3 +376,4 @@ fun drawLine(start: XY, end: XY, setCell: (x: Int, y: Int)->Unit) {
     }
 }
 
+fun Float.scaledTo(min: Float, max: Float) = min + this * (max - min)
