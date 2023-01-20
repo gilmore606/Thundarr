@@ -1,7 +1,5 @@
 package render.tilesets
 
-import com.badlogic.gdx.graphics.Texture
-import render.Screen
 import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 import render.tileholders.TableTile
@@ -11,11 +9,28 @@ fun ThingTileSet() =
     TileSet(SpriteSheets.Sheet.ThingSprites).apply {
 
         setTile(Glyph.BLANK, SimpleTile(this, 4, 2))
-        setTile(Glyph.TREE, VariantsTile(this).apply {
-            add(0.3f, 0, 1)
-            add(0.3f, 1, 1)
-            add(0.4f, 0, 0)
-        })
+
+        setTile(Glyph.OAK_TREE, SimpleTile(this, 0, 0))
+        setTile(Glyph.MAPLE_TREE, SimpleTile(this, 0, 1))
+        setTile(Glyph.BIRCH_TREE, SimpleTile(this, 1, 1))
+        setTile(Glyph.FRUIT_TREE, SimpleTile(this, 10, 0))
+        setTile(Glyph.DEAD_TREE, SimpleTile(this, 0, 2))
+        setTile(Glyph.PINE_TREE, SimpleTile(this, 0, 3))
+        setTile(Glyph.PALM_TREE, SimpleTile(this, 2, 3))
+
+        setTile(Glyph.BUSH_1, SimpleTile(this, 1, 2))
+        setTile(Glyph.BUSH_1_FRUIT, SimpleTile(this, 2, 2))
+        setTile(Glyph.BUSH_2, SimpleTile(this, 1, 3))
+        setTile(Glyph.BUSH_2_FRUIT, SimpleTile(this, 3, 2))
+        setTile(Glyph.SUNFLOWER, SimpleTile(this, 4, 2))
+        setTile(Glyph.HANGFLOWER, SimpleTile(this, 3, 3))
+        setTile(Glyph.SUCCULENT, SimpleTile(this, 4, 3))
+        setTile(Glyph.FLOWERS, SimpleTile(this, 4, 10))
+        setTile(Glyph.TOADSTOOLS, SimpleTile(this, 5, 10))
+        setTile(Glyph.MUSHROOM, SimpleTile(this, 6, 10))
+        setTile(Glyph.CACTUS_SMALL, SimpleTile(this, 5, 1))
+        setTile(Glyph.CACTUS_BIG, SimpleTile(this, 5, 0))
+        setTile(Glyph.HERB_PLANT_1, SimpleTile(this, 7, 10))
 
         setTile(Glyph.LIGHTBULB, SimpleTile(this, 1, 0))
 
@@ -29,20 +44,9 @@ fun ThingTileSet() =
             add(0.5f, 2, 1)
             add(0.5f, 2, 2)
         })
-        setTile(Glyph.DEAD_TREE, VariantsTile(this).apply {
-            add(1f, 0, 2)
-        })
         setTile(Glyph.BLADE, SimpleTile(this, 4, 2))
         setTile(Glyph.HILT, SimpleTile(this, 5, 2))
         setTile(Glyph.HILT_LIT, SimpleTile(this, 5, 4))
-        setTile(Glyph.PINE_TREE, VariantsTile(this).apply {
-            add(0.5f, 0, 3)
-            add(0.5f, 1, 3)
-        })
-        setTile(Glyph.PALM_TREE, VariantsTile(this).apply {
-            add(0.5f, 2, 3)
-            add(0.5f, 3, 3)
-        })
         setTile(Glyph.BOTTLE, SimpleTile(this, 5, 3))
         setTile(Glyph.FRUIT, SimpleTile(this, 0, 4))
         setTile(Glyph.TORCH, SimpleTile(this, 1, 4))
@@ -130,18 +134,5 @@ fun ThingTileSet() =
         setTile(Glyph.WOOD_DOOR_OPEN, SimpleTile(this, 1, 10))
         setTile(Glyph.TRIDENT, SimpleTile(this, 2, 10))
         setTile(Glyph.SPEAR, SimpleTile(this, 3, 10))
-        setTile(Glyph.BUSH_1, SimpleTile(this, 1, 2))
-        setTile(Glyph.BUSH_1_FRUIT, SimpleTile(this, 2, 2))
-        setTile(Glyph.BUSH_2, SimpleTile(this, 1, 3))
-        setTile(Glyph.BUSH_2_FRUIT, SimpleTile(this, 3, 2))
-        setTile(Glyph.SUNFLOWER, SimpleTile(this, 4, 2))
-        setTile(Glyph.HANGFLOWER, SimpleTile(this, 3, 3))
-        setTile(Glyph.SUCCULENT, SimpleTile(this, 4, 3))
-        setTile(Glyph.FLOWERS, SimpleTile(this, 4, 10))
-        setTile(Glyph.TOADSTOOLS, SimpleTile(this, 5, 10))
-        setTile(Glyph.MUSHROOM, SimpleTile(this, 6, 10))
-        setTile(Glyph.CACTUS_SMALL, SimpleTile(this, 5, 1))
-        setTile(Glyph.CACTUS_BIG, SimpleTile(this, 5, 0))
-        setTile(Glyph.HERB_PLANT_1, SimpleTile(this, 7, 10))
         setTile(Glyph.HIGHWAY_SIGN, SimpleTile(this, 9, 10))
     }

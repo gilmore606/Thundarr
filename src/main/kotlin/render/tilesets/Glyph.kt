@@ -79,7 +79,10 @@ enum class Glyph {
     THRALL_ARCHER,
     FURWORM,
 
-    TREE,
+    OAK_TREE,
+    MAPLE_TREE,
+    BIRCH_TREE,
+    FRUIT_TREE,
     LIGHTBULB,
     AXE,
     SIGN,

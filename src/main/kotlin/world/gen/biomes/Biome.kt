@@ -21,6 +21,7 @@ sealed class Biome(
     open fun defaultTitle() = "the wilderness"
     open fun canHaveLake() = true
     open fun trailChance() = 0.1f
+    open fun plantDensity() = 1.0f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
     open fun canHaveRain() = true
@@ -83,6 +84,7 @@ object Plain : Biome(
 
     override fun defaultTitle() = "grassland"
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
+    override fun plantDensity() = 0.5f
 
     override fun addPlant(fertility: Float, variance: Float,
                           addThing: (Thing) -> Unit, addTerrain: (Terrain.Type) -> Unit) {
@@ -115,6 +117,7 @@ object Forest : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
+    override fun plantDensity() = 1.0f
     override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.6f) TERRAIN_SWAMP else TERRAIN_UNDERGROWTH
 
     val forestMin = 0.7f
@@ -157,6 +160,7 @@ object Hill : Biome(
 ) {
     override fun defaultTitle() = "hills"
     override fun trailChance() = 0.2f
+    override fun plantDensity() = 0.3f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
@@ -181,6 +185,7 @@ object ForestHill : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
+    override fun plantDensity() = 0.8f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
@@ -211,6 +216,7 @@ object Mountain : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
+    override fun plantDensity() = 0.2f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -234,6 +240,7 @@ object Swamp : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.SWAMP
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
+    override fun plantDensity() = 0.7f
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
 
@@ -266,6 +273,7 @@ object Scrub : Biome(
     override fun defaultTitle() = "plains"
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
+    override fun plantDensity() = 0.3f
 
     val dirtMin = 0.1f
     val grassMin = 0.4f
@@ -299,6 +307,7 @@ object Desert : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
         TERRAIN_GRASS else TERRAIN_HARDPAN
+    override fun plantDensity() = 0.1f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("desertRocks",x,y).toFloat()
@@ -342,6 +351,7 @@ object Suburb: Biome(
     override fun defaultTitle() = "suburban ruins"
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun trailChance() = 0f
+    override fun plantDensity() = 0.2f
 }
 
 @Serializable
@@ -354,6 +364,7 @@ object Ruins : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.RUINS
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_DIRT
     override fun trailChance() = 0f
+    override fun plantDensity() = 0.0f
 
     override fun carveExtraTerrain(carto: WorldCarto) {
         val gridsize = Dice.range(2, 4)
