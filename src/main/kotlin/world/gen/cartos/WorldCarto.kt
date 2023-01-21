@@ -76,6 +76,8 @@ class WorldCarto(
             if (meta.lavaExits.isNotEmpty()) buildLava()
             if (meta.hasVolcano) buildVolcano()
 
+            digCave()
+
             // Populate!
             buildFertilityMap()
             growPlants()
@@ -89,6 +91,43 @@ class WorldCarto(
         }
 
         //debugBorders()
+    }
+
+    private fun digCave() {
+        val entrances = mutableSetOf<XY>()
+        forEachCell { x,y ->
+            if (getTerrain(x,y) == TERRAIN_CAVEWALL) {
+                var free = 0
+                CARDINALS.from(x,y) { dx, dy, _ ->
+                    if (boundsCheck(dx,dy) && Terrain.get(getTerrain(dx,dy)).isWalkable()) free++
+                }
+                if (free == 1) entrances.add(XY(x,y))
+            }
+        }
+        if (entrances.isNotEmpty()) {
+            repeat (kotlin.math.min(entrances.size, Dice.oneTo(4))) {
+                val entrance = entrances.random()
+                recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
+                chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
+            }
+        }
+    }
+
+    private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float) {
+        setTerrain(x, y, TERRAIN_CAVEFLOOR)
+        chunk.setRoofed(x, y, Chunk.Roofed.INDOOR)
+        CARDINALS.from(x, y) { dx, dy, _ ->
+            if (boundsCheck(dx, dy) && getTerrain(dx, dy) == TERRAIN_CAVEWALL) {
+                var ok = true
+                DIRECTIONS.from(dx, dy) { ddx, ddy, _ ->
+                    if (boundsCheck(ddx,ddy)) {
+                        val testTerrain = getTerrain(ddx,ddy)
+                        if (testTerrain != TERRAIN_CAVEFLOOR && testTerrain != TERRAIN_CAVEWALL) ok = false
+                    }
+                }
+                if (ok && Dice.chance(density)) recurseCave(dx, dy, density - falloff, falloff)
+            }
+        }
     }
 
     // Set per-cell biomes for things we generate like rivers, coastal beach, etc
