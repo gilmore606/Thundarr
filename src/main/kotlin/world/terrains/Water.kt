@@ -46,4 +46,5 @@ object ScratchWater : Water(Type.GENERIC_WATER, Glyph.BLANK) { }
 
 object Lava : Terrain(Type.TERRAIN_LAVA, Glyph.LAVA, false, true, false, false) {
     override fun name() = "lava"
+    override fun glowColor() = LightColor(1f, 0.4f, 0.1f)
 }

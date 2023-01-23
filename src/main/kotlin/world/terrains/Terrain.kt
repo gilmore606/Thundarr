@@ -110,6 +110,7 @@ sealed class Terrain(
     open fun moveSpeed(actor: Actor) = 1f
     open fun stepSound(actor: Actor): Speaker.SFX? = null
     open fun fertilityBonus() = 0f
+    open fun glowColor(): LightColor? = null
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
 

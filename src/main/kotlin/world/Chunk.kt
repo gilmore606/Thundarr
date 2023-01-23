@@ -522,6 +522,25 @@ class Chunk(
                 lightCache[x][y].b = min(1f, (lightCache[x][y].b + max(0f, (color.b * flicker))))
             }
         }
+        Terrain.get(getTerrain(x + this.x, y + this.y)).glowColor()?.also { glowColor ->
+            lightCache[x][y].r = min(1f, (lightCache[x][y].r + glowColor.r))
+            lightCache[x][y].g = min(1f, (lightCache[x][y].g + glowColor.g))
+            lightCache[x][y].b = min(1f, (lightCache[x][y].b + glowColor.b))
+        } ?: run {
+            var nearGlow: LightColor? = null
+            for (ix in -1..1) {
+                for (iy in -1 .. 1) {
+                    Terrain.get(getTerrain(x + ix + this.x, y + iy + this.y)).glowColor()?.also { glowColor ->
+                        nearGlow = glowColor
+                    }
+                }
+            }
+            nearGlow?.also {
+                lightCache[x][y].r = min(1f, (lightCache[x][y].r + it.r * 0.5f))
+                lightCache[x][y].g = min(1f, (lightCache[x][y].g + it.g * 0.5f))
+                lightCache[x][y].b = min(1f, (lightCache[x][y].b + it.b * 0.5f))
+            }
+        }
         lightCacheDirty[x][y] = false
     }
 
