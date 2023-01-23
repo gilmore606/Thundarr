@@ -4,6 +4,8 @@ import actors.Actor
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.Screen
+import render.sparks.Scoot
+import render.sparks.Spark
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.modals.Modal
@@ -109,6 +111,7 @@ sealed class Terrain(
     open fun isOpaque() = this.opaque
     open fun moveSpeed(actor: Actor) = 1f
     open fun stepSound(actor: Actor): Speaker.SFX? = null
+    open fun stepSpark(actor: Actor, dir: XY): Spark? = Scoot(dir)
     open fun fertilityBonus() = 0f
     open fun glowColor(): LightColor? = null
 

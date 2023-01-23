@@ -44,6 +44,7 @@ object Speaker {
         STEPDIRT(listOf("steps/stepdirt1.ogg", "steps/stepdirt2.ogg", "steps/stepdirt3.ogg"), 0.3f),
         STEPGRASS(listOf("steps/stepgrass1.ogg", "steps/stepgrass2.ogg", "steps/stepgrass3.ogg"), 0.3f, 0.7f),
         STEPHARD(listOf("steps/stephard1.ogg", "steps/stephard2.ogg", "steps/stephard3.ogg"), 0.3f),
+        STEPWATER(listOf("steps/stepwater1.ogg", "steps/stepwater2.ogg", "steps/stepwater3.ogg"), 0.3f),
 
         THUNDER_NEAR(listOf("weather/thundernear.ogg"), 0.4f),
         THUNDER_DISTANT(listOf("weather/thunderdistant.ogg"), 0.2f),
@@ -82,7 +83,8 @@ object Speaker {
         OCEAN("ambi/ocean.ogg"),
         RIVER1("ambi/river1.ogg"),
         RIVER2("ambi/river2.ogg"),
-        RIVER3("ambi/river3.ogg")
+        RIVER3("ambi/river3.ogg"),
+        LAVA("ambi/lava.ogg")
     }
 
     @Serializable

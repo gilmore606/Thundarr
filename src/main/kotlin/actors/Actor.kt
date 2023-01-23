@@ -80,7 +80,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun bleedChance() = 0.6f
     open fun stepAnimation(dir: XY): Animation = Step(dir)
-    open fun stepSpark(dir: XY): Spark? = Scoot(dir)
+    open fun stepSpark(dir: XY): Spark? = level?.let { level ->
+        Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSpark(this, dir)
+    }
     open fun stepSound(dir: XY): Speaker.SFX? = level?.let { level ->
         Terrain.get(level.getTerrain(xy.x + dir.x, xy.y + dir.y)).stepSound(this)
     }

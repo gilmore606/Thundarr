@@ -1,5 +1,8 @@
 package world.terrains
 
+import actors.Actor
+import audio.Speaker
+import render.sparks.Splash
 import render.tilesets.Glyph
 import util.*
 import world.level.Level
@@ -11,6 +14,8 @@ sealed class Water(
 ) : Terrain(type, glyph, false, true, false, false, dataType = Type.GENERIC_WATER){
 
     override fun name() = "water"
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPWATER
+    override fun stepSpark(actor: Actor, dir: XY) = Splash(dir)
 
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,
