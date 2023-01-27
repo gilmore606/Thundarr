@@ -37,6 +37,8 @@ class WorldCarto(
 
     val globalPlantDensity = 0.2f
 
+    val cavePortalChance = 0.5f
+
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
@@ -47,6 +49,7 @@ class WorldCarto(
     private var hasBlends = false
     lateinit var meta: ChunkMeta
     private val riverIslandPoints = ArrayList<XY>()
+    private val cavePortalPoints = ArrayList<XY>()
 
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
@@ -71,7 +74,7 @@ class WorldCarto(
             // Carve extra terrain with no biome edge blending
             meta.biome.carveExtraTerrain(this)
 
-            if (Dice.chance(0.05f) || forStarter) buildBuilding()
+            if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
             if (meta.lavaExits.isNotEmpty()) buildLava()
             if (meta.hasVolcano) buildVolcano()
@@ -105,10 +108,14 @@ class WorldCarto(
             }
         }
         if (entrances.isNotEmpty()) {
+            cavePortalPoints.clear()
             repeat (kotlin.math.min(entrances.size, Dice.oneTo(4))) {
                 val entrance = entrances.random()
                 recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
+            }
+            if (cavePortalPoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
+                buildCaveDungeon(cavePortalPoints.random())
             }
         }
     }
@@ -116,6 +123,7 @@ class WorldCarto(
     private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float) {
         setTerrain(x, y, TERRAIN_CAVEFLOOR)
         chunk.setRoofed(x, y, Chunk.Roofed.INDOOR)
+        var continuing = false
         CARDINALS.from(x, y) { dx, dy, _ ->
             if (boundsCheck(dx, dy) && getTerrain(dx, dy) == TERRAIN_CAVEWALL) {
                 var ok = true
@@ -125,9 +133,13 @@ class WorldCarto(
                         if (testTerrain != TERRAIN_CAVEFLOOR && testTerrain != TERRAIN_CAVEWALL) ok = false
                     }
                 }
-                if (ok && Dice.chance(density)) recurseCave(dx, dy, density - falloff, falloff)
+                if (ok && Dice.chance(density)) {
+                    continuing = true
+                    recurseCave(dx, dy, density - falloff, falloff)
+                }
             }
         }
+        if (!continuing) cavePortalPoints.add(XY(x, y))
     }
 
     // Set per-cell biomes for things we generate like rivers, coastal beach, etc
@@ -730,33 +742,33 @@ class WorldCarto(
         printGrid(growBlob(width, height), x, y, TEMP1)
     }
 
-    private fun buildBuilding() {
+    private fun buildStructureDungeon() {
         val facing = CARDINALS.random()
         carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
-        assignDoor(facing)
-    }
-
-    private fun assignDoor(facing: XY) {
         if (forStarter) {
             log.info("Looking for door for starter dungeon...")
+        } else {
+            log.info("Building structure dungeon...")
         }
         forEachCell { x, y ->
             if (getTerrain(x, y) == TERRAIN_PORTAL_DOOR) {
-
                 val building = if (forStarter)
                     StarterDungeon().at(x,y).facing(facing)
                 else
                     BoringBuilding().at(x,y).facing(facing)
-
-                LevelKeeper.makeBuilding(building)
-                chunk.exits.add(Chunk.ExitRecord(
-                    Chunk.ExitType.LEVEL, XY(x,y),
-                    building.doorMsg(),
-                    buildingId = building.id,
-                    buildingFirstLevelId = building.firstLevelId
-                ))
+                connectBuilding(building)
             }
         }
+    }
+
+    private fun buildCaveDungeon(doorPos: XY) {
+        log.info("Building cave dungeon...")
+        setTerrain(doorPos.x, doorPos.y, TERRAIN_PORTAL_DOOR)
+        val facings = mutableListOf<XY>()
+        CARDINALS.from(doorPos.x, doorPos.y) { dx, dy, dir ->
+            if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)
+        }
+        connectBuilding(NaturalCavern().at(doorPos.x, doorPos.y).facing(facings.random()))
     }
 
 }

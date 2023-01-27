@@ -6,12 +6,14 @@ import kotlinx.serialization.json.Json
 import kotlin.random.Random
 import things.Thing
 import util.*
+import world.Building
 import world.Chunk
 import world.gen.NoisePatches
 import world.level.Level
 import world.gen.prefabs.Prefab
 import world.gen.prefabs.TiledFile
 import world.level.CHUNK_SIZE
+import world.persist.LevelKeeper
 import world.terrains.Floor
 import world.terrains.Terrain
 import world.terrains.TerrainData
@@ -253,7 +255,17 @@ abstract class Carto(
         return prefab
     }
 
-    protected fun findEdgeForDoor(facing: XY): XY {
+    protected fun addWorldPortal(building: Building, worldDest: XY) {
+        val door = findEdgeForWorldPortal(building.facing)
+        carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
+        chunk.exits.add(Chunk.ExitRecord(
+            Chunk.ExitType.WORLD, door,
+            "The door leads outside to the wilderness.\nExit the building?",
+            worldDest = worldDest
+        ))
+    }
+
+    protected fun findEdgeForWorldPortal(facing: XY): XY {
         for (ny in y0 .. y1) {
             for (nx in x0..x1) {
                 val x = when (facing) {
@@ -497,5 +509,16 @@ abstract class Carto(
     protected fun debugBorders() {
         carveRoom(Rect(x0, y0, x1, y0), 0, Terrain.Type.TERRAIN_STONEFLOOR)
         carveRoom(Rect(x0, y0, x0, y1), 0, Terrain.Type.TERRAIN_STONEFLOOR)
+    }
+
+    protected fun connectBuilding(building: Building) {
+        log.info("Connecting new building $building")
+        LevelKeeper.makeBuilding(building)
+        chunk.exits.add(Chunk.ExitRecord(
+            Chunk.ExitType.LEVEL, building.xy,
+            building.doorMsg(),
+            buildingId = building.id,
+            buildingFirstLevelId = building.firstLevelId
+        ))
     }
 }

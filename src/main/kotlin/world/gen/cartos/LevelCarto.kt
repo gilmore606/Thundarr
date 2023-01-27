@@ -12,8 +12,6 @@ import world.Building
 import world.Chunk
 import world.WizardDungeon
 import world.level.EnclosedLevel
-import world.level.Level
-import world.terrains.PortalDoor
 import world.terrains.Terrain
 import java.lang.Float.max
 import java.lang.Float.min
@@ -80,7 +78,7 @@ class LevelCarto(
             deadEnds = removeDeadEnds(Terrain.Type.TERRAIN_BRICKWALL)
         }
 
-        addDoor(worldDest)
+        addWorldPortal(building, worldDest)
 
         addLights()
 
@@ -157,16 +155,6 @@ class LevelCarto(
                 return
             }
         }
-    }
-
-    private fun addDoor(worldDest: XY) {
-        val door = findEdgeForDoor(building.facing)
-        carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
-        chunk.exits.add(Chunk.ExitRecord(
-            Chunk.ExitType.WORLD, door,
-            "The door leads outside to the wilderness.\nExit the building?",
-            worldDest = worldDest
-        ))
     }
 
     private fun addLights() {

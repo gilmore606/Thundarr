@@ -4,6 +4,7 @@ import actors.stats.Heart
 import kotlinx.serialization.Serializable
 import render.Screen
 import util.*
+import world.gen.cartos.CavernCarto
 import world.gen.cartos.LevelCarto
 import world.journal.JournalEntry
 import world.level.EnclosedLevel
@@ -77,7 +78,6 @@ sealed class WizardDungeon : Building() {
 
 @Serializable
 class StarterDungeon : WizardDungeon() {
-
     override fun carveLevel(level: EnclosedLevel) {
         super.carveLevel(level)
         log.info("StarterDungeon $this exists - finishing create world")
@@ -91,5 +91,20 @@ class StarterDungeon : WizardDungeon() {
         ), withModal = true)
         Heart.improve(App.player, fullLevel = true)
     }
+}
 
+@Serializable
+class NaturalCavern : Building() {
+    override fun shortName() = "cavern"
+    override fun doorMsg() = "A tunnel slopes down underground.  Venture in?"
+    override fun at(x: Int, y: Int): Building {
+        floorDimensions.x = 20 + Random.nextInt(0, 20)
+        floorDimensions.y = 20 + Random.nextInt(0, 20)
+        return super.at(x, y)
+    }
+    override fun carveLevel(level: EnclosedLevel) {
+        CavernCarto(level, this).carveLevel(
+            worldDest = XY(xy.x + facing.x, xy.y + facing.y)
+        )
+    }
 }
