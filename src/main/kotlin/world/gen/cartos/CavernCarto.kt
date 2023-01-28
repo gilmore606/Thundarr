@@ -1,9 +1,6 @@
 package world.gen.cartos
 
-import util.CARDINALS
-import util.Dice
-import util.Rect
-import util.XY
+import util.*
 import world.Building
 import world.level.EnclosedLevel
 import world.terrains.Terrain.Type.*
@@ -18,14 +15,18 @@ class CavernCarto(
     ) {
         carveRoom(Rect(x0, y0, x1, y1), 0, TERRAIN_CAVEWALL)
 
-        when (Dice.oneTo(3)) {
+        when (Dice.oneTo(5)) {
             1 -> carveCellular()
             2 -> carveCellularSmoother()
-            else -> carveWorm()
+            3 -> carveCracks(true)
+            4 -> carveCracks(false)
+            5 -> carveWorm(true)
+            else -> carveWorm(false)
         }
-        carveWorm()
 
         addWorldPortal(building, worldDest)
+
+        setOverlaps()
     }
 
     private fun carveCellular() {
@@ -62,7 +63,7 @@ class CavernCarto(
         }
     }
 
-    private fun carveWorm() {
+    private fun carveWorm(fuzz: Boolean) {
         val cursor = XY(x0 + (x1 - x0) / 2, y0 + (y1 - y0) / 2)
         var steps = ((x1 - x0) * (y1 - y0) * 0.6f).toInt()
         while (steps > 0) {
@@ -76,5 +77,21 @@ class CavernCarto(
                 cursor.y = y0 + (y1 - y0) / 2
             }
         }
+        if (fuzz) fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.3f,0.6f))
+    }
+
+    private fun carveCracks(stayCentered: Boolean) {
+        val cursor = XY(x0 + (x1 - x0) / 2, y0 + (y1 - y0) / 2)
+        var steps = Dice.range(6,14)
+        while (steps > 0) {
+            steps--
+            val next = XY(Dice.range(x0+2,x1-2),Dice.range(y0+2,y1-2))
+            drawLine(cursor, next) { x,y -> setTerrain(x,y,TERRAIN_CAVEFLOOR) }
+            if (!stayCentered) {
+                cursor.x = next.x
+                cursor.y = next.y
+            }
+        }
+        repeat (4) { fuzzTerrain(TERRAIN_CAVEFLOOR, 0.3f) }
     }
 }
