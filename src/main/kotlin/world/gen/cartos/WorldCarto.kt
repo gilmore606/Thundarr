@@ -98,14 +98,9 @@ class WorldCarto(
 
     private fun digCave() {
         val entrances = mutableSetOf<XY>()
-        forEachCell { x,y ->
-            if (getTerrain(x,y) == TERRAIN_CAVEWALL) {
-                var free = 0
-                CARDINALS.from(x,y) { dx, dy, _ ->
-                    if (boundsCheck(dx,dy) && Terrain.get(getTerrain(dx,dy)).isWalkable()) free++
-                }
-                if (free == 1) entrances.add(XY(x,y))
-            }
+        forEachTerrain(TERRAIN_CAVEWALL) { x,y ->
+            val free = neighborCount(x, y, CARDINALS) { dx,dy -> isWalkableAt(dx,dy) }
+            if (free == 1) entrances.add(XY(x,y))
         }
         if (entrances.isNotEmpty()) {
             cavePortalPoints.clear()
@@ -114,8 +109,11 @@ class WorldCarto(
                 recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
             }
-            if (cavePortalPoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
-                buildCaveDungeon(cavePortalPoints.random())
+            val usablePoints = cavePortalPoints.filter { point ->
+                CARDINALS.hasOneWhere { !isWalkableAt(it.x + point.x, it.y + point.y) }
+            }
+            if (usablePoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
+                buildCaveDungeon(usablePoints.random())
             }
         }
     }
@@ -164,12 +162,8 @@ class WorldCarto(
             val terrain = Terrain.get(getTerrain(x,y))
             if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && terrain.canGrowPlants) {
                 var fert = biome.fertilityAt(x, y) + terrain.fertilityBonus()
-                var nearTrees = false
-                var nearWater = false
-                DIRECTIONS.from(x, y) { dx, dy, dir ->
-                    if (boundsCheck(dx,dy) && getTerrain(dx,dy) == TERRAIN_FORESTWALL) nearTrees = true
-                    if (boundsCheck(dx,dy) && getTerrain(dx,dy) == GENERIC_WATER) nearWater = true
-                }
+                val nearTrees = neighborCount(x, y, DIRECTIONS) { x,y -> getTerrain(x,y) == TERRAIN_FORESTWALL } > 0
+                val nearWater = neighborCount(x, y, DIRECTIONS) { x,y -> getTerrain(x,y) == GENERIC_WATER } > 0
                 if (nearTrees) fert += 0.4f
                 if (nearWater) fert += 0.4f
                 if (Dice.chance(0.2f)) fert += Dice.float(-0.3f, 0.3f)

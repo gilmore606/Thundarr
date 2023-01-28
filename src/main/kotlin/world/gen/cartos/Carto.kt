@@ -173,6 +173,16 @@ abstract class Carto(
         return c
     }
 
+    fun neighborCount(x: Int, y: Int, dirs: List<XY>, match: (x: Int, y: Int)->Boolean): Int {
+        var c =0
+        dirs.forEach { dir ->
+            if (boundsCheck(x + dir.x, y + dir.y)) {
+                if (match(x + dir.x, y + dir.y)) c++
+            }
+        }
+        return c
+    }
+
     protected fun cardinalBlockerCount(x: Int, y: Int): Int {
         var c = 0
         if (!isWalkableAt(x-1,y)) c++
@@ -315,18 +325,32 @@ abstract class Carto(
 
     fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
 
+    protected fun forEachCellWhere(condition: (x: Int, y: Int)->Boolean, doThis: (x: Int, y: Int)->Unit) {
+        forEachCell { x,y ->
+            if (condition(x,y)) doThis(x,y)
+        }
+    }
+
+    protected fun forEachTerrain(type: Terrain.Type, doThis: (x: Int, y: Int)->Unit) {
+        forEachCell { x,y ->
+            if (getTerrain(x,y) == type) doThis(x,y)
+        }
+    }
+
+    protected fun neighborsAt(x: Int, y: Int, dirs: List<XY>, doThis: (nx: Int, ny: Int, terrain: Terrain.Type)->Unit) {
+        dirs.forEach { dir ->
+            if (boundsCheck(x + dir.x, y + dir.y)) {
+                doThis(x + dir.x, y + dir.y, getTerrain(x + dir.x, y + dir.y))
+            }
+        }
+    }
+
     protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
         val adds = ArrayList<XY>()
-        forEachCell { x, y ->
-            if (getTerrain(x,y) == type) {
-                CARDINALS.forEach { dir ->
-                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
-                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
-                            if (Dice.chance(density)) {
-                                adds.add(XY(x+dir.x, y+dir.y))
-                            }
-                        }
-                    }
+        forEachTerrain(type) { x, y ->
+            neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
+                if (terrain != type && (exclude == null || terrain != exclude)) {
+                    if (Dice.chance(density)) adds.add(XY(nx,ny))
                 }
             }
         }
@@ -335,15 +359,11 @@ abstract class Carto(
 
     fun varianceFuzzTerrain(type: Terrain.Type, exclude: Terrain.Type? = null) {
         val adds = ArrayList<XY>()
-        forEachCell { x, y ->
-            if (getTerrain(x,y) == type) {
-                CARDINALS.forEach { dir ->
-                    if (boundsCheck(x + dir.x, y + dir.y) && getTerrain(x + dir.x, y + dir.y) != type) {
-                        if (exclude == null || getTerrain(x + dir.x, y + dir.y) != exclude) {
-                            if (Dice.chance(NoisePatches.get("metaVariance", x, y).toFloat())) {
-                                adds.add(XY(x+dir.x, y+dir.y))
-                            }
-                        }
+        forEachTerrain(type) { x,y ->
+            neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
+                if (terrain != type && (exclude == null || terrain != exclude)) {
+                    if (Dice.chance(NoisePatches.get("metaVariance", x, y).toFloat())) {
+                        adds.add(XY(nx, ny))
                     }
                 }
             }
@@ -352,9 +372,7 @@ abstract class Carto(
     }
 
     protected fun swapTerrain(oldType: Terrain.Type, newType: Terrain.Type) {
-        forEachCell { x,y ->
-            if (getTerrain(x,y) == oldType) setTerrain(x,y,newType)
-        }
+        forEachTerrain(oldType) { x,y -> setTerrain(x,y,newType) }
     }
 
     fun fringeTerrain(type: Terrain.Type, withType: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
@@ -369,33 +387,25 @@ abstract class Carto(
 
     protected fun deepenWater() {
         val adds = mutableSetOf<XY>()
-        forEachCell { x, y ->
-            if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
-                val shores = neighborCount(x,y) { it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK }
-                if (Dice.chance(shores * 0.75f)) adds.add(XY(x,y))
-            }
+        forEachTerrain(Terrain.Type.GENERIC_WATER) { x,y ->
+            val shores = neighborCount(x,y) { it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK }
+            if (Dice.chance(shores * 0.75f)) adds.add(XY(x,y))
         }
         adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
         var extendChance = 0.4f
         repeat (3) {
             adds.clear()
-            forEachCell { x, y ->
-                if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
-                    val shallows = neighborCount(x,y) { it == Terrain.Type.TERRAIN_SHALLOW_WATER }
-                    if (shallows > 0) {
-                        if (Dice.chance(extendChance)) adds.add(XY(x,y))
-                    }
-                }
+            forEachTerrain(Terrain.Type.GENERIC_WATER) { x,y ->
+                val shallows = neighborCount(x,y) { it == Terrain.Type.TERRAIN_SHALLOW_WATER }
+                if (shallows > 0 && Dice.chance(extendChance)) adds.add(XY(x,y))
             }
             extendChance -= 0.15f
             adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
         }
         adds.clear()
         // Fill remainder with deep
-        forEachCell { x, y ->
-            if (getTerrain(x,y) == Terrain.Type.GENERIC_WATER) {
-                setTerrain(x,y, Terrain.Type.TERRAIN_DEEP_WATER)
-            }
+        forEachTerrain(Terrain.Type.GENERIC_WATER) { x, y ->
+            setTerrain(x,y, Terrain.Type.TERRAIN_DEEP_WATER)
         }
     }
 
