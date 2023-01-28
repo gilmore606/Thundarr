@@ -98,8 +98,8 @@ class NaturalCavern : Building() {
     override fun shortName() = "cavern"
     override fun doorMsg() = "A tunnel slopes down underground.  Venture in?"
     override fun at(x: Int, y: Int): Building {
-        floorDimensions.x = 20 + Random.nextInt(0, 20)
-        floorDimensions.y = 20 + Random.nextInt(0, 20)
+        floorDimensions.x = 30 + Random.nextInt(0, 40)
+        floorDimensions.y = 30 + Random.nextInt(0, 40)
         return super.at(x, y)
     }
     override fun carveLevel(level: EnclosedLevel) {

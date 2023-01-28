@@ -324,6 +324,7 @@ abstract class Carto(
     }
 
     fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
+    fun innerBoundsCheck(x: Int, y: Int) = (x > x0 && y > y0 && x < x1 && y < y1)
 
     protected fun forEachCellWhere(condition: (x: Int, y: Int)->Boolean, doThis: (x: Int, y: Int)->Unit) {
         forEachCell { x,y ->
@@ -341,6 +342,33 @@ abstract class Carto(
         dirs.forEach { dir ->
             if (boundsCheck(x + dir.x, y + dir.y)) {
                 doThis(x + dir.x, y + dir.y, getTerrain(x + dir.x, y + dir.y))
+            }
+        }
+    }
+
+    protected fun randomFill(x0: Int, y0: Int, x1: Int, y1: Int, density: Float, fill: Terrain.Type) {
+        for (x in x0..x1) {
+            for (y in y0..y1) {
+                if (Dice.chance(density)) setTerrain(x,y,fill)
+            }
+        }
+    }
+
+    protected fun evolve(gens: Int, trueType: Terrain.Type, falseType: Terrain.Type, test: (x: Int, y: Int)->Boolean) {
+        repeat (gens) {
+            val changes = mutableListOf<Pair<XY, Boolean>>()
+            forEachCell { x, y ->
+                if (x > x0 && y > y0 && x < x1 && y < y1) {
+                    val isTrue = getTerrain(x, y) == trueType
+                    if (test(x, y)) {
+                        if (!isTrue) changes.add(Pair(XY(x, y), true))
+                    } else {
+                        if (isTrue) changes.add(Pair(XY(x, y), false))
+                    }
+                }
+            }
+            changes.forEach {
+                setTerrain(it.first.x, it.first.y, if (it.second) trueType else falseType)
             }
         }
     }
