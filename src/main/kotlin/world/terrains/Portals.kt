@@ -2,25 +2,17 @@ package world.terrains
 
 import actors.Actor
 import actors.Player
-import kotlinx.serialization.Serializable
 import render.Screen
 import render.tilesets.Glyph
 import ui.modals.ConfirmModal
 import ui.modals.Modal
 import ui.panels.Console
-import util.XY
 import world.Chunk
 
-
-object PortalDoor : Terrain(
-    Type.TERRAIN_PORTAL_DOOR,
-    Glyph.PORTAL_DOOR,
-    false,
-    false,
-    true,
-    false
-) {
-    override fun name() = "door"
+sealed class Portal(
+    type: Terrain.Type,
+    glyph: Glyph
+) : Terrain(type, glyph, false, false, true, false) {
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level?.exitAt(x, y)?.also { exitRecord ->
             val oldLevel = actor.level!!
@@ -46,6 +38,20 @@ object PortalDoor : Terrain(
                     Console.say("You reconsider and step away.")
                 }
             })
-        } ?: throw RuntimeException("No exit record found for portalDoor at $x $y !")
+        } ?: throw RuntimeException("No exit record found for portal at $x $y !")
     }
+}
+
+object PortalDoor : Portal(
+    Type.TERRAIN_PORTAL_DOOR,
+    Glyph.PORTAL_DOOR
+) {
+    override fun name() = "door"
+}
+
+object PortalCave : Portal(
+    Type.TERRAIN_PORTAL_CAVE,
+    Glyph.PORTAL_CAVE
+) {
+    override fun name() = "cave mouth"
 }

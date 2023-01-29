@@ -15,18 +15,21 @@ class CavernCarto(
     ) {
         carveRoom(Rect(x0, y0, x1, y1), 0, TERRAIN_CAVEWALL)
 
-        when (Dice.oneTo(5)) {
+        when (Dice.oneTo(7)) {
             1 -> carveCellular()
             2 -> carveCellularSmoother()
             3 -> carveCracks(true)
             4 -> carveCracks(false)
-            5 -> carveWorm(true)
-            else -> carveWorm(false)
+            5 -> carveWorm(0)
+            6 -> carveWorm(1)
+            else -> carveWorm(2)
         }
 
-        addWorldPortal(building, worldDest)
-
+        fillEdges()
         setOverlaps()
+
+        addWorldPortal(building, worldDest, TERRAIN_PORTAL_CAVE)
+
     }
 
     private fun carveCellular() {
@@ -63,7 +66,7 @@ class CavernCarto(
         }
     }
 
-    private fun carveWorm(fuzz: Boolean) {
+    private fun carveWorm(fuzz: Int) {
         val cursor = XY(x0 + (x1 - x0) / 2, y0 + (y1 - y0) / 2)
         var steps = ((x1 - x0) * (y1 - y0) * 0.6f).toInt()
         while (steps > 0) {
@@ -77,7 +80,7 @@ class CavernCarto(
                 cursor.y = y0 + (y1 - y0) / 2
             }
         }
-        if (fuzz) fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.3f,0.6f))
+        repeat (fuzz) { fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.1f,0.5f)) }
     }
 
     private fun carveCracks(stayCentered: Boolean) {
@@ -92,6 +95,17 @@ class CavernCarto(
                 cursor.y = next.y
             }
         }
-        repeat (4) { fuzzTerrain(TERRAIN_CAVEFLOOR, 0.3f) }
+        repeat (Dice.range(2,5)) { fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.1f, 0.4f)) }
+    }
+
+    private fun fillEdges() {
+        for (x in x0..x1) {
+            setTerrain(x, y0, TERRAIN_CAVEWALL)
+            setTerrain(x, y1, TERRAIN_CAVEWALL)
+        }
+        for (y in y0 .. y1) {
+            setTerrain(x0, y, TERRAIN_CAVEWALL)
+            setTerrain(x1, y, TERRAIN_CAVEWALL)
+        }
     }
 }

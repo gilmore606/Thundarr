@@ -757,7 +757,7 @@ class WorldCarto(
 
     private fun buildCaveDungeon(doorPos: XY) {
         log.info("Building cave dungeon...")
-        setTerrain(doorPos.x, doorPos.y, TERRAIN_PORTAL_DOOR)
+        setTerrain(doorPos.x, doorPos.y, TERRAIN_PORTAL_CAVE)
         val facings = mutableListOf<XY>()
         CARDINALS.from(doorPos.x, doorPos.y) { dx, dy, dir ->
             if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)

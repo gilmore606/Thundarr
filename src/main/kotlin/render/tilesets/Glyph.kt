@@ -22,6 +22,7 @@ enum class Glyph {
     DEEP_WATER,
     LAVA,
     PORTAL_DOOR,
+    PORTAL_CAVE,
     PAVEMENT,
     HIGHWAY_V,
     HIGHWAY_H,
@@ -171,6 +172,7 @@ enum class Glyph {
     CACTUS_BIG,
     HERB_PLANT_1,
     HIGHWAY_SIGN,
+    GLOWING_CRYSTAL,
 
     BLOODSTAIN,
     SCORCHMARK,

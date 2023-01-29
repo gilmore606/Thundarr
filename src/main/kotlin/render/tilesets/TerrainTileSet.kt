@@ -153,6 +153,7 @@ fun TerrainTileSet() =
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))
+        setTile(Glyph.PORTAL_CAVE, SimpleTile(this, 0, 8))
 
         setTile(Glyph.PAVEMENT, VariantsTile(this).apply {
             add(0.5f, 8, 6)

@@ -265,9 +265,9 @@ abstract class Carto(
         return prefab
     }
 
-    protected fun addWorldPortal(building: Building, worldDest: XY) {
+    protected fun addWorldPortal(building: Building, worldDest: XY, portalType: Terrain.Type) {
         val door = findEdgeForWorldPortal(building.facing)
-        carve(door.x, door.y, 0, Terrain.Type.TERRAIN_PORTAL_DOOR)
+        carve(door.x, door.y, 0, portalType)
         chunk.exits.add(Chunk.ExitRecord(
             Chunk.ExitType.WORLD, door,
             "The door leads outside to the wilderness.\nExit the building?",

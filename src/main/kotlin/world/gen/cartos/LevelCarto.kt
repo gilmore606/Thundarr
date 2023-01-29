@@ -78,7 +78,7 @@ class LevelCarto(
             deadEnds = removeDeadEnds(Terrain.Type.TERRAIN_BRICKWALL)
         }
 
-        addWorldPortal(building, worldDest)
+        addWorldPortal(building, worldDest, Terrain.Type.TERRAIN_PORTAL_DOOR)
 
         addLights()
 
