@@ -129,7 +129,23 @@ fun TerrainTileSet() =
             add(WallTile.Slot.CAP_LEFT, 1f, 9, 3)
             add(WallTile.Slot.CAP_RIGHT, 1f, 11, 3)
             add(WallTile.Slot.FULL, 1f, 10, 2)
+        })
 
+        setTile(Glyph.CHASM, ChasmTile(this, Glyph.CHASM).apply {
+            add(ChasmTile.Slot.SOLO, 1f, 0, 9)
+            add(ChasmTile.Slot.LEFTCAP, 1f, 0, 10)
+            add(ChasmTile.Slot.RIGHTCAP, 1f, 1, 10)
+            add(ChasmTile.Slot.TOPLEFT, 1f, 2, 8)
+            add(ChasmTile.Slot.TOP, 1f, 3, 8)
+            add(ChasmTile.Slot.TOPRIGHT, 1f, 4, 8)
+            add(ChasmTile.Slot.TOPCAP, 1f, 5, 8)
+            add(ChasmTile.Slot.LEFT, 1f, 3, 9)
+            add(ChasmTile.Slot.MIDDLE, 1f, 4, 9)
+            add(ChasmTile.Slot.RIGHT, 1f, 5, 9)
+            add(ChasmTile.Slot.BOTTOMCAP, 1f, 6, 9)
+            add(ChasmTile.Slot.BOTTOMLEFT, 1f, 3, 10)
+            add(ChasmTile.Slot.BOTTOM, 1f, 4, 10)
+            add(ChasmTile.Slot.BOTTOMRIGHT, 1f, 5, 10)
         })
 
         setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))

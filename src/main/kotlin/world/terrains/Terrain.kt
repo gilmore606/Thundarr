@@ -97,7 +97,8 @@ sealed class Terrain(
         TERRAIN_PAVEMENT,
         TERRAIN_HIGHWAY_H,
         TERRAIN_HIGHWAY_V,
-        TERRAIN_LAVA
+        TERRAIN_LAVA,
+        TERRAIN_CHASM,
     }
 
     override fun glyph() = this.glyph

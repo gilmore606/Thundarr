@@ -206,7 +206,6 @@ sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H, false) {
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
 }
 
-
 object HighwayH : Highway() {
     override fun glyph() = Glyph.HIGHWAY_H
 }

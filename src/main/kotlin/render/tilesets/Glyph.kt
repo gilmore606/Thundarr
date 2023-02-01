@@ -27,6 +27,7 @@ enum class Glyph {
     PAVEMENT,
     HIGHWAY_V,
     HIGHWAY_H,
+    CHASM,
 
     WALL_DAMAGE,
     CURSOR,
