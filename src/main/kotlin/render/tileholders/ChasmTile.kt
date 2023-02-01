@@ -10,7 +10,7 @@ class ChasmTile(
     val neighborType: Glyph,
 ): TileHolder(set) {
 
-    enum class Slot { SOLO, LEFTCAP, RIGHTCAP, TOPLEFT, TOP, TOPRIGHT, LEFT, MIDDLE, RIGHT, BOTTOMLEFT, BOTTOM, BOTTOMRIGHT, TOPCAP, BOTTOMCAP }
+    enum class Slot { SOLO, LEFTCAP, RIGHTCAP, TOPLEFT, TOP, TOPRIGHT, LEFT, MIDDLE, RIGHT, BOTTOMLEFT, BOTTOM, BOTTOMRIGHT, TOPCAP, BOTTOMCAP, VERTICAL, HORIZONTAL }
 
     private val variants = HashMap<Slot, ArrayList<Triple<Float, Int, Int>>>()
 
@@ -51,8 +51,14 @@ class ChasmTile(
                 bucket = variants[Slot.TOPLEFT]
             } else if (!nNorth && nSouth && !nEast && nWest) {
                 bucket = variants[Slot.TOPRIGHT]
+            } else if (!nNorth && nSouth && nEast && nWest) {
+                bucket = variants[Slot.TOP]
             } else if (nNorth && nSouth && !nEast && nWest) {
                 bucket = variants[Slot.RIGHT]
+            } else if (nNorth && nSouth && !nEast && !nWest) {
+                bucket = variants[Slot.VERTICAL]
+            } else if (!nNorth && !nSouth && nEast && nWest) {
+                bucket = variants[Slot.HORIZONTAL]
             }
             return pickIndexFromVariants(level.getRandom(x,y), bucket!!)
         }

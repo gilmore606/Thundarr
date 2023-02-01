@@ -20,6 +20,7 @@ class CavernCarto(
 ) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() -1, level.chunk!!, level) {
 
     val waterChance = 0.6f
+    val pitsChance = 1.0f
     val globalPlantDensity = 1f
 
     lateinit var distanceMap: DistanceMap
@@ -44,6 +45,9 @@ class CavernCarto(
             digPools(Dice.oneTo(3))
             deepenWater()
             plantChance = 0.9f
+        }
+        if (Dice.chance(pitsChance)) {
+            digPits(Dice.oneTo(3))
         }
 
         fillEdges()
@@ -95,6 +99,16 @@ class CavernCarto(
             }
         }
         fuzzTerrain(TERRAIN_CAVE_ROCKS, 0.5f, TERRAIN_CAVEWALL)
+    }
+
+    private fun digPits(count: Int) {
+        repeat (count) {
+            val width = Dice.range(3, 8)
+            val height = Dice.range(3, 8)
+            val x = Dice.range(x0 + 1, x1 - width)
+            val y = Dice.range(y0 + 1, y1 - height)
+            printGrid(growBlob(width, height), x, y, TERRAIN_CHASM)
+        }
     }
 
     private fun digPools(count: Int) {

@@ -54,6 +54,7 @@ sealed class Terrain(
             Type.TERRAIN_HIGHWAY_H -> HighwayH
             Type.TERRAIN_HIGHWAY_V -> HighwayV
             Type.TERRAIN_LAVA -> Lava
+            Type.TERRAIN_CHASM -> Chasm
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
