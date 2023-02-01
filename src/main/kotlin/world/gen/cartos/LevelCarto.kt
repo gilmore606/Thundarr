@@ -78,7 +78,7 @@ class LevelCarto(
             deadEnds = removeDeadEnds(Terrain.Type.TERRAIN_BRICKWALL)
         }
 
-        addWorldPortal(building, worldDest, Terrain.Type.TERRAIN_PORTAL_DOOR)
+        val door = addWorldPortal(building, worldDest, Terrain.Type.TERRAIN_PORTAL_DOOR, "The door leads outside to the wilderness.\nExit the building?")
 
         addLights()
 

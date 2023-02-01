@@ -3,12 +3,16 @@ package world.gen.cartos
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import things.LitThing
 import kotlin.random.Random
 import things.Thing
 import util.*
 import world.Building
 import world.Chunk
 import world.gen.NoisePatches
+import world.gen.biomes.Biome
+import world.gen.habitats.Habitat
+import world.gen.plantSpawns
 import world.level.Level
 import world.gen.prefabs.Prefab
 import world.gen.prefabs.TiledFile
@@ -35,6 +39,8 @@ abstract class Carto(
 
     protected val json = Json { ignoreUnknownKeys = true }
 
+    protected val plantSpawns = plantSpawns()
+
     init {
         for (x in x0 .. x1) {
             for (y in y0 .. y1) {
@@ -52,6 +58,9 @@ abstract class Carto(
         val dest = chunk.cellContainerAt(x, y)
         dest?.reconnect(level, x, y)
         thing.moveTo(dest)
+        if (thing is LitThing && thing.active) {
+            thing.reproject()
+        }
     }
 
     protected fun regionAt(x: Int, y: Int): Int? = try {
@@ -265,14 +274,15 @@ abstract class Carto(
         return prefab
     }
 
-    protected fun addWorldPortal(building: Building, worldDest: XY, portalType: Terrain.Type) {
+    protected fun addWorldPortal(building: Building, worldDest: XY, portalType: Terrain.Type, exitMsg: String): XY {
         val door = findEdgeForWorldPortal(building.facing)
         carve(door.x, door.y, 0, portalType)
         chunk.exits.add(Chunk.ExitRecord(
             Chunk.ExitType.WORLD, door,
-            "The door leads outside to the wilderness.\nExit the building?",
+            exitMsg,
             worldDest = worldDest
         ))
+        return door
     }
 
     protected fun findEdgeForWorldPortal(facing: XY): XY {
@@ -559,4 +569,33 @@ abstract class Carto(
             buildingFirstLevelId = building.firstLevelId
         ))
     }
+
+    protected fun setAllRoofed(roofed: Chunk.Roofed) {
+        forEachCell { x,y ->
+            chunk.setRoofed(x, y, roofed)
+        }
+    }
+
+    protected fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float): Thing? {
+        val plantChance = biome.plantDensity() * globalPlantDensity * java.lang.Float.max(0.2f, fertility)
+        if (Dice.chance(plantChance)) {
+            val plants = plantSpawns.filter {
+                it.biomes.contains(biome) && it.habitats.contains(habitat) &&
+                        fertility >= it.minFertility && fertility <= it.maxFertility
+            }
+            if (plants.isNotEmpty()) {
+                val totalFreq = plants.map { it.frequency }.reduce { t, f -> t + f }
+                val spawnFreq = Dice.float(0f, totalFreq)
+                var acc = 0f
+                plants.forEach {
+                    acc += it.frequency
+                    if (acc >= spawnFreq) {
+                        return it.spawn()
+                    }
+                }
+            }
+        }
+        return null
+    }
+
 }

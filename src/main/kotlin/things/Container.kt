@@ -47,6 +47,22 @@ sealed class Container : Portable(), ThingHolder {
     }
     open fun onRemove(thing: Thing) { }
 
+    open fun randomTreasure(): Thing? = null
+    open fun randomTreasureCount(): Int = 0
+
+    override fun onSpawn() {
+        // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
+        // Coroutine, because otherwise constructor hasn't finished and we don't have a contents.
+        val treasures = randomTreasureCount()
+        if (treasures > 0) {
+            KtxAsync.launch {
+                repeat (treasures) {
+                    randomTreasure()?.moveTo(this@Container)
+                }
+            }
+        }
+    }
+
     override fun uses(): Map<UseTag, Use> {
         if (isOpenable()) {
             return mapOf(
@@ -60,6 +76,7 @@ sealed class Container : Portable(), ThingHolder {
             )
         } else return mapOf()
     }
+
 }
 
 @Serializable
@@ -70,17 +87,12 @@ class FilingCabinet : Container() {
     override fun isPortable() = false
     override fun openVerb() = "open"
 
-    override fun onSpawn() {
-        KtxAsync.launch {
-            repeat (Dice.zeroTo(2)) {
-                when (Dice.zeroTo(3)) {
-                    0 -> BoysLife()
-                    1 -> Lighter()
-                    2 -> HardHat()
-                    else -> Paperback()
-                }.moveTo(this@FilingCabinet)
-            }
-        }
+    override fun randomTreasureCount() = Dice.zeroTo(2)
+    override fun randomTreasure() = when (Dice.zeroTo(3)) {
+        0 -> BoysLife()
+        1 -> Lighter()
+        2 -> HardHat()
+        else -> Paperback()
     }
 }
 
@@ -94,23 +106,41 @@ class Fridge : Container() {
 
     fun isRefrigerating() = true  // TODO: invent electric power
 
-    override fun onSpawn() {
-        // Coroutine, because otherwise constructor hasn't finished and we don't have a contents.
-        // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
-        KtxAsync.launch {
-            repeat (Dice.oneTo(3)) {
-                when (Dice.zeroTo(13)) {
-                    0,8,9,10 -> RawMeat()
-                    1 -> ChickenLeg()
-                    2 -> Cheese()
-                    3 -> EnergyDrink()
-                    4 -> Steak()
-                    5 -> Apple()
-                    6 -> Pear()
-                    7,11 -> ThrallChow()
-                    else -> Stew()
-                }.moveTo(this@Fridge)
-            }
-        }
+    override fun randomTreasureCount() = Dice.oneTo(3)
+    override fun randomTreasure() = when (Dice.zeroTo(13)) {
+        0,8,9,10 -> RawMeat()
+        1 -> ChickenLeg()
+        2 -> Cheese()
+        3 -> EnergyDrink()
+        4 -> Steak()
+        5 -> Apple()
+        6 -> Pear()
+        7,11 -> ThrallChow()
+        else -> Stew()
+    }
+}
+
+@Serializable
+class Bonepile : Container() {
+    override fun name() = "bone pile"
+    override fun description() = "A pile of dried old bones; from what, you can't tell."
+    override fun glyph() = Glyph.BONEPILE
+    override fun isPortable() = false
+    override fun openVerb() = "search"
+    override fun isEmptyMsg() = "You find nothing useful in the bones."
+
+    override fun randomTreasureCount() = Dice.zeroTo(2)
+    override fun randomTreasure() = when (Dice.zeroTo(10)) {
+        0 -> BoysLife()
+        1 -> Lighter()
+        2 -> HardHat()
+        3 -> Axe()
+        4 -> Pickaxe()
+        5 -> Bandages()
+        6 -> FirstAidKit()
+        7 -> RiotHelmet()
+        8 -> TravelBoots()
+        9 -> Paperback()
+        else -> Torch()
     }
 }

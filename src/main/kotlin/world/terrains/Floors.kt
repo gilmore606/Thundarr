@@ -144,6 +144,12 @@ object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, true) {
     override fun fertilityBonus() = -0.4f
 }
 
+object CaveRocks : Floor(Type.TERRAIN_CAVE_ROCKS, Glyph.CAVE_ROCKS, false) {
+    override fun name() = "rocky ground"
+    override fun moveSpeed(actor: Actor) = 1.4f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+}
+
 object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
     override fun name() = "grass"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)

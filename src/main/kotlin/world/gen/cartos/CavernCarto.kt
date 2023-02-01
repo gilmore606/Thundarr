@@ -1,14 +1,28 @@
 package world.gen.cartos
 
+import things.Bonepile
+import things.Glowstone
+import things.LitThing
+import things.Thing
 import util.*
 import world.Building
+import world.Chunk
+import world.gen.NoisePatches
+import world.gen.biomes.Cavern
+import world.gen.habitats.TemperateA
 import world.level.EnclosedLevel
+import world.path.DistanceMap
 import world.terrains.Terrain.Type.*
 
 class CavernCarto(
     level: EnclosedLevel,
     val building: Building
 ) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() -1, level.chunk!!, level) {
+
+    val waterChance = 0.6f
+    val globalPlantDensity = 1f
+
+    lateinit var distanceMap: DistanceMap
 
     fun carveLevel(
         worldDest: XY
@@ -25,11 +39,99 @@ class CavernCarto(
             else -> carveWorm(2)
         }
 
+        var plantChance = 0.5f
+        if (Dice.chance(waterChance)) {
+            digPools(Dice.oneTo(3))
+            deepenWater()
+            plantChance = 0.9f
+        }
+
         fillEdges()
+        varyFloors()
         setOverlaps()
 
-        addWorldPortal(building, worldDest, TERRAIN_PORTAL_CAVE)
+        val doorPos = addWorldPortal(building, worldDest, TERRAIN_PORTAL_CAVE, "You feel a breeze from the tunnel mouth.\nReturn to the surface?")
+        distanceMap = DistanceMap(doorPos, chunk)
+        placeTreasure()
 
+        addLights()
+        if (Dice.chance(plantChance)) growPlants()
+
+        setAllRoofed(Chunk.Roofed.INDOOR)
+    }
+
+    private fun placeTreasure() {
+        repeat (Dice.oneTo(3)) {
+            placeThing(distanceMap, Bonepile(), distanceMap.maxDistance / 2)
+        }
+    }
+
+    private fun placeThing(map: DistanceMap, thing: Thing, minDistance: Int) {
+        while (true) {
+            val x = Dice.zeroTil(width)
+            val y = Dice.zeroTil(height)
+            if (isWalkableAt(chunk.x + x, chunk.y + y) && map.distanceAt(x,y) >= minDistance) {
+                addThing(chunk.x + x, chunk.y + y, thing)
+                return
+            }
+        }
+    }
+
+    private fun growPlants() {
+        forEachTerrain(TERRAIN_CAVE_ROCKS) { x,y ->
+            // TODO : pass in and use actual habitat from overworld
+            val fert = Cavern.fertilityAt(x, y)
+            getPlant(Cavern, TemperateA, fert, globalPlantDensity)?.also {
+                addThing(x, y, it)
+            }
+        }
+    }
+
+    private fun varyFloors() {
+        forEachTerrain(TERRAIN_CAVEFLOOR) { x,y ->
+            val noise = NoisePatches.get("caveRocks", x, y).toFloat()
+            if (Dice.chance(noise * noise * noise)) {
+                setTerrain(x, y, TERRAIN_CAVE_ROCKS)
+            }
+        }
+        fuzzTerrain(TERRAIN_CAVE_ROCKS, 0.5f, TERRAIN_CAVEWALL)
+    }
+
+    private fun digPools(count: Int) {
+        repeat (count) {
+            val width = Dice.range(5, 16)
+            val height = Dice.range(5, 16)
+            val x = Dice.range(x0 + 1, x1 - width)
+            val y = Dice.range(y0 + 1, y1 - height)
+            printGrid(growBlob(width, height), x, y, GENERIC_WATER)
+            if (Dice.chance(0.7f)) {
+                fringeTerrain(GENERIC_WATER, TEMP1, if (Dice.flip()) 1f else Dice.float(0.4f, 1f))
+                if (Dice.flip()) fuzzTerrain(TEMP1, 0.8f, GENERIC_WATER)
+                swapTerrain(TEMP1, TERRAIN_CAVEFLOOR)
+            }
+        }
+    }
+
+    private fun addLights() {
+        level.indoorLight.r = 0f
+        level.indoorLight.g = 0f
+        level.indoorLight.b = 0f
+        val color = LightColor(Dice.float(0.0f, 0.1f),  Dice.float(0.1f, 0.3f), Dice.float(0.1f, 0.4f))
+        repeat (Dice.range(5, 200)) {
+            val x = Dice.zeroTil(width)
+            val y = Dice.zeroTil(height)
+            if (chunk.isWalkableAt(x,y) && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
+                if (!chunk.thingsAt(x,y).hasOneWhere { it is LitThing }) {
+                    if (chunk.lightAt(x,y).brightness() < 0.3f) {
+                        addThing(x, y, Glowstone().withColor(
+                            color.r * Dice.float(0.7f, 1.3f),
+                            color.g * Dice.float(0.7f, 1.3f),
+                            color.b * Dice.float(0.7f, 1.3f)
+                        ))
+                    }
+                }
+            }
+        }
     }
 
     private fun carveCellular() {

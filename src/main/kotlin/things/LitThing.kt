@@ -75,7 +75,7 @@ sealed class LitThing : Portable(), LightSource {
         }
     }
 
-    protected fun reproject() {
+    fun reproject() {
         holder?.also { holder ->
             holder.level?.also { level ->
                 holder.xy()?.also { xy ->
@@ -120,6 +120,22 @@ class CeilingLight : LitThing(), Smashable {
         (!active && broken) -> "It's dark.  It looks broken, but could probably be repaired."
         (!active) -> "It's dark."
         else -> "It's turned on."
+    }
+}
+
+@Serializable
+class Glowstone : LitThing() {
+    override fun glyph() = Glyph.GLOWING_CRYSTAL
+    override fun name() = "glowstone"
+    override fun description() = "A softly glowing quartz-like crystal formation."
+    override fun isPortable() = false
+    override fun onSpawn() { active = true }
+    override val lightColor = LightColor(0f, 0f, 0f)
+    fun withColor(r: Float, g: Float, b: Float): Glowstone {
+        lightColor.r = r
+        lightColor.g = g
+        lightColor.b = b
+        return this
     }
 }
 

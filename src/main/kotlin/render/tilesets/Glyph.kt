@@ -13,6 +13,7 @@ enum class Glyph {
     STONE_FLOOR,
     DIRT,
     ROCKS,
+    CAVE_ROCKS,
     GRASS,
     UNDERGROWTH,
     HARDPAN,
@@ -173,6 +174,7 @@ enum class Glyph {
     HERB_PLANT_1,
     HIGHWAY_SIGN,
     GLOWING_CRYSTAL,
+    BONEPILE,
 
     BLOODSTAIN,
     SCORCHMARK,

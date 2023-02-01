@@ -285,6 +285,15 @@ object Desert : Biome(
     }
 }
 
+// Non-map biome for spawning plants
+@Serializable
+object Cavern : Biome(
+    Glyph.BLANK,
+    TERRAIN_CAVEFLOOR
+) {
+    override fun plantDensity() = 0.1f
+}
+
 @Serializable
 object Beach : Biome(
     Glyph.MAP_DESERT,

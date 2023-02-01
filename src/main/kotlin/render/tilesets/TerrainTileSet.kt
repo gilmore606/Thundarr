@@ -175,4 +175,6 @@ fun TerrainTileSet() =
             add(HighwayTile.Slot.STRIPED, 0.5f, 6, 6)
             add(HighwayTile.Slot.STRIPED, 0.5f, 7, 6)
         })
+
+        setTile(Glyph.CAVE_ROCKS, SimpleTile(this, 1, 8))
     }

@@ -52,7 +52,6 @@ open class EnclosedLevel(
 
     // Put the player next to the door he came in.
     // TODO: find a better solution for this
-    // TODO: this changes when doors aren't all on north edge!
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {
         if (isReady()) {
             chunk?.exits?.forEach { exit ->

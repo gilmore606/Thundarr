@@ -38,6 +38,7 @@ sealed class Terrain(
             Type.TERRAIN_STONEFLOOR -> StoneFloor
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_ROCKS -> Rocks
+            Type.TERRAIN_CAVE_ROCKS -> CaveRocks
             Type.TERRAIN_GRASS -> Grass
             Type.TERRAIN_UNDERGROWTH -> Undergrowth
             Type.TERRAIN_HARDPAN -> Hardpan
@@ -82,6 +83,7 @@ sealed class Terrain(
         TERRAIN_CAVEFLOOR,
         TERRAIN_DIRT,
         TERRAIN_ROCKS,
+        TERRAIN_CAVE_ROCKS,
         TERRAIN_GRASS,
         TERRAIN_UNDERGROWTH,
         TERRAIN_HARDPAN,

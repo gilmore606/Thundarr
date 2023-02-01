@@ -2,6 +2,7 @@ package world.gen.cartos
 
 import App
 import audio.Speaker
+import things.Glowstone
 import util.*
 import world.*
 import world.gen.NoisePatches
@@ -104,24 +105,35 @@ class WorldCarto(
         }
         if (entrances.isNotEmpty()) {
             cavePortalPoints.clear()
+            var cellCount = 0
             repeat (kotlin.math.min(entrances.size, Dice.oneTo(4))) {
                 val entrance = entrances.random()
-                recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
+                cellCount += recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
             }
-            val usablePoints = cavePortalPoints.filter { point ->
-                CARDINALS.hasOneWhere { !isWalkableAt(it.x + point.x, it.y + point.y) }
-            }
-            if (usablePoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
-                buildCaveDungeon(usablePoints.random())
+            if (cellCount > 6) {
+                val usablePoints = cavePortalPoints.filter { point ->
+                    CARDINALS.hasOneWhere { !isWalkableAt(it.x + point.x, it.y + point.y) }
+                }.toMutableList()
+                if (usablePoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
+                    val caveEntrance = usablePoints.random()
+                    usablePoints.remove(caveEntrance)
+                    buildCaveDungeon(caveEntrance)
+                    if (usablePoints.isNotEmpty()) {
+                        val lightPos = usablePoints.random()
+                        val light = Glowstone().withColor(0.1f, 0.2f, 0.5f)
+                        addThing(lightPos.x, lightPos.y, light)
+                    }
+                }
             }
         }
     }
 
-    private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float) {
+    private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float): Int {
         setTerrain(x, y, TERRAIN_CAVEFLOOR)
         chunk.setRoofed(x, y, Chunk.Roofed.INDOOR)
         var continuing = false
+        var count = 1
         CARDINALS.from(x, y) { dx, dy, _ ->
             if (boundsCheck(dx, dy) && getTerrain(dx, dy) == TERRAIN_CAVEWALL) {
                 var ok = true
@@ -133,11 +145,12 @@ class WorldCarto(
                 }
                 if (ok && Dice.chance(density)) {
                     continuing = true
-                    recurseCave(dx, dy, density - falloff, falloff)
+                    count += recurseCave(dx, dy, density - falloff, falloff)
                 }
             }
         }
         if (!continuing) cavePortalPoints.add(XY(x, y))
+        return count
     }
 
     // Set per-cell biomes for things we generate like rivers, coastal beach, etc
@@ -173,28 +186,10 @@ class WorldCarto(
     }
 
     private fun growPlants() {
-        val allSpawns = plantSpawns()
         forEachBiome { x,y,biome ->
             fertMap[x-x0][y-y0]?.also { fertility ->
-                val plantChance = biome.plantDensity() * globalPlantDensity * max(0.2f, fertility)
-                if (Dice.chance(plantChance)) {
-                    val plants = allSpawns.filter {
-                        it.biomes.contains(biome) && it.habitats.contains(meta.habitat) &&
-                                fertility >= it.minFertility && fertility <= it.maxFertility
-                    }
-                    if (plants.isNotEmpty()) {
-                        val totalFreq = plants.map { it.frequency }.reduce { t, f -> t + f }
-                        val spawnFreq = Dice.float(0f, totalFreq)
-                        var acc = 0f
-                        var spawned = false
-                        plants.forEach {
-                            acc += it.frequency
-                            if (!spawned && acc >= spawnFreq) {
-                                addThing(x, y, it.spawn())
-                                spawned = true
-                            }
-                        }
-                    }
+                getPlant(biome, meta.habitat, fertility, globalPlantDensity)?.also {
+                    addThing(x, y, it)
                 }
             }
         }
