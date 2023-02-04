@@ -129,6 +129,12 @@ object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR, false) {
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
 }
 
+object WoodFloor: Floor(Type.TERRAIN_WOODFLOOR, Glyph.WOOD_FLOOR, false) {
+    override fun name() = "wood planks"
+    override fun moveSpeed(actor: Actor) = 0.7f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+}
+
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true) {
     override fun name() = "bare ground"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)

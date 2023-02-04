@@ -215,4 +215,5 @@ fun TerrainTileSet() =
         })
 
         setTile(Glyph.CAVE_ROCKS, SimpleTile(this, 1, 8))
+        setTile(Glyph.WOOD_FLOOR, SimpleTile(this, 9, 8))
     }

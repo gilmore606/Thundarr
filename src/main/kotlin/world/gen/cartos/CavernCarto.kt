@@ -22,8 +22,9 @@ class CavernCarto(
     val building: Building
 ) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, level.chunk!!, level) {
 
-    val waterChance = 0.6f
-    val pitsChance = 0.6f
+    val waterChance = 0.5f
+    val pitsChance = 0.5f
+    val bridgeChance = 0.5f
     val globalPlantDensity = 1f
 
     lateinit var distanceMap: DistanceMap
@@ -42,7 +43,7 @@ class CavernCarto(
             4 -> carveCracks(false)
             5 -> carveWorm(0)
             6 -> carveWorm(1)
-            else -> carveWorm(2)
+            7 -> carveWorm(2)
         }
 
         if (size > 2000 && Dice.chance(pitsChance)) {
@@ -56,11 +57,11 @@ class CavernCarto(
 
         var plantChance = 0.5f
         if (size > 2000 && Dice.chance(waterChance)) {
-            when (Dice.oneTo(4)) {
+            when (Dice.oneTo(5)) {
                 1 -> digPools(Dice.range(2, 5))
                 2 -> digPools(1)
                 3 -> digLake()
-                4 -> digRiver(GENERIC_WATER)
+                4,5 -> digRiver(GENERIC_WATER)
             }
             deepenWater()
             plantChance = 0.9f
@@ -100,7 +101,8 @@ class CavernCarto(
     private fun growPlants() {
         forEachTerrain(TERRAIN_CAVE_ROCKS) { x,y ->
             // TODO : pass in and use actual habitat from overworld
-            val fert = Cavern.fertilityAt(x, y)
+            var fert = Cavern.fertilityAt(x, y)
+            if (neighborCount(x, y, TERRAIN_SHALLOW_WATER) > 0) fert *= 2f
             getPlant(Cavern, TemperateA, fert, globalPlantDensity)?.also {
                 addThing(x, y, it)
             }
@@ -136,8 +138,8 @@ class CavernCarto(
     }
 
     private fun digLake() {
-        val width = Dice.range(16, 36)
-        val height = Dice.range(16, 36)
+        val width = Dice.range(16, 24)
+        val height = Dice.range(16, 24)
         digWaterBlob(width, height)
     }
 
@@ -159,6 +161,8 @@ class CavernCarto(
         val endControl: XY
         val startEdge: XY
         val endEdge: XY
+        val bridgeVertical: Boolean
+        var bridgeOffset = -1
         if (Dice.flip()) {
             startPos =  XY(Dice.range(x0 + 3, x1 - 3) - x0, y0)
             startEdge = NORTH
@@ -166,6 +170,8 @@ class CavernCarto(
             endPos = XY(Dice.range(x0 + 3, x1 - 3) - x0, y1)
             endEdge = SOUTH
             endControl = XY(endPos.x + Dice.range(-3, 3), endPos.y - Dice.range(4, 10))
+            bridgeVertical = true
+            bridgeOffset = Dice.range(y0 + 6, y1 - 6)
         } else {
             startPos = XY(x0, Dice.range(y0 + 3, y1 - 3) - y0)
             startEdge = WEST
@@ -173,7 +179,10 @@ class CavernCarto(
             endPos = XY(x1, Dice.range(y0 + 3, y1 - 3) - y0)
             endEdge = EAST
             endControl = XY(endPos.x - Dice.range(4, 10), endPos.y + Dice.range(-3, 3))
+            bridgeVertical = false
+            bridgeOffset = Dice.range(x0 + 6, x1 - 6)
         }
+        if (!Dice.chance(bridgeChance)) bridgeOffset = -1
         val start = RiverExit(startPos, startEdge, Dice.range(2, 6), startControl)
         val end = RiverExit(endPos, endEdge, Dice.range(2, 6), endControl)
         var t = 0f
@@ -183,19 +192,25 @@ class CavernCarto(
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRiverChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
-                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), terrain)
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), terrain,
+                bridgeOffset, bridgeVertical, if (Dice.flip()) TERRAIN_WOODFLOOR else TERRAIN_CAVEFLOOR)
             chunk.setSound(x0 + p.x.toInt(), y0 + p.y.toInt(), Speaker.PointAmbience(Speaker.Ambience.RIVER1, 30f, 1f))
             t += step
             width += widthStep
         }
     }
 
-    private fun carveRiverChunk(room: Rect, skipCorners: Boolean, terrain: Terrain.Type) {
+    private fun carveRiverChunk(room: Rect, skipCorners: Boolean, terrain: Terrain.Type,
+                                bridgeOffset: Int, bridgeVertical: Boolean, bridgeTerrain: Terrain.Type) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        setTerrain(x, y, terrain)
+                        if ((bridgeVertical && y == bridgeOffset) || (!bridgeVertical && x == bridgeOffset)) {
+                            setTerrain(x, y, bridgeTerrain)
+                        } else {
+                            setTerrain(x, y, terrain)
+                        }
                     }
                 }
             }
@@ -210,7 +225,7 @@ class CavernCarto(
         repeat (Dice.range(5, 200)) {
             val x = Dice.zeroTil(width)
             val y = Dice.zeroTil(height)
-            if (chunk.isWalkableAt(x,y) && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
+            if (chunk.isWalkableAt(x,y) && getTerrain(x,y) != TERRAIN_SHALLOW_WATER && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
                 if (!chunk.thingsAt(x,y).hasOneWhere { it is LitThing }) {
                     if (chunk.lightAt(x,y).brightness() < 0.3f) {
                         addThing(x, y, Glowstone().withColor(
@@ -292,12 +307,20 @@ class CavernCarto(
 
     private fun fillEdges() {
         for (x in x0..x1) {
-            setTerrain(x, y0, TERRAIN_CAVEWALL)
-            setTerrain(x, y1, TERRAIN_CAVEWALL)
+            overrideEdge(x, y0)
+            overrideEdge(x, y1)
         }
         for (y in y0 .. y1) {
-            setTerrain(x0, y, TERRAIN_CAVEWALL)
-            setTerrain(x1, y, TERRAIN_CAVEWALL)
+            overrideEdge(x0, y)
+            overrideEdge(x1, y)
+        }
+    }
+
+    private fun overrideEdge(x: Int, y: Int) {
+        when (getTerrain(x,y)) {
+            TERRAIN_CHASM, TERRAIN_DEEP_WATER -> { }
+            TERRAIN_SHALLOW_WATER -> { setTerrain(x, y, TERRAIN_DEEP_WATER) }
+            else -> { setTerrain(x, y, TERRAIN_CAVEWALL) }
         }
     }
 }

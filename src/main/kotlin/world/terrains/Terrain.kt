@@ -34,6 +34,7 @@ sealed class Terrain(
             Type.TERRAIN_PINE_FORESTWALL -> PineForestWall
             Type.TERRAIN_CAVEFLOOR -> CaveFloor
             Type.TERRAIN_STONEFLOOR -> StoneFloor
+            Type.TERRAIN_WOODFLOOR -> WoodFloor
             Type.TERRAIN_DIRT -> Dirt
             Type.TERRAIN_ROCKS -> Rocks
             Type.TERRAIN_CAVE_ROCKS -> CaveRocks
@@ -81,6 +82,7 @@ sealed class Terrain(
         TERRAIN_PINE_FORESTWALL,
         TERRAIN_STONEFLOOR,
         TERRAIN_CAVEFLOOR,
+        TERRAIN_WOODFLOOR,
         TERRAIN_DIRT,
         TERRAIN_ROCKS,
         TERRAIN_CAVE_ROCKS,
