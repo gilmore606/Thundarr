@@ -2,13 +2,14 @@ package world.gen.habitats
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import world.terrains.Terrain
 
 @Serializable
 sealed class Habitat(
     val mapGlyph: Glyph,
 ) {
 
-
+    open fun forestWallType(): Terrain.Type = Terrain.Type.TERRAIN_FORESTWALL
 
 }
 
@@ -20,17 +21,23 @@ object Blank : Habitat(
 @Serializable
 object Arctic : Habitat(
     Glyph.MAP_HABITAT_ARCTIC
-)
+) {
+    override fun forestWallType() = Terrain.Type.TERRAIN_PINE_FORESTWALL
+}
 
 @Serializable
 object AlpineA : Habitat(
     Glyph.MAP_HABITAT_COLD_A
-)
+) {
+    override fun forestWallType() = Terrain.Type.TERRAIN_PINE_FORESTWALL
+}
 
 @Serializable
 object AlpineB : Habitat(
     Glyph.MAP_HABITAT_COLD_B
-)
+) {
+    override fun forestWallType() = Terrain.Type.TERRAIN_PINE_FORESTWALL
+}
 
 @Serializable
 object TemperateA : Habitat(

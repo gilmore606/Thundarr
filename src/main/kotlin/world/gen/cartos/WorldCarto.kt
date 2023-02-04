@@ -286,7 +286,9 @@ class WorldCarto(
 
     private fun carveBaseTerrain() {
         forEachBiome { x,y,biome ->
-            carve(x, y, 0, biome.terrainAt(x,y))
+            var t = biome.terrainAt(x,y)
+            if (t == TERRAIN_FORESTWALL) t = meta.habitat.forestWallType()
+            carve(x, y, 0, t)
         }
         // Biome-specific post-blend processing
         if (hasBlends) {

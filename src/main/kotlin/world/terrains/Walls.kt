@@ -92,3 +92,9 @@ object ForestWall : Wall(Type.TERRAIN_FORESTWALL, Glyph.FOREST_WALL, 4f) {
     override fun isDiggable() = false
     override fun bumpMsg() = "The forest is too thick to pass this way."
 }
+
+object PineForestWall : Wall(Type.TERRAIN_PINE_FORESTWALL, Glyph.PINE_FOREST_WALL, 4f) {
+    override fun name() = "pine trees"
+    override fun isDiggable() = false
+    override fun bumpMsg() = "The forest is too thick to pass this way."
+}
