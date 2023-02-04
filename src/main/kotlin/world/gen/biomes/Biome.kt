@@ -3,7 +3,6 @@ package world.gen.biomes
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.*
 import util.Dice
 import util.Rect
 import world.gen.NoisePatches
@@ -11,7 +10,6 @@ import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
-import world.terrains.Undergrowth
 
 @Serializable
 sealed class Biome(
@@ -87,7 +85,7 @@ object Plain : Biome(
         val fert = fertilityAt(x, y)
         val variance = NoisePatches.get("metaVariance", x, y).toFloat()
         if (fert > 0.96f + (variance * 0.1f)) {
-            return TERRAIN_FORESTWALL
+            return TERRAIN_TEMPERATE_FORESTWALL
         } else if (fert < (variance * 0.004f)) {
             return TERRAIN_DIRT
         }
@@ -113,7 +111,7 @@ object Forest : Biome(
         val fert = NoisePatches.get("plantsBasic", x, y)
         val ef = NoisePatches.get("extraForest", x, y)
         if (fert > 0.7f || ef > 0.2f) {
-            return Terrain.Type.TERRAIN_FORESTWALL
+            return Terrain.Type.TERRAIN_TEMPERATE_FORESTWALL
         } else if (ef > 0.01f) {
             return Terrain.Type.TERRAIN_UNDERGROWTH
         }
@@ -163,7 +161,7 @@ object ForestHill : Biome(
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         if (NoisePatches.get("extraForest", x, y) > 0.2f) {
-            return Terrain.Type.TERRAIN_FORESTWALL
+            return Terrain.Type.TERRAIN_TEMPERATE_FORESTWALL
         }
         val v = NoisePatches.get("mountainShapes", x, y)
         if (v > 0.78f) return Terrain.Type.TERRAIN_CAVEWALL
@@ -172,10 +170,10 @@ object ForestHill : Biome(
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
-        carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.6f, TERRAIN_FORESTWALL)
-        carto.fringeTerrain(TERRAIN_FORESTWALL, TERRAIN_UNDERGROWTH, 0.6f, TERRAIN_CAVEWALL)
+        carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.6f, TERRAIN_TEMPERATE_FORESTWALL)
+        carto.fringeTerrain(TERRAIN_TEMPERATE_FORESTWALL, TERRAIN_UNDERGROWTH, 0.6f, TERRAIN_CAVEWALL)
         carto.varianceFuzzTerrain(TERRAIN_ROCKS, TERRAIN_CAVEWALL)
-        carto.varianceFuzzTerrain(TERRAIN_UNDERGROWTH, TERRAIN_FORESTWALL)
+        carto.varianceFuzzTerrain(TERRAIN_UNDERGROWTH, TERRAIN_TEMPERATE_FORESTWALL)
     }
 }
 
@@ -223,7 +221,7 @@ object Swamp : Biome(
         val localThresh = 0.35f + (NoisePatches.get("metaVariance", x, y) * 0.3f).toFloat()
         val fert = NoisePatches.get("swampForest", x, y).toFloat()
         if (fert > localThresh) {
-            return Terrain.Type.TERRAIN_FORESTWALL
+            return Terrain.Type.TERRAIN_TEMPERATE_FORESTWALL
         } else if (fert > localThresh * 0.6f && Dice.chance(localThresh)) {
             return TERRAIN_UNDERGROWTH
         }

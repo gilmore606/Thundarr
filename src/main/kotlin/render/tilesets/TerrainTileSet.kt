@@ -111,7 +111,7 @@ fun TerrainTileSet() =
             add(WallTile.Slot.FULL, 1f, 5, 3)
         })
 
-        setTile(Glyph.FOREST_WALL, WallTile(this, Glyph.FOREST_WALL).apply {
+        setTile(Glyph.TEMPERATE_FOREST_WALL, WallTile(this, Glyph.TEMPERATE_FOREST_WALL).apply {
             add(WallTile.Slot.TOP, 1f, 10, 3)
             add(WallTile.Slot.LEFTTOP, 1f, 9, 3)
             add(WallTile.Slot.RIGHTTOP, 1f, 11, 3)

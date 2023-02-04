@@ -9,7 +9,7 @@ sealed class Habitat(
     val mapGlyph: Glyph,
 ) {
 
-    open fun forestWallType(): Terrain.Type = Terrain.Type.TERRAIN_FORESTWALL
+    open fun forestWallType(): Terrain.Type = Terrain.Type.TERRAIN_TEMPERATE_FORESTWALL
 
 }
 

@@ -38,6 +38,9 @@ object Metamap {
     val maxRangePeakDistance = 3f
     val isolatedMountainDensity = 0.4f
     val mountainRangeWetness = 6
+    val randomHillChance = 0.015f
+    val randomForestChance = 0.015f
+    val oasisChance = 0.015f
     val citiesRiverMouth = 6
     val citiesRiver = 8
     val citiesCoast = 8
@@ -49,7 +52,7 @@ object Metamap {
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
-    val maxVolcanoes = 100
+    val maxVolcanoes = 3
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -557,10 +560,13 @@ object Metamap {
                         else if (biomeNeighbors(x, y, Mountain) > 1 && Dice.chance(0.5f)) cell.biome = ForestHill
                     }
                     Plain -> {
-                        if (biomeNeighbors(x, y, Plain, true) == 8 && Dice.chance(0.01f)) cell.biome = if (Dice.flip()) Hill else ForestHill
+                        if (biomeNeighbors(x, y, Plain, true) == 8) {
+                            if (Dice.chance(randomHillChance)) cell.biome = if (Dice.flip()) Hill else ForestHill
+                            if (Dice.chance(randomForestChance)) cell.biome = Forest
+                        }
                     }
                     Desert -> {
-                        if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(0.01f)) {
+                        if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(oasisChance)) {
                             cell.biome = if (Dice.flip()) Plain else Scrub
                             cell.hasLake = true
                         }

@@ -84,17 +84,23 @@ object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
     override fun name() = "rock face"
     override fun bumpMsg() = "You bump into a rock face."
     override fun digResult() = if (Dice.chance(0.4f)) Rock() else null
-    override fun digToFloorTerrain() = Terrain.Type.TERRAIN_CAVEFLOOR
+    override fun digToFloorTerrain() = Type.TERRAIN_CAVEFLOOR
 }
 
-object ForestWall : Wall(Type.TERRAIN_FORESTWALL, Glyph.FOREST_WALL, 4f) {
-    override fun name() = "trees"
+sealed class ForestWall(
+    type: Terrain.Type,
+    glyph: Glyph
+) : Wall(type, glyph, 4f) {
     override fun isDiggable() = false
+    override fun pruneVerticalOrphans() = true
+}
+
+object TemperateForestWall : ForestWall(Type.TERRAIN_TEMPERATE_FORESTWALL, Glyph.TEMPERATE_FOREST_WALL) {
+    override fun name() = "trees"
     override fun bumpMsg() = "The forest is too thick to pass this way."
 }
 
-object PineForestWall : Wall(Type.TERRAIN_PINE_FORESTWALL, Glyph.PINE_FOREST_WALL, 4f) {
+object PineForestWall : ForestWall(Type.TERRAIN_PINE_FORESTWALL, Glyph.PINE_FOREST_WALL) {
     override fun name() = "pine trees"
-    override fun isDiggable() = false
     override fun bumpMsg() = "The forest is too thick to pass this way."
 }

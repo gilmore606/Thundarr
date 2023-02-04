@@ -7,9 +7,6 @@ import render.Screen
 import render.sparks.Scoot
 import render.sparks.Spark
 import render.tilesets.Glyph
-import ui.modals.ConfirmModal
-import ui.modals.Modal
-import ui.panels.Console
 import util.LightColor
 import util.XY
 import world.Entity
@@ -33,7 +30,7 @@ sealed class Terrain(
             Type.TEMP3 -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
-            Type.TERRAIN_FORESTWALL -> ForestWall
+            Type.TERRAIN_TEMPERATE_FORESTWALL -> TemperateForestWall
             Type.TERRAIN_PINE_FORESTWALL -> PineForestWall
             Type.TERRAIN_CAVEFLOOR -> CaveFloor
             Type.TERRAIN_STONEFLOOR -> StoneFloor
@@ -80,7 +77,7 @@ sealed class Terrain(
         GENERIC_HIGHWAY,
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
-        TERRAIN_FORESTWALL,
+        TERRAIN_TEMPERATE_FORESTWALL,
         TERRAIN_PINE_FORESTWALL,
         TERRAIN_STONEFLOOR,
         TERRAIN_CAVEFLOOR,
@@ -124,6 +121,8 @@ sealed class Terrain(
     open fun glowColor(): LightColor? = null
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
+
+    open fun pruneVerticalOrphans() = false
 
     open fun debugData(data: TerrainData?): String { return "none" }
 }

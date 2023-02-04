@@ -10,10 +10,8 @@ import world.gen.biomes.Beach
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
-import world.gen.plantSpawns
 import world.level.CHUNK_SIZE
 import world.level.Level
-import world.persist.LevelKeeper
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 import java.lang.Float.max
@@ -88,6 +86,7 @@ class WorldCarto(
 
             // Post-processing
             deepenWater()
+            pruneTrees()
             buildBridges()
             setRoofedInRock()
             setGeneratedBiomes()
@@ -95,6 +94,21 @@ class WorldCarto(
         }
 
         //debugBorders()
+    }
+
+    private fun pruneTrees() {
+        forEachCell { x,y ->
+            if (y in (y0 + 1) until y1) {
+                val type = getTerrain(x, y)
+                if (Terrain.get(type).pruneVerticalOrphans()) {
+                    val upper = getTerrain(x, y - 1)
+                    val lower = getTerrain(x, y + 1)
+                    if (upper != type && lower != type) {
+                        setTerrain(x, y, if (Dice.flip()) upper else lower)
+                    }
+                }
+            }
+        }
     }
 
     private fun digCave() {
@@ -175,7 +189,7 @@ class WorldCarto(
             val terrain = Terrain.get(getTerrain(x,y))
             if (!flagsMap[x-x0][y-y0].contains(CellFlag.NO_PLANTS) && terrain.canGrowPlants) {
                 var fert = biome.fertilityAt(x, y) + terrain.fertilityBonus()
-                val nearTrees = neighborCount(x, y, DIRECTIONS) { x,y -> getTerrain(x,y) == TERRAIN_FORESTWALL } > 0
+                val nearTrees = neighborCount(x, y, DIRECTIONS) { x,y -> getTerrain(x,y) == TERRAIN_TEMPERATE_FORESTWALL } > 0
                 val nearWater = neighborCount(x, y, DIRECTIONS) { x,y -> getTerrain(x,y) == GENERIC_WATER } > 0
                 if (nearTrees) fert += 0.4f
                 if (nearWater) fert += 0.4f
@@ -287,7 +301,7 @@ class WorldCarto(
     private fun carveBaseTerrain() {
         forEachBiome { x,y,biome ->
             var t = biome.terrainAt(x,y)
-            if (t == TERRAIN_FORESTWALL) t = meta.habitat.forestWallType()
+            if (t == TERRAIN_TEMPERATE_FORESTWALL) t = meta.habitat.forestWallType()
             carve(x, y, 0, t)
         }
         // Biome-specific post-blend processing
