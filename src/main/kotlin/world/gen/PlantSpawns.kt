@@ -154,6 +154,11 @@ fun plantSpawns() = listOf<PlantSpawn>(
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
         0.2f, 0.5f, 1f
     ),
+    PlantSpawn({ Boulder() },
+        setOf(Cavern, Mountain),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        0.1f, 0f, 0.4f
+    ),
 
     // Mushrooms
     PlantSpawn({ WizardcapMushroom() },

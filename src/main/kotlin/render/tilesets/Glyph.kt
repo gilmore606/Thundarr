@@ -177,6 +177,7 @@ enum class Glyph {
     HIGHWAY_SIGN,
     GLOWING_CRYSTAL,
     BONEPILE,
+    BOULDER,
 
     BLOODSTAIN,
     SCORCHMARK,

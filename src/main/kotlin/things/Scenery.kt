@@ -15,7 +15,7 @@ sealed class Scenery : Thing() {
     override fun onWalkedOnBy(actor: Actor) {
         if (actor is Player) { Console.say(walkOnMsg()) }
     }
-    abstract fun walkOnMsg(): String
+    open fun walkOnMsg() = ""
 
     override fun description() = "Just another bit of the twisted beauty of the wasteland."
 }
@@ -29,4 +29,12 @@ class HighwaySign(
     override fun isOpaque() = false
     override fun walkOnMsg() = "\"$text\""
     override fun description() = "An ancient faded highway information sign."
+}
+
+@Serializable
+class Boulder : Scenery() {
+    override fun glyph() = Glyph.BOULDER
+    override fun name() = "boulder"
+    override fun isOpaque() = false
+    override fun description() = "A large rock."
 }

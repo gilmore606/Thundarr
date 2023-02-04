@@ -137,4 +137,5 @@ fun ThingTileSet() =
         setTile(Glyph.HIGHWAY_SIGN, SimpleTile(this, 9, 10))
         setTile(Glyph.GLOWING_CRYSTAL, SimpleTile(this, 10, 1))
         setTile(Glyph.BONEPILE, SimpleTile(this, 10, 2))
+        setTile(Glyph.BOULDER, SimpleTile(this, 10, 3))
     }
