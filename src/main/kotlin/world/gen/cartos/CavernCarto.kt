@@ -1,5 +1,6 @@
 package world.gen.cartos
 
+import audio.Speaker
 import things.Bonepile
 import things.Glowstone
 import things.LitThing
@@ -7,20 +8,22 @@ import things.Thing
 import util.*
 import world.Building
 import world.Chunk
+import world.RiverExit
 import world.gen.NoisePatches
 import world.gen.biomes.Cavern
 import world.gen.habitats.TemperateA
 import world.level.EnclosedLevel
 import world.path.DistanceMap
+import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 
 class CavernCarto(
     level: EnclosedLevel,
     val building: Building
-) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() -1, level.chunk!!, level) {
+) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, level.chunk!!, level) {
 
     val waterChance = 0.6f
-    val pitsChance = 1.0f
+    val pitsChance = 0.6f
     val globalPlantDensity = 1f
 
     lateinit var distanceMap: DistanceMap
@@ -29,6 +32,8 @@ class CavernCarto(
         worldDest: XY
     ) {
         carveRoom(Rect(x0, y0, x1, y1), 0, TERRAIN_CAVEWALL)
+
+        val size = (x1 - x0) * (y1 - y0)
 
         when (Dice.oneTo(7)) {
             1 -> carveCellular()
@@ -40,14 +45,25 @@ class CavernCarto(
             else -> carveWorm(2)
         }
 
+        if (size > 2000 && Dice.chance(pitsChance)) {
+            when (Dice.oneTo(3)) {
+                1 -> digPits(Dice.oneTo(size / 1000))
+                2 -> digPits(1)
+                3 -> digRiver(TERRAIN_CHASM)
+            }
+
+        }
+
         var plantChance = 0.5f
-        if (Dice.chance(waterChance)) {
-            digPools(Dice.oneTo(3))
+        if (size > 2000 && Dice.chance(waterChance)) {
+            when (Dice.oneTo(4)) {
+                1 -> digPools(Dice.range(2, 5))
+                2 -> digPools(1)
+                3 -> digLake()
+                4 -> digRiver(GENERIC_WATER)
+            }
             deepenWater()
             plantChance = 0.9f
-        }
-        if (Dice.chance(pitsChance)) {
-            digPits(Dice.oneTo(3))
         }
 
         fillEdges()
@@ -115,13 +131,73 @@ class CavernCarto(
         repeat (count) {
             val width = Dice.range(5, 16)
             val height = Dice.range(5, 16)
-            val x = Dice.range(x0 + 1, x1 - width)
-            val y = Dice.range(y0 + 1, y1 - height)
-            printGrid(growBlob(width, height), x, y, GENERIC_WATER)
-            if (Dice.chance(0.7f)) {
-                fringeTerrain(GENERIC_WATER, TEMP1, if (Dice.flip()) 1f else Dice.float(0.4f, 1f))
-                if (Dice.flip()) fuzzTerrain(TEMP1, 0.8f, GENERIC_WATER)
-                swapTerrain(TEMP1, TERRAIN_CAVEFLOOR)
+            digWaterBlob(width, height)
+        }
+    }
+
+    private fun digLake() {
+        val width = Dice.range(16, 36)
+        val height = Dice.range(16, 36)
+        digWaterBlob(width, height)
+    }
+
+    private fun digWaterBlob(width: Int, height: Int) {
+        val x = Dice.range(x0 + 1, x1 - width)
+        val y = Dice.range(y0 + 1, y1 - height)
+        printGrid(growBlob(width, height), x, y, GENERIC_WATER)
+        if (Dice.chance(0.7f)) {
+            fringeTerrain(GENERIC_WATER, TEMP1, if (Dice.flip()) 1f else Dice.float(0.4f, 1f))
+            if (Dice.flip()) fuzzTerrain(TEMP1, 0.8f, GENERIC_WATER)
+            swapTerrain(TEMP1, TERRAIN_CAVEFLOOR)
+        }
+    }
+
+    private fun digRiver(terrain: Terrain.Type) {
+        val startPos: XY
+        val endPos: XY
+        val startControl: XY
+        val endControl: XY
+        val startEdge: XY
+        val endEdge: XY
+        if (Dice.flip()) {
+            startPos =  XY(Dice.range(x0 + 3, x1 - 3) - x0, y0)
+            startEdge = NORTH
+            startControl = XY(startPos.x + Dice.range(-3, 3), startPos.y + Dice.range(4, 10))
+            endPos = XY(Dice.range(x0 + 3, x1 - 3) - x0, y1)
+            endEdge = SOUTH
+            endControl = XY(endPos.x + Dice.range(-3, 3), endPos.y - Dice.range(4, 10))
+        } else {
+            startPos = XY(x0, Dice.range(y0 + 3, y1 - 3) - y0)
+            startEdge = WEST
+            startControl = XY(startPos.x + Dice.range(4, 10), startPos.y + Dice.range(-3, 3))
+            endPos = XY(x1, Dice.range(y0 + 3, y1 - 3) - y0)
+            endEdge = EAST
+            endControl = XY(endPos.x - Dice.range(4, 10), endPos.y + Dice.range(-3, 3))
+        }
+        val start = RiverExit(startPos, startEdge, Dice.range(2, 6), startControl)
+        val end = RiverExit(endPos, endEdge, Dice.range(2, 6), endControl)
+        var t = 0f
+        var width = start.width.toFloat()
+        val step = 0.02f
+        val widthStep = (end.width - start.width).toFloat() * step
+        while (t < 1f) {
+            val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
+            carveRiverChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), terrain)
+            chunk.setSound(x0 + p.x.toInt(), y0 + p.y.toInt(), Speaker.PointAmbience(Speaker.Ambience.RIVER1, 30f, 1f))
+            t += step
+            width += widthStep
+        }
+    }
+
+    private fun carveRiverChunk(room: Rect, skipCorners: Boolean, terrain: Terrain.Type) {
+        for (x in room.x0..room.x1) {
+            for (y in room.y0..room.y1) {
+                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                        setTerrain(x, y, terrain)
+                    }
+                }
             }
         }
     }
