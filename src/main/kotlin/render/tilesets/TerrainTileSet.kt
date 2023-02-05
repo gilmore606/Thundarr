@@ -16,6 +16,13 @@ fun TerrainTileSet() =
             add(11, 7)
             add(11, 6)
         })
+        setTile(Glyph.LAVA_SURF, AnimatedTile(this).apply {
+            frameMs = 381
+            add(11, 8)
+            add(11, 9)
+            add(11, 10)
+            add(11, 9)
+        })
 
         setTile(Glyph.CAVE_FLOOR, VariantsTile(this).apply {
             add(0.5f, 5, 4)
@@ -183,11 +190,11 @@ fun TerrainTileSet() =
             add(0.3f, 10, 4)
         })
 
-        setTile(Glyph.LAVA, AnimatedTile(this).apply {
-            frameMs = 500
-            add(10, 5)
-            add(10, 6)
-            add(10, 7)
+        setTile(Glyph.LAVA, WaterTile(this).apply {
+            animA = 743
+            add(0.3f, 10, 5)
+            add(0.4f, 10, 6)
+            add(0.3f, 10, 7)
         })
 
         setTile(Glyph.PORTAL_DOOR, SimpleTile(this, 3, 2))

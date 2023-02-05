@@ -1,10 +1,7 @@
 package world.gen.cartos
 
 import audio.Speaker
-import things.Bonepile
-import things.Glowstone
-import things.LitThing
-import things.Thing
+import things.*
 import util.*
 import world.Building
 import world.Chunk
@@ -16,6 +13,7 @@ import world.level.EnclosedLevel
 import world.path.DistanceMap
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import world.terrains.Water
 
 class CavernCarto(
     level: EnclosedLevel,
@@ -83,7 +81,7 @@ class CavernCarto(
 
     private fun placeTreasure() {
         repeat (Dice.oneTo(3)) {
-            placeThing(distanceMap, Bonepile(), distanceMap.maxDistance / 2)
+            placeThing(distanceMap, if (Dice.chance(0.25f)) Trunk() else Bonepile(), distanceMap.maxDistance / 2)
         }
     }
 
@@ -91,7 +89,8 @@ class CavernCarto(
         while (true) {
             val x = Dice.zeroTil(width)
             val y = Dice.zeroTil(height)
-            if (isWalkableAt(chunk.x + x, chunk.y + y) && map.distanceAt(x,y) >= minDistance) {
+            if (isWalkableAt(chunk.x + x, chunk.y + y) && Terrain.get(getTerrain(x,y)) !is Water
+                && map.distanceAt(x,y) >= minDistance) {
                 addThing(chunk.x + x, chunk.y + y, thing)
                 return
             }
@@ -162,7 +161,8 @@ class CavernCarto(
         val startEdge: XY
         val endEdge: XY
         val bridgeVertical: Boolean
-        var bridgeOffset = -1
+        var bridgeOffset: Int
+        val bridgeTerrain = if (Dice.flip()) TERRAIN_WOODFLOOR else TERRAIN_CAVEFLOOR
         if (Dice.flip()) {
             startPos =  XY(Dice.range(x0 + 3, x1 - 3) - x0, y0)
             startEdge = NORTH
@@ -193,7 +193,7 @@ class CavernCarto(
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRiverChunk(Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
                 (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), terrain,
-                bridgeOffset, bridgeVertical, if (Dice.flip()) TERRAIN_WOODFLOOR else TERRAIN_CAVEFLOOR)
+                bridgeOffset, bridgeVertical, bridgeTerrain)
             chunk.setSound(x0 + p.x.toInt(), y0 + p.y.toInt(), Speaker.PointAmbience(Speaker.Ambience.RIVER1, 30f, 1f))
             t += step
             width += widthStep

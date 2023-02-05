@@ -17,6 +17,8 @@ sealed class Water(
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPWATER
     override fun stepSpark(actor: Actor, dir: XY) = Splash(dir)
 
+    open fun surfGlyph() = Glyph.SURF
+
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,
                                            vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean
@@ -26,10 +28,10 @@ sealed class Water(
         CARDINALS.forEach { dir ->
             if (get(level.getTerrain(x+dir.x,y+dir.y)) !is Water) {
                 when (dir) {
-                    WEST -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 0f, 0f, 1f, 1f, vis, Glyph.SURF, light, false)
-                    EAST -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 1f, 0f, 0f, 1f, vis, Glyph.SURF, light, false)
-                    NORTH -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 0f, 0f, 1f, 1f, vis, Glyph.SURF, light, true)
-                    SOUTH -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 1f, 0f, 0f, 1f, vis, Glyph.SURF, light, true)
+                    WEST -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 0f, 0f, 1f, 1f, vis, surfGlyph(), light, false)
+                    EAST -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 1f, 0f, 0f, 1f, vis, surfGlyph(), light, false)
+                    NORTH -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 0f, 0f, 1f, 1f, vis, surfGlyph(), light, true)
+                    SOUTH -> doQuad(x.toDouble(), y.toDouble(), x.toDouble() + 1.0, y.toDouble() + 1.0, 1f, 0f, 0f, 1f, vis, surfGlyph(), light, true)
                 }
             }
         }
@@ -49,7 +51,9 @@ object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {
 // Only used in generation, should never appear in the world
 object ScratchWater : Water(Type.GENERIC_WATER, Glyph.BLANK) { }
 
-object Lava : Terrain(Type.TERRAIN_LAVA, Glyph.LAVA, false, true, false, false) {
+object Lava : Water(Type.TERRAIN_LAVA, Glyph.LAVA) {
     override fun name() = "lava"
+    override fun surfGlyph() = Glyph.LAVA_SURF
     override fun glowColor() = LightColor(1f, 0.4f, 0.1f)
+    override fun isWalkable() = false
 }

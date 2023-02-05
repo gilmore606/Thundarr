@@ -121,6 +121,30 @@ class Fridge : Container() {
 }
 
 @Serializable
+class Trunk : Container() {
+    override fun name() = "trunk"
+    override fun description() = "A heavy metal-bound trunk."
+    override fun glyph() = Glyph.STRONGBOX
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+
+    override fun randomTreasureCount() = Dice.oneTo(4)
+    override fun randomTreasure() = when (Dice.zeroTo(10)) {
+        0 -> BoysLife()
+        1 -> Lighter()
+        2 -> HardHat()
+        3 -> Axe()
+        4 -> Pickaxe()
+        5 -> Bandages()
+        6 -> FirstAidKit()
+        7 -> RiotHelmet()
+        8 -> TravelBoots()
+        9 -> Paperback()
+        else -> Torch()
+    }
+}
+
+@Serializable
 class Bonepile : Container() {
     override fun name() = "bone pile"
     override fun description() = "A pile of dried old bones; from what, you can't tell."
@@ -129,7 +153,7 @@ class Bonepile : Container() {
     override fun openVerb() = "search"
     override fun isEmptyMsg() = "You find nothing useful in the bones."
 
-    override fun randomTreasureCount() = Dice.zeroTo(2)
+    override fun randomTreasureCount() = Dice.zeroTo(1)
     override fun randomTreasure() = when (Dice.zeroTo(10)) {
         0 -> BoysLife()
         1 -> Lighter()
