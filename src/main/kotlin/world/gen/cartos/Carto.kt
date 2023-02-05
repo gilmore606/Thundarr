@@ -52,7 +52,7 @@ abstract class Carto(
     fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
-    protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
+    fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
     fun addThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)

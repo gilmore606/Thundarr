@@ -2,7 +2,9 @@ package world.gen.cartos
 
 import App
 import audio.Speaker
+import things.Bonepile
 import things.Glowstone
+import things.Trunk
 import util.*
 import world.*
 import world.gen.NoisePatches
@@ -37,6 +39,7 @@ class WorldCarto(
     val globalPlantDensity = 0.2f
 
     val cavePortalChance = 0.5f
+    val ruinTreasureChance = 0.4f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
@@ -394,6 +397,18 @@ class WorldCarto(
                     setRuinTerrain(ix + x0, iy + y0, 0.34f,
                         if (Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
                             null else TERRAIN_STONEFLOOR)
+                }
+            }
+        }
+        if (Dice.chance(ruinTreasureChance)) {
+            var placed = false
+            while (!placed) {
+                val tx = Dice.range(x-2, x+2) + x0
+                val ty = Dice.range(y-2, y+2) + y0
+                if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
+                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
+                    addThing(tx, ty, treasure)
+                    placed = true
                 }
             }
         }

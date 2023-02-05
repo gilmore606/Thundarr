@@ -483,6 +483,8 @@ object Metamap {
                             scratches[dx][dy].height = 1
                         }
                     }
+                    suggestedPlayerStart.x = xToChunkX(city.x)
+                    suggestedPlayerStart.y = yToChunkY(city.y)
                 }
             }
             growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
@@ -524,8 +526,6 @@ object Metamap {
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
                         eruptions++
-                        suggestedPlayerStart.x = xToChunkX(volcano.x)
-                        suggestedPlayerStart.y = yToChunkY(volcano.y)
                     }
                 }
                 Console.sayFromThread("Erupted $eruptions volcanoes in desert peaks.")

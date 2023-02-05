@@ -91,7 +91,7 @@ fun tileFragShader() = """
        
        // scanlines
         if (mod(floor(gl_FragCoord.y), 4.0) == 0.0) {
-            gl_FragColor.rgb *= 0.9;
+            gl_FragColor.rgb *= 0.95;
         }
        
     }

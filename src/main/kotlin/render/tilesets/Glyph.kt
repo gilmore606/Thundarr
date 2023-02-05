@@ -30,6 +30,7 @@ enum class Glyph {
     HIGHWAY_H,
     CHASM,
     WOOD_FLOOR,
+    RUBBLE,
 
     WALL_DAMAGE,
     CURSOR,

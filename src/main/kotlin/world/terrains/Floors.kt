@@ -206,6 +206,12 @@ object Pavement : Floor(Type.TERRAIN_PAVEMENT, Glyph.PAVEMENT, false) {
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
 }
 
+object Rubble : Floor(Type.TERRAIN_RUBBLE, Glyph.RUBBLE, false) {
+    override fun name() = "rubble"
+    override fun moveSpeed(actor: Actor) = 1.8f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+}
+
 sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H, false) {
     override fun name() = "pavement"
     override fun moveSpeed(actor: Actor) = 0.7f
