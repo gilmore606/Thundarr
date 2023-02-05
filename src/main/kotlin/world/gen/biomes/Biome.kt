@@ -308,14 +308,3 @@ object Tundra: Biome(
     override fun defaultTitle() = "tundra"
     override fun canHaveRain() = false
 }
-
-@Serializable
-object Suburb: Biome(
-    Glyph.MAP_SUBURB,
-    TERRAIN_DIRT
-) {
-    override fun defaultTitle() = "suburban ruins"
-    override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_GRASS
-    override fun trailChance() = 0f
-    override fun plantDensity() = 0.2f
-}

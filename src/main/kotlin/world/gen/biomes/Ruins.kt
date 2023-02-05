@@ -16,7 +16,7 @@ object Ruins : Biome(
     Glyph.MAP_RUINS,
     Terrain.Type.TERRAIN_PAVEMENT
 ) {
-    private val ruinTreasureChance = 0.5f
+    private const val ruinTreasureChance = 0.5f
 
     override fun defaultTitle() = "urban ruins"
     override fun ambientSoundDay() = Speaker.Ambience.RUINS
@@ -27,10 +27,10 @@ object Ruins : Biome(
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)
-        if (fert < 0.25f) {
+        if (fert < 0.2f) {
             return Terrain.Type.TERRAIN_DIRT
         }
-        if (fert < 0.35f && Dice.chance((0.35f - fert) * 3f)) {
+        if (fert < 0.25f && Dice.chance((0.25f - fert) * 3f)) {
             return Terrain.Type.TERRAIN_DIRT
         }
         if (fert > 0.6f && Dice.chance((fert - 0.6f) * 0.3f)) {

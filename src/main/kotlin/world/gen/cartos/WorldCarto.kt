@@ -402,7 +402,8 @@ class WorldCarto(
         }
         if (Dice.chance(ruinTreasureChance)) {
             var placed = false
-            while (!placed) {
+            var tries = 0
+            while (!placed && tries < 200) {
                 val tx = Dice.range(x-2, x+2) + x0
                 val ty = Dice.range(y-2, y+2) + y0
                 if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
@@ -410,6 +411,7 @@ class WorldCarto(
                     addThing(tx, ty, treasure)
                     placed = true
                 }
+                tries++
             }
         }
     }

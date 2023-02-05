@@ -642,6 +642,7 @@ object Metamap {
                 cell.ruinedBuildings += when (cell.biome) {
                     Mountain -> -1
                     Ruins -> -cell.ruinedBuildings
+                    Suburb -> Dice.range(2, 6)
                     else -> 0
                 }
                 cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
@@ -704,6 +705,15 @@ object Metamap {
             cityCells.forEach { city ->
                 cityCells.forEach { ocity ->
                     if (ocity != city) connectCityToRoads(city, ocity)
+                }
+            }
+            forEachMeta { x,y,cell ->
+                if (cell.biome == Suburb) {
+                    CARDINALS.forEach { dir ->
+                        if (Dice.chance(0.9f) && !scratches[x][y].roadExits.hasOneWhere { it.edge == dir }) {
+                            scratches[x][y].roadExits.add(RoadExit(edge = dir))
+                        }
+                    }
                 }
             }
 
@@ -956,6 +966,8 @@ object Metamap {
         val newRoads = ArrayList<XY>()
         var done = false
         var stepsSinceSideRoad = 0
+        var turnsMade = 0
+        var lastDir = XY(0,0)
         while (!done) {
             // Find target closest to cursor which is closer to targetCity than cursor
             var nearestTarget = targetCity
@@ -1003,6 +1015,11 @@ object Metamap {
                     }
                     cursor.x += moveDir.x
                     cursor.y += moveDir.y
+                    if (moveDir != lastDir) {
+                        turnsMade++
+                        lastDir = moveDir
+                        if (turnsMade > 6) done = true
+                    }
                 }
             }
         }
