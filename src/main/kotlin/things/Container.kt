@@ -168,3 +168,28 @@ class Bonepile : Container() {
         else -> Torch()
     }
 }
+
+@Serializable
+class WreckedCar : Container() {
+    override fun name() = "wrecked vehicle"
+    override fun description() = "The hulk of a rusty metal wagon."
+    override fun glyph() = Glyph.WRECKED_CAR
+    override fun isPortable() = false
+    override fun openVerb() = "search"
+    override fun isEmptyMsg() = "You find nothing useful in the vehicle."
+
+    override fun randomTreasureCount() = Dice.zeroTo(1)
+    override fun randomTreasure() = when (Dice.zeroTo(10)) {
+        0 -> BoysLife()
+        1 -> Lighter()
+        2 -> HardHat()
+        3 -> Axe()
+        4 -> Pickaxe()
+        5 -> Bandages()
+        6 -> FirstAidKit()
+        7 -> RiotHelmet()
+        8 -> TravelBoots()
+        9 -> Paperback()
+        else -> Torch()
+    }
+}

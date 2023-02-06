@@ -138,4 +138,8 @@ fun ThingTileSet() =
         setTile(Glyph.GLOWING_CRYSTAL, SimpleTile(this, 10, 1))
         setTile(Glyph.BONEPILE, SimpleTile(this, 10, 2))
         setTile(Glyph.BOULDER, SimpleTile(this, 10, 3))
+        setTile(Glyph.WRECKED_CAR, VariantsTile(this).apply {
+            add(0.5f, 10, 4)
+            add(0.5f, 10, 5)
+        })
     }

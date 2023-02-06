@@ -5,11 +5,12 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Bonepile
 import things.Trunk
+import things.WreckedCar
 import util.Dice
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
-import world.terrains.Terrain
+import world.terrains.*
 
 @Serializable
 object Ruins : Biome(
@@ -17,6 +18,7 @@ object Ruins : Biome(
     Terrain.Type.TERRAIN_PAVEMENT
 ) {
     private const val ruinTreasureChance = 0.5f
+    private fun wreckedCarCount() = Dice.oneTo(4)
 
     override fun defaultTitle() = "urban ruins"
     override fun ambientSoundDay() = Speaker.Ambience.RUINS
@@ -108,6 +110,21 @@ object Ruins : Biome(
                 if (carto.boundsCheck(tx,ty) && carto.isWalkableAt(tx,ty)) {
                     val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
                     carto.addThing(tx, ty, treasure)
+                    placed = true
+                }
+            }
+        }
+    }
+
+    override fun populateExtra(carto: WorldCarto) {
+        repeat (wreckedCarCount()) {
+            var placed = false
+            while (!placed) {
+                val tx = Dice.range(carto.x0, carto.x1)
+                val ty = Dice.range(carto.y0, carto.y1)
+                val t = Terrain.get(carto.getTerrain(tx, ty))
+                if (t is HighwayH || t is HighwayV || t is Pavement) {
+                    carto.addThing(tx, ty, WreckedCar())
                     placed = true
                 }
             }

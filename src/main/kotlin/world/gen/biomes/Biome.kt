@@ -31,6 +31,7 @@ sealed class Biome(
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
+    open fun populateExtra(carto: WorldCarto) { }
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
         if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {

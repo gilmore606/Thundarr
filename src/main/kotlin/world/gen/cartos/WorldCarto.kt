@@ -5,6 +5,7 @@ import audio.Speaker
 import things.Bonepile
 import things.Glowstone
 import things.Trunk
+import things.WreckedCar
 import util.*
 import world.*
 import world.gen.NoisePatches
@@ -14,6 +15,7 @@ import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.level.Level
+import world.terrains.Highway
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 import java.lang.Float.max
@@ -40,6 +42,7 @@ class WorldCarto(
 
     val cavePortalChance = 0.5f
     val ruinTreasureChance = 0.4f
+    val roadCarChance = 0.5f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
@@ -86,6 +89,7 @@ class WorldCarto(
             // Populate!
             buildFertilityMap()
             growPlants()
+            meta.biome.populateExtra(this)
 
             // Post-processing
             deepenWater()
@@ -350,6 +354,7 @@ class WorldCarto(
                 }
             }
         }
+        if (meta.roadExits.isEmpty()) return
         val mid = CHUNK_SIZE/2
         val end = CHUNK_SIZE-1
         meta.roadExits.forEach { exit ->
@@ -358,6 +363,19 @@ class WorldCarto(
                 SOUTH -> drawLine(XY(mid, mid), XY(mid,end)) { x,y -> buildRoadCell(x,y,exit.width,true) }
                 WEST -> drawLine(XY(0,mid+1), XY(mid, mid+1)) { x,y -> buildRoadCell(x,y,exit.width,false) }
                 EAST -> drawLine(XY(mid, mid+1), XY(end, mid+1)) { x,y -> buildRoadCell(x,y,exit.width,false) }
+            }
+        }
+        if (Dice.chance(roadCarChance)) {
+            repeat (Dice.oneTo(3)) {
+                var placed = false
+                while (!placed) {
+                    val tx = Dice.range(x0, x1)
+                    val ty = Dice.range(y0, y1)
+                    if (Terrain.get(getTerrain(tx, ty)) is Highway) {
+                        addThing(tx, ty, WreckedCar())
+                        placed = true
+                    }
+                }
             }
         }
     }
@@ -369,8 +387,7 @@ class WorldCarto(
             val along = Dice.range(2, CHUNK_SIZE/2-2)
             val width = Dice.range(4, 10)
             val height = Dice.range(4, 10)
-            val ruinEdge = meta.roadExits.random().edge
-            when (ruinEdge) {
+            when (meta.roadExits.random().edge) {
                 NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height)
                 SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE-along, width, height)
                 WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
