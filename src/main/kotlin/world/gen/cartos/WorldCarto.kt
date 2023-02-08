@@ -83,6 +83,7 @@ class WorldCarto(
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
             if (meta.lavaExits.isNotEmpty()) buildLava()
             if (meta.hasVolcano) buildVolcano()
+            if (meta.hasVillage) buildVillage()
 
             digCave()
 
@@ -808,6 +809,10 @@ class WorldCarto(
             if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)
         }
         connectBuilding(NaturalCavern().at(doorPos.x, doorPos.y).facing(facings.random()))
+    }
+
+    private fun buildVillage() {
+        printGrid(growBlob(63, 63), x0, y0, meta.biome.trailTerrain(0,0))
     }
 
 }

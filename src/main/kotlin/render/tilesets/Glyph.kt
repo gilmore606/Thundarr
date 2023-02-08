@@ -31,6 +31,7 @@ enum class Glyph {
     CHASM,
     WOOD_FLOOR,
     RUBBLE,
+    WOOD_WALL,
 
     WALL_DAMAGE,
     CURSOR,
@@ -216,7 +217,8 @@ enum class Glyph {
     MAP_RIVER_WS,
     MAP_RIVER_SE,
     MAP_PLAYER,
-    MAP_MARKER,
+    MAP_CITY,
+    MAP_VILLAGE,
     MAP_ROAD_NSE,
     MAP_ROAD_NSW,
     MAP_ROAD_NWE,

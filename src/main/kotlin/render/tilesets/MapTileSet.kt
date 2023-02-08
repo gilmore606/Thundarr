@@ -50,5 +50,6 @@ fun MapTileSet() =
         setTile(Glyph.MAP_HABITAT_ARCTIC, SimpleTile(this, 5, 5))
 
         setTile(Glyph.MAP_PLAYER, SimpleTile(this, 3, 3))
-        setTile(Glyph.MAP_MARKER, SimpleTile(this, 4, 1))
+        setTile(Glyph.MAP_CITY, SimpleTile(this, 4, 1))
+        setTile(Glyph.MAP_VILLAGE, SimpleTile(this, 0, 6))
     }

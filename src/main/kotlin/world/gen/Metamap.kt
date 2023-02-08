@@ -48,6 +48,8 @@ object Metamap {
     val citiesDesert = 2
     val minCityDistance = 15
     val bigCityFraction = 0.2f
+    val villageCount = 40
+    val minVillageDistance = 10
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
@@ -483,8 +485,6 @@ object Metamap {
                             scratches[dx][dy].height = 1
                         }
                     }
-                    suggestedPlayerStart.x = xToChunkX(city.x)
-                    suggestedPlayerStart.y = yToChunkY(city.y)
                 }
             }
             growBiome(Ruins, 1, 0.4f, false, listOf(Ocean))
@@ -717,6 +717,36 @@ object Metamap {
                 }
             }
 
+            // Place villages
+            Console.sayFromThread("Founding $villageCount villages...")
+            val villages = ArrayList<XY>()
+            var placed = 0
+            while (placed < villageCount) {
+                var placedOne = false
+                while (!placedOne) {
+                    val x = Dice.zeroTil(chunkRadius * 2)
+                    val y = Dice.zeroTil(chunkRadius * 2)
+                    val meta = scratches[x][y]
+                    if (!(meta.biome in listOf(Ocean, Glacier))) {
+                        if (!meta.hasCity && !meta.hasVolcano && !meta.hasLake) {
+                            if (meta.riverExits.isEmpty() && meta.coasts.isEmpty()) {
+                                if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
+                                    placedOne = true
+                                    placed++
+                                    villages.add(XY(x,y))
+                                    scratches[x][y].hasVillage = true
+                                    scratches[x][y].title = Madlib.villageName()
+                                    scratches[x][y].ruinedBuildings = 0
+
+                                    suggestedPlayerStart.x = xToChunkX(x)
+                                    suggestedPlayerStart.y = yToChunkY(y)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Name contiguous features
             Console.sayFromThread("Naming geography...")
             val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
@@ -748,7 +778,7 @@ object Metamap {
                 }
             }
             fun nameArea(areaID: Int, name: String) {
-                forEachMeta { x,y,cell -> if (areaMap[x][y] == areaID) cell.title = name }
+                forEachMeta { x,y,cell -> if (areaMap[x][y] == areaID && cell.title == "") cell.title = name }
             }
             areas[Ruins]?.sortByDescending { it.size }
             areas[Ruins]?.forEachIndexed { n, area ->

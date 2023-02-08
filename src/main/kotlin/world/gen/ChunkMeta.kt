@@ -28,6 +28,7 @@ class ChunkMeta(
     val lavaExits: MutableList<LavaExit> = mutableListOf(),
     val variance: Float = 0f,
     var hasCity: Boolean = false,
+    var hasVillage: Boolean = false,
     var hasVolcano: Boolean = false,
     var cityDistance: Float = 0f,
     var ruinedBuildings: Int = 0,
@@ -85,6 +86,7 @@ class ChunkScratch(
     var lavaExits: MutableList<LavaExit> = mutableListOf()
     var hasCity = false
     var hasVolcano = false
+    var hasVillage = false
     var cityDistance = 0f
     var ruinedBuildings = 0
     var title = ""
@@ -104,6 +106,7 @@ class ChunkScratch(
         trailExits = trailExits,
         lavaExits = lavaExits,
         hasCity = hasCity,
+        hasVillage = hasVillage,
         hasVolcano = hasVolcano,
         cityDistance = cityDistance,
         ruinedBuildings = ruinedBuildings,

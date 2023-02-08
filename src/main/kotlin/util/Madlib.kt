@@ -438,4 +438,17 @@ object Madlib {
             else -> { adjs.random() + " Forest" }
         }
     }
+
+    fun villageName(): String {
+        val pre = listOf("iron", "owl", "deer", "oak", "sparrow", "robin", "mud", "snake", "turnip",
+            "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hounds", "water", "rabbit", "hare",
+            "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",
+            "north", "south", "larry", "bill", "maude", "sally", "chester", "white", "black", "gray", "blue",
+            "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull")
+        val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend",
+            "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead")
+
+        val name = pre.random() + post.random()
+        return name.capitalize()
+    }
 }

@@ -30,6 +30,7 @@ sealed class Terrain(
             Type.TEMP3 -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
+            Type.TERRAIN_WOODWALL -> WoodWall
             Type.TERRAIN_TEMPERATE_FORESTWALL -> TemperateForestWall
             Type.TERRAIN_PINE_FORESTWALL -> PineForestWall
             Type.TERRAIN_CAVEFLOOR -> CaveFloor
@@ -79,6 +80,7 @@ sealed class Terrain(
         GENERIC_HIGHWAY,
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
+        TERRAIN_WOODWALL,
         TERRAIN_TEMPERATE_FORESTWALL,
         TERRAIN_PINE_FORESTWALL,
         TERRAIN_STONEFLOOR,

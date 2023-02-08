@@ -223,6 +223,7 @@ fun TerrainTileSet() =
 
         setTile(Glyph.CAVE_ROCKS, SimpleTile(this, 1, 8))
         setTile(Glyph.WOOD_FLOOR, SimpleTile(this, 9, 8))
+        setTile(Glyph.WOOD_WALL, SimpleTile(this, 9, 9))
 
         setTile(Glyph.RUBBLE, VariantsTile(this).apply {
             add(0.5f, 10, 8)

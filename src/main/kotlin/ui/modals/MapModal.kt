@@ -138,7 +138,10 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(road))
                     }
                     if (meta.hasCity) {
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_MARKER))
+                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_CITY))
+                    }
+                    if (meta.hasVillage) {
+                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_VILLAGE))
                     }
                     if (x + mapx == playerX && y + mapy == playerY) {
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_PLAYER))

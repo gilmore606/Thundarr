@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.Brick
+import things.Log
 import things.Rock
 import things.Thing
 import ui.panels.Console
@@ -85,6 +86,13 @@ object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
     override fun bumpMsg() = "You bump into a rock face."
     override fun digResult() = if (Dice.chance(0.4f)) Rock() else null
     override fun digToFloorTerrain() = Type.TERRAIN_CAVEFLOOR
+}
+
+object WoodWall : Wall(Type.TERRAIN_WOODWALL, Glyph.WOOD_WALL, 2f) {
+    override fun name() = "wooden wall"
+    override fun bumpMsg() = "You bump into a wooden wall."
+    override fun digResult() = Log()
+    override fun digToFloorTerrain() = Type.TERRAIN_DIRT
 }
 
 sealed class ForestWall(
