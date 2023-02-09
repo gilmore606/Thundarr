@@ -48,7 +48,7 @@ object Metamap {
     val citiesDesert = 2
     val minCityDistance = 15
     val bigCityFraction = 0.2f
-    val villageCount = 40
+    val villageCount = 160
     val minVillageDistance = 10
     val ruinFalloff = 14f
     val ruinsMax = 5f
@@ -65,6 +65,7 @@ object Metamap {
     private var isolatedPeaks = ArrayList<XY>()
     private var volcanoPeaks = ArrayList<XY>()
     val metaCache = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
+    val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
     var suggestedPlayerStart = XY(-999,-999)
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metaCache[x][y] else outOfBoundsMeta
@@ -103,6 +104,14 @@ object Metamap {
         for (x in 0 until chunkRadius * 2) {
             for (y in 0 until chunkRadius * 2) {
                 doThis(x,y, scratches[x][y])
+            }
+        }
+    }
+
+    private fun forEachAreaId(areaId: Int, doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
+        for (x in 0 until chunkRadius * 2) {
+            for (y in 0 until chunkRadius * 2) {
+                if (areaMap[x][y] == areaId) doThis(x, y, scratches[x][y])
             }
         }
     }
@@ -749,7 +758,6 @@ object Metamap {
 
             // Name contiguous features
             Console.sayFromThread("Naming geography...")
-            val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
             fun floodFill(x: Int, y: Int, id: Int, biome: Biome): Int {
                 var cells = 1
                 areaMap[x][y] = id
@@ -798,6 +806,20 @@ object Metamap {
             areas[Forest]?.sortByDescending { it.size }
             areas[Forest]?.forEachIndexed { n, area ->
                 if (n < 40) nameArea(area.areaID, Madlib.forestName())
+            }
+            areas[Suburb]?.forEach { biomeArea ->
+                val areaId = biomeArea.areaID
+                var cityName: String? = null
+                forEachMeta { x,y,cell ->
+                    if (cell.biome == Ruins && CARDINALS.hasOneWhere { areaMap[x+it.x][y+it.y] == areaId }) {
+                        cityName = cell.title
+                    }
+                }
+                cityName?.also { cityName ->
+                    forEachAreaId(areaId) { x,y,cell ->
+                        cell.title = "$cityName suburbs"
+                    }
+                }
             }
             forEachMeta { x,y,cell ->
                 if (cell.title == "") cell.title = cell.biome.defaultTitle()
