@@ -102,6 +102,7 @@ class ModernDoor : Door() {
     override fun description() = "A dull metal sliding door, pitted with corrosion."
 }
 
+@Serializable
 class WoodDoor : Door() {
     override fun description() = "A heavy oak door bound with brass."
     override fun openGlyph() = Glyph.WOOD_DOOR_OPEN

@@ -48,8 +48,8 @@ object Metamap {
     val citiesDesert = 2
     val minCityDistance = 15
     val bigCityFraction = 0.2f
-    val villageCount = 160
-    val minVillageDistance = 10
+    val villageCount = 220
+    val minVillageDistance = 8
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
@@ -738,7 +738,7 @@ object Metamap {
                     val meta = scratches[x][y]
                     if (!(meta.biome in listOf(Ocean, Glacier))) {
                         if (!meta.hasCity && !meta.hasVolcano && !meta.hasLake) {
-                            if (meta.riverExits.isEmpty() && meta.coasts.isEmpty()) {
+                            if (meta.riverExits.isEmpty() && meta.coasts.isEmpty() && meta.roadExits.isEmpty()) {
                                 if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
                                     placedOne = true
                                     placed++
