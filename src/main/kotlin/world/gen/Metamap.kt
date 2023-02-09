@@ -727,12 +727,14 @@ object Metamap {
             }
 
             // Place villages
-            Console.sayFromThread("Founding $villageCount villages...")
+            Console.sayFromThread("Populating the land...")
             val villages = ArrayList<XY>()
             var placed = 0
+            var actuallyPlaced = 0
             while (placed < villageCount) {
                 var placedOne = false
-                while (!placedOne) {
+                var tries = 0
+                while (!placedOne && tries < 5000) {
                     val x = Dice.zeroTil(chunkRadius * 2)
                     val y = Dice.zeroTil(chunkRadius * 2)
                     val meta = scratches[x][y]
@@ -741,7 +743,7 @@ object Metamap {
                             if (meta.riverExits.isEmpty() && meta.coasts.isEmpty() && meta.roadExits.isEmpty()) {
                                 if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
                                     placedOne = true
-                                    placed++
+                                    actuallyPlaced++
                                     villages.add(XY(x,y))
                                     scratches[x][y].hasVillage = true
                                     scratches[x][y].title = Madlib.villageName()
@@ -753,8 +755,11 @@ object Metamap {
                             }
                         }
                     }
+                    tries++
                 }
+                placed++
             }
+            Console.sayFromThread("Founded $actuallyPlaced villages.")
 
             // Name contiguous features
             Console.sayFromThread("Naming geography...")

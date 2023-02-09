@@ -2,10 +2,7 @@ package world.gen.cartos
 
 import App
 import audio.Speaker
-import things.Bonepile
-import things.Glowstone
-import things.Trunk
-import things.WreckedCar
+import things.*
 import util.*
 import world.*
 import world.gen.NoisePatches
@@ -812,7 +809,74 @@ class WorldCarto(
     }
 
     private fun buildVillage() {
-        printGrid(growBlob(63, 63), x0, y0, meta.biome.trailTerrain(0,0))
+        printGrid(growBlob(63, 63), x0, y0, TEMP1)
+        forEachTerrain(TEMP1) { x,y ->
+            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
+        }
+
+        val hutCount = Dice.range(8, 12)
+        var built = 0
+        while (built < hutCount) {
+            val width = Dice.range(7, 11)
+            val height = Dice.range(7, 11)
+            var tries = 0
+            var placed = false
+            while (tries < 200 && !placed) {
+                val x = Dice.range(3, 63 - width)
+                val y = Dice.range(3, 63 - height)
+                var clearHere = true
+                for (tx in x until x+width) {
+                    for (ty in y until y+height) {
+                        if (getTerrain(x0+tx,y0+ty) != TEMP1) clearHere = false
+                    }
+                }
+                if (clearHere) {
+                    buildHut(x, y, width, height)
+                    placed = true
+                }
+                tries++
+            }
+            built++
+        }
+
+        swapTerrain(TEMP1, meta.biome.trailTerrain(x0,y0))
+    }
+
+    private fun buildHut(x: Int, y: Int, width: Int, height: Int) {
+        var doorDir = NORTH
+        if (y < 28) doorDir = SOUTH
+        if (x < 20) doorDir = EAST
+        if (x > 40) doorDir = WEST
+        val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
+            Dice.range(x+2, x+width-3)
+        } else {
+            if (doorDir == EAST) x+width-2 else x+1
+        }
+        val doory = if (doorDir == EAST || doorDir == WEST) {
+            Dice.range(y+2, y+height-3)
+        } else {
+            if (doorDir == SOUTH) y+height-2 else y+1
+        }
+        val dirt =  meta.biome.trailTerrain(x0,y0)
+        for (tx in x until x+width) {
+            for (ty in y until y+height) {
+                if (tx == doorx && ty == doory) {
+                    setTerrain(x0+tx, y0+ty, TERRAIN_WOODFLOOR)
+                    if (Dice.chance(0.8f)) addThing(x0+tx, y0+ty, WoodDoor())
+                } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
+                    setTerrain(x0 + tx, y0 + ty, dirt)
+                } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
+                    setTerrain(x0 + tx, y0 + ty, TERRAIN_WOODWALL)
+                } else {
+                    setTerrain(x0+tx, y0+ty, TERRAIN_WOODFLOOR)
+                }
+            }
+        }
+        if (Dice.chance(0.5f)) {
+            val tablex = Dice.range(x+2,x+width-3)
+            val tabley = Dice.range(y+2,y+height-3)
+            addThing(x0+tablex, y0+tabley, Table())
+        }
     }
 
 }
