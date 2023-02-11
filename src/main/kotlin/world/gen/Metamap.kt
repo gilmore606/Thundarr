@@ -534,6 +534,8 @@ object Metamap {
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
+                        suggestedPlayerStart.x = xToChunkX(volcano.x)
+                        suggestedPlayerStart.y = yToChunkY(volcano.y)
                         eruptions++
                     }
                 }
@@ -749,8 +751,8 @@ object Metamap {
                                     scratches[x][y].title = Madlib.villageName()
                                     scratches[x][y].ruinedBuildings = 0
 
-                                    suggestedPlayerStart.x = xToChunkX(x)
-                                    suggestedPlayerStart.y = yToChunkY(y)
+                                    //suggestedPlayerStart.x = xToChunkX(x)
+                                    //suggestedPlayerStart.y = yToChunkY(y)
                                 }
                             }
                         }

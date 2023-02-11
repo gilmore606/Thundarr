@@ -80,6 +80,7 @@ class WorldCarto(
             repeat (meta.ruinedBuildings) { buildRandomRuin() }
             if (meta.lavaExits.isNotEmpty()) buildLava()
             if (meta.hasVolcano) buildVolcano()
+            if (meta.lavaExits.isNotEmpty() || meta.hasVolcano) addLavaSound()
             if (meta.hasVillage) buildVillage()
 
             digCave()
@@ -553,6 +554,14 @@ class WorldCarto(
             val y = y0 + if (dir == NORTH) i else cross
             if (getTerrain(x,y) == TERRAIN_LAVA) {
                 setTerrain(x,y,TERRAIN_ROCKS)
+            }
+        }
+    }
+
+    private fun addLavaSound() {
+        forEachTerrain(TERRAIN_LAVA) { x,y ->
+            if (CARDINALS.hasOneWhere { boundsCheck(x+it.x, y+it.y) && getTerrain(x+it.x, y+it.y) != TERRAIN_LAVA }) {
+                chunk.setSound(x, y, Speaker.PointAmbience(Speaker.Ambience.LAVA, 35f, 1f))
             }
         }
     }
