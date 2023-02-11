@@ -26,6 +26,8 @@ sealed class Biome(
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
     open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
     open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
+    open fun villageWallType() = Terrain.Type.TERRAIN_WOODWALL
+    open fun villageFloorType() = Terrain.Type.TERRAIN_WOODFLOOR
 
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
@@ -129,6 +131,8 @@ object Hill : Biome(
     override fun trailChance() = 0.2f
     override fun plantDensity() = 0.3f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun villageWallType() = TERRAIN_BRICKWALL
+    override fun villageFloorType() = TERRAIN_CAVEFLOOR
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) - NoisePatches.get("mountainShapes", x, y).toFloat() * 0.6f
 
@@ -156,6 +160,8 @@ object ForestHill : Biome(
     override fun trailChance() = 0.2f
     override fun plantDensity() = 0.7f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_WOODWALL
+    override fun villageFloorType() = if (Dice.chance(0.7f)) TERRAIN_WOODFLOOR else TERRAIN_CAVEFLOOR
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
             (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 3f).toFloat()
@@ -189,6 +195,9 @@ object Mountain : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
     override fun plantDensity() = 0.5f
+    override fun villageWallType() = TERRAIN_BRICKWALL
+    override fun villageFloorType() = if (Dice.chance(0.1f)) TERRAIN_DIRT else
+        if (Dice.flip()) TERRAIN_STONEFLOOR else TERRAIN_CAVEFLOOR
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -215,6 +224,7 @@ object Swamp : Biome(
     override fun plantDensity() = 1f
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
+    override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
 
@@ -247,6 +257,7 @@ object Scrub : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
     override fun plantDensity() = 0.25f
+    override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)
@@ -272,6 +283,8 @@ object Desert : Biome(
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
         TERRAIN_GRASS else TERRAIN_HARDPAN
     override fun plantDensity() = 0.1f
+    override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_CAVEWALL
+    override fun villageFloorType() = if (Dice.chance(0.2f)) TERRAIN_HARDPAN else TERRAIN_STONEFLOOR
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

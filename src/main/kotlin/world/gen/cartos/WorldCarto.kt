@@ -852,6 +852,8 @@ class WorldCarto(
     }
 
     private fun buildHut(x: Int, y: Int, width: Int, height: Int) {
+        val wallType = meta.biome.villageWallType()
+        val floorType = meta.biome.villageFloorType()
         var doorDir = NORTH
         if (y < 28) doorDir = SOUTH
         if (x < 20) doorDir = EAST
@@ -870,14 +872,14 @@ class WorldCarto(
         for (tx in x until x+width) {
             for (ty in y until y+height) {
                 if (tx == doorx && ty == doory) {
-                    setTerrain(x0+tx, y0+ty, TERRAIN_WOODFLOOR)
+                    setTerrain(x0+tx, y0+ty, floorType)
                     if (Dice.chance(0.8f)) addThing(x0+tx, y0+ty, WoodDoor())
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, dirt)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    setTerrain(x0 + tx, y0 + ty, TERRAIN_WOODWALL)
+                    setTerrain(x0 + tx, y0 + ty, wallType)
                 } else {
-                    setTerrain(x0+tx, y0+ty, TERRAIN_WOODFLOOR)
+                    setTerrain(x0+tx, y0+ty, floorType)
                 }
             }
         }
