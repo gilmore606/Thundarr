@@ -4,9 +4,11 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Bonepile
+import things.ModernDoor
 import things.Trunk
 import things.WreckedCar
-import util.Dice
+import util.*
+import world.Chunk
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
@@ -85,18 +87,42 @@ object Ruins : Biome(
         }
         if (!clear) return
         val filled = Dice.chance(0.3f)
+        val intact = !filled && Dice.chance(0.3f)
         for (ix in x0 .. x1) {
             for (iy in y0 .. y1) {
-                val wear = NoisePatches.get("ruinWear", ix + carto.x0, iy + carto.y0).toFloat()
+                val wear = if (intact) 0f else NoisePatches.get("ruinWear", ix + carto.x0, iy + carto.y0).toFloat()
                 if (wear < 0.4f && Dice.chance(1.1f - wear * 0.5f)) {
-                    val microwear = NoisePatches.get("ruinMicro", ix + carto.x0, iy + carto.y0).toFloat()
+                    val microwear = if (intact) 0.01f else NoisePatches.get("ruinMicro", ix + carto.x0, iy + carto.y0).toFloat()
                     if (microwear > wear) {
                         if (ix == x0 || ix == x1 || iy == y0 || iy == y1 || filled || microwear > 0.6f) {
-                            if (Dice.chance(0.9f)) setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_BRICKWALL)
+                            if (intact || Dice.chance(0.9f)) setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_BRICKWALL)
                         } else {
                             setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_STONEFLOOR)
                         }
+                        if (intact) {
+                            carto.setRoofed(ix + carto.x0, iy + carto.y0, Chunk.Roofed.INDOOR)
+                        }
                     }
+                }
+            }
+        }
+        if (intact) {
+            repeat (Dice.oneTo(3)) {
+                val doorDir = CARDINALS.random()
+                val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
+                    Dice.range(x0+1, x1-1)
+                } else {
+                    if (doorDir == EAST) x1 else x0
+                }
+                val doory = if (doorDir == EAST || doorDir == WEST) {
+                    Dice.range(y0+1, y1-1)
+                } else {
+                    if (doorDir == SOUTH) y1 else y0
+                }
+                setTerrain(carto, doorx, doory, Terrain.Type.TERRAIN_STONEFLOOR)
+                carto.setRoofed(doorx + carto.x0, doory + carto.y0, Chunk.Roofed.WINDOW)
+                if (Dice.chance(0.7f)) {
+                    carto.addThing(doorx + carto.x0, doory + carto.y0, ModernDoor())
                 }
             }
         }

@@ -39,7 +39,8 @@ class WorldCarto(
 
     val cavePortalChance = 0.5f
     val ruinTreasureChance = 0.4f
-    val roadCarChance = 0.5f
+    val ruinIntactChance = 0.25f
+    val roadCarChance = 0.4f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
@@ -380,6 +381,7 @@ class WorldCarto(
     }
 
     private fun buildRandomRuin() {
+        val isIntact = Dice.chance(ruinIntactChance)
         val mid = CHUNK_SIZE/2
         if (meta.roadExits.isNotEmpty()) {
             val offset = Dice.range(3, 8) * Dice.sign()
@@ -387,17 +389,17 @@ class WorldCarto(
             val width = Dice.range(4, 10)
             val height = Dice.range(4, 10)
             when (meta.roadExits.random().edge) {
-                NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height)
-                SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE-along, width, height)
-                WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
-                EAST -> buildRuin(CHUNK_SIZE-along, mid + offset + width * (if (offset<0) -1 else 0), width, height)
+                NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height, isIntact)
+                SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE-along, width, height, isIntact)
+                WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)
+                EAST -> buildRuin(CHUNK_SIZE-along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)
             }
         } else {
-            buildRuin(Dice.range(1, CHUNK_SIZE-10), Dice.range(1, CHUNK_SIZE-10), Dice.range(4, 10), Dice.range(4, 10))
+            buildRuin(Dice.range(1, CHUNK_SIZE-10), Dice.range(1, CHUNK_SIZE-10), Dice.range(4, 10), Dice.range(4, 10), isIntact)
         }
     }
 
-    private fun buildRuin(x: Int, y: Int, width: Int, height: Int) {
+    private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
         for (ix in x until x+width) {
             for (iy in y until y+height) {
                 if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE && flagsMap[ix][iy].contains(CellFlag.NO_BUILDINGS)) return
@@ -405,15 +407,36 @@ class WorldCarto(
         }
         for (ix in x until x + width) {
             for (iy in y until y + height) {
-                if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
-                    setRuinTerrain(ix + x0, iy + y0, 0.34f,
-                        if (Dice.chance(0.9f))
-                            TERRAIN_BRICKWALL else null)
-                } else {
-                    setRuinTerrain(ix + x0, iy + y0, 0.34f,
-                        if (Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
-                            null else TERRAIN_STONEFLOOR)
+                if (boundsCheck(ix + x0, iy + y0)) {
+                    if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
+                        val terrain = if (isIntact || Dice.chance(0.9f)) TERRAIN_BRICKWALL else null
+                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
+                    } else {
+                        val terrain =
+                            if (!isIntact && Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
+                                null else TERRAIN_STONEFLOOR
+                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
+                    }
+                    if (isIntact) chunk.setRoofed(ix + x0, iy + y0, Chunk.Roofed.INDOOR)
                 }
+            }
+        }
+        val doorDir = CARDINALS.random()
+        val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
+            Dice.range(x+1, x+width-2)
+        } else {
+            if (doorDir == EAST) x+width-1 else x
+        } + x0
+        val doory = if (doorDir == EAST || doorDir == WEST) {
+            Dice.range(y+1, y+height-2)
+        } else {
+            if (doorDir == SOUTH) y+height-1 else y
+        } + y0
+        if (boundsCheck(doorx, doory)) {
+            setTerrain(doorx, doory, TERRAIN_STONEFLOOR)
+            if (isIntact || Dice.chance(0.2f)) {
+                if (isIntact) chunk.setRoofed(doorx, doory, Chunk.Roofed.WINDOW)
+                addThing(doorx, doory, ModernDoor())
             }
         }
         if (Dice.chance(ruinTreasureChance)) {
@@ -851,9 +874,10 @@ class WorldCarto(
         swapTerrain(TEMP1, meta.biome.trailTerrain(x0,y0))
     }
 
-    private fun buildHut(x: Int, y: Int, width: Int, height: Int) {
+    fun buildHut(x: Int, y: Int, width: Int, height: Int) {
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
+        val dirtType =  meta.biome.trailTerrain(x0,y0)
         var doorDir = NORTH
         if (y < 28) doorDir = SOUTH
         if (x < 20) doorDir = EAST
@@ -868,18 +892,20 @@ class WorldCarto(
         } else {
             if (doorDir == SOUTH) y+height-2 else y+1
         }
-        val dirt =  meta.biome.trailTerrain(x0,y0)
         for (tx in x until x+width) {
             for (ty in y until y+height) {
                 if (tx == doorx && ty == doory) {
                     setTerrain(x0+tx, y0+ty, floorType)
                     if (Dice.chance(0.8f)) addThing(x0+tx, y0+ty, WoodDoor())
+                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
-                    setTerrain(x0 + tx, y0 + ty, dirt)
+                    setTerrain(x0 + tx, y0 + ty, dirtType)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
                     setTerrain(x0 + tx, y0 + ty, wallType)
+                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
                 } else {
                     setTerrain(x0+tx, y0+ty, floorType)
+                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
                 }
             }
         }

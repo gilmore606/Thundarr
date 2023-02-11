@@ -320,6 +320,12 @@ abstract class Carto(
         }
     }
 
+    fun setRoofed(x: Int, y: Int, roofed: Chunk.Roofed) {
+        if (boundsCheck(x, y)) {
+            chunk.setRoofed(x, y, roofed)
+        }
+    }
+
     // Cartos should always run this at the end to overlap floor tiles and occlude shadows.
     protected fun setOverlaps() {
         for (y in y0..y1) {

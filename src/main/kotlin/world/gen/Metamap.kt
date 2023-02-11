@@ -489,9 +489,12 @@ object Metamap {
                 scratches[city.x][city.y].biome = Ruins
                 if (n < numBigCities) {
                     DIRECTIONS.from(city.x, city.y) { dx, dy, _ ->
-                        if (Dice.chance(0.5f)) {
+                        if (Dice.chance(0.65f)) {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
+
+                            suggestedPlayerStart.x = xToChunkX(dx)
+                            suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -534,8 +537,8 @@ object Metamap {
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
-                        suggestedPlayerStart.x = xToChunkX(volcano.x)
-                        suggestedPlayerStart.y = yToChunkY(volcano.y)
+                        //suggestedPlayerStart.x = xToChunkX(volcano.x)
+                        //suggestedPlayerStart.y = yToChunkY(volcano.y)
                         eruptions++
                     }
                 }
