@@ -553,4 +553,5 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             doThis(tx, ty, dir)
         }
     }
+
 }

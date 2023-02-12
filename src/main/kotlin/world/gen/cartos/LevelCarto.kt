@@ -42,7 +42,7 @@ class LevelCarto(
                 carveRoom(room, nextRegion)
 
                 if (Dice.chance(0.6f)) {
-                    addThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.chance(0.7f)) FilingCabinet() else Fridge())
+                    spawnThing(Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1), if (Dice.chance(0.7f)) FilingCabinet() else Fridge())
                 }
                 if (Dice.chance(0.3f)) {
                     Ratthing().spawnAt(level, Dice.range(room.x0, room.x1), Dice.range(room.y0, room.y1))
@@ -183,7 +183,7 @@ class LevelCarto(
                         color.r = min(1f, max(0f, color.r * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
                         color.g = min(1f, max(0f, color.g * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
                         color.b = min(1f, max(0f, color.b * Dice.float(1f - colorVariance, 1f + colorVariance) * v))
-                        addThing(x, y, CeilingLight().withColor(color.r, color.g, color.b))
+                        spawnThing(x, y, CeilingLight().withColor(color.r, color.g, color.b))
                         count++
                     }
                 }

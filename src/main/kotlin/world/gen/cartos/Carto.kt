@@ -54,10 +54,11 @@ abstract class Carto(
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
     fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 
-    fun addThing(x: Int, y: Int, thing: Thing) {
+    fun spawnThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)
         dest?.reconnect(level, x, y)
         thing.moveTo(dest)
+        thing.onSpawn()
         if (thing is LitThing && thing.active) {
             thing.reproject()
         }

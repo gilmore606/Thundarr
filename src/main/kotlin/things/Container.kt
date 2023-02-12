@@ -50,7 +50,7 @@ sealed class Container : Portable(), ThingHolder {
     open fun randomTreasure(): Thing? = null
     open fun randomTreasureCount(): Int = 0
 
-    override fun onSpawn() {
+    override fun onCreate() {
         // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
         // Coroutine, because otherwise constructor hasn't finished and we don't have a contents.
         val treasures = randomTreasureCount()

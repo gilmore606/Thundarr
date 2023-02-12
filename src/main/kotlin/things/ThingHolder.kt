@@ -13,4 +13,5 @@ interface ThingHolder {
     fun add(thing: Thing)
     fun remove(thing: Thing)
 
+    fun temperature(): Float = xy()?.let { level?.temperatureAt(it) } ?: 65f
 }

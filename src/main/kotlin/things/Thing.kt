@@ -3,7 +3,6 @@ package things
 import actors.Actor
 import actors.actions.Action
 import audio.Speaker
-import com.badlogic.gdx.graphics.glutils.ETC1
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -59,10 +58,11 @@ sealed class Thing : Entity {
     init {
         if (!spawned) {
             spawned = true
-            onSpawn()
+            onCreate()
         }
     }
 
+    open fun onCreate() { }
     open fun onSpawn() { }
 
     open fun thingTag() = name()

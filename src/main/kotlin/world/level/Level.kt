@@ -546,4 +546,8 @@ sealed class Level {
         val actorsToSave = director.unloadActorsFromArea(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1)
         chunk.unload(actorsToSave, levelId)
     }
+
+    open fun temperatureAt(xy: XY): Float {
+        return 65f
+    }
 }

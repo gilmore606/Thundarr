@@ -41,6 +41,11 @@ fun plantSpawns() = listOf<PlantSpawn>(
         setOf(TemperateA, TemperateB),
         0.3f, 0.6f, 1f
     ),
+    PlantSpawn({ PearTree() },
+        setOf(Forest, ForestHill),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        0.3f, 0.5f, 1f
+    ),
     PlantSpawn({ PineTree() },
         setOf(Forest, ForestHill, Mountain, Hill),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB),

@@ -143,7 +143,7 @@ class WorldCarto(
                     if (usablePoints.isNotEmpty()) {
                         val lightPos = usablePoints.random()
                         val light = Glowstone().withColor(0.1f, 0.2f, 0.5f)
-                        addThing(lightPos.x, lightPos.y, light)
+                        spawnThing(lightPos.x, lightPos.y, light)
                     }
                 }
             }
@@ -210,7 +210,7 @@ class WorldCarto(
         forEachBiome { x,y,biome ->
             fertMap[x-x0][y-y0]?.also { fertility ->
                 getPlant(biome, meta.habitat, fertility, globalPlantDensity)?.also {
-                    addThing(x, y, it)
+                    spawnThing(x, y, it)
                 }
             }
         }
@@ -372,7 +372,7 @@ class WorldCarto(
                     val tx = Dice.range(x0, x1)
                     val ty = Dice.range(y0, y1)
                     if (Terrain.get(getTerrain(tx, ty)) is Highway) {
-                        addThing(tx, ty, WreckedCar())
+                        spawnThing(tx, ty, WreckedCar())
                         placed = true
                     }
                 }
@@ -436,7 +436,7 @@ class WorldCarto(
             setTerrain(doorx, doory, TERRAIN_STONEFLOOR)
             if (isIntact || Dice.chance(0.2f)) {
                 if (isIntact) chunk.setRoofed(doorx, doory, Chunk.Roofed.WINDOW)
-                addThing(doorx, doory, ModernDoor())
+                spawnThing(doorx, doory, ModernDoor())
             }
         }
         if (Dice.chance(ruinTreasureChance)) {
@@ -447,7 +447,7 @@ class WorldCarto(
                 val ty = Dice.range(y-2, y+2) + y0
                 if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
                     val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
-                    addThing(tx, ty, treasure)
+                    spawnThing(tx, ty, treasure)
                     placed = true
                 }
                 tries++
@@ -896,7 +896,7 @@ class WorldCarto(
             for (ty in y until y+height) {
                 if (tx == doorx && ty == doory) {
                     setTerrain(x0+tx, y0+ty, floorType)
-                    if (Dice.chance(0.8f)) addThing(x0+tx, y0+ty, WoodDoor())
+                    if (Dice.chance(0.8f)) spawnThing(x0+tx, y0+ty, WoodDoor())
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, dirtType)
@@ -912,7 +912,7 @@ class WorldCarto(
         if (Dice.chance(0.5f)) {
             val tablex = Dice.range(x+2,x+width-3)
             val tabley = Dice.range(y+2,y+height-3)
-            addThing(x0+tablex, y0+tabley, Table())
+            spawnThing(x0+tablex, y0+tabley, Table())
         }
     }
 

@@ -93,7 +93,7 @@ class Lightbulb : LitThing() {
     override fun name() = "lightbulb"
     override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
     override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
-    override fun onSpawn() { active = true }
+    override fun onCreate() { active = true }
 }
 
 @Serializable
@@ -129,7 +129,7 @@ class Glowstone : LitThing() {
     override fun name() = "glowstone"
     override fun description() = "A softly glowing quartz-like crystal formation."
     override fun isPortable() = false
-    override fun onSpawn() { active = true }
+    override fun onCreate() { active = true }
     override val lightColor = LightColor(0f, 0f, 0f)
     fun withColor(r: Float, g: Float, b: Float): Glowstone {
         lightColor.r = r
@@ -151,7 +151,7 @@ class Sunsword : LitThing() {
 
     override fun light() = if (active) lightColor else null
 
-    override fun onSpawn() { active = false }
+    override fun onCreate() { active = false }
 
     override fun uses() = mapOf(
         UseTag.SWITCH to Use("switch " + (if (active) "off" else "on"), 0.2f,
@@ -181,7 +181,7 @@ class Torch : LitThing(), Temporal {
 
     private val smokeChance = 1.1f
 
-    override fun onSpawn() { active = false }
+    override fun onCreate() { active = false }
 
     override fun light() = if (active) lightColor else null
 

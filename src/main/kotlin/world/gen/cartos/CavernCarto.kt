@@ -91,7 +91,7 @@ class CavernCarto(
             val y = Dice.zeroTil(height)
             if (isWalkableAt(chunk.x + x, chunk.y + y) && Terrain.get(getTerrain(x,y)) !is Water
                 && map.distanceAt(x,y) >= minDistance) {
-                addThing(chunk.x + x, chunk.y + y, thing)
+                spawnThing(chunk.x + x, chunk.y + y, thing)
                 return
             }
         }
@@ -103,7 +103,7 @@ class CavernCarto(
             var fert = Cavern.fertilityAt(x, y)
             if (neighborCount(x, y, TERRAIN_SHALLOW_WATER) > 0) fert *= 2f
             getPlant(Cavern, TemperateA, fert, globalPlantDensity)?.also {
-                addThing(x, y, it)
+                spawnThing(x, y, it)
             }
         }
     }
@@ -228,7 +228,7 @@ class CavernCarto(
             if (chunk.isWalkableAt(x,y) && getTerrain(x,y) != TERRAIN_SHALLOW_WATER && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
                 if (!chunk.thingsAt(x,y).hasOneWhere { it is LitThing }) {
                     if (chunk.lightAt(x,y).brightness() < 0.3f) {
-                        addThing(x, y, Glowstone().withColor(
+                        spawnThing(x, y, Glowstone().withColor(
                             color.r * Dice.float(0.7f, 1.3f),
                             color.g * Dice.float(0.7f, 1.3f),
                             color.b * Dice.float(0.7f, 1.3f)

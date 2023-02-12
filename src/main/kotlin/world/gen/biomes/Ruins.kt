@@ -122,7 +122,7 @@ object Ruins : Biome(
                 setTerrain(carto, doorx, doory, Terrain.Type.TERRAIN_STONEFLOOR)
                 carto.setRoofed(doorx + carto.x0, doory + carto.y0, Chunk.Roofed.WINDOW)
                 if (Dice.chance(0.7f)) {
-                    carto.addThing(doorx + carto.x0, doory + carto.y0, ModernDoor())
+                    carto.spawnThing(doorx + carto.x0, doory + carto.y0, ModernDoor())
                 }
             }
         }
@@ -135,7 +135,7 @@ object Ruins : Biome(
                 val ty = Dice.range(y0-1,y1+1) + carto.y0
                 if (carto.boundsCheck(tx,ty) && carto.isWalkableAt(tx,ty)) {
                     val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
-                    carto.addThing(tx, ty, treasure)
+                    carto.spawnThing(tx, ty, treasure)
                     placed = true
                 }
             }
@@ -150,7 +150,7 @@ object Ruins : Biome(
                 val ty = Dice.range(carto.y0, carto.y1)
                 val t = Terrain.get(carto.getTerrain(tx, ty))
                 if (t is HighwayH || t is HighwayV || t is Pavement) {
-                    carto.addThing(tx, ty, WreckedCar())
+                    carto.spawnThing(tx, ty, WreckedCar())
                     placed = true
                 }
             }

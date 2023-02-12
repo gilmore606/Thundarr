@@ -10,8 +10,6 @@ import things.*
 import util.*
 import world.*
 import world.level.Level
-import world.persist.LevelKeeper
-import world.terrains.PortalDoor
 import world.terrains.Terrain
 import kotlin.Exception
 import kotlin.random.Random
@@ -61,7 +59,7 @@ class AttractCarto(
                     val n = Perlin.noise(x * 0.04, y * 0.04, 0.01) +
                             Perlin.noise(x * 0.7, y * 0.4, 1.5) * 0.5
                     if (Dice.chance(n.toFloat() * 1.6f)) {
-                        addThing(x + this.x0, y + this.y0, if (Dice.flip()) OakTree() else PineTree())
+                        spawnThing(x + this.x0, y + this.y0, if (Dice.flip()) OakTree() else PineTree())
                         if (Dice.chance(0.2f)) {
                             var clear = true
                             CARDINALS.forEach { dir ->
@@ -73,7 +71,7 @@ class AttractCarto(
                                 val dir = CARDINALS.random()
                                 try {
 
-                                    addThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(4)) {
+                                    spawnThing(x + this.x0 + dir.x, y + this.y0 + dir.y, when (Random.nextInt(4)) {
                                         0 -> Apple()
                                         1 -> Axe()
                                         2 -> Pear()

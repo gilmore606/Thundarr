@@ -4,6 +4,7 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Thing
 import ui.panels.Console
 
 
