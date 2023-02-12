@@ -97,7 +97,8 @@ object Ruins : Biome(
                         if (ix == x0 || ix == x1 || iy == y0 || iy == y1 || filled || microwear > 0.6f) {
                             if (intact || Dice.chance(0.9f)) setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_BRICKWALL)
                         } else {
-                            setTerrain(carto, ix, iy, Terrain.Type.TERRAIN_STONEFLOOR)
+                            setTerrain(carto, ix, iy,
+                                if (microwear > 0.5f) Terrain.Type.TERRAIN_RUBBLE else Terrain.Type.TERRAIN_STONEFLOOR)
                         }
                         if (intact) {
                             carto.setRoofed(ix + carto.x0, iy + carto.y0, Chunk.Roofed.INDOOR)

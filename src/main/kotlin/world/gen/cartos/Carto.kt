@@ -51,6 +51,10 @@ abstract class Carto(
 
     fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x,y)
     fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
+    fun safeSetTerrain(x: Int, y: Int, type: Terrain.Type) {
+        if (boundsCheck(x, y)) setTerrain(x, y, type)
+    }
+
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
     fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
 

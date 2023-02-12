@@ -14,11 +14,7 @@ sealed class Plant : Scenery(), Temporal {
     override fun temporalDone() = !bearsFruit()
     override fun advanceTime(delta: Float) {
         if (bearsFruit() && App.gameTime.time > nextFruitTime) {
-            holder?.also {
-                if (it.temperature() >= fruitTemperatureMin()) {
-                    bearFruit()
-                }
-            }
+            bearFruit()
         }
     }
 
@@ -28,19 +24,19 @@ sealed class Plant : Scenery(), Temporal {
     open fun fruit(): Thing? = null
     open fun nextFruitTurns() = Dice.range(2000, 4000).toLong()
     open fun bearFruit() {
-        fruit()?.also { fruit ->
-            fruit.moveTo(holder)
+        holder?.also {
+            if (it.temperature() >= fruitTemperatureMin()) {
+                fruit()?.also { fruit ->
+                    fruit.moveTo(holder)
+                }
+                nextFruitTime = App.gameTime.time.toLong() + nextFruitTurns()
+            }
         }
-        nextFruitTime = App.gameTime.time.toLong() + nextFruitTurns()
     }
 
     override fun onSpawn() {
-        holder?.also {
-            if (bearsFruit() && it.temperature() >= fruitTemperatureMin()) {
-                if (Dice.chance(spawnFruitChance())) {
-                    bearFruit()
-                }
-            }
+        if (bearsFruit() && Dice.chance(spawnFruitChance())) {
+            bearFruit()
         }
     }
 }

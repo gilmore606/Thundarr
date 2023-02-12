@@ -842,12 +842,15 @@ class WorldCarto(
 
     private fun buildVillage() {
         printGrid(growBlob(63, 63), x0, y0, TEMP1)
-        forEachTerrain(TEMP1) { x,y ->
+        printGrid(growBlob(52, 52), x0+6, y0+6, TEMP2)
+        forEachTerrain(TEMP2) { x,y ->
             flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
         }
 
         val hutCount = Dice.range(8, 12)
         var built = 0
+        // TODO: set this to false and make buildVillageFeature do something
+        var featureBuilt = true
         while (built < hutCount) {
             val width = Dice.range(7, 11)
             val height = Dice.range(7, 11)
@@ -859,19 +862,28 @@ class WorldCarto(
                 var clearHere = true
                 for (tx in x until x+width) {
                     for (ty in y until y+height) {
-                        if (getTerrain(x0+tx,y0+ty) != TEMP1) clearHere = false
+                        if (getTerrain(x0+tx,y0+ty) !in listOf(TEMP1, TEMP2)) clearHere = false
                     }
                 }
                 if (clearHere) {
-                    buildHut(x, y, width, height)
+                    if (!featureBuilt) {
+                        buildVillageFeature(x, y, width, height)
+                        featureBuilt = true
+                    } else {
+                        buildHut(x, y, width, height)
+                    }
                     placed = true
                 }
                 tries++
             }
             built++
         }
+        swapTerrain(TEMP1, meta.biome.baseTerrain)
+        swapTerrain(TEMP2, meta.biome.trailTerrain(x0,y0))
+    }
 
-        swapTerrain(TEMP1, meta.biome.trailTerrain(x0,y0))
+    fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
+        printGrid(growBlob(width, height), x0 + x, y0 + y, TERRAIN_PAVEMENT)
     }
 
     fun buildHut(x: Int, y: Int, width: Int, height: Int) {
@@ -899,7 +911,7 @@ class WorldCarto(
                     if (Dice.chance(0.8f)) spawnThing(x0+tx, y0+ty, WoodDoor())
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
-                    setTerrain(x0 + tx, y0 + ty, dirtType)
+                    setTerrain(x0 + tx, y0 + ty, TEMP3)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
                     setTerrain(x0 + tx, y0 + ty, wallType)
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
@@ -909,6 +921,11 @@ class WorldCarto(
                 }
             }
         }
+        fuzzTerrain(TEMP3, 0.4f, wallType)
+        swapTerrain(TEMP3, meta.biome.baseTerrain)
+        safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
+        safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+
         if (Dice.chance(0.5f)) {
             val tablex = Dice.range(x+2,x+width-3)
             val tabley = Dice.range(y+2,y+height-3)
