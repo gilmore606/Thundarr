@@ -170,10 +170,11 @@ object Ruins : Biome(
                         else -> i + k
                     }
                     val t = carto.getTerrain(carto.x0 + x, carto.y0 + y)
-                    if (t == Terrain.Type.TERRAIN_SHALLOW_WATER || t == Terrain.Type.TERRAIN_DEEP_WATER || t == Terrain.Type.TERRAIN_BEACH) {
+                    if (t == Terrain.Type.TERRAIN_SHALLOW_WATER || t == Terrain.Type.TERRAIN_DEEP_WATER) {
                         setTerrain(carto, x, y, pierTerrain)
                     }
                     if (t == Terrain.Type.TERRAIN_BEACH && !beachDone) {
+                        setTerrain(carto, x, y, pierTerrain)
                         if (Dice.chance(0.5f)) beachDone = true
                     }
                 }
