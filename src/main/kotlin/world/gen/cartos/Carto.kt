@@ -10,6 +10,7 @@ import util.*
 import world.Building
 import world.Chunk
 import world.gen.NoisePatches
+import world.gen.PlantSpawn
 import world.gen.biomes.Biome
 import world.gen.habitats.Habitat
 import world.gen.plantSpawns
@@ -437,7 +438,9 @@ abstract class Carto(
     protected fun deepenWater() {
         val adds = mutableSetOf<XY>()
         forEachTerrain(Terrain.Type.GENERIC_WATER) { x,y ->
-            val shores = neighborCount(x,y) { it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK }
+            val shores = neighborCount(x,y) {
+                it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK
+            }
             if (Dice.chance(shores * 0.75f)) adds.add(XY(x,y))
         }
         adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
@@ -587,10 +590,12 @@ abstract class Carto(
         }
     }
 
-    protected fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float): Thing? {
+    protected fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float,
+                           fromSpawns: List<PlantSpawn> = plantSpawns
+    ): Thing? {
         val plantChance = biome.plantDensity() * globalPlantDensity * java.lang.Float.max(0.2f, fertility)
         if (Dice.chance(plantChance)) {
-            val plants = plantSpawns.filter {
+            val plants = fromSpawns.filter {
                 it.biomes.contains(biome) && it.habitats.contains(habitat) &&
                         fertility >= it.minFertility && fertility <= it.maxFertility
             }

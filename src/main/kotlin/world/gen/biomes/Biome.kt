@@ -3,6 +3,7 @@ package world.gen.biomes
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.panels.Console
 import util.Dice
 import util.Rect
 import world.gen.NoisePatches
@@ -32,12 +33,18 @@ sealed class Biome(
     open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
+    open fun postProcess(carto: WorldCarto) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
     open fun populateExtra(carto: WorldCarto) { }
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
         if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
             carto.setTerrain(x + carto.x0, y + carto.y0, type)
+        }
+    }
+    protected fun setFlag(carto: WorldCarto, x: Int, y: Int, flag: WorldCarto.CellFlag) {
+        if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
+            carto.setFlag(x + carto.x0, y + carto.y0, flag)
         }
     }
     protected fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {

@@ -10,6 +10,7 @@ import things.WreckedCar
 import util.*
 import world.Chunk
 import world.gen.NoisePatches
+import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.*
@@ -73,6 +74,10 @@ object Ruins : Biome(
                 }
             }
         }
+    }
+
+    override fun postProcess(carto: WorldCarto) {
+        carto.meta.coasts.forEach { carvePiers(carto, it) }
     }
 
     private fun carveRuin(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
@@ -139,6 +144,49 @@ object Ruins : Biome(
                     carto.spawnThing(tx, ty, treasure)
                     placed = true
                 }
+            }
+        }
+    }
+
+    private fun carvePiers(carto: WorldCarto, coastDir: XY) {
+        if (carto.meta.riverExits.hasOneWhere { it.edge == coastDir }) return
+        var i = 10
+        var clip = Dice.zeroTo(2)
+        var width = Dice.oneTo(2)
+        var spacing = Dice.oneTo(3)
+        var pierTerrain = listOf(Terrain.Type.TERRAIN_WOODFLOOR, Terrain.Type.TERRAIN_PAVEMENT).random()
+        while (i < CHUNK_SIZE - 10) {
+            var beachDone = false
+            for (j in clip..10) {
+                for (k in 0 until width) {
+                    val x = when (coastDir) {
+                        EAST -> CHUNK_SIZE - 1 - j
+                        WEST -> j
+                        else -> i + k
+                    }
+                    val y = when (coastDir) {
+                        NORTH -> j
+                        SOUTH -> CHUNK_SIZE - 1 - j
+                        else -> i + k
+                    }
+                    val t = carto.getTerrain(carto.x0 + x, carto.y0 + y)
+                    if (t == Terrain.Type.TERRAIN_SHALLOW_WATER || t == Terrain.Type.TERRAIN_DEEP_WATER || t == Terrain.Type.TERRAIN_BEACH) {
+                        setTerrain(carto, x, y, pierTerrain)
+                    }
+                    if (t == Terrain.Type.TERRAIN_BEACH && !beachDone) {
+                        if (Dice.chance(0.5f)) beachDone = true
+                    }
+                }
+            }
+            i += width + spacing
+            if (Dice.chance(0.1f)) return
+            if (Dice.chance(0.1f)) i += Dice.range(5, 30)
+            if (Dice.chance(0.3f)) {
+                width = Dice.oneTo(2)
+                clip = Dice.zeroTo(3)
+                spacing = Dice.oneTo(3)
+                pierTerrain = listOf(Terrain.Type.TERRAIN_WOODFLOOR, Terrain.Type.TERRAIN_PAVEMENT).random()
+                i += Dice.zeroTo(12)
             }
         }
     }

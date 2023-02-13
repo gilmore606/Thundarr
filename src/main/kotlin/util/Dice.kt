@@ -19,7 +19,7 @@ object Dice {
 
     fun oneTo(max: Int) = random.nextInt(max) + 1
 
-    fun range(min: Int, max: Int) = if (min == max) min else random.nextInt(max - min + 1) + min
+    fun range(min: Int, max: Int) = if (min == max) min else if (min > max) random.nextInt(min - max + 1) + max else random.nextInt(max - min + 1) + min
 
     fun skillCheck() = (random.nextInt(6) + random.nextInt(6) + random.nextInt(6) + 3).toFloat()
 

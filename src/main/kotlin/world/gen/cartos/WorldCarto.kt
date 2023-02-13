@@ -10,6 +10,7 @@ import world.gen.biomes.Beach
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
+import world.gen.villagePlantSpawns
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.terrains.Highway
@@ -54,6 +55,8 @@ class WorldCarto(
     private val riverIslandPoints = ArrayList<XY>()
     private val cavePortalPoints = ArrayList<XY>()
 
+    val villagePlantSpawns = villagePlantSpawns()
+
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
         meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
@@ -96,11 +99,16 @@ class WorldCarto(
             pruneTrees()
             buildBridges()
             setRoofedInRock()
+            meta.biome.postProcess(this)
             setGeneratedBiomes()
             setOverlaps()
         }
 
         //debugBorders()
+    }
+
+    fun setFlag(x: Int, y: Int, flag: CellFlag) {
+        flagsMap[x-x0][y-y0].add(flag)
     }
 
     private fun pruneTrees() {
@@ -849,8 +857,7 @@ class WorldCarto(
 
         val hutCount = Dice.range(8, 12)
         var built = 0
-        // TODO: set this to false and make buildVillageFeature do something
-        var featureBuilt = true
+        var featureBuilt = false
         while (built < hutCount) {
             val width = Dice.range(7, 11)
             val height = Dice.range(7, 11)
@@ -883,7 +890,24 @@ class WorldCarto(
     }
 
     fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
-        printGrid(growBlob(width, height), x0 + x, y0 + y, TERRAIN_PAVEMENT)
+        buildGarden(x + 1, y + 1, width - 2, height - 2)
+    }
+
+    fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
+        val inVertRows = Dice.flip()
+        val gardenDensity = Dice.float(0.2f, 0.8f)
+        for (tx in x0 + x..x0 + x + width - 1) {
+            for (ty in y0 + y .. y0 + y + height - 1) {
+                flagsMap[tx-x0][ty-y0].add(CellFlag.NO_PLANTS)
+                if (inVertRows && (tx % 2 == 0) || !inVertRows && (ty % 2 == 0)) {
+                    setTerrain(tx, ty, TERRAIN_GRASS)
+                    getPlant(meta.biome, meta.habitat, 1f,
+                        gardenDensity, villagePlantSpawns)?.also { plant ->
+                        spawnThing(tx, ty, plant)
+                    }
+                }
+            }
+        }
     }
 
     fun buildHut(x: Int, y: Int, width: Int, height: Int) {
@@ -921,10 +945,19 @@ class WorldCarto(
                 }
             }
         }
+        safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
+        val plantDensity = Dice.float(0.2f, 0.7f)
+        forEachTerrain(TEMP3) { x,y ->
+            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
+            getPlant(meta.biome, meta.habitat, 0.5f,
+                plantDensity, villagePlantSpawns)?.also { plant ->
+                spawnThing(x, y, plant)
+            }
+        }
         fuzzTerrain(TEMP3, 0.4f, wallType)
-        swapTerrain(TEMP3, meta.biome.baseTerrain)
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
         safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+        swapTerrain(TEMP3, meta.biome.baseTerrain)
 
         if (Dice.chance(0.5f)) {
             val tablex = Dice.range(x+2,x+width-3)

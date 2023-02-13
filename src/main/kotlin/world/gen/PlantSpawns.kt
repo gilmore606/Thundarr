@@ -182,3 +182,61 @@ fun plantSpawns() = listOf<PlantSpawn>(
         0.05f, 0f, 0.2f
     )
 )
+
+fun villagePlantSpawns() = listOf<PlantSpawn>(
+    PlantSpawn({ Wildflowers() },
+    setOf(Forest, ForestHill, Swamp, Desert, Plain, Scrub, Mountain, Hill),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        2f, 0f, 1f
+    ),
+    PlantSpawn({ Poppies() },
+        setOf(Plain),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        2f,  0f, 1f
+    ),
+    PlantSpawn({ Deathflower() },
+        setOf(Desert, Scrub),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        0.1f,  0f, 1f
+    ),
+    PlantSpawn({ Dreamflower() },
+        setOf(Desert, Scrub),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        0.1f,  0f, 1f
+    ),
+    PlantSpawn({ Sunflower() },
+        setOf(Plain, Scrub),
+        setOf(TemperateA, TropicalA),
+        0.2f,  0f, 1f
+    ),
+    PlantSpawn({ Lightflower() },
+        setOf(Desert, Scrub),
+        setOf(TemperateB, TropicalA, TropicalB),
+        0.2f,  0f, 1f
+    ),
+    PlantSpawn({ BerryBush() },
+        setOf(Plain, Forest, Swamp),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        1f,  0f, 1f
+    ),
+    PlantSpawn({ HoneypodBush() },
+        setOf(Hill, ForestHill),
+        setOf(TemperateA, TemperateB, TropicalA, TropicalB),
+        1f,  0f, 1f
+    ),
+    PlantSpawn({ Cholla() },
+        setOf(Desert, Scrub),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        1f,  0f, 1f
+    ),
+    PlantSpawn({ Prickpear() },
+        setOf(Desert),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        0.3f,  0f, 1f
+    ),
+    PlantSpawn({ Boulder() },
+        setOf(Desert, Cavern, Mountain),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        0.5f,  0f, 1f
+    ),
+)

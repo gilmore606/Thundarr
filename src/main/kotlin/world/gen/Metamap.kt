@@ -493,8 +493,8 @@ object Metamap {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
 
-                            //suggestedPlayerStart.x = xToChunkX(dx)
-                            //suggestedPlayerStart.y = yToChunkY(dy)
+                            suggestedPlayerStart.x = xToChunkX(dx)
+                            suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -754,8 +754,8 @@ object Metamap {
                                     scratches[x][y].title = Madlib.villageName()
                                     scratches[x][y].ruinedBuildings = 0
 
-                                    suggestedPlayerStart.x = xToChunkX(x)
-                                    suggestedPlayerStart.y = yToChunkY(y)
+                                    //suggestedPlayerStart.x = xToChunkX(x)
+                                    //suggestedPlayerStart.y = yToChunkY(y)
                                 }
                             }
                         }
