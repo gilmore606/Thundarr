@@ -142,4 +142,5 @@ fun ThingTileSet() =
             add(0.5f, 10, 4)
             add(0.5f, 10, 5)
         })
+        setTile(Glyph.WELL, SimpleTile(this, 10, 6))
     }

@@ -13,6 +13,7 @@ import world.gen.biomes.Ocean
 import world.gen.villagePlantSpawns
 import world.level.CHUNK_SIZE
 import world.level.Level
+import world.path.DistanceMap
 import world.terrains.Highway
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
@@ -885,8 +886,25 @@ class WorldCarto(
             }
             built++
         }
+        placeVillageWell()
         swapTerrain(TEMP1, meta.biome.baseTerrain)
         swapTerrain(TEMP2, meta.biome.trailTerrain(x0,y0))
+    }
+
+    private fun placeVillageWell() {
+        fun placeWell(x: Int, y: Int) {
+            spawnThing(x, y, Well())
+        }
+        val distanceMap = DistanceMap(chunk) { x,y ->
+            getTerrain(x,y) != Terrain.Type.TEMP2
+        }
+        var placed = false
+        forEachCell { x, y ->
+            if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {
+                placeWell(x, y)
+                placed = true
+            }
+        }
     }
 
     fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {

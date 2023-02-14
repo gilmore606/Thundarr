@@ -184,6 +184,7 @@ enum class Glyph {
     BONEPILE,
     BOULDER,
     WRECKED_CAR,
+    WELL,
 
     BLOODSTAIN,
     SCORCHMARK,

@@ -70,7 +70,7 @@ class CavernCarto(
         setOverlaps()
 
         val doorPos = addWorldPortal(building, worldDest, TERRAIN_PORTAL_CAVE, "You feel a breeze from the tunnel mouth.\nReturn to the surface?")
-        distanceMap = DistanceMap(doorPos, chunk)
+        distanceMap = DistanceMap(chunk) { x,y -> x == doorPos.x && y == doorPos.y }
         placeTreasure()
 
         addLights()
@@ -90,7 +90,7 @@ class CavernCarto(
             val x = Dice.zeroTil(width)
             val y = Dice.zeroTil(height)
             if (isWalkableAt(chunk.x + x, chunk.y + y) && Terrain.get(getTerrain(x,y)) !is Water
-                && map.distanceAt(x,y) >= minDistance) {
+                && map.distanceAt(chunk.x + x,chunk.y + y) >= minDistance) {
                 spawnThing(chunk.x + x, chunk.y + y, thing)
                 return
             }

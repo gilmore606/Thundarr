@@ -216,6 +216,7 @@ class Chunk(
     }
 
     private inline fun boundsCheck(x: Int, y: Int) = !(x < this.x || y < this.y || x > this.x1 || y > this.y1)
+    fun inBounds(x: Int, y: Int) = boundsCheck(x, y)
 
     fun onAddThing(x: Int, y: Int, thing: Thing) {
         updateOpaque(x - this.x, y - this.y)

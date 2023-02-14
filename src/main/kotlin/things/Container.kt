@@ -175,6 +175,7 @@ class WreckedCar : Container() {
     override fun description() = "The hulk of a rusty metal wagon."
     override fun glyph() = Glyph.WRECKED_CAR
     override fun isPortable() = false
+    override fun isBlocking() = true
     override fun openVerb() = "search"
     override fun isEmptyMsg() = "You find nothing useful in the vehicle."
 
