@@ -19,8 +19,9 @@ import world.level.Level
 sealed class Wall(
     type: Type,
     glyph: Glyph,
-    val damageToBreak: Float = 1f
-) : Terrain(type, glyph, false, false, true, false, dataType = Type.GENERIC_WALL) {
+    val damageToBreak: Float = 1f,
+    val overrideOpaque: Boolean = true,
+) : Terrain(type, glyph, false, false, overrideOpaque, false, dataType = Type.GENERIC_WALL) {
 
     @Serializable class Data(
         var damage: Float = 0f
@@ -93,6 +94,12 @@ object WoodWall : Wall(Type.TERRAIN_WOODWALL, Glyph.WOOD_WALL, 2f) {
     override fun bumpMsg() = "You bump into a wooden wall."
     override fun digResult() = Log()
     override fun digToFloorTerrain() = Type.TERRAIN_DIRT
+}
+
+object WindowWall : Wall(Type.TERRAIN_WINDOWWALL, Glyph.WINDOW, 1f, overrideOpaque = false) {
+    override fun name() = "window"
+    override fun bumpMsg() = "You can't fit through the window."
+    override fun isDiggable() = false
 }
 
 sealed class ForestWall(

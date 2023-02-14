@@ -395,11 +395,17 @@ abstract class Carto(
         }
     }
 
-    protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type? = null) {
+    protected fun fuzzTerrain(type: Terrain.Type, density: Float) {
+        fuzzTerrain(type, density, listOf(null))
+    }
+    protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type?) {
+        fuzzTerrain(type, density, listOf(exclude))
+    }
+    protected fun fuzzTerrain(type: Terrain.Type, density: Float, excludeList: List<Terrain.Type?>?) {
         val adds = ArrayList<XY>()
         forEachTerrain(type) { x, y ->
             neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
-                if (terrain != type && (exclude == null || terrain != exclude)) {
+                if (terrain != type && (excludeList == null || !excludeList.contains(terrain))) {
                     if (Dice.chance(density)) adds.add(XY(nx,ny))
                 }
             }

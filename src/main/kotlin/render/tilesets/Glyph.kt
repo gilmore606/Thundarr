@@ -32,6 +32,7 @@ enum class Glyph {
     WOOD_FLOOR,
     RUBBLE,
     WOOD_WALL,
+    WINDOW,
 
     WALL_DAMAGE,
     CURSOR,

@@ -895,7 +895,7 @@ class WorldCarto(
 
     fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
         val inVertRows = Dice.flip()
-        val gardenDensity = Dice.float(0.2f, 0.8f)
+        val gardenDensity = Dice.float(0.2f, 0.8f) * 5f
         for (tx in x0 + x..x0 + x + width - 1) {
             for (ty in y0 + y .. y0 + y + height - 1) {
                 flagsMap[tx-x0][ty-y0].add(CellFlag.NO_PLANTS)
@@ -928,17 +928,25 @@ class WorldCarto(
         } else {
             if (doorDir == SOUTH) y+height-2 else y+1
         }
+        var windowBlockerCount = Dice.range(3, 8)
         for (tx in x until x+width) {
             for (ty in y until y+height) {
                 if (tx == doorx && ty == doory) {
                     setTerrain(x0+tx, y0+ty, floorType)
-                    if (Dice.chance(0.8f)) spawnThing(x0+tx, y0+ty, WoodDoor())
+                    spawnThing(x0+tx, y0+ty, WoodDoor())
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, TEMP3)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    setTerrain(x0 + tx, y0 + ty, wallType)
-                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
+                    if (windowBlockerCount < 1 && ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
+                        setTerrain(x0 + tx, y0 + ty, TERRAIN_WINDOWWALL)
+                        chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
+                        windowBlockerCount = Dice.range(4, 12)
+                    } else {
+                        setTerrain(x0 + tx, y0 + ty, wallType)
+                        chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
+                        windowBlockerCount--
+                    }
                 } else {
                     setTerrain(x0+tx, y0+ty, floorType)
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
@@ -946,15 +954,15 @@ class WorldCarto(
             }
         }
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-        val plantDensity = Dice.float(0.2f, 0.7f)
+        val plantDensity = Dice.float(0.3f, 0.9f) * 3f
         forEachTerrain(TEMP3) { x,y ->
-            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
             getPlant(meta.biome, meta.habitat, 0.5f,
                 plantDensity, villagePlantSpawns)?.also { plant ->
                 spawnThing(x, y, plant)
             }
+            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
         }
-        fuzzTerrain(TEMP3, 0.4f, wallType)
+        fuzzTerrain(TEMP3, 0.4f, listOf(wallType, TERRAIN_WINDOWWALL))
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
         safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
         swapTerrain(TEMP3, meta.biome.baseTerrain)
