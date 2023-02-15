@@ -1,6 +1,8 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
+import things.Shrine
+import things.Thing
 import things.Well
 import util.Dice
 import world.gen.cartos.WorldCarto
@@ -19,10 +21,11 @@ class Village(
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
         printGrid(growBlob(52, 52), x0+6, y0+6, Terrain.Type.TEMP2)
         forEachTerrain(Terrain.Type.TEMP2) { x, y ->
-            carto.flagsMap[x-x0][y-y0].add(WorldCarto.CellFlag.NO_PLANTS)
+            flagsAt(x,y).add(WorldCarto.CellFlag.NO_PLANTS)
         }
 
-        val hutCount = Dice.range(8, 12)
+        val fertility = Dice.float(0.0f, 1.0f)
+        val hutCount = Dice.range(6, 12)
         var built = 0
         var featureBuilt = !Dice.chance(0.8f)
         while (built < hutCount) {
@@ -44,7 +47,7 @@ class Village(
                         buildVillageFeature(x, y, width, height)
                         featureBuilt = true
                     } else {
-                        buildHut(x, y, width, height)
+                        buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f))
                     }
                     placed = true
                 }
@@ -52,14 +55,18 @@ class Village(
             }
             built++
         }
-        if (Dice.chance(0.8f)) placeVillageWell()
+        if (Dice.chance(0.7f)) {
+            placeInMostPublic(
+                if (Dice.chance(0.7f)) Well() else Shrine()
+            )
+        }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
         swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
     }
 
-    private fun placeVillageWell() {
+    private fun placeInMostPublic(thing: Thing) {
         fun placeWell(x: Int, y: Int) {
-            spawnThing(x, y, Well())
+            spawnThing(x, y, thing)
         }
         val distanceMap = DistanceMap(chunk) { x,y ->
             getTerrain(x,y) != Terrain.Type.TEMP2
@@ -74,23 +81,37 @@ class Village(
     }
 
     private fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
-        buildGarden(x + 1, y + 1, width - 2, height - 2)
+        when (Dice.oneTo(3)) {
+            1,2 -> buildGarden(x + 1, y + 1, width - 2, height - 2)
+            3 -> buildStage(x + 1, y + 1, width - 2, height - 2)
+        }
+
     }
 
     private fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
+        val isWild = Dice.chance(0.4f)
         val inVertRows = Dice.flip()
         val gardenDensity = Dice.float(0.2f, 0.8f) * 3f
         val villagePlantSpawns = villagePlantSpawns()
-        for (tx in x0 + x..x0 + x + width - 1) {
-            for (ty in y0 + y .. y0 + y + height - 1) {
-                carto.flagsMap[tx-x0][ty-y0].add(WorldCarto.CellFlag.NO_PLANTS)
-                if (inVertRows && (tx % 2 == 0) || !inVertRows && (ty % 2 == 0)) {
+        for (tx in x0 + x until x0 + x + width) {
+            for (ty in y0 + y until y0 + y + height) {
+                flagsAt(tx,ty).add(WorldCarto.CellFlag.NO_PLANTS)
+                if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isWild) {
                     setTerrain(tx, ty, Terrain.Type.TERRAIN_GRASS)
                     carto.getPlant(meta.biome, meta.habitat, 1f,
                         gardenDensity, villagePlantSpawns)?.also { plant ->
                         spawnThing(tx, ty, plant)
                     }
                 }
+            }
+        }
+    }
+
+    private fun buildStage(x: Int, y: Int, width: Int, height: Int) {
+        val terrain = listOf(Terrain.Type.TERRAIN_WOODFLOOR, Terrain.Type.TERRAIN_STONEFLOOR).random()
+        for (tx in x0 + x until x0 + x + width) {
+            for (ty in y0 + y until y0 + y + height) {
+                setTerrain(tx, ty, terrain)
             }
         }
     }

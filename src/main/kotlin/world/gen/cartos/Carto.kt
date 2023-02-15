@@ -579,7 +579,7 @@ abstract class Carto(
         carveRoom(Rect(x0, y0, x0, y1), 0, Terrain.Type.TERRAIN_STONEFLOOR)
     }
 
-    protected fun connectBuilding(building: Building) {
+    fun connectBuilding(building: Building) {
         log.info("Connecting new building $building")
         LevelKeeper.makeBuilding(building)
         chunk.exits.add(Chunk.ExitRecord(

@@ -8,6 +8,7 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
+import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.villagePlantSpawns
 import world.terrains.Terrain
@@ -76,6 +77,12 @@ sealed class ChunkFeature(
     protected fun forEachTerrain(type: Terrain.Type, doThis: (x: Int, y: Int)->Unit) {
         carto.forEachTerrain(type, doThis)
     }
+    protected fun forEachBiome(doThis: (x: Int, y: Int, biome: Biome)->Unit) {
+        carto.forEachBiome(doThis)
+    }
+    protected fun neighborCount(x: Int, y: Int, type: Terrain.Type) = carto.neighborCount(x, y, type)
+    protected fun neighborCount(x: Int, y: Int, match: (Terrain.Type)->Boolean) = carto.neighborCount(x, y, match)
+    protected fun neighborCount(x: Int, y: Int, dirs: List<XY>, match: (x: Int, y: Int)->Boolean) = carto.neighborCount(x, y, dirs, match)
     protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x, y)
@@ -84,6 +91,9 @@ sealed class ChunkFeature(
     protected fun spawnThing(x: Int, y: Int, thing: Thing) {
         carto.spawnThing(x, y, thing)
     }
+    protected fun biomeAt(x: Int, y: Int) = carto.biomeAt(x, y)
+
+    protected fun flagsAt(x: Int, y: Int) = carto.flagsMap[x - x0][y - y0]
 
     protected fun carveTrailChunk(room: Rect,
                                   type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
@@ -92,13 +102,14 @@ sealed class ChunkFeature(
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (!carto.flagsMap[x-x0][y-y0].contains(WorldCarto.CellFlag.OCEAN) && !carto.flagsMap[x-x0][y-y0].contains(
-                                WorldCarto.CellFlag.BEACH)) {
+                        if (!flagsAt(x,y).contains(WorldCarto.CellFlag.OCEAN) && !flagsAt(x,y).contains(WorldCarto.CellFlag.BEACH)) {
                             if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
                                 setTerrain(x, y, type)
-                                carto.flagsMap[x - x0][y - y0].add(WorldCarto.CellFlag.TRAIL)
-                                carto.flagsMap[x - x0][y - y0].add(WorldCarto.CellFlag.NO_PLANTS)
-                                carto.flagsMap[x - x0][y - y0].add(WorldCarto.CellFlag.NO_BUILDINGS)
+                                flagsAt(x,y).apply {
+                                    add(WorldCarto.CellFlag.TRAIL)
+                                    add(WorldCarto.CellFlag.NO_PLANTS)
+                                    add(WorldCarto.CellFlag.NO_BUILDINGS)
+                                }
                             }
                         }
                     }
@@ -107,7 +118,7 @@ sealed class ChunkFeature(
         }
     }
 
-    protected fun buildHut(x: Int, y: Int, width: Int, height: Int) {
+    protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float) {
         val villagePlantSpawns = villagePlantSpawns()
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
@@ -152,14 +163,14 @@ sealed class ChunkFeature(
             }
         }
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-        val plantDensity = Dice.float(0.3f, 0.9f) * 2f
+        val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->
             carto.getPlant(meta.biome, meta.habitat, 0.5f,
                 plantDensity, villagePlantSpawns
             )?.also { plant ->
                 spawnThing(x, y, plant)
             }
-            carto.flagsMap[x-x0][y-y0].add(WorldCarto.CellFlag.NO_PLANTS)
+            flagsAt(x,y).add(WorldCarto.CellFlag.NO_PLANTS)
         }
         fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)

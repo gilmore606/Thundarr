@@ -13,7 +13,6 @@ import world.gen.biomes.Blank
 import world.gen.features.*
 import world.gen.habitats.*
 import world.level.CHUNK_SIZE
-import world.persist.SaveSlot
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
@@ -362,7 +361,7 @@ object Metamap {
             // Calculate moisture
             Console.sayFromThread("Moisturizing biomes...")
             forEachMeta { x,y,cell ->
-                if (cell.height == 0 || cell.riverExits.isNotEmpty()) {
+                if (cell.height == 0 || cell.hasFeature(Rivers::class)) {
                     cell.dryness = 0
                 }
             }
@@ -411,7 +410,7 @@ object Metamap {
             val desertSites = ArrayList<XY>()
             forEachMeta { x,y,cell ->
                 if (cell.dryness > (maxDry * 0.6f)) desertSites.add(XY(x,y))
-                if (cell.height > 1 && cell.biome == Blank && cell.riverExits.isEmpty() && cell.dryness >= (maxDry * 0.1f)) {
+                if (cell.height > 1 && cell.biome == Blank && !cell.hasFeature(Rivers::class) && cell.dryness >= (maxDry * 0.1f)) {
                     val mountains = biomeNeighbors(x,y,Mountain)
                     if (mountains > 1) {
                         val deserts = biomeNeighbors(x,y,Desert)
@@ -435,7 +434,7 @@ object Metamap {
             // Seed and grow swamps
             forEachMeta { x,y,cell ->
                 if (y > 50 && cell.height > 0 && cell.height < 13 && cell.biome == Blank) {
-                    var chance = cell.riverExits.size * 0.015f +
+                    var chance = cell.rivers().size * 0.015f +
                             (if (cell.dryness < 7) 0.005f else 0f)
                     chance *= 1f + (y * 0.0004f)
                     if (Dice.chance(chance)) {
@@ -608,7 +607,7 @@ object Metamap {
                         if (biomeNeighbors(x,y,Desert, false) == 4) cell.biome = Desert
                     }
                     Desert -> {
-                        if (cell.riverExits.isNotEmpty()) cell.biome = if (Dice.flip()) Plain else Scrub
+                        if (cell.hasFeature(Rivers::class)) cell.biome = if (Dice.flip()) Plain else Scrub
                     }
                     else -> { }
                 }
@@ -616,30 +615,34 @@ object Metamap {
 
             // Post-processing
             forEachMeta { x,y,cell ->
-                if (cell.riverExits.isNotEmpty()) {
-                    cell.riverBlur = 0.3f
-                }
+                // Vari-blur rivers
+                cell.featureOf(Rivers::class)?.also { (it as Rivers).riverBlur = NoisePatches.get("metaVariance", x, y).toFloat() }
+
                 // Set coasts
                 if (cell.height > 0) {
+                    val coasts = mutableListOf<XY>()
                     DIRECTIONS.from(x, y) { dx, dy, dir ->
                         metaAt(dx, dy)?.also { neighbor ->
                             if (neighbor.height == 0) {
-                                cell.coasts.add(dir)
+                                coasts.add(dir)
                             }
                         }
                     }
                     val adds = ArrayList<XY>()
-                    cell.coasts.forEach { when (it) {
+                    coasts.forEach { when (it) {
                         NORTH -> { adds.add(NORTHWEST) ; adds.add(NORTHEAST) }
                         SOUTH -> { adds.add(SOUTHWEST) ; adds.add(SOUTHEAST) }
                         WEST -> { adds.add(NORTHWEST) ; adds.add(SOUTHWEST) }
                         EAST -> { adds.add(NORTHEAST) ; adds.add(SOUTHEAST) }
                     } }
-                    adds.forEach { if (!cell.coasts.contains(it)) cell.coasts.add(it) }
+                    adds.forEach { if (!coasts.contains(it)) coasts.add(it) }
+                    if (coasts.isNotEmpty()) {
+                        cell.features.add(Coastlines(coasts))
+                    }
                 }
                 // Add lake
                 if (cell.biome.canHaveLake()) {
-                    if (Dice.chance(when (cell.riverExits.size) {
+                    if (Dice.chance(when (cell.rivers().size) {
                         0 -> 0.02f
                         1 -> 0.3f
                         2 -> 0.06f
@@ -651,7 +654,7 @@ object Metamap {
 
                 // Add ruined buildings around cities
                 cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
-                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.roadExits.size * 0.1f
+                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.highways().size * 0.1f
                 val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
                 var buildingCount = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
                 if (cell.cityDistance <= 2f) buildingCount += 2
@@ -718,17 +721,17 @@ object Metamap {
                 }
             }
 
-            // Run roads
+            // Run highways
             cityCells.forEach { city ->
                 cityCells.forEach { ocity ->
-                    if (ocity != city) connectCityToRoads(city, ocity)
+                    if (ocity != city) connectCityToHighways(city, ocity)
                 }
             }
             forEachMeta { x,y,cell ->
                 if (cell.biome == Suburb) {
                     CARDINALS.forEach { dir ->
-                        if (Dice.chance(0.9f) && !scratches[x][y].roadExits.hasOneWhere { it.edge == dir }) {
-                            scratches[x][y].roadExits.add(RoadExit(edge = dir))
+                        if (Dice.chance(0.9f) && !scratches[x][y].highways().hasOneWhere { it.edge == dir }) {
+                            scratches[x][y].addHighwayExit(Highways.HighwayExit(edge = dir))
                         }
                     }
                 }
@@ -748,7 +751,7 @@ object Metamap {
                     val meta = scratches[x][y]
                     if (!(meta.biome in listOf(Ocean, Glacier))) {
                         if (!meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class) && !meta.hasFeature(Lake::class)) {
-                            if (meta.riverExits.isEmpty() && meta.coasts.isEmpty() && meta.roadExits.isEmpty()) {
+                            if (!meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class) && !meta.hasFeature(Highways::class)) {
                                 if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
                                     placedOne = true
                                     actuallyPlaced++
@@ -770,10 +773,13 @@ object Metamap {
             }
             Console.sayFromThread("Founded $actuallyPlaced villages.")
 
-            // Place forest cabins
+            // Place cabins and caves
             forEachMeta { x,y,cell ->
                 if (Dice.chance(cell.biome.cabinChance())) {
                     cell.features.add(Cabin())
+                }
+                if (Dice.chance(cell.biome.cavesChance())) {
+                    cell.features.add(Caves())
                 }
             }
 
@@ -911,22 +917,28 @@ object Metamap {
                     val width = min(1 + (childCell.riverDescendantCount * riverWidth).toInt(), maxRiverWidth)
                     val edgeDir = XY(child.x - cursor.x, child.y - cursor.y)
                     val edgePos = randomChunkEdgePos(edgeDir, wiggle)
-                    val myExit = RiverExit(
+                    val myExit = Rivers.RiverExit(
                         pos = edgePos,
                         edge = edgeDir,
-                        control = edgePos + (edgeDir * -1 * Dice.range(4,20) + (edgeDir.rotated() * Dice.range(-12,12))),
+                        control = edgePos + (edgeDir * -1 * Dice.range(4, 20) + (edgeDir.rotated() * Dice.range(
+                            -12,
+                            12
+                        ))),
                         width = width
                     )
                     val childEdgePos = flipChunkEdgePos(edgePos)
                     val childEdgeDir = XY(cursor.x - child.x, cursor.y - child.y)
-                    val childExit = RiverExit(
+                    val childExit = Rivers.RiverExit(
                         pos = childEdgePos,
                         edge = childEdgeDir,
-                        control = childEdgePos + (edgeDir * Dice.range(4,20)) + (edgeDir.rotated() * Dice.range(-12,12)),
+                        control = childEdgePos + (edgeDir * Dice.range(4, 20)) + (edgeDir.rotated() * Dice.range(
+                            -12,
+                            12
+                        )),
                         width = width
                     )
-                    cell.riverExits.add(myExit)
-                    childCell.riverExits.add(childExit)
+                    cell.addRiverExit(myExit)
+                    childCell.addRiverExit(childExit)
                     runRiver(child, wiggle)
                 }
             }
@@ -942,7 +954,7 @@ object Metamap {
         while (!done) {
             val next = XY(cursor.x + dir.x, cursor.y + dir.y)
             if (scratches[next.x][next.y].height < 1) done = true
-            if (scratches[next.x][next.y].riverExits.isNotEmpty()) done = true
+            if (scratches[next.x][next.y].hasFeature(Rivers::class)) done = true
             if (scratches[next.x][next.y].hasFeature(LavaFlows::class)) done = true
             if (!done) {
                 val edgePos = randomChunkEdgePos(dir, 0.8f)
@@ -986,22 +998,28 @@ object Metamap {
                 val cell = scratches[cursor.x][cursor.y]
                 val childCell = scratches[cursor.x + direction.x][cursor.y + direction.y]
                 val edgePos = randomChunkEdgePos(direction, 0.8f)
-                val myExit = TrailExit(
+                val myExit = Trails.TrailExit(
                     pos = edgePos,
                     edge = direction,
-                    control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
+                    control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(
+                        -12,
+                        12
+                    )))
                 )
                 val childEdgePos = flipChunkEdgePos(edgePos)
                 val childDirection = XY(-direction.x, -direction.y)
-                val childExit = TrailExit(
+                val childExit = Trails.TrailExit(
                     pos = childEdgePos,
                     edge = childDirection,
-                    control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
+                    control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(
+                        -12,
+                        12
+                    )))
                 )
-                cell.trailExits.add(myExit)
-                childCell.trailExits.add(childExit)
+                cell.addTrailExit(myExit)
+                childCell.addTrailExit(childExit)
                 if (childCell.height < 1 || Dice.chance(0.05f)) done = true
-                if (childCell.trailExits.size > 1) done = true
+                if (childCell.hasFeature(Trails::class)) done = true
                 if (childCell.biome.trailChance() <= 0f) done = true
                 cursor.x += direction.x
                 cursor.y += direction.y
@@ -1031,7 +1049,7 @@ object Metamap {
         }
     }
 
-    private fun connectCityToRoads(city: XY, targetCity: XY) {
+    private fun connectCityToHighways(city: XY, targetCity: XY) {
         val cursor = XY(city.x, city.y)
         val targets = ArrayList<XY>().apply {
             addAll(cityCells)
@@ -1108,7 +1126,7 @@ object Metamap {
         while (!done) {
             if (Dice.chance(0.05f)) done = true
             val next = XY(cursor.x + currentDir.x, cursor.y + currentDir.y)
-            if (scratches[next.x][next.y].roadExits.isNotEmpty()) done = true
+            if (scratches[next.x][next.y].hasFeature(Highways::class)) done = true
             else if (scratches[next.x][next.y].height < 1) done = true
             else if (scratches[next.x][next.y].biome == Mountain) {
                 if (Dice.chance(0.2f)) done = true
@@ -1132,11 +1150,11 @@ object Metamap {
         if (scratches[dest.x][dest.y].height < 1) return
         val sourceEdge = XY(dest.x - source.x, dest.y - source.y)
         val destEdge = XY(source.x - dest.x, source.y - dest.y)
-        if (!scratches[source.x][source.y].roadExits.hasOneWhere { it.edge == sourceEdge }) {
-            scratches[source.x][source.y].roadExits.add(RoadExit(edge = sourceEdge))
+        if (!scratches[source.x][source.y].highways().hasOneWhere { it.edge == sourceEdge }) {
+            scratches[source.x][source.y].addHighwayExit(Highways.HighwayExit(edge = sourceEdge))
         }
-        if (!scratches[dest.x][dest.y].roadExits.hasOneWhere { it.edge == destEdge }) {
-            scratches[dest.x][dest.y].roadExits.add(RoadExit(edge = destEdge))
+        if (!scratches[dest.x][dest.y].highways().hasOneWhere { it.edge == destEdge }) {
+            scratches[dest.x][dest.y].addHighwayExit(Highways.HighwayExit(edge = destEdge))
         }
     }
 

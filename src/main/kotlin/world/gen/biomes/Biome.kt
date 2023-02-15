@@ -22,6 +22,7 @@ sealed class Biome(
     open fun trailChance() = 0.1f
     open fun plantDensity() = 1.0f
     open fun cabinChance() = 0.0f
+    open fun cavesChance() = 0.0f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
     open fun canHaveRain() = true
@@ -112,6 +113,7 @@ object Hill : Biome(
 ) {
     override fun defaultTitle() = "hills"
     override fun trailChance() = 0.2f
+    override fun cavesChance() = 0.6f
     override fun plantDensity() = 0.3f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = TERRAIN_BRICKWALL
@@ -142,6 +144,7 @@ object ForestHill : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
     override fun cabinChance() = 0.1f
+    override fun cavesChance() = 0.4f
     override fun plantDensity() = 0.7f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_WOODWALL
@@ -176,6 +179,7 @@ object Mountain : Biome(
     override fun defaultTitle() = "mountains"
     override fun ambientSoundDay() = Speaker.Ambience.MOUNTAIN
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
+    override fun cavesChance() = 0.8f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
     override fun plantDensity() = 0.5f
@@ -262,6 +266,7 @@ object Desert : Biome(
 ) {
     override fun defaultTitle() = "desert"
     override fun canHaveRain() = false
+    override fun cavesChance() = 0.8f
     override fun ambientSoundDay() = Speaker.Ambience.DESERT
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)

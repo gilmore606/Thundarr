@@ -5,9 +5,9 @@ import things.*
 import util.*
 import world.Building
 import world.Chunk
-import world.RiverExit
 import world.gen.NoisePatches
 import world.gen.biomes.Cavern
+import world.gen.features.Rivers
 import world.gen.habitats.TemperateA
 import world.level.EnclosedLevel
 import world.path.DistanceMap
@@ -183,8 +183,8 @@ class CavernCarto(
             bridgeOffset = Dice.range(x0 + 6, x1 - 6)
         }
         if (!Dice.chance(bridgeChance)) bridgeOffset = -1
-        val start = RiverExit(startPos, startEdge, Dice.range(2, 6), startControl)
-        val end = RiverExit(endPos, endEdge, Dice.range(2, 6), endControl)
+        val start = Rivers.RiverExit(startPos, startEdge, Dice.range(2, 6), startControl)
+        val end = Rivers.RiverExit(endPos, endEdge, Dice.range(2, 6), endControl)
         var t = 0f
         var width = start.width.toFloat()
         val step = 0.02f

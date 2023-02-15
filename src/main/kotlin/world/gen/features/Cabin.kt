@@ -13,7 +13,8 @@ class Cabin : ChunkFeature(
         val height = Dice.range(6, 10)
         val x = Dice.range(3, 63 - width)
         val y = Dice.range(3, 63 - height)
-        buildHut(x, y, width, height)
+        val fertility = if (Dice.chance(0.3f)) 0f else Dice.float(0.2f, 1f)
+        buildHut(x, y, width, height, fertility)
     }
 
 }

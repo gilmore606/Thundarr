@@ -9,6 +9,8 @@ import ui.input.Mouse
 import util.*
 import world.gen.Metamap
 import world.gen.biomes.Ocean
+import world.gen.features.Highways
+import world.gen.features.Rivers
 import world.gen.features.RuinedCitySite
 import world.gen.features.Village
 import world.gen.habitats.Blank
@@ -86,8 +88,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                     var isSouth = false
                     var isEast = false
                     var isWest = false
-                    if (meta.biome != Ocean && meta.riverExits.isNotEmpty()) {
-                        meta.riverExits.forEach { exit ->
+                    if (meta.biome != Ocean && meta.hasFeature(Rivers::class)) {
+                        meta.rivers().forEach { exit ->
                             when (exit.edge) {
                                 NORTH -> isNorth = true
                                 SOUTH -> isSouth = true
@@ -112,8 +114,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                         }
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(river))
                     }
-                    if (meta.roadExits.isNotEmpty()) {
-                        meta.roadExits.forEach { exit ->
+                    if (meta.hasFeature(Highways::class)) {
+                        meta.highways().forEach { exit ->
                             when (exit.edge) {
                                 NORTH -> isNorth = true
                                 SOUTH -> isSouth = true

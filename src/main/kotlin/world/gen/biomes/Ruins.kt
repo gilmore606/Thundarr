@@ -77,7 +77,7 @@ object Ruins : Biome(
     }
 
     override fun postProcess(carto: WorldCarto) {
-        carto.meta.coasts.forEach { carvePiers(carto, it) }
+        carto.meta.coasts().forEach { carvePiers(carto, it) }
     }
 
     private fun carveRuin(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
@@ -149,7 +149,7 @@ object Ruins : Biome(
     }
 
     private fun carvePiers(carto: WorldCarto, coastDir: XY) {
-        if (carto.meta.riverExits.hasOneWhere { it.edge == coastDir }) return
+        if (carto.meta.rivers().hasOneWhere { it.edge == coastDir }) return
         var i = 10
         var clip = Dice.zeroTo(2)
         var width = Dice.oneTo(2)

@@ -29,12 +29,12 @@ class RuinedBuildings(
     private fun buildRandomRuin() {
         val isIntact = Dice.chance(ruinIntactChance)
         val mid = CHUNK_SIZE /2
-        if (meta.roadExits.isNotEmpty()) {
+        if (meta.hasFeature(Highways::class)) {
             val offset = Dice.range(3, 8) * Dice.sign()
             val along = Dice.range(2, CHUNK_SIZE /2-2)
             val width = Dice.range(4, 10)
             val height = Dice.range(4, 10)
-            when (meta.roadExits.random().edge) {
+            when (meta.highways().random().edge) {
                 NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height, isIntact)
                 SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE -along, width, height, isIntact)
                 WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)

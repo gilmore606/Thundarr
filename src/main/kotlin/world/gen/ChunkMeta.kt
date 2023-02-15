@@ -1,13 +1,11 @@
 package world
 
 import kotlinx.serialization.Serializable
-import render.tilesets.Glyph
 import util.XY
 import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
-import world.gen.features.ChunkFeature
-import world.gen.features.LavaFlows
+import world.gen.features.*
 import world.gen.habitats.Habitat
 import kotlin.reflect.KClass
 
@@ -20,13 +18,8 @@ class ChunkMeta(
     val y: Int = 0,
     val height: Int = 0,
     val temperature: Int = 0,
-    val riverExits: MutableList<RiverExit> = mutableListOf(),
-    val riverBlur: Float = 0f,
-    val coasts: MutableList<XY> = mutableListOf(),
     val biome: Biome = Blank,
     val habitat: Habitat = world.gen.habitats.Blank,
-    val roadExits: MutableList<RoadExit> = mutableListOf(),
-    val trailExits: MutableList<TrailExit> = mutableListOf(),
     val variance: Float = 0f,
     var features: MutableList<ChunkFeature> = mutableListOf(),
     var cityDistance: Float = 0f,
@@ -39,28 +32,23 @@ class ChunkMeta(
         return false
     }
 
+    fun featureOf(ofClass: KClass<out Any>): ChunkFeature? {
+        features.forEach { if (ofClass.isInstance(it)) return it }
+        return null
+    }
+
+    fun coasts(): List<XY> = featureOf(Coastlines::class)?.let {
+        (it as Coastlines).exits
+    } ?: listOf<XY>()
+
+    fun rivers(): List<Rivers.RiverExit> = featureOf(Rivers::class)?.let {
+        (it as Rivers).exits
+    } ?: listOf()
+
+    fun highways(): List<Highways.HighwayExit> = featureOf(Highways::class)?.let {
+        (it as Highways).exits
+    } ?: listOf()
 }
-
-@Serializable
-class RiverExit(
-    var pos: XY,
-    var edge: XY,
-    var width: Int = 4,
-    var control: XY
-)
-
-@Serializable
-class RoadExit(
-    var edge: XY,
-    var width: Int = 2
-)
-
-@Serializable
-class TrailExit(
-    var pos: XY,
-    var edge: XY,
-    var control: XY
-)
 
 class ChunkScratch(
     var x: Int = 0,
@@ -72,14 +60,9 @@ class ChunkScratch(
     var riverParentY = -1
     var riverChildren: MutableList<XY> = mutableListOf()
     var riverDescendantCount = 0
-    var riverExits: MutableList<RiverExit> = mutableListOf()
-    var riverBlur = 0f
     var dryness = -1
-    var coasts: MutableList<XY> = mutableListOf()
     var biome: Biome = Blank
     var habitat: Habitat = world.gen.habitats.Blank
-    var roadExits: MutableList<RoadExit> = mutableListOf()
-    var trailExits: MutableList<TrailExit> = mutableListOf()
     var features: MutableList<ChunkFeature> = mutableListOf()
     var cityDistance = 0f
     var title = ""
@@ -89,14 +72,9 @@ class ChunkScratch(
         y = y,
         height = height,
         temperature = temperature,
-        riverExits = riverExits,
-        riverBlur = riverBlur,
-        coasts = coasts,
         biome = biome,
         habitat = habitat,
         variance = NoisePatches.get("metaVariance",x,y).toFloat(),
-        roadExits = roadExits,
-        trailExits = trailExits,
         features = features,
         cityDistance = cityDistance,
         title = title,
@@ -126,4 +104,36 @@ class ChunkScratch(
             features.add(LavaFlows(mutableListOf(exit)))
         }
     }
+
+    fun addTrailExit(exit: Trails.TrailExit) {
+        featureOf(Trails::class)?.also {
+            (it as Trails).addExit(exit)
+        } ?: run {
+            features.add(Trails(mutableListOf(exit)))
+        }
+    }
+
+    fun addRiverExit(exit: Rivers.RiverExit) {
+        featureOf(Rivers::class)?.also {
+            (it as Rivers).addExit(exit)
+        } ?: run {
+            features.add(Rivers(mutableListOf(exit)))
+        }
+    }
+
+    fun addHighwayExit(exit: Highways.HighwayExit) {
+        featureOf(Highways::class)?.also {
+            (it as Highways).addExit(exit)
+        } ?: run {
+            features.add(Highways(mutableListOf(exit)))
+        }
+    }
+
+    fun rivers(): List<Rivers.RiverExit> = featureOf(Rivers::class)?.let {
+        (it as Rivers).exits
+    } ?: listOf()
+
+    fun highways(): List<Highways.HighwayExit> = featureOf(Highways::class)?.let {
+        (it as Highways).exits
+    } ?: listOf()
 }

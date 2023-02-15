@@ -7,7 +7,7 @@ import world.terrains.Terrain
 
 @Serializable
 class Lake : ChunkFeature(
-    1, Stage.TERRAIN
+    3, Stage.TERRAIN
 ) {
     override fun doDig() {
         if (Dice.chance(0.15f)) {
