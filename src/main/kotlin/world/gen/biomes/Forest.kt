@@ -19,6 +19,7 @@ object Forest : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
+    override fun cabinChance() = 0.15f
     override fun plantDensity() = 1.4f
     override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (fertilityAt(x, y) > 0.6f) Terrain.Type.TERRAIN_SWAMP else Terrain.Type.TERRAIN_UNDERGROWTH
 
@@ -34,13 +35,4 @@ object Forest : Biome(
         return super.terrainAt(x, y)
     }
 
-    override fun carveExtraTerrain(carto: WorldCarto) {
-        if (Dice.chance(cabinChance)) {
-            val width = Dice.range(6, 10)
-            val height = Dice.range(6, 10)
-            val x = Dice.range(3, 63 - width)
-            val y = Dice.range(3, 63 - height)
-            carto.buildHut(x, y, width, height)
-        }
-    }
 }

@@ -10,10 +10,9 @@ import world.gen.biomes.Beach
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
-import world.gen.villagePlantSpawns
+import world.gen.features.ChunkFeature
 import world.level.CHUNK_SIZE
 import world.level.Level
-import world.path.DistanceMap
 import world.terrains.Highway
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
@@ -40,23 +39,19 @@ class WorldCarto(
     val globalPlantDensity = 0.2f
 
     val cavePortalChance = 0.5f
-    val ruinTreasureChance = 0.4f
-    val ruinIntactChance = 0.25f
     val roadCarChance = 0.4f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
-    private val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
+    val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
     private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
 
     private var hasBlends = false
     lateinit var meta: ChunkMeta
     private val riverIslandPoints = ArrayList<XY>()
     private val cavePortalPoints = ArrayList<XY>()
-
-    val villagePlantSpawns = villagePlantSpawns()
 
     // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
@@ -74,21 +69,16 @@ class WorldCarto(
             // Add features
             if (meta.coasts.isNotEmpty()) buildCoasts()
             if (meta.trailExits.isNotEmpty()) buildTrails()
-            if (meta.hasLake) digLake()
+            digFeatures(ChunkFeature.Stage.TERRAIN)
             if (meta.riverExits.isNotEmpty()) digRivers()
             if (meta.roadExits.isNotEmpty()) buildRoads()
 
-            // Carve extra terrain with no biome edge blending
+            // Carve extra biome terrain with no edge blending
             meta.biome.carveExtraTerrain(this)
 
             if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
-            repeat (meta.ruinedBuildings) { buildRandomRuin() }
-            if (meta.lavaExits.isNotEmpty()) buildLava()
-            if (meta.hasVolcano) buildVolcano()
-            if (meta.lavaExits.isNotEmpty() || meta.hasVolcano) addLavaSound()
-            if (meta.hasVillage) buildVillage()
-
-            digCave()
+            digFeatures(ChunkFeature.Stage.BUILD)
+            digCaves()
 
             // Populate!
             buildFertilityMap()
@@ -106,6 +96,12 @@ class WorldCarto(
         }
 
         //debugBorders()
+    }
+
+    private fun digFeatures(stage: ChunkFeature.Stage) {
+        meta.features.filter { it.stage == stage }.sortedBy { it.order }.forEach { feature ->
+            feature.dig(this)
+        }
     }
 
     fun setFlag(x: Int, y: Int, flag: CellFlag) {
@@ -127,7 +123,7 @@ class WorldCarto(
         }
     }
 
-    private fun digCave() {
+    private fun digCaves() {
         val entrances = mutableSetOf<XY>()
         forEachTerrain(TERRAIN_CAVEWALL) { x,y ->
             val free = neighborCount(x, y, CARDINALS) { dx,dy -> isWalkableAt(dx,dy) }
@@ -389,90 +385,6 @@ class WorldCarto(
         }
     }
 
-    private fun buildRandomRuin() {
-        val isIntact = Dice.chance(ruinIntactChance)
-        val mid = CHUNK_SIZE/2
-        if (meta.roadExits.isNotEmpty()) {
-            val offset = Dice.range(3, 8) * Dice.sign()
-            val along = Dice.range(2, CHUNK_SIZE/2-2)
-            val width = Dice.range(4, 10)
-            val height = Dice.range(4, 10)
-            when (meta.roadExits.random().edge) {
-                NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height, isIntact)
-                SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE-along, width, height, isIntact)
-                WEST -> buildRuin(along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)
-                EAST -> buildRuin(CHUNK_SIZE-along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)
-            }
-        } else {
-            buildRuin(Dice.range(1, CHUNK_SIZE-10), Dice.range(1, CHUNK_SIZE-10), Dice.range(4, 10), Dice.range(4, 10), isIntact)
-        }
-    }
-
-    private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
-        for (ix in x until x+width) {
-            for (iy in y until y+height) {
-                if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE && flagsMap[ix][iy].contains(CellFlag.NO_BUILDINGS)) return
-            }
-        }
-        for (ix in x until x + width) {
-            for (iy in y until y + height) {
-                if (boundsCheck(ix + x0, iy + y0)) {
-                    if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
-                        val terrain = if (isIntact || Dice.chance(0.9f)) TERRAIN_BRICKWALL else null
-                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
-                    } else {
-                        val terrain =
-                            if (!isIntact && Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
-                                null else TERRAIN_STONEFLOOR
-                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
-                    }
-                    if (isIntact) chunk.setRoofed(ix + x0, iy + y0, Chunk.Roofed.INDOOR)
-                }
-            }
-        }
-        val doorDir = CARDINALS.random()
-        val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
-            Dice.range(x+1, x+width-2)
-        } else {
-            if (doorDir == EAST) x+width-1 else x
-        } + x0
-        val doory = if (doorDir == EAST || doorDir == WEST) {
-            Dice.range(y+1, y+height-2)
-        } else {
-            if (doorDir == SOUTH) y+height-1 else y
-        } + y0
-        if (boundsCheck(doorx, doory)) {
-            setTerrain(doorx, doory, TERRAIN_STONEFLOOR)
-            if (isIntact || Dice.chance(0.2f)) {
-                if (isIntact) chunk.setRoofed(doorx, doory, Chunk.Roofed.WINDOW)
-                spawnThing(doorx, doory, ModernDoor())
-            }
-        }
-        if (Dice.chance(ruinTreasureChance)) {
-            var placed = false
-            var tries = 0
-            while (!placed && tries < 200) {
-                val tx = Dice.range(x-2, x+2) + x0
-                val ty = Dice.range(y-2, y+2) + y0
-                if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
-                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
-                    spawnThing(tx, ty, treasure)
-                    placed = true
-                }
-                tries++
-            }
-        }
-    }
-
-    private fun setRuinTerrain(x: Int, y: Int, wear: Float, terrain: Terrain.Type?) {
-        if (terrain == null) return
-        if (NoisePatches.get("ruinWear", x, y) < wear) {
-            if (boundsCheck(x, y)) {
-                setTerrain(x, y, terrain)
-            }
-        }
-    }
-
     private fun buildCoasts() {
         val cornerWater = growOblong(8, 8)
         meta.coasts.forEach { edge ->
@@ -521,79 +433,6 @@ class WorldCarto(
             } else if (getTerrain(x,y) == TERRAIN_BEACH) {
                 flagsMap[x-x0][y-y0].add(CellFlag.BEACH)
                 flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
-            }
-        }
-    }
-
-    private fun buildLava() {
-        var bridgeDir: XY? = null
-        when (meta.lavaExits.size) {
-            1 -> {
-                val start = meta.lavaExits[0]
-                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
-                val end = LavaExit(pos = endPos, edge = XY(0,0), width = 1)
-                drawLava(start, end)
-            }
-            2 -> {
-                val e1 = meta.lavaExits[0]
-                val e2 = meta.lavaExits[1]
-                drawLava(e1, e2)
-                if (e1.width <= 6) {
-                    if ((e1.edge == NORTH && e2.edge == SOUTH) || (e1.edge == SOUTH && e2.edge == NORTH)) {
-                        bridgeDir = EAST
-                    } else if ((e1.edge == EAST && e2.edge == WEST) || (e1.edge == WEST && e2.edge == EAST)) {
-                        bridgeDir = NORTH
-                    }
-                }
-            }
-            else -> {
-                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
-                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val center = LavaExit(pos = XY(centerX, centerY), edge = XY(0,0), width = meta.lavaExits[0].width + 1)
-                meta.lavaExits.forEach { exit ->
-                    drawLava(exit, center)
-                }
-            }
-        }
-        fuzzTerrain(TERRAIN_LAVA, 0.5f)
-        bridgeDir?.also { addLavaBridge(it) }
-    }
-
-    private fun drawLava(start: LavaExit, end: LavaExit) {
-        var t = 0f
-        val step = 0.02f
-        var width = start.width.toFloat()
-        val widthStep = (end.width.toFloat() - start.width.toFloat()) * step
-        while (t < 1f) {
-            val p = getBezier(t, start.pos.toXYf(), start.pos.toXYf(), end.pos.toXYf(), end.pos.toXYf())
-            val px = x0 + p.x
-            val py = y0 + p.y
-            carveTrailChunk(Rect((px - width/2).toInt(), (py - width/2).toInt(),
-                (px + width/2).toInt(), (py + width/2).toInt()), TERRAIN_LAVA, false)
-            val edgeWidth = width + 2.5f + width * (NoisePatches.get("metaVariance",px.toInt(),py.toInt()).toFloat()) * 1.5f
-            carveTrailChunk(Rect((px - edgeWidth / 2).toInt(), (py - edgeWidth / 2).toInt(),
-                (px + edgeWidth/2).toInt(), (py + edgeWidth/2).toInt()), TERRAIN_ROCKS, true, TERRAIN_LAVA)
-            t += step
-            width += widthStep
-        }
-    }
-
-    private fun addLavaBridge(dir: XY) {
-        val cross = (CHUNK_SIZE / 4) + Dice.zeroTo(CHUNK_SIZE-30)
-        for (i in 0 until CHUNK_SIZE) {
-            val x = x0 + if (dir == NORTH) cross else i
-            val y = y0 + if (dir == NORTH) i else cross
-            if (getTerrain(x,y) == TERRAIN_LAVA) {
-                setTerrain(x,y,TERRAIN_ROCKS)
-            }
-        }
-    }
-
-    private fun addLavaSound() {
-        forEachTerrain(TERRAIN_LAVA) { x,y ->
-            if (CARDINALS.hasOneWhere { boundsCheck(x+it.x, y+it.y) && getTerrain(x+it.x, y+it.y) != TERRAIN_LAVA }) {
-                chunk.setSound(x, y, Speaker.PointAmbience(Speaker.Ambience.LAVA, 35f, 1f))
             }
         }
     }
@@ -769,57 +608,6 @@ class WorldCarto(
         }
     }
 
-    private fun buildVolcano() {
-        val width = Dice.range(40,56)
-        val height = Dice.range(40,56)
-        printGrid(growBlob(width, height), x0 + Dice.range(3,6), y0 + Dice.range(3,6), TERRAIN_LAVA)
-        fringeTerrain(TERRAIN_LAVA, TERRAIN_ROCKS, 0.7f)
-    }
-
-    private fun digLake() {
-        if (Dice.chance(0.15f)) {
-            // Big lake!
-            val width = Dice.range(40,56)
-            val height = Dice.range(40,56)
-            digLakeBlobAt(Dice.range(3, 6), Dice.range(3,6), width, height)
-            if (Dice.chance(0.5f)) {
-                // Big lake island
-                printGrid(growBlob(Dice.range(4,12), Dice.range(4,12)), Dice.range(10, 45), Dice.range(10, 45), meta.biome.baseTerrain)
-            }
-            return
-        }
-        val width = Dice.range(12,31)
-        val height = Dice.range(12,31)
-        val x = x0 + Dice.range(width, CHUNK_SIZE - width) - width / 2
-        val y = y0 + Dice.range(height, CHUNK_SIZE - height) - height / 2
-        digLakeBlobAt(x, y, width, height)
-        if (Dice.chance(0.4f)) {
-            // Double lake
-            val ox = x + Dice.range(-(width / 2), width / 2)
-            val oy = y + Dice.range(-(height / 2), height / 2)
-            val owidth = (width * Dice.float(0.3f,0.7f)).toInt()
-            val oheight = (height * Dice.float(0.3f, 0.7f)).toInt()
-            digLakeBlobAt(ox, oy, owidth, oheight)
-        }
-        if (width > 17 && height > 17 && Dice.chance(0.5f)) {
-            // Island
-            printGrid(growBlob((width * Dice.float(0.1f, 0.7f)).toInt(), (height * Dice.float(0.1f, 0.7f)).toInt()),
-            x + Dice.range(3,15), y + Dice.range(3, 15), meta.biome.baseTerrain)
-        }
-        fringeTerrain(TEMP1, TEMP2, 1f)
-        repeat (3) { varianceFuzzTerrain(TEMP2, TEMP1) }
-        swapTerrain(TEMP1, GENERIC_WATER)
-        forEachCell { x,y ->
-            if (getTerrain(x,y) == TEMP2) {
-                setTerrain(x,y,meta.biome.riverBankTerrain(x,y))
-            }
-        }
-    }
-
-    private fun digLakeBlobAt(x: Int, y: Int, width: Int, height: Int) {
-        printGrid(growBlob(width, height), x, y, TEMP1)
-    }
-
     private fun buildStructureDungeon() {
         val facing = CARDINALS.random()
         carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
@@ -847,149 +635,6 @@ class WorldCarto(
             if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)
         }
         connectBuilding(NaturalCavern().at(doorPos.x, doorPos.y).facing(facings.random()))
-    }
-
-    private fun buildVillage() {
-        printGrid(growBlob(63, 63), x0, y0, TEMP1)
-        printGrid(growBlob(52, 52), x0+6, y0+6, TEMP2)
-        forEachTerrain(TEMP2) { x,y ->
-            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
-        }
-
-        val hutCount = Dice.range(8, 12)
-        var built = 0
-        var featureBuilt = false
-        while (built < hutCount) {
-            val width = Dice.range(7, 11)
-            val height = Dice.range(7, 11)
-            var tries = 0
-            var placed = false
-            while (tries < 200 && !placed) {
-                val x = Dice.range(3, 63 - width)
-                val y = Dice.range(3, 63 - height)
-                var clearHere = true
-                for (tx in x until x+width) {
-                    for (ty in y until y+height) {
-                        if (getTerrain(x0+tx,y0+ty) !in listOf(TEMP1, TEMP2)) clearHere = false
-                    }
-                }
-                if (clearHere) {
-                    if (!featureBuilt) {
-                        buildVillageFeature(x, y, width, height)
-                        featureBuilt = true
-                    } else {
-                        buildHut(x, y, width, height)
-                    }
-                    placed = true
-                }
-                tries++
-            }
-            built++
-        }
-        placeVillageWell()
-        swapTerrain(TEMP1, meta.biome.baseTerrain)
-        swapTerrain(TEMP2, meta.biome.trailTerrain(x0,y0))
-    }
-
-    private fun placeVillageWell() {
-        fun placeWell(x: Int, y: Int) {
-            spawnThing(x, y, Well())
-        }
-        val distanceMap = DistanceMap(chunk) { x,y ->
-            getTerrain(x,y) != Terrain.Type.TEMP2
-        }
-        var placed = false
-        forEachCell { x, y ->
-            if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {
-                placeWell(x, y)
-                placed = true
-            }
-        }
-    }
-
-    fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
-        buildGarden(x + 1, y + 1, width - 2, height - 2)
-    }
-
-    fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
-        val inVertRows = Dice.flip()
-        val gardenDensity = Dice.float(0.2f, 0.8f) * 5f
-        for (tx in x0 + x..x0 + x + width - 1) {
-            for (ty in y0 + y .. y0 + y + height - 1) {
-                flagsMap[tx-x0][ty-y0].add(CellFlag.NO_PLANTS)
-                if (inVertRows && (tx % 2 == 0) || !inVertRows && (ty % 2 == 0)) {
-                    setTerrain(tx, ty, TERRAIN_GRASS)
-                    getPlant(meta.biome, meta.habitat, 1f,
-                        gardenDensity, villagePlantSpawns)?.also { plant ->
-                        spawnThing(tx, ty, plant)
-                    }
-                }
-            }
-        }
-    }
-
-    fun buildHut(x: Int, y: Int, width: Int, height: Int) {
-        val wallType = meta.biome.villageWallType()
-        val floorType = meta.biome.villageFloorType()
-        val dirtType =  meta.biome.trailTerrain(x0,y0)
-        var doorDir = NORTH
-        if (y < 28) doorDir = SOUTH
-        if (x < 20) doorDir = EAST
-        if (x > 40) doorDir = WEST
-        val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
-            Dice.range(x+2, x+width-3)
-        } else {
-            if (doorDir == EAST) x+width-2 else x+1
-        }
-        val doory = if (doorDir == EAST || doorDir == WEST) {
-            Dice.range(y+2, y+height-3)
-        } else {
-            if (doorDir == SOUTH) y+height-2 else y+1
-        }
-        var windowBlockerCount = Dice.range(3, 8)
-        for (tx in x until x+width) {
-            for (ty in y until y+height) {
-                if (tx == doorx && ty == doory) {
-                    setTerrain(x0+tx, y0+ty, floorType)
-                    spawnThing(x0+tx, y0+ty, WoodDoor())
-                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
-                } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
-                    setTerrain(x0 + tx, y0 + ty, TEMP3)
-                } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    if (windowBlockerCount < 1 && ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
-                        setTerrain(x0 + tx, y0 + ty, TERRAIN_WINDOWWALL)
-                        chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
-                        windowBlockerCount = Dice.range(4, 12)
-                    } else {
-                        setTerrain(x0 + tx, y0 + ty, wallType)
-                        chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
-                        windowBlockerCount--
-                    }
-                } else {
-                    setTerrain(x0+tx, y0+ty, floorType)
-                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
-                }
-            }
-        }
-        safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-        val plantDensity = Dice.float(0.3f, 0.9f) * 3f
-        forEachTerrain(TEMP3) { x,y ->
-            getPlant(meta.biome, meta.habitat, 0.5f,
-                plantDensity, villagePlantSpawns)?.also { plant ->
-                spawnThing(x, y, plant)
-            }
-            flagsMap[x-x0][y-y0].add(CellFlag.NO_PLANTS)
-        }
-        fuzzTerrain(TEMP3, 0.4f, listOf(wallType, TERRAIN_WINDOWWALL))
-        safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-        safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
-        swapTerrain(TEMP3, meta.biome.baseTerrain)
-
-        if (Dice.chance(0.5f)) {
-            val tablex = Dice.range(x+2,x+width-3)
-            val tabley = Dice.range(y+2,y+height-3)
-            spawnThing(x0+tablex, y0+tabley, Table())
-        }
     }
 
 }

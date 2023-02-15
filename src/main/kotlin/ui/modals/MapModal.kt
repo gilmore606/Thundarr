@@ -9,6 +9,8 @@ import ui.input.Mouse
 import util.*
 import world.gen.Metamap
 import world.gen.biomes.Ocean
+import world.gen.features.RuinedCitySite
+import world.gen.features.Village
 import world.gen.habitats.Blank
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -137,10 +139,10 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                         }
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(road))
                     }
-                    if (meta.hasCity) {
+                    if (meta.hasFeature(RuinedCitySite::class)) {
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_CITY))
                     }
-                    if (meta.hasVillage) {
+                    if (meta.hasFeature(Village::class)) {
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_VILLAGE))
                     }
                     if (x + mapx == playerX && y + mapy == playerY) {

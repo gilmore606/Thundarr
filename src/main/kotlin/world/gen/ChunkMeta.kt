@@ -6,7 +6,10 @@ import util.XY
 import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
+import world.gen.features.ChunkFeature
+import world.gen.features.LavaFlows
 import world.gen.habitats.Habitat
+import kotlin.reflect.KClass
 
 // Metadata about how to construct a chunk.  Generated at worldgen.
 
@@ -19,22 +22,24 @@ class ChunkMeta(
     val temperature: Int = 0,
     val riverExits: MutableList<RiverExit> = mutableListOf(),
     val riverBlur: Float = 0f,
-    val hasLake: Boolean = false,
     val coasts: MutableList<XY> = mutableListOf(),
     val biome: Biome = Blank,
     val habitat: Habitat = world.gen.habitats.Blank,
     val roadExits: MutableList<RoadExit> = mutableListOf(),
     val trailExits: MutableList<TrailExit> = mutableListOf(),
-    val lavaExits: MutableList<LavaExit> = mutableListOf(),
     val variance: Float = 0f,
-    var hasCity: Boolean = false,
-    var hasVillage: Boolean = false,
-    var hasVolcano: Boolean = false,
+    var features: MutableList<ChunkFeature> = mutableListOf(),
     var cityDistance: Float = 0f,
-    var ruinedBuildings: Int = 0,
     var title: String = "the wilderness",
     var mapped: Boolean = false
-)
+) {
+
+    fun hasFeature(ofClass: KClass<out Any>): Boolean {
+        features.forEach { if (ofClass.isInstance(it)) return true }
+        return false
+    }
+
+}
 
 @Serializable
 class RiverExit(
@@ -57,13 +62,6 @@ class TrailExit(
     var control: XY
 )
 
-@Serializable
-class LavaExit(
-    var pos: XY,
-    var edge: XY,
-    var width: Int = 4
-)
-
 class ChunkScratch(
     var x: Int = 0,
     var y: Int = 0
@@ -76,20 +74,16 @@ class ChunkScratch(
     var riverDescendantCount = 0
     var riverExits: MutableList<RiverExit> = mutableListOf()
     var riverBlur = 0f
-    var hasLake = false
     var dryness = -1
     var coasts: MutableList<XY> = mutableListOf()
     var biome: Biome = Blank
     var habitat: Habitat = world.gen.habitats.Blank
     var roadExits: MutableList<RoadExit> = mutableListOf()
     var trailExits: MutableList<TrailExit> = mutableListOf()
-    var lavaExits: MutableList<LavaExit> = mutableListOf()
-    var hasCity = false
-    var hasVolcano = false
-    var hasVillage = false
+    var features: MutableList<ChunkFeature> = mutableListOf()
     var cityDistance = 0f
-    var ruinedBuildings = 0
     var title = ""
+
     fun toChunkMeta() = ChunkMeta(
         x = x,
         y = y,
@@ -97,20 +91,39 @@ class ChunkScratch(
         temperature = temperature,
         riverExits = riverExits,
         riverBlur = riverBlur,
-        hasLake = hasLake,
         coasts = coasts,
         biome = biome,
         habitat = habitat,
         variance = NoisePatches.get("metaVariance",x,y).toFloat(),
         roadExits = roadExits,
         trailExits = trailExits,
-        lavaExits = lavaExits,
-        hasCity = hasCity,
-        hasVillage = hasVillage,
-        hasVolcano = hasVolcano,
+        features = features,
         cityDistance = cityDistance,
-        ruinedBuildings = ruinedBuildings,
         title = title,
         mapped = false
     )
+
+    fun hasFeature(ofClass: KClass<out Any>): Boolean {
+        features.forEach { if (ofClass.isInstance(it)) return true }
+        return false
+    }
+
+    fun featureOf(ofClass: KClass<out Any>): ChunkFeature? {
+        features.forEach { if (ofClass.isInstance(it)) return it }
+        return null
+    }
+
+    fun removeFeature(ofClass: KClass<out Any>) {
+        var found: ChunkFeature? = null
+        features.forEach { if (ofClass.isInstance(it)) found = it }
+        found?.also { features.remove(it) }
+    }
+
+    fun addLavaExit(exit: LavaFlows.LavaExit) {
+        featureOf(LavaFlows::class)?.also {
+            (it as LavaFlows).addExit(exit)
+        } ?: run {
+            features.add(LavaFlows(mutableListOf(exit)))
+        }
+    }
 }

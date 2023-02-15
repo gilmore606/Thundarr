@@ -10,6 +10,7 @@ import world.*
 import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.gen.biomes.Blank
+import world.gen.features.*
 import world.gen.habitats.*
 import world.level.CHUNK_SIZE
 import world.persist.SaveSlot
@@ -532,13 +533,13 @@ object Metamap {
                 var eruptions = 0
                 repeat(maxVolcanoes) {
                     val volcano = volcanoPeaks.random()
-                    if (!scratches[volcano.x][volcano.y].hasVolcano) {
-                        scratches[volcano.x][volcano.y].hasVolcano = true
+                    if (!scratches[volcano.x][volcano.y].hasFeature(Volcano::class)) {
+                        scratches[volcano.x][volcano.y].features.add(Volcano())
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
-                        //suggestedPlayerStart.x = xToChunkX(volcano.x)
-                        //suggestedPlayerStart.y = yToChunkY(volcano.y)
+                        suggestedPlayerStart.x = xToChunkX(volcano.x)
+                        suggestedPlayerStart.y = yToChunkY(volcano.y)
                         eruptions++
                     }
                 }
@@ -582,7 +583,7 @@ object Metamap {
                     Desert -> {
                         if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(oasisChance)) {
                             cell.biome = if (Dice.flip()) Plain else Scrub
-                            cell.hasLake = true
+                            cell.features.add(Lake())
                         }
                     }
                     else -> { }
@@ -638,28 +639,30 @@ object Metamap {
                 }
                 // Add lake
                 if (cell.biome.canHaveLake()) {
-                    cell.hasLake = Dice.chance(when (cell.riverExits.size) {
+                    if (Dice.chance(when (cell.riverExits.size) {
                         0 -> 0.02f
                         1 -> 0.3f
                         2 -> 0.06f
                         else -> 0.1f
-                    })
+                    })) {
+                        cell.features.add(Lake())
+                    }
                 }
 
                 // Add ruined buildings around cities
                 cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
                 val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.roadExits.size * 0.1f
                 val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
-                cell.ruinedBuildings = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
-                if (cell.cityDistance <= 2f) cell.ruinedBuildings += 2
-                if (Dice.chance(0.01f)) cell.ruinedBuildings += 1
-                cell.ruinedBuildings += when (cell.biome) {
+                var buildingCount = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
+                if (cell.cityDistance <= 2f) buildingCount += 2
+                if (Dice.chance(0.01f)) buildingCount += 1
+                buildingCount += when (cell.biome) {
                     Mountain -> -1
-                    Ruins -> -cell.ruinedBuildings
+                    Ruins -> -buildingCount
                     Suburb -> Dice.range(2, 6)
                     else -> 0
                 }
-                cell.ruinedBuildings = max(cell.ruinedBuildings, 0)
+                cell.features.add(RuinedBuildings(max(buildingCount, 0)))
             }
 
             // Set temperatures
@@ -744,18 +747,19 @@ object Metamap {
                     val y = Dice.zeroTil(chunkRadius * 2)
                     val meta = scratches[x][y]
                     if (!(meta.biome in listOf(Ocean, Glacier))) {
-                        if (!meta.hasCity && !meta.hasVolcano && !meta.hasLake) {
+                        if (!meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class) && !meta.hasFeature(Lake::class)) {
                             if (meta.riverExits.isEmpty() && meta.coasts.isEmpty() && meta.roadExits.isEmpty()) {
                                 if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
                                     placedOne = true
                                     actuallyPlaced++
                                     villages.add(XY(x,y))
-                                    scratches[x][y].hasVillage = true
-                                    scratches[x][y].title = Madlib.villageName()
-                                    scratches[x][y].ruinedBuildings = 0
+                                    val villageName = Madlib.villageName()
+                                    scratches[x][y].features.add(Village(villageName))
+                                    scratches[x][y].title = villageName
+                                    scratches[x][y].removeFeature(RuinedBuildings::class)
 
-                                    suggestedPlayerStart.x = xToChunkX(x)
-                                    suggestedPlayerStart.y = yToChunkY(y)
+                                    //suggestedPlayerStart.x = xToChunkX(x)
+                                    //suggestedPlayerStart.y = yToChunkY(y)
                                 }
                             }
                         }
@@ -765,6 +769,13 @@ object Metamap {
                 placed++
             }
             Console.sayFromThread("Founded $actuallyPlaced villages.")
+
+            // Place forest cabins
+            forEachMeta { x,y,cell ->
+                if (Dice.chance(cell.biome.cabinChance())) {
+                    cell.features.add(Cabin())
+                }
+            }
 
             // Name contiguous features
             Console.sayFromThread("Naming geography...")
@@ -932,24 +943,24 @@ object Metamap {
             val next = XY(cursor.x + dir.x, cursor.y + dir.y)
             if (scratches[next.x][next.y].height < 1) done = true
             if (scratches[next.x][next.y].riverExits.isNotEmpty()) done = true
-            if (scratches[next.x][next.y].lavaExits.isNotEmpty()) done = true
+            if (scratches[next.x][next.y].hasFeature(LavaFlows::class)) done = true
             if (!done) {
                 val edgePos = randomChunkEdgePos(dir, 0.8f)
-                val myExit = LavaExit(
+                val myExit = LavaFlows.LavaExit(
                     pos = edgePos,
                     edge = dir,
                     width = width.toInt()
                 )
                 val childEdgePos = flipChunkEdgePos(edgePos)
                 val childDir = XY(-dir.x, -dir.y)
-                val childExit = LavaExit(
+                val childExit = LavaFlows.LavaExit(
                     pos = childEdgePos,
                     edge = childDir,
                     width = width.toInt()
                 )
-                scratches[cursor.x][cursor.y].hasLake = false
-                scratches[cursor.x][cursor.y].lavaExits.add(myExit)
-                scratches[next.x][next.y].lavaExits.add(childExit)
+                scratches[cursor.x][cursor.y].removeFeature(Lake::class)
+                scratches[cursor.x][cursor.y].addLavaExit(myExit)
+                scratches[next.x][next.y].addLavaExit(childExit)
                 cursor.x = next.x
                 cursor.y = next.y
                 width -= Dice.float(1f, 2.5f)
@@ -959,7 +970,9 @@ object Metamap {
                     digLavaFlow(cursor, branchDir, width * 0.7f)
                 }
             } else {
-                if (scratches[cursor.x][cursor.y].lavaExits.isNotEmpty()) scratches[cursor.x][cursor.y].lavaExits.last().width = 1
+                scratches[cursor.x][cursor.y].featureOf(LavaFlows::class)?.also {
+                    (it as LavaFlows).exits.last().width = 1
+                }
             }
         }
     }
@@ -1011,7 +1024,7 @@ object Metamap {
                         }
                     }
                     cityCells.add(actualSite)
-                    scratches[actualSite.x][actualSite.y].hasCity = true
+                    scratches[actualSite.x][actualSite.y].features.add(RuinedCitySite("Fix Later"))
                     placed = true
                 }
             }

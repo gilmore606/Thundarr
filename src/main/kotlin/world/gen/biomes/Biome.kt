@@ -21,6 +21,7 @@ sealed class Biome(
     open fun canHaveLake() = true
     open fun trailChance() = 0.1f
     open fun plantDensity() = 1.0f
+    open fun cabinChance() = 0.0f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
     open fun canHaveRain() = true
@@ -140,6 +141,7 @@ object ForestHill : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
+    override fun cabinChance() = 0.1f
     override fun plantDensity() = 0.7f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_WOODWALL

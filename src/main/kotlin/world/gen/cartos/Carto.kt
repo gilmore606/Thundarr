@@ -154,7 +154,7 @@ abstract class Carto(
         }
     }
 
-    protected fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
+    fun forEachCell(doThis: (x: Int, y: Int) -> Unit) {
         for (x in x0..x1) {
             for (y in y0..y1) {
                 doThis(x,y)
@@ -354,7 +354,7 @@ abstract class Carto(
         }
     }
 
-    protected fun forEachTerrain(type: Terrain.Type, doThis: (x: Int, y: Int)->Unit) {
+    fun forEachTerrain(type: Terrain.Type, doThis: (x: Int, y: Int)->Unit) {
         forEachCell { x,y ->
             if (getTerrain(x,y) == type) doThis(x,y)
         }
@@ -395,13 +395,13 @@ abstract class Carto(
         }
     }
 
-    protected fun fuzzTerrain(type: Terrain.Type, density: Float) {
+    fun fuzzTerrain(type: Terrain.Type, density: Float) {
         fuzzTerrain(type, density, listOf(null))
     }
-    protected fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type?) {
+    fun fuzzTerrain(type: Terrain.Type, density: Float, exclude: Terrain.Type?) {
         fuzzTerrain(type, density, listOf(exclude))
     }
-    protected fun fuzzTerrain(type: Terrain.Type, density: Float, excludeList: List<Terrain.Type?>?) {
+    fun fuzzTerrain(type: Terrain.Type, density: Float, excludeList: List<Terrain.Type?>?) {
         val adds = ArrayList<XY>()
         forEachTerrain(type) { x, y ->
             neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
@@ -427,7 +427,7 @@ abstract class Carto(
         adds.forEach { setTerrain(it.x, it.y, type) }
     }
 
-    protected fun swapTerrain(oldType: Terrain.Type, newType: Terrain.Type) {
+    fun swapTerrain(oldType: Terrain.Type, newType: Terrain.Type) {
         forEachTerrain(oldType) { x,y -> setTerrain(x,y,newType) }
     }
 
@@ -596,7 +596,7 @@ abstract class Carto(
         }
     }
 
-    protected fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float,
+    fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float,
                            fromSpawns: List<PlantSpawn> = plantSpawns
     ): Thing? {
         val plantChance = biome.plantDensity() * globalPlantDensity * java.lang.Float.max(0.2f, fertility)

@@ -143,4 +143,5 @@ fun ThingTileSet() =
             add(0.5f, 10, 5)
         })
         setTile(Glyph.WELL, SimpleTile(this, 10, 6))
+        setTile(Glyph.SHRINE, SimpleTile(this, 10, 7))
     }
