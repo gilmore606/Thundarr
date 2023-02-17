@@ -25,15 +25,15 @@ class Village(
         }
 
         val fertility = Dice.float(0.0f, 1.0f)
-        val hutCount = Dice.range(6, 12)
+        val hutCount = Dice.range(6, 18)
         var built = 0
-        var featureBuilt = !Dice.chance(0.8f)
+        var featureBuilt = !Dice.chance(0.6f)
+        var width = Dice.range(9, 13)
+        var height = Dice.range(9, 13)
         while (built < hutCount) {
-            val width = Dice.range(7, 11)
-            val height = Dice.range(7, 11)
             var tries = 0
             var placed = false
-            while (tries < 200 && !placed) {
+            while (tries < 1200 && !placed) {
                 val x = Dice.range(3, 63 - width)
                 val y = Dice.range(3, 63 - height)
                 var clearHere = true
@@ -50,10 +50,15 @@ class Village(
                         buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f))
                     }
                     placed = true
+                    built++
                 }
                 tries++
             }
-            built++
+            if (placed || Dice.chance(0.2f)) {
+                if (Dice.chance(0.6f)) width -= 1
+                if (Dice.chance(0.6f)) height -= 1
+            }
+            if (width <= 6 || height <= 6) built = hutCount
         }
         if (Dice.chance(0.7f)) {
             placeInMostPublic(

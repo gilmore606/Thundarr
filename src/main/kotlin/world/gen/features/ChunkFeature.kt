@@ -137,6 +137,21 @@ sealed class ChunkFeature(
         } else {
             if (doorDir == SOUTH) y+height-2 else y+1
         }
+        var splitVert = false
+        var splitHoriz = false
+        var split = 0
+        var splitDoor = 0
+        if (width > 9 && width > height && Dice.chance(0.7f)) {
+            splitVert = true
+            split = x + (width / 2) + Dice.range(-1, 1)
+            splitDoor = Dice.range(y+2, y+height-3)
+            if (split == doorx) split +=1
+        } else if (height > 9 && height > width && Dice.chance(0.7f)) {
+            splitHoriz = true
+            split = y + (height / 2) + Dice.range(-1, 1)
+            splitDoor = Dice.range(x+2, x+width-3)
+            if (split == doory) split += 1
+        }
         var windowBlockerCount = Dice.range(3, 8)
         for (tx in x until x+width) {
             for (ty in y until y+height) {
@@ -147,7 +162,9 @@ sealed class ChunkFeature(
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    if (windowBlockerCount < 1 && ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
+                    if (windowBlockerCount < 1 &&
+                        !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
+                        ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
                         setTerrain(x0 + tx, y0 + ty, Terrain.Type.TERRAIN_WINDOWWALL)
                         chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                         windowBlockerCount = Dice.range(4, 12)
@@ -160,6 +177,15 @@ sealed class ChunkFeature(
                     setTerrain(x0+tx, y0+ty, floorType)
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
                 }
+            }
+        }
+        if (splitVert) {
+            for (ty in y+2 until y+height-2) {
+                if (ty != splitDoor) setTerrain(x0+split, y0+ty, wallType)
+            }
+        } else if (splitHoriz) {
+            for (tx in x+2 until x+width-2) {
+                if (tx != splitDoor) setTerrain(x0+tx, y0+split, wallType)
             }
         }
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
@@ -176,11 +202,5 @@ sealed class ChunkFeature(
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
         safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
-
-        if (Dice.chance(0.5f)) {
-            val tablex = Dice.range(x+2,x+width-3)
-            val tabley = Dice.range(y+2,y+height-3)
-            spawnThing(x0+tablex, y0+tabley, Table())
-        }
     }
 }

@@ -29,9 +29,6 @@ class WorldCarto(
     val chunkBlendWidth = 6
     val chunkBlendCornerRadius = 4
 
-    val autoBridgeChance = 0.5f
-    val autoBridgesInThisChunk = Dice.chance(autoBridgeChance)
-
     val globalPlantDensity = 0.2f
 
     enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
@@ -53,16 +50,12 @@ class WorldCarto(
         } else {
 
             buildBiomeBlendMap()
-
             carveBlendedTerrain()
-
             digFeatures(ChunkFeature.Stage.TERRAIN)
 
             meta.biome.carveExtraTerrain(this)
-
-            if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
-
             digFeatures(ChunkFeature.Stage.BUILD)
+            if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
 
             // Populate!
             buildFertilityMap()
@@ -72,10 +65,8 @@ class WorldCarto(
             // Post-processing
             deepenWater()
             pruneTrees()
-            buildBridges()
             setRoofedInRock()
             meta.biome.postProcess(this)
-            setGeneratedBiomes()
             setOverlaps()
         }
 
@@ -102,23 +93,6 @@ class WorldCarto(
                     if (upper != type && lower != type) {
                         setTerrain(x, y, if (Dice.flip()) upper else lower)
                     }
-                }
-            }
-        }
-    }
-
-    // Set per-cell biomes for things we generate like rivers, coastal beach, etc
-    private fun setGeneratedBiomes() {
-        forEachCell { x,y ->
-            getTerrain(x,y).also { terrain ->
-                when (terrain) {
-                    TERRAIN_BEACH -> Beach
-                    TERRAIN_SHALLOW_WATER -> Ocean
-                    TERRAIN_STONEFLOOR -> Blank
-                    else -> null
-                }?.also { newBiome ->
-                    blendMap[x-x0][y-y0].clear()
-                    blendMap[x-x0][y-y0].add(Pair(newBiome,1f))
                 }
             }
         }
@@ -258,20 +232,6 @@ class WorldCarto(
                     else -> Rect(0,0,chunkBlendWidth-1,chunkBlendWidth-1)
                 }
                 neighborMeta?.biome?.postBlendProcess(this, bounds)
-            }
-        }
-    }
-
-    private fun buildBridges() {
-        if (autoBridgesInThisChunk) {
-            var bridgeCellsLeft = Dice.range(4, 16)
-            forEachCell { x, y ->
-                if (flagsMap[x - x0][y - y0].contains(CellFlag.TRAIL) && flagsMap[x - x0][y - y0].contains(CellFlag.RIVER)) {
-                    if (bridgeCellsLeft > 0) {
-                        setTerrain(x, y, TERRAIN_PAVEMENT)
-                        bridgeCellsLeft--
-                    }
-                }
             }
         }
     }

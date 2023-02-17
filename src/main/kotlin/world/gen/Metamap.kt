@@ -537,8 +537,8 @@ object Metamap {
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
-                        suggestedPlayerStart.x = xToChunkX(volcano.x)
-                        suggestedPlayerStart.y = yToChunkY(volcano.y)
+                        //suggestedPlayerStart.x = xToChunkX(volcano.x)
+                        //suggestedPlayerStart.y = yToChunkY(volcano.y)
                         eruptions++
                     }
                 }
@@ -752,17 +752,19 @@ object Metamap {
                     if (!(meta.biome in listOf(Ocean, Glacier))) {
                         if (!meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class) && !meta.hasFeature(Lake::class)) {
                             if (!meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class) && !meta.hasFeature(Highways::class)) {
-                                if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
-                                    placedOne = true
-                                    actuallyPlaced++
-                                    villages.add(XY(x,y))
-                                    val villageName = Madlib.villageName()
-                                    scratches[x][y].features.add(Village(villageName))
-                                    scratches[x][y].title = villageName
-                                    scratches[x][y].removeFeature(RuinedBuildings::class)
+                                if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
+                                    if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
+                                        placedOne = true
+                                        actuallyPlaced++
+                                        villages.add(XY(x, y))
+                                        val villageName = Madlib.villageName()
+                                        scratches[x][y].features.add(Village(villageName))
+                                        scratches[x][y].title = villageName
+                                        scratches[x][y].removeFeature(RuinedBuildings::class)
 
-                                    //suggestedPlayerStart.x = xToChunkX(x)
-                                    //suggestedPlayerStart.y = yToChunkY(y)
+                                        suggestedPlayerStart.x = xToChunkX(x)
+                                        suggestedPlayerStart.y = yToChunkY(y)
+                                    }
                                 }
                             }
                         }
@@ -773,13 +775,16 @@ object Metamap {
             }
             Console.sayFromThread("Founded $actuallyPlaced villages.")
 
-            // Place cabins and caves
+            // Place cabins, caves, bridges
             forEachMeta { x,y,cell ->
-                if (Dice.chance(cell.biome.cabinChance())) {
+                if (!cell.hasFeature(Village::class) && Dice.chance(cell.biome.cabinChance())) {
                     cell.features.add(Cabin())
                 }
-                if (Dice.chance(cell.biome.cavesChance())) {
+                if (!cell.hasFeature(Village::class) && Dice.chance(cell.biome.cavesChance())) {
                     cell.features.add(Caves())
+                }
+                if (cell.hasFeature(Rivers::class) && cell.hasFeature(Trails::class)) {
+                    cell.features.add(Bridge())
                 }
             }
 
