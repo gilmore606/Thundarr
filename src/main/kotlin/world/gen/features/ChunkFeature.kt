@@ -118,15 +118,17 @@ sealed class ChunkFeature(
         }
     }
 
-    protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float) {
+    protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float, forceDoorDir: XY? = null) {
         val villagePlantSpawns = villagePlantSpawns()
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
         val dirtType =  meta.biome.trailTerrain(x0,y0)
         var doorDir = NORTH
-        if (y < 28) doorDir = SOUTH
-        if (x < 20) doorDir = EAST
-        if (x > 40) doorDir = WEST
+        if (forceDoorDir != null) doorDir = forceDoorDir else {
+            if (y < 28) doorDir = SOUTH
+            if (x < 20) doorDir = EAST
+            if (x > 40) doorDir = WEST
+        }
         val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
             Dice.range(x+2, x+width-3)
         } else {
@@ -179,13 +181,22 @@ sealed class ChunkFeature(
                 }
             }
         }
+        val hasInternalDoor = Dice.chance(0.5f)
         if (splitVert) {
             for (ty in y+2 until y+height-2) {
-                if (ty != splitDoor) setTerrain(x0+split, y0+ty, wallType)
+                if (ty != splitDoor) {
+                    setTerrain(x0+split, y0+ty, wallType)
+                } else if (hasInternalDoor) {
+                    spawnThing(x0+split, y0+ty, WoodDoor())
+                }
             }
         } else if (splitHoriz) {
             for (tx in x+2 until x+width-2) {
-                if (tx != splitDoor) setTerrain(x0+tx, y0+split, wallType)
+                if (tx != splitDoor) {
+                    setTerrain(x0+tx, y0+split, wallType)
+                } else if (hasInternalDoor) {
+                    spawnThing(x0+tx, y0+split, WoodDoor())
+                }
             }
         }
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)

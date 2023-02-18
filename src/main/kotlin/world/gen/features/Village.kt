@@ -1,10 +1,11 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import things.Shrine
 import things.Thing
 import things.Well
-import util.Dice
+import util.*
 import world.gen.cartos.WorldCarto
 import world.gen.villagePlantSpawns
 import world.path.DistanceMap
@@ -17,17 +18,127 @@ class Village(
     3, Stage.BUILD
 ) {
 
+    @Transient private var featureBuilt = false
+
     override fun doDig() {
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
-        printGrid(growBlob(52, 52), x0+6, y0+6, Terrain.Type.TEMP2)
+        printGrid(growBlob(52, 52), x0 + 6, y0 + 6, Terrain.Type.TEMP2)
         forEachTerrain(Terrain.Type.TEMP2) { x, y ->
-            flagsAt(x,y).add(WorldCarto.CellFlag.NO_PLANTS)
+            flagsAt(x, y).add(WorldCarto.CellFlag.NO_PLANTS)
         }
+        when (Dice.oneTo(4)) {
+            1,2 -> layoutVillageBag()
+            3 -> layoutVillageHoriz()
+            4 -> layoutVillageVert()
+        }
+        if (Dice.chance(0.7f)) {
+            placeInMostPublic(
+                if (Dice.chance(0.7f)) Well() else Shrine()
+            )
+        }
+        swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
+        swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
+    }
 
+    private fun layoutVillageVert() {
+        val fertility = Dice.float(0.0f, 1.0f)
+        val xMid = 32 + Dice.range(-4, 4)
+        val xMidLeft = xMid - Dice.oneTo(3)
+        val xMidRight = xMid + Dice.oneTo(3)
+        var cursorY= 32
+        while (cursorY > 14) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(xMidLeft - width, cursorY - height, width, height, fertility, EAST)
+            cursorY -= (height + Dice.zeroTo(2))
+            if (Dice.chance(0.1f)) cursorY = 0
+        }
+        cursorY = 32
+        while (cursorY < 49) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(xMidLeft - width, cursorY, width, height, fertility, EAST)
+            cursorY += height + Dice.zeroTo(2)
+            if (Dice.chance(0.1f)) cursorY = 64
+        }
+        cursorY = 32
+        while (cursorY > 14) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(xMidRight, cursorY - height, width, height, fertility, WEST)
+            cursorY -= (height + Dice.zeroTo(2))
+            if (Dice.chance(0.1f)) cursorY = 0
+        }
+        cursorY = 32
+        while (cursorY < 49) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(xMidRight, cursorY, width, height, fertility, WEST)
+            cursorY += height + Dice.zeroTo(2)
+            if (Dice.chance(0.1f)) cursorY = 64
+        }
+        for (iy in 3 .. 60) {
+            setTerrain(x0 + xMid, y0 + iy, Terrain.Type.TEMP2)
+            setTerrain(x0 + xMid + 1, y0 + iy, Terrain.Type.TEMP2)
+        }
+    }
+
+    private fun layoutVillageHoriz() {
+        val fertility = Dice.float(0.0f, 1.0f)
+        val yMid = 32 + Dice.range(-4, 4)
+        val yMidTop = yMid - Dice.oneTo(3)
+        val yMidBottom = yMid + Dice.oneTo(3)
+        var cursorX = 32
+        while (cursorX > 14) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(cursorX - width, yMidTop - height, width, height, fertility, SOUTH)
+            cursorX -= (height + Dice.zeroTo(2))
+            if (Dice.chance(0.1f)) cursorX = 0
+        }
+        cursorX = 32
+        while (cursorX < 49) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(cursorX, yMidTop - height, width, height, fertility, SOUTH)
+            cursorX += height + Dice.zeroTo(2)
+            if (Dice.chance(0.1f)) cursorX = 64
+        }
+        cursorX = 32
+        while (cursorX > 14) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(cursorX - width, yMidBottom, width, height, fertility, NORTH)
+            cursorX -= (height + Dice.zeroTo(2))
+            if (Dice.chance(0.1f)) cursorX = 0
+        }
+        cursorX = 32
+        while (cursorX < 49) {
+            val width = Dice.range(9, 13)
+            val height = Dice.range(9, 13)
+            layoutHutOrFeature(cursorX, yMidBottom, width, height, fertility, NORTH)
+            cursorX += height + Dice.zeroTo(2)
+            if (Dice.chance(0.1f)) cursorX = 64
+        }
+        for (ix in 3 .. 60) {
+            setTerrain(x0 + ix, y0 + yMid, Terrain.Type.TEMP2)
+            setTerrain(x0 + ix, y0 + yMid + 1, Terrain.Type.TEMP2)
+        }
+    }
+
+    private fun layoutHutOrFeature(x: Int, y: Int, width: Int, height: Int, fertility: Float, forceDoorDir: XY? = null) {
+        if (!featureBuilt && Dice.chance(0.15f)) {
+            buildVillageFeature(x, y, width, height)
+            featureBuilt = true
+        } else {
+            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir)
+        }
+    }
+
+    private fun layoutVillageBag() {
         val fertility = Dice.float(0.0f, 1.0f)
         val hutCount = Dice.range(6, 18)
         var built = 0
-        var featureBuilt = !Dice.chance(0.6f)
         var width = Dice.range(9, 13)
         var height = Dice.range(9, 13)
         while (built < hutCount) {
@@ -43,12 +154,7 @@ class Village(
                     }
                 }
                 if (clearHere) {
-                    if (!featureBuilt) {
-                        buildVillageFeature(x, y, width, height)
-                        featureBuilt = true
-                    } else {
-                        buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f))
-                    }
+                    layoutHutOrFeature(x, y, width, height, fertility)
                     placed = true
                     built++
                 }
@@ -60,13 +166,6 @@ class Village(
             }
             if (width <= 6 || height <= 6) built = hutCount
         }
-        if (Dice.chance(0.7f)) {
-            placeInMostPublic(
-                if (Dice.chance(0.7f)) Well() else Shrine()
-            )
-        }
-        swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
-        swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
     }
 
     private fun placeInMostPublic(thing: Thing) {
