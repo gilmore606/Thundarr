@@ -299,7 +299,8 @@ class Chunk(
     }
 
     fun getSound(x: Int, y: Int): Speaker.PointAmbience? = if (boundsCheck(x, y)) {
-        this.sounds[x-this.x][y-this.y]
+        this.sounds[x-this.x][y-this.y] ?:
+        things[x-this.x][y-this.y].contents().firstNotNullOfOrNull { it.ambientSound() }
     } else null
 
     fun setSound(x: Int, y: Int, newSound: Speaker.PointAmbience) {

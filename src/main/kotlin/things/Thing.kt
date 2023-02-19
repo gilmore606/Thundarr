@@ -147,6 +147,8 @@ sealed class Thing : Entity {
             }
         }
     }
+
+    open fun ambientSound(): Speaker.PointAmbience? = null
 }
 
 @Serializable

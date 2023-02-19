@@ -84,7 +84,8 @@ object Speaker {
         RIVER1("ambi/river1.ogg"),
         RIVER2("ambi/river2.ogg"),
         RIVER3("ambi/river3.ogg"),
-        LAVA("ambi/lava.ogg")
+        LAVA("ambi/lava.ogg"),
+        SHRINECHORD("ambi/shrine.ogg")
     }
 
     @Serializable

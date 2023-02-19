@@ -1,12 +1,17 @@
 package things
 
 import actors.Actor
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.LightColor
 
 @Serializable
-class Shrine : Thing() {
+class Shrine : LitThing() {
+    init {
+        active = true
+    }
 
     override fun name() = "shrine"
     override fun description() = "A stone shrine erected to honor the Lords of Light."
@@ -14,6 +19,8 @@ class Shrine : Thing() {
     override fun isPortable() = false
     override fun isOpaque() = false
     override fun isBlocking() = true
+    override fun ambientSound() = Speaker.PointAmbience(Speaker.Ambience.SHRINECHORD, 24f, 1f)
+    override val lightColor = LightColor(0.5f, 0.5f, 0.1f)
 
     override fun uses() = mapOf(
         UseTag.CONSUME to Use("pray to " + name(), 2.0f,
