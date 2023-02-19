@@ -152,7 +152,7 @@ class Director(val level: Level) {
 
     fun advanceTime(delta: Float) {
         actors.filterOut({ it.level != level }) { it.advanceTime(delta) }
-        temporals.filterOut({ it.temporalDone() }) { it.advanceTime(delta) }
+        temporals.filterOut({ it != null && it.temporalDone() }) { it.advanceTime(delta) }
     }
 
     fun linkTemporal(temporal: Temporal) {
