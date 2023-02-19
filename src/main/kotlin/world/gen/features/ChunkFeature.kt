@@ -10,8 +10,7 @@ import world.Chunk
 import world.ChunkMeta
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
-import world.gen.decors.Decor
-import world.gen.decors.Hut
+import world.gen.decors.*
 import world.gen.villagePlantSpawns
 import world.terrains.Terrain
 
@@ -156,11 +155,11 @@ sealed class ChunkFeature(
             splitDoor = Dice.range(y+2, y+height-3)
             if (split == doorx) split +=1
             rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+split-2, y0+y+height-2),
+                Rect(x0+x+2, y0+y+2, x0+split-2, y0+y+height-3),
                 listOf(doorClearCell, XY(x0 + split - 1, y0 + splitDoor))
             ))
             rooms.add(Decor.Room(
-                Rect(x0+split+2, y0+y+2, x0+x+width-2, y0+y+height-2),
+                Rect(x0+split+2, y0+y+2, x0+x+width-3, y0+y+height-3),
                 listOf(doorClearCell, XY(x0 + split + 1, y0 + splitDoor))
             ))
         } else if (height > 9 && height > width && Dice.chance(0.7f)) {
@@ -173,12 +172,12 @@ sealed class ChunkFeature(
                 listOf(doorClearCell, XY(x0+splitDoor, y0+split-1))
             ))
             rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+split+1, x0+x+width-2, y0+y+height-2),
+                Rect(x0+x+2, y0+split+1, x0+x+width-3, y0+y+height-3),
                 listOf(doorClearCell, XY(x0+splitDoor, y0+split+1))
             ))
         } else {
             rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+x+width-2, y0+y+height-2),
+                Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3),
                 listOf(doorClearCell)
             ))
         }
@@ -233,10 +232,11 @@ sealed class ChunkFeature(
         // Furnish rooms
         when (rooms.size) {
             1 -> {
-                Hut.furnish(rooms[0], carto)
+                Schoolhouse().furnish(rooms[0], carto)
             }
             2 -> {
-                Hut.furnish(rooms[0], carto)
+                HutBedroom().furnish(rooms[0], carto)
+                HutLivingRoom().furnish(rooms[1], carto)
             }
         }
         // Grow yard
@@ -255,6 +255,7 @@ sealed class ChunkFeature(
         if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y,
             if (Dice.chance(0.3f)) Terrain.Type.TERRAIN_STONEFLOOR else dirtType)
         if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+        if (!isAbandoned) flagsAt(x0 + doorx + doorDir.x, y0 + doory + doorDir.y).add(WorldCarto.CellFlag.NO_PLANTS)
 
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
     }
