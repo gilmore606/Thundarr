@@ -10,6 +10,8 @@ import world.Chunk
 import world.ChunkMeta
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
+import world.gen.decors.Decor
+import world.gen.decors.Hut
 import world.gen.villagePlantSpawns
 import world.terrains.Terrain
 
@@ -124,11 +126,12 @@ sealed class ChunkFeature(
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
         val dirtType =  meta.biome.trailTerrain(x0,y0)
-        var doorDir = NORTH
-        if (forceDoorDir != null) doorDir = forceDoorDir else {
-            if (y < 28) doorDir = SOUTH
-            if (x < 20) doorDir = EAST
-            if (x > 40) doorDir = WEST
+        // Locate door
+        val doorDir = forceDoorDir ?: when {
+            y < 28 -> SOUTH
+            x < 20 -> EAST
+            x > 40 -> WEST
+            else -> NORTH
         }
         val doorx = if (doorDir == NORTH || doorDir == SOUTH) {
             Dice.range(x+2, x+width-3)
@@ -140,22 +143,45 @@ sealed class ChunkFeature(
         } else {
             if (doorDir == SOUTH) y+height-2 else y+1
         }
+        // Split into one or two rooms
         var splitVert = false
         var splitHoriz = false
         var split = 0
         var splitDoor = 0
+        val rooms = mutableListOf<Decor.Room>()
+        val doorClearCell = XY(x0 + doorx - doorDir.x, y0 + doory - doorDir.y)
         if (width > 9 && width > height && Dice.chance(0.7f)) {
             splitVert = true
             split = x + (width / 2) + Dice.range(-1, 1)
             splitDoor = Dice.range(y+2, y+height-3)
             if (split == doorx) split +=1
+            rooms.add(Decor.Room(
+                Rect(x0+x+2, y0+y+2, x0+split-2, y0+y+height-2),
+                listOf(doorClearCell, XY(x0 + split - 1, y0 + splitDoor))
+            ))
+            rooms.add(Decor.Room(
+                Rect(x0+split+2, y0+y+2, x0+x+width-2, y0+y+height-2),
+                listOf(doorClearCell, XY(x0 + split + 1, y0 + splitDoor))
+            ))
         } else if (height > 9 && height > width && Dice.chance(0.7f)) {
             splitHoriz = true
             split = y + (height / 2) + Dice.range(-1, 1)
             splitDoor = Dice.range(x+2, x+width-3)
             if (split == doory) split += 1
+            rooms.add(Decor.Room(
+                Rect(x0+x+2, y0+y+2, x0+x+width-2, y0+split-1),
+                listOf(doorClearCell, XY(x0+splitDoor, y0+split-1))
+            ))
+            rooms.add(Decor.Room(
+                Rect(x0+x+2, y0+split+1, x0+x+width-2, y0+y+height-2),
+                listOf(doorClearCell, XY(x0+splitDoor, y0+split+1))
+            ))
+        } else {
+            rooms.add(Decor.Room(
+                Rect(x0+x+2, y0+y+2, x0+x+width-2, y0+y+height-2),
+                listOf(doorClearCell)
+            ))
         }
-
         // Draw yard/wall/floor terrain, with door and windows
         var windowBlockerCount = Dice.range(3, 10)
         for (tx in x until x+width) {
@@ -185,7 +211,6 @@ sealed class ChunkFeature(
                 }
             }
         }
-
         // Draw inside door if needed
         val hasInternalDoor = Dice.chance(if (isAbandoned) 0.1f else 0.5f)
         if (splitVert) {
@@ -205,8 +230,18 @@ sealed class ChunkFeature(
                 }
             }
         }
+        // Furnish rooms
+        when (rooms.size) {
+            1 -> {
+                Hut.furnish(rooms[0], carto)
+            }
+            2 -> {
+                Hut.furnish(rooms[0], carto)
+            }
+        }
+        // Grow yard
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-
+        fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
         // Grow plants in yard
         val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->
@@ -216,9 +251,11 @@ sealed class ChunkFeature(
                 spawnThing(x, y, plant)
             }
         }
-        fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
-        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
+        // Cut walkway through yard
+        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y,
+            if (Dice.chance(0.3f)) Terrain.Type.TERRAIN_STONEFLOOR else dirtType)
         if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
     }
 }
