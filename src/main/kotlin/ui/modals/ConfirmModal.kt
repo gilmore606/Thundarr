@@ -9,6 +9,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import ui.input.Keyboard
+import ui.input.Keydef
 import ui.input.Mouse
 import util.EAST
 import util.NO_DIRECTION
@@ -77,15 +78,11 @@ class ConfirmModal(
         }
     }
 
-    override fun onKeyDown(keycode: Int) {
-        if (Keyboard.moveKeys.keys.contains(keycode) && Keyboard.moveKeys[keycode] !== NO_DIRECTION) {
+    override fun onKeyDown(key: Keydef) {
+        if (key in Keyboard.moveKeys.keys && key != Keydef.INTERACT) {
             selectNext()
-        } else if (keycode == Input.Keys.Y) {
-            changeSelection(1)
-        } else if (keycode == Input.Keys.N) {
-            changeSelection(0)
         } else {
-            super.onKeyDown(keycode)
+            super.onKeyDown(key)
         }
     }
 

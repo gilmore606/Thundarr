@@ -6,6 +6,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 import ui.input.Keyboard
+import ui.input.Keydef
 import util.WEST
 
 class ContextMenu(
@@ -89,13 +90,13 @@ class ContextMenu(
         options[selection].onPick.invoke()
     }
 
-    override fun onKeyDown(keycode: Int) {
-        if (keycode == Input.Keys.TAB) dismissSuccess()
-        else if (Keyboard.moveKeys[keycode] == WEST || keycode == Input.Keys.CONTROL_LEFT) {
+    override fun onKeyDown(key: Keydef) {
+        if (key == Keydef.OPEN_INV) dismissSuccess()
+        else if (key == Keydef.MOVE_W) {
             Screen.clearCursor()
             dismiss()
         } else {
-            super.onKeyDown(keycode)
+            super.onKeyDown(key)
         }
     }
 

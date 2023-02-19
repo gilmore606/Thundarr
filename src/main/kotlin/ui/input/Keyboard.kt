@@ -2,10 +2,8 @@ package ui.input
 
 import App
 import actors.Herder
-import actors.Wolfman
 import actors.actions.Wait
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Keys.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,8 +14,11 @@ import things.*
 import ui.panels.DebugPanel
 import ui.panels.Toolbar
 import util.*
+import ui.input.Keydef.*
 
 object Keyboard : KtxInputAdapter {
+
+    val binds = mutableMapOf<Int, Keydef>()
 
     var debugFloat = 0f
     val debugFloatStep = 0.05f
@@ -35,32 +36,16 @@ object Keyboard : KtxInputAdapter {
 
     var CURSOR_MODE = false
 
-    val moveKeys = mutableMapOf<Int, XY>().apply {
-        this[W] = NORTH
-        this[E] = NORTHEAST
-        this[D] = EAST
-        this[C] = SOUTHEAST
-        this[X] = SOUTH
-        this[Z] = SOUTHWEST
-        this[A] = WEST
-        this[Q] = NORTHWEST
-        this[S] = NO_DIRECTION
-
-        this[NUMPAD_8] = NORTH
-        this[NUMPAD_9] = NORTHEAST
-        this[NUMPAD_6] = EAST
-        this[NUMPAD_3] = SOUTHEAST
-        this[NUMPAD_2] = SOUTH
-        this[NUMPAD_1] = SOUTHWEST
-        this[NUMPAD_4] = WEST
-        this[NUMPAD_7] = NORTHWEST
-        this[NUMPAD_5] = NO_DIRECTION
-        this[NUMPAD_ENTER] = NO_DIRECTION
-
-        this[DPAD_UP] = NORTH
-        this[DPAD_RIGHT] = EAST
-        this[DPAD_DOWN] = SOUTH
-        this[DPAD_LEFT] = WEST
+    val moveKeys = mutableMapOf<Keydef, XY>().apply {
+        this[MOVE_N] = NORTH
+        this[MOVE_NE] = NORTHEAST
+        this[MOVE_E] = EAST
+        this[MOVE_SE] = SOUTHEAST
+        this[MOVE_S] = SOUTH
+        this[MOVE_SW] = SOUTHWEST
+        this[MOVE_W] = WEST
+        this[MOVE_NW] = NORTHWEST
+        this[INTERACT] = NO_DIRECTION
     }
 
     init {
@@ -70,6 +55,12 @@ object Keyboard : KtxInputAdapter {
                 if ((System.currentTimeMillis() > lastKeyTime + REPEAT_DELAY_MS) && lastKey >= 0) {
                     pressKey(lastKey)
                 }
+            }
+        }
+
+        Keydef.values().forEach { keydef ->
+            keydef.defaultKey?.also { keycode ->
+                binds[keycode] = keydef
             }
         }
     }
@@ -109,7 +100,8 @@ object Keyboard : KtxInputAdapter {
             modKeyDown = 0
         }
         Screen.topModal?.also { modal ->
-            modal.keyUp(keycode)
+            val key = keycodeToKeydef(keycode)
+            key?.also { modal.keyUp(it) }
         }
         return true
     }
@@ -143,84 +135,89 @@ object Keyboard : KtxInputAdapter {
             ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
         }
 
+        val key = keycodeToKeydef(keycode)
+
         Screen.topModal?.also { modal ->
-            modal.keyDown(keycode)
+            key?.also { modal.keyDown(it) }
         } ?: run {
             if (App.player.isActing()) {
                 App.player.cancelAction()
             }
-            if (moveKeys.contains(keycode)) {
-
-                val dir = moveKeys[keycode]
+            if (moveKeys.contains(key)) {
+                val dir = moveKeys[key]
                 if (dir == NO_DIRECTION) Screen.rightClickCursorTile()
                 else dir?.also { processDir(it) }
+            } else when (key) {
 
-            } else when (keycode) {
+                WAIT -> { App.player.queue(Wait(1f)) }
+                SLEEP -> { App.player.toggleSleep() }
+                AGGRO -> { App.player.toggleAggro() }
 
-                SPACE -> { App.player.queue(Wait(1f)) }
-                PERIOD -> { App.player.toggleSleep() }
+                CURSOR_TOGGLE -> { toggleCursorMode() }
+                CURSOR_PREV -> { CURSOR_MODE = true ; Screen.cursorNextTarget(-1) }
+                CURSOR_NEXT -> { CURSOR_MODE = true ; Screen.cursorNextTarget(1) }
 
-                NUMPAD_DIVIDE -> { toggleCursorMode() }
-                PAGE_UP -> { CURSOR_MODE = true ; Screen.cursorNextTarget(-1) }
-                PAGE_DOWN -> { CURSOR_MODE = true ; Screen.cursorNextTarget(1) }
+                ZOOM_IN -> { Screen.mouseScrolled(-1.43f) }
+                ZOOM_OUT -> { Screen.mouseScrolled(1.43f) }
 
-                EQUALS -> { Screen.mouseScrolled(-1.43f) }
-                MINUS -> { Screen.mouseScrolled(1.43f) }
+                SEEN_TOGGLE -> { Screen.showSeenAreas = !Screen.showSeenAreas }
 
-                V -> { Screen.showSeenAreas = !Screen.showSeenAreas }
+                OPEN_INV -> { App.openInventory() }
+                OPEN_GEAR -> { App.openGear() }
+                OPEN_SKILLS -> { App.openSkills() }
+                OPEN_MAP -> { App.openMap() }
+                OPEN_JOURNAL -> { App.openJournal() }
 
-                TAB -> { App.openInventory() }
-                BACKSLASH -> { App.openGear() }
-                BACKSPACE -> { App.openSkills() }
-                ESCAPE -> { App.openSystemMenu() }
-                M -> { App.openMap() }
+                CANCEL -> { App.openSystemMenu() }
+                TOOLBAR_SHOW -> { Toolbar.onKey(-1)}
+                SHORTCUT1 -> { Toolbar.onKey(1) }
+                SHORTCUT2 -> { Toolbar.onKey(2) }
+                SHORTCUT3 -> { Toolbar.onKey(3) }
+                SHORTCUT4 -> { Toolbar.onKey(4) }
+                SHORTCUT5 -> { Toolbar.onKey(5) }
+                SHORTCUT6 -> { Toolbar.onKey(6) }
+                SHORTCUT7 -> { Toolbar.onKey(7) }
+                SHORTCUT8 -> { Toolbar.onKey(8) }
+                SHORTCUT9 -> { Toolbar.onKey(9) }
 
-                SLASH -> { App.player.toggleAggro() }
+                else -> when (keycode) {
+                    I -> { App.player.debugMove(NORTH) }
+                    J -> { App.player.debugMove(WEST) }
+                    K -> { App.player.debugMove(SOUTH) }
+                    L -> { App.player.debugMove(EAST) }
 
-                GRAVE -> { Toolbar.onKey(-1)}
-                NUM_1 -> { Toolbar.onKey(1) }
-                NUM_2 -> { Toolbar.onKey(2) }
-                NUM_3 -> { Toolbar.onKey(3) }
-                NUM_4 -> { Toolbar.onKey(4) }
-                NUM_5 -> { Toolbar.onKey(5) }
-                NUM_6 -> { Toolbar.onKey(6) }
-                NUM_7 -> { Toolbar.onKey(7) }
-                NUM_8 -> { Toolbar.onKey(8) }
-
-                I -> { App.player.debugMove(NORTH) }
-                J -> { App.player.debugMove(WEST) }
-                K -> { App.player.debugMove(SOUTH) }
-                L -> { App.player.debugMove(EAST) }
-
-                Input.Keys.F1 -> {
-                    App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE
-                }
-                Input.Keys.F2 -> { Lightbulb().moveTo(groundAtPlayer()) }
-                Input.Keys.F4 -> { PalmTree().moveTo(groundAtPlayer()) }
-                Input.Keys.F5 -> {
-                    App.DEBUG_PANEL = !App.DEBUG_PANEL
-                    if (App.DEBUG_PANEL) {
-                        Screen.addPanel(DebugPanel)
-                    } else {
-                        Screen.removePanel(DebugPanel)
+                    F1 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
+                    F2 -> { Lightbulb().moveTo(groundAtPlayer()) }
+                    F5 -> {
+                        App.DEBUG_PANEL = !App.DEBUG_PANEL
+                        if (App.DEBUG_PANEL) {
+                            Screen.addPanel(DebugPanel)
+                        } else {
+                            Screen.removePanel(DebugPanel)
+                        }
                     }
-                }
-                Input.Keys.F6 -> {
-                    Herder().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
-                }
-                Input.Keys.F7 -> {
-                    Table().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
-                }
-                Input.Keys.F8 -> {
-                    ModernDoor().moveTo(App.level, App.player.xy.x + 1, App.player.xy.y)
-                }
 
-                Input.Keys.F9 -> { Screen.tiltAmount += debugFloatStep }
-                Input.Keys.F10 -> { Screen.tiltAmount -= debugFloatStep }
-                F11 -> { App.openPerlinDebug() }
+                    F11 -> { App.openPerlinDebug() }
 
-                else -> { lastKey = -1 }
+                    else -> { lastKey = -1 }
+                }
             }
         }
+    }
+
+    private fun keycodeToKeydef(keycode: Int): Keydef? = binds[keycode] ?: when (keycode) {
+        NUMPAD_8 -> MOVE_N
+        NUMPAD_9 -> MOVE_NE
+        NUMPAD_6 -> MOVE_E
+        NUMPAD_3 -> MOVE_SE
+        NUMPAD_2 -> MOVE_S
+        NUMPAD_1 -> MOVE_SW
+        NUMPAD_4 -> MOVE_W
+        NUMPAD_7 -> MOVE_NW
+        NUMPAD_5 -> INTERACT
+        NUMPAD_ENTER -> INTERACT
+        NUMPAD_DIVIDE -> CURSOR_TOGGLE
+        ENTER -> INTERACT
+        else -> null
     }
 }

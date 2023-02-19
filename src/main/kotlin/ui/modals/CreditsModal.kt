@@ -2,6 +2,7 @@ package ui.modals
 
 import render.Screen
 import render.tilesets.Glyph
+import ui.input.Keydef
 import ui.input.Mouse
 
 class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN", Position.CENTER_LOW) {
@@ -28,8 +29,8 @@ class CreditsModal : Modal(450, 180, "ThUNdARR  the  BARBARIAN", Position.CENTER
         return true
     }
 
-    override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
+    override fun onKeyDown(key: Keydef) {
+        super.onKeyDown(key)
         dismiss()
     }
 }

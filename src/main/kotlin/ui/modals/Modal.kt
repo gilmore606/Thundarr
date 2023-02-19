@@ -18,6 +18,7 @@ import render.tilesets.ThingTileSet
 import render.tilesets.UITileSet
 import things.Container
 import things.Thing
+import ui.input.Keydef
 import ui.input.Mouse
 import ui.panels.Toolbar
 import util.groundAtPlayer
@@ -119,21 +120,21 @@ abstract class Modal(
 
     open fun drawModalText() { }
 
-    fun keyDown(keycode: Int) {
-        if (dismissible && keycode == Input.Keys.ESCAPE) {
+    fun keyDown(key: Keydef) {
+        if (dismissible && key == Keydef.CANCEL) {
             dismiss()
             return
         }
-        if (isInSidecar) sidecar?.also { it.onKeyDown(keycode) } ?: run { onKeyDown(keycode) }
-        else onKeyDown(keycode)
+        if (isInSidecar) sidecar?.also { it.onKeyDown(key) } ?: run { onKeyDown(key) }
+        else onKeyDown(key)
     }
-    open fun onKeyDown(keycode: Int) { }
+    open fun onKeyDown(key: Keydef) { }
 
-    fun keyUp(keycode: Int) {
-        if (isInSidecar) sidecar?.also { it.onKeyUp(keycode) } ?: run { onKeyUp(keycode) }
-        else onKeyUp(keycode)
+    fun keyUp(key: Keydef) {
+        if (isInSidecar) sidecar?.also { it.onKeyUp(key) } ?: run { onKeyUp(key) }
+        else onKeyUp(key)
     }
-    open fun onKeyUp(keycode: Int) { }
+    open fun onKeyUp(key: Keydef) { }
 
     final override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         return if (sidecar?.isInBounds(screenX, screenY) == true) {

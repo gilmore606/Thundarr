@@ -10,6 +10,7 @@ import things.Container
 import things.Thing
 import things.ThingHolder
 import things.Workbench
+import ui.input.Keydef
 import util.difficultyDesc
 import util.groundAtPlayer
 import util.log
@@ -185,20 +186,20 @@ class InventoryModal(
         return null
     }
 
-    override fun onKeyDown(keycode: Int) {
-        when (keycode) {
-            Input.Keys.TAB -> dismiss()
-            Input.Keys.NUMPAD_4 -> {
+    override fun onKeyDown(key: Keydef) {
+        when (key) {
+            Keydef.OPEN_INV -> dismiss()
+            Keydef.MOVE_W -> {
                 parentModal?.also {
                     returnToParent()
                 } ?: run { dismiss() }
             }
-            Input.Keys.NUMPAD_6 -> {
+            Keydef.MOVE_E -> {
                 if (sidecar is InventoryModal && (sidecar as InventoryModal).grouped.isNotEmpty()) {
                     moveToSidecar()
                 } else doSelect()
             }
-            else -> super.onKeyDown(keycode)
+            else -> super.onKeyDown(key)
         }
     }
 

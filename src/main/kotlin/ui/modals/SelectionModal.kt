@@ -9,6 +9,7 @@ import ktx.async.KtxAsync
 import render.Screen
 import things.Thing
 import ui.input.Keyboard
+import ui.input.Keydef
 import ui.input.Mouse
 import util.*
 import world.Entity
@@ -85,24 +86,22 @@ abstract class SelectionModal(
         }
     }
 
-    override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
-        if (Keyboard.moveKeys[keycode] == NORTH) {
-            selectPrevious()
-        } else if (Keyboard.moveKeys[keycode] == SOUTH) {
-            selectNext()
-        } else if (Keyboard.moveKeys[keycode] == NO_DIRECTION || keycode in listOf(Input.Keys.SPACE, Input.Keys.ENTER)) {
-            if (selection >= 0) doSelect()
-        } else when (keycode) {
-            Input.Keys.NUM_1 -> onShortcutSelect(0)
-            Input.Keys.NUM_2 -> onShortcutSelect(1)
-            Input.Keys.NUM_3 -> onShortcutSelect(2)
-            Input.Keys.NUM_4 -> onShortcutSelect(3)
-            Input.Keys.NUM_5 -> onShortcutSelect(4)
-            Input.Keys.NUM_6 -> onShortcutSelect(5)
-            Input.Keys.NUM_7 -> onShortcutSelect(6)
-            Input.Keys.NUM_8 -> onShortcutSelect(7)
-            Input.Keys.NUM_9 -> onShortcutSelect(8)
+    override fun onKeyDown(key: Keydef) {
+        super.onKeyDown(key)
+        when (key) {
+            Keydef.MOVE_N -> selectPrevious()
+            Keydef.MOVE_S -> selectNext()
+            Keydef.INTERACT -> { if (selection >= 0) doSelect() }
+            Keydef.SHORTCUT1 -> onShortcutSelect(0)
+            Keydef.SHORTCUT2 -> onShortcutSelect(1)
+            Keydef.SHORTCUT3 -> onShortcutSelect(2)
+            Keydef.SHORTCUT4 -> onShortcutSelect(3)
+            Keydef.SHORTCUT5 -> onShortcutSelect(4)
+            Keydef.SHORTCUT6 -> onShortcutSelect(5)
+            Keydef.SHORTCUT7 -> onShortcutSelect(6)
+            Keydef.SHORTCUT8 -> onShortcutSelect(7)
+            Keydef.SHORTCUT9 -> onShortcutSelect(8)
+            else -> { }
         }
     }
 

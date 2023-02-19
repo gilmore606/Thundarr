@@ -3,6 +3,7 @@ package ui.modals
 import com.badlogic.gdx.Input
 import render.Screen
 import render.tilesets.Glyph
+import ui.input.Keydef
 import ui.modals.widgets.ButtonStrip
 import ui.modals.widgets.NoisePicker
 import ui.modals.widgets.Slider
@@ -105,15 +106,14 @@ class PerlinModal : WidgetModal(410, 750, "nOisE LAb"), ContextMenu.ParentModal 
         App.DEBUG_PERLIN = null
     }
 
-    override fun onKeyDown(keycode: Int) {
-        when (keycode) {
-            Input.Keys.I -> { App.player.debugMove(NORTH) }
-            Input.Keys.J -> { App.player.debugMove(WEST) }
-            Input.Keys.K -> { App.player.debugMove(SOUTH) }
-            Input.Keys.L -> { App.player.debugMove(EAST) }
+    override fun onKeyDown(key: Keydef) {
+        when (key) {
+            Keydef.MOVE_N -> { App.player.debugMove(NORTH) }
+            Keydef.MOVE_W -> { App.player.debugMove(WEST) }
+            Keydef.MOVE_S -> { App.player.debugMove(SOUTH) }
+            Keydef.MOVE_E-> { App.player.debugMove(EAST) }
 
-            Input.Keys.ESCAPE -> dismiss()
-            Input.Keys.F11 -> dismiss()
+            Keydef.CANCEL -> dismiss()
         }
     }
 

@@ -2,6 +2,7 @@ package ui.modals
 
 import render.Screen
 import ui.input.Keyboard
+import ui.input.Keydef
 import util.XY
 import java.lang.Integer.max
 
@@ -24,8 +25,8 @@ class DirectionModal(
         drawCenterText(hint, 0, padding + 26, width, Screen.fontColorDull, Screen.smallFont)
     }
 
-    override fun onKeyDown(keycode: Int) {
-        Keyboard.moveKeys[keycode]?.also { dir ->
+    override fun onKeyDown(key: Keydef) {
+        Keyboard.moveKeys[key]?.also { dir ->
             dismiss()
             callback(dir)
         } ?: run {

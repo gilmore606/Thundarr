@@ -4,6 +4,7 @@ import App
 import com.badlogic.gdx.Input
 import render.Screen
 import ui.input.Keyboard
+import ui.input.Keydef
 import ui.input.Mouse
 import util.NO_DIRECTION
 import util.wrapText
@@ -52,10 +53,9 @@ class BigSplashModal(
         }
     }
 
-    override fun onKeyDown(keycode: Int) {
-        if (Keyboard.moveKeys[keycode] != null && Keyboard.moveKeys[keycode] != NO_DIRECTION) isHovered = !isHovered
-        if (Keyboard.moveKeys[keycode] == NO_DIRECTION) doSelect()
-        if (keycode == Input.Keys.ENTER) doSelect()
+    override fun onKeyDown(key: Keydef) {
+        if (key in Keyboard.moveKeys.keys && key != Keydef.INTERACT) isHovered = !isHovered
+        if (key == Keydef.INTERACT) doSelect()
     }
 
     override fun onMouseMovedTo(screenX: Int, screenY: Int) {

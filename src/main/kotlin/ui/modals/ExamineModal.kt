@@ -5,6 +5,7 @@ import render.Screen
 import things.Clothing
 import things.Thing
 import things.MeleeWeapon
+import ui.input.Keydef
 import ui.input.Mouse
 import util.plural
 import util.wrapText
@@ -60,8 +61,8 @@ class ExamineModal(
         return true
     }
 
-    override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
+    override fun onKeyDown(key: Keydef) {
+        super.onKeyDown(key)
         dismiss()
     }
 

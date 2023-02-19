@@ -5,6 +5,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Keyboard
+import ui.input.Keydef
 import ui.input.Mouse
 import util.*
 import world.gen.Metamap
@@ -41,26 +42,27 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         return true
     }
 
-    override fun onKeyDown(keycode: Int) {
-        if (keycode == Input.Keys.ESCAPE) dismiss()
-        else if (keycode == Input.Keys.MINUS) {
-            cellSize = max(6, cellSize - 2)
-            centerView()
-        } else if (keycode == Input.Keys.EQUALS) {
-            cellSize = min(20, cellSize + 2)
-            centerView()
-        } else if (keycode == Input.Keys.F1) {
-            showHabitats = !showHabitats
-        }
-        else when (Keyboard.moveKeys[keycode]) {
-            NORTH -> mapy--
-            SOUTH -> mapy++
-            WEST -> mapx--
-            EAST -> mapx++
-            NORTHWEST -> { mapy-- ; mapx-- }
-            NORTHEAST -> { mapy-- ; mapx++ }
-            SOUTHWEST -> { mapy++ ; mapx-- }
-            SOUTHEAST -> { mapy++ ; mapx++ }
+    override fun onKeyDown(key: Keydef) {
+        when (key) {
+            Keydef.CANCEL -> dismiss()
+            Keydef.ZOOM_OUT -> {
+                cellSize = max(6, cellSize - 2)
+                centerView()
+
+            }
+            Keydef.ZOOM_IN -> {
+                cellSize = min(20, cellSize + 2)
+                centerView()
+
+            }
+            Keydef.MOVE_N -> mapy--
+            Keydef.MOVE_S -> mapy++
+            Keydef.MOVE_W -> mapx--
+            Keydef.MOVE_E -> mapx++
+            Keydef.MOVE_NW -> { mapy-- ; mapx-- }
+            Keydef.MOVE_NE -> { mapy-- ; mapx++ }
+            Keydef.MOVE_SW -> { mapy++ ; mapx-- }
+            Keydef.MOVE_SE -> { mapy++ ; mapx++ }
         }
     }
 

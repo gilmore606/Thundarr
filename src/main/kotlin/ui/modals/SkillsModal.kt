@@ -6,6 +6,7 @@ import audio.Speaker
 import com.badlogic.gdx.Input
 import render.Screen
 import ui.input.Keyboard
+import ui.input.Keydef
 import ui.input.Mouse
 import util.*
 import java.lang.Integer.max
@@ -119,14 +120,12 @@ class SkillsModal(val actor: Actor) : Modal(370, 500, "- ${actor.name()} -") {
         return true
     }
 
-    override fun onKeyDown(keycode: Int) {
-        when (Keyboard.moveKeys[keycode]) {
-            NORTH -> selectPrevious()
-            SOUTH -> selectNext()
-            WEST, EAST -> switchSide()
-        }
-        when (keycode) {
-            Input.Keys.BACKSPACE, Input.Keys.ESCAPE -> dismiss()
+    override fun onKeyDown(key: Keydef) {
+        when (key) {
+            Keydef.MOVE_N -> selectPrevious()
+            Keydef.MOVE_S -> selectNext()
+            Keydef.MOVE_W, Keydef.MOVE_E -> switchSide()
+            Keydef.CANCEL, Keydef.OPEN_SKILLS -> dismiss()
         }
     }
 

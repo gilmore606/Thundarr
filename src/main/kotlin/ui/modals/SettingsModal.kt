@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
+import ui.input.Keydef
 import ui.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
@@ -219,8 +220,8 @@ class SettingsModal : Modal(300, 580, "- settings -") {
         sections[selectedSection].mouseUp(this)
     }
 
-    override fun onKeyDown(keycode: Int) {
-        super.onKeyDown(keycode)
+    override fun onKeyDown(key: Keydef) {
+        super.onKeyDown(key)
         dismiss()
     }
 

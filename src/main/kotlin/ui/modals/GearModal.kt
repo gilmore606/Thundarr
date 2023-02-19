@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input
 import render.Screen
 import things.Gear
 import things.ThingHolder
+import ui.input.Keydef
 import util.log
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -132,13 +133,13 @@ class GearModal(
         maxSelection = slots.size - 1
     }
 
-    override fun onKeyDown(keycode: Int) {
-        when (keycode) {
-            Input.Keys.BACKSLASH -> dismiss()
-            Input.Keys.TAB -> dismiss()
-            Input.Keys.NUMPAD_4 -> dismiss()
-            Input.Keys.NUMPAD_6 -> doSelect()
-            else -> super.onKeyDown(keycode)
+    override fun onKeyDown(key: Keydef) {
+        when (key) {
+            Keydef.OPEN_GEAR -> dismiss()
+            Keydef.CANCEL -> dismiss()
+            Keydef.MOVE_W -> dismiss()
+            Keydef.MOVE_E -> doSelect()
+            else -> super.onKeyDown(key)
         }
     }
 }
