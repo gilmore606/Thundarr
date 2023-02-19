@@ -50,6 +50,7 @@ object Metamap {
     val bigCityFraction = 0.2f
     val villageCount = 220
     val minVillageDistance = 8
+    val villageAbandonedChance = 0.2f
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
@@ -758,7 +759,7 @@ object Metamap {
                                         actuallyPlaced++
                                         villages.add(XY(x, y))
                                         val villageName = Madlib.villageName()
-                                        scratches[x][y].features.add(Village(villageName))
+                                        scratches[x][y].features.add(Village(villageName, isAbandoned = Dice.chance(villageAbandonedChance)))
                                         scratches[x][y].title = villageName
                                         scratches[x][y].removeFeature(RuinedBuildings::class)
 

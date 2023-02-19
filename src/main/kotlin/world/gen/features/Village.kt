@@ -14,34 +14,50 @@ import world.terrains.Terrain
 @Serializable
 class Village(
     val name: String,
+    val isAbandoned: Boolean = false,
 ) : ChunkFeature(
     3, Stage.BUILD
 ) {
+    private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
 
     @Transient private var featureBuilt = false
 
     override fun doDig() {
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
         printGrid(growBlob(52, 52), x0 + 6, y0 + 6, Terrain.Type.TEMP2)
-        forEachTerrain(Terrain.Type.TEMP2) { x, y ->
-            flagsAt(x, y).add(WorldCarto.CellFlag.NO_PLANTS)
+        if (!isAbandoned) {
+            forEachTerrain(Terrain.Type.TEMP2) { x, y ->
+                flagsAt(x, y).add(WorldCarto.CellFlag.NO_PLANTS)
+            }
         }
         when (Dice.oneTo(4)) {
             1,2 -> layoutVillageBag()
             3 -> layoutVillageHoriz()
             4 -> layoutVillageVert()
         }
-        if (Dice.chance(0.7f)) {
+        if (!isAbandoned && Dice.chance(0.7f)) {
             placeInMostPublic(
                 if (Dice.chance(0.7f)) Well() else Shrine()
             )
+        }
+        if (isAbandoned) {
+            val wear = Dice.float(0.3f, 0.9f)
+            forEachCell { x,y ->
+                if (Dice.chance(when (getTerrain(x, y)) {
+                        Terrain.Type.TERRAIN_WOODFLOOR -> 0.03f * wear
+                        Terrain.Type.TERRAIN_STONEFLOOR -> 0.02f * wear
+                        Terrain.Type.TERRAIN_DIRT -> 0.04f * wear
+                        Terrain.Type.TEMP2 -> 0.06f * wear
+                        else -> 0f
+                })) setTerrain(x, y, Terrain.Type.TEMP1)
+            }
+            fuzzTerrain(Terrain.Type.TEMP1, wear, listOf(Terrain.Type.TERRAIN_WOODWALL, Terrain.Type.TERRAIN_BRICKWALL, Terrain.Type.TERRAIN_WINDOWWALL))
         }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
         swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
     }
 
     private fun layoutVillageVert() {
-        val fertility = Dice.float(0.0f, 1.0f)
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
         val xMidRight = xMid + Dice.oneTo(3)
@@ -78,13 +94,12 @@ class Village(
             if (Dice.chance(0.1f)) cursorY = 64
         }
         for (iy in 3 .. 60) {
-            setTerrain(x0 + xMid, y0 + iy, Terrain.Type.TEMP2)
-            setTerrain(x0 + xMid + 1, y0 + iy, Terrain.Type.TEMP2)
+            if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + xMid, y0 + iy, Terrain.Type.TEMP2)
+            if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + xMid + 1, y0 + iy, Terrain.Type.TEMP2)
         }
     }
 
     private fun layoutVillageHoriz() {
-        val fertility = Dice.float(0.0f, 1.0f)
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
         val yMidBottom = yMid + Dice.oneTo(3)
@@ -121,22 +136,22 @@ class Village(
             if (Dice.chance(0.1f)) cursorX = 64
         }
         for (ix in 3 .. 60) {
-            setTerrain(x0 + ix, y0 + yMid, Terrain.Type.TEMP2)
-            setTerrain(x0 + ix, y0 + yMid + 1, Terrain.Type.TEMP2)
+            if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + ix, y0 + yMid, Terrain.Type.TEMP2)
+            if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + ix, y0 + yMid + 1, Terrain.Type.TEMP2)
         }
     }
 
-    private fun layoutHutOrFeature(x: Int, y: Int, width: Int, height: Int, fertility: Float, forceDoorDir: XY? = null) {
+    private fun layoutHutOrFeature(x: Int, y: Int, width: Int, height: Int, fertility: Float,
+                                   forceDoorDir: XY? = null) {
         if (!featureBuilt && Dice.chance(0.15f)) {
             buildVillageFeature(x, y, width, height)
             featureBuilt = true
         } else {
-            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir)
+            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned)
         }
     }
 
     private fun layoutVillageBag() {
-        val fertility = Dice.float(0.0f, 1.0f)
         val hutCount = Dice.range(6, 18)
         var built = 0
         var width = Dice.range(9, 13)
@@ -195,11 +210,10 @@ class Village(
     private fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
         val isWild = Dice.chance(0.4f)
         val inVertRows = Dice.flip()
-        val gardenDensity = Dice.float(0.2f, 0.8f) * 3f
+        val gardenDensity = fertility * 2f
         val villagePlantSpawns = villagePlantSpawns()
         for (tx in x0 + x until x0 + x + width) {
             for (ty in y0 + y until y0 + y + height) {
-                flagsAt(tx,ty).add(WorldCarto.CellFlag.NO_PLANTS)
                 if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isWild) {
                     setTerrain(tx, ty, Terrain.Type.TERRAIN_GRASS)
                     carto.getPlant(meta.biome, meta.habitat, 1f,

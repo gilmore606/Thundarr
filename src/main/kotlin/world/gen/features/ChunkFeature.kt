@@ -118,7 +118,8 @@ sealed class ChunkFeature(
         }
     }
 
-    protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float, forceDoorDir: XY? = null) {
+    protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
+                           forceDoorDir: XY? = null, isAbandoned: Boolean = false) {
         val villagePlantSpawns = villagePlantSpawns()
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
@@ -154,12 +155,14 @@ sealed class ChunkFeature(
             splitDoor = Dice.range(x+2, x+width-3)
             if (split == doory) split += 1
         }
-        var windowBlockerCount = Dice.range(3, 8)
+
+        // Draw yard/wall/floor terrain, with door and windows
+        var windowBlockerCount = Dice.range(3, 10)
         for (tx in x until x+width) {
             for (ty in y until y+height) {
                 if (tx == doorx && ty == doory) {
                     setTerrain(x0+tx, y0+ty, floorType)
-                    spawnThing(x0+tx, y0+ty, WoodDoor())
+                    if (!isAbandoned || Dice.chance(0.5f)) spawnThing(x0+tx, y0+ty, WoodDoor())
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
@@ -167,7 +170,8 @@ sealed class ChunkFeature(
                     if (windowBlockerCount < 1 &&
                         !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
                         ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
-                        setTerrain(x0 + tx, y0 + ty, Terrain.Type.TERRAIN_WINDOWWALL)
+                        setTerrain(x0 + tx, y0 + ty,
+                            if (!isAbandoned || Dice.chance(0.5f)) Terrain.Type.TERRAIN_WINDOWWALL else floorType)
                         chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                         windowBlockerCount = Dice.range(4, 12)
                     } else {
@@ -181,7 +185,9 @@ sealed class ChunkFeature(
                 }
             }
         }
-        val hasInternalDoor = Dice.chance(0.5f)
+
+        // Draw inside door if needed
+        val hasInternalDoor = Dice.chance(if (isAbandoned) 0.1f else 0.5f)
         if (splitVert) {
             for (ty in y+2 until y+height-2) {
                 if (ty != splitDoor) {
@@ -200,6 +206,8 @@ sealed class ChunkFeature(
             }
         }
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
+
+        // Grow plants in yard
         val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->
             carto.getPlant(meta.biome, meta.habitat, 0.5f,
@@ -207,11 +215,10 @@ sealed class ChunkFeature(
             )?.also { plant ->
                 spawnThing(x, y, plant)
             }
-            flagsAt(x,y).add(WorldCarto.CellFlag.NO_PLANTS)
         }
         fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
-        safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
-        safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
+        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
     }
 }
