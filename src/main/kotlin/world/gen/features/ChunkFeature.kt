@@ -120,7 +120,8 @@ sealed class ChunkFeature(
     }
 
     protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
-                           forceDoorDir: XY? = null, isAbandoned: Boolean = false) {
+                           forceDoorDir: XY? = null, isAbandoned: Boolean = false,
+                           forRooms: ((List<Decor.Room>)->Unit)? = null) {
         val villagePlantSpawns = villagePlantSpawns()
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
@@ -208,6 +209,7 @@ sealed class ChunkFeature(
                     setTerrain(x0+tx, y0+ty, floorType)
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
                 }
+                flagsAt(x0+tx, y0+ty).add(WorldCarto.CellFlag.NO_PLANTS)
             }
         }
         // Draw inside door if needed
@@ -230,18 +232,15 @@ sealed class ChunkFeature(
             }
         }
         // Furnish rooms
-        when (rooms.size) {
-            1 -> {
-                Schoolhouse().furnish(rooms[0], carto)
-            }
-            2 -> {
-                HutBedroom().furnish(rooms[0], carto)
-                HutLivingRoom().furnish(rooms[1], carto)
-            }
-        }
+        forRooms?.invoke(rooms)
         // Grow yard
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
         fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
+        // Cut walkway through yard
+        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y,
+            if (Dice.chance(0.3f)) Terrain.Type.TERRAIN_STONEFLOOR else dirtType)
+        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
+        if (!isAbandoned) flagsAt(x0 + doorx + doorDir.x, y0 + doory + doorDir.y).add(WorldCarto.CellFlag.NO_PLANTS)
         // Grow plants in yard
         val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->
@@ -251,11 +250,6 @@ sealed class ChunkFeature(
                 spawnThing(x, y, plant)
             }
         }
-        // Cut walkway through yard
-        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y,
-            if (Dice.chance(0.3f)) Terrain.Type.TERRAIN_STONEFLOOR else dirtType)
-        if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
-        if (!isAbandoned) flagsAt(x0 + doorx + doorDir.x, y0 + doory + doorDir.y).add(WorldCarto.CellFlag.NO_PLANTS)
 
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
     }

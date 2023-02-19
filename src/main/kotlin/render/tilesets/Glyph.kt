@@ -187,6 +187,7 @@ enum class Glyph {
     WELL,
     SHRINE,
     BOOKSHELF,
+    FORGE,
 
     BLOODSTAIN,
     SCORCHMARK,

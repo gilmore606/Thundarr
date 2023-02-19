@@ -5,6 +5,7 @@ import util.Dice
 import util.Rect
 import util.XY
 import world.gen.cartos.Carto
+import world.terrains.Terrain
 
 abstract class Decor {
 
@@ -29,7 +30,10 @@ abstract class Decor {
                 if (lx >= 0 && ly >= 0 && lx < width && ly < height) clearAt[lx][ly] = false
             }
         }
-
+        fun isClearAt(x: Int, y: Int): Boolean {
+            if (x < rect.x0 || y < rect.y0|| x > rect.x1 || y > rect.y1) return false
+            return clearAt[x-rect.x0][y-rect.y0]
+        }
         fun unclear(loc: XY) {
             clearAt[loc.x-rect.x0][loc.y-rect.y0] = false
             clears.remove(loc)
@@ -50,9 +54,17 @@ abstract class Decor {
 
     private lateinit var carto: Carto
     private lateinit var room: Room
+    protected val x0: Int get() = room.rect.x0
+    protected val y0: Int get() = room.rect.y0
+    protected val x1: Int get() = room.rect.x1
+    protected val y1: Int get() = room.rect.y1
+
     private var cell = XY(0,0)
 
+    open fun fitsInRoom(room: Room): Boolean = true
+
     fun furnish(room: Room, carto: Carto) {
+        if (!fitsInRoom(room)) return
         this.carto = carto
         this.room = room
         doFurnish()
@@ -97,6 +109,25 @@ abstract class Decor {
         doThis()
     }
 
+    protected fun atCenter(doThis: ()->Unit) {
+        val cx = room.rect.x0 + (room.width / 2)
+        val cy = room.rect.y0 + (room.height / 2)
+        if (room.isClearAt(cx, cy)) {
+            cell = XY(cx, cy)
+            doThis()
+        } else {
+            for (ix in -1..1) {
+                for (iy in -1..1) {
+                    if (room.isClearAt(cx+ix, cy+iy)) {
+                        cell = XY(cx+ix, cy+iy)
+                        doThis()
+                        return
+                    }
+                }
+            }
+        }
+    }
+
     protected fun forEachClear(doThis: (x: Int, y: Int)->Unit) {
         for (ix in room.rect.x0..room.rect.x1) {
             for (iy in room.rect.y0..room.rect.y1) {
@@ -106,6 +137,18 @@ abstract class Decor {
                 }
             }
         }
+    }
+
+    protected fun forArea(x0: Int, y0: Int, x1: Int, y1: Int, doThis: (x: Int, y: Int)->Unit) {
+        for (ix in x0..x1) {
+            for (iy in y0..y1) {
+                doThis(ix, iy)
+            }
+        }
+    }
+
+    protected fun setTerrain(x: Int, y: Int, type: Terrain.Type, roofed: Boolean? = null) {
+        carto.setTerrain(x, y, type, roofed)
     }
 
     protected val clearCount: Int

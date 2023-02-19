@@ -7,6 +7,7 @@ import things.Thing
 import things.Well
 import util.*
 import world.gen.cartos.WorldCarto
+import world.gen.decors.*
 import world.gen.villagePlantSpawns
 import world.path.DistanceMap
 import world.terrains.Terrain
@@ -21,8 +22,14 @@ class Village(
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
 
     @Transient private var featureBuilt = false
+    @Transient private val uniqueHuts = mutableListOf<Decor>()
 
     override fun doDig() {
+        uniqueHuts.add(BlacksmithShop())
+        uniqueHuts.add(Schoolhouse())
+        uniqueHuts.add(Church())
+        uniqueHuts.add(StorageShed())
+
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
         printGrid(growBlob(52, 52), x0 + 6, y0 + 6, Terrain.Type.TEMP2)
         if (!isAbandoned) {
@@ -147,7 +154,22 @@ class Village(
             buildVillageFeature(x, y, width, height)
             featureBuilt = true
         } else {
-            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned)
+            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned) { rooms ->
+                when (rooms.size) {
+                    1 -> {
+                        uniqueHuts.filter { it.fitsInRoom(rooms[0]) }.randomOrNull()?.also { uniqueDecor ->
+                            uniqueDecor.furnish(rooms[0], carto)
+                            uniqueHuts.remove(uniqueDecor)
+                        } ?: run {
+                            Hut().furnish(rooms[0], carto)
+                        }
+                    }
+                    2 -> {
+                        HutLivingRoom().furnish(rooms[0], carto)
+                        HutBedroom().furnish(rooms[1], carto)
+                    }
+                }
+            }
         }
     }
 
