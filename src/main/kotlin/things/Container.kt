@@ -97,6 +97,22 @@ class FilingCabinet : Container() {
 }
 
 @Serializable
+class Bookshelf : Container() {
+    override fun name() = "bookshelf"
+    override fun description() = "Shelves full of mostly uninteresting books."
+    override fun glyph() = Glyph.BOOKSHELF
+    override fun isPortable() = false
+    override fun openVerb() = "peruse"
+
+    override fun randomTreasureCount() = Dice.zeroTo(2)
+    override fun randomTreasure() = when (Dice.zeroTo(1)) {
+        0 -> BoysLife()
+        1 -> Paperback()
+        else -> Paperback()
+    }
+}
+
+@Serializable
 class Fridge : Container() {
     override fun name() = "fridge"
     override fun description() = "A box chilled by technology to preserve foods.  Astounding."

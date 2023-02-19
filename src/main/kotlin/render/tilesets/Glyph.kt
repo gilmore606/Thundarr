@@ -186,6 +186,7 @@ enum class Glyph {
     WRECKED_CAR,
     WELL,
     SHRINE,
+    BOOKSHELF,
 
     BLOODSTAIN,
     SCORCHMARK,
