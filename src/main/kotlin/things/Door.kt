@@ -7,6 +7,7 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
+import util.Dice
 import util.XY
 
 @Serializable
@@ -21,6 +22,8 @@ sealed class Door : Thing(), Smashable {
     open fun isOpenable() = !isLocked
     open fun isLockable() = false
 
+    open fun maybeLocked(chance: Float) = this.apply { if (Dice.chance(chance)) isLocked = true }
+
     override fun isPortable() = false
     override fun isBlocking() = !isOpen
     override fun isOpaque() = !isOpen
@@ -33,28 +36,20 @@ sealed class Door : Thing(), Smashable {
         UseTag.OPEN to Use("open " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
             toDo = { actor,level,x,y ->
-                doOpen()
+                if (isLocked) Console.sayAct("It's locked.", "", actor) else doOpen()
             }),
         UseTag.CLOSE to Use("close " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && isOpen && !isObstructed() },
-            toDo = { actor,level,x,y ->
-                doClose()
-            }),
+            toDo = { actor,level,x,y -> doClose() }),
         UseTag.USE to Use("knock on " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
-            toDo = { actor,level,x,y ->
-                doKnock(actor)
-            }),
+            toDo = { actor,level,x,y -> doKnock(actor) }),
         UseTag.SWITCH_ON to Use("lock " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isLockable() && isNextTo(actor) && !isOpen && !isLocked },
-            toDo = { actor,level,x,y ->
-
-            }),
+            toDo = { actor,level,x,y ->   }),
         UseTag.SWITCH_OFF to Use("unlock " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isLockable() && isNextTo(actor) && !isOpen && isLocked },
-            toDo = { actor,level,x,y ->
-
-            })
+            toDo = { actor,level,x,y ->   }),
     )
 
     override fun bumpAction(): Action? {
@@ -98,12 +93,12 @@ sealed class Door : Thing(), Smashable {
 }
 
 @Serializable
-class ModernDoor : Door() {
+class ModernDoor() : Door() {
     override fun description() = "A dull metal sliding door, pitted with corrosion."
 }
 
 @Serializable
-class WoodDoor : Door() {
+class WoodDoor() : Door() {
     override fun description() = "A heavy oak door bound with brass."
     override fun openGlyph() = Glyph.WOOD_DOOR_OPEN
     override fun closedGlyph() = Glyph.WOOD_DOOR_CLOSED

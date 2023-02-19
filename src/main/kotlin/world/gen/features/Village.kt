@@ -66,7 +66,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY - height, width, height, fertility, EAST)
-            cursorY -= (height + Dice.zeroTo(2))
+            cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
@@ -74,7 +74,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY, width, height, fertility, EAST)
-            cursorY += height + Dice.zeroTo(2)
+            cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         cursorY = 32
@@ -82,7 +82,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight, cursorY - height, width, height, fertility, WEST)
-            cursorY -= (height + Dice.zeroTo(2))
+            cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
@@ -90,7 +90,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight, cursorY, width, height, fertility, WEST)
-            cursorY += height + Dice.zeroTo(2)
+            cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         for (iy in 3 .. 60) {
@@ -108,7 +108,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidTop - height, width, height, fertility, SOUTH)
-            cursorX -= (height + Dice.zeroTo(2))
+            cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
@@ -116,7 +116,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidTop - height, width, height, fertility, SOUTH)
-            cursorX += height + Dice.zeroTo(2)
+            cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         cursorX = 32
@@ -124,7 +124,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidBottom, width, height, fertility, NORTH)
-            cursorX -= (height + Dice.zeroTo(2))
+            cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
@@ -132,7 +132,7 @@ class Village(
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidBottom, width, height, fertility, NORTH)
-            cursorX += height + Dice.zeroTo(2)
+            cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         for (ix in 3 .. 60) {
@@ -186,6 +186,13 @@ class Village(
     private fun placeInMostPublic(thing: Thing) {
         fun placeWell(x: Int, y: Int) {
             spawnThing(x, y, thing)
+            if (Dice.chance(0.7f)) {
+                for (ix in -1 .. 1) {
+                    for (iy in -1 .. 1) {
+                        setTerrain(x+ix, y+iy, Terrain.Type.TERRAIN_STONEFLOOR)
+                    }
+                }
+            }
         }
         val distanceMap = DistanceMap(chunk) { x,y ->
             getTerrain(x,y) != Terrain.Type.TEMP2
@@ -204,7 +211,6 @@ class Village(
             1,2 -> buildGarden(x + 1, y + 1, width - 2, height - 2)
             3 -> buildStage(x + 1, y + 1, width - 2, height - 2)
         }
-
     }
 
     private fun buildGarden(x: Int, y: Int, width: Int, height: Int) {

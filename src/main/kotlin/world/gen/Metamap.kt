@@ -50,7 +50,7 @@ object Metamap {
     val bigCityFraction = 0.2f
     val villageCount = 220
     val minVillageDistance = 8
-    val villageAbandonedChance = 0.2f
+    val villageAbandonedChance = 0.15f
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
