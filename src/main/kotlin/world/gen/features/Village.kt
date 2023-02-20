@@ -8,7 +8,7 @@ import things.Well
 import util.*
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.gen.villagePlantSpawns
+import world.gen.gardenPlantSpawns
 import world.path.DistanceMap
 import world.terrains.Terrain
 
@@ -23,6 +23,8 @@ class Village(
 
     @Transient private var featureBuilt = false
     @Transient private val uniqueHuts = mutableListOf<Decor>()
+
+    override fun cellTitle() = name
 
     override fun doDig() {
         uniqueHuts.add(BlacksmithShop())
@@ -209,10 +211,12 @@ class Village(
     private fun placeInMostPublic(thing: Thing) {
         fun placeWell(x: Int, y: Int) {
             spawnThing(x, y, thing)
+            val edgeTerrain = if (isAbandoned) Terrain.Type.TERRAIN_UNDERGROWTH else
+                if (Dice.flip()) Terrain.Type.TERRAIN_STONEFLOOR else Terrain.Type.TERRAIN_GRASS
             if (Dice.chance(0.7f)) {
                 for (ix in -1 .. 1) {
                     for (iy in -1 .. 1) {
-                        setTerrain(x+ix, y+iy, Terrain.Type.TERRAIN_STONEFLOOR)
+                        setTerrain(x+ix, y+iy, edgeTerrain)
                     }
                 }
             }
@@ -230,36 +234,10 @@ class Village(
     }
 
     private fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
-        when (Dice.oneTo(3)) {
-            1,2 -> buildGarden(x + 1, y + 1, width - 2, height - 2)
-            3 -> buildStage(x + 1, y + 1, width - 2, height - 2)
+        val room = when (Dice.oneTo(3)) {
+            1,2 -> Garden(fertility, meta.biome, meta.habitat)
+            else -> Stage()
         }
-    }
-
-    private fun buildGarden(x: Int, y: Int, width: Int, height: Int) {
-        val isWild = Dice.chance(0.4f)
-        val inVertRows = Dice.flip()
-        val gardenDensity = fertility * 2f
-        val villagePlantSpawns = villagePlantSpawns()
-        for (tx in x0 + x until x0 + x + width) {
-            for (ty in y0 + y until y0 + y + height) {
-                if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isWild) {
-                    setTerrain(tx, ty, Terrain.Type.TERRAIN_GRASS)
-                    carto.getPlant(meta.biome, meta.habitat, 1f,
-                        gardenDensity, villagePlantSpawns)?.also { plant ->
-                        spawnThing(tx, ty, plant)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun buildStage(x: Int, y: Int, width: Int, height: Int) {
-        val terrain = listOf(Terrain.Type.TERRAIN_WOODFLOOR, Terrain.Type.TERRAIN_STONEFLOOR).random()
-        for (tx in x0 + x until x0 + x + width) {
-            for (ty in y0 + y until y0 + y + height) {
-                setTerrain(tx, ty, terrain)
-            }
-        }
+        room.furnish(Decor.Room(Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2), listOf()), carto)
     }
 }

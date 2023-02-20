@@ -183,7 +183,7 @@ fun plantSpawns() = listOf<PlantSpawn>(
     )
 )
 
-fun villagePlantSpawns() = listOf<PlantSpawn>(
+fun gardenPlantSpawns() = listOf<PlantSpawn>(
     PlantSpawn({ Wildflowers() },
     setOf(Forest, ForestHill, Swamp, Desert, Plain, Scrub, Mountain, Hill),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),

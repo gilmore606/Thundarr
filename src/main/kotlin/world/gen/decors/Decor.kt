@@ -7,6 +7,7 @@ import ui.panels.Console
 import util.Dice
 import util.Rect
 import util.XY
+import world.ChunkMeta
 import world.gen.cartos.Carto
 import world.terrains.Terrain
 
@@ -57,13 +58,16 @@ sealed class Decor {
         }
     }
 
-    @Transient private lateinit var carto: Carto
+    @Transient
+    lateinit var carto: Carto
     lateinit var room: Room
     var isAbandoned: Boolean = false
     protected val x0: Int get() = room.rect.x0
     protected val y0: Int get() = room.rect.y0
     protected val x1: Int get() = room.rect.x1
     protected val y1: Int get() = room.rect.y1
+    protected val width: Int get() = room.width
+    protected val height: Int get() = room.height
 
     private var cell = XY(0,0)
 
@@ -99,6 +103,11 @@ sealed class Decor {
         if (isAbandoned && Dice.chance(0.3f)) return
         carto.spawnThing(cell.x, cell.y, thing)
         room.unclear(cell)
+    }
+
+    protected fun spawnAt(x: Int, y: Int, thing: Thing) {
+        carto.spawnThing(x, y, thing)
+        room.unclear(XY(x, y))
     }
 
     protected fun clearAround() {

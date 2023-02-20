@@ -51,6 +51,7 @@ object Metamap {
     val villageCount = 220
     val minVillageDistance = 8
     val villageAbandonedChance = 0.15f
+    val villageNeighborFeatureChance = 1.0f
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
@@ -760,9 +761,19 @@ object Metamap {
                                         villages.add(XY(x, y))
                                         val villageName = Madlib.villageName()
                                         scratches[x][y].features.add(Village(villageName, isAbandoned = Dice.chance(villageAbandonedChance)))
-                                        scratches[x][y].title = villageName
                                         scratches[x][y].removeFeature(RuinedBuildings::class)
-
+                                        // Place features around village
+                                        CARDINALS.from(x, y) { dx, dy, dir ->
+                                            if (boundsCheck(dx, dy) && Dice.chance(villageNeighborFeatureChance)) {
+                                                val neighbor = scratches[dx][dy]
+                                                when (neighbor.biome) {
+                                                    Plain, Scrub -> Farm()
+                                                    else -> null
+                                                }?.also { feature ->
+                                                    scratches[dx][dy].features.add(feature)
+                                                }
+                                            }
+                                        }
                                         suggestedPlayerStart.x = xToChunkX(x)
                                         suggestedPlayerStart.y = yToChunkY(y)
                                     }
@@ -855,7 +866,7 @@ object Metamap {
                 }
             }
             forEachMeta { x,y,cell ->
-                if (cell.title == "") cell.title = cell.biome.defaultTitle()
+                if (cell.title == "") cell.title = cell.defaultTitle()
             }
 
             // END STAGE : WRITE ALL DATA

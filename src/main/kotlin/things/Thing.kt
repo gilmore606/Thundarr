@@ -296,6 +296,7 @@ class Lighter : Portable() {
     )
     override fun toolbarName() = "light fire nearby"
     override fun toolbarUseTag() = UseTag.USE
+    override fun spawnContainers() = mutableListOf(Tag.THING_TRUNK, Tag.THING_WRECKEDCAR, Tag.THING_BONEPILE, Tag.THING_TABLE)
 
     private fun hasTargetAt(x: Int, y: Int): Boolean = holder?.level?.thingsAt(x, y)?.hasOneWhere { it.flammability() > 0f } ?: false
 

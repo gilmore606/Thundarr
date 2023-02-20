@@ -136,4 +136,6 @@ class ChunkScratch(
     fun highways(): List<Highways.HighwayExit> = featureOf(Highways::class)?.let {
         (it as Highways).exits
     } ?: listOf()
+
+    fun defaultTitle() = features.firstNotNullOfOrNull { it.cellTitle() } ?: biome.defaultTitle()
 }

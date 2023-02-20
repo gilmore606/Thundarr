@@ -3,6 +3,9 @@ package world.gen.decors
 import kotlinx.serialization.Serializable
 import things.*
 import util.Dice
+import world.gen.biomes.Biome
+import world.gen.habitats.Habitat
+import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
 
 @Serializable
@@ -100,6 +103,45 @@ class BlacksmithShop : Decor() {
         atCenter { spawn(Forge()) }
         repeat (Dice.range(1, 4)) {
             againstWall { spawn(Table()) }
+        }
+    }
+}
+
+@Serializable
+class Garden(
+    private val fertility: Float, val biome: Biome, val habitat: Habitat
+) : Decor() {
+    private fun sizeName() = if (room.width * room.height > 60) "farm field" else "garden"
+    override fun description() = "A ${sizeName()} plowed in rows."
+    override fun abandonedDescription() = "An abandoned ${sizeName()}, overgrown with weeds."
+    override fun doFurnish() {
+        val inVertRows = Dice.flip()
+        val gardenDensity = fertility * 2f
+        val gardenPlantSpawns = gardenPlantSpawns()
+        for (tx in x0 until x1) {
+            for (ty in y0 until y1) {
+                if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isAbandoned) {
+                    setTerrain(tx, ty, Terrain.Type.TERRAIN_GRASS)
+                    carto.getPlant(biome, habitat, 1f,
+                        gardenDensity, gardenPlantSpawns)?.also { plant ->
+                        spawnAt(tx, ty, plant)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Serializable
+class Stage : Decor() {
+    override fun description() = "A broad raised platform for public gatherings."
+    override fun abandonedDescription() = "A raised platform once used for public events, long abandoned."
+    override fun doFurnish() {
+        val terrain = listOf(Terrain.Type.TERRAIN_WOODFLOOR, Terrain.Type.TERRAIN_STONEFLOOR).random()
+        for (tx in x0 until x1) {
+            for (ty in y0 until y1) {
+                setTerrain(tx, ty, terrain)
+            }
         }
     }
 }

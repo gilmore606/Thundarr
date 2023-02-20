@@ -2,7 +2,6 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import things.Table
 import things.Thing
 import things.WoodDoor
 import util.*
@@ -11,7 +10,7 @@ import world.ChunkMeta
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.gen.villagePlantSpawns
+import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
 
 @Serializable
@@ -48,6 +47,8 @@ sealed class ChunkFeature(
     }
 
     abstract fun doDig()
+
+    open fun cellTitle(): String? = null
 
     protected fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         carto.printGrid(blob, x, y, terrain)
@@ -120,9 +121,9 @@ sealed class ChunkFeature(
     }
 
     protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
-                           forceDoorDir: XY? = null, isAbandoned: Boolean = false,
-                           forRooms: ((List<Decor.Room>)->Unit)? = null) {
-        val villagePlantSpawns = villagePlantSpawns()
+                           forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
+                           forRooms: ((List<Decor.Room>)->Unit)) {
+        val villagePlantSpawns = gardenPlantSpawns()
         val wallType = meta.biome.villageWallType()
         val floorType = meta.biome.villageFloorType()
         val dirtType =  meta.biome.trailTerrain(x0,y0)
@@ -150,20 +151,20 @@ sealed class ChunkFeature(
         var splitDoor = 0
         val rooms = mutableListOf<Decor.Room>()
         val doorClearCell = XY(x0 + doorx - doorDir.x, y0 + doory - doorDir.y)
-        if (width > 9 && width > height && Dice.chance(0.7f)) {
+        if (splittable && width > 9 && width > height && Dice.chance(0.6f)) {
             splitVert = true
             split = x + (width / 2) + Dice.range(-1, 1)
             splitDoor = Dice.range(y+2, y+height-3)
             if (split == doorx) split +=1
             rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+split-2, y0+y+height-3),
+                Rect(x0+x+2, y0+y+2, x0+split-1, y0+y+height-3),
                 listOf(doorClearCell, XY(x0 + split - 1, y0 + splitDoor))
             ))
             rooms.add(Decor.Room(
-                Rect(x0+split+2, y0+y+2, x0+x+width-3, y0+y+height-3),
+                Rect(x0+split+1, y0+y+2, x0+x+width-3, y0+y+height-3),
                 listOf(doorClearCell, XY(x0 + split + 1, y0 + splitDoor))
             ))
-        } else if (height > 9 && height > width && Dice.chance(0.7f)) {
+        } else if (splittable && height > 9 && height > width && Dice.chance(0.6f)) {
             splitHoriz = true
             split = y + (height / 2) + Dice.range(-1, 1)
             splitDoor = Dice.range(x+2, x+width-3)
