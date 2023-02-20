@@ -89,6 +89,7 @@ sealed class LitThing : Portable(), LightSource {
 
 @Serializable
 class Lightbulb : LitThing() {
+    override val tag = Tag.THING_LIGHTBULB
     override fun glyph() = Glyph.LIGHTBULB
     override fun name() = "lightbulb"
     override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
@@ -98,6 +99,7 @@ class Lightbulb : LitThing() {
 
 @Serializable
 class CeilingLight : LitThing(), Smashable {
+    override val tag = Tag.THING_CEILINGLIGHT
     var broken = false
     override fun glyph() = Glyph.CEILING_LIGHT
     override fun name() = "ceiling light"
@@ -125,6 +127,7 @@ class CeilingLight : LitThing(), Smashable {
 
 @Serializable
 class Glowstone : LitThing() {
+    override val tag = Tag.THING_GLOWSTONE
     override fun glyph() = Glyph.GLOWING_CRYSTAL
     override fun name() = "glowstone"
     override fun description() = "A softly glowing quartz-like crystal formation."
@@ -141,6 +144,7 @@ class Glowstone : LitThing() {
 
 @Serializable
 class Sunsword : LitThing() {
+    override val tag = Tag.THING_SUNSWORD
     override fun glyph() = if (active) Glyph.HILT_LIT else Glyph.HILT
     override fun name() = "sunsword"
     override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
@@ -170,6 +174,7 @@ class Sunsword : LitThing() {
 
 @Serializable
 class Torch : LitThing(), Temporal {
+    override val tag = Tag.THING_TORCH
     private var fuel = 2000f
     override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"

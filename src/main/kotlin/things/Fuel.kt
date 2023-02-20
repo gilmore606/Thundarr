@@ -53,6 +53,7 @@ sealed class FuelBlock : Portable(), Fuel {
 
 @Serializable
 class Log() : FuelBlock() {
+    override val tag = Tag.THING_LOG
     override fun name() = "log"
     override fun description() = "Big, heavy, wood.  Better than bad.  Good."
     override fun glyph() = Glyph.LOG
@@ -61,6 +62,7 @@ class Log() : FuelBlock() {
 
 @Serializable
 class Board() : FuelBlock() {
+    override val tag = Tag.THING_BOARD
     override fun name() = "board"
     override fun description() = "A length of 2x4 knotty pine."
     override fun glyph() = Glyph.BOARD

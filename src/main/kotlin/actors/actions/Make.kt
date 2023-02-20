@@ -19,7 +19,7 @@ class Make(
             if (actor is Player) Console.say(recipe.makeFailMsg())
             if (roll < -2f) {
                 recipe.ingredients().random().also { thingTag ->
-                    bench.contents().firstOrNull { it.thingTag() == thingTag }?.moveTo(null)
+                    bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
                 }
             } else if (roll < -5f) {
                 consumeAllIngredients()
@@ -33,7 +33,7 @@ class Make(
 
     private fun consumeAllIngredients() {
         recipe.ingredients().forEach { thingTag ->
-            bench.contents().firstOrNull { it.thingTag() == thingTag }?.moveTo(null)
+            bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
         }
     }
 }

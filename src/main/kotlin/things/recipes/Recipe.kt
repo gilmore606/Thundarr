@@ -11,7 +11,7 @@ abstract class Recipe {
             SteakRecipe
         )
     }
-    abstract fun ingredients(): List<String>
+    abstract fun ingredients(): List<Thing.Tag>
     abstract fun product(): Thing
     abstract fun skill(): Stat
     abstract fun difficulty(): Float
@@ -27,7 +27,7 @@ abstract class FoodRecipe : Recipe() {
 }
 
 object SteakRecipe : FoodRecipe() {
-    override fun ingredients() = listOf("meat")
+    override fun ingredients() = listOf(Thing.Tag.THING_RAWMEAT)
     override fun product() = Steak()
     override fun skill() = Survive
     override fun difficulty() = 1f

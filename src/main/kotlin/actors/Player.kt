@@ -31,7 +31,7 @@ open class Player : Actor() {
 
     var journal: Journal = Journal()
     var dangerMode: Boolean = false
-    var thrownTag: String = ""
+    var thrownTag: Thing.Tag? = null
     override fun glyph() = Glyph.PLAYER
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
@@ -51,7 +51,7 @@ open class Player : Actor() {
     private val caloriesHunger = -2000f
     private val caloriesStarving = -4000f
 
-    val autoPickUpTypes = mutableListOf<String>()
+    val autoPickUpTypes = mutableListOf<Thing.Tag>()
 
     init {
         Pather.subscribe(this, this, 60f)
@@ -133,15 +133,12 @@ open class Player : Actor() {
         }
     }
 
-    fun readyForThrowing(tag: String) {
+    fun readyForThrowing(tag: Thing.Tag) {
         thrownTag = tag
-        Console.say("You'll throw " + thrownTag.plural() + " now.")
+        Console.say("You'll throw " + tag.pluralName + " now.")
     }
 
-    fun getThrown(): Thing? {
-        if (thrownTag == "") return null
-        return contents.firstOrNull { it.thingTag() == thrownTag }
-    }
+    fun getThrown(): Thing? = thrownTag?.let { tag -> contents.firstOrNull { it.tag == tag } }
 
     override fun advanceTime(delta: Float) {
         super.advanceTime(delta)
@@ -186,13 +183,13 @@ open class Player : Actor() {
         }
     }
 
-    override fun wantsToPickUp(thing: Thing) = isAutoActionSafe() && autoPickUpTypes.contains(thing.thingTag())
+    override fun wantsToPickUp(thing: Thing) = isAutoActionSafe() && autoPickUpTypes.contains(thing.tag)
 
-    open fun addAutoPickUpType(type: String) {
+    open fun addAutoPickUpType(type: Thing.Tag) {
         autoPickUpTypes.add(type)
-        Console.say("You remind yourself to pick up any " + type.plural() + " you find.")
+        Console.say("You remind yourself to pick up any " + type.pluralName + " you find.")
     }
-    open fun removeAutoPickUpType(type: String) {
+    open fun removeAutoPickUpType(type: Thing.Tag) {
         autoPickUpTypes.remove(type)
         Console.say("You give up on your $type collection.")
     }

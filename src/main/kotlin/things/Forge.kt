@@ -10,6 +10,7 @@ class Forge : LitThing() {
         active = true
     }
 
+    override val tag = Tag.THING_FORGE
     override fun name() = "forge"
     override fun description() = "A brick furnace and forge for ironworking."
     override fun glyph() = Glyph.FORGE

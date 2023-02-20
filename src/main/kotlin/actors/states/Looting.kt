@@ -13,7 +13,7 @@ import world.path.Pather
 // Trying to get a known seen item.
 class Looting(
     val targetXY: XY,
-    val thingTag: String
+    val thingTag: Thing.Tag
 ) : State() {
 
     override fun enter(npc: NPC) {
@@ -47,9 +47,9 @@ class Looting(
     }
 
     private fun stillThere(level: Level?): Boolean =
-        level?.thingsAt(targetXY.x, targetXY.y)?.hasOneWhere { it.thingTag() == thingTag } ?: false
+        level?.thingsAt(targetXY.x, targetXY.y)?.hasOneWhere { it.tag == thingTag } ?: false
 
     private fun theThing(level: Level?): Thing? =
-        level?.thingsAt(targetXY.x, targetXY.y)?.firstOrNull { it.thingTag() == thingTag }
+        level?.thingsAt(targetXY.x, targetXY.y)?.firstOrNull { it.tag == thingTag }
 
 }

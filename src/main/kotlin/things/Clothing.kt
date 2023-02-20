@@ -24,6 +24,7 @@ class HardHat : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.HARD_HAT, 0.0f, -0.6f)
     }
+    override val tag = Tag.THING_HARDHAT
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HARD_HAT
     override fun name() = "hard hat"
@@ -41,6 +42,7 @@ class HornedHelmet : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.HORNED_HAT, 0.0f, -0.6f)
     }
+    override val tag = Tag.THING_HORNEDHELMET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HORNED_HAT
     override fun name() = "horned helmet"
@@ -59,6 +61,7 @@ class RiotHelmet : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.HELMET, 0.0f, -0.5f)
     }
+    override val tag = Tag.THING_RIOTHELMET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HELMET
     override fun name() = "riot helmet"
@@ -73,6 +76,7 @@ class MokBoots : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.GRAY_BOOTS_WORN)
     }
+    override val tag = Tag.THING_MOKBOOTS
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.GRAY_BOOTS
     override fun name() = "mok boots"
@@ -87,6 +91,7 @@ class TravelBoots : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.BROWN_BOOTS_WORN)
     }
+    override val tag = Tag.THING_TRAVELBOOTS
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.BROWN_BOOTS
     override fun name() = "travel boots"
@@ -101,6 +106,7 @@ class FurTunic : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_TUNIC_WORN)
     }
+    override val tag = Tag.THING_FURTUNIC
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_TUNIC
     override fun name() = "fur tunic"
@@ -115,6 +121,7 @@ class FurJacket : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_JACKET_WORN)
     }
+    override val tag = Tag.THING_FURJACKET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_JACKET
     override fun name() = "fur jacket"
@@ -129,6 +136,7 @@ class SabretoothCharm : Clothing() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.NECK_CHARM_WORN)
     }
+    override val tag = Tag.THING_SABRETOOTHCHARM
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.NECK_CHARM
     override fun name() = "sabretooth charm"

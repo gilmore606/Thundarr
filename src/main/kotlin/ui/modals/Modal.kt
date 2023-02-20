@@ -251,9 +251,9 @@ abstract class Modal(
                         }
                     }
                 }
-                if (portable && thing.thingTag() != App.player.thrownTag) {
+                if (portable && thing.tag != App.player.thrownTag) {
                     addOption("ready " + thing.name().plural() + " for throwing") {
-                        App.player.readyForThrowing(thing.thingTag())
+                        App.player.readyForThrowing(thing.tag)
                     }
                 }
                 thing.toolbarName()?.also { hotbarName ->
@@ -261,13 +261,13 @@ abstract class Modal(
                         Toolbar.beginAdd(thing)
                     }
                 }
-                if (App.player.autoPickUpTypes.contains(thing.thingTag())) {
-                    addOption("stop auto-pickup of " + thing.name().plural()) {
-                        App.player.removeAutoPickUpType(thing.thingTag())
+                if (App.player.autoPickUpTypes.contains(thing.tag)) {
+                    addOption("stop auto-pickup of " + thing.tag.pluralName) {
+                        App.player.removeAutoPickUpType(thing.tag)
                     }
                 } else if (portable) {
-                    addOption("auto-pickup " + thing.name().plural()) {
-                        App.player.addAutoPickUpType(thing.thingTag())
+                    addOption("auto-pickup " + thing.tag.pluralName) {
+                        App.player.addAutoPickUpType(thing.tag)
                     }
                 }
             }

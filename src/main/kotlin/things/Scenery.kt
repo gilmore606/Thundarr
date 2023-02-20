@@ -25,6 +25,7 @@ sealed class Scenery : Thing() {
 class HighwaySign(
     val text: String
 ) : Scenery() {
+    override val tag = Tag.THING_HIGHWAYSIGN
     override fun glyph() = Glyph.HIGHWAY_SIGN
     override fun name() = "highway sign"
     override fun isOpaque() = false
@@ -34,6 +35,7 @@ class HighwaySign(
 
 @Serializable
 class Boulder : Scenery() {
+    override val tag = Tag.THING_BOULDER
     override fun glyph() = Glyph.BOULDER
     override fun name() = "boulder"
     override fun isOpaque() = false

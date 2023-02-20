@@ -81,6 +81,7 @@ sealed class Container : Portable(), ThingHolder {
 
 @Serializable
 class FilingCabinet : Container() {
+    override val tag = Tag.THING_FILINGCABINET
     override fun name() = "filing cabinet"
     override fun description() = "You don't know what files are, but you know they went in here."
     override fun glyph() = Glyph.FILING_CABINET
@@ -98,6 +99,7 @@ class FilingCabinet : Container() {
 
 @Serializable
 class Bookshelf : Container() {
+    override val tag = Tag.THING_BOOKSHELF
     override fun name() = "bookshelf"
     override fun description() = "Shelves full of mostly uninteresting books."
     override fun glyph() = Glyph.BOOKSHELF
@@ -114,6 +116,7 @@ class Bookshelf : Container() {
 
 @Serializable
 class Fridge : Container() {
+    override val tag = Tag.THING_FRIDGE
     override fun name() = "fridge"
     override fun description() = "A box chilled by technology to preserve foods.  Astounding."
     override fun glyph() = Glyph.FRIDGE
@@ -138,6 +141,7 @@ class Fridge : Container() {
 
 @Serializable
 class Trunk : Container() {
+    override val tag = Tag.THING_TRUNK
     override fun name() = "trunk"
     override fun description() = "A heavy metal-bound trunk."
     override fun glyph() = Glyph.STRONGBOX
@@ -162,6 +166,7 @@ class Trunk : Container() {
 
 @Serializable
 class Bonepile : Container() {
+    override val tag = Tag.THING_BONEPILE
     override fun name() = "bone pile"
     override fun description() = "A pile of dried old bones; from what, you can't tell."
     override fun glyph() = Glyph.BONEPILE
@@ -187,6 +192,7 @@ class Bonepile : Container() {
 
 @Serializable
 class WreckedCar : Container() {
+    override val tag = Tag.THING_WRECKEDCAR
     override fun name() = "wrecked vehicle"
     override fun description() = "The hulk of a rusty metal wagon."
     override fun glyph() = Glyph.WRECKED_CAR

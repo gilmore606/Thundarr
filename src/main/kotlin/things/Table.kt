@@ -12,6 +12,7 @@ class Table : Container(), Smashable {
     override fun isBlocking() = true
     override fun isOpaque() = false
 
+    override val tag = Tag.THING_TABLE
     override fun name() = "table"
     override fun description() = "A lacquered wooden table."
     override fun glyph() = Glyph.TABLE

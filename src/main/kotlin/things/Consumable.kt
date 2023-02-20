@@ -101,6 +101,7 @@ sealed class Food : Consumable() {
 
 @Serializable
 class Apple : Food() {
+    override val tag = Tag.THING_APPLE
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
     override fun weight() = 0.1f
@@ -108,6 +109,7 @@ class Apple : Food() {
 
 @Serializable
 class Pear : Food() {
+    override val tag = Tag.THING_PEAR
     override fun glyph() = Glyph.FRUIT
     override fun hue() = 0.9f
     override fun name() = "pear"
@@ -116,9 +118,9 @@ class Pear : Food() {
 
 @Serializable
 class RawMeat : Rottable() {
+    override val tag = Tag.THING_RAWMEAT
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw meat"
-    override fun thingTag() = "meat"
     override fun description() = "A bloody chunk of raw meat.  Edible as-is, but not exactly appetizing; you're a barbarian, not a savage."
     override fun calories() = 600
     override fun consumeSelfMsg() = "You choke down the raw meat, imagining how delicious it would be if you cooked it first.  Oh well."
@@ -132,10 +134,10 @@ class RawMeat : Rottable() {
 
 @Serializable
 class Steak : Food() {
+    override val tag = Tag.THING_STEAK
     override fun glyph() = Glyph.MEAT
     override fun hue() = 0.5f
     override fun name() = "seared steak"
-    override fun thingTag() = "steak"
     override fun description() = "A delicious flame-grilled slab of steak.  From what animal, is not important.  It smells wonderful."
     override fun calories() = 1200
     override fun consumeSelfMsg() = "You feast on the steak, congratulating yourself for your domestic prowess."
@@ -143,6 +145,7 @@ class Steak : Food() {
 
 @Serializable
 class ChickenLeg : Food() {
+    override val tag = Tag.THING_CHICKENLEG
     override fun glyph() = Glyph.CHICKEN_LEG
     override fun name() = "chicken leg"
     override fun description() = "You're not sure it actually came from a chicken, but it's cooked and smells tasty."
@@ -152,6 +155,7 @@ class ChickenLeg : Food() {
 
 @Serializable
 class Cheese : Food() {
+    override val tag = Tag.THING_CHEESE
     override fun glyph() = Glyph.CHEESE
     override fun name() = "cheese"
     override fun description() = "A wedge of hard cheese.  It smells like Ookla."
@@ -161,6 +165,7 @@ class Cheese : Food() {
 
 @Serializable
 class Stew : Food() {
+    override val tag = Tag.THING_STEW
     override fun glyph() = Glyph.STEW
     override fun name() = "stew"
     override fun description() = "A nutritious melange of meat and vegetables."
@@ -170,6 +175,7 @@ class Stew : Food() {
 
 @Serializable
 class ThrallChow : Food() {
+    override val tag = Tag.THING_THRALLCHOW
     override fun glyph() = Glyph.PACKAGE_BAG
     override fun name() = "thrall-chow"
     override fun description() = "A plastic bag of Thrall-Chow(tm).  'For minimum Thrall sustenance,' says the colorful package."
@@ -179,6 +185,7 @@ class ThrallChow : Food() {
 
 @Serializable
 class EnergyDrink : Consumable() {
+    override val tag = Tag.THING_ENERGYDRINK
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"
     override fun consumeVerb() = "drink"

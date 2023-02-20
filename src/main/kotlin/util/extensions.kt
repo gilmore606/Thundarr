@@ -94,7 +94,7 @@ fun MutableList<Thing>.groupByTag(): List<List<Thing>> {
     forEach {
         var found = false
         groups.forEach { group ->
-            if (group[0].thingTag() == it.thingTag()) {
+            if (group[0].tag == it.tag) {
                 group.add(it)
                 found = true
             }

@@ -97,11 +97,11 @@ class ExamineModal(
             if (entity is Clothing) {
                 drawStat("armor:", "", entity.armor(), padding)
             }
-            if (App.player.autoPickUpTypes.contains(entity.thingTag())) {
-                drawStatFact("You'll pick up any " + entity.name().plural() + " you see.", padding)
+            if (App.player.autoPickUpTypes.contains(entity.tag)) {
+                drawStatFact("You'll pick up any " + entity.tag.pluralName + " you see.", padding)
             }
-            if (App.player.thrownTag == entity.thingTag()) {
-                drawStatFact(entity.name().plural() + " are your preferred thrown weapon.", padding)
+            if (App.player.thrownTag == entity.tag) {
+                drawStatFact(entity.tag.pluralName + " are your preferred thrown weapon.", padding)
             }
         }
     }

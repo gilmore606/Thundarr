@@ -1,12 +1,13 @@
 package render.tileholders
 
 import render.tilesets.TileSet
+import things.Thing
 import util.*
 import world.level.Level
 
 class TableTile(
     set: TileSet,
-    val neighborType: String
+    private val neighborType: Thing.Tag
 ): TileHolder(set) {
 
     enum class Slot { SINGLE, LEFT, RIGHT, MIDDLE, UPPER }
@@ -37,6 +38,6 @@ class TableTile(
         return indexFromCoords(v!!.x, v!!.y)
     }
 
-    private fun neighborAt(level: Level, x: Int, y: Int) = level.thingsAt(x,y).hasOneWhere { it.thingTag() == neighborType }
+    private fun neighborAt(level: Level, x: Int, y: Int) = level.thingsAt(x,y).hasOneWhere { it.tag == neighborType }
     private fun neighborTo(level: Level, x: Int, y: Int, dir: XY) = neighborAt(level, x + dir.x, y + dir.y)
 }

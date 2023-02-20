@@ -52,7 +52,7 @@ sealed class Workbench : Container() {
             var possible = true
             val pool = mutableListOf<Thing>().apply { addAll(contents()) }
             recipe.ingredients().forEach { ingTag ->
-                pool.firstOrNull { it.thingTag() == ingTag }?.also {
+                pool.firstOrNull { it.tag == ingTag }?.also {
                     pool.remove(it)
                 } ?: run {
                     possible = false
@@ -72,6 +72,7 @@ sealed class Workbench : Container() {
 class Campfire : Workbench(), Fuel {
     override var fuel = 100f
     override fun flammability() = 0.7f
+    override val tag = Tag.THING_CAMPFIRE
     override fun name() = "campfire"
     override fun description() = "Logs expertly stacked for controlled burning."
     override fun examineInfo() = "The stack of wood looks like it'll burn for " + (fuel / 2f).turnsToRoughTime() + "."

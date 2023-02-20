@@ -476,9 +476,9 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != "" && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
+        if (App.player.thrownTag != null && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
             App.player.getThrown()?.also { thrown ->
-                menu.addOption("throw " + App.player.thrownTag + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
+                menu.addOption("throw " + (App.player.thrownTag)?.singularName + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))
                 }
             }

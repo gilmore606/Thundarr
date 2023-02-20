@@ -38,6 +38,7 @@ sealed class MeleeWeapon : Gear() {
 
 @Serializable
 class Fist : MeleeWeapon() {
+    override val tag = Tag.THING_FIST
     override fun glyph() = Glyph.BLANK
     override fun name() = "fist"
     override fun description() = "Bare knuckles."
@@ -48,6 +49,7 @@ class Fist : MeleeWeapon() {
 
 @Serializable
 class Teeth : MeleeWeapon() {
+    override val tag = Tag.THING_TEETH
     override fun glyph() = Glyph.BLANK
     override fun name() = "teeth"
     override fun description() = "Sharp teeth."
@@ -61,6 +63,7 @@ class Axe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
     }
+    override val tag = Tag.THING_AXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
@@ -74,6 +77,7 @@ class Pickaxe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
     }
+    override val tag = Tag.THING_PICKAXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 5.2f

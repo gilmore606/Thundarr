@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 
 @Serializable
-sealed class Bed : Thing() {
+sealed class Bed() : Thing() {
     override fun isPortable() = false
     override fun isBlocking() = false
     override fun isOpaque() = false
@@ -13,6 +13,7 @@ sealed class Bed : Thing() {
 
 @Serializable
 class Bedroll : Bed() {
+    override val tag = Tag.THING_BEDROLL
     override fun glyph() = Glyph.BEDROLL
     override fun name() = "bedroll"
     override fun description() = "A light but sturdy cotton bedroll for traveling."

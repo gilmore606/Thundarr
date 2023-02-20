@@ -13,7 +13,7 @@ object Toolbar : Panel() {
 
     class Button(
         val number: Int,
-        var thingTag: String? = null,
+        var thingTag: Thing.Tag? = null,
         ) {
         var nextThing: Thing? = null
         var text: String? = null
@@ -27,7 +27,7 @@ object Toolbar : Panel() {
         fun updateNextThing() {
             nextThing = null
             App.player.contents.forEach {
-                if (it.thingTag() == thingTag) {
+                if (it.tag == thingTag) {
                     nextThing = it
                     text = it.toolbarName()
                 }
@@ -206,13 +206,13 @@ object Toolbar : Panel() {
 
     private fun replaceButton(button: Button, newThing: Thing) {
         buttons.forEach { old ->
-            if (old.thingTag == newThing.thingTag()) {
+            if (old.thingTag == newThing.tag) {
                 old.thingTag = null
                 old.text = null
                 old.nextThing = null
             }
         }
-        button.thingTag = newThing.thingTag()
+        button.thingTag = newThing.tag
         button.text = newThing.toolbarName()
         button.updateNextThing()
     }
@@ -225,10 +225,10 @@ object Toolbar : Panel() {
         ))
     }
 
-    fun getTagsForSave(): List<String?> = mutableListOf<String?>().apply {
+    fun getTagsForSave(): List<Thing.Tag?> = mutableListOf<Thing.Tag?>().apply {
         buttons.forEach { add(it.thingTag) }
     }
-    fun loadTagsFromSave(newTags: List<String?>) {
+    fun loadTagsFromSave(newTags: List<Thing.Tag?>) {
         buttons.forEachIndexed { n, button ->
             button.thingTag = newTags[n]
             button.updateNextThing()

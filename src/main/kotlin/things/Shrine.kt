@@ -13,6 +13,7 @@ class Shrine : LitThing() {
         active = true
     }
 
+    override val tag = Tag.THING_SHRINE
     override fun name() = "shrine"
     override fun description() = "A stone shrine erected to honor the Lords of Light."
     override fun glyph() = Glyph.SHRINE

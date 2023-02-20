@@ -488,8 +488,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun getActor(id: String) = level?.director?.actors?.firstOrNull { it.id == id }
 
-    protected fun doWeHave(thingTag: String): Thing? {
-        for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) return contents[i]
+    protected fun doWeHave(thingTag: Thing.Tag): Thing? {
+        for (i in 0 until contents.size) if (contents[i].tag == thingTag) return contents[i]
         return null
     }
 
@@ -498,9 +498,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return null
     }
 
-    protected fun howManyWeHave(thingTag: String): Int {
+    protected fun howManyWeHave(thingTag: Thing.Tag): Int {
         var c = 0
-        for (i in 0 until contents.size) if (contents[i].thingTag() == thingTag) c++
+        for (i in 0 until contents.size) if (contents[i].tag == thingTag) c++
         return c
     }
 

@@ -61,7 +61,7 @@ class Ratman(
             val cheeses = entitiesSeen { it is Cheese }
             if (cheeses.isNotEmpty()) {
                 val cheese = cheeses.keys.random()
-                pushState(Looting(cheese.xy()!!, (cheese as Thing).thingTag()))
+                pushState(Looting(cheese.xy()!!, (cheese as Thing).tag))
                 say(findCheeseLines().random())
             }
         }

@@ -14,11 +14,103 @@ import world.Entity
 import world.level.Level
 import world.stains.Fire
 import world.terrains.Terrain
+import java.awt.print.Paper
 import java.lang.Float.min
 import java.lang.RuntimeException
 
 @Serializable
-sealed class Thing : Entity {
+sealed class Thing() : Entity {
+
+    enum class Tag(
+        val singularName: String,
+        val pluralName: String,
+        val spawnOne: ()->Thing
+    ) {
+        THING_BEDROLL("bedroll", "bedrolls", { Bedroll() }),
+        THING_PAPERBACK("paperback", "paperbacks", { Paperback() }),
+        THING_BOYSLIFE("Boys Life magazine", "Boys Life magazines", { BoysLife() }),
+        THING_HARDHAT("hardhat", "hardhats", { HardHat() }),
+        THING_HORNEDHELMET("horned helmet", "horned helmets", { HornedHelmet() }),
+        THING_RIOTHELMET("riot helmet", "riot helmets", { RiotHelmet() }),
+        THING_MOKBOOTS("mok books", "pairs of mok boots", { MokBoots() }),
+        THING_TRAVELBOOTS("travel boots", "pairs of travel boots", { TravelBoots() }),
+        THING_FURTUNIC("fur tunic", "fur tunics", { FurTunic() }),
+        THING_FURJACKET("fur jacket", "fur jackets", { FurJacket() }),
+        THING_SABRETOOTHCHARM("sabretooth charm", "sabretooth charms", { SabretoothCharm() }),
+        THING_BRICK("brick", "bricks", { Brick() }),
+        THING_ROCK("rock", "rocks", { Rock() }),
+        THING_LIGHTER("lighter", "lighters", { Lighter() }),
+        THING_APPLE("apple", "apples", { Apple() }),
+        THING_PEAR("pear", "pears", { Pear() }),
+        THING_RAWMEAT("chunk of raw meat", "chunks of raw meat", { RawMeat() }),
+        THING_STEAK("steak", "steaks", { Steak() }),
+        THING_CHICKENLEG("chicken leg", "chicken legs", { ChickenLeg() }),
+        THING_CHEESE("cheese", "cheeses", { Cheese() }),
+        THING_STEW("bowl of stew", "bowls of stew", { Stew() }),
+        THING_THRALLCHOW("thrall chow", "thrall chows", { ThrallChow() }),
+        THING_ENERGYDRINK("energy drink", "energy drinks", { EnergyDrink() }),
+        THING_FILINGCABINET("filing cabinet", "filing cabinets", { FilingCabinet() }),
+        THING_BOOKSHELF("bookshelf", "bookshelves", { Bookshelf() }),
+        THING_FRIDGE("fridge", "fridges", { Fridge() }),
+        THING_TRUNK("storage trunk", "storage trunks", { Trunk() }),
+        THING_BONEPILE("bone pile", "bone piles", { Bonepile() }),
+        THING_WRECKEDCAR("wrecked car", "wrecked cars", { WreckedCar() }),
+        THING_CORPSE("corpse", "corpses", { Corpse() }),
+        THING_MODERNDOOR("door", "doors", { ModernDoor() }),
+        THING_WOODDOOR("door", "doors", { WoodDoor() }),
+        THING_FORGE("forge", "forges", { Forge() }),
+        THING_LOG("log", "logs", { Log() }),
+        THING_BOARD("board", "boards", { Board() }),
+        THING_LIGHTBULB("lightbulb", "lightbulbs", { Lightbulb() }),
+        THING_CEILINGLIGHT("ceiling light", "ceiling lights", { CeilingLight() }),
+        THING_GLOWSTONE("glowstone", "glowstones", { Glowstone() }),
+        THING_SUNSWORD("sunsword", "sunswords", { Sunsword() }),
+        THING_TORCH("torch", "torches", { Torch() }),
+        THING_BANDAGES("bandages", "bandages", { Bandages() }),
+        THING_FIRSTAIDKIT("first aid kit", "first aid kits", { FirstAidKit() }),
+        THING_FIST("fists", "fists", { Fist() }),
+        THING_TEETH("teeth", "teeth", { Teeth() }),
+        THING_AXE("axe", "axes", { Axe() }),
+        THING_PICKAXE("pickaxe", "pickaxes", { Pickaxe() }),
+        THING_THORNBUSH("thornbush", "thornbushes", { ThornBush() }),
+        THING_SAGEBUSH("sagebush", "sagebushes", { SageBush() }),
+        THING_BERRYBUSH("berry bush", "berry bushes", { BerryBush() }),
+        THING_HONEYPODBUSH("honeypod bush", "honeypod bushes", { HoneypodBush() }),
+        THING_WILDFLOWERS("wildflowers", "wildflowers", { Wildflowers() }),
+        THING_POPPIES("poppies", "poppies", { Poppies() }),
+        THING_DEATHFLOWER("deathflower", "deathflowers", { Deathflower() }),
+        THING_DREAMFLOWER("dreamflower", "dreamflowers", { Dreamflower() }),
+        THING_SUNFLOWER("sunflower", "sunflowers", { Sunflower() }),
+        THING_LIGHTFLOWER("lightflower", "lightflowers", { Lightflower() }),
+        THING_SAGUARO("saguaro", "saguaros", { Saguaro() }),
+        THING_CHOLLA("cholla", "chollas", { Cholla() }),
+        THING_PRICKPEAR("prickpear", "prickpears", { Prickpear() }),
+        THING_BALMMOSS("balm moss", "balm mosses", { BalmMoss() }),
+        THING_LACEMOSS("lace moss", "lace mosses", { LaceMoss() }),
+        THING_WIZARDCAPMUSHROOM("wizardcap mushroom", "wizardcap mushrooms", { WizardcapMushroom() }),
+        THING_SPECKLEDMUSHROOM("speckled mushroom", "speckled mushrooms", { SpeckledMushroom() }),
+        THING_BLOODCAPMUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
+        THING_FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),
+        THING_HIGHWAYSIGN("highway sign", "highway signs", { HighwaySign("") }),
+        THING_BOULDER("boulder", "boulders", { Boulder() }),
+        THING_SHRINE("shrine", "shrines", { Shrine() }),
+        THING_TABLE("table", "tables", { Table() }),
+        THING_OAKTREE("oak tree", "oak trees", { OakTree() }),
+        THING_TEAKTREE("teak tree", "teak trees", { TeakTree() }),
+        THING_MAPLETREE("maple tree", "maple trees", { MapleTree() }),
+        THING_BIRCHTREE("birch tree", "birch trees", { BirchTree() }),
+        THING_APPLETREE("apple tree", "apple trees", { AppleTree() }),
+        THING_PEARTREE("pear tree", "pear trees", { PearTree() }),
+        THING_PINETREE("pine tree", "pine trees", { PineTree() }),
+        THING_SPRUCETREE("spruce tree", "spruce trees", { SpruceTree() }),
+        THING_PALMTREE("palm tree", "palm trees", { PalmTree() }),
+        THING_COCONUTTREE("coconut tree", "coconut trees", { CoconutTree() }),
+        THING_DEADTREE("dead tree", "dead trees", { DeadTree() }),
+        THING_WELL("well", "wells", { Well() }),
+        THING_CAMPFIRE("campfire", "campfires", { Campfire() }),
+    }
+
+    abstract val tag: Tag
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
@@ -65,8 +157,9 @@ sealed class Thing : Entity {
     open fun onCreate() { }
     open fun onSpawn() { }
 
-    open fun thingTag() = name()
     open fun uses(): Map<UseTag, Use> = mapOf()
+    open fun canSpawnIn(containerType: Thing.Tag) = spawnContainers().hasOneWhere { it == containerType }
+    open fun spawnContainers() = listOf<Thing.Tag>()
 
     protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
     protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false
@@ -78,7 +171,7 @@ sealed class Thing : Entity {
     }} ?: false
 
     override fun description() =  ""
-    open fun listTag() = if (thingTag() == App.player.thrownTag) "(throwing)" else ""
+    open fun listTag() = if (tag == App.player.thrownTag) "(throwing)" else ""
     fun listName() = name() + " " + listTag()
 
     override fun examineInfo(): String {
@@ -160,6 +253,7 @@ sealed class Portable : Thing() {
 
 @Serializable
 class Brick : Portable() {
+    override val tag = Tag.THING_BRICK
     override fun name() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun glyph() = Glyph.BRICK
@@ -169,6 +263,7 @@ class Brick : Portable() {
 
 @Serializable
 class Rock : Portable() {
+    override val tag = Tag.THING_ROCK
     override fun name() = "rock"
     override fun description() = "A chunk of rock.  You could throw it at someone."
     override fun glyph() = Glyph.ROCK
@@ -178,6 +273,7 @@ class Rock : Portable() {
 
 @Serializable
 class Lighter : Portable() {
+    override val tag = Tag.THING_LIGHTER
     override fun name() = "lighter"
     override fun description() = "A brass cigarette lighter.  Handy for starting fires."
     override fun glyph() = Glyph.LIGHTER
@@ -214,55 +310,5 @@ class Lighter : Portable() {
     private fun lightFireAt(actor: Actor, level: Level, xy: XY) {
         level.addStain(Fire(), xy.x, xy.y)
         Console.sayAct("You start a fire.", "%Dn lights a fire.", actor)
-    }
-}
-
-@Serializable
-class Bomb : Portable(), Temporal {
-    override fun name() = "bomb"
-    override fun description() = "A box of explosives."
-    override fun glyph() = Glyph.CHEST
-    override fun weight() = 1.5f
-
-    var active = false
-    var fuse = 0f
-
-    val radius = 4
-
-    override fun uses() = mapOf(
-        UseTag.SWITCH to Use("activate " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> !active && ((targ && isNextTo(actor)) || (targ && !isHeldBy(actor))) },
-            toDo = { actor, level, x, y ->
-                active = true
-                Console.sayAct("You activate %dd.", "%Dn activates %dd.", actor, this)
-                level.linkTemporal(this@Bomb)
-                fuse = 15f
-            }))
-
-    override fun advanceTime(delta: Float) {
-        if (active) {
-            if (fuse > 0f) {
-                fuse -= delta
-            } else {
-                explode()
-            }
-        }
-    }
-
-    private fun explode() {
-        holder?.also { holder ->
-            holder.xy()?.also { xy ->
-                Speaker.world(Speaker.SFX.EXPLODE, source = xy)
-                val x0 = xy.x - radius
-                val y0 = xy.y - radius
-                for (ix in x0 .. x0 + radius * 2) {
-                    for (iy in y0 .. y0 + radius * 2) {
-                        holder.level?.setTerrain(ix, iy, Terrain.Type.TERRAIN_STONEFLOOR)
-                    }
-                }
-            }
-        }
-        active = false
-        moveTo(null)
     }
 }

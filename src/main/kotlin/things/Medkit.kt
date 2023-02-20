@@ -63,6 +63,7 @@ sealed class Medkit : Portable() {
 
 @Serializable
 class Bandages : Medkit() {
+    override val tag = Tag.THING_BANDAGES
     override fun glyph() = Glyph.CLOTH_ROLL
     override fun name() = "bandage"
     override fun description() = "A roll of thick cloth suitable for binding wounds."
@@ -75,6 +76,7 @@ class Bandages : Medkit() {
 
 @Serializable
 class FirstAidKit : Medkit() {
+    override val tag = Tag.THING_FIRSTAIDKIT
     override fun glyph() = Glyph.MEDPACK
     override fun name() = "first-aid kit"
     override fun description() = "A box of bandages and topical antibiotics for effective wound care."

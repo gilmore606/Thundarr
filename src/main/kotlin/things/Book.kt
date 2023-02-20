@@ -51,6 +51,7 @@ sealed class Book : Portable() {
 
 @Serializable
 class Paperback : Book() {
+    override val tag = Tag.THING_PAPERBACK
     override fun name() = "paperback"
     override fun description() = "A waterlogged but still readable old paperback novel."
 }
@@ -80,6 +81,7 @@ sealed class SkillBook: Book() {
 
 @Serializable
 class BoysLife: SkillBook() {
+    override val tag = Tag.THING_BOYSLIFE
     override fun name() = "Boys Life magazine"
     override fun description() = "An ancient but implausibly well preserved magazine, full of practical scouting advice for youths."
     override fun text() = "Oh boy!  An article about " + listOf(
