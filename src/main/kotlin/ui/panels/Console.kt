@@ -26,6 +26,11 @@ object Console : Panel() {
     private var scrollSpeed = 80f
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
+    private val floatColor = Color(0.9f, 0.9f, 0.7f, 0f)
+    private var floatText = ""
+    private var floatAge = 0f
+    private var floatWidth = 0
+    private const val floatFadeTime = 1.6f
 
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
@@ -105,6 +110,7 @@ object Console : Panel() {
         if (lines.size > maxLines) {
             lines.removeFirst()
         }
+        resetFloat(text)
     }
 
     fun sayFromThread(text: String) {
@@ -187,6 +193,7 @@ object Console : Panel() {
             b = min(1f, Screen.fontColorDull.b * burst)
             a = min(1f, Screen.fontColorDull.a * burst)
         }
+        floatAge += delta
     }
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
@@ -208,5 +215,18 @@ object Console : Panel() {
             }
             offset += lineSpacing
         }
+        if (!App.attractMode && floatAge <= floatFadeTime) {
+            floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime))
+            drawString(floatText,
+                Screen.width / 2 - floatWidth / 2,
+                (Screen.height / Screen.aspectRatio).toInt() / 2.toInt(),
+                floatColor, Screen.smallFont)
+        }
+    }
+
+    private fun resetFloat(newText: String) {
+        floatText = newText
+        floatAge = 0f
+        floatWidth = measure(floatText, Screen.smallFont)
     }
 }

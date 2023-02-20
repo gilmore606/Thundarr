@@ -203,7 +203,7 @@ sealed class ChunkFeature(
                     if (!isAbandoned || Dice.chance(0.5f)) spawnThing(x0+tx, y0+ty, WoodDoor().maybeLocked(0.3f))
                     chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
-                    setTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
+                    safeSetTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
                     if (windowBlockerCount < 1 && hasWindows &&
                         !((splitVert && split == tx) || (splitHoriz && split == ty)) &&

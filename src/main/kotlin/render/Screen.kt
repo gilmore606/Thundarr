@@ -59,8 +59,6 @@ object Screen : KtxScreen {
     private val zoomLevels = listOf(0.25, 0.5, 0.6, 0.75, 0.85, 1.0, 1.3, 1.6, 2.0)
     var zoomIndex = 3.0
 
-    var tiltAmount = 0f
-
     var width = 0
     var height = 0
     var fullscreen = false
