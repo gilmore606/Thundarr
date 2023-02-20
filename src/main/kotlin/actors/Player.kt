@@ -81,16 +81,6 @@ open class Player : Actor() {
         if (dangerMode) drawIt(Glyph.HOSTILE_ICON)
     }
 
-    override fun onMove() {
-        super.onMove()
-        level?.also { level ->
-            val things = level.thingsAt(xy.x, xy.y).filter { it !is Scenery }
-            if (things.isNotEmpty()) {
-                Console.say("You see " + things.englishList() + " here.")
-            }
-        }
-    }
-
     fun tryMove(dir: XY) {
         level?.also { level ->
             if (level.isWalkableFrom(xy, dir)) {

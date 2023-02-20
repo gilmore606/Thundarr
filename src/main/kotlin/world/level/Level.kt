@@ -6,22 +6,22 @@ import actors.actions.*
 import actors.actions.processes.WalkTo
 import actors.statuses.Status
 import audio.Speaker
+import kotlinx.serialization.Transient
 import render.Screen
 import render.sparks.Raindrop
 import render.sparks.Spark
 import render.sunLights
 import render.tilesets.Glyph
-import things.LightSource
-import things.Smashable
-import things.Temporal
-import things.Thing
+import things.*
 import ui.modals.ContextMenu
 import ui.modals.ExamineModal
 import ui.modals.Modal
+import ui.panels.Console
 import util.*
 import world.Chunk
 import world.Director
 import world.Entity
+import world.gen.decors.Decor
 import world.path.Pather
 import world.stains.Fire
 import world.stains.Stain
@@ -46,6 +46,8 @@ sealed class Level {
     private val noThing = mutableListOf<Thing>()
 
     val dirtyLights = mutableMapOf<LightSource,XY>()
+
+    @Transient private var lastPlayerRoom: Decor? = null
 
     abstract fun receiveChunk(chunk: Chunk)
 
@@ -212,6 +214,20 @@ sealed class Level {
             if (!App.attractMode) setPov(actor.xy.x, actor.xy.y)
             Screen.updateZoomTarget()
             director.wakeNPCsNear(actor.xy)
+
+            roomAt(x, y)?.also { room ->
+                if (room != lastPlayerRoom) {
+                    lastPlayerRoom = room
+                    room.onPlayerEnter()
+                }
+            } ?: run {
+                lastPlayerRoom?.onPlayerExit()
+                lastPlayerRoom = null
+            }
+
+            thingsAt(x, y).filter { it !is Scenery }.also { things ->
+                if (things.isNotEmpty()) Console.say("You see " + things.englishList() + " here.")
+            }
         }
     }
 
@@ -288,6 +304,8 @@ sealed class Level {
     fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
     fun isOpaqueAt(x: Int, y: Int) = chunkAt(x,y)?.isOpaqueAt(x,y) ?: true
+
+    fun roomAt(x: Int, y: Int): Decor? = chunkAt(x,y)?.roomAt(x,y)
 
     fun addSpark(spark: Spark) = chunkAt(spark.xy.x, spark.xy.y)?.addSpark(spark)
     fun hasBlockingSpark() = allChunks().hasOneWhere { it.sparks().hasOneWhere { it.pausesAction }}

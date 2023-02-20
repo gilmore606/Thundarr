@@ -1,14 +1,19 @@
 package world.gen.decors
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import things.Thing
+import ui.panels.Console
 import util.Dice
 import util.Rect
 import util.XY
 import world.gen.cartos.Carto
 import world.terrains.Terrain
 
-abstract class Decor {
+@Serializable
+sealed class Decor {
 
+    @Serializable
     data class Room(
         val rect: Rect,
         val forbiddenCells: List<XY>,
@@ -52,8 +57,9 @@ abstract class Decor {
         }
     }
 
-    private lateinit var carto: Carto
-    private lateinit var room: Room
+    @Transient private lateinit var carto: Carto
+    lateinit var room: Room
+    var isAbandoned: Boolean = false
     protected val x0: Int get() = room.rect.x0
     protected val y0: Int get() = room.rect.y0
     protected val x1: Int get() = room.rect.x1
@@ -61,22 +67,36 @@ abstract class Decor {
 
     private var cell = XY(0,0)
 
+    var lastSeenTime: Long = 0L
+
     open fun fitsInRoom(room: Room): Boolean = true
 
-    fun furnish(room: Room, carto: Carto) {
+    fun furnish(room: Room, carto: Carto, isAbandoned: Boolean = false) {
         if (!fitsInRoom(room)) return
+        this.isAbandoned = isAbandoned
         this.carto = carto
         this.room = room
         doFurnish()
+        this.carto.chunk.rooms.add(this)
     }
 
+    open fun getDescription(): String = if (isAbandoned) abandonedDescription() else description()
+    open fun description() = ""
+    open fun abandonedDescription() = "The room is covered in dust and cobwebs, clearly abandoned long ago."
     abstract fun doFurnish()
+
+    open fun onPlayerEnter() {
+        Console.say(getDescription())
+    }
+
+    open fun onPlayerExit() { }
 
     protected fun chance(chance: Float, doThis: ()->Unit) {
         if (Dice.chance(chance)) doThis()
     }
 
     protected fun spawn(thing: Thing) {
+        if (isAbandoned && Dice.chance(0.3f)) return
         carto.spawnThing(cell.x, cell.y, thing)
         room.unclear(cell)
     }

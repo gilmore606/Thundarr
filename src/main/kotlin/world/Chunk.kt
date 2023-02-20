@@ -15,6 +15,7 @@ import things.Thing
 import util.*
 import world.gen.cartos.AttractCarto
 import world.gen.cartos.WorldCarto
+import world.gen.decors.Decor
 import world.level.AttractLevel
 import world.level.EnclosedLevel
 import world.level.Level
@@ -70,8 +71,10 @@ class Chunk(
     private val sounds = Array(width) { Array<Speaker.PointAmbience?>(height) { null } }
     private val things = Array(width) { Array(height) { CellContainer() } }
 
+    val rooms = mutableListOf<Decor>()
 
     private val savedActors: MutableSet<Actor> = mutableSetOf()
+
     var generating = true
 
     @Transient
@@ -378,6 +381,10 @@ class Chunk(
             return v
         }
         return false
+    }
+
+    fun roomAt(x: Int, y: Int): Decor? = rooms.firstOrNull {
+        x >= it.room.rect.x0 && x <= it.room.rect.x1 && y >= it.room.rect.y0 && y <= it.room.rect.y1
     }
 
     fun visibilityAt(x: Int, y: Int): Float = if (boundsCheck(x, y)) {

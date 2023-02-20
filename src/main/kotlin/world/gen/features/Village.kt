@@ -155,18 +155,19 @@ class Village(
             featureBuilt = true
         } else {
             buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned) { rooms ->
+                val abandoned = isAbandoned || Dice.chance(0.05f)
                 when (rooms.size) {
                     1 -> {
                         uniqueHuts.filter { it.fitsInRoom(rooms[0]) }.randomOrNull()?.also { uniqueDecor ->
-                            uniqueDecor.furnish(rooms[0], carto)
+                            uniqueDecor.furnish(rooms[0], carto, abandoned)
                             uniqueHuts.remove(uniqueDecor)
                         } ?: run {
-                            Hut().furnish(rooms[0], carto)
+                            Hut().furnish(rooms[0], carto, abandoned)
                         }
                     }
                     2 -> {
-                        HutLivingRoom().furnish(rooms[0], carto)
-                        HutBedroom().furnish(rooms[1], carto)
+                        HutLivingRoom().furnish(rooms[0], carto, abandoned)
+                        HutBedroom().furnish(rooms[1], carto, abandoned)
                     }
                 }
             }

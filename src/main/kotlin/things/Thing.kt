@@ -13,8 +13,6 @@ import util.*
 import world.Entity
 import world.level.Level
 import world.stains.Fire
-import world.terrains.Terrain
-import java.awt.print.Paper
 import java.lang.Float.min
 import java.lang.RuntimeException
 
@@ -24,7 +22,7 @@ sealed class Thing() : Entity {
     enum class Tag(
         val singularName: String,
         val pluralName: String,
-        val spawnOne: ()->Thing
+        val spawn: ()->Thing
     ) {
         THING_BEDROLL("bedroll", "bedrolls", { Bedroll() }),
         THING_PAPERBACK("paperback", "paperbacks", { Paperback() }),
