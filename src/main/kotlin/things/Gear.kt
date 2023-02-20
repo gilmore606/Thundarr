@@ -45,6 +45,9 @@ sealed class Gear : Portable(), StatEffector {
 
     open fun glyphTransform() = glyphTransform
 
+    override fun spawnContainers() = mutableListOf(
+        Tag.THING_WARDROBE, Tag.THING_WRECKEDCAR, Tag.THING_BONEPILE
+    )
     override fun listTag() = if (equipped) "(equipped)" else ""
 
     override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {

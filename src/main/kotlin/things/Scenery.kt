@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Thing
 import ui.panels.Console
+import util.Dice
+import util.Madlib
 
 
 @Serializable
@@ -40,4 +42,15 @@ class Boulder : Scenery() {
     override fun name() = "boulder"
     override fun isOpaque() = false
     override fun description() = "A large rock."
+}
+
+@Serializable
+class Gravestone(
+    val text: String = Madlib.graveName() + " -- " + Dice.range(1994, 2007).toString() + " -- " + Madlib.epitaph()
+) : Scenery() {
+    override val tag = Tag.THING_GRAVESTONE
+    override fun glyph() = Glyph.GRAVESTONE
+    override fun name() = "gravestone"
+    override fun isOpaque() = false
+    override fun description() = "A lichen-covered tombstone.  '$text'"
 }

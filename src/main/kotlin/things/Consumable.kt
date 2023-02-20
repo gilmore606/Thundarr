@@ -42,6 +42,8 @@ sealed class Consumable : Portable() {
 
     override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
 
+    override fun spawnContainers() = mutableListOf(Tag.THING_FRIDGE, Tag.THING_TABLE)
+
     override fun examineInfo(): String {
         return statusEffect()?.let { effect ->
             consumeVerb().capitalize() + "ing this makes you " + effect.name() + "."

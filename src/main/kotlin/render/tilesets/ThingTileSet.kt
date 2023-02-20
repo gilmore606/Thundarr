@@ -41,7 +41,7 @@ fun ThingTileSet() =
             add(0.5f, 4, 1)
         })
         setTile(Glyph.CHEST, SimpleTile(this, 4, 0))
-        setTile(Glyph.TOMBSTONE, VariantsTile(this).apply {
+        setTile(Glyph.GRAVESTONE, VariantsTile(this).apply {
             add(0.5f, 2, 1)
             add(0.5f, 2, 2)
         })
@@ -147,4 +147,5 @@ fun ThingTileSet() =
         setTile(Glyph.SHRINE, SimpleTile(this, 10, 7))
         setTile(Glyph.BOOKSHELF, SimpleTile(this, 10, 8))
         setTile(Glyph.FORGE, SimpleTile(this, 10, 9))
+        setTile(Glyph.WARDROBE, SimpleTile(this, 10, 10))
     }

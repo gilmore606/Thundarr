@@ -47,13 +47,17 @@ sealed class Thing() : Entity {
         THING_STEW("bowl of stew", "bowls of stew", { Stew() }),
         THING_THRALLCHOW("thrall chow", "thrall chows", { ThrallChow() }),
         THING_ENERGYDRINK("energy drink", "energy drinks", { EnergyDrink() }),
+
         THING_FILINGCABINET("filing cabinet", "filing cabinets", { FilingCabinet() }),
         THING_BOOKSHELF("bookshelf", "bookshelves", { Bookshelf() }),
+        THING_WARDROBE("wardrobe", "wardrobes", { Wardrobe() }),
         THING_FRIDGE("fridge", "fridges", { Fridge() }),
         THING_TRUNK("storage trunk", "storage trunks", { Trunk() }),
         THING_BONEPILE("bone pile", "bone piles", { Bonepile() }),
         THING_WRECKEDCAR("wrecked car", "wrecked cars", { WreckedCar() }),
         THING_CORPSE("corpse", "corpses", { Corpse() }),
+        THING_TABLE("table", "tables", { Table() }),
+
         THING_MODERNDOOR("door", "doors", { ModernDoor() }),
         THING_WOODDOOR("door", "doors", { WoodDoor() }),
         THING_FORGE("forge", "forges", { Forge() }),
@@ -92,7 +96,6 @@ sealed class Thing() : Entity {
         THING_HIGHWAYSIGN("highway sign", "highway signs", { HighwaySign("") }),
         THING_BOULDER("boulder", "boulders", { Boulder() }),
         THING_SHRINE("shrine", "shrines", { Shrine() }),
-        THING_TABLE("table", "tables", { Table() }),
         THING_OAKTREE("oak tree", "oak trees", { OakTree() }),
         THING_TEAKTREE("teak tree", "teak trees", { TeakTree() }),
         THING_MAPLETREE("maple tree", "maple trees", { MapleTree() }),
@@ -106,6 +109,7 @@ sealed class Thing() : Entity {
         THING_DEADTREE("dead tree", "dead trees", { DeadTree() }),
         THING_WELL("well", "wells", { Well() }),
         THING_CAMPFIRE("campfire", "campfires", { Campfire() }),
+        THING_GRAVESTONE("gravestone", "gravestones", { Gravestone("") })
     }
 
     abstract val tag: Tag
@@ -157,7 +161,7 @@ sealed class Thing() : Entity {
 
     open fun uses(): Map<UseTag, Use> = mapOf()
     open fun canSpawnIn(containerType: Thing.Tag) = spawnContainers().hasOneWhere { it == containerType }
-    open fun spawnContainers() = listOf<Thing.Tag>()
+    open fun spawnContainers() = mutableListOf<Thing.Tag>()
 
     protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
     protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false

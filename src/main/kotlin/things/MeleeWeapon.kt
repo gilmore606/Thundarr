@@ -17,6 +17,10 @@ sealed class MeleeWeapon : Gear() {
     override fun equipOtherMsg() = "%Dn takes out %id."
     override fun unequipOtherMsg() = "%Dn puts away %p %d."
 
+    override fun spawnContainers() = super.spawnContainers().apply {
+        add(Tag.THING_TABLE)
+    }
+
     open fun hitSelfMsg() = "You hit %dd with your %i!"
     open fun hitOtherMsg() = "%Dn hits %dd with %p %i!"
     open fun missSelfMsg() = "You miss."

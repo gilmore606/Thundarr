@@ -32,6 +32,10 @@ sealed class Medkit : Portable() {
         // TODO: USE_ON to treat other, but how to select/target?
     )
 
+    override fun spawnContainers() = mutableListOf(
+        Tag.THING_TRUNK, Tag.THING_BONEPILE, Tag.THING_WRECKEDCAR, Tag.THING_TABLE
+    )
+
     private fun doTreatment(healer: Actor, target: Actor) {
         if (healer == target) Console.sayAct(useSelfMsg(), useOtherMsg(), healer, target, this)
         else Console.sayAct(useSelfOtherMsg(), if (target is Player) useOtherSelfMsg() else useOtherOtherMsg(), healer, target, this)

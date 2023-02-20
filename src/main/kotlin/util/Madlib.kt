@@ -444,11 +444,55 @@ object Madlib {
             "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hounds", "water", "rabbit", "hare",
             "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",
             "north", "south", "larry", "bill", "maude", "sally", "chester", "white", "black", "gray", "blue",
-            "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull")
+            "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull",
+            "fail", "bleak", "fear", "gale", "frost", "anger", "hunger", "hope", "faith", "mel", "kayle", "figs")
         val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend",
-            "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead")
+            "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead", "vale", "point", "sted", "ston",
+            " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend")
 
         val name = pre.random() + post.random()
         return name.capitalize()
+    }
+
+    fun graveName(): String {
+        val names = listOf("Henry Corden", "Robert Ridgely", "Nellie Bellflower", "Dick Tufeld", "Alan Oppenheimer",
+            "Joe Ruby", "Ken Spears", "Jerry Eisenberg", "Rudy Larriva", "Buzz Dixon", "Mel Stanley", "Dan Burford",
+            "Wade Bell", "Jesse Morris")
+        return names.random()
+    }
+
+    fun epitaph(): String {
+        val epitaphs = listOf(
+            "All dressed up and noplace to go.",
+            "Quick on the trigger, slow on the draw.",
+            "He told us he was sick.",
+            "Sire of few, father of many.",
+            "Stay dead this time.",
+            "Go to the old tree at full moon to learn my secret.",
+            "Died in bed.",
+            "He is with his God now.",
+            "All shall join me one day.",
+            "A Saint to many, a Scoundrel to some.",
+            "Keep Back - Contagious Necromancy",
+            "We thank him for his sacrifice.",
+            "Measured once, shot twice.",
+            "The world was not ending -- only him.",
+            "Fell before the walls did.",
+            "One day he will rise for his vengeance.",
+            "Died hungry, or at least he said as much.",
+            "Sticks and stones broke his bones.",
+            "He never heard it coming.",
+            "Covered in glory and dirt.",
+            "Sleeps alone.",
+            "One crazy son of a bitch.",
+            "He couldn't take it with him.",
+            "His works completed, may he find rest.",
+            "A true Oddity.",
+            "May all his children prosper.",
+            "Clan exile, hero to our village.",
+            "Let this stone be a warning to those who would imitate him.",
+            "Resting in the place he loved most."
+        )
+        return epitaphs.random()
     }
 }

@@ -115,6 +115,17 @@ class Bookshelf : Container() {
 }
 
 @Serializable
+class Wardrobe : Container() {
+    override val tag = Tag.THING_WARDROBE
+    override fun name() = "wardrobe"
+    override fun description() = "A wooden wardrobe."
+    override fun glyph() = Glyph.WARDROBE
+    override fun isPortable() = false
+
+    override fun randomTreasureCount() = Dice.zeroTo(2)
+}
+
+@Serializable
 class Fridge : Container() {
     override val tag = Tag.THING_FRIDGE
     override fun name() = "fridge"

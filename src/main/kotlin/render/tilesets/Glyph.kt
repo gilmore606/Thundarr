@@ -97,7 +97,7 @@ enum class Glyph {
     SIGN,
     CHEST,
     DEAD_TREE,
-    TOMBSTONE,
+    GRAVESTONE,
     BLADE,
     HILT,
     HILT_LIT,
@@ -188,6 +188,7 @@ enum class Glyph {
     SHRINE,
     BOOKSHELF,
     FORGE,
+    WARDROBE,
 
     BLOODSTAIN,
     SCORCHMARK,

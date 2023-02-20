@@ -17,6 +17,10 @@ sealed class Book : Portable() {
     override fun flammability() = 0.8f
     override fun toolbarName() = "read " + this.name()
     override fun toolbarUseTag() = UseTag.USE
+    override fun spawnContainers() = mutableListOf(
+        Tag.THING_FILINGCABINET, Tag.THING_BOOKSHELF,
+        Tag.THING_TRUNK, Tag.THING_WRECKEDCAR, Tag.THING_TABLE
+    )
 
     override fun uses() = mapOf(
         UseTag.USE to Use("read " + this.name(), 5f,
@@ -26,14 +30,14 @@ sealed class Book : Portable() {
             })
     )
 
-    fun readMsg() = "You open your copy of %d and read for a while."
-    fun readOtherMsg() = "%Dn reads a book."
+    private fun readMsg() = "You open your copy of %d and read for a while."
+    private fun readOtherMsg() = "%Dn reads a book."
 
     open fun text() = "It's something about a guy who's a writer, and he's got writer's block, so he goes to some weird place, and maybe someone attacked him.  It was confusing."
 
     open fun difficulty() = 1f
 
-    fun tryRead(actor: Actor) {
+    private fun tryRead(actor: Actor) {
         Console.sayAct(readMsg(), readOtherMsg(), actor, this)
         val result = Brains.resolve(actor, difficulty())
         if (result < 0) {
