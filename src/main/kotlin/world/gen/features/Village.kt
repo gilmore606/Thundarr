@@ -6,6 +6,9 @@ import things.Shrine
 import things.Thing
 import things.Well
 import util.*
+import world.ChunkScratch
+import world.gen.biomes.Glacier
+import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.gen.gardenPlantSpawns
@@ -19,6 +22,12 @@ class Village(
 ) : ChunkFeature(
     3, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)
+                && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
+                && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
+    }
+
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
 
     @Transient private var featureBuilt = false
@@ -90,7 +99,7 @@ class Village(
         while (cursorY > 14) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidRight, cursorY - height, width, height, fertility, WEST)
+            layoutHutOrFeature(xMidRight + 1, cursorY - height, width, height, fertility, WEST)
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
@@ -98,7 +107,7 @@ class Village(
         while (cursorY < 49) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidRight, cursorY, width, height, fertility, WEST)
+            layoutHutOrFeature(xMidRight + 1, cursorY, width, height, fertility, WEST)
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }

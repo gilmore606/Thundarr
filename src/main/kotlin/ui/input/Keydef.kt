@@ -32,7 +32,7 @@ enum class Keydef(
     OPEN_GEAR("Open gear", BACKSLASH),
     OPEN_SKILLS("Open skills", BACKSPACE),
     OPEN_MAP("Open map", M),
-    OPEN_JOURNAL("Open journal", J),
+    OPEN_JOURNAL("Open journal", O),
     TOOLBAR_SHOW("Show toolbar", GRAVE),
 
     CANCEL("Cancel / Menu", ESCAPE),

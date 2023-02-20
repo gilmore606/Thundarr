@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import things.*
 import util.Dice
 import world.gen.biomes.Biome
+import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
 import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
@@ -109,7 +110,8 @@ class BlacksmithShop : Decor() {
 
 @Serializable
 class Garden(
-    private val fertility: Float, val biome: Biome, val habitat: Habitat
+    private val fertility: Float, val biome: Biome, val habitat: Habitat,
+    private val rowType: Terrain.Type = Terrain.Type.TERRAIN_GRASS
 ) : Decor() {
     private fun sizeName() = if (room.width * room.height > 60) "farm field" else "garden"
     override fun description() = "A ${sizeName()} plowed in rows."
@@ -121,12 +123,13 @@ class Garden(
         for (tx in x0 until x1) {
             for (ty in y0 until y1) {
                 if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isAbandoned) {
-                    setTerrain(tx, ty, Terrain.Type.TERRAIN_GRASS)
+                    setTerrain(tx, ty, rowType)
                     carto.getPlant(biome, habitat, 1f,
                         gardenDensity, gardenPlantSpawns)?.also { plant ->
                         spawnAt(tx, ty, plant)
                     }
                 }
+                if (!isAbandoned && carto is WorldCarto) (carto as WorldCarto).setFlag(tx, ty, WorldCarto.CellFlag.NO_PLANTS)
             }
         }
     }
@@ -143,5 +146,14 @@ class Stage : Decor() {
                 setTerrain(tx, ty, terrain)
             }
         }
+    }
+}
+
+@Serializable
+class Barn : Decor() {
+    override fun description() = "A barn.  It smells of hay and manure."
+    override fun abandonedDescription() = "A barn that hasn't seen use in a long time."
+    override fun doFurnish() {
+
     }
 }

@@ -16,6 +16,7 @@ import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
+import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
 
@@ -51,7 +52,6 @@ object Metamap {
     val villageCount = 220
     val minVillageDistance = 8
     val villageAbandonedChance = 0.15f
-    val villageNeighborFeatureChance = 1.0f
     val ruinFalloff = 14f
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
@@ -744,6 +744,9 @@ object Metamap {
             val villages = ArrayList<XY>()
             var placed = 0
             var actuallyPlaced = 0
+            val possibleNeighbors = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
+                Triple(1.0f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) })
+            )
             while (placed < villageCount) {
                 var placedOne = false
                 var tries = 0
@@ -751,33 +754,28 @@ object Metamap {
                     val x = Dice.zeroTil(chunkRadius * 2)
                     val y = Dice.zeroTil(chunkRadius * 2)
                     val meta = scratches[x][y]
-                    if (!(meta.biome in listOf(Ocean, Glacier))) {
-                        if (!meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class) && !meta.hasFeature(Lake::class)) {
-                            if (!meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class) && !meta.hasFeature(Highways::class)) {
-                                if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
-                                    if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
-                                        placedOne = true
-                                        actuallyPlaced++
-                                        villages.add(XY(x, y))
-                                        val villageName = Madlib.villageName()
-                                        scratches[x][y].features.add(Village(villageName, isAbandoned = Dice.chance(villageAbandonedChance)))
-                                        scratches[x][y].removeFeature(RuinedBuildings::class)
-                                        // Place features around village
-                                        CARDINALS.from(x, y) { dx, dy, dir ->
-                                            if (boundsCheck(dx, dy) && Dice.chance(villageNeighborFeatureChance)) {
-                                                val neighbor = scratches[dx][dy]
-                                                when (neighbor.biome) {
-                                                    Plain, Scrub -> Farm()
-                                                    else -> null
-                                                }?.also { feature ->
-                                                    scratches[dx][dy].features.add(feature)
-                                                }
-                                            }
+                    if (Village.canBuildOn(meta)) {
+                        if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
+                            if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
+                                val village = Village(Madlib.villageName(),  isAbandoned = Dice.chance(villageAbandonedChance))
+                                placedOne = true
+                                actuallyPlaced++
+                                villages.add(XY(x, y))
+                                scratches[x][y].features.add(village)
+                                scratches[x][y].removeFeature(RuinedBuildings::class)
+                                // Place features around village
+                                possibleNeighbors.forEach { neighborData ->
+                                    CARDINALS.from(x, y) { dx, dy, dir ->
+                                        if (boundsCheck(dx, dy) && Dice.chance(neighborData.first) && neighborData.second.invoke(scratches[dx][dy])) {
+                                            val feature = neighborData.third.invoke(village.isAbandoned)
+                                            scratches[dx][dy].features.add(feature)
+                                            scratches[dx][dy].removeFeature(RuinedBuildings::class)
+                                            scratches[dx][dy].removeFeature(Lake::class)
                                         }
-                                        suggestedPlayerStart.x = xToChunkX(x)
-                                        suggestedPlayerStart.y = yToChunkY(y)
                                     }
                                 }
+                                suggestedPlayerStart.x = xToChunkX(x)
+                                suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -830,7 +828,10 @@ object Metamap {
                 }
             }
             fun nameArea(areaID: Int, name: String) {
-                forEachMeta { x,y,cell -> if (areaMap[x][y] == areaID && cell.title == "") cell.title = name }
+                forEachMeta { x,y,cell ->
+                    if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle())
+                        cell.title = name
+                }
             }
             areas[Ruins]?.sortByDescending { it.size }
             areas[Ruins]?.forEachIndexed { n, area ->

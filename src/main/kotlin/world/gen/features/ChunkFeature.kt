@@ -7,6 +7,7 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
+import world.ChunkScratch
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
@@ -18,6 +19,7 @@ sealed class ChunkFeature(
     val order: Int,
     val stage: Stage,
 ) {
+
     enum class Stage { TERRAIN, BUILD }
     @Transient
     lateinit var carto: WorldCarto
@@ -97,6 +99,14 @@ sealed class ChunkFeature(
 
     protected fun flagsAt(x: Int, y: Int) = carto.flagsMap[x - x0][y - y0]
 
+    protected fun carveBlock(x0: Int, y0: Int, x1: Int, y1: Int, terrain: Terrain.Type) {
+        for (x in x0..x1) {
+            for (y in y0..y1) {
+                setTerrain(x, y, terrain)
+            }
+        }
+    }
+
     protected fun carveTrailChunk(room: Rect,
                                   type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
                                   skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
@@ -122,10 +132,11 @@ sealed class ChunkFeature(
 
     protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
                            forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
+                           hasWindows: Boolean = true, forceFloor: Terrain.Type? = null, forceWall: Terrain.Type? = null,
                            forRooms: ((List<Decor.Room>)->Unit)) {
         val villagePlantSpawns = gardenPlantSpawns()
-        val wallType = meta.biome.villageWallType()
-        val floorType = meta.biome.villageFloorType()
+        val wallType = forceWall ?: meta.biome.villageWallType()
+        val floorType = forceFloor ?:  meta.biome.villageFloorType()
         val dirtType =  meta.biome.trailTerrain(x0,y0)
         // Locate door
         val doorDir = forceDoorDir ?: when {
@@ -194,7 +205,7 @@ sealed class ChunkFeature(
                 } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
                     setTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
                 } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    if (windowBlockerCount < 1 &&
+                    if (windowBlockerCount < 1 && hasWindows &&
                         !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
                         ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
                         setTerrain(x0 + tx, y0 + ty,

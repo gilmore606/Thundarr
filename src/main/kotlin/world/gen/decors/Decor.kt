@@ -17,7 +17,7 @@ sealed class Decor {
     @Serializable
     data class Room(
         val rect: Rect,
-        val forbiddenCells: List<XY>,
+        val forbiddenCells: List<XY> = listOf(),
     ) {
         val width = rect.x1 - rect.x0 + 1
         val height = rect.y1 - rect.y0 + 1
