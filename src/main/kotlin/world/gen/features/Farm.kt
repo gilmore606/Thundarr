@@ -22,24 +22,29 @@ class Farm(
                 && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class) && !meta.hasFeature(Highways::class)
     }
 
-    private val barnChance = 0.9f
+    private val fieldChance = 0.7f
+    private val barnChance = 0.7f
 
     override fun cellTitle() = "farm"
 
     override fun doDig() {
-        val width = Dice.range(25, 45)
-        val height = Dice.range(25, 45)
+        val width = Dice.range(35, 50)
+        val height = Dice.range(35, 50)
         val x = x0 + Dice.range(5, 56 - width)
         val y = y0 + Dice.range(5, 56 - height)
         carveBlock(x, y, x + width - 1, y + height - 1, Terrain.Type.TEMP1)
         repeat(3) { fuzzTerrain(Terrain.Type.TEMP1, 0.5f) }
 
-        val field = Rect(x + Dice.range(7, 15), y + Dice.range(7, 15),
+        val field = Rect(x + Dice.range(12, 18), y + Dice.range(12, 18),
             x + width - Dice.range(1, 10), y + height - Dice.range(1, 5))
-        Garden(0.5f, meta.biome, meta.habitat, Terrain.Type.TERRAIN_DIRT)
-            .furnish(Decor.Room(field), carto, isAbandoned)
+        var fieldPlaced = false
+        if (Dice.chance(fieldChance)) {
+            Garden(0.5f, meta.biome, meta.habitat, Terrain.Type.TERRAIN_DIRT)
+                .furnish(Decor.Room(field), carto, isAbandoned)
+            fieldPlaced = true
+        }
 
-        if (Dice.chance(barnChance)) {
+        if (Dice.chance(barnChance) || !fieldPlaced) {
             val barnWidth = Dice.range(8, 12)
             val barnHeight = Dice.range(8, 12)
             val barnRect = when (CARDINALS.random()) {

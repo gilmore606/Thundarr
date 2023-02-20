@@ -26,6 +26,12 @@ class Village(
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
                 && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
+
+        val neighborFeatures = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
+
+            Triple(0.7f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) })
+
+        )
     }
 
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f

@@ -744,9 +744,6 @@ object Metamap {
             val villages = ArrayList<XY>()
             var placed = 0
             var actuallyPlaced = 0
-            val possibleNeighbors = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
-                Triple(1.0f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) })
-            )
             while (placed < villageCount) {
                 var placedOne = false
                 var tries = 0
@@ -764,7 +761,7 @@ object Metamap {
                                 scratches[x][y].features.add(village)
                                 scratches[x][y].removeFeature(RuinedBuildings::class)
                                 // Place features around village
-                                possibleNeighbors.forEach { neighborData ->
+                                Village.neighborFeatures.forEach { neighborData ->
                                     CARDINALS.from(x, y) { dx, dy, dir ->
                                         if (boundsCheck(dx, dy) && Dice.chance(neighborData.first) && neighborData.second.invoke(scratches[dx][dy])) {
                                             val feature = neighborData.third.invoke(village.isAbandoned)
