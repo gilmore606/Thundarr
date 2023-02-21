@@ -441,24 +441,45 @@ object Madlib {
 
     fun villageName(): String {
         val pre = listOf("iron", "owl", "deer", "oak", "sparrow", "robin", "mud", "snake", "turnip",
-            "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hounds", "water", "rabbit", "hare",
+            "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hound", "water", "rabbit", "hare",
             "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",
             "north", "south", "larry", "bill", "maude", "sally", "chester", "white", "black", "gray", "blue",
             "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull",
-            "fail", "bleak", "fear", "gale", "frost", "anger", "hunger", "hope", "faith", "mel", "kayle", "figs")
+            "fail", "bleak", "fear", "gale", "frost", "anger", "hunger", "hope", "faith", "mel", "kayle", "figs",
+            "turd", "waste", "dust", "ruby", "kirby", "stan", "buffa", "cow", "chicken", "caul", "omen",
+            "comet", "moon", "demon", "motor", "trucker", "kill", "dismal", "dubya", "yeezy", "prince", "beggar",
+            "hobo", "bum", "drifter", "booze"
+        )
         val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend",
             "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead", "vale", "point", "sted", "ston",
-            " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend")
+            " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend", " Fork", " Mill", " Grove",
+            "land", "stein", "ward", "gard", "'s Folly", "'s End"
+        )
 
         val name = pre.random() + post.random()
         return name.capitalize()
     }
 
     fun graveName(): String {
-        val names = listOf("Henry Corden", "Robert Ridgely", "Nellie Bellflower", "Dick Tufeld", "Alan Oppenheimer",
-            "Joe Ruby", "Ken Spears", "Jerry Eisenberg", "Rudy Larriva", "Buzz Dixon", "Mel Stanley", "Dan Burford",
-            "Wade Bell", "Jesse Morris")
-        return names.random()
+        if (Dice.chance(0.1f)) {
+            val names = listOf(
+                "Henry Corden", "Robert Ridgely", "Nellie Bellflower", "Dick Tufeld", "Alan Oppenheimer",
+                "Joe Ruby", "Ken Spears", "Jerry Eisenberg", "Rudy Larriva", "Buzz Dixon", "Mel Stanley", "Dan Burford",
+                "Wade Bell", "Jesse Morris"
+            )
+            return names.random()
+        }
+        val first = listOf("Cletus", "Abe", "Arthur", "Fred", "Phil", "Walt", "Ralph", "Amos", "Theo", "Atticus",
+            "Felix", "Silas", "Oliver", "Cassius", "Hugo", "Oscar", "Milo", "Otto", "August", "Jude", "Miles",
+            "Ezra", "Clarence", "Adolf", "Clem", "Joseph", "Archie", "Bernard", "Grady", "Cliff", "Dean", "Earl",
+            "Edison", "Edmund", "Elijah", "Emile", "Erwin", "Fletcher", "Frank", "George", "Gerald", "Gus",
+            "Harold",  "Harvey", "Howard", "Hugh", "Jerry", "Langston", "Louis", "Mickey", "Milton", "Morgan",
+            "Nelson", "Norman", "Neville", "Orville", "Oscar", "Otis", "Reed", "Rodney", "Roy", "Sherman",
+            "Spencer", "Stan", "Sterling"
+        )
+        val initial = listOf("X", "S", "Q", "N", "L", "P", "T", "Z", "B")
+
+        return first.random() + " " + initial.random() + "."
     }
 
     fun epitaph(): String {

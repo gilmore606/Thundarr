@@ -4,13 +4,22 @@ import kotlinx.serialization.Serializable
 import things.Glowstone
 import util.*
 import world.Chunk
+import world.ChunkScratch
 import world.NaturalCavern
+import world.gen.biomes.Desert
+import world.gen.biomes.ForestHill
+import world.gen.biomes.Hill
+import world.gen.biomes.Mountain
 import world.terrains.Terrain
 
 @Serializable
 class Caves : ChunkFeature(
     4, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
+                && meta.biome in listOf(Mountain, Hill, ForestHill, Desert)
+    }
 
     private val cavePortalChance = 0.5f
     private val cavePortalPoints = ArrayList<XY>()

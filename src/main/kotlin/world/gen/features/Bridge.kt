@@ -1,6 +1,7 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
+import world.ChunkScratch
 import world.gen.cartos.WorldCarto.CellFlag.*
 import world.terrains.Terrain
 
@@ -8,6 +9,9 @@ import world.terrains.Terrain
 class Bridge : ChunkFeature(
     4, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = meta.hasFeature(Rivers::class) && meta.hasFeature(Trails::class)
+    }
 
     override fun doDig() {
         forEachCell { x,y ->

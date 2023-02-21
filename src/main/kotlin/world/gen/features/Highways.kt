@@ -21,7 +21,8 @@ class Highways(
     @Serializable
     class HighwayExit(
         var edge: XY,
-        var width: Int = 2
+        var width: Int = 2,
+        var sign: String? = null
     )
 
     fun addExit(exit: HighwayExit) {

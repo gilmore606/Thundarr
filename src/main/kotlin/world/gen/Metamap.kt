@@ -60,6 +60,8 @@ object Metamap {
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
     val maxVolcanoes = 3
+    val randomFarmChance = 0.01f
+    val randomGraveyardChance = 0.005f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -142,7 +144,7 @@ object Metamap {
     }
 
     suspend fun sayProgress(text: String) {
-        if (fakeDelaysInWorldgenText) delay(300L)
+        if (fakeDelaysInWorldgenText) delay(500L)
         Console.sayFromThread(text)
     }
 
@@ -627,7 +629,6 @@ object Metamap {
             forEachMeta { x,y,cell ->
                 // Vari-blur rivers
                 cell.featureOf(Rivers::class)?.also { (it as Rivers).riverBlur = NoisePatches.get("metaVariance", x, y).toFloat() }
-
                 // Set coasts
                 if (cell.height > 0) {
                     val coasts = mutableListOf<XY>()
@@ -650,32 +651,6 @@ object Metamap {
                         cell.features.add(Coastlines(coasts))
                     }
                 }
-                // Add lake
-                if (Lake.canBuildOn(cell)) {
-                    if (Dice.chance(when (cell.rivers().size) {
-                        0 -> 0.02f
-                        1 -> 0.3f
-                        2 -> 0.06f
-                        else -> 0.1f
-                    })) {
-                        cell.features.add(Lake())
-                    }
-                }
-
-                // Add ruined buildings around cities
-                cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
-                val ruinousness = kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.highways().size * 0.1f
-                val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
-                var buildingCount = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
-                if (cell.cityDistance <= 2f) buildingCount += 2
-                if (Dice.chance(0.01f)) buildingCount += 1
-                buildingCount += when (cell.biome) {
-                    Mountain -> -1
-                    Ruins -> -buildingCount
-                    Suburb -> Dice.range(2, 6)
-                    else -> 0
-                }
-                cell.features.add(RuinedBuildings(max(buildingCount, 0)))
             }
 
             // Set temperatures
@@ -726,6 +701,7 @@ object Metamap {
 
             sayProgress("Running roads and trails...")
             // Run trails
+            // TODO: This is really lame.  Run smarter trails.
             forEachMeta { x,y,cell ->
                 if (Dice.chance(cell.biome.trailChance())) {
                     runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
@@ -769,15 +745,17 @@ object Metamap {
                                 villages.add(XY(x, y))
                                 scratches[x][y].features.add(village)
                                 scratches[x][y].removeFeature(RuinedBuildings::class)
+                                val placedDirs = mutableSetOf<XY>()
                                 // Place features around village
                                 Village.neighborFeatures.forEach { neighborData ->
-                                    CARDINALS.from(x, y) { dx, dy, dir ->
-                                        if (boundsCheck(dx, dy) && Dice.chance(neighborData.first)
+                                    DIRECTIONS.from(x, y) { dx, dy, dir ->
+                                        if (dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
                                             && neighborData.second.invoke(scratches[dx][dy])) {
+                                            val neighbor = scratches[dx][dy]
                                             val feature = neighborData.third.invoke(village.isAbandoned)
-                                            scratches[dx][dy].features.add(feature)
-                                            scratches[dx][dy].removeFeature(RuinedBuildings::class)
-                                            scratches[dx][dy].removeFeature(Lake::class)
+                                            neighbor.features.add(feature)
+                                            neighbor.removeFeature(RuinedBuildings::class)
+                                            placedDirs.add(dir)
                                         }
                                     }
                                 }
@@ -792,16 +770,58 @@ object Metamap {
             }
             sayProgress("Founded $actuallyPlaced villages.")
 
-            // Place cabins, caves, bridges
+            // Place random cell features
             forEachMeta { x,y,cell ->
-                if (!cell.hasFeature(Village::class) && Dice.chance(cell.biome.cabinChance())) {
+                // Cabins
+                if (Cabin.canBuildOn(cell) && Dice.chance(cell.biome.cabinChance())) {
                     cell.features.add(Cabin())
                 }
-                if (!cell.hasFeature(Village::class) && Dice.chance(cell.biome.cavesChance())) {
+                // Caves
+                if (Caves.canBuildOn(cell) && Dice.chance(cell.biome.cavesChance())) {
                     cell.features.add(Caves())
                 }
-                if (cell.hasFeature(Rivers::class) && cell.hasFeature(Trails::class)) {
+                // Bridges
+                if (Bridge.canBuildOn(cell)) {
                     cell.features.add(Bridge())
+                }
+                // Lakes
+                if (Lake.canBuildOn(cell) && Dice.chance(when (cell.rivers().size) {
+                        0 -> 0.02f
+                        1 -> 0.3f
+                        2 -> 0.06f
+                        else -> 0.1f
+                    })) {
+                    cell.features.add(Lake())
+                }
+                // Ruined buildings
+                cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
+                if (RuinedBuildings.canBuildOn(cell)) {
+                    val ruinousness =
+                        kotlin.math.max(0f, (1f - cell.cityDistance / ruinFalloff)) + cell.highways().size * 0.1f
+                    val minruins = Integer.max(0, (ruinousness * ruinsMax * 0.5f - 1.5f).toInt())
+                    var buildingCount = Dice.range(minruins, (ruinousness * ruinsMax).toInt())
+                    if (cell.cityDistance <= 2f) buildingCount += 2
+                    if (Dice.chance(0.01f)) buildingCount += 1
+                    buildingCount += when (cell.biome) {
+                        Mountain -> -1
+                        Ruins -> -buildingCount
+                        Suburb -> Dice.range(2, 6)
+                        else -> 0
+                    }
+                    if (buildingCount > 0) cell.features.add(RuinedBuildings(buildingCount))
+                }
+                // Special attention to cells with no surrounding features
+                if (cell.features.isEmpty() && DIRECTIONS.hasNoneWhere {
+                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].features.isNotEmpty() }
+                ) {
+                    // Farms
+                    if (Farm.canBuildOn(cell) && Dice.chance(randomFarmChance)) {
+                        cell.features.add(Farm(Dice.flip()))
+                    }
+                    // Graveyards
+                    if (Graveyard.canBuildOn(cell) && Dice.chance(randomGraveyardChance)) {
+                        cell.features.add(Graveyard(Dice.flip()))
+                    }
                 }
             }
 

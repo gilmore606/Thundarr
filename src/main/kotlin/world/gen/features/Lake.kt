@@ -14,7 +14,8 @@ class Lake : ChunkFeature(
 ) {
 
     companion object {
-        fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
+                && meta.biome !in listOf(Ocean, Glacier)
     }
 
     override fun doDig() {

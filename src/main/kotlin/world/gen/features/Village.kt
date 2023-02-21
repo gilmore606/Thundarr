@@ -27,8 +27,8 @@ class Village(
 
         val neighborFeatures = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
 
-            Triple(0.6f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) }),
-            Triple(0.1f, { meta -> Graveyard.canBuildOn(meta) }, { isAbandoned -> Graveyard(isAbandoned) }),
+            Triple(0.7f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) }),
+            Triple(0.7f, { meta -> Graveyard.canBuildOn(meta) }, { isAbandoned -> Graveyard(isAbandoned) }),
 
         )
     }
@@ -188,8 +188,8 @@ class Village(
                         }
                     }
                     2 -> {
-                        HutLivingRoom().furnish(rooms[0], carto, abandoned)
-                        HutBedroom().furnish(rooms[1], carto, abandoned)
+                        HutBedroom().furnish(rooms[0], carto, abandoned)
+                        HutLivingRoom().furnish(rooms[1], carto, abandoned)
                     }
                 }
             }

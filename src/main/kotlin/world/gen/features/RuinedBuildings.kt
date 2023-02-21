@@ -6,6 +6,7 @@ import things.ModernDoor
 import things.Trunk
 import util.*
 import world.Chunk
+import world.ChunkScratch
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
@@ -17,6 +18,10 @@ class RuinedBuildings(
 ) : ChunkFeature(
     1, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
+    }
+
     private val ruinTreasureChance = 0.4f
     private val ruinIntactChance = 0.25f
 

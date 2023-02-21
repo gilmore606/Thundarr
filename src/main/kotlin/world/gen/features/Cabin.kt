@@ -2,12 +2,20 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import util.Dice
+import world.ChunkScratch
+import world.gen.biomes.Desert
+import world.gen.biomes.ForestHill
+import world.gen.biomes.Hill
+import world.gen.biomes.Mountain
 import world.gen.decors.Hut
 
 @Serializable
 class Cabin : ChunkFeature(
     0, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
+    }
 
     override fun doDig() {
         val width = Dice.range(6, 10)
