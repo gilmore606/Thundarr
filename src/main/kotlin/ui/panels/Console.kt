@@ -30,7 +30,7 @@ object Console : Panel() {
     private var floatText = ""
     private var floatAge = 0f
     private var floatWidth = 0
-    private const val floatFadeTime = 1.6f
+    private var floatFadeTime = 1.6f
 
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
@@ -216,7 +216,7 @@ object Console : Panel() {
             offset += lineSpacing
         }
         if (!App.attractMode && floatAge <= floatFadeTime) {
-            floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime))
+            floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
             drawString(floatText,
                 Screen.width / 2 - floatWidth / 2,
                 (Screen.height / Screen.aspectRatio).toInt() / 2.toInt(),
@@ -228,5 +228,6 @@ object Console : Panel() {
         floatText = newText
         floatAge = 0f
         floatWidth = measure(floatText, Screen.smallFont)
+        floatFadeTime = 1f + (floatText.length * 0.04f)
     }
 }

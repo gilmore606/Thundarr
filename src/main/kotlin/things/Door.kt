@@ -27,6 +27,7 @@ sealed class Door : Thing(), Smashable {
     override fun isPortable() = false
     override fun isBlocking() = !isOpen
     override fun isOpaque() = !isOpen
+    override fun announceOnWalk() = false
     override fun glyph() = if (isOpen) openGlyph() else closedGlyph()
 
     override fun name() = "door"

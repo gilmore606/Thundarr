@@ -2,6 +2,9 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import util.Dice
+import world.ChunkScratch
+import world.gen.biomes.Glacier
+import world.gen.biomes.Ocean
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 
@@ -9,6 +12,11 @@ import world.terrains.Terrain
 class Lake : ChunkFeature(
     3, Stage.TERRAIN
 ) {
+
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)
+    }
+
     override fun doDig() {
         if (Dice.chance(0.15f)) {
             // Big lake!

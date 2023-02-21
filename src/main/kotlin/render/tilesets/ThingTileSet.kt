@@ -43,7 +43,7 @@ fun ThingTileSet() =
         setTile(Glyph.CHEST, SimpleTile(this, 4, 0))
         setTile(Glyph.GRAVESTONE, VariantsTile(this).apply {
             add(0.5f, 2, 1)
-            add(0.5f, 2, 2)
+            add(0.5f, 3, 1)
         })
         setTile(Glyph.BLADE, SimpleTile(this, 4, 2))
         setTile(Glyph.HILT, SimpleTile(this, 5, 2))

@@ -9,6 +9,7 @@ import util.Rect
 import util.XY
 import world.ChunkMeta
 import world.gen.cartos.Carto
+import world.gen.cartos.WorldCarto
 import world.terrains.Terrain
 
 @Serializable
@@ -70,8 +71,6 @@ sealed class Decor {
     protected val height: Int get() = room.height
 
     private var cell = XY(0,0)
-
-    var lastSeenTime: Long = 0L
 
     open fun fitsInRoom(room: Room): Boolean = true
 
@@ -183,4 +182,7 @@ sealed class Decor {
     protected val clearCount: Int
         get() = room.clears.size
 
+    protected fun boundsCheck(x: Int, y: Int) = (x in x0..x1 && y in y0..y1)
+
+    protected fun flagsAt(x: Int, y: Int) = if (carto is WorldCarto) (carto as WorldCarto).flagsMap[x - x0][y - y0] else null
 }

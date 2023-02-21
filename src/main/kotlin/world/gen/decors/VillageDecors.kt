@@ -73,7 +73,9 @@ class Church : Decor() {
     override fun description() = "A humble but lovingly constructed shrine to the Lords of Light."
     override fun abandonedDescription() = "An abandoned shrine to the Lords of Light, now covered in dust."
     override fun doFurnish() {
-        atCenter { spawn(Shrine()) }
+        atCenter { spawn(
+            if (!isAbandoned || Dice.chance(0.5f)) Shrine() else Boulder()
+        ) }
         repeat(Dice.zeroTo(2)) { againstWall { spawn(Table()) }}
     }
 }
@@ -130,6 +132,26 @@ class Garden(
                     }
                 }
                 if (!isAbandoned && carto is WorldCarto) (carto as WorldCarto).setFlag(tx, ty, WorldCarto.CellFlag.NO_PLANTS)
+            }
+        }
+    }
+}
+
+@Serializable
+class Graveyard(
+    private val density: Float,
+    private val slop: Float,
+) : Decor() {
+    override fun description() = "An old graveyard.  You can't help but whistle."
+    override fun doFurnish() {
+        for (tx in x0 until x1) {
+            for (ty in y0 until y1) {
+                if (tx % 3 == 0 && ty % 3 == 0 && Dice.chance(density)) {
+                    val ox = if (Dice.chance(slop)) Dice.range(-1, 1) else 0
+                    val oy = if (Dice.chance(slop)) Dice.range(-1, 1) else 0
+                    if (boundsCheck(tx + ox, ty + oy)) spawnAt(tx + ox, ty + oy, Gravestone())
+                }
+                if (!isAbandoned && Dice.chance(0.95f)) flagsAt(tx, ty)?.add(WorldCarto.CellFlag.NO_PLANTS)
             }
         }
     }

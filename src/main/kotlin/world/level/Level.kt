@@ -225,7 +225,7 @@ sealed class Level {
                 lastPlayerRoom = null
             }
 
-            thingsAt(x, y).filter { it !is Scenery }.also { things ->
+            thingsAt(x, y).filter { it.announceOnWalk() }.also { things ->
                 if (things.isNotEmpty()) Console.say("You see " + things.englishList() + " here.")
             }
         }

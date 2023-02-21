@@ -116,6 +116,7 @@ sealed class Thing() : Entity {
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
+    open fun announceOnWalk() = true
 
     @Transient var holder: ThingHolder? = null
 

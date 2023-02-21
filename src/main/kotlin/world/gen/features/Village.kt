@@ -2,9 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import things.Shrine
-import things.Thing
-import things.Well
+import things.*
 import util.*
 import world.ChunkScratch
 import world.gen.biomes.Glacier
@@ -29,7 +27,8 @@ class Village(
 
         val neighborFeatures = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
 
-            Triple(0.7f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) })
+            Triple(0.6f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) }),
+            Triple(0.1f, { meta -> Graveyard.canBuildOn(meta) }, { isAbandoned -> Graveyard(isAbandoned) }),
 
         )
     }
@@ -39,9 +38,10 @@ class Village(
     @Transient private var featureBuilt = false
     @Transient private val uniqueHuts = mutableListOf<Decor>()
 
-    override fun cellTitle() = name
+    override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
     override fun doDig() {
+
         uniqueHuts.add(BlacksmithShop())
         uniqueHuts.add(Schoolhouse())
         uniqueHuts.add(Church())
@@ -61,7 +61,12 @@ class Village(
         }
         if (!isAbandoned && Dice.chance(0.7f)) {
             placeInMostPublic(
-                if (Dice.chance(0.7f)) Well() else Shrine()
+                when (Dice.oneTo(10)) {
+                    1 -> Gravestone()
+                    2 -> Shrine()
+                    3 -> if (Dice.chance(0.3f)) WreckedCar() else DeadTree()
+                    else -> Well()
+                }
             )
         }
         if (isAbandoned) {

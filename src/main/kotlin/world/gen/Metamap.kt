@@ -2,6 +2,7 @@ package world.gen
 
 import App
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.newSingleThreadAsyncContext
 import ui.panels.Console
@@ -19,6 +20,8 @@ import java.lang.Math.abs
 import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
+
+    private val fakeDelaysInWorldgenText = true
 
     private val chunkRadius = 100
 
@@ -138,6 +141,11 @@ object Metamap {
         }
     }
 
+    suspend fun sayProgress(text: String) {
+        if (fakeDelaysInWorldgenText) delay(300L)
+        Console.sayFromThread(text)
+    }
+
     fun buildWorld() {
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
@@ -153,10 +161,10 @@ object Metamap {
         coroutineScope.launch {
 
             // CONTINENT
-            Console.sayFromThread("Breaking the moon in half...")
+            sayProgress("Breaking the moon in half...")
             var landFraction = 0f
             while (landFraction < minLand || landFraction > maxLand) {
-                if (landFraction > 0f) Console.sayFromThread("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
+                if (landFraction > 0f) sayProgress("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
                 var landC = 0
                 var totalC = 0
                 for (ix in -chunkRadius until chunkRadius) {
@@ -261,7 +269,7 @@ object Metamap {
             }
 
             // SLOPES
-            Console.sayFromThread("Stirring the face of the waters...")
+            sayProgress("Stirring the face of the waters...")
 
             val opens = ArrayList<XY>()
             val coasts = ArrayList<XY>()
@@ -316,7 +324,7 @@ object Metamap {
             }
 
             // Set mountaintops
-            Console.sayFromThread("Raising mountains...")
+            sayProgress("Raising mountains...")
             val peaks = ArrayList<XY>()
             forEachMeta { x,y,cell ->
                 val height = cell.height
@@ -331,7 +339,7 @@ object Metamap {
             }
 
             // Freeze ice caps
-            Console.sayFromThread("Freezing ice cap..")
+            sayProgress("Freezing ice cap..")
             forEachMeta { x,y,cell ->
                 if (y < 20 && cell.height == 0) {
                     cell.biome = Glacier
@@ -357,11 +365,10 @@ object Metamap {
                     }
                 }
             }
-            Console.sayFromThread("Running ${mouths.size} rivers from ${coasts.size} possible coasts...")
+            sayProgress("Running ${mouths.size} rivers from ${coasts.size} possible coasts...")
             mouths.forEach { runRiver(it, wiggle = 0.5f) }
 
             // Calculate moisture
-            Console.sayFromThread("Moisturizing biomes...")
             forEachMeta { x,y,cell ->
                 if (cell.height == 0 || cell.hasFeature(Rivers::class)) {
                     cell.dryness = 0
@@ -387,6 +394,7 @@ object Metamap {
                 maxDry++
             }
 
+            sayProgress("Shaping the land...")
             // Link peaks into mountain ranges
             peaks.shuffle()
             while (peaks.isNotEmpty()) {
@@ -467,7 +475,7 @@ object Metamap {
 
             // Place cities
             val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland + citiesDesert
-            Console.sayFromThread("Building $citiesTotal ancient cities...")
+            sayProgress("Building $citiesTotal ancient cities...")
             repeat (citiesRiverMouth) { placeCity(mouths) }
             repeat (citiesCoast) { placeCity(coasts) }
             repeat (citiesRiver) { placeCity(riverCells) }
@@ -544,7 +552,7 @@ object Metamap {
                         eruptions++
                     }
                 }
-                Console.sayFromThread("Erupted $eruptions volcanoes in desert peaks.")
+                sayProgress("Erupted $eruptions volcanoes in desert peaks.")
             }
 
             // Biomes pass 2 - insert intermediate biomes
@@ -643,7 +651,7 @@ object Metamap {
                     }
                 }
                 // Add lake
-                if (cell.biome.canHaveLake()) {
+                if (Lake.canBuildOn(cell)) {
                     if (Dice.chance(when (cell.rivers().size) {
                         0 -> 0.02f
                         1 -> 0.3f
@@ -716,6 +724,7 @@ object Metamap {
                 }
             }
 
+            sayProgress("Running roads and trails...")
             // Run trails
             forEachMeta { x,y,cell ->
                 if (Dice.chance(cell.biome.trailChance())) {
@@ -740,7 +749,7 @@ object Metamap {
             }
 
             // Place villages
-            Console.sayFromThread("Populating the land...")
+            sayProgress("Populating the land...")
             val villages = ArrayList<XY>()
             var placed = 0
             var actuallyPlaced = 0
@@ -754,7 +763,7 @@ object Metamap {
                     if (Village.canBuildOn(meta)) {
                         if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
                             if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
-                                val village = Village(Madlib.villageName(),  isAbandoned = Dice.chance(villageAbandonedChance))
+                                val village = Village(Madlib.villageName(), isAbandoned = Dice.chance(villageAbandonedChance))
                                 placedOne = true
                                 actuallyPlaced++
                                 villages.add(XY(x, y))
@@ -763,7 +772,8 @@ object Metamap {
                                 // Place features around village
                                 Village.neighborFeatures.forEach { neighborData ->
                                     CARDINALS.from(x, y) { dx, dy, dir ->
-                                        if (boundsCheck(dx, dy) && Dice.chance(neighborData.first) && neighborData.second.invoke(scratches[dx][dy])) {
+                                        if (boundsCheck(dx, dy) && Dice.chance(neighborData.first)
+                                            && neighborData.second.invoke(scratches[dx][dy])) {
                                             val feature = neighborData.third.invoke(village.isAbandoned)
                                             scratches[dx][dy].features.add(feature)
                                             scratches[dx][dy].removeFeature(RuinedBuildings::class)
@@ -780,7 +790,7 @@ object Metamap {
                 }
                 placed++
             }
-            Console.sayFromThread("Founded $actuallyPlaced villages.")
+            sayProgress("Founded $actuallyPlaced villages.")
 
             // Place cabins, caves, bridges
             forEachMeta { x,y,cell ->
@@ -796,7 +806,7 @@ object Metamap {
             }
 
             // Name contiguous features
-            Console.sayFromThread("Naming geography...")
+            sayProgress("Naming geography...")
             fun floodFill(x: Int, y: Int, id: Int, biome: Biome): Int {
                 var cells = 1
                 areaMap[x][y] = id
@@ -868,7 +878,7 @@ object Metamap {
             }
 
             // END STAGE : WRITE ALL DATA
-            Console.sayFromThread("Saving generated world...")
+            sayProgress("Saving generated world...")
             for (ix in -chunkRadius until chunkRadius) {
                 App.save.putWorldMetas(scratches[ix + chunkRadius])
                 ArrayList<ChunkMeta>().also {
@@ -880,7 +890,7 @@ object Metamap {
             }
             scratches = Array(1) { Array(1) { ChunkScratch() } }
 
-            Console.sayFromThread("The world is new.")
+            sayProgress("The world is new.")
             isWorking = false
         }
     }

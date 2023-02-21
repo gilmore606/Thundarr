@@ -18,7 +18,6 @@ sealed class Biome(
     val baseTerrain: Terrain.Type,
 ) {
     open fun defaultTitle() = "the wilderness"
-    open fun canHaveLake() = true
     open fun trailChance() = 0.1f
     open fun plantDensity() = 1.0f
     open fun cabinChance() = 0.0f
@@ -69,7 +68,6 @@ object Ocean : Biome(
     TERRAIN_DEEP_WATER
 ) {
     override fun defaultTitle() = "ocean"
-    override fun canHaveLake() = false
     override fun trailChance() = 0f
 }
 
