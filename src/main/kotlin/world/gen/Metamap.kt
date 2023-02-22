@@ -59,6 +59,7 @@ object Metamap {
     val ruinsMax = 5f
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
+    val randomHighwaySignChance = 0.4f
     val maxVolcanoes = 3
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
@@ -505,8 +506,8 @@ object Metamap {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
 
-                            //suggestedPlayerStart.x = xToChunkX(dx)
-                            //suggestedPlayerStart.y = yToChunkY(dy)
+                            suggestedPlayerStart.x = xToChunkX(dx)
+                            suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -759,8 +760,8 @@ object Metamap {
                                         }
                                     }
                                 }
-                                suggestedPlayerStart.x = xToChunkX(x)
-                                suggestedPlayerStart.y = yToChunkY(y)
+                                //suggestedPlayerStart.x = xToChunkX(x)
+                                //suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -1095,6 +1096,8 @@ object Metamap {
     }
 
     private fun connectCityToHighways(city: XY, targetCity: XY) {
+        val highwayNumber = Dice.range(13, 99)
+        val highwayId = "US$highwayNumber"
         val cursor = XY(city.x, city.y)
         val targets = ArrayList<XY>().apply {
             addAll(cityCells)
@@ -1142,13 +1145,14 @@ object Metamap {
                     if (possDirs.isEmpty()) done = true else moveDir = possDirs.random()
                 }
                 if (!done) {
-                    connectRoadExits(cursor, XY(cursor.x + moveDir.x, cursor.y + moveDir.y))
+                    val sign = if (Dice.chance(randomHighwaySignChance)) highwayId else null
+                    connectRoadExits(cursor, XY(cursor.x + moveDir.x, cursor.y + moveDir.y), sourceSign = sign)
                     if (cursor != city) newRoads.add(XY(cursor.x, cursor.y))
                     stepsSinceSideRoad++
                     if (stepsSinceSideRoad >= minStepsBetweenSideRoads && Dice.chance(sideRoadChance)) {
                         var sideRoadDir = moveDir.rotated()
                         if (Dice.flip()) sideRoadDir = sideRoadDir.flipped()
-                        runSideRoad(XY(cursor.x, cursor.y), sideRoadDir)
+                        runSideRoad(XY(cursor.x, cursor.y), sideRoadDir, highwayNumber)
                         stepsSinceSideRoad = 0
                     }
                     cursor.x += moveDir.x
@@ -1164,7 +1168,9 @@ object Metamap {
         roadCells.addAll(newRoads)
     }
 
-    private fun runSideRoad(start: XY, dir: XY) {
+    private fun runSideRoad(start: XY, dir: XY, mainHighwayNumber: Int) {
+        val highwayNumber = mainHighwayNumber + Dice.range(1,5) * 100
+        val highwayId = "HWY$highwayNumber"
         var done = false
         val cursor = XY(start.x,start.y)
         var currentDir = XY(dir.x, dir.y)
@@ -1180,7 +1186,8 @@ object Metamap {
                     if (Dice.flip()) currentDir = currentDir.flipped()
                 }
             } else {
-                connectRoadExits(cursor, next)
+                val sign = if (Dice.chance(randomHighwaySignChance)) highwayId else null
+                connectRoadExits(cursor, next, sourceSign = sign)
                 roadCells.add(XY(cursor.x, cursor.y))
                 cursor.x = next.x
                 cursor.y = next.y
@@ -1190,16 +1197,16 @@ object Metamap {
 
     private fun isLandAt(xy: XY) = boundsCheck(xy.x, xy.y) && scratches[xy.x][xy.y].height > 0
 
-    private fun connectRoadExits(source: XY, dest: XY) {
+    private fun connectRoadExits(source: XY, dest: XY, sourceSign: String? = null, destSign: String? = null) {
         if (scratches[dest.x][dest.y].biome == Ocean) return
         if (scratches[dest.x][dest.y].height < 1) return
         val sourceEdge = XY(dest.x - source.x, dest.y - source.y)
         val destEdge = XY(source.x - dest.x, source.y - dest.y)
         if (!scratches[source.x][source.y].highways().hasOneWhere { it.edge == sourceEdge }) {
-            scratches[source.x][source.y].addHighwayExit(Highways.HighwayExit(edge = sourceEdge))
+            scratches[source.x][source.y].addHighwayExit(Highways.HighwayExit(edge = sourceEdge, sign = sourceSign))
         }
         if (!scratches[dest.x][dest.y].highways().hasOneWhere { it.edge == destEdge }) {
-            scratches[dest.x][dest.y].addHighwayExit(Highways.HighwayExit(edge = destEdge))
+            scratches[dest.x][dest.y].addHighwayExit(Highways.HighwayExit(edge = destEdge, sign = destSign))
         }
     }
 

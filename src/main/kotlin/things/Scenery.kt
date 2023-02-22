@@ -31,8 +31,8 @@ class HighwaySign(
     override fun glyph() = Glyph.HIGHWAY_SIGN
     override fun name() = "highway sign"
     override fun isOpaque() = false
-    override fun walkOnMsg() = "\"$text\""
-    override fun description() = "An ancient faded highway information sign."
+    override fun walkOnMsg() = "\"$text\"."
+    override fun description() = "An ancient faded highway information sign.  \"$text\"."
 }
 
 @Serializable
