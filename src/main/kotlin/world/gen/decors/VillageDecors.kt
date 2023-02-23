@@ -143,6 +143,7 @@ class Graveyard(
     private val slop: Float,
 ) : Decor() {
     override fun description() = "An old graveyard.  You can't help but whistle."
+    override fun abandonedDescription() = "A forgotten graveyard, overgrown with weeds."
     override fun doFurnish() {
         for (tx in x0 until x1) {
             for (ty in y0 until y1) {
