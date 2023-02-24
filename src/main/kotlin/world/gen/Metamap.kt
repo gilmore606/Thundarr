@@ -21,9 +21,9 @@ import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
 
-    private val fakeDelaysInWorldgenText = true
+    private const val fakeDelaysInWorldgenText = false
 
-    private val chunkRadius = 100
+    private const val chunkRadius = 100
 
     private val coroutineContext = newSingleThreadAsyncContext("Metamap")
     private val coroutineScope = CoroutineScope(coroutineContext)

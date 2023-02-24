@@ -198,30 +198,39 @@ sealed class ChunkFeature(
         var windowBlockerCount = Dice.range(3, 10)
         for (tx in x until x+width) {
             for (ty in y until y+height) {
-                if (tx == doorx && ty == doory) {
-                    setTerrain(x0+tx, y0+ty, floorType)
-                    if (!isAbandoned || Dice.chance(0.5f)) spawnThing(x0+tx, y0+ty, WoodDoor().maybeLocked(0.3f))
-                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
-                } else if (tx == x || tx == x+width-1 || ty == y || ty == y+height-1) {
-                    safeSetTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
-                } else if (tx == x+1 || tx == x+width-2 || ty == y+1 || ty == y+height-2) {
-                    if (windowBlockerCount < 1 && hasWindows &&
-                        !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
-                        ((tx > x+1 && tx < x+width-2) || (ty > y+1 && ty < y+height-2))) {
-                        setTerrain(x0 + tx, y0 + ty,
-                            if (!isAbandoned || Dice.chance(0.5f)) Terrain.Type.TERRAIN_WINDOWWALL else floorType)
+                if (boundsCheck(x0+tx, y0+ty)) {
+                    if (tx == doorx && ty == doory) {
+                        setTerrain(x0 + tx, y0 + ty, floorType)
+                        if (!isAbandoned || Dice.chance(0.5f)) spawnThing(
+                            x0 + tx,
+                            y0 + ty,
+                            WoodDoor().maybeLocked(0.3f)
+                        )
                         chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
-                        windowBlockerCount = Dice.range(4, 12)
+                    } else if (tx == x || tx == x + width - 1 || ty == y || ty == y + height - 1) {
+                        safeSetTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
+                    } else if (tx == x + 1 || tx == x + width - 2 || ty == y + 1 || ty == y + height - 2) {
+                        if (windowBlockerCount < 1 && hasWindows &&
+                            !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
+                            ((tx > x + 1 && tx < x + width - 2) || (ty > y + 1 && ty < y + height - 2))
+                        ) {
+                            setTerrain(
+                                x0 + tx, y0 + ty,
+                                if (!isAbandoned || Dice.chance(0.5f)) Terrain.Type.TERRAIN_WINDOWWALL else floorType
+                            )
+                            chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
+                            windowBlockerCount = Dice.range(4, 12)
+                        } else {
+                            setTerrain(x0 + tx, y0 + ty, wallType)
+                            chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
+                            windowBlockerCount--
+                        }
                     } else {
-                        setTerrain(x0 + tx, y0 + ty, wallType)
+                        setTerrain(x0 + tx, y0 + ty, floorType)
                         chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
-                        windowBlockerCount--
                     }
-                } else {
-                    setTerrain(x0+tx, y0+ty, floorType)
-                    chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.INDOOR)
+                    flagsAt(x0 + tx, y0 + ty).add(WorldCarto.CellFlag.NO_PLANTS)
                 }
-                flagsAt(x0+tx, y0+ty).add(WorldCarto.CellFlag.NO_PLANTS)
             }
         }
         // Draw inside door if needed
