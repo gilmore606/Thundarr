@@ -305,6 +305,7 @@ object Screen : KtxScreen {
 
         this.width = width
         this.height = height
+        log.info("Screen resized to $width by $height")
         textCamera = OrthographicCamera(width.toFloat(), height.toFloat())
 
         panels.forEach { it.onResize(width, height) }

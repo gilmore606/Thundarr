@@ -73,6 +73,11 @@ abstract class Panel {
         font.draw(myTextBatch(), text, ((x  + this.x) - (Screen.width / 2f)), 0f - ((y + this.y) - (Screen.height / 2f)))
     }
 
+    fun drawStringAbsolute(text: String, x: Int, y: Int, color: Color = Screen.fontColor, font: BitmapFont = Screen.font) {
+        font.color = color
+        font.draw(myTextBatch(), text, (x - Screen.width / 2f), 0f - (y - Screen.height / 2f))
+    }
+
     fun drawTitle(text: String) {
         val xOffset = (width - GlyphLayout(Screen.titleFont, text).width) / 2f
         val yOffset = 24f

@@ -27,6 +27,7 @@ object Console : Panel() {
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
     private val floatColor = Color(0.9f, 0.9f, 0.7f, 0f)
+    private val floatHeightAbovePlayer = 60
     private var floatText = ""
     private var floatAge = 0f
     private var floatWidth = 0
@@ -217,9 +218,9 @@ object Console : Panel() {
         }
         if (!App.attractMode && floatAge <= floatFadeTime) {
             floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
-            drawString(floatText,
+            drawStringAbsolute(floatText,
                 Screen.width / 2 - floatWidth / 2,
-                (Screen.height / Screen.aspectRatio).toInt() / 2.toInt(),
+                Screen.height / 2 - floatHeightAbovePlayer,
                 floatColor, Screen.smallFont)
         }
     }
