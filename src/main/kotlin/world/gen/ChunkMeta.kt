@@ -48,6 +48,10 @@ class ChunkMeta(
     fun highways(): List<Highways.HighwayExit> = featureOf(Highways::class)?.let {
         (it as Highways).exits
     } ?: listOf()
+
+    fun trails(): List<Trails.TrailExit> = featureOf(Trails::class)?.let {
+        (it as Trails).exits
+    } ?: listOf()
 }
 
 class ChunkScratch(
