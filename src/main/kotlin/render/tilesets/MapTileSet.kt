@@ -41,6 +41,18 @@ fun MapTileSet() =
         setTile(Glyph.MAP_ROAD_SE, SimpleTile(this, 3, 4))
         setTile(Glyph.MAP_ROAD_NSEW, SimpleTile(this, 4, 3))
 
+        setTile(Glyph.MAP_TRAIL_NSE, SimpleTile(this, 6, 6))
+        setTile(Glyph.MAP_TRAIL_NSW, SimpleTile(this, 6, 7))
+        setTile(Glyph.MAP_TRAIL_NWE, SimpleTile(this, 2, 6))
+        setTile(Glyph.MAP_TRAIL_NS, SimpleTile(this, 5, 7))
+        setTile(Glyph.MAP_TRAIL_WE, SimpleTile(this, 2, 7))
+        setTile(Glyph.MAP_TRAIL_WES, SimpleTile(this, 4, 7))
+        setTile(Glyph.MAP_TRAIL_WN, SimpleTile(this, 4, 6))
+        setTile(Glyph.MAP_TRAIL_NE, SimpleTile(this, 3, 6))
+        setTile(Glyph.MAP_TRAIL_WS, SimpleTile(this, 3, 7))
+        setTile(Glyph.MAP_TRAIL_SE, SimpleTile(this, 5, 6))
+        setTile(Glyph.MAP_TRAIL_NSEW, SimpleTile(this, 1, 7))
+
         setTile(Glyph.MAP_HABITAT_HOT_A, SimpleTile(this, 6, 0))
         setTile(Glyph.MAP_HABITAT_HOT_B, SimpleTile(this, 6, 1))
         setTile(Glyph.MAP_HABITAT_TEMP_A, SimpleTile(this, 6, 2))

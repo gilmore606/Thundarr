@@ -10,10 +10,7 @@ import ui.input.Mouse
 import util.*
 import world.gen.Metamap
 import world.gen.biomes.Ocean
-import world.gen.features.Highways
-import world.gen.features.Rivers
-import world.gen.features.RuinedCitySite
-import world.gen.features.Village
+import world.gen.features.*
 import world.gen.habitats.Blank
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -142,6 +139,33 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                             else -> Glyph.MAP_ROAD_SE
                         }
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(road))
+                    }
+                    if (meta.hasFeature(Trails::class)) {
+                        meta.trails().forEach { exit ->
+                            when (exit.edge) {
+                                NORTH -> isNorth = true
+                                SOUTH -> isSouth = true
+                                WEST -> isWest = true
+                                EAST -> isEast = true
+                            }
+                        }
+                        val trail = when {
+                            isNorth && isSouth && isWest && isEast -> Glyph.MAP_TRAIL_NSEW
+                            isNorth && isSouth && isWest -> Glyph.MAP_TRAIL_NSW
+                            isNorth && isSouth && isEast -> Glyph.MAP_TRAIL_NSE
+                            isWest && isEast && isSouth -> Glyph.MAP_TRAIL_WES
+                            isWest && isEast && isNorth -> Glyph.MAP_TRAIL_NWE
+                            isNorth && isSouth -> Glyph.MAP_TRAIL_NS
+                            isWest && isEast -> Glyph.MAP_TRAIL_WE
+                            isNorth && isWest -> Glyph.MAP_TRAIL_WN
+                            isSouth && isWest -> Glyph.MAP_TRAIL_WS
+                            isSouth && isEast -> Glyph.MAP_TRAIL_SE
+                            isNorth && isEast -> Glyph.MAP_TRAIL_NE
+                            isNorth || isSouth -> Glyph.MAP_TRAIL_NS
+                            isWest || isEast -> Glyph.MAP_TRAIL_WE
+                            else -> Glyph.MAP_TRAIL_SE
+                        }
+                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(trail))
                     }
                     if (meta.hasFeature(RuinedCitySite::class)) {
                         batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_CITY))
