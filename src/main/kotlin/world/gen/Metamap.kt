@@ -21,7 +21,8 @@ import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
 
-    private const val fakeDelaysInWorldgenText = false
+    private const val fakeDelaysInWorldgenText = true
+    private const val progressBarSegments = 16
 
     private const val chunkRadius = 100
 
@@ -75,6 +76,9 @@ object Metamap {
     val metaCache = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
     val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
     var suggestedPlayerStart = XY(-999,-999)
+
+    private var updateProgress: ((Float)->Unit)? = null
+    private var progressIncrement: Float = 0.1f
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metaCache[x][y] else outOfBoundsMeta
     fun metaAtWorld(x: Int, y: Int): ChunkMeta {
@@ -147,9 +151,12 @@ object Metamap {
     suspend fun sayProgress(text: String) {
         if (fakeDelaysInWorldgenText) delay(500L)
         Console.sayFromThread(text)
+        updateProgress?.also { it.invoke(progressIncrement) }
     }
 
-    fun buildWorld() {
+    fun buildWorld(updateProgress: (Float)->Unit) {
+        this.updateProgress = updateProgress
+        this.progressIncrement = 1f / progressBarSegments
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
         riverCells.clear()

@@ -225,14 +225,17 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     private fun createNewWorld(startType: StartType) {
-        Screen.addModal(LoadingModal("Generating new world -- please wait a moment..."))
+        val modal = LoadingModal(
+            "Generating new world -- please wait a moment...", withProgress = true
+        )
+        Screen.addModal(modal)
         Screen.brightnessTarget = 0f
         pendingJob = KtxAsync.launch {
 
             LevelKeeper.hibernateAll()
             save.eraseAll()
 
-            Metamap.buildWorld()
+            Metamap.buildWorld() { modal.addProgress(it) }
             while (Metamap.isWorking) {
                 delay(250L)
             }

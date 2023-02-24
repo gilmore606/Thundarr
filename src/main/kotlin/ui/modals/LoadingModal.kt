@@ -6,8 +6,10 @@ import render.tilesets.UITileSet
 import util.log
 import world.gen.Metamap
 import world.persist.ChunkLoader
+import java.lang.Float.min
 
-class LoadingModal(text: String) : SplashModal(text) {
+class LoadingModal(text: String, val withProgress: Boolean = false) :
+    SplashModal(text, forceHeight = if (withProgress) 120 else 60) {
 
     companion object {
         val boxBatch = QuadBatch(UITileSet())
@@ -15,7 +17,6 @@ class LoadingModal(text: String) : SplashModal(text) {
     override fun openSound() = null
     override fun closeSound() = null
 
-    override fun newBoxBatch() = LoadingModal.boxBatch
     override fun newThingBatch() = null
     override fun newActorBatch() = null
 
@@ -25,9 +26,13 @@ class LoadingModal(text: String) : SplashModal(text) {
     private var lastCheckTime = System.currentTimeMillis()
     private val checkMs = 100
 
+    private var progress = 0f
+
     init {
         dismissible = false
     }
+
+    fun addProgress(more: Float) { progress = min(1f, progress + more) }
 
     override fun onRender(delta: Float) {
         super.onRender(delta)
@@ -42,6 +47,15 @@ class LoadingModal(text: String) : SplashModal(text) {
                 lastCheckTime = time
             }
         }
+    }
+
+    override fun drawBackground() {
+        super.drawBackground()
+        if (!withProgress) return
+        val padding = 30
+        boxBatch.addHealthBar(x + padding, y + 80, x + width - (padding), y + 100,
+            (progress * 100f).toInt(), 100, allGreen = true
+        )
     }
 
     private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking
