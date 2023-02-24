@@ -27,22 +27,22 @@ fun plantSpawns() = listOf<PlantSpawn>(
         1f, 0.7f, 1f
     ),
     PlantSpawn({ MapleTree() },
-        setOf(Forest, ForestHill, Swamp),
+        setOf(Forest, ForestHill, Swamp, Suburb),
         setOf(TemperateA, TemperateB),
         1f, 0.7f, 1f
     ),
     PlantSpawn({ BirchTree() },
-        setOf(Forest, Plain, Swamp),
+        setOf(Forest, Plain, Swamp, Suburb),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
         1f, 0.7f, 1f
     ),
     PlantSpawn({ AppleTree() },
-        setOf(Forest, ForestHill, Plain),
+        setOf(Forest, ForestHill, Plain, Suburb),
         setOf(TemperateA, TemperateB),
         0.3f, 0.6f, 1f
     ),
     PlantSpawn({ PearTree() },
-        setOf(Forest, ForestHill),
+        setOf(Forest, ForestHill, Suburb),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
         0.3f, 0.5f, 1f
     ),
@@ -52,12 +52,12 @@ fun plantSpawns() = listOf<PlantSpawn>(
         1f, 0.7f, 1f
     ),
     PlantSpawn({ SpruceTree() },
-        setOf(Forest, ForestHill),
+        setOf(Forest, ForestHill, Suburb),
         setOf(AlpineA, AlpineB),
         1f, 0.6f, 1f
     ),
     PlantSpawn({ PalmTree() },
-        setOf(Desert, Forest, Plain, Swamp),
+        setOf(Desert, Forest, Plain, Swamp, Suburb),
         setOf(TropicalA, TropicalB),
         1f, 0.7f, 1f
     ),
@@ -67,14 +67,14 @@ fun plantSpawns() = listOf<PlantSpawn>(
         0.4f, 0.7f, 1f
     ),
     PlantSpawn({ DeadTree() },
-        setOf(Mountain, Forest, ForestHill, Hill, Swamp),
+        setOf(Mountain, Forest, ForestHill, Hill, Swamp, Suburb),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB),
         0.3f, 0.6f, 1f
     ),
 
     // Bushes
     PlantSpawn({ ThornBush() },
-        setOf(Plain, Scrub, Hill, Forest, ForestHill, Swamp),
+        setOf(Plain, Scrub, Hill, Forest, ForestHill, Swamp, Suburb),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         1f, 0f, 0.8f
     ),
@@ -96,7 +96,7 @@ fun plantSpawns() = listOf<PlantSpawn>(
 
     // Flowers
     PlantSpawn({ Wildflowers() },
-        setOf(Forest, Plain, Scrub, Hill, ForestHill, Swamp, Desert),
+        setOf(Forest, Plain, Scrub, Hill, ForestHill, Swamp, Desert, Suburb),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
         0.4f, 0f, 0.5f
     ),
