@@ -31,6 +31,8 @@ class Rivers(
         exits.add(exit)
     }
 
+    override fun trailDestinationChance() = 0.1f
+
     override fun doDig() {
         when (exits.size) {
             1 -> {

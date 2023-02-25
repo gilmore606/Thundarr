@@ -52,6 +52,8 @@ sealed class ChunkFeature(
 
     open fun cellTitle(): String? = null
 
+    open fun trailDestinationChance() = 0.0f
+
     protected fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         carto.printGrid(blob, x, y, terrain)
     }

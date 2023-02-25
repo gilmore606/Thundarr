@@ -40,6 +40,8 @@ class Village(
 
     override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
+    override fun trailDestinationChance() = 1f
+
     override fun doDig() {
 
         uniqueHuts.add(BlacksmithShop())

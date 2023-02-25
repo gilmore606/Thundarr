@@ -141,5 +141,9 @@ class ChunkScratch(
         (it as Highways).exits
     } ?: listOf()
 
+    fun trails(): List<Trails.TrailExit> = featureOf(Trails::class)?.let {
+        (it as Trails).exits
+    } ?: listOf()
+
     fun defaultTitle() = features.firstNotNullOfOrNull { it.cellTitle() } ?: biome.defaultTitle()
 }

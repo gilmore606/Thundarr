@@ -1,10 +1,10 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
-import util.Dice
-import util.Rect
-import util.XY
-import util.getBezier
+import util.*
+import world.ChunkScratch
+import world.gen.biomes.Ruins
+import world.gen.biomes.Suburb
 import world.level.CHUNK_SIZE
 
 @Serializable
@@ -13,6 +13,9 @@ class Trails(
 ) : ChunkFeature(
     2, Stage.TERRAIN
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ruins, Suburb)
+    }
 
     @Serializable
     class TrailExit(
@@ -26,23 +29,30 @@ class Trails(
     }
 
     override fun doDig() {
-        when (exits.size) {
-            1 -> {
-                val start = exits[0]
-                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
-                val end = TrailExit(pos = endPos, control = endPos, edge = XY(0,0))
-                drawTrail(start, end)
+        carto.trailHead?.also { centerPos ->
+            val center = TrailExit(pos = centerPos, control = centerPos, edge = NO_DIRECTION)
+            exits.forEach { exit ->
+                drawTrail(exit, center)
             }
-            2 -> {
-                drawTrail(exits[0], exits[1])
-            }
-            else -> {
-                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
-                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val center = TrailExit(pos = XY(centerX, centerY), control = XY(centerX, centerY), edge = XY(0,0))
-                exits.forEach { exit ->
-                    drawTrail(exit, center)
+        } ?: run {
+            when (exits.size) {
+                1 -> {
+                    val start = exits[0]
+                    val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
+                    val end = TrailExit(pos = endPos, control = endPos, edge = XY(0,0))
+                    drawTrail(start, end)
+                }
+                2 -> {
+                    drawTrail(exits[0], exits[1])
+                }
+                else -> {
+                    val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
+                    val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                    val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
+                    val center = TrailExit(pos = XY(centerX, centerY), control = XY(centerX, centerY), edge = NO_DIRECTION)
+                    exits.forEach { exit ->
+                        drawTrail(exit, center)
+                    }
                 }
             }
         }

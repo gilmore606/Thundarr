@@ -37,11 +37,11 @@ class WorldCarto(
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
     val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
     private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
+    var trailHead: XY? = null
 
     private var hasBlends = false
     lateinit var meta: ChunkMeta
 
-    // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
         meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
 

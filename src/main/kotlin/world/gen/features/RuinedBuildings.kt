@@ -25,6 +25,8 @@ class RuinedBuildings(
     private val ruinTreasureChance = 0.4f
     private val ruinIntactChance = 0.25f
 
+    override fun trailDestinationChance() = 0.5f
+
     override fun doDig() {
         repeat (buildingCount) {
             buildRandomRuin()
@@ -51,6 +53,7 @@ class RuinedBuildings(
     }
 
     private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
+        carto.trailHead = XY(x + width/2, y + height/2)
         for (ix in x until x+width) {
             for (iy in y until y+height) {
                 if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE

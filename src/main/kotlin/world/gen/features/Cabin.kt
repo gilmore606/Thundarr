@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import util.Dice
+import util.XY
 import world.ChunkScratch
 import world.gen.biomes.Desert
 import world.gen.biomes.ForestHill
@@ -17,6 +18,8 @@ class Cabin : ChunkFeature(
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }
 
+    override fun trailDestinationChance() = 1f
+
     override fun doDig() {
         val width = Dice.range(6, 10)
         val height = Dice.range(6, 10)
@@ -26,6 +29,7 @@ class Cabin : ChunkFeature(
         buildHut(x, y, width, height, fertility) { rooms ->
             Hut().furnish(rooms[0], carto)
         }
+        carto.trailHead = XY(x,y)
     }
 
 }
