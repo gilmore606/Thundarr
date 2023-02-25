@@ -25,7 +25,7 @@ class RuinedBuildings(
     private val ruinTreasureChance = 0.4f
     private val ruinIntactChance = 0.25f
 
-    override fun trailDestinationChance() = 0.5f
+    override fun trailDestinationChance() = 0.6f
 
     override fun doDig() {
         repeat (buildingCount) {

@@ -24,7 +24,7 @@ class Caves : ChunkFeature(
     private val cavePortalChance = 0.5f
     private val cavePortalPoints = ArrayList<XY>()
 
-    override fun trailDestinationChance() = 0.5f
+    override fun trailDestinationChance() = 0.7f
 
     override fun doDig() {
         val entrances = mutableSetOf<XY>()
