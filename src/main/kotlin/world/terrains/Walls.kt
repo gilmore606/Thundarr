@@ -80,6 +80,7 @@ object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
     override fun bumpMsg() = "You bump into a brick wall."
     override fun digResult() = if (Dice.chance(0.4f)) Brick() else null
     override fun digToFloorTerrain() = Terrain.Type.TERRAIN_STONEFLOOR
+    override fun trailsOverwrite() = false
 }
 
 object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
@@ -94,12 +95,14 @@ object WoodWall : Wall(Type.TERRAIN_WOODWALL, Glyph.WOOD_WALL, 2f) {
     override fun bumpMsg() = "You bump into a wooden wall."
     override fun digResult() = Log()
     override fun digToFloorTerrain() = Type.TERRAIN_DIRT
+    override fun trailsOverwrite() = false
 }
 
 object WindowWall : Wall(Type.TERRAIN_WINDOWWALL, Glyph.WINDOW, 1f, overrideOpaque = false) {
     override fun name() = "window"
     override fun bumpMsg() = "You can't fit through the window."
     override fun isDiggable() = false
+    override fun trailsOverwrite() = false
 }
 
 sealed class ForestWall(

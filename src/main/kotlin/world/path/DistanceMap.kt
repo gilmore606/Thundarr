@@ -11,7 +11,8 @@ import world.level.CHUNK_SIZE
 
 class DistanceMap(
     val chunk: Chunk,
-    val isTarget: (x: Int, y: Int)->Boolean
+    val isTarget: (x: Int, y: Int)->Boolean,
+    val isWalkable: (x: Int, y: Int)->Boolean,
 ) {
     val map: Array<Array<Int>> = Array(chunk.width) { Array(chunk.height) { -1 } }
     var maxDistance = 0
@@ -32,7 +33,7 @@ class DistanceMap(
                         DIRECTIONS.from(x, y) { tx, ty, dir ->
                             if (tx in 0 until chunk.width && ty in 0 until chunk.height) {
                                 if (map[tx][ty] < 0) {
-                                    if (chunk.isWalkableAt(chunk.x + tx, chunk.y + ty)) {
+                                    if (isWalkable(chunk.x + tx, chunk.y + ty)) {
                                         map[tx][ty] = step + 1
                                         dirty = true
                                     }

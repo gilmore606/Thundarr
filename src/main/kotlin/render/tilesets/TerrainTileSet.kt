@@ -231,4 +231,6 @@ fun TerrainTileSet() =
             add(0.5f, 10, 9)
         })
 
+        setTile(Glyph.TRAIL, SimpleTile(this, 10, 10))
+
     }

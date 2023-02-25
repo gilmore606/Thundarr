@@ -62,6 +62,7 @@ class Caves : ChunkFeature(
     private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float): Int {
         setTerrain(x, y, Terrain.Type.TERRAIN_CAVEFLOOR)
         chunk.setRoofed(x, y, Chunk.Roofed.INDOOR)
+        carto.blockTrailAt(x, y)
         var continuing = false
         var count = 1
         CARDINALS.from(x, y) { dx, dy, _ ->

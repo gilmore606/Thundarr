@@ -21,8 +21,8 @@ import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
 
-    private const val fakeDelaysInWorldgenText = true
-    private const val progressBarSegments = 17
+    private const val fakeDelaysInWorldgenText = false
+    private const val progressBarSegments = 16
 
     private const val chunkRadius = 100
 

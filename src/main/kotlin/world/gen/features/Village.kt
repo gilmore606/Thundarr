@@ -196,6 +196,7 @@ class Village(
                 }
             }
         }
+        carto.addTrailBlock(x, y, x+width-1, y+height-1)
     }
 
     private fun layoutVillageBag() {
@@ -243,9 +244,11 @@ class Village(
                 }
             }
         }
-        val distanceMap = DistanceMap(chunk) { x,y ->
+        val distanceMap = DistanceMap(chunk, { x,y ->
             getTerrain(x,y) != Terrain.Type.TEMP2
-        }
+        }, { x, y ->
+            isWalkableAt(x,y)
+        })
         var placed = false
         forEachCell { x, y ->
             if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {

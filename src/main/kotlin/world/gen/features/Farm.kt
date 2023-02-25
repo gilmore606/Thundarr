@@ -45,6 +45,7 @@ class Farm(
                 .furnish(Decor.Room(field), carto, isAbandoned)
             fieldPlaced = true
             carto.trailHead = XY(x + width / 2, y + height / 2)
+            carto.addTrailBlock(x, y, x+width-1, y+height-1)
         }
 
         if (Dice.chance(barnChance) || !fieldPlaced) {
@@ -81,6 +82,7 @@ class Farm(
                 }
             }
             carto.trailHead = XY(barnRect.x0, barnRect.y0)
+            carto.addTrailBlock(barnRect.x0, barnRect.y0, barnRect.x1, barnRect.y1)
         }
 
         swapTerrain(Terrain.Type.TEMP1, Terrain.Type.TERRAIN_GRASS)

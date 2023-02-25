@@ -53,13 +53,13 @@ class RuinedBuildings(
     }
 
     private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
-        carto.trailHead = XY(x + width/2, y + height/2)
         for (ix in x until x+width) {
             for (iy in y until y+height) {
                 if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE
                     && carto.flagsMap[ix][iy].contains(WorldCarto.CellFlag.NO_BUILDINGS)) return
             }
         }
+        carto.addTrailBlock(x0+x, y0+y, x0+x+width-1, y0+y+height-1)
         for (ix in x until x + width) {
             for (iy in y until y + height) {
                 if (boundsCheck(ix + x0, iy + y0)) {

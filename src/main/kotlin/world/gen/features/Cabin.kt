@@ -30,6 +30,7 @@ class Cabin : ChunkFeature(
             Hut().furnish(rooms[0], carto)
         }
         carto.trailHead = XY(x,y)
+        carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width -1, y0 + y + height - 1)
     }
 
 }
