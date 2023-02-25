@@ -136,10 +136,11 @@ sealed class ChunkFeature(
                            forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
                            hasWindows: Boolean = true, forceFloor: Terrain.Type? = null, forceWall: Terrain.Type? = null,
                            forRooms: ((List<Decor.Room>)->Unit)) {
+        carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width - 1, y0 + y + height - 1)
         val villagePlantSpawns = gardenPlantSpawns()
         val wallType = forceWall ?: meta.biome.villageWallType()
         val floorType = forceFloor ?:  meta.biome.villageFloorType()
-        val dirtType =  meta.biome.trailTerrain(x0,y0)
+        val dirtType =  meta.biome.bareTerrain(x0,y0)
         // Locate door
         val doorDir = forceDoorDir ?: when {
             y < 28 -> SOUTH

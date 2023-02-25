@@ -85,7 +85,7 @@ class Village(
             fuzzTerrain(Terrain.Type.TEMP1, wear, listOf(Terrain.Type.TERRAIN_WOODWALL, Terrain.Type.TERRAIN_BRICKWALL, Terrain.Type.TERRAIN_WINDOWWALL))
         }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
-        swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
+        swapTerrain(Terrain.Type.TEMP2, meta.biome.bareTerrain(x0,y0))
     }
 
     private fun layoutVillageVert() {

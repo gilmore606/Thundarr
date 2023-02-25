@@ -190,6 +190,7 @@ object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true) {
 object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH, true) {
     override fun name() = "beach sand"
     override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
+    override fun trailsOverwrite() = false
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }

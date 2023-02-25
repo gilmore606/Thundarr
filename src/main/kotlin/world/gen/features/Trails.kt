@@ -7,6 +7,7 @@ import world.ChunkScratch
 import world.gen.biomes.Ocean
 import world.gen.biomes.Ruins
 import world.gen.biomes.Suburb
+import world.gen.cartos.WorldCarto
 import world.path.DistanceMap
 import world.terrains.Terrain
 import java.time.Year
@@ -65,9 +66,24 @@ class Trails(
         exits.forEach { exit ->
             trailToCenter(exit.pos)
         }
+        // swap in terrain and add some edges
         forEachCell { x,y ->
             if (getTerrain(x, y) == Terrain.Type.TEMP4) {
                 setTerrain(x,y,Terrain.Type.TERRAIN_TRAIL)
+                CARDINALS.from(x,y) { dx,dy,dir ->
+                    if (boundsCheck(dx,dy)) {
+                        val t = getTerrain(dx, dy)
+                        if (Terrain.get(t).trailsOverwrite() && t !in listOf(
+                                Terrain.Type.TEMP4,
+                                Terrain.Type.TERRAIN_TRAIL
+                            )
+                        ) {
+                            if (Dice.chance(meta.variance * 0.5f)) {
+                                setTerrain(dx, dy, meta.biome.trailSideTerrain(dx, dy))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -105,7 +121,9 @@ class Trails(
                 if (boundsCheck(dx, dy) && Dice.chance(0.9f)) {
                     val t = getTerrain(dx,dy)
                     if (Terrain.get(t).trailsOverwrite()) {
-                        setTerrain(dx, dy, Terrain.Type.TEMP4)
+                        if (!flagsAt(dx,dy).contains(WorldCarto.CellFlag.NO_TRAILS)) {
+                            setTerrain(dx, dy, Terrain.Type.TEMP4)
+                        }
                     }
                 }
             }

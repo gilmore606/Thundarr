@@ -28,7 +28,8 @@ sealed class Biome(
     open fun canHaveRain() = true
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
     open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
-    open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_TRAIL
+    open fun bareTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
+    open fun trailSideTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_UNDERGROWTH
     open fun villageWallType() = Terrain.Type.TERRAIN_WOODWALL
     open fun villageFloorType() = Terrain.Type.TERRAIN_WOODFLOOR
 
@@ -84,6 +85,8 @@ object Glacier : Biome(
     override fun defaultTitle() = "glacier"
     override fun canHaveRain() = false
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 }
 
 @Serializable
@@ -213,6 +216,7 @@ object Swamp : Biome(
     override fun trailChance() = 0.4f
     override fun plantDensity() = 1f
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
@@ -271,6 +275,8 @@ object Desert : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
         TERRAIN_GRASS else TERRAIN_HARDPAN
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
+    override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun plantDensity() = 0.1f
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_CAVEWALL
     override fun villageFloorType() = if (Dice.chance(0.2f)) TERRAIN_HARDPAN else TERRAIN_STONEFLOOR
