@@ -22,7 +22,7 @@ import kotlin.reflect.full.memberExtensionFunctions
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = true
-    private const val progressBarSegments = 16
+    private const val progressBarSegments = 17
 
     private const val chunkRadius = 100
 
@@ -707,7 +707,7 @@ object Metamap {
                 }
             }
 
-            sayProgress("Running roads and trails...")
+            sayProgress("Paving highways...")
             // Run highways
             cityCells.forEach { city ->
                 cityCells.forEach { ocity ->
@@ -723,9 +723,6 @@ object Metamap {
                     }
                 }
             }
-
-            // Run trails
-            runTrails()
 
             // Place villages
             sayProgress("Populating the land...")
@@ -771,7 +768,6 @@ object Metamap {
                 }
                 placed++
             }
-            sayProgress("Founded $actuallyPlaced villages.")
 
             // Place random cell features
             forEachMeta { x,y,cell ->
@@ -827,6 +823,10 @@ object Metamap {
                     }
                 }
             }
+
+            // Run trails
+            sayProgress("Walking trails...")
+            runTrails()
 
             // Name contiguous features
             sayProgress("Naming geography...")
@@ -1041,9 +1041,9 @@ object Metamap {
         val origins = mutableListOf<XY>()
         val targets = mutableListOf<XY>()
         forEachMeta { x,y,cell ->
-            if (cell.features.hasOneWhere {
+            if ((cell.features.hasOneWhere {
                     Dice.chance(it.trailDestinationChance())
-            } && Trails.canBuildOn(cell)
+            } || Dice.chance(0.002f)) && Trails.canBuildOn(cell)
             ) {
                 origins.add(XY(x, y))
                 targets.add(XY(x, y))
@@ -1057,7 +1057,7 @@ object Metamap {
                 while (!done) {
                     val nextPoint = targets.nextNearestTo(cursor, exclude = visited)
                     val madeIt = runTrailBetween(cursor, nextPoint)
-                    if (madeIt && Dice.chance(0.7f)) {
+                    if (madeIt && Dice.chance(0.8f)) {
                         visited.add(nextPoint)
                         cursor = nextPoint
                     } else {
@@ -1079,7 +1079,7 @@ object Metamap {
             var moveDir: XY? = null
             val possDirs = ArrayList<XY>()
             CARDINALS.from(cursor.x, cursor.y) { dx, dy, dir ->
-                if (boundsCheck(dx, dy)) {
+                if (boundsCheck(dx, dy) && Trails.canBuildOn(scratches[dx][dy])) {
                     if (!newTrails.contains(XY(dx, dy))) possDirs.add(dir)
                 }
             }
@@ -1111,7 +1111,6 @@ object Metamap {
                 Trails.TrailExit(
                 edge = direction,
                 pos = edgePos,
-                control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
                 )
             )
             val childEdgePos = flipChunkEdgePos(edgePos)
@@ -1120,50 +1119,8 @@ object Metamap {
                 Trails.TrailExit(
                 pos = childEdgePos,
                 edge = childDirection,
-                control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(-12, 12)))
                 )
             )
-        }
-    }
-
-    private fun runTrail(cursor: XY, turnChance: Float) {
-        var done = false
-        var direction = CARDINALS.random()
-        while (!done) {
-            if (!boundsCheck(cursor.x + direction.x, cursor.y + direction.y)) done = true
-            else {
-                val cell = scratches[cursor.x][cursor.y]
-                val childCell = scratches[cursor.x + direction.x][cursor.y + direction.y]
-                val edgePos = randomChunkEdgePos(direction, 0.8f)
-                val myExit = Trails.TrailExit(
-                    pos = edgePos,
-                    edge = direction,
-                    control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(
-                        -12,
-                        12
-                    )))
-                )
-                val childEdgePos = flipChunkEdgePos(edgePos)
-                val childDirection = XY(-direction.x, -direction.y)
-                val childExit = Trails.TrailExit(
-                    pos = childEdgePos,
-                    edge = childDirection,
-                    control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(
-                        -12,
-                        12
-                    )))
-                )
-                cell.addTrailExit(myExit)
-                childCell.addTrailExit(childExit)
-                if (childCell.height < 1 || Dice.chance(0.05f)) done = true
-                if (childCell.hasFeature(Trails::class)) done = true
-                if (childCell.biome.trailChance() <= 0f) done = true
-                cursor.x += direction.x
-                cursor.y += direction.y
-                if (Dice.chance(turnChance)) {
-                    direction = CARDINALS.toMutableList().apply { remove(direction) }.random()
-                }
-            }
         }
     }
 
