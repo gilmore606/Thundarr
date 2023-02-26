@@ -16,6 +16,7 @@ sealed class Water(
     override fun name() = "water"
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPWATER
     override fun stepSpark(actor: Actor, dir: XY) = Splash(dir)
+    override fun trailsOverwrite() = false
 
     open fun surfGlyph() = Glyph.SURF
 

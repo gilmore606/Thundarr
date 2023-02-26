@@ -22,7 +22,7 @@ import kotlin.reflect.full.memberExtensionFunctions
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
-    private const val progressBarSegments = 14
+    private const val progressBarSegments = 13
 
     private const val chunkRadius = 100
 
@@ -1061,7 +1061,6 @@ object Metamap {
                     }
                 }
             }
-            suggestedPlayerStart = origin
         }
     }
 
@@ -1090,6 +1089,9 @@ object Metamap {
                 val dir = moveDir ?: possDirs.random()
                 val nextCell = cursor + dir
                 if (scratches[nextCell.x][nextCell.y].hasFeature(Trails::class)) done = true
+
+                if (scratches[cursor.x][cursor.y].hasFeature(Rivers::class)) suggestedPlayerStart = origin
+
                 connectTrailExits(cursor, nextCell)
                 if (nextCell == target) return true
                 cursor = nextCell

@@ -88,8 +88,9 @@ class Trails(
     private fun trailToCenter(source: XY) {
         var cursor = XY(source.x + x0, source.y + y0)
         var done = false
+        val bridgeTerrain = if (Dice.chance(0.7f)) Terrain.Type.TERRAIN_WOODFLOOR else Terrain.Type.TERRAIN_STONEFLOOR
         while (!done) {
-            drawTrailCell(cursor.x, cursor.y)
+            drawTrailCell(cursor.x, cursor.y, bridgeTerrain)
             val step = walkMap.distanceAt(cursor.x, cursor.y)
             if (step < 1) done = true
             else {
@@ -109,7 +110,7 @@ class Trails(
         }
     }
 
-    private fun drawTrailCell(x: Int, y: Int) {
+    private fun drawTrailCell(x: Int, y: Int, bridgeTerrain: Terrain.Type) {
         val width = if (Dice.chance(meta.variance - 0.2f)) -1 else 0
         for (tx in width..1) {
             for (ty in width..1) {
@@ -119,6 +120,8 @@ class Trails(
                     val t = getTerrain(dx,dy)
                     if (Terrain.get(t).trailsOverwrite()) {
                         setTerrain(dx, dy, Terrain.Type.TEMP4)
+                    } else if (flagsAt(dx,dy).contains(WorldCarto.CellFlag.BRIDGE_SLOT)) {
+                        setTerrain(dx, dy, bridgeTerrain)
                     }
                 }
             }
