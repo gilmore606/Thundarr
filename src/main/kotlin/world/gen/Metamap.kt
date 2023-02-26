@@ -22,7 +22,7 @@ import kotlin.reflect.full.memberExtensionFunctions
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
-    private const val progressBarSegments = 16
+    private const val progressBarSegments = 14
 
     private const val chunkRadius = 100
 
@@ -174,7 +174,7 @@ object Metamap {
             sayProgress("Breaking the moon in half...")
             var landFraction = 0f
             while (landFraction < minLand || landFraction > maxLand) {
-                if (landFraction > 0f) sayProgress("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
+                if (landFraction > 0f) Console.sayFromThread("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
                 var landC = 0
                 var totalC = 0
                 for (ix in -chunkRadius until chunkRadius) {
@@ -562,7 +562,7 @@ object Metamap {
                         eruptions++
                     }
                 }
-                sayProgress("Erupted $eruptions volcanoes in desert peaks.")
+                sayProgress("Erupted $eruptions volcanoes.")
             }
 
             // Biomes pass 2 - insert intermediate biomes

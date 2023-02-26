@@ -34,7 +34,7 @@ class Trails(
 
     @Transient lateinit var walkMap: DistanceMap
 
-    private fun openAt(x: Int, y: Int) = boundsCheck(x, y) && flagsAt(x,y).contains(WorldCarto.CellFlag.BLOCK_TRAILS)
+    private fun openAt(x: Int, y: Int) = boundsCheck(x, y) && !flagsAt(x,y).contains(WorldCarto.CellFlag.BLOCK_TRAILS)
 
     override fun doDig() {
         // pick unblocked point near center as Target
@@ -102,8 +102,7 @@ class Trails(
                         }
                     }
                 }
-                if (poss.isEmpty()) done = true
-                else {
+                if (poss.isEmpty()) done = true else {
                     cursor = poss.random()
                 }
             }
@@ -111,8 +110,9 @@ class Trails(
     }
 
     private fun drawTrailCell(x: Int, y: Int) {
-        for (tx in 0 .. 1) {
-            for (ty in 0..1) {
+        val width = if (Dice.chance(meta.variance - 0.2f)) -1 else 0
+        for (tx in width..1) {
+            for (ty in width..1) {
                 val dx = tx + x
                 val dy = ty + y
                 if (boundsCheck(dx, dy) && Dice.chance(0.9f)) {
