@@ -70,10 +70,10 @@ class LavaFlows(
             val p = getBezier(t, start.pos.toXYf(), start.pos.toXYf(), end.pos.toXYf(), end.pos.toXYf())
             val px = x0 + p.x
             val py = y0 + p.y
-            carveTrailChunk(Rect((px - width/2).toInt(), (py - width/2).toInt(),
+            carveFlowBlob(Rect((px - width/2).toInt(), (py - width/2).toInt(),
                 (px + width/2).toInt(), (py + width/2).toInt()), Terrain.Type.TERRAIN_LAVA, false)
             val edgeWidth = width + 2.5f + width * (NoisePatches.get("metaVariance",px.toInt(),py.toInt()).toFloat()) * 1.5f
-            carveTrailChunk(Rect((px - edgeWidth / 2).toInt(), (py - edgeWidth / 2).toInt(),
+            carveFlowBlob(Rect((px - edgeWidth / 2).toInt(), (py - edgeWidth / 2).toInt(),
                 (px + edgeWidth/2).toInt(), (py + edgeWidth/2).toInt()),
                 Terrain.Type.TERRAIN_ROCKS, true,
                 Terrain.Type.TERRAIN_LAVA

@@ -7,7 +7,6 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
-import world.ChunkScratch
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
@@ -109,9 +108,9 @@ sealed class ChunkFeature(
         }
     }
 
-    protected fun carveTrailChunk(room: Rect,
-                                  type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
-                                  skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
+    protected fun carveFlowBlob(room: Rect,
+                                type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
+                                skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {

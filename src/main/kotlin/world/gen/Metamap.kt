@@ -513,8 +513,8 @@ object Metamap {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
 
-                            suggestedPlayerStart.x = xToChunkX(dx)
-                            suggestedPlayerStart.y = yToChunkY(dy)
+                            //suggestedPlayerStart.x = xToChunkX(dx)
+                            //suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -1049,7 +1049,7 @@ object Metamap {
                 targets.add(XY(x, y))
             }
         }
-        origins.forEach { origin ->
+        origins.shuffled().forEach { origin ->
             if (!scratches[origin.x][origin.y].hasFeature(Trails::class)) {
                 var cursor = origin
                 var done = false
@@ -1065,6 +1065,7 @@ object Metamap {
                     }
                 }
             }
+            suggestedPlayerStart = origin
         }
     }
 
