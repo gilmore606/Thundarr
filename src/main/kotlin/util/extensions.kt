@@ -305,6 +305,21 @@ fun List<XY>.from(x: Int, y: Int, doThis: (dx: Int, dy: Int, dir: XY)->Unit) {
     }
 }
 
+fun List<XY>.nextNearestTo(origin: XY, exclude: List<XY>): XY {
+    var nearestDistance = Float.MAX_VALUE
+    var nearest: XY? = null
+    this.forEach { point ->
+        if (point != origin && point !in exclude) {
+            val distance = manhattanDistance(origin, point)
+            if (distance < nearestDistance) {
+                nearest = point
+                nearestDistance = distance
+            }
+        }
+    }
+    return nearest ?: throw RuntimeException()
+}
+
 fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
     NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
     SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)

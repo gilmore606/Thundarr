@@ -25,6 +25,8 @@ class RuinedBuildings(
     private val ruinTreasureChance = 0.4f
     private val ruinIntactChance = 0.25f
 
+    override fun trailDestinationChance() = 0.6f
+
     override fun doDig() {
         repeat (buildingCount) {
             buildRandomRuin()
@@ -57,6 +59,7 @@ class RuinedBuildings(
                     && carto.flagsMap[ix][iy].contains(WorldCarto.CellFlag.NO_BUILDINGS)) return
             }
         }
+        carto.addTrailBlock(x0+x, y0+y, x0+x+width-1, y0+y+height-1)
         for (ix in x until x + width) {
             for (iy in y until y + height) {
                 if (boundsCheck(ix + x0, iy + y0)) {

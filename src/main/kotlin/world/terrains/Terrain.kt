@@ -28,6 +28,7 @@ sealed class Terrain(
             Type.TEMP1 -> Blank
             Type.TEMP2 -> Blank
             Type.TEMP3 -> Blank
+            Type.TEMP4 -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
             Type.TERRAIN_WOODWALL -> WoodWall
@@ -57,6 +58,7 @@ sealed class Terrain(
             Type.TERRAIN_LAVA -> Lava
             Type.TERRAIN_CHASM -> Chasm
             Type.TERRAIN_RUBBLE -> Rubble
+            Type.TERRAIN_TRAIL -> Trail
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
@@ -75,6 +77,7 @@ sealed class Terrain(
         TEMP1,
         TEMP2,
         TEMP3,
+        TEMP4,
         GENERIC_WALL,
         GENERIC_FLOOR,
         GENERIC_WATER,
@@ -107,6 +110,7 @@ sealed class Terrain(
         TERRAIN_LAVA,
         TERRAIN_CHASM,
         TERRAIN_RUBBLE,
+        TERRAIN_TRAIL,
     }
 
     override fun glyph() = this.glyph
@@ -127,6 +131,7 @@ sealed class Terrain(
     open fun stepSpark(actor: Actor, dir: XY): Spark? = Scoot(dir)
     open fun fertilityBonus() = 0f
     open fun glowColor(): LightColor? = null
+    open fun trailsOverwrite() = true
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
 

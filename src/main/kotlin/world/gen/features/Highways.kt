@@ -68,7 +68,7 @@ class Highways(
             if (n == 0 || n == exit.width + 1) {
                 if (current != Terrain.Type.TERRAIN_HIGHWAY_H && current != Terrain.Type.TERRAIN_HIGHWAY_V && current != Terrain.Type.GENERIC_WATER) {
                     if (wear < 0.001f || Dice.chance(1f - wear)) {
-                        setTerrain(lx, ly, biomeAt(lx, ly).trailTerrain(lx, ly))
+                        setTerrain(lx, ly, biomeAt(lx, ly).bareTerrain(lx, ly))
                     }
                 }
             } else {
@@ -76,7 +76,7 @@ class Highways(
                 if (wear < 0.34f || (current != Terrain.Type.GENERIC_WATER && Dice.chance(0.7f - wear))) {
                     setTerrain(lx, ly, t)
                 } else if (current != Terrain.Type.GENERIC_WATER) {
-                    setTerrain(lx, ly, biomeAt(lx, ly).trailTerrain(lx, ly))
+                    setTerrain(lx, ly, biomeAt(lx, ly).bareTerrain(lx, ly))
                     flagsAt(lx,ly).add(WorldCarto.CellFlag.NO_PLANTS)
                 }
             }

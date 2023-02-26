@@ -33,6 +33,7 @@ enum class Glyph {
     RUBBLE,
     WOOD_WALL,
     WINDOW,
+    TRAIL,
 
     WALL_DAMAGE,
     CURSOR,
@@ -235,5 +236,16 @@ enum class Glyph {
     MAP_ROAD_NE,
     MAP_ROAD_WS,
     MAP_ROAD_SE,
-    MAP_ROAD_NSEW
+    MAP_ROAD_NSEW,
+    MAP_TRAIL_NSE,
+    MAP_TRAIL_NSW,
+    MAP_TRAIL_NWE,
+    MAP_TRAIL_NS,
+    MAP_TRAIL_WE,
+    MAP_TRAIL_WES,
+    MAP_TRAIL_WN,
+    MAP_TRAIL_NE,
+    MAP_TRAIL_WS,
+    MAP_TRAIL_SE,
+    MAP_TRAIL_NSEW,
 }

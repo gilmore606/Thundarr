@@ -24,6 +24,8 @@ class Caves : ChunkFeature(
     private val cavePortalChance = 0.5f
     private val cavePortalPoints = ArrayList<XY>()
 
+    override fun trailDestinationChance() = 0.7f
+
     override fun doDig() {
         val entrances = mutableSetOf<XY>()
         forEachTerrain(Terrain.Type.TERRAIN_CAVEWALL) { x, y ->
@@ -37,6 +39,7 @@ class Caves : ChunkFeature(
                 val entrance = entrances.random()
                 cellCount += recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
+                carto.trailHead = entrance
             }
             if (cellCount > 6) {
                 val usablePoints = cavePortalPoints.filter { point ->
@@ -59,6 +62,7 @@ class Caves : ChunkFeature(
     private fun recurseCave(x: Int, y: Int, density: Float, falloff: Float): Int {
         setTerrain(x, y, Terrain.Type.TERRAIN_CAVEFLOOR)
         chunk.setRoofed(x, y, Chunk.Roofed.INDOOR)
+        carto.blockTrailAt(x, y)
         var continuing = false
         var count = 1
         CARDINALS.from(x, y) { dx, dy, _ ->

@@ -12,6 +12,8 @@ class Volcano : ChunkFeature(
     2, Stage.BUILD
 ) {
 
+    override fun trailDestinationChance() = 1f
+
     override fun doDig() {
         val width = Dice.range(40,56)
         val height = Dice.range(40,56)

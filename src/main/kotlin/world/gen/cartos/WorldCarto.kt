@@ -3,9 +3,7 @@ package world.gen.cartos
 import App
 import util.*
 import world.*
-import world.gen.biomes.Beach
 import world.gen.biomes.Biome
-import world.gen.biomes.Blank
 import world.gen.biomes.Ocean
 import world.gen.features.ChunkFeature
 import world.level.CHUNK_SIZE
@@ -31,17 +29,18 @@ class WorldCarto(
 
     val globalPlantDensity = 0.2f
 
-    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, RIVER, RIVERBANK, OCEAN, BEACH }
+    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, NO_TRAILS, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
     val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
     private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
+    val trailBlockMap = Array(CHUNK_SIZE) { Array<Boolean>(CHUNK_SIZE) { false } }
+    var trailHead: XY? = null
 
     private var hasBlends = false
     lateinit var meta: ChunkMeta
 
-    // Build a chunk of the world, based on metadata.
     suspend fun carveWorldChunk() {
         meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
 
@@ -255,4 +254,21 @@ class WorldCarto(
         }
     }
 
+    fun addTrailBlock(x0: Int, y0: Int, x1: Int, y1: Int) {
+        for (dx in x0-1..x1+1) {
+            for (dy in y0-1..y1+1) {
+                if (dx in this.x0..this.x1 && dy in this.y0..this.y1) {
+                    trailBlockMap[dx-this.x0][dy-this.y0] = true
+                }
+            }
+        }
+    }
+
+    fun blockTrailAt(x0: Int, y0: Int) {
+        for (dx in x0-1..x0+1) {
+            for (dy in y0-1..y0+1) {
+                if (dx in x0..x1 && dy in y0..y1) trailBlockMap[dx-this.x0][dy-this.y0] = true
+            }
+        }
+    }
 }

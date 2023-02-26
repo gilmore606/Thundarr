@@ -8,6 +8,7 @@ import render.Screen
 import util.XY
 import util.log
 import world.Entity
+import world.gen.Metamap
 import world.level.Level
 import java.lang.Float.max
 import java.lang.Float.min
@@ -220,7 +221,7 @@ object Console : Panel() {
             floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
             drawStringAbsolute(floatText,
                 Screen.width / 2 - floatWidth / 2,
-                Screen.height / 2 - floatHeightAbovePlayer,
+                Screen.height / 2 - floatHeightAbovePlayer + if (Metamap.isWorking) 150 else 0,
                 floatColor, Screen.smallFont)
         }
     }

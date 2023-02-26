@@ -22,6 +22,7 @@ import kotlin.reflect.full.memberExtensionFunctions
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
+    private const val progressBarSegments = 16
 
     private const val chunkRadius = 100
 
@@ -75,6 +76,9 @@ object Metamap {
     val metaCache = ArrayList<ArrayList<ChunkMeta>>(chunkRadius*2)
     val areaMap = Array(chunkRadius*2) { Array(chunkRadius*2) { 0 } }
     var suggestedPlayerStart = XY(-999,-999)
+
+    private var updateProgress: ((Float)->Unit)? = null
+    private var progressIncrement: Float = 0.1f
 
     fun metaAt(x: Int, y: Int) = if (boundsCheck(x,y)) metaCache[x][y] else outOfBoundsMeta
     fun metaAtWorld(x: Int, y: Int): ChunkMeta {
@@ -147,9 +151,12 @@ object Metamap {
     suspend fun sayProgress(text: String) {
         if (fakeDelaysInWorldgenText) delay(500L)
         Console.sayFromThread(text)
+        updateProgress?.also { it.invoke(progressIncrement) }
     }
 
-    fun buildWorld() {
+    fun buildWorld(updateProgress: (Float)->Unit) {
+        this.updateProgress = updateProgress
+        this.progressIncrement = 1f / progressBarSegments
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
         riverCells.clear()
@@ -506,8 +513,8 @@ object Metamap {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
 
-                            suggestedPlayerStart.x = xToChunkX(dx)
-                            suggestedPlayerStart.y = yToChunkY(dy)
+                            //suggestedPlayerStart.x = xToChunkX(dx)
+                            //suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -700,15 +707,7 @@ object Metamap {
                 }
             }
 
-            sayProgress("Running roads and trails...")
-            // Run trails
-            // TODO: This is really lame.  Run smarter trails.
-            forEachMeta { x,y,cell ->
-                if (Dice.chance(cell.biome.trailChance())) {
-                    runTrail(XY(x,y), Dice.float(0.05f, 0.2f))
-                }
-            }
-
+            sayProgress("Paving highways...")
             // Run highways
             cityCells.forEach { city ->
                 cityCells.forEach { ocity ->
@@ -769,7 +768,6 @@ object Metamap {
                 }
                 placed++
             }
-            sayProgress("Founded $actuallyPlaced villages.")
 
             // Place random cell features
             forEachMeta { x,y,cell ->
@@ -825,6 +823,10 @@ object Metamap {
                     }
                 }
             }
+
+            // Run trails
+            sayProgress("Walking trails...")
+            runTrails()
 
             // Name contiguous features
             sayProgress("Naming geography...")
@@ -1035,44 +1037,91 @@ object Metamap {
         }
     }
 
-    private fun runTrail(cursor: XY, turnChance: Float) {
-        var done = false
-        var direction = CARDINALS.random()
-        while (!done) {
-            if (!boundsCheck(cursor.x + direction.x, cursor.y + direction.y)) done = true
-            else {
-                val cell = scratches[cursor.x][cursor.y]
-                val childCell = scratches[cursor.x + direction.x][cursor.y + direction.y]
-                val edgePos = randomChunkEdgePos(direction, 0.8f)
-                val myExit = Trails.TrailExit(
-                    pos = edgePos,
-                    edge = direction,
-                    control = edgePos + (direction * -1 * Dice.range(8, 25) + (direction.rotated() * Dice.range(
-                        -12,
-                        12
-                    )))
-                )
-                val childEdgePos = flipChunkEdgePos(edgePos)
-                val childDirection = XY(-direction.x, -direction.y)
-                val childExit = Trails.TrailExit(
-                    pos = childEdgePos,
-                    edge = childDirection,
-                    control = childEdgePos + (direction * Dice.range(8, 25) + (direction.rotated() * Dice.range(
-                        -12,
-                        12
-                    )))
-                )
-                cell.addTrailExit(myExit)
-                childCell.addTrailExit(childExit)
-                if (childCell.height < 1 || Dice.chance(0.05f)) done = true
-                if (childCell.hasFeature(Trails::class)) done = true
-                if (childCell.biome.trailChance() <= 0f) done = true
-                cursor.x += direction.x
-                cursor.y += direction.y
-                if (Dice.chance(turnChance)) {
-                    direction = CARDINALS.toMutableList().apply { remove(direction) }.random()
+    private fun runTrails() {
+        val origins = mutableListOf<XY>()
+        val targets = mutableListOf<XY>()
+        forEachMeta { x,y,cell ->
+            if ((cell.features.hasOneWhere {
+                    Dice.chance(it.trailDestinationChance())
+            } || Dice.chance(0.002f)) && Trails.canBuildOn(cell)
+            ) {
+                origins.add(XY(x, y))
+                targets.add(XY(x, y))
+            }
+        }
+        origins.shuffled().forEach { origin ->
+            if (!scratches[origin.x][origin.y].hasFeature(Trails::class)) {
+                var cursor = origin
+                var done = false
+                val visited = mutableListOf<XY>(cursor)
+                while (!done) {
+                    val nextPoint = targets.nextNearestTo(cursor, exclude = visited)
+                    val madeIt = runTrailBetween(cursor, nextPoint)
+                    if (madeIt && Dice.chance(0.8f)) {
+                        visited.add(nextPoint)
+                        cursor = nextPoint
+                    } else {
+                        done = true
+                    }
                 }
             }
+            suggestedPlayerStart = origin
+        }
+    }
+
+    private fun runTrailBetween(origin: XY, target: XY): Boolean {
+        if (origin == target) return false
+        val targetDistance = manhattanDistance(origin, target)
+        var cursor = origin
+        var done = false
+        val newTrails = mutableListOf<XY>()
+        while (!done) {
+            // Pick a direction that moves closer to it
+            var moveDir: XY? = null
+            val possDirs = ArrayList<XY>()
+            CARDINALS.from(cursor.x, cursor.y) { dx, dy, dir ->
+                if (boundsCheck(dx, dy) && Trails.canBuildOn(scratches[dx][dy])) {
+                    if (!newTrails.contains(XY(dx, dy))) possDirs.add(dir)
+                }
+            }
+            if (possDirs.isEmpty()) done = true
+            else {
+                possDirs.shuffled().from(cursor.x, cursor.y) { dx, dy, dir ->
+                    if (manhattanDistance(target.x, target.y, dx, dy) < targetDistance) {
+                        moveDir = dir
+                    }
+                }
+                val dir = moveDir ?: possDirs.random()
+                val nextCell = cursor + dir
+                if (scratches[nextCell.x][nextCell.y].hasFeature(Trails::class)) done = true
+                connectTrailExits(cursor, nextCell)
+                if (nextCell == target) return true
+                cursor = nextCell
+            }
+        }
+        return false
+    }
+
+    private fun connectTrailExits(source: XY, dest: XY) {
+        val scell = scratches[source.x][source.y]
+        val dcell = scratches[dest.x][dest.y]
+        val direction = XY(dest.x - source.x, dest.y - source.y)
+        if (!scell.trails().hasOneWhere { it.edge == direction }) {
+            val edgePos = randomChunkEdgePos(direction, 0.8f)
+            scell.addTrailExit(
+                Trails.TrailExit(
+                edge = direction,
+                pos = edgePos,
+                )
+            )
+            val childEdgePos = flipChunkEdgePos(edgePos)
+            val childDirection = XY(-direction.x, -direction.y)
+            dcell.addTrailExit(
+                Trails.TrailExit(
+                pos = childEdgePos,
+                edge = childDirection,
+                )
+            )
         }
     }
 

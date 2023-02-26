@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import util.Dice
+import util.XY
 import world.ChunkScratch
 import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
@@ -17,6 +18,8 @@ class Lake : ChunkFeature(
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome !in listOf(Ocean, Glacier)
     }
+
+    override fun trailDestinationChance() = 1f
 
     override fun doDig() {
         if (Dice.chance(0.15f)) {
@@ -34,6 +37,8 @@ class Lake : ChunkFeature(
         val height = Dice.range(12,31)
         val x = x0 + Dice.range(width, CHUNK_SIZE - width) - width / 2
         val y = y0 + Dice.range(height, CHUNK_SIZE - height) - height / 2
+        carto.trailHead = XY(x + width/2, y + height/2)
+        carto.addTrailBlock(x, y, x+width-1, y+height-1)
         digLakeBlobAt(x, y, width, height)
         if (Dice.chance(0.4f)) {
             // Double lake

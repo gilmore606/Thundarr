@@ -127,20 +127,29 @@ object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR, false) {
     override fun name() = "stone floor"
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+    override fun trailsOverwrite() = false
 }
 
 object WoodFloor: Floor(Type.TERRAIN_WOODFLOOR, Glyph.WOOD_FLOOR, false) {
     override fun name() = "wood planks"
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+    override fun trailsOverwrite() = false
 }
 
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true) {
     override fun name() = "bare ground"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)
-    override fun moveSpeed(actor: Actor) = 0.9f
+    override fun moveSpeed(actor: Actor) = 1.0f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
     override fun fertilityBonus() = -0.2f
+}
+
+object Trail : Floor(Type.TERRAIN_TRAIL, Glyph.TRAIL, false) {
+    override fun name() = "trail"
+    override fun overlapsOn() = setOf(Type.TERRAIN_ROCKS, Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_SAND, Type.TERRAIN_HARDPAN, Type.TERRAIN_UNDERGROWTH)
+    override fun moveSpeed(actor: Actor) = 0.8f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
 }
 
 object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, true) {
@@ -181,6 +190,7 @@ object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true) {
 object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH, true) {
     override fun name() = "beach sand"
     override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
+    override fun trailsOverwrite() = false
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
 }
@@ -216,6 +226,7 @@ sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H, false) {
     override fun name() = "pavement"
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+    override fun trailsOverwrite() = false
 }
 
 object HighwayH : Highway() {

@@ -40,6 +40,8 @@ class Village(
 
     override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
+    override fun trailDestinationChance() = 1f
+
     override fun doDig() {
 
         uniqueHuts.add(BlacksmithShop())
@@ -83,7 +85,7 @@ class Village(
             fuzzTerrain(Terrain.Type.TEMP1, wear, listOf(Terrain.Type.TERRAIN_WOODWALL, Terrain.Type.TERRAIN_BRICKWALL, Terrain.Type.TERRAIN_WINDOWWALL))
         }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
-        swapTerrain(Terrain.Type.TEMP2, meta.biome.trailTerrain(x0,y0))
+        swapTerrain(Terrain.Type.TEMP2, meta.biome.bareTerrain(x0,y0))
     }
 
     private fun layoutVillageVert() {
@@ -194,6 +196,7 @@ class Village(
                 }
             }
         }
+        carto.addTrailBlock(x, y, x+width-1, y+height-1)
     }
 
     private fun layoutVillageBag() {
@@ -241,9 +244,11 @@ class Village(
                 }
             }
         }
-        val distanceMap = DistanceMap(chunk) { x,y ->
+        val distanceMap = DistanceMap(chunk, { x,y ->
             getTerrain(x,y) != Terrain.Type.TEMP2
-        }
+        }, { x, y ->
+            isWalkableAt(x,y)
+        })
         var placed = false
         forEachCell { x, y ->
             if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {

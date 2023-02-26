@@ -7,7 +7,6 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
-import world.ChunkScratch
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
@@ -51,6 +50,8 @@ sealed class ChunkFeature(
     abstract fun doDig()
 
     open fun cellTitle(): String? = null
+
+    open fun trailDestinationChance() = 0.0f
 
     protected fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         carto.printGrid(blob, x, y, terrain)
@@ -107,9 +108,9 @@ sealed class ChunkFeature(
         }
     }
 
-    protected fun carveTrailChunk(room: Rect,
-                                  type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
-                                  skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
+    protected fun carveFlowBlob(room: Rect,
+                                type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
+                                skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
@@ -134,10 +135,11 @@ sealed class ChunkFeature(
                            forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
                            hasWindows: Boolean = true, forceFloor: Terrain.Type? = null, forceWall: Terrain.Type? = null,
                            forRooms: ((List<Decor.Room>)->Unit)) {
+        carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width - 1, y0 + y + height - 1)
         val villagePlantSpawns = gardenPlantSpawns()
         val wallType = forceWall ?: meta.biome.villageWallType()
         val floorType = forceFloor ?:  meta.biome.villageFloorType()
-        val dirtType =  meta.biome.trailTerrain(x0,y0)
+        val dirtType =  meta.biome.bareTerrain(x0,y0)
         // Locate door
         val doorDir = forceDoorDir ?: when {
             y < 28 -> SOUTH

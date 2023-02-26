@@ -11,6 +11,7 @@ import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
+import world.terrains.Wall
 
 @Serializable
 sealed class Biome(
@@ -27,7 +28,8 @@ sealed class Biome(
     open fun canHaveRain() = true
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
     open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
-    open fun trailTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
+    open fun bareTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
+    open fun trailSideTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_UNDERGROWTH
     open fun villageWallType() = Terrain.Type.TERRAIN_WOODWALL
     open fun villageFloorType() = Terrain.Type.TERRAIN_WOODFLOOR
 
@@ -37,10 +39,14 @@ sealed class Biome(
     open fun postProcess(carto: WorldCarto) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
     open fun populateExtra(carto: WorldCarto) { }
+    open fun wallsBlockTrails() = true
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
         if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
             carto.setTerrain(x + carto.x0, y + carto.y0, type)
+            if (wallsBlockTrails() && Terrain.get(type) is Wall) {
+                carto.blockTrailAt(x + carto.x0, y + carto.y0)
+            }
         }
     }
     protected fun setFlag(carto: WorldCarto, x: Int, y: Int, flag: WorldCarto.CellFlag) {
@@ -51,6 +57,7 @@ sealed class Biome(
     protected fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
         val blob = carto.growOblong(x1-x0, y1-y0)
         carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
+        carto.addTrailBlock(x0,y0,x1,y1)
     }
 }
 
@@ -79,7 +86,8 @@ object Glacier : Biome(
     override fun defaultTitle() = "glacier"
     override fun canHaveRain() = false
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
-    override fun trailTerrain(x: Int, y: Int) = TERRAIN_SAND
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
 }
 
 @Serializable
@@ -179,7 +187,7 @@ object Mountain : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
     override fun cavesChance() = 0.8f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
-    override fun trailTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
+    override fun wallsBlockTrails() = true
     override fun plantDensity() = 0.5f
     override fun villageWallType() = TERRAIN_BRICKWALL
     override fun villageFloorType() = if (Dice.chance(0.1f)) TERRAIN_DIRT else
@@ -208,8 +216,8 @@ object Swamp : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
     override fun plantDensity() = 1f
-    override fun trailTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
@@ -241,7 +249,6 @@ object Scrub : Biome(
 ) {
     override fun defaultTitle() = "plains"
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
-    override fun trailTerrain(x: Int, y: Int) = TERRAIN_DIRT
     override fun plantDensity() = 0.25f
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
@@ -269,6 +276,8 @@ object Desert : Biome(
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
         TERRAIN_GRASS else TERRAIN_HARDPAN
+    override fun bareTerrain(x: Int, y: Int) = TERRAIN_HARDPAN
+    override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun plantDensity() = 0.1f
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_CAVEWALL
     override fun villageFloorType() = if (Dice.chance(0.2f)) TERRAIN_HARDPAN else TERRAIN_STONEFLOOR

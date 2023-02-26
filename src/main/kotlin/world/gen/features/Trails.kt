@@ -1,63 +1,132 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
-import util.Dice
-import util.Rect
-import util.XY
-import util.getBezier
-import world.level.CHUNK_SIZE
+import kotlinx.serialization.Transient
+import util.*
+import world.ChunkScratch
+import world.gen.biomes.Ocean
+import world.gen.biomes.Ruins
+import world.gen.biomes.Suburb
+import world.gen.cartos.WorldCarto
+import world.path.DistanceMap
+import world.terrains.Terrain
+import java.time.Year
 
 @Serializable
 class Trails(
     val exits: MutableList<TrailExit>
 ) : ChunkFeature(
-    2, Stage.TERRAIN
+    5, Stage.BUILD
 ) {
+    companion object {
+        fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ruins, Suburb, Ocean)
+    }
 
     @Serializable
     class TrailExit(
         var pos: XY,
         var edge: XY,
-        var control: XY
     )
 
     fun addExit(exit: TrailExit) {
         exits.add(exit)
     }
 
+    @Transient lateinit var blockMap: Array<Array<Boolean>>
+    @Transient lateinit var walkMap: DistanceMap
+
+    private fun openAt(x: Int, y: Int) = boundsCheck(x, y) && !blockMap[x-x0][y-y0]
+
     override fun doDig() {
-        when (exits.size) {
-            1 -> {
-                val start = exits[0]
-                val endPos = XY(Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)), Dice.range(CHUNK_SIZE / 4, (CHUNK_SIZE / 4 * 3)))
-                val end = TrailExit(pos = endPos, control = endPos, edge = XY(0,0))
-                drawTrail(start, end)
+        blockMap = carto.trailBlockMap
+
+        // pick unblocked point near center as Target
+        var tries = 0
+        var found = false
+        var center: XY? = null
+        while (tries < 200 && !found) {
+            tries++
+            val centerX = 22 + Dice.zeroTil(20)
+            val centerY = 22 + Dice.zeroTil(20)
+            if (openAt(x0+centerX, y0+centerY)) {
+                found = true
+                center = XY(x0+centerX, y0+centerY)
             }
-            2 -> {
-                drawTrail(exits[0], exits[1])
-            }
-            else -> {
-                val variance = ((CHUNK_SIZE / 2) * 0.2f).toInt()
-                val centerX = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val centerY = (CHUNK_SIZE / 2) + Dice.zeroTil(variance) - (variance / 2)
-                val center = TrailExit(pos = XY(centerX, centerY), control = XY(centerX, centerY), edge = XY(0,0))
-                exits.forEach { exit ->
-                    drawTrail(exit, center)
+        }
+        if (!found) return   // TODO: deal with this case, look further from center
+
+        // build DistanceMap on trailBlockmap to Target
+        walkMap = DistanceMap(chunk, { x, y ->
+            x == center!!.x && y == center!!.y
+        }, { x,y ->
+            openAt(x,y)
+        })
+
+        // walk from each trail exit to Target
+        exits.forEach { exit ->
+            trailToCenter(exit.pos)
+        }
+        // swap in terrain and add some edges
+        forEachCell { x,y ->
+            if (getTerrain(x, y) == Terrain.Type.TEMP4) {
+                setTerrain(x,y,Terrain.Type.TERRAIN_TRAIL)
+                CARDINALS.from(x,y) { dx,dy,dir ->
+                    if (boundsCheck(dx,dy)) {
+                        val t = getTerrain(dx, dy)
+                        if (Terrain.get(t).trailsOverwrite() && t !in listOf(
+                                Terrain.Type.TEMP4,
+                                Terrain.Type.TERRAIN_TRAIL
+                            )
+                        ) {
+                            if (Dice.chance(meta.variance * 0.5f)) {
+                                setTerrain(dx, dy, meta.biome.trailSideTerrain(dx, dy))
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun drawTrail(start: TrailExit, end: TrailExit) {
-        var t = 0f
-        val step = 0.02f
-        while (t < 1f) {
-            val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
-            val terrain = biomeAt(x0 + p.x.toInt(), y0 + p.y.toInt()).trailTerrain(x0 + p.x.toInt(), y0 + p.y.toInt())
-            carveTrailChunk(
-                Rect((x0 + p.x).toInt(), (y0 + p.y).toInt(),
-                (x0 + p.x + 1).toInt(), (y0 + p.y + 1).toInt()), terrain, false)
-            t += step
+    private fun trailToCenter(source: XY) {
+        var cursor = XY(source.x + x0, source.y + y0)
+        var done = false
+        while (!done) {
+            drawTrailCell(cursor.x, cursor.y)
+            val step = walkMap.distanceAt(cursor.x, cursor.y)
+            if (step < 1) done = true
+            else {
+                val poss = mutableListOf<XY>()
+                for (dx in -1..1) {
+                    for (dy in -1..1) {
+                        val next = walkMap.distanceAt(cursor.x + dx, cursor.y + dy)
+                        if (next == step - 1) {
+                            poss.add(XY(cursor.x + dx, cursor.y + dy))
+                        }
+                    }
+                }
+                if (poss.isEmpty()) done = true
+                else {
+                    cursor = poss.random()
+                }
+            }
+        }
+    }
+
+    private fun drawTrailCell(x: Int, y: Int) {
+        for (tx in 0 .. 1) {
+            for (ty in 0..1) {
+                val dx = tx + x
+                val dy = ty + y
+                if (boundsCheck(dx, dy) && Dice.chance(0.9f)) {
+                    val t = getTerrain(dx,dy)
+                    if (Terrain.get(t).trailsOverwrite()) {
+                        if (!flagsAt(dx,dy).contains(WorldCarto.CellFlag.NO_TRAILS)) {
+                            setTerrain(dx, dy, Terrain.Type.TEMP4)
+                        }
+                    }
+                }
+            }
         }
     }
 }

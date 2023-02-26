@@ -23,6 +23,7 @@ class Graveyard(
 
     private val graveyardChance = 0.8f
     private val shrineChance = 0.5f
+    override fun trailDestinationChance() = 0.5f
 
     override fun doDig() {
         val width = Dice.range(16, 30)
@@ -32,8 +33,8 @@ class Graveyard(
         carveBlock(x, y, x + width - 1, y + height - 1, Terrain.Type.TEMP1)
         repeat(3) { fuzzTerrain(Terrain.Type.TEMP1, 0.5f) }
 
-        val graveWidth = (width * Dice.float(0.5f, 0.9f)).toInt()
-        val graveHeight =  (height * Dice.float(0.5f, 0.9f)).toInt()
+        val graveWidth = (width * Dice.float(0.4f, 0.8f)).toInt()
+        val graveHeight =  (height * Dice.float(0.4f, 0.8f)).toInt()
         val gravex = x + (width - graveWidth) / 2
         val gravey = y + (height - graveHeight) / 2
         var gravePlaced = false
@@ -42,6 +43,8 @@ class Graveyard(
                 Decor.Room(Rect(gravex, gravey, gravex + graveWidth - 1, gravey + graveHeight - 1)),
             carto, isAbandoned)
             gravePlaced = true
+            carto.trailHead = XY(x + width / 2, y + height / 2)
+            carto.addTrailBlock(x, y, x+width-1, y+height-1)
         }
 
         if (Dice.chance(shrineChance) || !gravePlaced) {
@@ -76,6 +79,8 @@ class Graveyard(
             ) { rooms ->
                 Church().furnish(rooms[0], carto, isAbandoned)
             }
+            carto.trailHead = XY(shrineRect.x0, shrineRect.y0)
+            carto.addTrailBlock(shrineRect.x0, shrineRect.x1, shrineRect.y0, shrineRect.y1)
         }
 
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)

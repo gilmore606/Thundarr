@@ -70,7 +70,10 @@ class CavernCarto(
         setOverlaps()
 
         val doorPos = addWorldPortal(building, worldDest, TERRAIN_PORTAL_CAVE, "You feel a breeze from the tunnel mouth.\nReturn to the surface?")
-        distanceMap = DistanceMap(chunk) { x,y -> x == doorPos.x && y == doorPos.y }
+        distanceMap = DistanceMap(chunk, { x,y ->
+            x == doorPos.x && y == doorPos.y }, { x,y ->
+                isWalkableAt(x, y)
+            })
         placeTreasure()
 
         addLights()
