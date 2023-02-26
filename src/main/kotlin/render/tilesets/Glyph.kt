@@ -95,7 +95,7 @@ enum class Glyph {
     FRUIT_TREE,
     LIGHTBULB,
     AXE,
-    SIGN,
+    TRAIL_SIGN,
     CHEST,
     DEAD_TREE,
     GRAVESTONE,

@@ -65,7 +65,17 @@ class Rivers(
             }
         }
 
-        fuzzTerrain(Terrain.Type.GENERIC_WATER, riverBlur * 0.4f)
+        // Fuzz water but don't overwrite bridge slots
+        val adds = ArrayList<XY>()
+        val density = riverBlur * 0.4f
+        forEachTerrain(Terrain.Type.GENERIC_WATER) { x, y ->
+            carto.neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
+                if (terrain != Terrain.Type.GENERIC_WATER && !flagsAt(x,y).contains(WorldCarto.CellFlag.BRIDGE_SLOT)) {
+                    if (Dice.chance(density)) adds.add(XY(nx,ny))
+                }
+            }
+        }
+        adds.forEach { setTerrain(it.x, it.y, Terrain.Type.GENERIC_WATER) }
         addRiverBanks()
 
         if (Dice.chance(lonelyBridgeChance)) {

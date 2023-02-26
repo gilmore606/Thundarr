@@ -373,7 +373,7 @@ abstract class Carto(
         }
     }
 
-    protected fun neighborsAt(x: Int, y: Int, dirs: List<XY>, doThis: (nx: Int, ny: Int, terrain: Terrain.Type)->Unit) {
+    fun neighborsAt(x: Int, y: Int, dirs: List<XY>, doThis: (nx: Int, ny: Int, terrain: Terrain.Type)->Unit) {
         dirs.forEach { dir ->
             if (boundsCheck(x + dir.x, y + dir.y)) {
                 doThis(x + dir.x, y + dir.y, getTerrain(x + dir.x, y + dir.y))
