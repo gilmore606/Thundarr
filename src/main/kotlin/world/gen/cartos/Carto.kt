@@ -188,6 +188,19 @@ abstract class Carto(
         return c
     }
 
+    fun neighborMatchCount(x: Int, y: Int, match: (x: Int, y: Int)->Boolean): Int {
+        var c = 0
+        if (match(x-1,y)) c++
+        if (match(x+1,y)) c++
+        if (match(x,y-1)) c++
+        if (match(x, y+1)) c++
+        if (match(x-1,y-1)) c++
+        if (match(x-1,y+1)) c++
+        if (match(x+1,y-1)) c++
+        if (match(x+1,y+1)) c++
+        return c
+    }
+
     fun neighborCount(x: Int, y: Int, dirs: List<XY>, match: (x: Int, y: Int)->Boolean): Int {
         var c =0
         dirs.forEach { dir ->
@@ -444,20 +457,22 @@ abstract class Carto(
     protected fun deepenWater() {
         val adds = mutableSetOf<XY>()
         forEachTerrain(Terrain.Type.GENERIC_WATER) { x,y ->
-            val shores = neighborCount(x,y) {
-                it != Terrain.Type.GENERIC_WATER && it != Terrain.Type.TERRAIN_SHALLOW_WATER && it != Terrain.Type.BLANK
+            val shores = neighborMatchCount(x,y) { nx,ny ->
+                val t = getTerrain(nx,ny)
+                (t != Terrain.Type.GENERIC_WATER && t != Terrain.Type.TERRAIN_SHALLOW_WATER && t != Terrain.Type.BLANK)
+                        && !ignoreCellForWaterDeepening(nx, ny)
             }
             if (Dice.chance(shores * 0.75f)) adds.add(XY(x,y))
         }
         adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
-        var extendChance = 0.4f
-        repeat (3) {
+        var extendChance = 0.25f
+        repeat (2) {
             adds.clear()
             forEachTerrain(Terrain.Type.GENERIC_WATER) { x,y ->
                 val shallows = neighborCount(x,y) { it == Terrain.Type.TERRAIN_SHALLOW_WATER }
                 if (shallows > 0 && Dice.chance(extendChance)) adds.add(XY(x,y))
             }
-            extendChance -= 0.15f
+            extendChance -= 0.1f
             adds.forEach { setTerrain(it.x,it.y, Terrain.Type.TERRAIN_SHALLOW_WATER)}
         }
         adds.clear()
@@ -466,6 +481,8 @@ abstract class Carto(
             setTerrain(x,y, Terrain.Type.TERRAIN_DEEP_WATER)
         }
     }
+
+    protected open fun ignoreCellForWaterDeepening(x: Int, y: Int): Boolean = false
 
     fun growBlob(width: Int, height: Int): Array<Array<Boolean>> {
         val grid = Array(width) { Array(height) { false } }

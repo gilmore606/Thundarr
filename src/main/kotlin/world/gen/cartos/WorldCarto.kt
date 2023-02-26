@@ -270,4 +270,6 @@ class WorldCarto(
             }
         }
     }
+
+    override fun ignoreCellForWaterDeepening(x: Int, y: Int) = flagsMap[x-x0][y-y0].contains(CellFlag.BRIDGE_SLOT)
 }
