@@ -32,14 +32,11 @@ class Trails(
         exits.add(exit)
     }
 
-    @Transient lateinit var blockMap: Array<Array<Boolean>>
     @Transient lateinit var walkMap: DistanceMap
 
-    private fun openAt(x: Int, y: Int) = boundsCheck(x, y) && !blockMap[x-x0][y-y0]
+    private fun openAt(x: Int, y: Int) = boundsCheck(x, y) && flagsAt(x,y).contains(WorldCarto.CellFlag.BLOCK_TRAILS)
 
     override fun doDig() {
-        blockMap = carto.trailBlockMap
-
         // pick unblocked point near center as Target
         var tries = 0
         var found = false
@@ -121,9 +118,7 @@ class Trails(
                 if (boundsCheck(dx, dy) && Dice.chance(0.9f)) {
                     val t = getTerrain(dx,dy)
                     if (Terrain.get(t).trailsOverwrite()) {
-                        if (!flagsAt(dx,dy).contains(WorldCarto.CellFlag.NO_TRAILS)) {
-                            setTerrain(dx, dy, Terrain.Type.TEMP4)
-                        }
+                        setTerrain(dx, dy, Terrain.Type.TEMP4)
                     }
                 }
             }

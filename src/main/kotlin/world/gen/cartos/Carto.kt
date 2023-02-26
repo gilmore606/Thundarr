@@ -565,9 +565,11 @@ abstract class Carto(
     fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
         for (ix in x..x + blob.size - 1) {
             for (iy in y .. y + blob[0].size - 1) {
-                if (blob[ix - x][iy - y]) {
-                    if (boundsCheck(ix, iy)) {
-                        setTerrain(ix, iy, terrain)
+                if (boundsCheck(ix, iy)) {
+                    if (blob[ix - x][iy - y]) {
+                        if (boundsCheck(ix, iy)) {
+                            setTerrain(ix, iy, terrain)
+                        }
                     }
                 }
             }

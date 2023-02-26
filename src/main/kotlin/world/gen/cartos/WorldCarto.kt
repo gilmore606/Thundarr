@@ -29,14 +29,12 @@ class WorldCarto(
 
     val globalPlantDensity = 0.2f
 
-    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, TRAIL, NO_TRAILS, RIVER, RIVERBANK, OCEAN, BEACH }
+    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, BLOCK_TRAILS, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
     val flagsMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<CellFlag>() } }
     private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
-    val trailBlockMap = Array(CHUNK_SIZE) { Array<Boolean>(CHUNK_SIZE) { false } }
-    var trailHead: XY? = null
 
     private var hasBlends = false
     lateinit var meta: ChunkMeta
@@ -258,7 +256,7 @@ class WorldCarto(
         for (dx in x0-1..x1+1) {
             for (dy in y0-1..y1+1) {
                 if (dx in this.x0..this.x1 && dy in this.y0..this.y1) {
-                    trailBlockMap[dx-this.x0][dy-this.y0] = true
+                    setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
                 }
             }
         }
@@ -267,7 +265,8 @@ class WorldCarto(
     fun blockTrailAt(x0: Int, y0: Int) {
         for (dx in x0-1..x0+1) {
             for (dy in y0-1..y0+1) {
-                if (dx in x0..x1 && dy in y0..y1) trailBlockMap[dx-this.x0][dy-this.y0] = true
+                if (dx in x0..x1 && dy in y0..y1)
+                    setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
             }
         }
     }

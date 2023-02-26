@@ -44,8 +44,7 @@ class Farm(
             Garden(0.5f, meta.biome, meta.habitat, Terrain.Type.TERRAIN_DIRT)
                 .furnish(Decor.Room(field), carto, isAbandoned)
             fieldPlaced = true
-            carto.trailHead = XY(x + width / 2, y + height / 2)
-            carto.addTrailBlock(x, y, x+width-1, y+height-1)
+            carto.addTrailBlock(field.x0, field.y0, field.x1, field.y1)
         }
 
         if (Dice.chance(barnChance) || !fieldPlaced) {
@@ -81,8 +80,6 @@ class Farm(
                     Barn().furnish(room, carto, isAbandoned)
                 }
             }
-            carto.trailHead = XY(barnRect.x0, barnRect.y0)
-            carto.addTrailBlock(barnRect.x0, barnRect.y0, barnRect.x1, barnRect.y1)
         }
 
         swapTerrain(Terrain.Type.TEMP1, Terrain.Type.TERRAIN_GRASS)

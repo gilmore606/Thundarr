@@ -15,6 +15,8 @@ class Rivers(
     4, Stage.TERRAIN
 ) {
 
+    private val harborChance = 0.8f
+
     @Serializable
     class RiverExit(
         var pos: XY,
@@ -79,8 +81,7 @@ class Rivers(
         repeat (3) {
             val adds = ArrayList<XY>()
             forEachBiome { x, y, biome ->
-                if (getTerrain(x, y) != Terrain.Type.GENERIC_WATER && !flagsAt(x,y).contains(WorldCarto.CellFlag.RIVERBANK) &&
-                    !flagsAt(x,y).contains(WorldCarto.CellFlag.TRAIL)) {
+                if (getTerrain(x, y) != Terrain.Type.GENERIC_WATER && !flagsAt(x,y).contains(WorldCarto.CellFlag.RIVERBANK)) {
                     var n = 0
                     DIRECTIONS.from(x, y) { dx, dy, dir ->
                         if (boundsCheck(dx,dy) && flagsAt(dx,dy).contains(WorldCarto.CellFlag.RIVERBANK)) n++
@@ -99,17 +100,21 @@ class Rivers(
     }
 
     private fun drawRiver(start: RiverExit, end: RiverExit) {
-        val startWidth = if (start.edge in meta.coasts()) start.width * 2f + 3f else start.width.toFloat()
-        val endWidth = if (end.edge in meta.coasts()) end.width * 2f + 3f else end.width.toFloat()
+        val startMouth = start.edge in meta.coasts()
+        val endMouth = end.edge in meta.coasts()
+        val startWidth = if (startMouth) start.width * 2f + 3f else start.width.toFloat()
+        val endWidth = if (endMouth) end.width * 2f + 3f else end.width.toFloat()
         var t = 0f
         var width = startWidth
         val step = 0.02f
         val widthStep = (endWidth - startWidth) * step
+        val bridgeX = if (start.edge in listOf(EAST, WEST) && end.edge in listOf(EAST, WEST)) x0 + 15 + Dice.zeroTo(30) else -1
+        val bridgeY = if (start.edge in listOf(NORTH, SOUTH) && end.edge in listOf(NORTH, SOUTH)) y0 + 15 + Dice.zeroTo(30) else -1
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRiverChunk(
                 Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
-                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f))
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), bridgeX, bridgeY)
             if (t > 0.2f && t < 0.8f && width > 6 && Dice.chance(0.1f)) {
                 riverIslandPoints.add(XY((x0 + p.x).toInt(), (y0 + p.y).toInt()))
             }
@@ -120,15 +125,27 @@ class Rivers(
             t += step
             width += widthStep
         }
+        if ((startMouth || endMouth) && Dice.chance(harborChance) && width > 3f) {
+            val pos = if (startMouth) start.pos else end.pos
+            val w = width.toInt()
+            printGrid(
+                growBlob(Dice.range(w, w * 3), Dice.range(w, w * 3)),
+                x0 + pos.x - Dice.range(1, w * 2), y0 + pos.y - Dice.range(1, w * 2),
+                Terrain.Type.GENERIC_WATER
+            )
+        }
     }
 
-    private fun carveRiverChunk(room: Rect, skipCorners: Boolean) {
+    private fun carveRiverChunk(room: Rect, skipCorners: Boolean, bridgeX: Int, bridgeY: Int) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        setTerrain(x, y, Terrain.Type.GENERIC_WATER)
-                        flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
+                        if (x != bridgeX && y != bridgeY && x != bridgeX + 1 && y != bridgeY + 1) {
+                            carto.blockTrailAt(x,y)
+                            setTerrain(x, y, Terrain.Type.GENERIC_WATER)
+                            flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
+                        }
                     }
                 }
             }

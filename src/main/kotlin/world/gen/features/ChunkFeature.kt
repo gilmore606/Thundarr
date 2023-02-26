@@ -119,7 +119,6 @@ sealed class ChunkFeature(
                             if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
                                 setTerrain(x, y, type)
                                 flagsAt(x,y).apply {
-                                    add(WorldCarto.CellFlag.TRAIL)
                                     add(WorldCarto.CellFlag.NO_PLANTS)
                                     add(WorldCarto.CellFlag.NO_BUILDINGS)
                                 }

@@ -779,10 +779,6 @@ object Metamap {
                 if (Caves.canBuildOn(cell) && Dice.chance(cell.biome.cavesChance())) {
                     cell.features.add(Caves())
                 }
-                // Bridges
-                if (Bridge.canBuildOn(cell)) {
-                    cell.features.add(Bridge())
-                }
                 // Lakes
                 if (Lake.canBuildOn(cell) && Dice.chance(when (cell.rivers().size) {
                         0 -> 0.02f

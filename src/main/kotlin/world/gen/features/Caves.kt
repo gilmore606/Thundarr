@@ -39,7 +39,6 @@ class Caves : ChunkFeature(
                 val entrance = entrances.random()
                 cellCount += recurseCave(entrance.x, entrance.y, 1f, Dice.float(0.02f, 0.12f))
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
-                carto.trailHead = entrance
             }
             if (cellCount > 6) {
                 val usablePoints = cavePortalPoints.filter { point ->

@@ -37,7 +37,6 @@ class Lake : ChunkFeature(
         val height = Dice.range(12,31)
         val x = x0 + Dice.range(width, CHUNK_SIZE - width) - width / 2
         val y = y0 + Dice.range(height, CHUNK_SIZE - height) - height / 2
-        carto.trailHead = XY(x + width/2, y + height/2)
         carto.addTrailBlock(x, y, x+width-1, y+height-1)
         digLakeBlobAt(x, y, width, height)
         if (Dice.chance(0.4f)) {

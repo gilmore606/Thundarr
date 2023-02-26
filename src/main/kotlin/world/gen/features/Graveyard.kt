@@ -43,8 +43,7 @@ class Graveyard(
                 Decor.Room(Rect(gravex, gravey, gravex + graveWidth - 1, gravey + graveHeight - 1)),
             carto, isAbandoned)
             gravePlaced = true
-            carto.trailHead = XY(x + width / 2, y + height / 2)
-            carto.addTrailBlock(x, y, x+width-1, y+height-1)
+            carto.addTrailBlock(gravex, gravey, gravex + graveWidth - 1, gravey + graveHeight - 1)
         }
 
         if (Dice.chance(shrineChance) || !gravePlaced) {
@@ -79,8 +78,6 @@ class Graveyard(
             ) { rooms ->
                 Church().furnish(rooms[0], carto, isAbandoned)
             }
-            carto.trailHead = XY(shrineRect.x0, shrineRect.y0)
-            carto.addTrailBlock(shrineRect.x0, shrineRect.x1, shrineRect.y0, shrineRect.y1)
         }
 
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
