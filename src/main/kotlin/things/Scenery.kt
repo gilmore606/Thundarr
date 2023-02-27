@@ -36,6 +36,18 @@ class HighwaySign(
 }
 
 @Serializable
+class TrailSign(
+    val text: String
+) : Scenery() {
+    override val tag = Tag.THING_TRAILSIGN
+    override fun glyph() = Glyph.TRAIL_SIGN
+    override fun name() = "trail sign"
+    override fun isOpaque() = false
+    override fun walkOnMsg() = "\"$text\"."
+    override fun description() = "A handmade wooden trail marker. \"$text\"."
+}
+
+@Serializable
 class Boulder : Scenery() {
     override val tag = Tag.THING_BOULDER
     override fun glyph() = Glyph.BOULDER

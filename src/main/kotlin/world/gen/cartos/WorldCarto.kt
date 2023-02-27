@@ -29,7 +29,7 @@ class WorldCarto(
 
     val globalPlantDensity = 0.2f
 
-    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, BLOCK_TRAILS, RIVER, RIVERBANK, OCEAN, BEACH }
+    enum class CellFlag { NO_PLANTS, NO_BUILDINGS, BLOCK_TRAILS, BRIDGE_SLOT, RIVER, RIVERBANK, OCEAN, BEACH }
 
     private val neighborMetas = mutableMapOf<XY,ChunkMeta?>()
     private val blendMap = Array(CHUNK_SIZE) { Array(CHUNK_SIZE) { mutableSetOf<Pair<Biome, Float>>() } }
@@ -270,4 +270,6 @@ class WorldCarto(
             }
         }
     }
+
+    override fun ignoreCellForWaterDeepening(x: Int, y: Int) = flagsMap[x-x0][y-y0].contains(CellFlag.BRIDGE_SLOT)
 }

@@ -94,6 +94,7 @@ sealed class Thing() : Entity {
         THING_BLOODCAPMUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
         THING_FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),
         THING_HIGHWAYSIGN("highway sign", "highway signs", { HighwaySign("") }),
+        THING_TRAILSIGN("trail sign", "trail signs", { TrailSign("") }),
         THING_BOULDER("boulder", "boulders", { Boulder() }),
         THING_SHRINE("shrine", "shrines", { Shrine() }),
         THING_OAKTREE("oak tree", "oak trees", { OakTree() }),

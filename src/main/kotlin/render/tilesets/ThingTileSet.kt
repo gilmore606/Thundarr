@@ -36,7 +36,7 @@ fun ThingTileSet() =
         setTile(Glyph.LIGHTBULB, SimpleTile(this, 1, 0))
 
         setTile(Glyph.AXE, SimpleTile(this, 2, 0))
-        setTile(Glyph.SIGN, VariantsTile(this).apply {
+        setTile(Glyph.TRAIL_SIGN, VariantsTile(this).apply {
             add(0.5f, 3, 0)
             add(0.5f, 4, 1)
         })

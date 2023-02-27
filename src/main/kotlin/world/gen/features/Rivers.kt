@@ -16,6 +16,7 @@ class Rivers(
 ) {
 
     private val harborChance = 0.8f
+    private val lonelyBridgeChance = 0.05f
 
     @Serializable
     class RiverExit(
@@ -57,13 +58,32 @@ class Rivers(
                 }
             }
         }
+
         if (riverIslandPoints.isNotEmpty() && Dice.chance(0.5f)) {
             riverIslandPoints.random().also { island ->
                 printGrid(growBlob(Dice.range(3,6), Dice.range(3,6)), island.x, island.y, meta.biome.baseTerrain)
             }
         }
-        fuzzTerrain(Terrain.Type.GENERIC_WATER, riverBlur * 0.4f)
+
+        // Fuzz water but don't overwrite bridge slots
+        val adds = ArrayList<XY>()
+        val density = riverBlur * 0.4f
+        forEachTerrain(Terrain.Type.GENERIC_WATER) { x, y ->
+            carto.neighborsAt(x,y,CARDINALS) { nx, ny, terrain ->
+                if (terrain != Terrain.Type.GENERIC_WATER && !flagsAt(x,y).contains(WorldCarto.CellFlag.BRIDGE_SLOT)) {
+                    if (Dice.chance(density)) adds.add(XY(nx,ny))
+                }
+            }
+        }
+        adds.forEach { setTerrain(it.x, it.y, Terrain.Type.GENERIC_WATER) }
         addRiverBanks()
+
+        if (Dice.chance(lonelyBridgeChance)) {
+            val terrain = if (Dice.flip()) Terrain.Type.TERRAIN_WOODFLOOR else Terrain.Type.TERRAIN_STONEFLOOR
+            forEachCell { x,y ->
+                if (flagsAt(x,y).contains(WorldCarto.CellFlag.BRIDGE_SLOT)) setTerrain(x, y, terrain)
+            }
+        }
     }
 
     private fun addRiverBanks() {
@@ -110,11 +130,13 @@ class Rivers(
         val widthStep = (endWidth - startWidth) * step
         val bridgeX = if (start.edge in listOf(EAST, WEST) && end.edge in listOf(EAST, WEST)) x0 + 15 + Dice.zeroTo(30) else -1
         val bridgeY = if (start.edge in listOf(NORTH, SOUTH) && end.edge in listOf(NORTH, SOUTH)) y0 + 15 + Dice.zeroTo(30) else -1
+        val wideBridge = Dice.flip()
         while (t < 1f) {
             val p = getBezier(t, start.pos.toXYf(), start.control.toXYf(), end.control.toXYf(), end.pos.toXYf())
             carveRiverChunk(
                 Rect((x0 + p.x - width/2).toInt(), (y0 + p.y - width/2).toInt(),
-                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f), bridgeX, bridgeY)
+                (x0 + p.x + width/2).toInt(), (y0 + p.y + width/2).toInt()), (width >= 3f),
+                bridgeX, bridgeY, wideBridge)
             if (t > 0.2f && t < 0.8f && width > 6 && Dice.chance(0.1f)) {
                 riverIslandPoints.add(XY((x0 + p.x).toInt(), (y0 + p.y).toInt()))
             }
@@ -136,16 +158,19 @@ class Rivers(
         }
     }
 
-    private fun carveRiverChunk(room: Rect, skipCorners: Boolean, bridgeX: Int, bridgeY: Int) {
+    private fun carveRiverChunk(room: Rect, skipCorners: Boolean,
+                                bridgeX: Int, bridgeY: Int, wideBridge: Boolean) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
                 if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
                     if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (x != bridgeX && y != bridgeY && x != bridgeX + 1 && y != bridgeY + 1) {
+                        if (x != bridgeX && y != bridgeY && (!wideBridge || (x != bridgeX + 1 && y != bridgeY + 1))) {
                             carto.blockTrailAt(x,y)
-                            setTerrain(x, y, Terrain.Type.GENERIC_WATER)
-                            flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
+                        } else {
+                            flagsAt(x,y).add(WorldCarto.CellFlag.BRIDGE_SLOT)
                         }
+                        setTerrain(x, y, Terrain.Type.GENERIC_WATER)
+                        flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
                     }
                 }
             }
