@@ -17,7 +17,6 @@ import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
-import kotlin.reflect.full.memberExtensionFunctions
 
 object Metamap {
 
@@ -61,6 +60,7 @@ object Metamap {
     val minStepsBetweenSideRoads = 4
     val sideRoadChance = 0.2f
     val randomHighwaySignChance = 0.4f
+    val randomTrailSignChance = 0.4f
     val maxVolcanoes = 3
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
@@ -1047,12 +1047,19 @@ object Metamap {
         }
         origins.shuffled().forEach { origin ->
             if (!scratches[origin.x][origin.y].hasFeature(Trails::class)) {
+                var signText = scratches[origin.x][origin.y].featureOf(Village::class)?.let {
+                    (it as Village).name
+                }
                 var cursor = origin
                 var done = false
                 val visited = mutableListOf<XY>(cursor)
                 while (!done) {
                     val nextPoint = targets.nextNearestTo(cursor, exclude = visited)
-                    val madeIt = runTrailBetween(cursor, nextPoint)
+                    val nextCell = scratches[nextPoint.x][nextPoint.y]
+                    if (signText == null && nextCell.hasFeature(Village::class)) {
+                        signText = (nextCell.featureOf(Village::class)!! as Village).name
+                    }
+                    val madeIt = runTrailBetween(cursor, nextPoint, signText)
                     if (madeIt && Dice.chance(0.8f)) {
                         visited.add(nextPoint)
                         cursor = nextPoint
@@ -1064,7 +1071,7 @@ object Metamap {
         }
     }
 
-    private fun runTrailBetween(origin: XY, target: XY): Boolean {
+    private fun runTrailBetween(origin: XY, target: XY, signText: String?): Boolean {
         if (origin == target) return false
         val targetDistance = manhattanDistance(origin, target)
         var cursor = origin
@@ -1092,7 +1099,7 @@ object Metamap {
 
                 if (scratches[cursor.x][cursor.y].hasFeature(Rivers::class)) suggestedPlayerStart = origin
 
-                connectTrailExits(cursor, nextCell)
+                connectTrailExits(cursor, nextCell, signText)
                 if (nextCell == target) return true
                 cursor = nextCell
             }
@@ -1100,7 +1107,7 @@ object Metamap {
         return false
     }
 
-    private fun connectTrailExits(source: XY, dest: XY) {
+    private fun connectTrailExits(source: XY, dest: XY, signText: String?) {
         val scell = scratches[source.x][source.y]
         val dcell = scratches[dest.x][dest.y]
         val direction = XY(dest.x - source.x, dest.y - source.y)
@@ -1110,6 +1117,7 @@ object Metamap {
                 Trails.TrailExit(
                 edge = direction,
                 pos = edgePos,
+                sign = if (Dice.chance(randomTrailSignChance)) signText else null
                 )
             )
             val childEdgePos = flipChunkEdgePos(edgePos)

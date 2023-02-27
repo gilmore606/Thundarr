@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import things.TrailSign
 import util.*
 import world.ChunkScratch
 import world.gen.biomes.Ocean
@@ -26,6 +27,7 @@ class Trails(
     class TrailExit(
         var pos: XY,
         var edge: XY,
+        var sign: String? = null
     )
 
     fun addExit(exit: TrailExit) {
@@ -41,16 +43,18 @@ class Trails(
         var tries = 0
         var found = false
         var center: XY? = null
-        while (tries < 200 && !found) {
+        var offset = 20
+        while (tries < 500 && !found) {
             tries++
-            val centerX = 22 + Dice.zeroTil(20)
-            val centerY = 22 + Dice.zeroTil(20)
+            val centerX = 2 + offset + Dice.zeroTil(40 - offset)
+            val centerY = 2 + offset + Dice.zeroTil(40 - offset)
             if (openAt(x0+centerX, y0+centerY)) {
                 found = true
                 center = XY(x0+centerX, y0+centerY)
             }
+            if (tries == 200) offset = 6
         }
-        if (!found) return   // TODO: deal with this case, look further from center
+        if (!found) return
 
         // build DistanceMap on trailBlockmap to Target
         walkMap = DistanceMap(chunk, { x, y ->
@@ -62,6 +66,20 @@ class Trails(
         // walk from each trail exit to Target
         exits.forEach { exit ->
             trailToCenter(exit.pos)
+            exit.sign?.also { signText ->
+                val signSpots = mutableListOf<XY>()
+                forEachCell { x,y ->
+                    val t = getTerrain(x,y)
+                    if (t != Terrain.Type.TEMP5 && Terrain.get(t).isWalkable() && neighborCount(x,y,Terrain.Type.TEMP5) > 0) {
+                        signSpots.add(XY(x,y))
+                    }
+                }
+                if (signSpots.isNotEmpty()) {
+                    val spot = signSpots.random()
+                    spawnThing(spot.x, spot.y, TrailSign(signText))
+                }
+            }
+            swapTerrain(Terrain.Type.TEMP5, Terrain.Type.TEMP4)
         }
         // swap in terrain and add some edges
         forEachCell { x,y ->
@@ -119,7 +137,7 @@ class Trails(
                 if (boundsCheck(dx, dy) && Dice.chance(0.9f)) {
                     val t = getTerrain(dx,dy)
                     if (Terrain.get(t).trailsOverwrite()) {
-                        setTerrain(dx, dy, Terrain.Type.TEMP4)
+                        setTerrain(dx, dy, Terrain.Type.TEMP5)
                     } else if (flagsAt(dx,dy).contains(WorldCarto.CellFlag.BRIDGE_SLOT)) {
                         setTerrain(dx, dy, bridgeTerrain)
                     }

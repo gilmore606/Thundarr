@@ -29,6 +29,7 @@ sealed class Terrain(
             Type.TEMP2 -> Blank
             Type.TEMP3 -> Blank
             Type.TEMP4 -> Blank
+            Type.TEMP5 -> Blank
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
             Type.TERRAIN_WOODWALL -> WoodWall
@@ -78,6 +79,7 @@ sealed class Terrain(
         TEMP2,
         TEMP3,
         TEMP4,
+        TEMP5,
         GENERIC_WALL,
         GENERIC_FLOOR,
         GENERIC_WATER,
