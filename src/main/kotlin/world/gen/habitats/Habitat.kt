@@ -52,9 +52,13 @@ object TemperateB : Habitat(
 @Serializable
 object TropicalA: Habitat(
     Glyph.MAP_HABITAT_HOT_A
-)
+) {
+    override fun forestWallType() = Terrain.Type.TERRAIN_TROPICAL_FORESTWALL
+}
 
 @Serializable
 object TropicalB : Habitat(
     Glyph.MAP_HABITAT_HOT_B
-)
+) {
+    override fun forestWallType() = Terrain.Type.TERRAIN_TROPICAL_FORESTWALL
+}

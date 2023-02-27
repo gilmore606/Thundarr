@@ -122,3 +122,8 @@ object PineForestWall : ForestWall(Type.TERRAIN_PINE_FORESTWALL, Glyph.PINE_FORE
     override fun name() = "pine trees"
     override fun bumpMsg() = "The forest is too thick to pass this way."
 }
+
+object TropicalForestWall : ForestWall(Type.TERRAIN_TROPICAL_FORESTWALL, Glyph.TROPICAL_FOREST_WALL) {
+    override fun name() = "jungle trees"
+    override fun bumpMsg() = "The jungle is too thick to pass this way."
+}

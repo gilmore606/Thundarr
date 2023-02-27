@@ -158,6 +158,26 @@ fun TerrainTileSet() =
             add(WallTile.Slot.FULL, 1f, 7, 9)
         })
 
+        setTile(Glyph.TROPICAL_FOREST_WALL, WallTile(this, Glyph.TROPICAL_FOREST_WALL).apply {
+            add(WallTile.Slot.TOP, 1f, 7, 13)
+            add(WallTile.Slot.LEFTTOP, 1f, 6, 13)
+            add(WallTile.Slot.RIGHTTOP, 1f, 8, 13)
+            add(WallTile.Slot.OUTSIDE_LEFTTOP, 1f, 6, 11)
+            add(WallTile.Slot.OUTSIDE_RIGHTTOP, 1f, 8, 11)
+            add(WallTile.Slot.LEFT, 1f, 8, 12)
+            add(WallTile.Slot.RIGHT, 1f, 6, 12)
+            add(WallTile.Slot.LEFTBOTTOM, 1f, 7, 12)
+            add(WallTile.Slot.OUTSIDE_LEFTBOTTOM, 1f, 8, 11)
+            add(WallTile.Slot.BOTTOM, 1f, 7, 11)
+            add(WallTile.Slot.RIGHTBOTTOM, 1f, 7, 12)
+            add(WallTile.Slot.OUTSIDE_RIGHTBOTTOM, 1f, 6, 11)
+            add(WallTile.Slot.CAP_BOTTOM, 1f, 7, 13)
+            add(WallTile.Slot.CAP_TOP, 1f, 7, 11)
+            add(WallTile.Slot.CAP_LEFT, 1f, 6, 13)
+            add(WallTile.Slot.CAP_RIGHT, 1f, 8, 13)
+            add(WallTile.Slot.FULL, 1f, 7, 12)
+        })
+
         setTile(Glyph.CHASM, ChasmTile(this, Glyph.CHASM).apply {
             add(ChasmTile.Slot.SOLO, 1f, 0, 9)
             add(ChasmTile.Slot.LEFTCAP, 1f, 0, 10)
