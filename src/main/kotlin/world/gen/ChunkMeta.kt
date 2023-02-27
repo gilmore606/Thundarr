@@ -145,5 +145,5 @@ class ChunkScratch(
         (it as Trails).exits
     } ?: listOf()
 
-    fun defaultTitle() = features.firstNotNullOfOrNull { it.cellTitle() } ?: biome.defaultTitle()
+    fun defaultTitle() = features.firstNotNullOfOrNull { it.cellTitle() } ?: biome.defaultTitle(habitat)
 }

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
+import world.gen.habitats.Habitat
 import world.terrains.Terrain
 
 @Serializable
@@ -11,7 +12,7 @@ object Suburb: Biome(
     Glyph.MAP_SUBURB,
     Terrain.Type.TERRAIN_DIRT
 ) {
-    override fun defaultTitle() = "suburban ruins"
+    override fun defaultTitle(habitat: Habitat) = "suburban ruins"
     override fun riverBankAltTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_GRASS
     override fun trailChance() = 0f
     override fun plantDensity() = 0.2f

@@ -12,6 +12,7 @@ import world.Chunk
 import world.gen.NoisePatches
 import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
+import world.gen.habitats.Habitat
 import world.level.CHUNK_SIZE
 import world.terrains.*
 
@@ -23,7 +24,7 @@ object Ruins : Biome(
     private const val ruinTreasureChance = 0.5f
     private fun wreckedCarCount() = Dice.oneTo(4)
 
-    override fun defaultTitle() = "urban ruins"
+    override fun defaultTitle(habitat: Habitat) = "urban ruins"
     override fun ambientSoundDay() = Speaker.Ambience.RUINS
     override fun ambientSoundNight() = Speaker.Ambience.RUINS
     override fun riverBankAltTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_DIRT

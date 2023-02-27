@@ -3,11 +3,11 @@ package world.gen.biomes
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import ui.panels.Console
 import util.Dice
 import util.Rect
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
+import world.gen.habitats.Habitat
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
@@ -18,7 +18,7 @@ sealed class Biome(
     val mapGlyph: Glyph,
     val baseTerrain: Terrain.Type,
 ) {
-    open fun defaultTitle() = "the wilderness"
+    open fun defaultTitle(habitat: Habitat) = "the wilderness"
     open fun trailChance() = 0.1f
     open fun plantDensity() = 1.0f
     open fun cabinChance() = 0.0f
@@ -74,7 +74,7 @@ object Ocean : Biome(
     Glyph.MAP_WATER,
     TERRAIN_DEEP_WATER
 ) {
-    override fun defaultTitle() = "ocean"
+    override fun defaultTitle(habitat: Habitat) = "ocean"
     override fun trailChance() = 0f
 }
 
@@ -83,7 +83,7 @@ object Glacier : Biome(
     Glyph.MAP_GLACIER,
     TERRAIN_DIRT
 ) {
-    override fun defaultTitle() = "glacier"
+    override fun defaultTitle(habitat: Habitat) = "glacier"
     override fun canHaveRain() = false
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun bareTerrain(x: Int, y: Int) = TERRAIN_ROCKS
@@ -95,7 +95,7 @@ object Plain : Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_GRASS
 ) {
-    override fun defaultTitle() = "grassland"
+    override fun defaultTitle(habitat: Habitat) = habitat.grasslandName()
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
     override fun plantDensity() = 0.5f
 
@@ -117,7 +117,7 @@ object Hill : Biome(
     Glyph.MAP_HILL,
     TERRAIN_GRASS
 ) {
-    override fun defaultTitle() = "hills"
+    override fun defaultTitle(habitat: Habitat) = "hills"
     override fun trailChance() = 0.2f
     override fun cavesChance() = 0.6f
     override fun plantDensity() = 0.3f
@@ -145,7 +145,7 @@ object ForestHill : Biome(
     Glyph.MAP_FORESTHILL,
     TERRAIN_GRASS
 ) {
-    override fun defaultTitle() = "wooded hills"
+    override fun defaultTitle(habitat: Habitat) = habitat.forestHillName()
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
@@ -182,7 +182,7 @@ object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
     TERRAIN_DIRT
 ) {
-    override fun defaultTitle() = "mountains"
+    override fun defaultTitle(habitat: Habitat) = "mountains"
     override fun ambientSoundDay() = Speaker.Ambience.MOUNTAIN
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
     override fun cavesChance() = 0.8f
@@ -211,7 +211,7 @@ object Swamp : Biome(
     Glyph.MAP_SWAMP,
     TERRAIN_SWAMP
 ) {
-    override fun defaultTitle() = "swamp"
+    override fun defaultTitle(habitat: Habitat) = "swamp"
     override fun ambientSoundDay() = Speaker.Ambience.SWAMP
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
@@ -247,7 +247,7 @@ object Scrub : Biome(
     Glyph.MAP_SCRUB,
     TERRAIN_GRASS
 ) {
-    override fun defaultTitle() = "plains"
+    override fun defaultTitle(habitat: Habitat) = habitat.scrubName()
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun plantDensity() = 0.25f
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
@@ -269,7 +269,7 @@ object Desert : Biome(
     Glyph.MAP_DESERT,
     TERRAIN_SAND
 ) {
-    override fun defaultTitle() = "desert"
+    override fun defaultTitle(habitat: Habitat) = "desert"
     override fun canHaveRain() = false
     override fun cavesChance() = 0.8f
     override fun ambientSoundDay() = Speaker.Ambience.DESERT
@@ -315,6 +315,6 @@ object Tundra: Biome(
     Glyph.MAP_PLAIN,
     TERRAIN_DIRT
 ) {
-    override fun defaultTitle() = "tundra"
+    override fun defaultTitle(habitat: Habitat) = "tundra"
     override fun canHaveRain() = false
 }

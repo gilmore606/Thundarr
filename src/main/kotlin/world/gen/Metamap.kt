@@ -855,7 +855,7 @@ object Metamap {
             }
             fun nameArea(areaID: Int, name: String) {
                 forEachMeta { x,y,cell ->
-                    if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle())
+                    if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle(cell.habitat))
                         cell.title = name
                 }
             }

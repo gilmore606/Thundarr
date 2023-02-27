@@ -6,6 +6,7 @@ import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
+import world.gen.habitats.Habitat
 import world.terrains.Terrain
 
 @Serializable
@@ -15,7 +16,7 @@ object Forest : Biome(
 ) {
     private const val cabinChance = 0.2f
 
-    override fun defaultTitle() = "forest"
+    override fun defaultTitle(habitat: Habitat) = habitat.forestName()
     override fun ambientSoundDay() = Speaker.Ambience.FOREST
     override fun ambientSoundNight() = Speaker.Ambience.FOREST
     override fun trailChance() = 0.2f
