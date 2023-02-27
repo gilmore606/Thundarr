@@ -46,4 +46,9 @@ enum class Keydef(
     SHORTCUT7("Shortcut 7", NUM_7),
     SHORTCUT8("Shortcut 8", NUM_8),
     SHORTCUT9("Shortcut 9", NUM_9),
+
+    DEBUG_F5("Debug_F5", F5),
+    DEBUG_F6("Debug_F6", F6),
+    DEBUG_F7("Debug_F7", F7),
+    DEBUG_F8("Debug_F8", F8),
 }

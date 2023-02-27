@@ -25,6 +25,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
     var mapx = 0
     var mapy = 0
 
+    var revealAll = false
     var showHabitats = false
 
     override fun newThingBatch() = null
@@ -60,6 +61,10 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
             Keydef.MOVE_NE -> { mapy-- ; mapx++ }
             Keydef.MOVE_SW -> { mapy++ ; mapx-- }
             Keydef.MOVE_SE -> { mapy++ ; mapx++ }
+
+            Keydef.DEBUG_F5 -> { revealAll = !revealAll }
+
+            else -> { }
         }
     }
 
@@ -75,7 +80,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         for (x in 0 until (1120 / cellSize)) {
             for (y in 0 until (800 / cellSize)) {
                 val meta = Metamap.metaAt(x+mapx, y+mapy)
-                if (meta.mapped) {
+                if (meta.mapped || revealAll) {
                     val ox = x * cellSize
                     val oy = y * cellSize
                     val px0 = x0 + ox

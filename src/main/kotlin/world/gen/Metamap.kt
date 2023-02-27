@@ -1039,7 +1039,7 @@ object Metamap {
         forEachMeta { x,y,cell ->
             if ((cell.features.hasOneWhere {
                     Dice.chance(it.trailDestinationChance())
-            } || Dice.chance(0.002f)) && Trails.canBuildOn(cell)
+            } || Dice.chance(0.001f)) && Trails.canBuildOn(cell)
             ) {
                 origins.add(XY(x, y))
                 targets.add(XY(x, y))
@@ -1060,7 +1060,7 @@ object Metamap {
                         signText = (nextCell.featureOf(Village::class)!! as Village).name
                     }
                     val madeIt = runTrailBetween(cursor, nextPoint, signText)
-                    if (madeIt && Dice.chance(0.8f)) {
+                    if (madeIt && Dice.chance(0.9f)) {
                         visited.add(nextPoint)
                         cursor = nextPoint
                     } else {
