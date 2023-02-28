@@ -191,6 +191,8 @@ enum class Glyph {
     BOOKSHELF,
     FORGE,
     WARDROBE,
+    RAILS_H,
+    RAILS_V,
 
     BLOODSTAIN,
     SCORCHMARK,

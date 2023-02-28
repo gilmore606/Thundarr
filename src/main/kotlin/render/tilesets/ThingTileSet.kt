@@ -148,4 +148,6 @@ fun ThingTileSet() =
         setTile(Glyph.BOOKSHELF, SimpleTile(this, 10, 8))
         setTile(Glyph.FORGE, SimpleTile(this, 10, 9))
         setTile(Glyph.WARDROBE, SimpleTile(this, 10, 10))
+        setTile(Glyph.RAILS_V, SimpleTile(this, 11, 10))
+        setTile(Glyph.RAILS_H, SimpleTile(this, 12, 10))
     }
