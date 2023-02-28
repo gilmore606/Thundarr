@@ -166,17 +166,17 @@ fun plantSpawns() = listOf<PlantSpawn>(
     ),
 
     // Mushrooms
-    PlantSpawn({ WizardcapMushroom() },
+    PlantSpawn({ WizardcapMycelium() },
         setOf(Hill, Mountain, Cavern),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB),
         0.03f, 0.6f, 1f
     ),
-    PlantSpawn({ SpeckledMushroom() },
+    PlantSpawn({ SpeckledMycelium() },
         setOf(ForestHill, Cavern),
         setOf(TemperateA, TemperateB),
         0.1f, 0.6f, 1f
     ),
-    PlantSpawn({ BloodcapMushroom() },
+    PlantSpawn({ BloodcapMycelium() },
         setOf(ForestHill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
         0.05f, 0f, 0.2f

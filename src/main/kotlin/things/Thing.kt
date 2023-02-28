@@ -89,9 +89,12 @@ sealed class Thing() : Entity {
         THING_PRICKPEAR("prickpear", "prickpears", { Prickpear() }),
         THING_BALMMOSS("balm moss", "balm mosses", { BalmMoss() }),
         THING_LACEMOSS("lace moss", "lace mosses", { LaceMoss() }),
-        THING_WIZARDCAPMUSHROOM("wizardcap mushroom", "wizardcap mushrooms", { WizardcapMushroom() }),
-        THING_SPECKLEDMUSHROOM("speckled mushroom", "speckled mushrooms", { SpeckledMushroom() }),
-        THING_BLOODCAPMUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
+        THING_WIZARDCAP_MYCELIUM("", "", { WizardcapMycelium() }),
+        THING_SPECKLED_MYCELIUM("", "",{ SpeckledMycelium() }),
+        THING_BLOODCAP_MYCELIUM("", "", { BloodcapMycelium() }),
+        THING_WIZARDCAP_MUSHROOM("wizardcap mushroom", "wizardcap mushrooms", { WizardcapMushroom() }),
+        THING_SPECKLED_MUSHROOM("speckled mushroom", "speckled mushrooms", { SpeckledMushroom() }),
+        THING_BLOODCAP_MUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
         THING_FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),
         THING_HIGHWAYSIGN("highway sign", "highway signs", { HighwaySign("") }),
         THING_TRAILSIGN("trail sign", "trail signs", { TrailSign("") }),
@@ -117,7 +120,8 @@ sealed class Thing() : Entity {
     abstract fun isOpaque(): Boolean
     abstract fun isBlocking(): Boolean
     abstract fun isPortable(): Boolean
-    open fun announceOnWalk() = true
+    open fun isIntangible() = false
+    open fun announceOnWalk() = !isIntangible()
 
     @Transient var holder: ThingHolder? = null
 
