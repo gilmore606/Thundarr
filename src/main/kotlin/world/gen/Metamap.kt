@@ -64,6 +64,7 @@ object Metamap {
     val maxVolcanoes = 3
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
+    val randomTavernChance = 0.003f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -739,7 +740,11 @@ object Metamap {
                     if (Village.canBuildOn(meta)) {
                         if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
                             if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
-                                val village = Village(Madlib.villageName(), isAbandoned = Dice.chance(villageAbandonedChance))
+                                val village = Village(
+                                    Madlib.villageName(),
+                                    isAbandoned = Dice.chance(villageAbandonedChance),
+                                    size = Dice.range(5, 18)
+                                )
                                 placedOne = true
                                 actuallyPlaced++
                                 villages.add(XY(x, y))
@@ -750,9 +755,14 @@ object Metamap {
                                 Village.neighborFeatures.forEach { neighborData ->
                                     DIRECTIONS.from(x, y) { dx, dy, dir ->
                                         if (dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
-                                            && neighborData.second.invoke(scratches[dx][dy])) {
+                                            && neighborData.second.invoke(
+                                                scratches[dx][dy], village
+                                            )) {
                                             val neighbor = scratches[dx][dy]
-                                            val feature = neighborData.third.invoke(village.isAbandoned)
+                                            val feature = neighborData.third.invoke(
+                                                village.isAbandoned,
+                                                dir
+                                            )
                                             neighbor.features.add(feature)
                                             neighbor.removeFeature(RuinedBuildings::class)
                                             placedDirs.add(dir)
@@ -816,6 +826,12 @@ object Metamap {
                     // Graveyards
                     if (Graveyard.canBuildOn(cell) && Dice.chance(randomGraveyardChance)) {
                         cell.features.add(Graveyard(Dice.flip()))
+                    }
+                    // Taverns
+                    if (Tavern.canBuildOn(cell) && Dice.chance(randomTavernChance)) {
+                        cell.features.add(Tavern(
+                            Madlib.tavernName(), NO_DIRECTION
+                        ))
                     }
                 }
             }

@@ -18,6 +18,8 @@ class Tavern(
         fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)
     }
 
+    override fun trailDestinationChance() = 1f
+
     override fun doDig() {
 
     }

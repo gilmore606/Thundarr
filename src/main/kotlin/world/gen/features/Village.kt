@@ -17,6 +17,7 @@ import world.terrains.Terrain
 class Village(
     val name: String,
     val isAbandoned: Boolean = false,
+    val size: Int,
 ) : ChunkFeature(
     3, Stage.BUILD
 ) {
@@ -25,10 +26,23 @@ class Village(
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
                 && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
 
-        val neighborFeatures = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->ChunkFeature>>(
+        val neighborFeatures = listOf<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->ChunkFeature>>(
 
-            Triple(0.7f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) }),
-            Triple(0.7f, { meta -> Graveyard.canBuildOn(meta) }, { isAbandoned -> Graveyard(isAbandoned) }),
+            Triple(0.6f, { meta, village ->
+                Farm.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Farm(isAbandoned)
+            }),
+            Triple(0.4f, { meta, village ->
+                Graveyard.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Graveyard(isAbandoned)
+            }),
+            Triple(0.3f, { meta, village ->
+                village.size > 8 && !village.isAbandoned && Tavern.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Tavern(Madlib.tavernName(), dir)
+            }),
 
         )
     }
@@ -200,7 +214,7 @@ class Village(
     }
 
     private fun layoutVillageBag() {
-        val hutCount = Dice.range(6, 18)
+        val hutCount = this.size
         var built = 0
         var width = Dice.range(9, 13)
         var height = Dice.range(9, 13)
