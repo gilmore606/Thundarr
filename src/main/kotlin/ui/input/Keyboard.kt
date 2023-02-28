@@ -58,10 +58,18 @@ object Keyboard : KtxInputAdapter {
             }
         }
 
+        // Install default keybinds
         Keydef.values().forEach { keydef ->
             keydef.defaultKey?.also { keycode ->
                 binds[keycode] = keydef
             }
+        }
+    }
+
+    fun loadBinds(newBinds: Map<Int, Keydef>) {
+        binds.clear()
+        newBinds.forEach { entry ->
+            binds[entry.key] = entry.value
         }
     }
 

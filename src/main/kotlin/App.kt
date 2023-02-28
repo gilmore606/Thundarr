@@ -157,7 +157,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 volumeMaster = Speaker.volumeMaster,
                 volumeWorld = Speaker.volumeWorld,
                 volumeMusic = Speaker.volumeMusic,
-                volumeUI = Speaker.volumeUI
+                volumeUI = Speaker.volumeUI,
+                binds = Keyboard.binds,
             )
         )
     }
@@ -220,6 +221,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Speaker.volumeWorld = state.volumeWorld
                 Speaker.volumeMusic = state.volumeMusic
                 Speaker.volumeUI = state.volumeUI
+
+                Keyboard.loadBinds(state.binds)
             }
         }
     }
@@ -403,7 +406,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     fun openSettings() { Screen.addModal(SettingsModal()) }
-    fun openHelp() { Screen.addModal(HelpModal()) }
+    fun openControls() { Screen.addModal(ControlsModal()) }
     fun openCredits() { Screen.addModal(CreditsModal()) }
     fun openInventory(withContainer: Container? = null) { Screen.addModal(InventoryModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }

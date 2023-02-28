@@ -1,7 +1,9 @@
 package ui.input
 
 import com.badlogic.gdx.Input.Keys.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class Keydef(
     val description: String,
     val defaultKey: Int?,
