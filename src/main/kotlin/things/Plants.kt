@@ -3,6 +3,7 @@ package things
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
+import util.hasOneWhere
 
 @Serializable
 sealed class Plant : Scenery(), Temporal {
@@ -22,17 +23,25 @@ sealed class Plant : Scenery(), Temporal {
     open fun fruitTemperatureMin() = 60
     open fun spawnFruitChance() = 0.2f
     open fun fruit(): Thing? = null
+    open fun fruitTag(): Thing.Tag? = null
     open fun nextFruitTurns() = Dice.range(2000, 4000).toLong()
     open fun bearFruit() {
         holder?.also {
             if (it.temperature() >= fruitTemperatureMin()) {
-                fruit()?.also { fruit ->
-                    fruit.moveTo(holder)
+                if (!hasFruit()) {
+                    fruit()?.also { fruit ->
+                        fruit.moveTo(holder)
+                    }
                 }
                 nextFruitTime = App.gameTime.time.toLong() + nextFruitTurns()
             }
         }
     }
+
+    open fun hasFruit(): Boolean =
+        holder?.let {
+            (it.contents().hasOneWhere { it.tag == fruitTag() })
+        } ?: true
 
     override fun onSpawn() {
         if (bearsFruit() && Dice.chance(spawnFruitChance())) {
@@ -158,30 +167,37 @@ class LaceMoss : Plant() {
 }
 
 @Serializable
-class WizardcapMushroom : Plant() {
-    override val tag = Tag.THING_WIZARDCAPMUSHROOM
-    override fun glyph() = Glyph.MUSHROOM
-    override fun name() = "wizardcap mushroom"
-}
-
-@Serializable
-class SpeckledMushroom : Plant() {
-    override val tag = Tag.THING_SPECKLEDMUSHROOM
-    override fun glyph() = Glyph.TOADSTOOLS
-    override fun name() = "speckled mushrooms"
-}
-
-@Serializable
-class BloodcapMushroom : Plant() {
-    override val tag = Tag.THING_BLOODCAPMUSHROOM
-    override fun glyph() = Glyph.TOADSTOOLS
-    override fun hue() = 0.5f
-    override fun name() = "bloodcap mushrooms"
-}
-
-@Serializable
 class Foolsleaf : Plant() {
     override val tag = Tag.THING_FOOLSLEAF
     override fun glyph() = Glyph.SUCCULENT
     override fun name() = "foolsleaf"
+}
+
+@Serializable
+sealed class Mycelium : Plant() {
+    override fun glyph() = Glyph.BLANK
+    override fun isIntangible() = true
+    override fun name() = ""
+    override fun bearsFruit() = true
+}
+
+@Serializable
+class WizardcapMycelium : Mycelium() {
+    override val tag = Tag.THING_WIZARDCAP_MYCELIUM
+    override fun fruit() = WizardcapMushroom()
+    override fun fruitTag() = Tag.THING_WIZARDCAP_MUSHROOM
+}
+
+@Serializable
+class SpeckledMycelium : Mycelium() {
+    override val tag = Tag.THING_SPECKLED_MYCELIUM
+    override fun fruit() = SpeckledMushroom()
+    override fun fruitTag() = Tag.THING_SPECKLED_MUSHROOM
+}
+
+@Serializable
+class BloodcapMycelium : Mycelium() {
+    override val tag = Tag.THING_BLOODCAP_MYCELIUM
+    override fun fruit() = BloodcapMushroom()
+    override fun fruitTag() = Tag.THING_BLOODCAP_MUSHROOM
 }

@@ -119,6 +119,31 @@ class Pear : Food() {
 }
 
 @Serializable
+class WizardcapMushroom : Food() {
+    override val tag = Tag.THING_WIZARDCAP_MUSHROOM
+    override fun name() = "wizardcap mushroom"
+    override fun glyph() = Glyph.MUSHROOM
+    override fun weight() = 0.05f
+}
+
+@Serializable
+class SpeckledMushroom : Food() {
+    override val tag = Tag.THING_SPECKLED_MUSHROOM
+    override fun name() = "speckled mushroom"
+    override fun glyph() = Glyph.TOADSTOOLS
+    override fun weight() = 0.05f
+}
+
+@Serializable
+class BloodcapMushroom : Food() {
+    override val tag = Tag.THING_BLOODCAP_MUSHROOM
+    override fun name() = "bloodcap mushroom"
+    override fun glyph() = Glyph.TOADSTOOLS
+    override fun hue() = 0.5f
+    override fun weight() = 0.05f
+}
+
+@Serializable
 class RawMeat : Rottable() {
     override val tag = Tag.THING_RAWMEAT
     override fun glyph() = Glyph.MEAT

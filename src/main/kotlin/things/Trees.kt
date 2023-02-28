@@ -88,6 +88,7 @@ class AppleTree : Tree() {
     override fun bearsFruit() = true
     override fun spawnFruitChance() = 0.7f
     override fun fruit() = Apple()
+    override fun fruitTag() = Tag.THING_APPLE
 }
 
 @Serializable
@@ -99,6 +100,7 @@ class PearTree: Tree() {
     override fun bearsFruit() = true
     override fun spawnFruitChance() = 0.4f
     override fun fruit() = Pear()
+    override fun fruitTag() = Tag.THING_PEAR
 }
 
 @Serializable
