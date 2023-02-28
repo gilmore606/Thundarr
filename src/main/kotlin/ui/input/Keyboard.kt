@@ -73,6 +73,13 @@ object Keyboard : KtxInputAdapter {
         }
     }
 
+    fun codeForBind(forBind: Keydef): Int {
+        for (bind in binds) {
+            if (bind.value == forBind) return bind.key
+        }
+        return -1
+    }
+
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == -1) return true
         Screen.releaseScrollLatch()
