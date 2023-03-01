@@ -18,7 +18,7 @@ class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
     var selectionY = -1
 
     val header = 80
-    val padding = 20
+    val padding = 24
     val columnWidth = 255
     val lineSpacing = 24
 
@@ -148,10 +148,10 @@ class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
                 val x = padding + ix * columnWidth
                 val y = header + iy * lineSpacing
                 item.header?.also { header ->
-                    drawString(header, x, y + 4, Screen.fontColorDull, Screen.smallFont)
+                    drawString(header, x, y + 3, Screen.fontColorDull, Screen.smallFont)
                 } ?: item.key?.also { key ->
                     val name = keyNames[item.code] ?: "???"
-                    drawString(key.description, x, y, Screen.fontColor, Screen.font)
+                    drawString(key.description, x + 4, y, Screen.fontColor, Screen.font)
                     drawString(name, x + columnWidth - 62, y, Screen.fontColorBold, Screen.font)
                 }
                 iy++
@@ -231,6 +231,7 @@ class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         select()
         return true
     }
