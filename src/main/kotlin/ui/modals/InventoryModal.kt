@@ -188,7 +188,11 @@ class InventoryModal(
 
     override fun onKeyDown(key: Keydef) {
         when (key) {
-            Keydef.OPEN_INV -> dismiss()
+            Keydef.OPEN_INV, Keydef.CANCEL -> dismiss()
+            Keydef.OPEN_GEAR -> replaceWith(GearModal(App.player))
+            Keydef.OPEN_JOURNAL -> replaceWith(JournalModal())
+            Keydef.OPEN_MAP -> replaceWith(MapModal())
+            Keydef.OPEN_SKILLS -> replaceWith(SkillsModal(App.player))
             Keydef.MOVE_W -> {
                 parentModal?.also {
                     returnToParent()
