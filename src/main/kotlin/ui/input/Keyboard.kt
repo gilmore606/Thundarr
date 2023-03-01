@@ -18,7 +18,7 @@ import ui.input.Keydef.*
 
 object Keyboard : KtxInputAdapter {
 
-    val binds = mutableMapOf<Int, Keydef>()
+    var binds = mutableMapOf<Int, Keydef>()
 
     var debugFloat = 0f
     val debugFloatStep = 0.05f
@@ -58,7 +58,12 @@ object Keyboard : KtxInputAdapter {
             }
         }
 
-        // Install default keybinds
+        loadDefaultBinds()
+    }
+
+    fun loadDefaultBinds() {
+        log.info("Installing default keybinds")
+        binds.clear()
         Keydef.values().forEach { keydef ->
             keydef.defaultKey?.also { keycode ->
                 binds[keycode] = keydef
@@ -69,6 +74,7 @@ object Keyboard : KtxInputAdapter {
     fun loadBinds(newBinds: Map<Int, Keydef>) {
         binds.clear()
         newBinds.forEach { entry ->
+            log.info("Loading keybind ${entry.key} for ${entry.value}")
             binds[entry.key] = entry.value
         }
     }
@@ -80,9 +86,24 @@ object Keyboard : KtxInputAdapter {
         return -1
     }
 
+    fun unbind(code: Int) {
+        binds.remove(code)
+    }
+
+    fun bind(code: Int, keyDef: Keydef) {
+        binds.remove(code)
+        binds[code] = keyDef
+    }
+
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == -1) return true
         Screen.releaseScrollLatch()
+        Screen.topModal?.also { modal ->
+            if (modal.receiveRawKeys()) {
+                modal.onRawKeyDown(keycode)
+                return true
+            }
+        }
         if (keycode == ALT_LEFT || keycode == ALT_RIGHT) {
             ALT = true
             modKeyDown = keycode
@@ -201,9 +222,9 @@ object Keyboard : KtxInputAdapter {
                     K -> { App.player.debugMove(SOUTH) }
                     L -> { App.player.debugMove(EAST) }
 
-                    F1 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
-                    F2 -> { Lightbulb().moveTo(groundAtPlayer()) }
-                    F5 -> {
+                    F9 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
+                    F10 -> { Lightbulb().moveTo(groundAtPlayer()) }
+                    F11 -> {
                         App.DEBUG_PANEL = !App.DEBUG_PANEL
                         if (App.DEBUG_PANEL) {
                             Screen.addPanel(DebugPanel)
@@ -212,7 +233,7 @@ object Keyboard : KtxInputAdapter {
                         }
                     }
 
-                    F11 -> { App.openPerlinDebug() }
+                    F12 -> { App.openPerlinDebug() }
 
                     else -> { lastKey = -1 }
                 }

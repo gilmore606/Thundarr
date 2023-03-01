@@ -65,6 +65,9 @@ abstract class Modal(
     open fun moveToSidecar() { sidecar?.also { isInSidecar = true } }
     open fun returnFromSidecar() { isInSidecar = false }
 
+    open fun receiveRawKeys() = false
+    open fun onRawKeyDown(keyCode: Int) { }
+
     override fun myTextBatch() = textBatch
     override fun myBoxBatch() = boxBatch
     override fun myThingBatch() = thingBatch

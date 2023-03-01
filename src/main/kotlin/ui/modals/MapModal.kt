@@ -62,7 +62,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
             Keydef.MOVE_SW -> { mapy++ ; mapx-- }
             Keydef.MOVE_SE -> { mapy++ ; mapx++ }
 
-            Keydef.DEBUG_F5 -> { revealAll = !revealAll }
+            Keydef.DEBUG_F9 -> { revealAll = !revealAll }
 
             else -> { }
         }

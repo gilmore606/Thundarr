@@ -141,7 +141,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         }
     }
 
-    private fun savePrefs() {
+    fun savePrefs() {
         save.putPrefsState(
             PrefsState(
                 zoomIndex = Screen.zoomIndex,

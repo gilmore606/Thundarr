@@ -59,8 +59,8 @@ enum class Keydef(
     SHORTCUT7("Shortcut 7", NUM_7, false, KeydefSection.HIDDEN),
     SHORTCUT8("Shortcut 8", NUM_8, false, KeydefSection.HIDDEN),
     SHORTCUT9("Shortcut 9", NUM_9, false, KeydefSection.HIDDEN),
-    DEBUG_F5("Debug_F5", F5, false, KeydefSection.HIDDEN),
-    DEBUG_F6("Debug_F6", F6, false, KeydefSection.HIDDEN),
-    DEBUG_F7("Debug_F7", F7, false, KeydefSection.HIDDEN),
-    DEBUG_F8("Debug_F8", F8, false, KeydefSection.HIDDEN),
+    DEBUG_F9("Debug_F9", F9, false, KeydefSection.HIDDEN),
+    DEBUG_F10("Debug_F10", F10, false, KeydefSection.HIDDEN),
+    DEBUG_F11("Debug_F11", F11, false, KeydefSection.HIDDEN),
+    DEBUG_F12("Debug_F12", F12, false, KeydefSection.HIDDEN),
 }
