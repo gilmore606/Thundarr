@@ -33,7 +33,10 @@ class ControlsRebindModal(
     override fun receiveRawKeys() = true
 
     override fun onRawKeyDown(keyCode: Int) {
-        if (keyCode == Input.Keys.ESCAPE) parent.abortChild()
+        if (keyCode == Input.Keys.ESCAPE) {
+            parent.abortChild()
+            return
+        }
 
         parent.codeToName(keyCode)?.also { keyName ->
             Keyboard.binds[keyCode]?.also { oldBind ->
