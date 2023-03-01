@@ -16,7 +16,7 @@ class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
     private val options = LinkedHashMap<String, ()->Unit>().apply {
         put("Resume") { }
         put("Settings") { App.openSettings() }
-        put("Help") { App.openHelp() }
+        put("Controls") { App.openControls() }
         put("Save and exit") { App.saveAndReturnToMenu() }
     }
 

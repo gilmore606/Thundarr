@@ -1,6 +1,7 @@
 package world.persist
 
 import kotlinx.serialization.Serializable
+import ui.input.Keydef
 import util.XY
 
 @Serializable
@@ -15,5 +16,6 @@ data class PrefsState(
     val volumeMaster: Double,
     val volumeWorld: Double,
     val volumeMusic: Double,
-    val volumeUI: Double
+    val volumeUI: Double,
+    val binds: Map<Int, Keydef>,
 )
