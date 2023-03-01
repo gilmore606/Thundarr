@@ -1075,7 +1075,7 @@ object Metamap {
                     if (signText == null && nextCell.hasFeature(Village::class)) {
                         signText = (nextCell.featureOf(Village::class)!! as Village).name
                     }
-                    val madeIt = runTrailBetween(cursor, nextPoint, signText)
+                    val madeIt = runTrailBetween(cursor, nextPoint, signText, targets)
                     if (madeIt && Dice.chance(0.9f)) {
                         visited.add(nextPoint)
                         cursor = nextPoint
@@ -1087,7 +1087,7 @@ object Metamap {
         }
     }
 
-    private fun runTrailBetween(origin: XY, target: XY, signText: String?): Boolean {
+    private fun runTrailBetween(origin: XY, target: XY, signText: String?, targets: MutableList<XY>): Boolean {
         if (origin == target) return false
         val targetDistance = manhattanDistance(origin, target)
         var cursor = origin
@@ -1116,6 +1116,9 @@ object Metamap {
                 if (scratches[cursor.x][cursor.y].hasFeature(Rivers::class)) suggestedPlayerStart = origin
 
                 connectTrailExits(cursor, nextCell, signText)
+                if (scratches[cursor.x][cursor.y].trails().size >= 2 || Dice.chance(0.2f)) {
+                    targets.remove(cursor)
+                }
                 if (nextCell == target) return true
                 cursor = nextCell
             }
