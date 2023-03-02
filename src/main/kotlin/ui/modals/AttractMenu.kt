@@ -3,13 +3,14 @@ package ui.modals
 import App
 import render.Screen
 import render.batches.QuadBatch
+import render.batches.UIBatch
 import render.tilesets.UITileSet
 
 class AttractMenu : SelectionModal(280, 230, "- ThUNdARR -", Position.LEFT) {
 
     private val options = LinkedHashMap<String, ()->Unit>()
     companion object {
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = UIBatch()
     }
 
     override fun newBoxBatch() = AttractMenu.boxBatch

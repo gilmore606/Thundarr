@@ -16,10 +16,12 @@ import java.lang.Float.min
 import kotlin.math.abs
 import kotlin.math.sign
 
-class QuadBatch(
+open class QuadBatch(
     val tileSet: TileSet,
     maxQuads: Int = 80000,
 ) : RenderBatch(maxQuads) {
+
+    open val uiScale = false
 
     val startTime = System.currentTimeMillis()
 

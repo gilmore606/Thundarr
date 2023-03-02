@@ -13,10 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.MathUtils.sin
 import ktx.app.KtxScreen
-import render.batches.CloudBatch
-import render.batches.FireBatch
-import render.batches.QuadBatch
-import render.batches.RainBatch
+import render.batches.*
 import render.tilesets.*
 import things.Thing
 import ui.input.Keyboard
@@ -58,6 +55,7 @@ object Screen : KtxScreen {
     private var zoomTarget = 0.75
     private val zoomLevels = listOf(0.25, 0.5, 0.6, 0.75, 0.85, 1.0, 1.3, 1.6, 2.0)
     var zoomIndex = 3.0
+    var uiScale = 2.0f
 
     var width = 0
     var height = 0
@@ -80,8 +78,8 @@ object Screen : KtxScreen {
     val actorBatch = QuadBatch(actorTileSet)
     val gearBatch = QuadBatch(thingTileSet)
     val fireBatch = FireBatch()
-    val uiWorldBatch = QuadBatch(uiTileSet)
-    val uiBatch = QuadBatch(uiTileSet)
+    val uiWorldBatch = UIBatch()
+    val uiBatch = UIBatch()
     val uiThingBatch = QuadBatch(thingTileSet)
     val uiActorBatch = QuadBatch(actorTileSet)
     val uiTerrainBatch = QuadBatch(terrainTileSet)

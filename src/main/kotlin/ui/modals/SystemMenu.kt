@@ -1,12 +1,13 @@
 package ui.modals
 
 import render.batches.QuadBatch
+import render.batches.UIBatch
 import render.tilesets.UITileSet
 
 class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
 
     companion object {
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = UIBatch()
     }
 
     override fun newBoxBatch() = SystemMenu.boxBatch

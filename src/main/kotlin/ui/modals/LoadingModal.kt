@@ -2,6 +2,7 @@ package ui.modals
 
 import render.Screen
 import render.batches.QuadBatch
+import render.batches.UIBatch
 import render.tilesets.UITileSet
 import util.log
 import world.gen.Metamap
@@ -12,7 +13,7 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
     SplashModal(text, forceHeight = if (withProgress) 120 else 60) {
 
     companion object {
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = UIBatch()
     }
     override fun openSound() = null
     override fun closeSound() = null

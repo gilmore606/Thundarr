@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import render.batches.QuadBatch
+import render.batches.UIBatch
 import render.tilesets.UITileSet
 import ui.input.Keyboard
 import ui.input.Keydef
@@ -16,7 +17,7 @@ class ContextMenu(
 ): SelectionModal(0, 0, null, Position.CURSOR, 0) {
 
     companion object {
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = UIBatch()
     }
     override fun openSound() = null
     override fun closeSound() = null

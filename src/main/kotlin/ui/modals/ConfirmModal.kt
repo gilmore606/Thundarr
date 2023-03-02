@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
 import render.batches.QuadBatch
+import render.batches.UIBatch
 import render.tilesets.UITileSet
 import ui.input.Keyboard
 import ui.input.Keydef
@@ -36,7 +37,7 @@ class ConfirmModal(
 
     companion object {
         fun textWidth(text: List<String>): Int = text.maxOf { GlyphLayout(Screen.font, it).width }.toInt()
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = UIBatch()
     }
 
     val yesOffset: Int

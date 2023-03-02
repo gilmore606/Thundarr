@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.batches.QuadBatch
 import render.Screen
+import render.batches.UIBatch
 import render.tilesets.ActorTileSet
 import ui.panels.Panel
 import render.tilesets.Glyph
@@ -43,7 +44,7 @@ abstract class Modal(
     protected val textBatch = SpriteBatch()
     protected val thingBatch: QuadBatch? = newThingBatch()
     protected val actorBatch: QuadBatch? = newActorBatch()
-    protected open fun newBoxBatch(): QuadBatch = QuadBatch(UITileSet(), maxQuads = 1000)
+    protected open fun newBoxBatch() = UIBatch()
     protected open fun newThingBatch(): QuadBatch? = QuadBatch(ThingTileSet(), maxQuads = 1000)
     protected open fun newActorBatch(): QuadBatch? = QuadBatch(ActorTileSet(), maxQuads = 1000)
 
