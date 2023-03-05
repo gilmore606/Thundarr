@@ -33,7 +33,6 @@ object Toolbar : Panel() {
                 }
             }
             if (nextThing == null) {
-                thingTag = null
                 text = null
             }
         }

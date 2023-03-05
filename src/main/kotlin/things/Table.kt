@@ -2,11 +2,13 @@ package things
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.LightColor
+import util.hasOneWhere
 import util.safeForEach
 import java.lang.Integer.max
 
 @Serializable
-class Table : Container(), Smashable {
+class Table : Container(), Smashable, LightSource {
 
     override fun isPortable() = false
     override fun isBlocking() = true
@@ -42,6 +44,36 @@ class Table : Container(), Smashable {
     private fun emptySelf(dest: ThingHolder?) {
         contents().safeForEach { thing ->
             thing.moveTo(dest)
+        }
+    }
+
+    override fun light(): LightColor? {
+        var light: LightColor? = null
+        contents.forEach { thing ->
+            if (thing is LightSource) {
+                val thingLight = thing.light()
+                if (thingLight != null) {
+                    if (light == null) light = LightColor(0f,0f,0f)
+                    light!!.r += thingLight.r
+                    light!!.g += thingLight.g
+                    light!!.b += thingLight.b
+                }
+            }
+        }
+        return light
+    }
+
+    override fun onAdd(thing: Thing) {
+        if (thing is LightSource) {
+            level?.addLightSource(xy()!!.x, xy()!!.y, this)
+        }
+    }
+
+    override fun onRemove(thing: Thing) {
+        if (thing is LightSource) {
+            if (!this.contents.hasOneWhere { it is LightSource }) {
+                level?.removeLightSource(this)
+            }
         }
     }
 }

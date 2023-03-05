@@ -223,7 +223,7 @@ object Keyboard : KtxInputAdapter {
                     L -> { App.player.debugMove(EAST) }
 
                     F9 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
-                    F10 -> { Lightbulb().moveTo(groundAtPlayer()) }
+                    F10 -> { Sunsword().moveTo(groundAtPlayer()) }
                     F11 -> {
                         App.DEBUG_PANEL = !App.DEBUG_PANEL
                         if (App.DEBUG_PANEL) {

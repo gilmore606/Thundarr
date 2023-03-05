@@ -23,7 +23,7 @@ class Caves : Feature(
                 && meta.biome in listOf(Mountain, Hill, ForestHill, Desert)
     }
 
-    private val cavePortalChance = 0.5f
+    private val cavePortalChance = 0.15f
     private val cavePortalPoints = ArrayList<XY>()
 
     var hasCavern = false
