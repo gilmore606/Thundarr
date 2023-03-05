@@ -226,6 +226,7 @@ sealed class Thing() : Entity {
     fun moveTo(x: Int, y: Int) = moveTo(level()?.cellContainerAt(x, y) ?: throw RuntimeException("moved $this to local coords but it wasn't in a level!"))
     fun moveTo(level: Level, x: Int, y: Int) = moveTo(level.cellContainerAt(x, y))
 
+    open fun onDropping(actor: Actor, dest: ThingHolder) { }
     open fun onMoveTo(from: ThingHolder?, to: ThingHolder?) { }
 
     // Move speed penalty to walk past/through this thing on the ground

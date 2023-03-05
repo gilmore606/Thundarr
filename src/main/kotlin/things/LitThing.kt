@@ -143,36 +143,6 @@ class Glowstone : LitThing() {
 }
 
 @Serializable
-class Sunsword : LitThing() {
-    override val tag = Tag.THING_SUNSWORD
-    override fun glyph() = if (active) Glyph.HILT_LIT else Glyph.HILT
-    override fun name() = "sunsword"
-    override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
-    override val lightColor = LightColor(0.1f, 0.25f, 0.3f)
-
-    override fun toolbarName() = "switch sunsword"
-    override fun toolbarUseTag() = UseTag.SWITCH
-
-    override fun light() = if (active) lightColor else null
-
-    override fun onCreate() { active = false }
-
-    override fun uses() = mapOf(
-        UseTag.SWITCH to Use("switch " + (if (active) "off" else "on"), 0.2f,
-            canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) },
-            toDo = { actor, level, x, y ->
-                if (active) {
-                    becomeDark()
-                    Console.sayAct("The shimmering blade vanishes.", "%Dn's sunsword turns off.", actor)
-                } else {
-                    becomeLit()
-                    Console.sayAct("A shimmering blade emerges from the sunsword's hilt.", "%Dn's sunsword turns on.", actor)
-                }
-            })
-    )
-}
-
-@Serializable
 class Torch : LitThing(), Temporal {
     override val tag = Tag.THING_TORCH
     private var fuel = 2000f

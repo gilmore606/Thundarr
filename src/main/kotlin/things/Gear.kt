@@ -50,6 +50,14 @@ sealed class Gear : Portable(), StatEffector {
     )
     override fun listTag() = if (equipped) "(equipped)" else ""
 
+    override fun onDropping(actor: Actor, dest: ThingHolder) {
+        this.equipped = false
+        if (actor.gear[slot] == this) {
+            actor.setGearSlot(slot, null)
+        }
+        this.onUnequip(actor)
+    }
+
     override fun onMoveTo(from: ThingHolder?, to: ThingHolder?) {
         this.equipped = false
         if (from is Actor && from != to && from.gear[slot] == this) {

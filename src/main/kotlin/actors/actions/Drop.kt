@@ -14,6 +14,7 @@ class Drop(
     override fun name() = "drop things"
 
     override fun execute(actor: Actor, level: Level) {
+        thing.onDropping(actor, dest)
         thing.moveTo(dest)
 
         if (dest is Container) {

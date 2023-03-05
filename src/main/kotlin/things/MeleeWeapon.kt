@@ -7,6 +7,7 @@ import actors.stats.skills.Fight
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.LightColor
 import world.terrains.Terrain
 
 @Serializable
@@ -95,4 +96,25 @@ class Pickaxe : MeleeWeapon() {
     override fun speed() = 1.3f
     override fun accuracy() = -2f
     override fun damage() = 4f
+}
+
+@Serializable
+class Sunsword : MeleeWeapon(), LightSource {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+        val lightColor = LightColor(0.1f, 0.3f, 0.3f)
+    }
+    override val tag = Tag.THING_SUNSWORD
+    override fun glyph() = if (equipped) Glyph.SUNSWORD_LIT else Glyph.SUNSWORD
+    override fun glyphTransform() = glyphTransform
+    override fun name() = "sunsword"
+    override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
+    override fun light() = if (equipped) lightColor else null
+    override fun onEquip(actor: Actor) {
+        actor.level?.addLightSource(actor.xy.x, actor.xy.y, actor)
+    }
+
+    override fun onUnequip(actor: Actor) {
+        actor.level?.removeLightSource(actor)
+    }
 }
