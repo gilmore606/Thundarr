@@ -28,7 +28,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.4.0'
 
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:$gdxVersion"

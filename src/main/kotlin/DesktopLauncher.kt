@@ -1,14 +1,14 @@
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import com.badlogic.gdx.graphics.glutils.HdpiMode
 
 object DesktopLauncher {
     @JvmStatic
     fun main(args: Array<String>) {
-        val config = LwjglApplicationConfiguration().apply {
-            title = "Thundarr"
-            width = 1600
-            height = 1000
+        val config = Lwjgl3ApplicationConfiguration().apply {
+            setTitle("Thundarr")
+            setHdpiMode(HdpiMode.Logical)
         }
-        LwjglApplication(App, config)
+        Lwjgl3Application(App, config)
     }
 }
