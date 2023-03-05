@@ -267,4 +267,6 @@ class Village(
     }
 
     override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE
+    override fun mapPOITitle() = name
+    override fun mapPOIDescription() = "The free human village of $name."
 }

@@ -1,8 +1,11 @@
 package world
 
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import util.XY
+import world.gen.Metamap
 import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
@@ -28,12 +31,11 @@ class ChunkMeta(
     var mapped: Boolean = false
 ) {
 
-    var mappedAt = 0.0
+    var mappedTime = 0.0
     val mapIcons = mutableListOf<Glyph>()
     fun mapPOITitle(): String? = features.firstNotNullOfOrNull { it.mapPOITitle() }
     fun mapPOIDescription(): String? = features.firstNotNullOfOrNull { it.mapPOIDescription() }
-    fun mapPOIDiscoveryTime(): Double = mappedAt
-
+    fun mapPOIDiscoveryTime(): Double = mappedTime
 
     fun regenerateMapIcons() {
         mapIcons.clear()

@@ -15,5 +15,6 @@ class RuinedCitySite(
     }
 
     override fun mapIcon(): Glyph? = Glyph.MAP_CITY
-
+    override fun mapPOITitle() = name
+    override fun mapPOIDescription() = "The ruins of the fabled lost city of $name."
 }

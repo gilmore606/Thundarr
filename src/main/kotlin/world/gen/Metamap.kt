@@ -13,7 +13,6 @@ import world.gen.biomes.*
 import world.gen.biomes.Blank
 import world.gen.features.*
 import world.gen.habitats.*
-import world.journal.GameTime
 import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -22,7 +21,7 @@ import java.lang.Math.abs
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
-    private const val progressBarSegments = 13
+    private const val progressBarSegments = 14
 
     private const val chunkRadius = 100
 
@@ -95,11 +94,19 @@ object Metamap {
             val meta = metaCache[cx][cy]
             if (!meta.mapped) {
                 meta.mapped = true
-                meta.mappedAt = App.gameTime.time
-                metaCache[cx][cy] = meta
-                coroutineScope.launch {
-                    App.save.updateWorldMeta(meta)
-                }
+                update(meta)
+            }
+        }
+    }
+
+    fun update(meta: ChunkMeta) {
+        val cx = chunkXtoX(meta.x)
+        val cy = chunkYtoY(meta.y)
+        if (boundsCheck(cx,cy)) {
+            meta.regenerateMapIcons()
+            metaCache[cx][cy] = meta
+            coroutineScope.launch {
+                App.save.updateWorldMeta(meta)
             }
         }
     }
