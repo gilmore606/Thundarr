@@ -450,14 +450,14 @@ object Madlib {
             "comet", "moon", "demon", "motor", "trucker", "kill", "dismal", "dubya", "yeezy", "prince", "beggar",
             "hobo", "bum", "drifter", "booze"
         )
-        val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend",
+        val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend", "dell",
             "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead", "vale", "point", "sted", "ston",
             " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend", " Fork", " Mill", " Grove",
             "land", "stein", "ward", "gard", "'s Folly", "'s End"
         )
 
         var name = pre.random() + post.random()
-        if (Dice.chance(0.1f)) name = listOf("North", "East", "South", "West", "New", "Old").random() + " " + name
+        if (Dice.chance(0.1f)) name = listOf("North", "East", "South", "West", "New", "Old").random() + " " + name.capitalize()
 
         return name.capitalize()
     }

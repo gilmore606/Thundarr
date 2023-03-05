@@ -762,8 +762,9 @@ object Metamap {
                                 val placedDirs = mutableSetOf<XY>()
                                 // Place features around village
                                 Village.neighborFeatures.forEach { neighborData ->
+                                    var placedFeature = false
                                     DIRECTIONS.from(x, y) { dx, dy, dir ->
-                                        if (dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
+                                        if (!placedFeature && dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
                                             && neighborData.second.invoke(
                                                 scratches[dx][dy], village
                                             )) {
@@ -775,11 +776,12 @@ object Metamap {
                                             neighbor.features.add(feature)
                                             neighbor.removeFeature(RuinedBuildings::class)
                                             placedDirs.add(dir)
+                                            placedFeature = true
                                         }
                                     }
                                 }
-                                //suggestedPlayerStart.x = xToChunkX(x)
-                                //suggestedPlayerStart.y = yToChunkY(y)
+                                suggestedPlayerStart.x = xToChunkX(x)
+                                suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -1121,8 +1123,6 @@ object Metamap {
                 val dir = moveDir ?: possDirs.random()
                 val nextCell = cursor + dir
                 if (scratches[nextCell.x][nextCell.y].hasFeature(Trails::class)) done = true
-
-                if (scratches[cursor.x][cursor.y].hasFeature(Rivers::class)) suggestedPlayerStart = origin
 
                 connectTrailExits(cursor, nextCell, signText)
                 if (scratches[cursor.x][cursor.y].trails().size >= 2 || Dice.chance(0.2f)) {

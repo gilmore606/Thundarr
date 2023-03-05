@@ -33,7 +33,7 @@ class Village(
                          }, { isAbandoned, dir ->
                 Farm(isAbandoned)
             }),
-            Triple(0.4f, { meta, village ->
+            Triple(0.3f, { meta, village ->
                 Graveyard.canBuildOn(meta)
                          }, { isAbandoned, dir ->
                 Graveyard(isAbandoned)

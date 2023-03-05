@@ -180,3 +180,12 @@ class Barn : Decor() {
 
     }
 }
+
+@Serializable
+class Tavern : Decor() {
+    override fun description() = "A roadside inn."
+    override fun abandonedDescription() = "An abandoned inn."
+    override fun doFurnish() {
+
+    }
+}
