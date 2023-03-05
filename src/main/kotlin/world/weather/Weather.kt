@@ -6,6 +6,7 @@ import ui.panels.Console
 import util.Dice
 import util.LightColor
 import util.isEveryFrame
+import world.Chunk
 import world.level.Level
 import java.lang.Float.max
 import java.lang.Float.min
@@ -15,7 +16,7 @@ import kotlin.math.sin
 @Serializable
 class Weather {
 
-    val overallRaininess = 0f   // 0.4f
+    val overallRaininess = 0.3f   // 0.4f
 
     var weatherIntensity = 0f
     var windX = 0f
@@ -139,7 +140,9 @@ class Weather {
                 }
             }
         }
-        if (m.isNotEmpty() && App.player.level == level) Console.say(m)
+        if (m.isNotEmpty() && App.player.level == level &&
+            level.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
+            Console.say(m)
     }
 
 }
