@@ -14,7 +14,7 @@ import world.terrains.Terrain
 @Serializable
 class Farm(
     private val isAbandoned: Boolean = false
-) : ChunkFeature(
+) : Feature(
     3, Stage.BUILD
 ) {
 

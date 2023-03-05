@@ -16,7 +16,7 @@ class ContextMenu(
 ): SelectionModal(0, 0, null, Position.CURSOR, 0) {
 
     companion object {
-        val boxBatch = QuadBatch(UITileSet())
+        val boxBatch = QuadBatch(Screen.uiTileSet)
     }
     override fun openSound() = null
     override fun closeSound() = null

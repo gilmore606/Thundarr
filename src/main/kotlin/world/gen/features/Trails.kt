@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import things.TrailSign
 import util.*
 import world.ChunkScratch
@@ -11,12 +12,11 @@ import world.gen.biomes.Suburb
 import world.gen.cartos.WorldCarto
 import world.path.DistanceMap
 import world.terrains.Terrain
-import java.time.Year
 
 @Serializable
 class Trails(
     val exits: MutableList<TrailExit>
-) : ChunkFeature(
+) : Feature(
     5, Stage.BUILD
 ) {
     companion object {
@@ -143,6 +143,38 @@ class Trails(
                     }
                 }
             }
+        }
+    }
+
+    override fun mapIcon(): Glyph? {
+        if (exits.isEmpty()) return null
+        var isNorth = false
+        var isSouth = false
+        var isEast = false
+        var isWest = false
+        exits.forEach { exit ->
+            when (exit.edge) {
+                NORTH -> isNorth = true
+                SOUTH -> isSouth = true
+                WEST -> isWest = true
+                EAST -> isEast = true
+            }
+        }
+        return when {
+            isNorth && isSouth && isWest && isEast -> Glyph.MAP_TRAIL_NSEW
+            isNorth && isSouth && isWest -> Glyph.MAP_TRAIL_NSW
+            isNorth && isSouth && isEast -> Glyph.MAP_TRAIL_NSE
+            isWest && isEast && isSouth -> Glyph.MAP_TRAIL_WES
+            isWest && isEast && isNorth -> Glyph.MAP_TRAIL_NWE
+            isNorth && isSouth -> Glyph.MAP_TRAIL_NS
+            isWest && isEast -> Glyph.MAP_TRAIL_WE
+            isNorth && isWest -> Glyph.MAP_TRAIL_WN
+            isSouth && isWest -> Glyph.MAP_TRAIL_WS
+            isSouth && isEast -> Glyph.MAP_TRAIL_SE
+            isNorth && isEast -> Glyph.MAP_TRAIL_NE
+            isNorth || isSouth -> Glyph.MAP_TRAIL_NS
+            isWest || isEast -> Glyph.MAP_TRAIL_WE
+            else -> Glyph.MAP_TRAIL_SE
         }
     }
 }

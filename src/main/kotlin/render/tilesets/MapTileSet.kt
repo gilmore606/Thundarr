@@ -64,4 +64,5 @@ fun MapTileSet() =
         setTile(Glyph.MAP_PLAYER, SimpleTile(this, 3, 3))
         setTile(Glyph.MAP_CITY, SimpleTile(this, 4, 1))
         setTile(Glyph.MAP_VILLAGE, SimpleTile(this, 0, 6))
+        setTile(Glyph.MAP_CAVE, SimpleTile(this, 0, 7))
     }

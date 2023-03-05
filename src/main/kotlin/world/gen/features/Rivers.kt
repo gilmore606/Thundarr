@@ -2,6 +2,7 @@ package world.gen.features
 
 import audio.Speaker
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.*
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
@@ -11,7 +12,7 @@ import world.terrains.Terrain
 @Serializable
 class Rivers(
     val exits: MutableList<RiverExit>,
-) : ChunkFeature(
+) : Feature(
     4, Stage.TERRAIN
 ) {
 
@@ -174,6 +175,37 @@ class Rivers(
                     }
                 }
             }
+        }
+    }
+
+    override fun mapIcon(): Glyph? {
+        if (exits.isEmpty()) return null
+        var isNorth = false
+        var isSouth = false
+        var isEast = false
+        var isWest = false
+        exits.forEach { exit ->
+            when (exit.edge) {
+                NORTH -> isNorth = true
+                SOUTH -> isSouth = true
+                WEST -> isWest = true
+                EAST -> isEast = true
+            }
+        }
+        return when {
+            isNorth && isSouth && isWest -> Glyph.MAP_RIVER_NSW
+            isNorth && isSouth && isEast -> Glyph.MAP_RIVER_NSE
+            isWest && isEast && isSouth -> Glyph.MAP_RIVER_WES
+            isWest && isEast && isNorth -> Glyph.MAP_RIVER_NWE
+            isNorth && isSouth -> Glyph.MAP_RIVER_NS
+            isWest && isEast -> Glyph.MAP_RIVER_WE
+            isNorth && isWest -> Glyph.MAP_RIVER_WN
+            isSouth && isWest -> Glyph.MAP_RIVER_WS
+            isSouth && isEast -> Glyph.MAP_RIVER_SE
+            isNorth && isEast -> Glyph.MAP_RIVER_NE
+            isNorth || isSouth -> Glyph.MAP_RIVER_NS
+            isWest || isEast -> Glyph.MAP_RIVER_WE
+            else -> Glyph.MAP_RIVER_SE
         }
     }
 }

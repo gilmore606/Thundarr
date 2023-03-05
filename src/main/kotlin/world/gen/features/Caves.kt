@@ -1,11 +1,13 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import things.Glowstone
 import util.*
 import world.Chunk
 import world.ChunkScratch
 import world.NaturalCavern
+import world.gen.Metamap
 import world.gen.biomes.Desert
 import world.gen.biomes.ForestHill
 import world.gen.biomes.Hill
@@ -13,7 +15,7 @@ import world.gen.biomes.Mountain
 import world.terrains.Terrain
 
 @Serializable
-class Caves : ChunkFeature(
+class Caves : Feature(
     4, Stage.BUILD
 ) {
     companion object {
@@ -23,6 +25,8 @@ class Caves : ChunkFeature(
 
     private val cavePortalChance = 0.5f
     private val cavePortalPoints = ArrayList<XY>()
+
+    var hasCavern = false
 
     override fun trailDestinationChance() = 0.7f
 
@@ -91,5 +95,11 @@ class Caves : ChunkFeature(
             if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)
         }
         carto.connectBuilding(NaturalCavern().at(doorPos.x, doorPos.y).facing(facings.random()))
+        hasCavern = true
+        Metamap.update(meta)
     }
+
+    override fun mapIcon() = if (hasCavern) Glyph.MAP_CAVE else null
+    override fun mapPOITitle() = if (hasCavern) "cavern" else null
+    override fun mapPOIDescription() = if (hasCavern) "An underground cave system." else null
 }

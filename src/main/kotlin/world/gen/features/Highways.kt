@@ -1,6 +1,7 @@
 package world.gen.features
 
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import things.HighwaySign
 import things.WreckedCar
 import util.*
@@ -13,7 +14,7 @@ import world.terrains.Terrain
 @Serializable
 class Highways(
     val exits: MutableList<HighwayExit>,
-) : ChunkFeature(
+) : Feature(
     5, Stage.TERRAIN
 ) {
 
@@ -87,6 +88,38 @@ class Highways(
             } else if (!isVertical && x == signOffset) {
                 spawnThing(x0 + x, y0 + y + signSide, HighwaySign(signText))
             }
+        }
+    }
+
+    override fun mapIcon(): Glyph? {
+        if (exits.isEmpty()) return null
+        var isNorth = false
+        var isSouth = false
+        var isEast = false
+        var isWest = false
+        exits.forEach { exit ->
+            when (exit.edge) {
+                NORTH -> isNorth = true
+                SOUTH -> isSouth = true
+                WEST -> isWest = true
+                EAST -> isEast = true
+            }
+        }
+        return when {
+            isNorth && isSouth && isWest && isEast -> Glyph.MAP_ROAD_NSEW
+            isNorth && isSouth && isWest -> Glyph.MAP_ROAD_NSW
+            isNorth && isSouth && isEast -> Glyph.MAP_ROAD_NSE
+            isWest && isEast && isSouth -> Glyph.MAP_ROAD_WES
+            isWest && isEast && isNorth -> Glyph.MAP_ROAD_NWE
+            isNorth && isSouth -> Glyph.MAP_ROAD_NS
+            isWest && isEast -> Glyph.MAP_ROAD_WE
+            isNorth && isWest -> Glyph.MAP_ROAD_WN
+            isSouth && isWest -> Glyph.MAP_ROAD_WS
+            isSouth && isEast -> Glyph.MAP_ROAD_SE
+            isNorth && isEast -> Glyph.MAP_ROAD_NE
+            isNorth || isSouth -> Glyph.MAP_ROAD_NS
+            isWest || isEast -> Glyph.MAP_ROAD_WE
+            else -> Glyph.MAP_ROAD_SE
         }
     }
 }

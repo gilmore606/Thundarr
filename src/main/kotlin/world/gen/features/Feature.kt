@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import things.Thing
 import things.WoodDoor
 import util.*
@@ -14,7 +15,7 @@ import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
 
 @Serializable
-sealed class ChunkFeature(
+sealed class Feature(
     val order: Int,
     val stage: Stage,
 ) {
@@ -50,6 +51,10 @@ sealed class ChunkFeature(
     abstract fun doDig()
 
     open fun cellTitle(): String? = null
+
+    open fun mapIcon(): Glyph? = null
+    open fun mapPOITitle(): String? = null
+    open fun mapPOIDescription(): String? = null
 
     open fun trailDestinationChance() = 0.0f
 

@@ -21,7 +21,7 @@ import java.lang.Math.abs
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
-    private const val progressBarSegments = 13
+    private const val progressBarSegments = 14
 
     private const val chunkRadius = 100
 
@@ -94,10 +94,19 @@ object Metamap {
             val meta = metaCache[cx][cy]
             if (!meta.mapped) {
                 meta.mapped = true
-                metaCache[cx][cy] = meta
-                coroutineScope.launch {
-                    App.save.updateWorldMeta(meta)
-                }
+                update(meta)
+            }
+        }
+    }
+
+    fun update(meta: ChunkMeta) {
+        val cx = chunkXtoX(meta.x)
+        val cy = chunkYtoY(meta.y)
+        if (boundsCheck(cx,cy)) {
+            meta.regenerateMapIcons()
+            metaCache[cx][cy] = meta
+            coroutineScope.launch {
+                App.save.updateWorldMeta(meta)
             }
         }
     }

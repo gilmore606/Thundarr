@@ -12,7 +12,7 @@ import world.terrains.Terrain
 @Serializable
 class Graveyard(
     private val isAbandoned: Boolean = false
-) : ChunkFeature(
+) : Feature(
     3, Stage.BUILD
 ) {
 

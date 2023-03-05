@@ -74,7 +74,6 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
-    val mapTileSet = MapTileSet()
     val terrainBatch = QuadBatch(terrainTileSet)
     val thingBatch = QuadBatch(thingTileSet)
     val actorBatch = QuadBatch(actorTileSet)
@@ -87,7 +86,6 @@ object Screen : KtxScreen {
     val uiTerrainBatch = QuadBatch(terrainTileSet)
     val cloudBatch = CloudBatch()
     val rainBatch = RainBatch()
-    val mapBatch = QuadBatch(mapTileSet)
     private val worldBatches = listOf(terrainBatch, thingBatch,  actorBatch, gearBatch, uiWorldBatch)
     private val allBatches = listOf(terrainBatch, thingBatch, actorBatch, gearBatch, fireBatch,
         uiWorldBatch, uiBatch, uiThingBatch, uiActorBatch, uiTerrainBatch, cloudBatch, rainBatch)
@@ -644,7 +642,6 @@ object Screen : KtxScreen {
         Gdx.gl.glEnable(GL_BLEND)
 
         allBatches.forEach { it.clear() }
-        mapBatch.clear()
 
         if (App.DEBUG_PERLIN != null) {
             App.DEBUG_PERLIN!!.forEachCellToRender(
@@ -682,9 +679,6 @@ object Screen : KtxScreen {
                 panel.renderBackground()
                 panel.renderEntities()
             }
-            if (panel is MapModal) {
-                panel.renderMap(mapBatch)
-            }
         }
 
         // Calculate our render time before hitting the GPU
@@ -694,7 +688,9 @@ object Screen : KtxScreen {
         lastDrawTimes.forEach { drawTime += it }
         drawTime /= 10
 
-        allBatches.forEach { it.draw() }
+        allBatches.forEach {
+            it.draw()
+        }
 
         textBatch.apply {
             projectionMatrix = textCamera.combined
@@ -714,9 +710,6 @@ object Screen : KtxScreen {
             }
         }
 
-        Gdx.gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        Gdx.gl.glEnable(GL_BLEND)
-        mapBatch.draw()
     }
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
