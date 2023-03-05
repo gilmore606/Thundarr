@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.HighwaySign
 import util.Dice
 import util.XY
 import world.ChunkScratch
@@ -36,7 +37,11 @@ class Tavern(
         repeat(3) { fuzzTerrain(Terrain.Type.TEMP1, 0.4f) }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.bareTerrain(x, y))
 
-        buildHut(x-x0, y-y0, width, height, 0.3f, hasWindows = true) { rooms ->
+        buildHut(x-x0, y-y0, width, height, 0.3f, hasWindows = true, splittable = false,
+            buildByOutsideDoor = { x, y ->
+                spawnThing(x, y, HighwaySign(name))
+            }
+        ) { rooms ->
             Tavern().furnish(rooms[0], carto)
         }
     }

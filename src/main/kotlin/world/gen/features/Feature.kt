@@ -138,6 +138,7 @@ sealed class Feature(
     protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
                            forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
                            hasWindows: Boolean = true, forceFloor: Terrain.Type? = null, forceWall: Terrain.Type? = null,
+                           buildByOutsideDoor: ((x: Int, y: Int)->Unit)? = null,
                            forRooms: ((List<Decor.Room>)->Unit)) {
         carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width - 1, y0 + y + height - 1)
         val villagePlantSpawns = gardenPlantSpawns()
@@ -268,6 +269,9 @@ sealed class Feature(
             if (Dice.chance(0.3f)) Terrain.Type.TERRAIN_STONEFLOOR else dirtType)
         if (!isAbandoned || Dice.chance(0.3f)) safeSetTerrain(x0 + doorx + doorDir.x*2, y0 + doory + doorDir.y * 2, dirtType)
         if (!isAbandoned) flagsAt(x0 + doorx + doorDir.x, y0 + doory + doorDir.y).add(WorldCarto.CellFlag.NO_PLANTS)
+        buildByOutsideDoor?.also {
+            it.invoke(x0 + doorx + doorDir.x*2 - doorDir.y, y0 + doory + doorDir.y*2 - doorDir.x)
+        }
         // Grow plants in yard
         val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->

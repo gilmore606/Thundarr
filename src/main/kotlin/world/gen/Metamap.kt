@@ -777,6 +777,7 @@ object Metamap {
                                             neighbor.removeFeature(RuinedBuildings::class)
                                             placedDirs.add(dir)
                                             placedFeature = true
+                                            runTrailBetween(XY(x, y), XY(dx, dy), null, mutableListOf())
                                         }
                                     }
                                 }
