@@ -5,7 +5,7 @@ import util.*
 import world.*
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
-import world.gen.features.ChunkFeature
+import world.gen.features.Feature
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.terrains.Terrain
@@ -48,10 +48,10 @@ class WorldCarto(
 
             buildBiomeBlendMap()
             carveBlendedTerrain()
-            digFeatures(ChunkFeature.Stage.TERRAIN)
+            digFeatures(Feature.Stage.TERRAIN)
 
             meta.biome.carveExtraTerrain(this)
-            digFeatures(ChunkFeature.Stage.BUILD)
+            digFeatures(Feature.Stage.BUILD)
             if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
 
             // Populate!
@@ -70,7 +70,7 @@ class WorldCarto(
         //debugBorders()
     }
 
-    private fun digFeatures(stage: ChunkFeature.Stage) {
+    private fun digFeatures(stage: Feature.Stage) {
         meta.features.filter { it.stage == stage }.sortedBy { it.order }.forEach { feature ->
             feature.dig(this)
         }

@@ -15,7 +15,7 @@ import world.terrains.Terrain
 @Serializable
 class RuinedBuildings(
     val buildingCount: Int,
-) : ChunkFeature(
+) : Feature(
     1, Stage.BUILD
 ) {
     companion object {

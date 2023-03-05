@@ -8,7 +8,7 @@ import util.hasOneWhere
 import world.terrains.Terrain
 
 @Serializable
-class Volcano : ChunkFeature(
+class Volcano : Feature(
     2, Stage.BUILD
 ) {
 

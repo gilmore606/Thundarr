@@ -13,7 +13,7 @@ import world.gen.biomes.Mountain
 import world.terrains.Terrain
 
 @Serializable
-class Caves : ChunkFeature(
+class Caves : Feature(
     4, Stage.BUILD
 ) {
     companion object {

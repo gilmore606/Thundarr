@@ -13,6 +13,7 @@ import world.gen.biomes.*
 import world.gen.biomes.Blank
 import world.gen.features.*
 import world.gen.habitats.*
+import world.journal.GameTime
 import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -94,6 +95,7 @@ object Metamap {
             val meta = metaCache[cx][cy]
             if (!meta.mapped) {
                 meta.mapped = true
+                meta.mappedAt = App.gameTime.time
                 metaCache[cx][cy] = meta
                 coroutineScope.launch {
                     App.save.updateWorldMeta(meta)
