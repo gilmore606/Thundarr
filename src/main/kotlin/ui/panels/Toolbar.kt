@@ -17,6 +17,7 @@ object Toolbar : Panel() {
         ) {
         var nextThing: Thing? = null
         var text: String? = null
+        var count: Int = 0
         var size = 36.0
         var targetSize = 36.0
         val growSpeed = 260.0
@@ -26,14 +27,14 @@ object Toolbar : Panel() {
         }
         fun updateNextThing() {
             nextThing = null
+            count = 0
+            text = null
             App.player.contents.forEach {
                 if (it.tag == thingTag) {
                     nextThing = it
                     text = it.toolbarName()
+                    count++
                 }
-            }
-            if (nextThing == null) {
-                text = null
             }
         }
     }
@@ -92,7 +93,7 @@ object Toolbar : Panel() {
             if (n == hovered) {
                 val text = if (inSelectMode()) (Screen.topModal as ToolbarAddModal).sampleText else buttons[n].text
                 text?.also { text ->
-                    drawString(text, cx + (iconSize / 2) - (measure(text, Screen.smallFont) / 2), cy + (iconSize / 2) + 64,
+                    drawString(text + if (button.count > 1) " (${button.count})" else "", cx + (iconSize / 2) - (measure(text, Screen.smallFont) / 2), cy + (iconSize / 2) + 64,
                     if (inSelectMode()) Screen.fontColorBold else Screen.fontColor, Screen.smallFont)
                 }
             }
