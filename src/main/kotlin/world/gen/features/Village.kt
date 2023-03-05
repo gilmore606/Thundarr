@@ -103,38 +103,43 @@ class Village(
     }
 
     private fun layoutVillageVert() {
+        var huts = 0
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
         val xMidRight = xMid + Dice.oneTo(3)
         var cursorY= 32
-        while (cursorY > 14) {
+        while (cursorY > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY - height, width, height, fertility, EAST)
+            huts++
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49) {
+        while (cursorY < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY, width, height, fertility, EAST)
+            huts++
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         cursorY = 32
-        while (cursorY > 14) {
+        while (cursorY > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight + 1, cursorY - height, width, height, fertility, WEST)
+            huts++
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49) {
+        while (cursorY < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight + 1, cursorY, width, height, fertility, WEST)
+            huts++
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
@@ -145,38 +150,43 @@ class Village(
     }
 
     private fun layoutVillageHoriz() {
+        var huts = 0
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
         val yMidBottom = yMid + Dice.oneTo(3)
         var cursorX = 32
-        while (cursorX > 14) {
+        while (cursorX > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidTop - height, width, height, fertility, SOUTH)
+            huts++
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49) {
+        while (cursorX < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidTop - height, width, height, fertility, SOUTH)
+            huts++
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         cursorX = 32
-        while (cursorX > 14) {
+        while (cursorX > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidBottom, width, height, fertility, NORTH)
+            huts++
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49) {
+        while (cursorX < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidBottom, width, height, fertility, NORTH)
+            huts++
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
@@ -221,7 +231,7 @@ class Village(
         while (built < hutCount) {
             var tries = 0
             var placed = false
-            while (tries < 1200 && !placed) {
+            while (tries < 2000 && !placed) {
                 val x = Dice.range(3, 63 - width)
                 val y = Dice.range(3, 63 - height)
                 var clearHere = true
