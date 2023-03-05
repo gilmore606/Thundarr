@@ -229,6 +229,8 @@ enum class Glyph {
     MAP_PLAYER,
     MAP_CITY,
     MAP_VILLAGE,
+    MAP_CAVE,
+    MAP_BUILDING,
     MAP_ROAD_NSE,
     MAP_ROAD_NSW,
     MAP_ROAD_NWE,

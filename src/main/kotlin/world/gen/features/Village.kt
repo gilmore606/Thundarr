@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import things.*
 import util.*
 import world.ChunkScratch
@@ -9,7 +10,6 @@ import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.gen.gardenPlantSpawns
 import world.path.DistanceMap
 import world.terrains.Terrain
 
@@ -18,7 +18,7 @@ class Village(
     val name: String,
     val isAbandoned: Boolean = false,
     val size: Int,
-) : ChunkFeature(
+) : Feature(
     3, Stage.BUILD
 ) {
     companion object {
@@ -26,7 +26,7 @@ class Village(
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
                 && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
 
-        val neighborFeatures = listOf<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->ChunkFeature>>(
+        val neighborFeatures = listOf<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->Feature>>(
 
             Triple(0.6f, { meta, village ->
                 Farm.canBuildOn(meta)
@@ -279,4 +279,8 @@ class Village(
         }
         room.furnish(Decor.Room(Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2), listOf()), carto)
     }
+
+    override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE
+    override fun mapPOITitle() = name
+    override fun mapPOIDescription() = "The free human village of $name."
 }

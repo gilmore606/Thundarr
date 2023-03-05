@@ -214,7 +214,7 @@ class InventoryModal(
                 (it as SelectionModal).changeSelection(max(0, min(selection, it.maxSelection)))
                 changeSelection(-1)
             }
-        }
+        } ?: run { dismiss() }
     }
 
     override fun onDismiss() {

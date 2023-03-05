@@ -10,7 +10,7 @@ import world.terrains.Terrain
 @Serializable
 class Coastlines(
     val exits: MutableList<XY>,
-) : ChunkFeature(
+) : Feature(
     1, Stage.TERRAIN
 ) {
 

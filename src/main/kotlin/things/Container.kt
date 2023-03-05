@@ -12,7 +12,7 @@ import world.level.Level
 @Serializable
 sealed class Container : Portable(), ThingHolder {
 
-    private val contents = ArrayList<Thing>()
+    protected val contents = ArrayList<Thing>()
 
     override fun contents() = contents
     @Transient

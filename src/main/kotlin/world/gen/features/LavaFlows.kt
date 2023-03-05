@@ -10,7 +10,7 @@ import world.terrains.Terrain
 @Serializable
 class LavaFlows(
     val exits: MutableList<LavaExit>,
-) : ChunkFeature(
+) : Feature(
     1, Stage.BUILD
 ) {
 

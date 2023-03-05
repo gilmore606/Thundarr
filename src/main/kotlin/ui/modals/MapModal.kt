@@ -1,22 +1,22 @@
 package ui.modals
 
-import com.badlogic.gdx.Input
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
-import ui.input.Keyboard
+import render.tilesets.MapTileSet
 import ui.input.Keydef
 import ui.input.Mouse
-import util.*
 import world.gen.Metamap
-import world.gen.biomes.Ocean
-import world.gen.features.*
 import world.gen.habitats.Blank
 import java.lang.Integer.max
 import java.lang.Integer.min
 
 class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
+    private val paddingX = 30
+    private val paddingY = 70
 
     val playerX = Metamap.chunkXtoX(App.player.xy.x)
     val playerY = Metamap.chunkYtoY(App.player.xy.y)
@@ -25,14 +25,60 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
     var mapx = 0
     var mapy = 0
 
+    var lastMouseX = -1
+    var lastMouseY = -1
+
     var revealAll = false
     var showHabitats = false
 
+    var poiFloater: MapFloater? = null
+
     override fun newThingBatch() = null
     override fun newActorBatch() = null
+    val mapBatch = QuadBatch(MapTileSet())
 
     override fun onAdd() {
         centerView()
+    }
+
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
+        val lx = screenX - x - paddingX
+        val ly = screenY - y - paddingY
+        val tx = (lx / cellSize) + mapx
+        val ty = (ly / cellSize) + mapy
+        if (tx != lastMouseX || ty != lastMouseY) {
+            lastMouseX = tx
+            lastMouseY = ty
+            val meta = Metamap.metaAt(tx,ty)
+            var hasFloater = false
+            if (meta.mapped || revealAll) {
+                var alreadyUp = false
+                meta.mapPOITitle()?.also { title ->
+                    poiFloater?.also {
+                        if (it.title !== title) {
+                            it.remoteDismiss()
+                            poiFloater = null
+                        } else {
+                            alreadyUp = true
+                            hasFloater = true
+                        }
+                    }
+                    if (!alreadyUp) {
+                        val floater =
+                            MapFloater(this, screenX + 8, screenY - 4,
+                                title, meta.mapPOIDescription() ?: "", meta.mapPOIDiscoveryTime())
+                        Screen.addModal(floater)
+                        poiFloater = floater
+                        hasFloater = true
+                    }
+                }
+            }
+            if (!hasFloater) {
+                poiFloater?.remoteDismiss()
+                poiFloater = null
+            }
+        }
+        super.onMouseMovedTo(screenX, screenY)
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
@@ -53,7 +99,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
             }
             Keydef.ZOOM_IN -> {
-                cellSize = min(20, cellSize + 2)
+                cellSize = min(30, cellSize + 2)
                 centerView()
 
             }
@@ -77,10 +123,11 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         mapy = playerY - (900 / cellSize) / 2
     }
 
-    fun renderMap(batch: QuadBatch) {
+    private fun renderMap() {
+        val batch = mapBatch
         if (isAnimating()) return
-        val x0 = x + 30
-        val y0 = y + 70
+        val x0 = x + paddingX
+        val y0 = y + paddingY
         for (x in 0 until (1120 / cellSize)) {
             for (y in 0 until (800 / cellSize)) {
                 val meta = Metamap.metaAt(x+mapx, y+mapy)
@@ -91,105 +138,39 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                     val py0 = y0 + oy
                     val px1 = px0 + cellSize
                     val py1 = py0 + cellSize
-                    batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.biome.mapGlyph))
-                    var isNorth = false
-                    var isSouth = false
-                    var isEast = false
-                    var isWest = false
-                    if (meta.biome != Ocean && meta.hasFeature(Rivers::class)) {
-                        meta.rivers().forEach { exit ->
-                            when (exit.edge) {
-                                NORTH -> isNorth = true
-                                SOUTH -> isSouth = true
-                                WEST -> isWest = true
-                                EAST -> isEast = true
-                            }
-                        }
-                        val river = when {
-                            isNorth && isSouth && isWest -> Glyph.MAP_RIVER_NSW
-                            isNorth && isSouth && isEast -> Glyph.MAP_RIVER_NSE
-                            isWest && isEast && isSouth -> Glyph.MAP_RIVER_WES
-                            isWest && isEast && isNorth -> Glyph.MAP_RIVER_NWE
-                            isNorth && isSouth -> Glyph.MAP_RIVER_NS
-                            isWest && isEast -> Glyph.MAP_RIVER_WE
-                            isNorth && isWest -> Glyph.MAP_RIVER_WN
-                            isSouth && isWest -> Glyph.MAP_RIVER_WS
-                            isSouth && isEast -> Glyph.MAP_RIVER_SE
-                            isNorth && isEast -> Glyph.MAP_RIVER_NE
-                            isNorth || isSouth -> Glyph.MAP_RIVER_NS
-                            isWest || isEast -> Glyph.MAP_RIVER_WE
-                            else -> Glyph.MAP_RIVER_SE
-                        }
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(river))
-                    }
-                    if (meta.hasFeature(Highways::class)) {
-                        meta.highways().forEach { exit ->
-                            when (exit.edge) {
-                                NORTH -> isNorth = true
-                                SOUTH -> isSouth = true
-                                WEST -> isWest = true
-                                EAST -> isEast = true
-                            }
-                        }
-                        val road = when {
-                            isNorth && isSouth && isWest && isEast -> Glyph.MAP_ROAD_NSEW
-                            isNorth && isSouth && isWest -> Glyph.MAP_ROAD_NSW
-                            isNorth && isSouth && isEast -> Glyph.MAP_ROAD_NSE
-                            isWest && isEast && isSouth -> Glyph.MAP_ROAD_WES
-                            isWest && isEast && isNorth -> Glyph.MAP_ROAD_NWE
-                            isNorth && isSouth -> Glyph.MAP_ROAD_NS
-                            isWest && isEast -> Glyph.MAP_ROAD_WE
-                            isNorth && isWest -> Glyph.MAP_ROAD_WN
-                            isSouth && isWest -> Glyph.MAP_ROAD_WS
-                            isSouth && isEast -> Glyph.MAP_ROAD_SE
-                            isNorth && isEast -> Glyph.MAP_ROAD_NE
-                            isNorth || isSouth -> Glyph.MAP_ROAD_NS
-                            isWest || isEast -> Glyph.MAP_ROAD_WE
-                            else -> Glyph.MAP_ROAD_SE
-                        }
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(road))
-                    }
-                    if (meta.hasFeature(Trails::class)) {
-                        meta.trails().forEach { exit ->
-                            when (exit.edge) {
-                                NORTH -> isNorth = true
-                                SOUTH -> isSouth = true
-                                WEST -> isWest = true
-                                EAST -> isEast = true
-                            }
-                        }
-                        val trail = when {
-                            isNorth && isSouth && isWest && isEast -> Glyph.MAP_TRAIL_NSEW
-                            isNorth && isSouth && isWest -> Glyph.MAP_TRAIL_NSW
-                            isNorth && isSouth && isEast -> Glyph.MAP_TRAIL_NSE
-                            isWest && isEast && isSouth -> Glyph.MAP_TRAIL_WES
-                            isWest && isEast && isNorth -> Glyph.MAP_TRAIL_NWE
-                            isNorth && isSouth -> Glyph.MAP_TRAIL_NS
-                            isWest && isEast -> Glyph.MAP_TRAIL_WE
-                            isNorth && isWest -> Glyph.MAP_TRAIL_WN
-                            isSouth && isWest -> Glyph.MAP_TRAIL_WS
-                            isSouth && isEast -> Glyph.MAP_TRAIL_SE
-                            isNorth && isEast -> Glyph.MAP_TRAIL_NE
-                            isNorth || isSouth -> Glyph.MAP_TRAIL_NS
-                            isWest || isEast -> Glyph.MAP_TRAIL_WE
-                            else -> Glyph.MAP_TRAIL_SE
-                        }
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(trail))
-                    }
-                    if (meta.hasFeature(RuinedCitySite::class)) {
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_CITY))
-                    }
-                    if (meta.hasFeature(Village::class)) {
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_VILLAGE))
+                    meta.mapIcons.forEach { mapIcon ->
+                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(mapIcon))
                     }
                     if (x + mapx == playerX && y + mapy == playerY) {
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
+                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_PLAYER))
                     }
                     if (showHabitats && meta.habitat != Blank) {
-                        batch.addPixelQuad(px0, py0, px1, py1, Screen.mapBatch.getTextureIndex(meta.habitat.mapGlyph))
+                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(meta.habitat.mapGlyph))
                     }
                 }
             }
         }
+    }
+
+    override fun drawEverything() {
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+
+        clearBoxBatch()
+        renderBackground()
+        drawBoxBatch()
+
+        mapBatch.clear()
+        renderMap()
+        mapBatch.draw()
+
+        beginTextBatch()
+        renderText()
+        endTextBatch()
+    }
+
+    override fun dispose() {
+        super.dispose()
+        mapBatch.dispose()
     }
 }

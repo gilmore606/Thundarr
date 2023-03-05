@@ -1,7 +1,11 @@
 package world
 
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import ktx.async.KtxAsync
+import render.tilesets.Glyph
 import util.XY
+import world.gen.Metamap
 import world.gen.NoisePatches
 import world.gen.biomes.Biome
 import world.gen.biomes.Blank
@@ -21,18 +25,32 @@ class ChunkMeta(
     val biome: Biome = Blank,
     val habitat: Habitat = world.gen.habitats.Blank,
     val variance: Float = 0f,
-    var features: MutableList<ChunkFeature> = mutableListOf(),
+    var features: MutableList<Feature> = mutableListOf(),
     var cityDistance: Float = 0f,
     var title: String = "the wilderness",
     var mapped: Boolean = false
 ) {
+
+    var mappedTime = 0.0
+    val mapIcons = mutableListOf<Glyph>()
+    fun mapPOITitle(): String? = features.firstNotNullOfOrNull { it.mapPOITitle() }
+    fun mapPOIDescription(): String? = features.firstNotNullOfOrNull { it.mapPOIDescription() }
+    fun mapPOIDiscoveryTime(): Double = mappedTime
+
+    fun regenerateMapIcons() {
+        mapIcons.clear()
+        mapIcons.add(biome.mapGlyph)
+        features.forEach { feature ->
+            feature.mapIcon()?.also { mapIcons.add(it) }
+        }
+    }
 
     fun hasFeature(ofClass: KClass<out Any>): Boolean {
         features.forEach { if (ofClass.isInstance(it)) return true }
         return false
     }
 
-    fun featureOf(ofClass: KClass<out Any>): ChunkFeature? {
+    fun featureOf(ofClass: KClass<out Any>): Feature? {
         features.forEach { if (ofClass.isInstance(it)) return it }
         return null
     }
@@ -52,6 +70,7 @@ class ChunkMeta(
     fun trails(): List<Trails.TrailExit> = featureOf(Trails::class)?.let {
         (it as Trails).exits
     } ?: listOf()
+
 }
 
 class ChunkScratch(
@@ -67,7 +86,7 @@ class ChunkScratch(
     var dryness = -1
     var biome: Biome = Blank
     var habitat: Habitat = world.gen.habitats.Blank
-    var features: MutableList<ChunkFeature> = mutableListOf()
+    var features: MutableList<Feature> = mutableListOf()
     var cityDistance = 0f
     var title = ""
 
@@ -83,20 +102,22 @@ class ChunkScratch(
         cityDistance = cityDistance,
         title = title,
         mapped = false
-    )
+    ).apply {
+        regenerateMapIcons()
+    }
 
     fun hasFeature(ofClass: KClass<out Any>): Boolean {
         features.forEach { if (ofClass.isInstance(it)) return true }
         return false
     }
 
-    fun featureOf(ofClass: KClass<out Any>): ChunkFeature? {
+    fun featureOf(ofClass: KClass<out Any>): Feature? {
         features.forEach { if (ofClass.isInstance(it)) return it }
         return null
     }
 
     fun removeFeature(ofClass: KClass<out Any>) {
-        var found: ChunkFeature? = null
+        var found: Feature? = null
         features.forEach { if (ofClass.isInstance(it)) found = it }
         found?.also { features.remove(it) }
     }

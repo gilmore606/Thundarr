@@ -10,7 +10,7 @@ import world.gen.biomes.Ocean
 class Tavern(
     private val name: String,
     private val villageDirection: XY
-) : ChunkFeature(
+) : Feature(
     4, Stage.BUILD
 ) {
 
