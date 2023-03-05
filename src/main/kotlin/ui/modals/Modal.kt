@@ -68,6 +68,11 @@ abstract class Modal(
     open fun receiveRawKeys() = false
     open fun onRawKeyDown(keyCode: Int) { }
 
+    open fun replaceWith(nextModal: Modal) {
+        dismiss()
+        Screen.addModal(nextModal)
+    }
+
     override fun myTextBatch() = textBatch
     override fun myBoxBatch() = boxBatch
     override fun myThingBatch() = thingBatch

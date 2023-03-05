@@ -64,6 +64,7 @@ object Metamap {
     val maxVolcanoes = 3
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
+    val randomTavernChance = 0.003f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -748,7 +749,11 @@ object Metamap {
                     if (Village.canBuildOn(meta)) {
                         if (biomeNeighbors(x, y, Suburb) == 0 && biomeNeighbors(x, y, Ruins) == 0) {
                             if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
-                                val village = Village(Madlib.villageName(), isAbandoned = Dice.chance(villageAbandonedChance))
+                                val village = Village(
+                                    Madlib.villageName(),
+                                    isAbandoned = Dice.chance(villageAbandonedChance),
+                                    size = Dice.range(5, 18)
+                                )
                                 placedOne = true
                                 actuallyPlaced++
                                 villages.add(XY(x, y))
@@ -757,19 +762,27 @@ object Metamap {
                                 val placedDirs = mutableSetOf<XY>()
                                 // Place features around village
                                 Village.neighborFeatures.forEach { neighborData ->
+                                    var placedFeature = false
                                     DIRECTIONS.from(x, y) { dx, dy, dir ->
-                                        if (dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
-                                            && neighborData.second.invoke(scratches[dx][dy])) {
+                                        if (!placedFeature && dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)
+                                            && neighborData.second.invoke(
+                                                scratches[dx][dy], village
+                                            )) {
                                             val neighbor = scratches[dx][dy]
-                                            val feature = neighborData.third.invoke(village.isAbandoned)
+                                            val feature = neighborData.third.invoke(
+                                                village.isAbandoned,
+                                                dir
+                                            )
                                             neighbor.features.add(feature)
                                             neighbor.removeFeature(RuinedBuildings::class)
                                             placedDirs.add(dir)
+                                            placedFeature = true
+                                            runTrailBetween(XY(x, y), XY(dx, dy), null, mutableListOf())
                                         }
                                     }
                                 }
-                                //suggestedPlayerStart.x = xToChunkX(x)
-                                //suggestedPlayerStart.y = yToChunkY(y)
+                                suggestedPlayerStart.x = xToChunkX(x)
+                                suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -825,6 +838,12 @@ object Metamap {
                     // Graveyards
                     if (Graveyard.canBuildOn(cell) && Dice.chance(randomGraveyardChance)) {
                         cell.features.add(Graveyard(Dice.flip()))
+                    }
+                    // Taverns
+                    if (Tavern.canBuildOn(cell) && Dice.chance(randomTavernChance)) {
+                        cell.features.add(Tavern(
+                            Madlib.tavernName(), NO_DIRECTION
+                        ))
                     }
                 }
             }
@@ -1105,8 +1124,6 @@ object Metamap {
                 val dir = moveDir ?: possDirs.random()
                 val nextCell = cursor + dir
                 if (scratches[nextCell.x][nextCell.y].hasFeature(Trails::class)) done = true
-
-                if (scratches[cursor.x][cursor.y].hasFeature(Rivers::class)) suggestedPlayerStart = origin
 
                 connectTrailExits(cursor, nextCell, signText)
                 if (scratches[cursor.x][cursor.y].trails().size >= 2 || Dice.chance(0.2f)) {

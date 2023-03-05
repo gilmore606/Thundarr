@@ -450,15 +450,26 @@ object Madlib {
             "comet", "moon", "demon", "motor", "trucker", "kill", "dismal", "dubya", "yeezy", "prince", "beggar",
             "hobo", "bum", "drifter", "booze"
         )
-        val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend",
+        val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend", "dell",
             "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead", "vale", "point", "sted", "ston",
             " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend", " Fork", " Mill", " Grove",
             "land", "stein", "ward", "gard", "'s Folly", "'s End"
         )
 
-        val name = pre.random() + post.random()
+        var name = pre.random() + post.random()
+        if (Dice.chance(0.1f)) name = listOf("North", "East", "South", "West", "New", "Old").random() + " " + name.capitalize()
+
         return name.capitalize()
     }
+
+    val firstNames = listOf("Cletus", "Abe", "Arthur", "Fred", "Phil", "Walt", "Ralph", "Amos", "Theo", "Atticus",
+        "Felix", "Silas", "Oliver", "Cassius", "Hugo", "Oscar", "Milo", "Otto", "August", "Jude", "Miles",
+        "Ezra", "Clarence", "Adolf", "Clem", "Joseph", "Archie", "Bernard", "Grady", "Cliff", "Dean", "Earl",
+        "Edison", "Edmund", "Elijah", "Emile", "Erwin", "Fletcher", "Frank", "George", "Gerald", "Gus",
+        "Harold",  "Harvey", "Howard", "Hugh", "Jerry", "Langston", "Louis", "Mickey", "Milton", "Morgan",
+        "Nelson", "Norman", "Neville", "Orville", "Oscar", "Otis", "Reed", "Rodney", "Roy", "Sherman",
+        "Spencer", "Stan", "Sterling"
+    )
 
     fun graveName(): String {
         if (Dice.chance(0.1f)) {
@@ -469,14 +480,7 @@ object Madlib {
             )
             return names.random()
         }
-        val first = listOf("Cletus", "Abe", "Arthur", "Fred", "Phil", "Walt", "Ralph", "Amos", "Theo", "Atticus",
-            "Felix", "Silas", "Oliver", "Cassius", "Hugo", "Oscar", "Milo", "Otto", "August", "Jude", "Miles",
-            "Ezra", "Clarence", "Adolf", "Clem", "Joseph", "Archie", "Bernard", "Grady", "Cliff", "Dean", "Earl",
-            "Edison", "Edmund", "Elijah", "Emile", "Erwin", "Fletcher", "Frank", "George", "Gerald", "Gus",
-            "Harold",  "Harvey", "Howard", "Hugh", "Jerry", "Langston", "Louis", "Mickey", "Milton", "Morgan",
-            "Nelson", "Norman", "Neville", "Orville", "Oscar", "Otis", "Reed", "Rodney", "Roy", "Sherman",
-            "Spencer", "Stan", "Sterling"
-        )
+        val first = firstNames.random()
         val initial = listOf("X", "S", "Q", "N", "L", "P", "T", "Z", "B")
 
         return first.random() + " " + initial.random() + "."
@@ -515,5 +519,24 @@ object Madlib {
             "Resting in the place he loved most."
         )
         return epitaphs.random()
+    }
+
+    fun tavernName(): String {
+        val post = listOf("Pub", "Tavern", "Bar", "House", "Inn", "Hole", "Rest", "Watering Hole", "Station",
+            "Toast", "Last Call", "Respite", "Public House", "Rest Stop", "Cask", "Jug", "Taphouse", "Alehouse", "Brewery",
+            "Distillery")
+        val adj = listOf("Laughing", "Dancing", "Scarlet", "Crimson", "Golden", "Silver", "Sloshed", "Tipsy", "Toasty",
+            "Singing", "Plastered", "Smiling", "Sleepy", "Stout", "Weeping", "Flaming", "Suffering", "Tempered", "Humble")
+        val noun = listOf("Dragon", "Pig", "Boar", "Groundhog", "Aurochs", "Ox", "Hound", "Toad", "Caroc", "Manape", "Axe",
+            "Tankard", "Flagon", "Lantern", "Hearth", "Dagger", "Wizard", "Witch", "Serpent", "Mok", "Stallion", "Mare")
+
+        return when (Dice.oneTo(6)) {
+            1 -> firstNames.random() + "'s " + post.random()
+            2 -> "The " + adj.random() + " " + noun.random()
+            3 -> adj.random() + " " + noun.random() + " " + post.random()
+            4 -> adj.random() + " " + firstNames.random() + "'s"
+            5 -> noun.random() + " & " + noun.random() + " " + post.random()
+            else -> adj.random() + " " + firstNames.random() + "'s " + post.random()
+        }
     }
 }

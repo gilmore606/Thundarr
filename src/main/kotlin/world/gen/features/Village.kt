@@ -17,6 +17,7 @@ import world.terrains.Terrain
 class Village(
     val name: String,
     val isAbandoned: Boolean = false,
+    val size: Int,
 ) : Feature(
     3, Stage.BUILD
 ) {
@@ -25,10 +26,23 @@ class Village(
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
                 && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
 
-        val neighborFeatures = listOf<Triple<Float, (ChunkScratch)->Boolean, (Boolean)->Feature>>(
+        val neighborFeatures = listOf<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->Feature>>(
 
-            Triple(0.7f, { meta -> Farm.canBuildOn(meta) }, { isAbandoned -> Farm(isAbandoned) }),
-            Triple(0.7f, { meta -> Graveyard.canBuildOn(meta) }, { isAbandoned -> Graveyard(isAbandoned) }),
+            Triple(0.6f, { meta, village ->
+                Farm.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Farm(isAbandoned)
+            }),
+            Triple(0.3f, { meta, village ->
+                Graveyard.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Graveyard(isAbandoned)
+            }),
+            Triple(0.3f, { meta, village ->
+                village.size > 8 && !village.isAbandoned && Tavern.canBuildOn(meta)
+                         }, { isAbandoned, dir ->
+                Tavern(Madlib.tavernName(), dir)
+            }),
 
         )
     }
@@ -89,38 +103,43 @@ class Village(
     }
 
     private fun layoutVillageVert() {
+        var huts = 0
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
         val xMidRight = xMid + Dice.oneTo(3)
         var cursorY= 32
-        while (cursorY > 14) {
+        while (cursorY > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY - height, width, height, fertility, EAST)
+            huts++
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49) {
+        while (cursorY < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidLeft - width, cursorY, width, height, fertility, EAST)
+            huts++
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         cursorY = 32
-        while (cursorY > 14) {
+        while (cursorY > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight + 1, cursorY - height, width, height, fertility, WEST)
+            huts++
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49) {
+        while (cursorY < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(xMidRight + 1, cursorY, width, height, fertility, WEST)
+            huts++
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
@@ -131,38 +150,43 @@ class Village(
     }
 
     private fun layoutVillageHoriz() {
+        var huts = 0
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
         val yMidBottom = yMid + Dice.oneTo(3)
         var cursorX = 32
-        while (cursorX > 14) {
+        while (cursorX > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidTop - height, width, height, fertility, SOUTH)
+            huts++
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49) {
+        while (cursorX < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidTop - height, width, height, fertility, SOUTH)
+            huts++
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         cursorX = 32
-        while (cursorX > 14) {
+        while (cursorX > 14 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX - width, yMidBottom, width, height, fertility, NORTH)
+            huts++
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49) {
+        while (cursorX < 49 && huts < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
             layoutHutOrFeature(cursorX, yMidBottom, width, height, fertility, NORTH)
+            huts++
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
@@ -200,14 +224,14 @@ class Village(
     }
 
     private fun layoutVillageBag() {
-        val hutCount = Dice.range(6, 18)
+        val hutCount = this.size
         var built = 0
         var width = Dice.range(9, 13)
         var height = Dice.range(9, 13)
         while (built < hutCount) {
             var tries = 0
             var placed = false
-            while (tries < 1200 && !placed) {
+            while (tries < 2000 && !placed) {
                 val x = Dice.range(3, 63 - width)
                 val y = Dice.range(3, 63 - height)
                 var clearHere = true
