@@ -83,6 +83,13 @@ object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
     override fun trailsOverwrite() = false
 }
 
+object MetalWall : Wall(Type.TERRAIN_METALWALL, Glyph.METAL_WALL, 10f) {
+    override fun name() = "metal wall"
+    override fun bumpMsg() = "You bump into a smooth metal wall."
+    override fun isDiggable() = false
+    override fun trailsOverwrite() = false
+}
+
 object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
     override fun name() = "rock face"
     override fun bumpMsg() = "You bump into a rock face."

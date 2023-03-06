@@ -42,10 +42,13 @@ abstract class Carto(
 
     protected val plantSpawns = plantSpawns()
 
-    init {
+    open val wallTerrain = Terrain.Type.TERRAIN_BRICKWALL
+    open val floorTerrain = Terrain.Type.TERRAIN_STONEFLOOR
+
+    fun clear() {
         for (x in x0 .. x1) {
             for (y in y0 .. y1) {
-                chunk.setTerrain(x, y, Terrain.Type.TERRAIN_BRICKWALL)
+                chunk.setTerrain(x, y, wallTerrain)
             }
         }
     }
@@ -104,17 +107,17 @@ abstract class Carto(
     // TODO: don't pass regionId here, compute it automatically in a stage
     // where we floodfill successively until all space is regions
     protected fun carve(x: Int, y: Int, regionId: Int,
-                        type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
+                        type: Terrain.Type = floorTerrain) {
         setTerrain(x, y, type)
         setRegionAt(x, y, regionId)
     }
     protected fun carve(xy: XY, regionId: Int,
-                        type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR) {
+                        type: Terrain.Type = floorTerrain) {
         carve(xy.x, xy.y, regionId, type)
     }
 
     protected fun carveRoom(room: Rect, regionId: Int,
-                            type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
+                            type: Terrain.Type = floorTerrain,
                             skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
         for (x in room.x0..room.x1) {
             for (y in room.y0..room.y1) {
@@ -272,7 +275,7 @@ abstract class Carto(
         return connections
     }
 
-    protected fun removeDeadEnds(type: Terrain.Type = Terrain.Type.TERRAIN_BRICKWALL): Boolean {
+    protected fun removeDeadEnds(type: Terrain.Type = wallTerrain): Boolean {
         var removed = false
         forEachCell { x, y ->
             if (!isRock(x, y)) {

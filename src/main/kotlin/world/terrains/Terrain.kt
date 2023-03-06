@@ -33,6 +33,7 @@ sealed class Terrain(
             Type.TERRAIN_BRICKWALL -> BrickWall
             Type.TERRAIN_CAVEWALL -> CaveWall
             Type.TERRAIN_WOODWALL -> WoodWall
+            Type.TERRAIN_METALWALL -> MetalWall
             Type.TERRAIN_TEMPERATE_FORESTWALL -> TemperateForestWall
             Type.TERRAIN_PINE_FORESTWALL -> PineForestWall
             Type.TERRAIN_TROPICAL_FORESTWALL -> TropicalForestWall
@@ -88,6 +89,7 @@ sealed class Terrain(
         TERRAIN_BRICKWALL,
         TERRAIN_CAVEWALL,
         TERRAIN_WOODWALL,
+        TERRAIN_METALWALL,
         TERRAIN_WINDOWWALL,
         TERRAIN_TEMPERATE_FORESTWALL,
         TERRAIN_PINE_FORESTWALL,

@@ -26,9 +26,13 @@ class LevelCarto(
     val building: Building
 ) : Carto(x0, y0, x1, y1, level.chunk!!, level) {
 
+    override val wallTerrain = Terrain.Type.TERRAIN_METALWALL
+
     fun carveLevel(
         worldDest: XY
     ) {
+        clear()
+
         val rooms = ArrayList<Rect>()
 
         val roomTries = Random.nextInt(30, 500)
@@ -63,7 +67,7 @@ class LevelCarto(
         for (x in x0+1 until x1) {
             for (y in y0+1 until y1) {
                 if (isRock(x, y)) {
-                    if (neighborCount(x, y, Terrain.Type.TERRAIN_STONEFLOOR) == 0) {
+                    if (neighborCount(x, y, floorTerrain) == 0) {
                         growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
                         nextRegion++
                     }
@@ -75,7 +79,7 @@ class LevelCarto(
 
         var deadEnds = true
         while (deadEnds) {
-            deadEnds = removeDeadEnds(Terrain.Type.TERRAIN_BRICKWALL)
+            deadEnds = removeDeadEnds(wallTerrain)
         }
 
         val door = addWorldPortal(building, worldDest, Terrain.Type.TERRAIN_PORTAL_DOOR, "The door leads outside to the wilderness.\nExit the building?")

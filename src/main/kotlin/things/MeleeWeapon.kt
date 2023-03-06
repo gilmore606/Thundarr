@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.stats.Heart
 import actors.stats.Stat
 import actors.stats.skills.Dig
 import actors.stats.skills.Fight
@@ -101,7 +102,7 @@ class Pickaxe : MeleeWeapon() {
 @Serializable
 class Sunsword : MeleeWeapon(), LightSource {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+        val glyphTransform = GlyphTransform(Glyph.SUNSWORD_LIT, 0.0f, -0.1f, false)
         val lightColor = LightColor(0.1f, 0.3f, 0.3f)
     }
     override val tag = Tag.THING_SUNSWORD
@@ -109,6 +110,9 @@ class Sunsword : MeleeWeapon(), LightSource {
     override fun glyphTransform() = glyphTransform
     override fun name() = "sunsword"
     override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
+    override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
+        this[Heart.tag] = 1f
+    }
     override fun light() = if (equipped) lightColor else null
     override fun onEquip(actor: Actor) {
         actor.level?.addLightSource(actor.xy.x, actor.xy.y, actor)

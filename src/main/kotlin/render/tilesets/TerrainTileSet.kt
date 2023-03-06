@@ -197,6 +197,25 @@ fun TerrainTileSet() =
             add(ChasmTile.Slot.HORIZONTAL, 1f, 5, 10)
         })
 
+        setTile(Glyph.METAL_WALL, ChasmTile(this, Glyph.METAL_WALL).apply {
+            add(ChasmTile.Slot.SOLO, 1f, 0, 12)
+            add(ChasmTile.Slot.LEFTCAP, 1f, 0, 13)
+            add(ChasmTile.Slot.RIGHTCAP, 1f, 1, 13)
+            add(ChasmTile.Slot.TOPLEFT, 1f, 2, 11)
+            add(ChasmTile.Slot.TOP, 1f, 3, 11)
+            add(ChasmTile.Slot.TOPRIGHT, 1f, 4, 11)
+            add(ChasmTile.Slot.TOPCAP, 1f, 5, 11)
+            add(ChasmTile.Slot.LEFT, 1f, 2, 12)
+            add(ChasmTile.Slot.MIDDLE, 1f, 3, 12)
+            add(ChasmTile.Slot.RIGHT, 1f, 4, 12)
+            add(ChasmTile.Slot.BOTTOMCAP, 1f, 5, 12)
+            add(ChasmTile.Slot.BOTTOMLEFT, 1f, 2, 13)
+            add(ChasmTile.Slot.BOTTOM, 1f, 3, 13)
+            add(ChasmTile.Slot.BOTTOMRIGHT, 1f, 4, 13)
+            add(ChasmTile.Slot.VERTICAL, 1f, 1, 12)
+            add(ChasmTile.Slot.HORIZONTAL, 1f, 5, 13)
+        })
+
         setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))
 
         setTile(Glyph.SHALLOW_WATER, WaterTile(this).apply {

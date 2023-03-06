@@ -27,6 +27,9 @@ class CavernCarto(
 
     lateinit var distanceMap: DistanceMap
 
+    override val wallTerrain = TERRAIN_CAVEWALL
+    override val floorTerrain = TERRAIN_CAVEFLOOR
+
     fun carveLevel(
         worldDest: XY
     ) {
