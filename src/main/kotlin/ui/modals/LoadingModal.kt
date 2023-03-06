@@ -54,7 +54,7 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
         if (!withProgress) return
         val padding = 30
         boxBatch.addHealthBar(x + padding, y + 80, x + width - (padding), y + 100,
-            (progress * 100f).toInt(), 100, allGreen = true
+            (progress * 100f).toInt(), 101, allGreen = true
         )
     }
 

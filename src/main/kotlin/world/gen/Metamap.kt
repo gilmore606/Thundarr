@@ -20,8 +20,9 @@ import java.lang.Math.abs
 
 object Metamap {
 
-    private const val fakeDelaysInWorldgenText = false
-    private const val progressBarSegments = 14
+    private const val fakeDelaysInWorldgenText = true
+    private const val fakeDelayMillis = 350L
+    private const val progressBarSegments = 13
 
     private const val chunkRadius = 100
 
@@ -159,7 +160,7 @@ object Metamap {
     }
 
     suspend fun sayProgress(text: String) {
-        if (fakeDelaysInWorldgenText) delay(500L)
+        if (fakeDelaysInWorldgenText) delay(fakeDelayMillis)
         Console.sayFromThread(text)
         updateProgress?.also { it.invoke(progressIncrement) }
     }
