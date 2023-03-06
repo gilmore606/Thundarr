@@ -4,7 +4,11 @@ import kotlin.random.Random
 
 object Dice {
 
-    val random = Random(Random.nextInt())
+    var random = Random(Random.nextInt())
+
+    fun newSeed(newSeed: Int) {
+        random = Random(newSeed)
+    }
 
     fun chance(c: Float) = random.nextFloat() < c
     fun flip() = chance(0.5f)

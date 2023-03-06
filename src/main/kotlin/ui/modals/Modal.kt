@@ -6,7 +6,6 @@ import actors.actions.Use
 import actors.statuses.Status
 import audio.Speaker
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import render.batches.QuadBatch
@@ -59,6 +58,8 @@ abstract class Modal(
         this.width = width
         this.height = height
     }
+
+    open fun getTitleForDisplay() = title
 
     open fun myXmargin() = xMargin
 
@@ -113,7 +114,7 @@ abstract class Modal(
 
     override fun drawText() {
         if (!isAnimating()) {
-            title?.also { title ->
+            getTitleForDisplay()?.also { title ->
                 drawTitle(title)
             }
             drawModalText()

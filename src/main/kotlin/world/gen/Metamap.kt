@@ -4,7 +4,10 @@ import App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
+import render.Screen
+import ui.modals.HistogenModal
 import ui.panels.Console
 import util.*
 import world.*
@@ -17,11 +20,12 @@ import world.level.CHUNK_SIZE
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
+import kotlin.random.Random
 
 object Metamap {
 
     private const val fakeDelaysInWorldgenText = true
-    private const val fakeDelayMillis = 350L
+    private const val fakeDelayMillis = 150L
     private const val progressBarSegments = 13
 
     private const val chunkRadius = 100
@@ -30,6 +34,7 @@ object Metamap {
     private val coroutineScope = CoroutineScope(coroutineContext)
 
     var isWorking = false
+    var worldRejected = true
 
     val minLand = 0.55f
     val maxLand = 0.8f
@@ -165,9 +170,17 @@ object Metamap {
         updateProgress?.also { it.invoke(progressIncrement) }
     }
 
+    suspend fun discardWorld() {
+        App.save.eraseAll()
+        metaCache.clear()
+    }
+
     fun buildWorld(updateProgress: (Float)->Unit) {
+        this.isWorking = true
+        this.worldRejected = true
         this.updateProgress = updateProgress
         this.progressIncrement = 1f / progressBarSegments
+        Dice.newSeed(Random.nextInt())
 
         scratches = Array(chunkRadius * 2) { Array(chunkRadius * 2) { ChunkScratch() } }
         riverCells.clear()
@@ -178,7 +191,6 @@ object Metamap {
 
         fun metaAt(x: Int, y: Int): ChunkScratch? = if (boundsCheck(x,y)) scratches[x][y] else null
 
-        isWorking = true
         coroutineScope.launch {
 
             // CONTINENT
@@ -938,9 +950,23 @@ object Metamap {
             }
             scratches = Array(1) { Array(1) { ChunkScratch() } }
 
-            sayProgress("The world is new.")
-            isWorking = false
+            // Launch history
+            sayProgress("The moon is cracked in god-damned half!")
+            KtxAsync.launch {
+                val histogenModal = HistogenModal()
+                Screen.addModal(histogenModal)
+            }
         }
+    }
+
+    fun finishBuildWorld() {
+        worldRejected = false
+        isWorking = false
+    }
+
+    fun rejectWorld() {
+        worldRejected = true
+        isWorking = false
     }
 
     private fun countRiverDescendants(mouth: XY) {

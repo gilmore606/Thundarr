@@ -51,11 +51,14 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
 
     override fun drawBackground() {
         super.drawBackground()
-        if (!withProgress) return
-        val padding = 30
-        boxBatch.addHealthBar(x + padding, y + 80, x + width - (padding), y + 100,
-            (progress * 100f).toInt(), 101, allGreen = true
-        )
+        if (!isAnimating()) {
+            if (!withProgress) return
+            val padding = 30
+            boxBatch.addHealthBar(
+                x + padding, y + 80, x + width - (padding), y + 100,
+                (progress * 100f).toInt(), 101, allGreen = true
+            )
+        }
     }
 
     private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking
