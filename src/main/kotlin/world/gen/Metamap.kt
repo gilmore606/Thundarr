@@ -1101,26 +1101,26 @@ object Metamap {
             }
         }
         origins.shuffled().forEach { origin ->
-            if (!scratches[origin.x][origin.y].hasFeature(Trails::class)) {
-                var signText = scratches[origin.x][origin.y].featureOf(Village::class)?.let {
-                    (it as Village).name
+            var signText = scratches[origin.x][origin.y].featureOf(Village::class)?.let {
+                (it as Village).name
+            }
+            var cursor = origin
+            var done = false
+            val visited = mutableListOf<XY>(cursor)
+            while (!done && visited.size < targets.size + 4) {
+                val nextPoint = targets.nextNearestTo(cursor, exclude = visited)
+                val nextCell = scratches[nextPoint.x][nextPoint.y]
+                if (signText == null && nextCell.hasFeature(Village::class)) {
+                    signText = (nextCell.featureOf(Village::class)!! as Village).name
                 }
-                var cursor = origin
-                var done = false
-                val visited = mutableListOf<XY>(cursor)
-                while (!done) {
-                    val nextPoint = targets.nextNearestTo(cursor, exclude = visited)
-                    val nextCell = scratches[nextPoint.x][nextPoint.y]
-                    if (signText == null && nextCell.hasFeature(Village::class)) {
-                        signText = (nextCell.featureOf(Village::class)!! as Village).name
-                    }
-                    val madeIt = runTrailBetween(cursor, nextPoint, signText, targets)
-                    if (madeIt && Dice.chance(0.9f)) {
-                        visited.add(nextPoint)
-                        cursor = nextPoint
-                    } else {
-                        done = true
-                    }
+                val madeIt = runTrailBetween(cursor, nextPoint, signText, targets)
+                if (madeIt && Dice.chance(0.95f)) {
+                    visited.add(nextPoint)
+                    cursor = nextPoint
+                    if (Dice.chance(0.4f)) cursor = origin
+                } else {
+                    if (Dice.chance(0.3f)) done = true
+                    else cursor = origin
                 }
             }
         }
@@ -1128,12 +1128,12 @@ object Metamap {
 
     private fun runTrailBetween(origin: XY, target: XY, signText: String?, targets: MutableList<XY>): Boolean {
         if (origin == target) return false
-        val targetDistance = manhattanDistance(origin, target)
         var cursor = origin
         var done = false
-        val newTrails = mutableListOf<XY>()
+        val newTrails = mutableListOf<XY>(cursor)
         while (!done) {
             // Pick a direction that moves closer to it
+            val targetDistance = manhattanDistance(cursor, target)
             var moveDir: XY? = null
             val possDirs = ArrayList<XY>()
             CARDINALS.from(cursor.x, cursor.y) { dx, dy, dir ->
@@ -1144,7 +1144,8 @@ object Metamap {
             if (possDirs.isEmpty()) done = true
             else {
                 possDirs.shuffled().from(cursor.x, cursor.y) { dx, dy, dir ->
-                    if (manhattanDistance(target.x, target.y, dx, dy) < targetDistance) {
+                    if (scratches[dx][dy].hasFeature(Trails::class)) moveDir = dir
+                    else if (manhattanDistance(target.x, target.y, dx, dy) < targetDistance) {
                         moveDir = dir
                     }
                 }
@@ -1153,7 +1154,8 @@ object Metamap {
                 if (scratches[nextCell.x][nextCell.y].hasFeature(Trails::class)) done = true
 
                 connectTrailExits(cursor, nextCell, signText)
-                if (scratches[cursor.x][cursor.y].trails().size >= 2 || Dice.chance(0.2f)) {
+                newTrails.add(nextCell)
+                if (scratches[cursor.x][cursor.y].trails().size >= 3 || Dice.chance(0.2f)) {
                     targets.remove(cursor)
                 }
                 if (nextCell == target) return true

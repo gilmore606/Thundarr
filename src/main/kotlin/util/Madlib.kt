@@ -54,6 +54,9 @@ object Madlib {
             "Zan",
             "Gro",
             "Kro",
+            "Bul",
+            "Ha",
+            "He",
             "Ko",
             "Ka",
             "Kel",
@@ -79,6 +82,9 @@ object Madlib {
         val conn = listOf(
             "ba",
             "sa",
+            "ta",
+            "to",
+            "zo",
             "da",
             "ga",
             "ti",
@@ -129,7 +135,12 @@ object Madlib {
             "n",
             "nn",
             "lio",
-            "lar"
+            "lar",
+            "tron",
+            "zoid",
+            "roid",
+            "zar",
+            "zan"
         )
 
         var name = ""
@@ -189,7 +200,10 @@ object Madlib {
             "Judge",
             "Baron von",
             "the Astounding",
-            "the World-Famous"
+            "the World-Famous",
+            "Czar",
+            "Overseer",
+            "Big",
         )
         val post = listOf(
             "the Mighty",
@@ -226,6 +240,9 @@ object Madlib {
             "the Dark",
             "the Evil",
             "the Malignant",
+            "the Normal",
+            "the Abnormal",
+            "the Mutant",
             "the Wrathful",
             "the Tyrant",
             "of the Abyss",
@@ -245,6 +262,8 @@ object Madlib {
             "the Protector",
             "the Unhelpful",
             "the Unpleasant",
+            "the Impossible",
+            "the Wonder-Worker",
             "the All-Knowing",
             "the Betrayer",
             "the Cracker-Jack Kid",
@@ -253,7 +272,8 @@ object Madlib {
             "Jr.",
             "III",
             "IV",
-            "the First"
+            "the First",
+            "2.0",
         )
 
         val full = if (Dice.chance(0.06f)) {

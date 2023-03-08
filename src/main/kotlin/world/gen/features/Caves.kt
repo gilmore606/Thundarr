@@ -28,7 +28,7 @@ class Caves : Feature(
 
     var hasCavern = false
 
-    override fun trailDestinationChance() = 0.7f
+    override fun trailDestinationChance() = 0.4f
 
     override fun doDig() {
         val entrances = mutableSetOf<XY>()
