@@ -12,9 +12,9 @@ import world.terrains.Terrain
 @Serializable
 class Rivers(
     val exits: MutableList<RiverExit>,
-) : Feature(
-    4, Stage.TERRAIN
-) {
+) : Feature() {
+    override fun order() = 4
+    override fun stage() = Stage.TERRAIN
 
     private val harborChance = 0.8f
     private val lonelyBridgeChance = 0.05f

@@ -12,9 +12,9 @@ import world.terrains.Terrain
 @Serializable
 class Graveyard(
     private val isAbandoned: Boolean = false
-) : Feature(
-    3, Stage.BUILD
-) {
+) : Feature() {
+    override fun order() = 3
+    override fun stage() = Stage.BUILD
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome in listOf(Plain, Scrub, Hill, ForestHill, Mountain, Forest, Swamp, Desert, Suburb)

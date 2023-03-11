@@ -10,9 +10,9 @@ import world.terrains.Terrain
 @Serializable
 class LavaFlows(
     val exits: MutableList<LavaExit>,
-) : Feature(
-    1, Stage.BUILD
-) {
+) : Feature() {
+    override fun order() = 1
+    override fun stage() = Stage.BUILD
 
     @Serializable
     class LavaExit(

@@ -16,6 +16,7 @@ import ui.panels.*
 import util.*
 import world.StarterDungeon
 import world.gen.Metamap
+import world.history.History
 import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel
@@ -32,6 +33,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     lateinit var level: Level
     lateinit var save: SaveSlot
     var weather = Weather()
+    var history = History()
 
     var time: Double = 200.0
     var gameTime: GameTime = GameTime(time)
@@ -130,6 +132,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     player = player,
                     time = time,
                     weather = weather,
+                    history = history,
                     consoleLines = Console.lines,
                     toolbarTags = Toolbar.getTagsForSave()
                 )
@@ -179,6 +182,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player = state.player
             level.setPov(player.xy.x, player.xy.y)
             weather = state.weather
+            history = state.history
             updateTime(state.time)
             Console.restoreLines(state.consoleLines)
             Toolbar.loadTagsFromSave(state.toolbarTags)

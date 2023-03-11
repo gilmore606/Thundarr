@@ -6,9 +6,10 @@ import world.ChunkScratch
 import world.gen.decors.Hut
 
 @Serializable
-class Cabin : Feature(
-    0, Stage.BUILD
-) {
+class Cabin : Feature() {
+    override fun order() = 0
+    override fun stage() = Stage.BUILD
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }

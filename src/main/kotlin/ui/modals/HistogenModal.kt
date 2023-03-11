@@ -8,21 +8,12 @@ import render.tilesets.Glyph
 import render.tilesets.MapTileSet
 import ui.input.Keydef
 import ui.input.Mouse
-import util.Dice
 import util.Madlib
 import world.gen.Metamap
+import world.history.Empire
+import world.history.History
 
 class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
-
-    private val wizardCount = 7
-
-    data class Wizard(
-        val name: String,
-        val color: Glyph,
-        val cunning: Float = Dice.float(0f,1f),
-        val cruelty: Float = Dice.float(0f, 1f),
-        val madness: Float = Dice.float(0f, 1f),
-    )
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -42,8 +33,6 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
     private var headerText: String = "A new world rises from the ashes..."
 
     var started = false
-    var year = 1994
-    val wizards: ArrayList<Wizard> = ArrayList()
 
     var selection = 0
 
@@ -54,7 +43,7 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
         this.y = 50
     }
 
-    override fun getTitleForDisplay() = "- nUMeRiA : AD $year -"
+    override fun getTitleForDisplay() = "- nUMeRiA : ${App.history.year} -"
 
     private fun renderMap() {
         val batch = mapBatch
@@ -77,11 +66,11 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
         }
 
         if (started) {
-            wizards.forEachIndexed { i, wizard ->
+            App.history.empires.values.forEachIndexed { i, empire ->
                 val x0 = x + dataX
                 val y0 = y + paddingY + 60 + i*wizSpacing
                 mapBatch.addPixelQuad(x0, y0, x0 + 16, y0 + 16, mapBatch.getTextureIndex(Glyph.MAP_GLACIER))
-                mapBatch.addPixelQuad(x0 + 2, y0 + 2, x0 + 14, y0 + 14, mapBatch.getTextureIndex(wizard.color))
+                mapBatch.addPixelQuad(x0 + 2, y0 + 2, x0 + 14, y0 + 14, mapBatch.getTextureIndex(empire.mapColor))
             }
         }
     }
@@ -96,8 +85,8 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
 
         } else {
 
-            wizards.forEachIndexed { i, wizard ->
-                drawString(wizard.name, dataX + 25, paddingY + 60 + i*wizSpacing)
+            App.history.empires.values.forEachIndexed { i, empire ->
+                drawString(empire.shortName(), dataX + 25, paddingY + 60 + i*wizSpacing)
             }
 
         }
@@ -114,7 +103,7 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
         } else {
 
             myBoxBatch().addHealthBar(dataX, paddingY + 20, dataX + 180, paddingY + 20,
-                (year - 1994), 1001, allGreen = true)
+                (App.history.year - 1994), 1001, allGreen = true)
 
         }
     }
@@ -202,20 +191,7 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
 
     private fun startHistory() {
         started = true
-
-        val wizardColors = mutableListOf(Glyph.MAP_COLOR_0, Glyph.MAP_COLOR_1, Glyph.MAP_COLOR_2, Glyph.MAP_COLOR_3,
-            Glyph.MAP_COLOR_4, Glyph.MAP_COLOR_5, Glyph.MAP_COLOR_6, Glyph.MAP_COLOR_7, Glyph.MAP_COLOR_8,
-            Glyph.MAP_COLOR_9, Glyph.MAP_COLOR_10, Glyph.MAP_COLOR_11, Glyph.MAP_COLOR_12, Glyph.MAP_COLOR_13,
-            Glyph.MAP_COLOR_14, Glyph.MAP_COLOR_15)
-        wizards.clear()
-        repeat (wizardCount) {
-            val color = wizardColors.random()
-            wizardColors.remove(color)
-            wizards.add(Wizard(
-                name = Madlib.wizardFullName(Madlib.wizardName()),
-                color = color,
-            ))
-        }
+        Metamap.startHistory()
     }
 
 }

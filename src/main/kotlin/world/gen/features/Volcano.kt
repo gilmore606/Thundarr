@@ -8,9 +8,9 @@ import util.hasOneWhere
 import world.terrains.Terrain
 
 @Serializable
-class Volcano : Feature(
-    2, Stage.BUILD
-) {
+class Volcano : Feature() {
+    override fun order() = 2
+    override fun stage() = Stage.BUILD
 
     override fun trailDestinationChance() = 1f
 

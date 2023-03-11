@@ -71,7 +71,7 @@ class WorldCarto(
     }
 
     private fun digFeatures(stage: Feature.Stage) {
-        meta.features.filter { it.stage == stage }.sortedBy { it.order }.forEach { feature ->
+        meta.features().filter { it.stage() == stage }.sortedBy { it.order() }.forEach { feature ->
             feature.dig(this)
         }
     }

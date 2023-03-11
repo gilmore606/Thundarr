@@ -9,9 +9,9 @@ import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 
 @Serializable
-class Lake : Feature(
-    3, Stage.TERRAIN
-) {
+class Lake : Feature() {
+    override fun order() = 3
+    override fun stage() = Stage.TERRAIN
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)

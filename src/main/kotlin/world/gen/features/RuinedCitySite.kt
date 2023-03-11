@@ -6,9 +6,9 @@ import render.tilesets.Glyph
 @Serializable
 class RuinedCitySite(
     val name: String,
-) : Feature(
-    4, Stage.BUILD
-) {
+) : Stronghold() {
+    override fun order() = 4
+    override fun stage() = Stage.BUILD
 
     override fun doDig() {
         // NOOP.  We only store this for a map marker.

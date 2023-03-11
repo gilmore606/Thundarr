@@ -16,7 +16,9 @@ import world.gen.biomes.*
 import world.gen.biomes.Blank
 import world.gen.features.*
 import world.gen.habitats.*
+import world.history.History
 import world.level.CHUNK_SIZE
+import world.weather.Weather
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.lang.Math.abs
@@ -128,10 +130,18 @@ object Metamap {
     fun chunkXtoX(x: Int) = (x + (chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
     fun chunkYtoY(y: Int) = (y + (chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
 
-    private fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
+    private fun forEachScratch(doThis: (x: Int, y: Int, cell: ChunkScratch)->Unit) {
         for (x in 0 until chunkRadius * 2) {
             for (y in 0 until chunkRadius * 2) {
                 doThis(x,y, scratches[x][y])
+            }
+        }
+    }
+
+    fun forEachMeta(doThis: (x: Int, y: Int, cell: ChunkMeta)->Unit) {
+        for (x in 0 until chunkRadius * 2) {
+            for (y in 0 until chunkRadius * 2) {
+                doThis(x,y, metaCache[x][y])
             }
         }
     }
@@ -172,6 +182,8 @@ object Metamap {
 
     suspend fun discardWorld() {
         App.save.eraseAll()
+        App.weather = Weather()
+        App.history = History()
         metaCache.clear()
     }
 
@@ -272,7 +284,7 @@ object Metamap {
                 }
                 // Grow the seas
                 for (density in listOf(0.2f, 0.6f, 0.1f, 0.5f, 0.6f, 0.2f, 0.2f)) {
-                    forEachMeta { x, y, cell ->
+                    forEachScratch { x, y, cell ->
                         if (cell.height == 0) {
                             CARDINALS.forEach { dir ->
                                 if (boundsCheck(x + dir.x, y + dir.y)) {
@@ -290,11 +302,11 @@ object Metamap {
                             }
                         }
                     }
-                    forEachMeta { x, y, cell ->
+                    forEachScratch { x, y, cell ->
                         if (cell.height == -2) cell.height = 0
                     }
                 }
-                forEachMeta { x, y, cell ->
+                forEachScratch { x, y, cell ->
                     if (cell.height != 0) landC++
                     totalC++
                 }
@@ -308,7 +320,7 @@ object Metamap {
             val coasts = ArrayList<XY>()
 
             // Set coasts at all coast water
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.height == 0) {
                     if (CARDINALS.hasOneWhere {
                         boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height == -1
@@ -359,7 +371,7 @@ object Metamap {
             // Set mountaintops
             sayProgress("Raising mountains...")
             val peaks = ArrayList<XY>()
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 val height = cell.height
                 if (height > minMountainHeight) {
                     if (!DIRECTIONS.hasOneWhere {
@@ -373,7 +385,7 @@ object Metamap {
 
             // Freeze ice caps
             sayProgress("Freezing ice cap..")
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (y < 20 && cell.height == 0) {
                     cell.biome = Glacier
                 }
@@ -402,7 +414,7 @@ object Metamap {
             mouths.forEach { runRiver(it, wiggle = 0.5f) }
 
             // Calculate moisture
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.height == 0 || cell.hasFeature(Rivers::class)) {
                     cell.dryness = 0
                 }
@@ -411,7 +423,7 @@ object Metamap {
             var maxDry = 0
             while (!done) {
                 done = true
-                forEachMeta { x,y,cell ->
+                forEachScratch { x, y, cell ->
                     if (cell.dryness == maxDry) {
                         DIRECTIONS.from(x,y) { dx, dy, _ ->
                             if (boundsCheck(dx, dy)) {
@@ -451,7 +463,7 @@ object Metamap {
 
             // Seed and grow deserts
             val desertSites = ArrayList<XY>()
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.dryness > (maxDry * 0.6f)) desertSites.add(XY(x,y))
                 if (cell.height > 1 && cell.biome == Blank && !cell.hasFeature(Rivers::class) && cell.dryness >= (maxDry * 0.1f)) {
                     val mountains = biomeNeighbors(x,y,Mountain)
@@ -475,7 +487,7 @@ object Metamap {
             }).evolve(5)
 
             // Seed and grow swamps
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (y > 50 && cell.height > 0 && cell.height < 13 && cell.biome == Blank) {
                     var chance = cell.rivers().size * 0.015f +
                             (if (cell.dryness < 7) 0.005f else 0f)
@@ -546,7 +558,7 @@ object Metamap {
             growBiome(Ruins, 2, 0.6f, true, listOf(Ocean))
 
             // Biomes pass 1 -- dry deserts, grow forests on plains, remove some isolated mountains
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.biome == Blank) {
                     if (cell.height == 0) cell.biome = Ocean
                     else if (cell.dryness >= (maxDry * 0.6f).toInt()) {
@@ -576,7 +588,7 @@ object Metamap {
                 repeat(maxVolcanoes) {
                     val volcano = volcanoPeaks.random()
                     if (!scratches[volcano.x][volcano.y].hasFeature(Volcano::class)) {
-                        scratches[volcano.x][volcano.y].features.add(Volcano())
+                        scratches[volcano.x][volcano.y].addFeature(Volcano())
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
@@ -589,7 +601,7 @@ object Metamap {
             }
 
             // Biomes pass 2 - insert intermediate biomes
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 when (cell.biome) {
                     Plain -> {
                         if (biomeNeighbors(x,y,Mountain,true) > 0) cell.biome = Hill
@@ -606,7 +618,7 @@ object Metamap {
                 cell.biome == Plain }
 
             // Biomes pass 3 - forest some hills, add desert oases
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 when (cell.biome) {
                     Hill -> {
                         if (biomeNeighbors(x, y, Forest, true) > 0) cell.biome = ForestHill
@@ -625,7 +637,7 @@ object Metamap {
                     Desert -> {
                         if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(oasisChance)) {
                             cell.biome = if (Dice.flip()) Plain else Scrub
-                            cell.features.add(Lake())
+                            cell.addFeature(Lake())
                         }
                     }
                     else -> { }
@@ -636,7 +648,7 @@ object Metamap {
             }
 
             // Clean up biome collisions
-            forEachMeta { x, y, cell ->
+            forEachScratch { x, y, cell ->
                 when (cell.biome) {
                     Swamp -> {
                         if (biomeNeighbors(x,y,Swamp,false) < 1) cell.biome = Plain
@@ -657,7 +669,7 @@ object Metamap {
             }
 
             // Post-processing
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 // Vari-blur rivers
                 cell.featureOf(Rivers::class)?.also { (it as Rivers).riverBlur = NoisePatches.get("metaVariance", x, y).toFloat() }
                 // Set coasts
@@ -679,13 +691,13 @@ object Metamap {
                     } }
                     adds.forEach { if (!coasts.contains(it)) coasts.add(it) }
                     if (coasts.isNotEmpty()) {
-                        cell.features.add(Coastlines(coasts))
+                        cell.addFeature(Coastlines(coasts))
                     }
                 }
             }
 
             // Set temperatures
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 var temp = 10 + (y * 0.5f) + NoisePatches.get("metaVariance2", x, y) * 15
                 when (cell.biome) {
                     Ocean -> temp += 10
@@ -702,7 +714,7 @@ object Metamap {
                 cell.temperature = temp.toInt()
             }
             repeat (3) {
-                forEachMeta { x, y, cell ->
+                forEachScratch { x, y, cell ->
                     var total = 0
                     DIRECTIONS.from(x, y) { x, y, _ -> if (boundsCheck(x, y)) total += scratches[x][y].temperature }
                     total = total / 8
@@ -711,7 +723,7 @@ object Metamap {
             }
 
             // Distribute habitats
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.biome != Ocean) {
                     cell.habitat = if (cell.temperature < 30) Arctic
                         else if (cell.temperature < 50) AlpineA
@@ -719,7 +731,7 @@ object Metamap {
                         else TropicalA
                 }
             }
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (NoisePatches.get("metaHabitats", x, y) > 0.5f) {
                     when (cell.habitat) {
                         AlpineA -> cell.habitat = AlpineB
@@ -737,7 +749,7 @@ object Metamap {
                     if (ocity != city) connectCityToHighways(city, ocity)
                 }
             }
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.biome == Suburb) {
                     CARDINALS.forEach { dir ->
                         if (Dice.chance(0.9f) && !scratches[x][y].highways().hasOneWhere { it.edge == dir }) {
@@ -770,7 +782,7 @@ object Metamap {
                                 placedOne = true
                                 actuallyPlaced++
                                 villages.add(XY(x, y))
-                                scratches[x][y].features.add(village)
+                                scratches[x][y].addFeature(village)
                                 scratches[x][y].removeFeature(RuinedBuildings::class)
                                 val placedDirs = mutableSetOf<XY>()
                                 // Place features around village
@@ -786,7 +798,7 @@ object Metamap {
                                                 village.isAbandoned,
                                                 dir
                                             )
-                                            neighbor.features.add(feature)
+                                            neighbor.addFeature(feature)
                                             neighbor.removeFeature(RuinedBuildings::class)
                                             placedDirs.add(dir)
                                             placedFeature = true
@@ -805,14 +817,14 @@ object Metamap {
             }
 
             // Place random cell features
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 // Cabins
                 if (Cabin.canBuildOn(cell) && Dice.chance(cell.biome.cabinChance())) {
-                    cell.features.add(Cabin())
+                    cell.addFeature(Cabin())
                 }
                 // Caves
                 if (Caves.canBuildOn(cell) && Dice.chance(cell.biome.cavesChance())) {
-                    cell.features.add(Caves())
+                    cell.addFeature(Caves())
                 }
                 // Lakes
                 if (Lake.canBuildOn(cell) && Dice.chance(when (cell.rivers().size) {
@@ -821,7 +833,7 @@ object Metamap {
                         2 -> 0.06f
                         else -> 0.1f
                     })) {
-                    cell.features.add(Lake())
+                    cell.addFeature(Lake())
                 }
                 // Ruined buildings
                 cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
@@ -838,23 +850,23 @@ object Metamap {
                         Suburb -> Dice.range(2, 6)
                         else -> 0
                     }
-                    if (buildingCount > 0) cell.features.add(RuinedBuildings(buildingCount))
+                    if (buildingCount > 0) cell.addFeature(RuinedBuildings(buildingCount))
                 }
                 // Special attention to cells with no surrounding features
-                if (cell.features.isEmpty() && DIRECTIONS.hasNoneWhere {
-                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].features.isNotEmpty() }
+                if (cell.features().isEmpty() && DIRECTIONS.hasNoneWhere {
+                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].features().isNotEmpty() }
                 ) {
                     // Farms
                     if (Farm.canBuildOn(cell) && Dice.chance(randomFarmChance)) {
-                        cell.features.add(Farm(Dice.flip()))
+                        cell.addFeature(Farm(Dice.flip()))
                     }
                     // Graveyards
                     if (Graveyard.canBuildOn(cell) && Dice.chance(randomGraveyardChance)) {
-                        cell.features.add(Graveyard(Dice.flip()))
+                        cell.addFeature(Graveyard(Dice.flip()))
                     }
                     // Taverns
                     if (Tavern.canBuildOn(cell) && Dice.chance(randomTavernChance)) {
-                        cell.features.add(Tavern(
+                        cell.addFeature(Tavern(
                             Madlib.tavernName(), NO_DIRECTION
                         ))
                     }
@@ -880,7 +892,7 @@ object Metamap {
             class BiomeArea(val areaID: Int, val size: Int)
             val areas = mutableMapOf<Biome,ArrayList<BiomeArea>>()
             var areaID = 1
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (areaMap[x][y] == 0) {
                     val biome = scratches[x][y].biome
                     if (listOf(Ruins, Suburb, Desert, Mountain, Forest, Swamp).contains(biome)) {
@@ -895,7 +907,7 @@ object Metamap {
                 }
             }
             fun nameArea(areaID: Int, name: String) {
-                forEachMeta { x,y,cell ->
+                forEachScratch { x, y, cell ->
                     if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle(cell.habitat))
                         cell.title = name
                 }
@@ -922,7 +934,7 @@ object Metamap {
             areas[Suburb]?.forEach { biomeArea ->
                 val areaId = biomeArea.areaID
                 var cityName: String? = null
-                forEachMeta { x,y,cell ->
+                forEachScratch { x, y, cell ->
                     if (cell.biome == Ruins && CARDINALS.hasOneWhere { areaMap[x+it.x][y+it.y] == areaId }) {
                         cityName = cell.title
                     }
@@ -933,7 +945,7 @@ object Metamap {
                     }
                 }
             }
-            forEachMeta { x,y,cell ->
+            forEachScratch { x, y, cell ->
                 if (cell.title == "") cell.title = cell.defaultTitle()
             }
 
@@ -956,6 +968,13 @@ object Metamap {
                 val histogenModal = HistogenModal()
                 Screen.addModal(histogenModal)
             }
+        }
+    }
+
+    fun startHistory() {
+        App.history = History()
+        coroutineScope.launch {
+            App.history.begin()
         }
     }
 
@@ -1091,8 +1110,8 @@ object Metamap {
     private fun runTrails() {
         val origins = mutableListOf<XY>()
         val targets = mutableListOf<XY>()
-        forEachMeta { x,y,cell ->
-            if ((cell.features.hasOneWhere {
+        forEachScratch { x, y, cell ->
+            if ((cell.features().hasOneWhere {
                     Dice.chance(it.trailDestinationChance())
             } || Dice.chance(0.001f)) && Trails.canBuildOn(cell)
             ) {
@@ -1201,7 +1220,7 @@ object Metamap {
                         }
                     }
                     cityCells.add(actualSite)
-                    scratches[actualSite.x][actualSite.y].features.add(RuinedCitySite("Fix Later"))
+                    scratches[actualSite.x][actualSite.y].addFeature(RuinedCitySite("Fix Later"))
                     placed = true
                 }
             }
@@ -1336,7 +1355,7 @@ object Metamap {
 
     private fun growBiome(biome: Biome, threshold: Int, chance: Float, allDirections: Boolean, exclude: List<Biome> = listOf()) {
         val adds = ArrayList<XY>()
-        forEachMeta { x, y, cell ->
+        forEachScratch { x, y, cell ->
             if (cell.biome != biome && cell.height > 0 && !exclude.contains(cell.biome) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
                 if (Dice.chance(chance)) adds.add(XY(x,y))
             }
@@ -1350,7 +1369,7 @@ object Metamap {
 
     private fun growBiome(biome: Biome, threshold: Int, chance: Float, allDirections: Boolean, cellOK: (x: Int, y: Int, cell: ChunkScratch)->Boolean) {
         val adds = ArrayList<XY>()
-        forEachMeta { x, y, cell ->
+        forEachScratch { x, y, cell ->
             if (cell.biome != biome && cell.height > 0 && cellOK(x,y,cell) && (biomeNeighbors(x, y, biome, allDirections) >= threshold)) {
                 if (Dice.chance(chance)) adds.add(XY(x,y))
             }

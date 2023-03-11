@@ -25,7 +25,7 @@ class ChunkMeta(
     val biome: Biome = Blank,
     val habitat: Habitat = world.gen.habitats.Blank,
     val variance: Float = 0f,
-    var features: MutableList<Feature> = mutableListOf(),
+    private var features: MutableList<Feature> = mutableListOf(),
     var cityDistance: Float = 0f,
     var title: String = "the wilderness",
     var mapped: Boolean = false
@@ -43,6 +43,15 @@ class ChunkMeta(
         features.forEach { feature ->
             feature.mapIcon()?.also { mapIcons.add(it) }
         }
+    }
+
+    fun features() = features
+
+    fun addFeature(feature: Feature) {
+        features.add(feature.apply {
+            worldX = x
+            worldY = y
+        })
     }
 
     fun hasFeature(ofClass: KClass<out Any>): Boolean {
@@ -86,7 +95,7 @@ class ChunkScratch(
     var dryness = -1
     var biome: Biome = Blank
     var habitat: Habitat = world.gen.habitats.Blank
-    var features: MutableList<Feature> = mutableListOf()
+    private var features: MutableList<Feature> = mutableListOf()
     var cityDistance = 0f
     var title = ""
 
@@ -104,6 +113,15 @@ class ChunkScratch(
         mapped = false
     ).apply {
         regenerateMapIcons()
+    }
+
+    fun features() = features
+
+    fun addFeature(feature: Feature) {
+        features.add(feature.apply {
+            worldX = x
+            worldY = y
+        })
     }
 
     fun hasFeature(ofClass: KClass<out Any>): Boolean {

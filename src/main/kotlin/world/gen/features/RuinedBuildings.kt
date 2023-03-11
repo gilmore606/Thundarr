@@ -15,9 +15,10 @@ import world.terrains.Terrain
 @Serializable
 class RuinedBuildings(
     val buildingCount: Int,
-) : Feature(
-    1, Stage.BUILD
-) {
+) : Feature() {
+    override fun order() = 1
+    override fun stage() = Stage.BUILD
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }

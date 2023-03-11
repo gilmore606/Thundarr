@@ -10,9 +10,9 @@ import world.terrains.Terrain
 @Serializable
 class Coastlines(
     val exits: MutableList<XY>,
-) : Feature(
-    1, Stage.TERRAIN
-) {
+) : Feature() {
+    override fun order() = 1
+    override fun stage() = Stage.TERRAIN
 
     override fun doDig() {
         val cornerWater = carto.growOblong(8, 8)

@@ -16,9 +16,10 @@ import world.terrains.Terrain
 @Serializable
 class Trails(
     val exits: MutableList<TrailExit>
-) : Feature(
-    5, Stage.BUILD
-) {
+) : Feature() {
+    override fun order() = 5
+    override fun stage() = Stage.BUILD
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ruins, Suburb, Ocean)
     }

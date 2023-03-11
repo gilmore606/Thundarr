@@ -14,9 +14,9 @@ import world.terrains.Terrain
 @Serializable
 class Highways(
     val exits: MutableList<HighwayExit>,
-) : Feature(
-    5, Stage.TERRAIN
-) {
+) : Feature() {
+    override fun order() = 5
+    override fun stage() = Stage.TERRAIN
 
     private val carChance = 0.4f
     private val signOffset = Dice.range(3, 10)

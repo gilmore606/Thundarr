@@ -15,12 +15,15 @@ import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
 
 @Serializable
-sealed class Feature(
-    val order: Int,
-    val stage: Stage,
-) {
+sealed class Feature {
 
+    open fun order(): Int = 0
+    open fun stage(): Stage = Stage.TERRAIN
     enum class Stage { TERRAIN, BUILD }
+
+    var worldX = 0
+    var worldY = 0
+
     @Transient
     lateinit var carto: WorldCarto
     @Transient

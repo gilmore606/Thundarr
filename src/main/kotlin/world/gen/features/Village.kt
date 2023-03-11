@@ -18,9 +18,10 @@ class Village(
     val name: String,
     val isAbandoned: Boolean = false,
     val size: Int,
-) : Feature(
-    3, Stage.BUILD
-) {
+) : Stronghold() {
+    override fun order() = 3
+    override fun stage() = Stage.BUILD
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)

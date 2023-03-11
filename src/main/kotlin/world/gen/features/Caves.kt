@@ -15,9 +15,10 @@ import world.gen.biomes.Mountain
 import world.terrains.Terrain
 
 @Serializable
-class Caves : Feature(
-    4, Stage.BUILD
-) {
+class Caves : Feature() {
+    override fun order() = 4
+    override fun stage() = Stage.BUILD
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome in listOf(Mountain, Hill, ForestHill, Desert)

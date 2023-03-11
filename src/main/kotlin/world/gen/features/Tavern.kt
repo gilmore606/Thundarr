@@ -15,9 +15,9 @@ import world.terrains.Terrain
 class Tavern(
     private val name: String,
     private val villageDirection: XY
-) : Feature(
-    4, Stage.BUILD
-) {
+) : Feature() {
+    override fun order() = 4
+    override fun stage() = Stage.BUILD
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)
