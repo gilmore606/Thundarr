@@ -8,12 +8,12 @@ import kotlinx.serialization.Transient
 import ktx.async.newSingleThreadAsyncContext
 import util.Dice
 import util.Madlib
-import util.hasOneWhere
 import world.gen.Metamap
 import world.gen.features.Stronghold
 
 @Serializable
 class History {
+    var renderLocked = false
 
     var year = 1994
     private val finalYear = 2994
@@ -21,7 +21,7 @@ class History {
 
     // Number of comet shards in world at start
     var shardsLeft = 20
-    private val shardFindChancePerTurn = 0.01f
+    private val shardFindChancePerTurn = 0.005f
 
     private val figures = mutableMapOf<Int, Figure>()
     private var figuresNextID = 0
@@ -35,7 +35,7 @@ class History {
     fun empire(id: Int) = empires[id]
     fun activeEmpires() = empires.values.filter { it.active }
 
-    @Transient private val strongholds = mutableListOf<Stronghold>()
+    @Transient val strongholds = mutableListOf<Stronghold>()
 
     @Transient private val coroutineContext = newSingleThreadAsyncContext("History")
     @Transient private val coroutineScope = CoroutineScope(coroutineContext)
@@ -43,6 +43,7 @@ class History {
     suspend fun begin() {
 
         coroutineScope.launch {
+            renderLocked = true
 
             // Collect all strongholds
             findStrongholds()
@@ -50,8 +51,11 @@ class History {
             // 1000 years of glorious tradition
             while (year < finalYear) {
                 year += yearsPerTurn
+                log("")
                 doTurn()
-                delay(1000L)
+                renderLocked = false
+                delay(500L)
+                renderLocked = true
             }
         }
     }
@@ -82,12 +86,19 @@ class History {
     }
 
     private fun birthWizard() {
-        val wizard = createFigure().apply {
-            name = Madlib.wizardName()
+        strongholds.filter { it.empire == null }.randomOrNull()?.also { firstStronghold ->
+            val wizard = createFigure().apply {
+                name = Madlib.wizardName()
+            }
+            log("The wizard ${wizard.name} appears in ${firstStronghold.name()}.")
+            val empire = createEmpire().apply {
+                leader = wizard.id
+            }
+            firstStronghold.empire = empire.id
         }
-        val empire = createEmpire().apply {
-            leader = wizard.id
-        }
+    }
 
+    private fun log(message: String) {
+        util.log.info("HISTORY: ($year) $message")
     }
 }

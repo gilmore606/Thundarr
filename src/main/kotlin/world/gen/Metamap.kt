@@ -30,7 +30,7 @@ object Metamap {
     private const val fakeDelayMillis = 150L
     private const val progressBarSegments = 13
 
-    private const val chunkRadius = 100
+    const val chunkRadius = 100
 
     private val coroutineContext = newSingleThreadAsyncContext("Metamap")
     private val coroutineScope = CoroutineScope(coroutineContext)

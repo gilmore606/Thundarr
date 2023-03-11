@@ -21,6 +21,7 @@ class Village(
 ) : Stronghold() {
     override fun order() = 3
     override fun stage() = Stage.BUILD
+    override fun name() = name
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)

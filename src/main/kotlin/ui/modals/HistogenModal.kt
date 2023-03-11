@@ -8,10 +8,8 @@ import render.tilesets.Glyph
 import render.tilesets.MapTileSet
 import ui.input.Keydef
 import ui.input.Mouse
-import util.Madlib
 import world.gen.Metamap
-import world.history.Empire
-import world.history.History
+import world.level.CHUNK_SIZE
 
 class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
 
@@ -46,25 +44,25 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
     override fun getTitleForDisplay() = "- nUMeRiA : ${App.history.year} -"
 
     private fun renderMap() {
-        val batch = mapBatch
         if (isAnimating()) return
-        val x0 = x + paddingX
-        val y0 = y + paddingY
         for (x in 0 until ((width - paddingX*2 - rightPad) / cellSize)) {
             for (y in 0 until ((height - paddingY - paddingX) / cellSize)) {
                 val meta = Metamap.metaAt(x+mapx, y+mapy)
-                val ox = x * cellSize
-                val oy = y * cellSize
-                val px0 = x0 + ox
-                val py0 = y0 + oy
-                val px1 = px0 + cellSize
-                val py1 = py0 + cellSize
                 meta.mapIcons.forEach { mapIcon ->
-                    batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(mapIcon))
+                    renderCell(x, y, mapIcon)
                 }
             }
         }
+        if (App.history.renderLocked) return
 
+        App.history.strongholds.forEach { strongHold ->
+            strongHold.empire?.also { empireId ->
+                val empire = App.history.empire(empireId)
+                renderCell(chunkXtoX(strongHold.worldX), chunkYtoY(strongHold.worldY), empire!!.mapColor, 5f)
+            }
+        }
+
+        // Draw right-side legend
         if (started) {
             App.history.empires.values.forEachIndexed { i, empire ->
                 val x0 = x + dataX
@@ -73,6 +71,20 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
                 mapBatch.addPixelQuad(x0 + 2, y0 + 2, x0 + 14, y0 + 14, mapBatch.getTextureIndex(empire.mapColor))
             }
         }
+    }
+
+    fun chunkXtoX(x: Int) = (x + (Metamap.chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
+    fun chunkYtoY(y: Int) = (y + (Metamap.chunkRadius * CHUNK_SIZE)) / CHUNK_SIZE
+
+    private fun renderCell(x: Int, y: Int, glyph: Glyph, zoom: Float = 1f) {
+        val ox = x * cellSize
+        val oy = y * cellSize
+        val size = cellSize * zoom
+        val px0 = this.x + paddingX + ox - (size - cellSize) / 2
+        val py0 = this.y + paddingY + oy - (size - cellSize) / 2
+        val px1 = px0 + cellSize + (size - cellSize) / 2
+        val py1 = py0 + cellSize + (size - cellSize) / 2
+        mapBatch.addPixelQuad(px0.toInt(), py0.toInt(), px1.toInt(), py1.toInt(), mapBatch.getTextureIndex(glyph))
     }
 
     override fun drawModalText() {
