@@ -18,6 +18,7 @@ class History {
     var year = 1994
     private val finalYear = 2994
     private val yearsPerTurn = 5
+    private val turnDelay = 50L
 
     // Number of comet shards in world at start
     var shardsLeft = 20
@@ -30,10 +31,11 @@ class History {
     fun activeFigures() = figures.values.filter { it.alive }
 
     val empires = mutableMapOf<Int, Empire>()
-    private var empiresNextID = 0
+    private var empiresNextID = 1  // 0 reserved for lords of light
     fun createEmpire() = Empire(empiresNextID).apply { foundingYear = year }.also { empires[empiresNextID++] = it }
     fun empire(id: Int) = empires[id]
     fun activeEmpires() = empires.values.filter { it.active }
+    lateinit var lightEmpire: LightEmpire
 
     @Transient val strongholds = mutableListOf<Stronghold>()
 
@@ -48,19 +50,26 @@ class History {
             // Collect all strongholds
             findStrongholds()
 
+            lightEmpire = LightEmpire().also { empires[0] = it }
+
             // 1000 years of glorious tradition
             while (year < finalYear) {
                 year += yearsPerTurn
                 log("")
                 doTurn()
                 renderLocked = false
-                delay(500L)
+                delay(turnDelay)
                 renderLocked = true
             }
         }
     }
 
     private fun doTurn() {
+        // Age figures
+        figures.values.forEach { figure ->
+            if (figure.alive)
+                figure.passYears(yearsPerTurn)
+        }
 
         // Check if a fragment is found; birth a wizard and empire
         maybeBirthWizard()
@@ -68,6 +77,10 @@ class History {
         // Empires accumulate power
 
         // Empires try to expand
+        empires.values.forEach { empire ->
+            if (empire.active)
+                empire.passYears(yearsPerTurn)
+        }
 
     }
 
@@ -76,6 +89,8 @@ class History {
             cell.features().firstOrNull { it is Stronghold }?.also { strongholds.add(it as Stronghold) }
         }
     }
+
+    fun freeStrongholds() = strongholds.filter { it.empire == null }
 
     private fun maybeBirthWizard() {
         if (shardsLeft > 0) {
@@ -86,19 +101,20 @@ class History {
     }
 
     private fun birthWizard() {
-        strongholds.filter { it.empire == null }.randomOrNull()?.also { firstStronghold ->
+        freeStrongholds().randomOrNull()?.also { firstStronghold ->
             val wizard = createFigure().apply {
                 name = Madlib.wizardName()
+                expectedLifespan = 300 + Dice.zeroTo(500)
             }
             log("The wizard ${wizard.name} appears in ${firstStronghold.name()}.")
             val empire = createEmpire().apply {
                 leader = wizard.id
+                addStronghold(firstStronghold)
             }
-            firstStronghold.empire = empire.id
         }
     }
 
-    private fun log(message: String) {
+    fun log(message: String) {
         util.log.info("HISTORY: ($year) $message")
     }
 }

@@ -26,9 +26,10 @@ import kotlin.random.Random
 
 object Metamap {
 
-    private const val fakeDelaysInWorldgenText = true
+    private const val fakeDelaysInWorldgenText = false
     private const val fakeDelayMillis = 150L
     private const val progressBarSegments = 13
+    private const val SKIP_HISTORY = true
 
     const val chunkRadius = 100
 
@@ -317,15 +318,15 @@ object Metamap {
             sayProgress("Stirring the face of the waters...")
 
             val opens = ArrayList<XY>()
-            val coasts = ArrayList<XY>()
+            val coastOceans = ArrayList<XY>()
 
-            // Set coasts at all coast water
+            // Collect list of coasts at all coast water
             forEachScratch { x, y, cell ->
                 if (cell.height == 0) {
                     if (CARDINALS.hasOneWhere {
                         boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].height == -1
                         }) {
-                        coasts.add(XY(x,y))
+                        coastOceans.add(XY(x,y))
                         opens.add(XY(x,y))
                     }
                 }
@@ -361,14 +362,8 @@ object Metamap {
                     }
                 }
             }
-            // Fix any height=-1 cells that got missed somehow in sloping
-            for (ix in 0 until chunkRadius *2) {
-                for (iy in 0 until chunkRadius *2) {
-                    if (scratches[ix][iy].height < 0) scratches[ix][iy].height = 1
-                }
-            }
 
-            // Set mountaintops
+            // Set ocean and mountaintops
             sayProgress("Raising mountains...")
             val peaks = ArrayList<XY>()
             forEachScratch { x, y, cell ->
@@ -380,6 +375,8 @@ object Metamap {
                         peaks.add(XY(x, y))
                         scratches[x][y].biome = Mountain
                     }
+                } else if (height == 0) {
+                    scratches[x][y].biome = Ocean
                 }
             }
 
@@ -400,7 +397,7 @@ object Metamap {
 
             // Run rivers from coast cells
             val mouths = mutableListOf<XY>()
-            coasts.forEach { coast ->
+            coastOceans.forEach { coast ->
                 if (scratches[coast.x][coast.y].biome != Glacier) {
                     countRiverDescendants(coast)
                     if (scratches[coast.x][coast.y].riverDescendantCount > 30) {
@@ -410,7 +407,7 @@ object Metamap {
                     }
                 }
             }
-            sayProgress("Running ${mouths.size} rivers from ${coasts.size} possible coasts...")
+            sayProgress("Running ${mouths.size} rivers from ${coastOceans.size} possible coasts...")
             mouths.forEach { runRiver(it, wiggle = 0.5f) }
 
             // Calculate moisture
@@ -521,6 +518,10 @@ object Metamap {
             // Place cities
             val citiesTotal = citiesRiverMouth + citiesCoast + citiesRiver + citiesInland + citiesDesert
             sayProgress("Building $citiesTotal ancient cities...")
+            val coasts = ArrayList<XY>()
+            forEachScratch { x,y,cell ->
+                if (cell.biome !in listOf(Ocean, Glacier) && biomeNeighbors(x,y,Ocean) > 0) coasts.add(XY(x,y))
+            }
             repeat (citiesRiverMouth) { placeCity(mouths) }
             repeat (citiesCoast) { placeCity(coasts) }
             repeat (citiesRiver) { placeCity(riverCells) }
@@ -548,8 +549,8 @@ object Metamap {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
 
-                            //suggestedPlayerStart.x = xToChunkX(dx)
-                            //suggestedPlayerStart.y = yToChunkY(dy)
+                            suggestedPlayerStart.x = xToChunkX(dx)
+                            suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -806,8 +807,8 @@ object Metamap {
                                         }
                                     }
                                 }
-                                suggestedPlayerStart.x = xToChunkX(x)
-                                suggestedPlayerStart.y = yToChunkY(y)
+                                //suggestedPlayerStart.x = xToChunkX(x)
+                                //suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -964,9 +965,13 @@ object Metamap {
 
             // Launch history
             sayProgress("The moon is cracked in god-damned half!")
-            KtxAsync.launch {
-                val histogenModal = HistogenModal()
-                Screen.addModal(histogenModal)
+            if (!SKIP_HISTORY) {
+                KtxAsync.launch {
+                    val histogenModal = HistogenModal()
+                    Screen.addModal(histogenModal)
+                }
+            } else {
+                finishBuildWorld()
             }
         }
     }
@@ -1213,15 +1218,18 @@ object Metamap {
         while (!placed) {
             locations.random().also { site ->
                 if (site.isFarEnoughFromAll(minCityDistance, cityCells)) {
-                    var actualSite = site
+                    var actualSite: XY? = site
                     if (!isLandAt(site)) {
+                        actualSite = null
                         DIRECTIONS.firstOrNull { isLandAt(XY(site.x + it.x, site.y + it.y)) }?.also { dir ->
                             actualSite = XY(site.x + dir.x, site.y + dir.y)
                         }
                     }
-                    cityCells.add(actualSite)
-                    scratches[actualSite.x][actualSite.y].addFeature(RuinedCitySite("Fix Later"))
-                    placed = true
+                    actualSite?.also { actualSite ->
+                        cityCells.add(actualSite)
+                        scratches[actualSite.x][actualSite.y].addFeature(RuinedCitySite("Fix Later"))
+                        placed = true
+                    }
                 }
             }
         }

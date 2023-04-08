@@ -286,6 +286,14 @@ object Madlib {
         return full
     }
 
+    fun prophetName(): String {
+        val a = listOf("P", "F", "B", "H", "Fl", "Br", "Pr", "Fr", "Pl", "Fl").random()
+        val b = listOf("a", "o", "e", "ei", "ou", "ae", "ea", "ai", "ee", "oo").random()
+        val c = listOf("b", "t", "s", "th", "ch", "f", "sh", "n", "d", "dh").random()
+        val d = listOf("o", "a", "ai", "oo", "ee", "ae", "io", "u", "ue", "ya").random()
+        return a+b+c+d
+    }
+
     fun bigCityName() = listOf<String>(
         "Man-Hat",
         "Hostone",

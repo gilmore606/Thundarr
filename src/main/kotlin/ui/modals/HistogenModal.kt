@@ -58,7 +58,7 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
         App.history.strongholds.forEach { strongHold ->
             strongHold.empire?.also { empireId ->
                 val empire = App.history.empire(empireId)
-                renderCell(chunkXtoX(strongHold.worldX), chunkYtoY(strongHold.worldY), empire!!.mapColor, 5f)
+                renderCell(chunkXtoX(strongHold.worldX) - mapx + 1, chunkYtoY(strongHold.worldY) - mapy + 1, empire!!.mapColor, 5f)
             }
         }
 

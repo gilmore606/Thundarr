@@ -30,6 +30,7 @@ object Ruins : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_DIRT
     override fun trailChance() = 0f
     override fun plantDensity() = 0.0f
+    override fun metaTravelCost() = 2f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)
@@ -193,7 +194,7 @@ object Ruins : Biome(
         }
     }
 
-    override fun populateExtra(carto: WorldCarto) {
+    override fun placeExtraThings(carto: WorldCarto) {
         repeat (wreckedCarCount()) {
             var placed = false
             while (!placed) {

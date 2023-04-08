@@ -54,10 +54,10 @@ class WorldCarto(
             digFeatures(Feature.Stage.BUILD)
             if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
 
-            // Populate!
+            // Plants and stuff
             buildFertilityMap()
             growPlants()
-            meta.biome.populateExtra(this)
+            meta.biome.placeExtraThings(this)
 
             // Post-processing
             deepenWater()
@@ -65,6 +65,9 @@ class WorldCarto(
             setRoofedInRock()
             meta.biome.postProcess(this)
             setOverlaps()
+
+            // Creatures
+            
         }
 
         //debugBorders()

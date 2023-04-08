@@ -38,8 +38,9 @@ sealed class Biome(
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun postProcess(carto: WorldCarto) { }
     open fun carveExtraTerrain(carto: WorldCarto) { }
-    open fun populateExtra(carto: WorldCarto) { }
+    open fun placeExtraThings(carto: WorldCarto) { }
     open fun wallsBlockTrails() = true
+    open fun metaTravelCost() = 1f
 
     protected fun setTerrain(carto: WorldCarto, x: Int, y: Int, type: Terrain.Type) {
         if (carto.boundsCheck(x + carto.x0, y + carto.y0)) {
@@ -124,6 +125,7 @@ object Hill : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = TERRAIN_BRICKWALL
     override fun villageFloorType() = TERRAIN_CAVEFLOOR
+    override fun metaTravelCost() = 1.5f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) - NoisePatches.get("mountainShapes", x, y).toFloat() * 0.6f
 
@@ -155,6 +157,7 @@ object ForestHill : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_WOODWALL
     override fun villageFloorType() = if (Dice.chance(0.7f)) TERRAIN_WOODFLOOR else TERRAIN_CAVEFLOOR
+    override fun metaTravelCost() = 2f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
             (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 3f).toFloat()
@@ -192,6 +195,7 @@ object Mountain : Biome(
     override fun villageWallType() = TERRAIN_BRICKWALL
     override fun villageFloorType() = if (Dice.chance(0.1f)) TERRAIN_DIRT else
         if (Dice.flip()) TERRAIN_STONEFLOOR else TERRAIN_CAVEFLOOR
+    override fun metaTravelCost() = 3f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -219,6 +223,7 @@ object Swamp : Biome(
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
     override fun bareTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
+    override fun metaTravelCost() = 2f
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
 
@@ -281,6 +286,7 @@ object Desert : Biome(
     override fun plantDensity() = 0.1f
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_CAVEWALL
     override fun villageFloorType() = if (Dice.chance(0.2f)) TERRAIN_HARDPAN else TERRAIN_STONEFLOOR
+    override fun metaTravelCost() = 0.7f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)
