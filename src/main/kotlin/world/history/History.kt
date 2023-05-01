@@ -32,10 +32,10 @@ class History {
 
     val empires = mutableMapOf<Int, Empire>()
     private var empiresNextID = 1  // 0 reserved for lords of light
-    fun createEmpire() = Empire(empiresNextID).apply { foundingYear = year }.also { empires[empiresNextID++] = it }
+    fun createEmpire() = Empire(empiresNextID, App.history.year).also { empires[empiresNextID++] = it }
     fun empire(id: Int) = empires[id]
     fun activeEmpires() = empires.values.filter { it.active }
-    lateinit var lightEmpire: LightEmpire
+    var lightEmpire: LightEmpire = LightEmpire().also { empires[0] = it }
 
     @Transient val strongholds = mutableListOf<Stronghold>()
 
@@ -49,8 +49,6 @@ class History {
 
             // Collect all strongholds
             findStrongholds()
-
-            lightEmpire = LightEmpire().also { empires[0] = it }
 
             // 1000 years of glorious tradition
             while (year < finalYear) {

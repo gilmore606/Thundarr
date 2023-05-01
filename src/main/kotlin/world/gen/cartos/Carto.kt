@@ -1,5 +1,6 @@
 package world.gen.cartos
 
+import actors.NPC
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -9,11 +10,9 @@ import things.Thing
 import util.*
 import world.Building
 import world.Chunk
-import world.gen.NoisePatches
-import world.gen.PlantSpawn
+import world.gen.*
 import world.gen.biomes.Biome
 import world.gen.habitats.Habitat
-import world.gen.plantSpawns
 import world.level.Level
 import world.gen.prefabs.Prefab
 import world.gen.prefabs.TiledFile
@@ -41,6 +40,7 @@ abstract class Carto(
     protected val json = Json { ignoreUnknownKeys = true }
 
     protected val plantSpawns = plantSpawns()
+    protected val animalSpawns = animalSpawns()
 
     open val wallTerrain = Terrain.Type.TERRAIN_BRICKWALL
     open val floorTerrain = Terrain.Type.TERRAIN_STONEFLOOR
@@ -634,6 +634,24 @@ abstract class Carto(
                     if (acc >= spawnFreq) {
                         return it.spawn()
                     }
+                }
+            }
+        }
+        return null
+    }
+
+    fun getAnimal(biome: Biome, habitat: Habitat, fromSpawns: List<AnimalSpawn> = animalSpawns): NPC? {
+        val animals = fromSpawns.filter {
+            it.biomes.contains(biome) && it.habitats.contains(habitat)
+        }
+        if (animals.isNotEmpty()) {
+            val totalFreq = animals.map { it.frequency }.reduce { t, f -> t + f }
+            val spawnFreq = Dice.float(0f, totalFreq)
+            var acc = 0f
+            animals.forEach {
+                acc += it.frequency
+                if (acc >= spawnFreq) {
+                    return it.spawn()
                 }
             }
         }

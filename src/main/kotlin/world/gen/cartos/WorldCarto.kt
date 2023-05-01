@@ -1,6 +1,9 @@
 package world.gen.cartos
 
 import App
+import actors.NPC
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import util.*
 import world.*
 import world.gen.biomes.Biome
@@ -67,7 +70,7 @@ class WorldCarto(
             setOverlaps()
 
             // Creatures
-            
+            spawnAnimals()
         }
 
         //debugBorders()
@@ -121,6 +124,27 @@ class WorldCarto(
                 }
             }
         }
+    }
+
+    private fun spawnAnimals() {
+        repeat(Dice.oneTo(5)) {
+            getAnimal(meta.biome, meta.habitat)?.also { animal ->
+                findAnimalSpawnLocation(animal)?.also { location ->
+                    KtxAsync.launch {
+                        animal.spawnAt(level, location.x, location.y)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun findAnimalSpawnLocation(animal: NPC): XY? {
+        repeat (200) {
+            val x = x0 + Dice.zeroTil(CHUNK_SIZE)
+            val y = y0 + Dice.zeroTil(CHUNK_SIZE)
+            if (isWalkableAt(x, y)) return XY(x,y)
+        }
+        return null
     }
 
     private suspend fun buildBiomeBlendMap() {
