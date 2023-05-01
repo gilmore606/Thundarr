@@ -125,6 +125,12 @@ sealed class Thing() : Entity {
 
     @Transient var holder: ThingHolder? = null
 
+    enum class Category {
+        GEAR, TOOL, CONSUMABLE, MISC
+    }
+
+    open fun category(): Category = Category.MISC
+
     enum class UseTag {
         E0, E1, E2, E3, E4, E5, E6, E7, E8, E9,
         USE, USE_ON, SWITCH, SWITCH_ON, SWITCH_OFF, CONSUME, OPEN, CLOSE, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
@@ -286,6 +292,7 @@ class Lighter : Portable() {
     override fun name() = "lighter"
     override fun description() = "A brass cigarette lighter.  Handy for starting fires."
     override fun glyph() = Glyph.LIGHTER
+    override fun category() = Category.TOOL
     override fun weight() = 0.02f
     override fun uses() = mapOf(
         UseTag.USE to Use("light fire nearby", 2.0f,

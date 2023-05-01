@@ -90,6 +90,8 @@ sealed class Gear : Portable(), StatEffector {
     override fun statEffects() = defaultStatEffects
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
 
+    override fun category() = Category.GEAR
+
     override fun examineInfo(): String {
         if (!known) return super.examineInfo()
         val effects = statEffects()

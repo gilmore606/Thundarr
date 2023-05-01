@@ -6,6 +6,7 @@ import actors.actions.Make
 import actors.actions.Use
 import com.badlogic.gdx.Input
 import render.Screen
+import render.tilesets.Glyph
 import things.Container
 import things.Thing
 import things.ThingHolder
@@ -23,11 +24,29 @@ class InventoryModal(
     private val withContainer: Container? = null,
     private val parentModal: Modal? = null,
     sidecarTitle: String? = null
-    ) : SelectionModal(400, 700, default = 0,
+    ) : SelectionModal(400, Screen.height - 150, default = 0,
         title = sidecarTitle?.let { "- $sidecarTitle -" } ?: "- bACkPACk -",
         position = if (parentModal == null) Position.LEFT else Position.SIDECAR
     ), ContextMenu.ParentModal {
 
+    enum class Tab(
+        val x: Int,
+        val title: String,
+        val icon: Glyph,
+        val category: Thing.Category?
+    ) {
+        ALL(80, "all", Glyph.INVENTORY_ALL, null),
+        GEAR(130, "gear", Glyph.INVENTORY_GEAR, Thing.Category.GEAR),
+        CONSUMABLE(180, "supplies", Glyph.INVENTORY_CONSUMABLES, Thing.Category.CONSUMABLE),
+        TOOL(230, "tools", Glyph.INVENTORY_TOOLS, Thing.Category.TOOL),
+        MISC(280, "misc", Glyph.INVENTORY_MISC, Thing.Category.MISC),
+    }
+
+    var tab = Tab.ALL
+    var tabY = 0
+    var cursorLocalX = 0
+    var cursorLocalY = 0
+    val tabSize = 24
     var grouped = ArrayList<ArrayList<Thing>>()
     var weights = ArrayList<String>()
     var totalText: String = ""
@@ -38,15 +57,16 @@ class InventoryModal(
     var isBench = (parentModal is InventoryModal && parentModal.withBench)
     fun getBench() = if (isBench) ((parentModal as InventoryModal).withContainer as Workbench) else null
 
+
     init {
         zoomWhenOpen = 1.2f
         parentModal?.also { this.isSidecar = true ; changeSelection(0) }
         updateGrouped()
-        adjustHeight()
         selectionBoxHeight = 18
         spacing = 27
         padding = 18
-        headerPad = 80
+        headerPad = 110
+        tabY = headerPad - 48
         withContainer?.also {
             sidecar = InventoryModal(withContainer, parentModal = this, sidecarTitle = withContainer.name())
             moveToSidecar()
@@ -58,13 +78,9 @@ class InventoryModal(
     fun shownThing(): Thing? = if (isInSidecar && sidecar is InventoryModal) (sidecar as InventoryModal).shownThing()
         else if (grouped.isEmpty()) null else if (selection > -1 && selection < firstRecipeSelection) grouped[selection].first() else null
 
-    private fun adjustHeight() {
-        height = headerPad + max(1, grouped.size + 1) * (spacing + 2) + padding * 2
-        if (isBench) height += getBench()!!.possibleRecipes().size * spacing
-        onResize(Screen.width, Screen.height)
-    }
-
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
+
+    override fun getTitleForDisplay() = "- bACkPACk (${tab.title}) -"
 
     override fun drawModalText() {
         if (maxSelection < 0) {
@@ -117,6 +133,9 @@ class InventoryModal(
     override fun drawBackground() {
         super.drawBackground()
         if (!isAnimating()) {
+            Tab.values().forEach { tab ->
+                drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon)
+            }
             if (selection > -1 && selection < firstRecipeSelection) {
                 drawOptionShade()
             } else if (selection >= firstRecipeSelection) {
@@ -137,7 +156,18 @@ class InventoryModal(
     }
 
     override fun doSelect() {
-        if (selection < 0) return
+        if (selection < 0) {
+            if (cursorLocalY in tabY - 10 .. tabY + tabSize + 12) {
+                Tab.values().forEach { thisTab ->
+                    if (cursorLocalX in thisTab.x - 5 until thisTab.x + tabSize + 5) {
+                        super.doSelect()
+                        tab = thisTab
+                        updateGrouped()
+                    }
+                }
+            }
+            return
+        }
         super.doSelect()
         val parent = this
         val ourSelection = selection
@@ -170,17 +200,20 @@ class InventoryModal(
     }
 
     override fun mouseToOption(screenX: Int, screenY: Int): Int? {
-        val localX = screenX - x
-        val localY = screenY - y + (spacing / 2)
-        if (localX in 1 until width) {
-            val hoverOption = (localY - headerPad - 5) / spacing
-            if (hoverOption in 0 until firstRecipeSelection) {
-                return hoverOption
-            }
-            height - padding - numRecipes * spacing
-            val recipeOption = (localY - (height - numRecipes * spacing)) / spacing
-            if (recipeOption in 0 until numRecipes) {
-                return recipeOption + firstRecipeSelection
+        cursorLocalX = screenX - x
+        cursorLocalY = screenY - y + (spacing / 2)
+        if (cursorLocalX in 1 until width) {
+            if (cursorLocalY > headerPad) {
+                val hoverOption = (cursorLocalY - headerPad - 5) / spacing
+                if (hoverOption in 0 until firstRecipeSelection) {
+                    return hoverOption
+                }
+                if (numRecipes > 0) {
+                    val recipeOption = (cursorLocalY - (height - numRecipes * spacing)) / spacing
+                    if (recipeOption in 0 until numRecipes) {
+                        return recipeOption + firstRecipeSelection
+                    }
+                }
             }
         }
         return null
@@ -230,8 +263,9 @@ class InventoryModal(
 
     private fun updateGrouped() {
         var weightTotal = 0f
+        val things = tab.category?.let { thingHolder.contents().filter { it.category() == tab.category }} ?: thingHolder.contents()
         grouped = ArrayList<ArrayList<Thing>>().apply {
-            thingHolder.contents().forEach { thing ->
+            things.forEach { thing ->
                 weightTotal += thing.weight()
                 val listName = thing.listName()
                 var placed = false
@@ -257,7 +291,6 @@ class InventoryModal(
         firstRecipeSelection = grouped.size
         maxSelection = grouped.size - 1 + numRecipes
         changeSelection(min(maxSelection, selection))
-        adjustHeight()
         if (maxSelection < 0) {
             changeSelection(-1)
             sidecar?.also { moveToSidecar() } ?: run {

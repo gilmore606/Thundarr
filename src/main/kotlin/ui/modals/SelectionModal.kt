@@ -118,6 +118,7 @@ abstract class SelectionModal(
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         if (super.onMouseClicked(screenX, screenY, button)) return true
         mouseToOption(screenX, screenY)?.also { changeSelection(it) ; doSelect(); return true }
+        doSelect()
         return false
     }
 

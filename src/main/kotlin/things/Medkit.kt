@@ -20,6 +20,8 @@ sealed class Medkit : Portable() {
     open fun junkMsg() = "That was the last of your %n."
     open fun treatmentsLeft() = 0
 
+    override fun category() = Category.TOOL
+
     override fun uses() = mapOf(
         UseTag.USE to Use("self-treat with " + name(), 3f,
             canDo = { actor,x,y,targ ->

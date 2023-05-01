@@ -30,4 +30,9 @@ fun UITileSet() =
         setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
         setTile(Glyph.WINDOW_SHADE, SimpleTile(this, 2, 4))
         setTile(Glyph.QUESTION_ICON, SimpleTile(this, 5, 4))
+        setTile(Glyph.INVENTORY_ALL, SimpleTile(this, 5, 0))
+        setTile(Glyph.INVENTORY_GEAR, SimpleTile(this, 5, 1))
+        setTile(Glyph.INVENTORY_CONSUMABLES, SimpleTile(this, 5, 2))
+        setTile(Glyph.INVENTORY_TOOLS, SimpleTile(this, 5, 3))
+        setTile(Glyph.INVENTORY_MISC, SimpleTile(this, 5, 5))
     }

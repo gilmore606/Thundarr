@@ -33,6 +33,8 @@ sealed class LitThing : Portable(), LightSource {
 
     override fun listTag() = if (active) "(lit)" else ""
 
+    override fun category() = Category.TOOL
+
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)
         if (light() != null && holder is CellContainer) {

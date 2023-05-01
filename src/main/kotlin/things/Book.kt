@@ -22,6 +22,8 @@ sealed class Book : Portable() {
         Tag.THING_TRUNK, Tag.THING_WRECKEDCAR, Tag.THING_TABLE
     )
 
+    override fun category() = Category.TOOL
+
     override fun uses() = mapOf(
         UseTag.USE to Use("read " + this.name(), 5f,
             canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) },
