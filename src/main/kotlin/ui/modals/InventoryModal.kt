@@ -25,7 +25,7 @@ class InventoryModal(
     private val parentModal: Modal? = null,
     sidecarTitle: String? = null
     ) : SelectionModal(400, Screen.height - 150, default = 0,
-        title = sidecarTitle?.let { "- $sidecarTitle -" } ?: "- bACkPACk -",
+        title = sidecarTitle ?: "bACkPACk",
         position = if (parentModal == null) Position.LEFT else Position.SIDECAR
     ), ContextMenu.ParentModal {
 
@@ -80,12 +80,14 @@ class InventoryModal(
 
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
 
-    override fun getTitleForDisplay() = "- bACkPACk (${tab.title}) -"
+    override fun getTitleForDisplay() = if (tab == Tab.ALL) "- $title -" else "- $title (${tab.title}) -"
 
     override fun drawModalText() {
         if (maxSelection < 0) {
             parentModal?.also {
-                drawOptionText((parentModal as InventoryModal).withContainer?.isEmptyMsg() ?: "It's empty.", 0)
+                if (tab == Tab.ALL) {
+                    drawOptionText((parentModal as InventoryModal).withContainer?.isEmptyMsg() ?: "It's empty.", 0)
+                }
             }
             changeSelection(-1)
             return
@@ -134,6 +136,9 @@ class InventoryModal(
         super.drawBackground()
         if (!isAnimating()) {
             Tab.values().forEach { tab ->
+                if (this.tab == tab) {
+                    drawSelectionBox(tab.x - 2, tabY + 8, tabSize - 4, tabSize - 4)
+                }
                 drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon)
             }
             if (selection > -1 && selection < firstRecipeSelection) {
