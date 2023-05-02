@@ -91,7 +91,7 @@ abstract class SelectionModal(
         when (key) {
             Keydef.MOVE_N -> selectPrevious()
             Keydef.MOVE_S -> selectNext()
-            Keydef.INTERACT -> { if (selection >= 0) doSelect() }
+            Keydef.INTERACT -> doSelect()
             Keydef.SHORTCUT1 -> onShortcutSelect(0)
             Keydef.SHORTCUT2 -> onShortcutSelect(1)
             Keydef.SHORTCUT3 -> onShortcutSelect(2)

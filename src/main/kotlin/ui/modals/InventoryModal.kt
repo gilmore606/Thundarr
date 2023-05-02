@@ -161,6 +161,25 @@ class InventoryModal(
         }
     }
 
+    override fun selectPrevious() {
+        if (selection == 0) {
+            selection = -1
+            hoveredTab = tab
+        } else {
+            hoveredTab = null
+            super.selectPrevious()
+        }
+    }
+
+    override fun selectNext() {
+        if (hoveredTab != null && maxSelection > 0) {
+            selection = 0
+            hoveredTab = null
+        } else {
+            super.selectNext()
+        }
+    }
+
     override fun doSelect() {
         if (selection < 0) {
             hoveredTab?.also { hovered ->
@@ -236,11 +255,23 @@ class InventoryModal(
             Keydef.OPEN_MAP -> replaceWith(MapModal())
             Keydef.OPEN_SKILLS -> replaceWith(SkillsModal(App.player))
             Keydef.MOVE_W -> {
+                hoveredTab?.also {
+                    val tabs = Tab.values()
+                    val i = tabs.indexOf(it)
+                    hoveredTab = tabs[if (i < 1) tabs.lastIndex else i-1]
+                    return
+                }
                 parentModal?.also {
                     returnToParent()
                 } ?: run { dismiss() }
             }
             Keydef.MOVE_E -> {
+                hoveredTab?.also {
+                    val tabs = Tab.values()
+                    val i = tabs.indexOf(it)
+                    hoveredTab = tabs[if (i >= tabs.lastIndex) 0 else i+1]
+                    return
+                }
                 if (sidecar is InventoryModal && (sidecar as InventoryModal).grouped.isNotEmpty()) {
                     moveToSidecar()
                 } else doSelect()
