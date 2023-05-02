@@ -43,6 +43,7 @@ class InventoryModal(
     }
 
     var tab = Tab.ALL
+    var hoveredTab: Tab? = null
     var tabY = 0
     var cursorLocalX = 0
     var cursorLocalY = 0
@@ -136,10 +137,10 @@ class InventoryModal(
         super.drawBackground()
         if (!isAnimating()) {
             Tab.values().forEach { tab ->
-                if (this.tab == tab) {
+                if (this.hoveredTab == tab) {
                     drawSelectionBox(tab.x - 2, tabY + 8, tabSize - 4, tabSize - 4)
                 }
-                drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon)
+                drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon, alpha = if (this.tab == tab) 1f else 0.4f)
             }
             if (selection > -1 && selection < firstRecipeSelection) {
                 drawOptionShade()
@@ -162,14 +163,10 @@ class InventoryModal(
 
     override fun doSelect() {
         if (selection < 0) {
-            if (cursorLocalY in tabY - 10 .. tabY + tabSize + 12) {
-                Tab.values().forEach { thisTab ->
-                    if (cursorLocalX in thisTab.x - 5 until thisTab.x + tabSize + 5) {
-                        super.doSelect()
-                        tab = thisTab
-                        updateGrouped()
-                    }
-                }
+            hoveredTab?.also { hovered ->
+                super.doSelect()
+                tab = hovered
+                updateGrouped()
             }
             return
         }
@@ -207,6 +204,7 @@ class InventoryModal(
     override fun mouseToOption(screenX: Int, screenY: Int): Int? {
         cursorLocalX = screenX - x
         cursorLocalY = screenY - y + (spacing / 2)
+        hoveredTab = null
         if (cursorLocalX in 1 until width) {
             if (cursorLocalY > headerPad) {
                 val hoverOption = (cursorLocalY - headerPad - 5) / spacing
@@ -217,6 +215,12 @@ class InventoryModal(
                     val recipeOption = (cursorLocalY - (height - numRecipes * spacing)) / spacing
                     if (recipeOption in 0 until numRecipes) {
                         return recipeOption + firstRecipeSelection
+                    }
+                }
+            } else if (cursorLocalY > tabY - 10) {
+                Tab.values().forEach { thisTab ->
+                    if (cursorLocalX in thisTab.x - 5 until thisTab.x + tabSize + 5) {
+                        hoveredTab = thisTab
                     }
                 }
             }

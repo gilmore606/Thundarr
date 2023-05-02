@@ -109,13 +109,13 @@ class QuadBatch(
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
                      textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
-                     hue: Float? = null) {
+                     hue: Float? = null, alpha: Float = 1f) {
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / Screen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / Screen.height.toDouble()) * 2f - 1f
         addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex,
-                lightR, lightG, lightB, 1f, 0f, hue ?: Screen.uiHue.toFloat())
+                lightR, lightG, lightB, alpha, 0f, hue ?: Screen.uiHue.toFloat())
     }
 
     fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY

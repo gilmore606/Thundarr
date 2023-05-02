@@ -98,9 +98,9 @@ abstract class Panel {
             myBoxBatch().getTextureIndex(Glyph.WINDOW_SHADE))
     }
 
-    fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph) {
+    fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph, alpha: Float = 1f) {
         myBoxBatch().addPixelQuad(x + this.x, y + this.y, x + width + this.x, y + height + this.y,
-            myBoxBatch().getTextureIndex(glyph))
+            myBoxBatch().getTextureIndex(glyph), alpha = alpha)
     }
 
     fun drawWrappedText(text: List<String>, x0: Int, y0: Int, spacing: Int = 20,
