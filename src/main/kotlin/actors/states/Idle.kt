@@ -62,7 +62,6 @@ class IdleDoNothing : Idle()
 
 @Serializable
 class IdleInRoom : Idle() {
-
     override fun pickAction(npc: NPC): Action {
         if (Dice.chance(0.5f)) return wander(npc) {
             npc.placeMemory["myRoom0"]?.let { room0 ->
@@ -73,14 +72,12 @@ class IdleInRoom : Idle() {
         }
         return super.pickAction(npc)
     }
-
 }
 
 @Serializable
 class IdleWander(
     val wanderChance: Float
 ) : Idle() {
-
     override fun pickAction(npc: NPC): Action {
         if (Dice.chance(wanderChance)) {
             return wander(npc) { true }

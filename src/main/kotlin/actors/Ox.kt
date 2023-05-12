@@ -2,6 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Bark
+import actors.states.IdleWander
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -27,6 +28,8 @@ class Ox : NPC() {
     }
     override fun armorTotal() = 2.5f
 
+    override fun idleState() = IdleWander(0.3f)
+
     override fun onDeath(corpse: Container?) {
         corpse?.also { RawMeat().moveTo(it) }
     }
@@ -46,6 +49,8 @@ class MuskOx : NPC() {
         Speed.set(this, 10f)
         Brains.set(this, 6f)
     }
+
+    override fun idleState() = IdleWander(0.4f)
 
     override fun onDeath(corpse: Container?) {
         corpse?.also { RawMeat().moveTo(it) }
