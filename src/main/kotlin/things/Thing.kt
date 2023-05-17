@@ -1,6 +1,7 @@
 package things
 
 import actors.Actor
+import actors.NPC
 import actors.actions.Action
 import audio.Speaker
 import kotlinx.serialization.Serializable
@@ -24,6 +25,7 @@ sealed class Thing() : Entity {
         val pluralName: String,
         val spawn: ()->Thing
     ) {
+        THING_NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.NPC_TUSKLET) }),
         THING_BEDROLL("bedroll", "bedrolls", { Bedroll() }),
         THING_PAPERBACK("paperback", "paperbacks", { Paperback() }),
         THING_BOYSLIFE("Boys Life magazine", "Boys Life magazines", { BoysLife() }),
@@ -113,7 +115,8 @@ sealed class Thing() : Entity {
         THING_DEADTREE("dead tree", "dead trees", { DeadTree() }),
         THING_WELL("well", "wells", { Well() }),
         THING_CAMPFIRE("campfire", "campfires", { Campfire() }),
-        THING_GRAVESTONE("gravestone", "gravestones", { Gravestone("") })
+        THING_GRAVESTONE("gravestone", "gravestones", { Gravestone("") }),
+        THING_HIDE("hide", "hides", { Hide() }),
     }
 
     abstract val tag: Tag
@@ -284,6 +287,15 @@ class Rock : Portable() {
     override fun glyph() = Glyph.ROCK
     override fun weight() = 0.3f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
+}
+
+@Serializable
+class Hide : Portable() {
+    override val tag = Tag.THING_HIDE
+    override fun name() = "hide"
+    override fun description() = "A leather animal hide.  You could make something out of it."
+    override fun glyph() = Glyph.LEATHER
+    override fun weight() = 0.5f
 }
 
 @Serializable

@@ -52,6 +52,8 @@ class Director(val level: Level) {
         removeActor(actor)
     }
 
+    fun getActor(id: String) = actors.firstOrNull { it.id == id }
+
     fun unloadActorsFromArea(x0: Int, y0: Int, x1: Int, y1: Int): Set<Actor> {
         val unloads = actors.filter { it.xy.x >= x0 && it.xy.y >= y0 && it.xy.x <= x1 && it.xy.y <= y1 }
         val unloadSet = mutableSetOf<Actor>()
@@ -152,7 +154,7 @@ class Director(val level: Level) {
 
     fun advanceTime(delta: Float) {
         actors.filterOut({ it.level != level }) { it.advanceTime(delta) }
-        temporals.filterOut({ it.temporalDone() }) { it?.advanceTime(delta) }
+        temporals.filterOut({ it?.temporalDone() ?: true }) { it?.apply { advanceTime(delta) } }
     }
 
     fun linkTemporal(temporal: Temporal) {

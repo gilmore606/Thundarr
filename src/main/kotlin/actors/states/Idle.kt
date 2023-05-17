@@ -1,15 +1,20 @@
 package actors.states
 
+import App
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Move
+import actors.actions.Sleep
 import actors.actions.Wait
+import actors.statuses.Status
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.DIRECTIONS
 import util.Dice
 import util.XY
+import util.log
+import world.journal.GameTime
 
 @Serializable
 sealed class Idle : State() {
@@ -55,6 +60,24 @@ sealed class Idle : State() {
         return Wait(1f)
     }
 
+    fun shouldSleep(sleepHour: Float, wakeHour: Float): Boolean {
+        val hoursFromSleep = hoursFromSleep(sleepHour, wakeHour)
+        return if (hoursFromSleep <= -1f) true
+        else if (hoursFromSleep <= 0f) Dice.chance(0.7f)
+        else if (hoursFromSleep <= 1f) Dice.chance(0.2f)
+        else false
+    }
+
+    fun hoursFromSleep(sleepHour: Float, wakeHour: Float): Float {
+        val hour = App.gameTime.hour
+        return if (sleepHour > wakeHour) {
+            if (hour < wakeHour) hour - wakeHour
+            else sleepHour - hour
+        } else {
+            if (hour < sleepHour) hour - sleepHour
+            else wakeHour - hour
+        }
+    }
 }
 
 @Serializable
@@ -82,6 +105,32 @@ class IdleWander(
         if (Dice.chance(wanderChance)) {
             return wander(npc) { true }
         }
+        return super.pickAction(npc)
+    }
+}
+
+@Serializable
+class IdleHerd(
+    val wanderChance: Float,
+    val sleepHour: Float,
+    val wakeHour: Float,
+) : Idle() {
+    override fun pickAction(npc: NPC): Action {
+        if (shouldSleep(sleepHour, wakeHour)) {
+            if (!npc.hasStatus(Status.Tag.ASLEEP)) {
+                npc.fallAsleep()
+                return Sleep()
+            }
+        } else {
+            if (npc.hasStatus(Status.Tag.ASLEEP)) {
+                npc.wakeFromSleep()
+            }
+        }
+
+        if (Dice.chance(wanderChance)) {
+            return wander(npc) { true }
+        }
+
         return super.pickAction(npc)
     }
 }

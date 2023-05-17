@@ -170,7 +170,7 @@ class AttractPlayer : Player() {
                     if (entity is NPC && entity.isHostile()) {
                         return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
-                    if (entity is Ox || entity is MuskOx) {
+                    if (entity is Aurox || entity is MuskOx) {
                         if (Dice.chance(0.1f)) {
                             Speaker.world(Speaker.SFX.VOICE_MALELOW, 0.4f, source = this.xy)
                             return Converse(entity as Actor)

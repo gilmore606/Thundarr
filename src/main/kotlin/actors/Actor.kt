@@ -407,6 +407,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
     }
 
+    fun fallAsleep() {
+        addStatus(Asleep())
+        Console.sayAct("You fall asleep.", "%N falls asleep.", this)
+    }
+
+    fun wakeFromSleep() {
+        removeStatus(Status.Tag.ASLEEP)
+        Console.sayAct("You wake up.", "%N wakes up.", this)
+    }
+
     open fun onSleep() {
         if (hp < hpMax) {
             if (!hasStatus(Status.Tag.STARVING)) {
@@ -486,7 +496,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// useful utilities
 
-    fun getActor(id: String) = level?.director?.actors?.firstOrNull { it.id == id }
+    fun getActor(id: String) = level?.director?.getActor(id)
 
     protected fun doWeHave(thingTag: Thing.Tag): Thing? {
         for (i in 0 until contents.size) if (contents[i].tag == thingTag) return contents[i]

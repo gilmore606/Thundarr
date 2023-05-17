@@ -40,7 +40,6 @@ abstract class Carto(
     protected val json = Json { ignoreUnknownKeys = true }
 
     protected val plantSpawns = plantSpawns()
-    protected val animalSpawns = animalSpawns()
 
     open val wallTerrain = Terrain.Type.TERRAIN_BRICKWALL
     open val floorTerrain = Terrain.Type.TERRAIN_STONEFLOOR
@@ -634,24 +633,6 @@ abstract class Carto(
                     if (acc >= spawnFreq) {
                         return it.spawn()
                     }
-                }
-            }
-        }
-        return null
-    }
-
-    fun getAnimal(biome: Biome, habitat: Habitat, fromSpawns: List<AnimalSpawn> = animalSpawns): NPC? {
-        val animals = fromSpawns.filter {
-            it.biomes.contains(biome) && it.habitats.contains(habitat)
-        }
-        if (animals.isNotEmpty()) {
-            val totalFreq = animals.map { it.frequency }.reduce { t, f -> t + f }
-            val spawnFreq = Dice.float(0f, totalFreq)
-            var acc = 0f
-            animals.forEach {
-                acc += it.frequency
-                if (acc >= spawnFreq) {
-                    return it.spawn()
                 }
             }
         }

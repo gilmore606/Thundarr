@@ -95,6 +95,12 @@ enum class Glyph {
     WIZARD_SCYTHE,
     THRALL_ARCHER,
     FURWORM,
+    PIG,
+    CYCLOX,
+    LANDWHALE,
+    TAILMANDER,
+    DEMONDOG,
+    VOLTELOPE,
 
     OAK_TREE,
     MAPLE_TREE,
@@ -199,6 +205,7 @@ enum class Glyph {
     WARDROBE,
     RAILS_H,
     RAILS_V,
+    LEATHER,
 
     BLOODSTAIN,
     SCORCHMARK,

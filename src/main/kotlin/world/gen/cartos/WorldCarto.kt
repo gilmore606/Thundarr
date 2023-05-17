@@ -4,8 +4,10 @@ import App
 import actors.NPC
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
+import things.NPCDen
 import util.*
 import world.*
+import world.gen.animalSpawns
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
 import world.gen.features.Feature
@@ -127,18 +129,21 @@ class WorldCarto(
     }
 
     private fun spawnAnimals() {
-        repeat(Dice.oneTo(5)) {
-            getAnimal(meta.biome, meta.habitat)?.also { animal ->
-                findAnimalSpawnLocation(animal)?.also { location ->
-                    KtxAsync.launch {
-                        animal.spawnAt(level, location.x, location.y)
+        val groupsPool = animalSpawns().filter { it.biomes.contains(meta.biome) && it.habitats.contains(meta.habitat) }.shuffled()
+        var groupsSpawned = 0
+        groupsPool.forEach { group ->
+            if (groupsSpawned < 2 && Dice.chance(group.frequency)) {
+                repeat(Dice.range(group.min, group.max)) {
+                    findAnimalSpawnLocation()?.also { location ->
+                        spawnThing(location.x, location.y, NPCDen(group.tag.invoke()))
                     }
                 }
+                groupsSpawned++
             }
         }
     }
 
-    private fun findAnimalSpawnLocation(animal: NPC): XY? {
+    private fun findAnimalSpawnLocation(): XY? {
         repeat (200) {
             val x = x0 + Dice.zeroTil(CHUNK_SIZE)
             val y = y0 + Dice.zeroTil(CHUNK_SIZE)
