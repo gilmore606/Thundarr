@@ -25,7 +25,7 @@ sealed class GenericTusker : NPC() {
     override fun armorTotal() = 1.0f
 
     override fun idleState() = IdleHerd(
-        0.5f,
+        0.5f, 6, true,
         21.0f,
         7.0f,
     )

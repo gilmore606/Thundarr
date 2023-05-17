@@ -10,10 +10,7 @@ import actors.statuses.Status
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
-import util.DIRECTIONS
-import util.Dice
-import util.XY
-import util.log
+import util.*
 import world.journal.GameTime
 
 @Serializable
@@ -112,6 +109,8 @@ class IdleWander(
 @Serializable
 class IdleHerd(
     val wanderChance: Float,
+    val wanderRadius: Int,
+    val wanderChunkOnly: Boolean,
     val sleepHour: Float,
     val wakeHour: Float,
 ) : Idle() {
@@ -128,7 +127,22 @@ class IdleHerd(
         }
 
         if (Dice.chance(wanderChance)) {
-            return wander(npc) { true }
+            return wander(npc) { wanderXy ->
+                npc.den?.let { den ->
+                    den.level()?.let { denLevel ->
+                        den.xy()?.let { denXy ->
+                            if (wanderChunkOnly && denLevel.chunkAt(denXy.x, denXy.y) != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
+                                return@let false
+                            } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
+                                return@let false
+                            } else {
+                                return@let true
+                            }
+                        }
+                    }
+                }
+                return@wander true
+            }
         }
 
         return super.pickAction(npc)

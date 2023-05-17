@@ -17,7 +17,7 @@ class Aurox : NPC() {
     override fun glyph() = Glyph.CATTLE
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
-    override fun name() = "ox"
+    override fun name() = "aurox"
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
     override fun isHuman() = false
     override fun onSpawn() {
@@ -28,7 +28,7 @@ class Aurox : NPC() {
     override fun armorTotal() = 2.5f
 
     override fun idleState() = IdleHerd(
-        0.4f,
+        0.4f, 10, true,
         20.0f,
         6.0f,
     )
@@ -44,7 +44,7 @@ class MuskOx : NPC() {
     override fun hue() = 4.3f
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
-    override fun name() = "musk ox"
+    override fun name() = "muskox"
     override fun description() = "Predictably, it smells awful."
     override fun isHuman() = false
     override fun onSpawn() {
@@ -54,7 +54,7 @@ class MuskOx : NPC() {
     }
 
     override fun idleState() = IdleHerd(
-        0.4f,
+        0.4f, 15, true,
         20.0f,
         6.0f,
     )
