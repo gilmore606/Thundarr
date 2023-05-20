@@ -121,27 +121,24 @@ class IdleHerd(
                 return Sleep()
             }
         } else {
-            if (npc.hasStatus(Status.Tag.ASLEEP)) {
+            if (npc.hasStatus(Status.Tag.ASLEEP) && hoursFromSleep(sleepHour, wakeHour) > 2) {
                 npc.wakeFromSleep()
             }
         }
 
         if (Dice.chance(wanderChance)) {
             return wander(npc) { wanderXy ->
-                npc.den?.let { den ->
-                    den.level()?.let { denLevel ->
-                        den.xy()?.let { denXy ->
-                            if (wanderChunkOnly && denLevel.chunkAt(denXy.x, denXy.y) != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
-                                return@let false
-                            } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
-                                return@let false
-                            } else {
-                                return@let true
-                            }
-                        }
+                val den = npc.den
+                if (den != null) {
+                    val denXy = den.xy()
+                    if (wanderChunkOnly && den.chunk() != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
+                        false
+                    } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
+                        false
+                    } else {
+                        true
                     }
-                }
-                return@wander true
+                } else true
             }
         }
 

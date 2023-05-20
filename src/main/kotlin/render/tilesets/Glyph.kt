@@ -101,6 +101,9 @@ enum class Glyph {
     TAILMANDER,
     DEMONDOG,
     VOLTELOPE,
+    TORTLE,
+    PIDGEY,
+    PIDGEY_BRUTE,
 
     OAK_TREE,
     MAPLE_TREE,

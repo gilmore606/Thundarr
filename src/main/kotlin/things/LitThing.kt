@@ -47,7 +47,7 @@ sealed class LitThing : Portable(), LightSource {
     fun becomeLit() {
         active = true
         holder?.also { holder ->
-            holder.xy()?.also { xy ->
+            holder.xy().also { xy ->
                 holder.level?.addLightSource(xy.x, xy.y,
                     if (holder is Actor) holder else this
                 )
@@ -64,7 +64,7 @@ sealed class LitThing : Portable(), LightSource {
         active = false
         holder?.also { holder ->
             holder.level?.also { level ->
-                holder.xy()?.also { xy ->
+                holder.xy().also { xy ->
                     level.removeLightSource(if (holder is Actor) holder else this )
                     if (holder is Actor) {
                         Console.sayAct(extinguishSelfMsg(), extinguishOtherMsg(), holder, this)
@@ -80,7 +80,7 @@ sealed class LitThing : Portable(), LightSource {
     fun reproject() {
         holder?.also { holder ->
             holder.level?.also { level ->
-                holder.xy()?.also { xy ->
+                holder.xy().also { xy ->
                     level.removeLightSource(if (holder is Actor) holder else this )
                     level.addLightSource(xy.x, xy.y, if (holder is Actor) holder else this)
                 }
@@ -168,7 +168,7 @@ class Torch : LitThing(), Temporal {
         if (active && Screen.timeMs % 5 == 1L) {
             flicker = Random.nextFloat() * 0.12f + 0.88f
             if (Dice.chance(delta * smokeChance * 5f)) {
-                xy()?.also { xy -> level()?.addSpark(Smoke().at(xy.x, xy.y)) }
+                xy().also { xy -> level()?.addSpark(Smoke().at(xy.x, xy.y)) }
             }
         }
     }

@@ -414,7 +414,10 @@ sealed class Level {
 
     fun updateTime(hour: Int, minute: Int) {
         updateAmbientLight(hour, minute)
-        if (App.level == this) updateAmbientSound()
+        if (App.level == this) {
+            dirtyEntireLightAndGlyphCaches()
+            updateAmbientSound()
+        }
     }
 
     private fun updateAmbientLight(hour: Int, minute: Int) {

@@ -33,7 +33,7 @@ class Corpse(
     private fun rot() {
         onRot()
         level()?.also { level ->
-            xy()?.also { xy ->
+            xy().also { xy ->
                 contents().iterateAndEmpty { it.moveTo(level, xy.x, xy.y) }
             }
         } ?: run {

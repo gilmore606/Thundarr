@@ -43,4 +43,7 @@ fun ActorTileSet() =
         setTile(Glyph.LANDWHALE, SimpleTile(this, 5, 4))
         setTile(Glyph.TAILMANDER, SimpleTile(this, 5, 3))
         setTile(Glyph.CYCLOX, SimpleTile(this, 6, 3))
+        setTile(Glyph.TORTLE, SimpleTile(this, 5, 0))
+        setTile(Glyph.PIDGEY, SimpleTile(this, 6, 2))
+        setTile(Glyph.PIDGEY_BRUTE, SimpleTile(this, 6, 0))
     }

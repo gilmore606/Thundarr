@@ -3,6 +3,7 @@ package things
 import actors.NPC
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.log
 
 @Serializable
 class NPCDen(
@@ -34,7 +35,9 @@ class NPCDen(
     override fun advanceTime(delta: Float) {
         if (npcId == null) {
             if (App.gameTime.time - npcLostAt > spawnDelay) {
-                spawnNpc()
+                if (App.player.level?.chunkAt(App.player.xy.x, App.player.xy.y) != this.chunk()) {
+                    spawnNpc()
+                }
             }
         } else {
             App.level.director.getActor(npcId!!)?.also { npc ->
@@ -42,6 +45,8 @@ class NPCDen(
             }
         }
     }
+
+    fun chunk() = xy().let { xy -> level()?.chunkAt(xy.x, xy.y) }
 
     private fun spawnNpc() {
         level()?.also { level ->

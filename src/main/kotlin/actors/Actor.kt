@@ -518,9 +518,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (level == null) return false
         if (entity == null) return false
         if (entity.level() != level) return false
-        entity.xy()?.also { entityXY ->
+        entity.xy().also { entityXY ->
             if (distanceBetween(entityXY, xy) > visualRange()) return false
-        } ?: run { return false }
+        }
 
         return entitiesSeen { it == entity }.isNotEmpty()
     }
@@ -554,7 +554,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false
 
-    protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy()?.x ?: 0, entity.xy()?.y ?: 0, xy.x, xy.y)
+    protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy().x, entity.xy().y, xy.x, xy.y)
 
     protected fun forCardinals(doThis: (tx: Int, ty: Int, dir: XY)->Unit) {
         CARDINALS.forEach { dir ->

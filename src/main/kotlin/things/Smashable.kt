@@ -6,7 +6,7 @@ import world.Entity
 interface Smashable {
 
     fun moveTo(holder: ThingHolder?)
-    fun xy(): XY?
+    fun xy(): XY
     val holder: ThingHolder?
 
     fun sturdiness() = 1f

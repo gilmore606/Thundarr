@@ -117,6 +117,7 @@ sealed class Thing() : Entity {
         THING_CAMPFIRE("campfire", "campfires", { Campfire() }),
         THING_GRAVESTONE("gravestone", "gravestones", { Gravestone("") }),
         THING_HIDE("hide", "hides", { Hide() }),
+        THING_SCALYHIDE("scaly hide", "scaly hides", { ScalyHide() }),
     }
 
     abstract val tag: Tag
@@ -180,10 +181,10 @@ sealed class Thing() : Entity {
 
     protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
     protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false
-    protected fun isNextTo(actor: Actor) = holder?.let { it.xy()?.let { xy ->
+    protected fun isNextTo(actor: Actor) = holder?.let { it.xy().let { xy ->
         Math.abs(xy.x - actor.xy.x) < 2 && Math.abs(xy.y - actor.xy.y) < 2
     }} ?: false
-    protected fun isNextTo(x: Int, y: Int) = holder?.let { it.xy()?.let { xy ->
+    protected fun isNextTo(x: Int, y: Int) = holder?.let { it.xy().let { xy ->
         Math.abs(xy.x - x) < 2 && Math.abs(xy.y - y) < 2
     }} ?: false
 
@@ -199,7 +200,7 @@ sealed class Thing() : Entity {
     }
 
     override fun level() = holder?.level
-    override fun xy() = holder?.xy()
+    override fun xy() = holder?.xy() ?: XY(0,0)
     override fun glyphBatch() = Screen.thingBatch
     override fun uiBatch() = Screen.uiThingBatch
 
@@ -296,6 +297,15 @@ class Hide : Portable() {
     override fun description() = "A leather animal hide.  You could make something out of it."
     override fun glyph() = Glyph.LEATHER
     override fun weight() = 0.5f
+}
+
+@Serializable
+class ScalyHide: Portable() {
+    override val tag = Tag.THING_SCALYHIDE
+    override fun name() = "scaly hide"
+    override fun description() = "A thick animal hide covered in rigid scales.  You could make something out of it."
+    override fun glyph() = Glyph.LEATHER
+    override fun weight() = 0.7f
 }
 
 @Serializable

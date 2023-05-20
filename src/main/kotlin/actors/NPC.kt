@@ -22,6 +22,12 @@ sealed class NPC : Actor() {
         NPC_CYCLOX,
         NPC_TUSKER,
         NPC_TUSKLET,
+        NPC_VOLTELOPE,
+        NPC_VOLTELOPE_FAWN,
+        NPC_SALAMAN,
+        NPC_TORTLE,
+        NPC_PIDGEY,
+        NPC_PIDGEY_BRUTE,
     }
 
     companion object {
@@ -31,6 +37,12 @@ sealed class NPC : Actor() {
             Tag.NPC_CYCLOX -> Cyclox()
             Tag.NPC_TUSKER -> Tusker()
             Tag.NPC_TUSKLET -> Tusklet()
+            Tag.NPC_VOLTELOPE -> Voltelope()
+            Tag.NPC_VOLTELOPE_FAWN -> VoltelopeFawn()
+            Tag.NPC_SALAMAN -> Salaman()
+            Tag.NPC_TORTLE -> Tortle()
+            Tag.NPC_PIDGEY -> Pidgey()
+            Tag.NPC_PIDGEY_BRUTE -> PidgeyBrute()
         }
     }
 
