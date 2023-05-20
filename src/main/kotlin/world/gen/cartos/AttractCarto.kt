@@ -2,7 +2,7 @@ package world.gen.cartos
 
 import actors.Herder
 import actors.MuskOx
-import actors.Ox
+import actors.Aurox
 import actors.Wolfman
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
@@ -48,7 +48,7 @@ class AttractCarto(
                     if (Dice.chance(0.01f)) {
                         KtxAsync.launch {
                             if (Dice.chance(0.8f)) {
-                                (if (Dice.chance(0.7f)) Ox() else MuskOx()).spawnAt(level, x + x0, y + y0)
+                                (if (Dice.chance(0.7f)) Aurox() else MuskOx()).spawnAt(level, x + x0, y + y0)
                             } else if (Dice.flip()) {
                                 Wolfman().spawnAt(level, x + x0, y + y0)
                             } else {

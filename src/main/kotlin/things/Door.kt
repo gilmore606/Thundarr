@@ -60,7 +60,7 @@ sealed class Door : Thing(), Smashable {
         return null
     }
 
-    private fun isObstructed() = xy()?.let { xy -> level()!!.actorAt(xy.x, xy.y) != null || level()!!.thingsAt(xy.x, xy.y).size > 1 } ?: false
+    private fun isObstructed() = xy().let { xy -> level()!!.actorAt(xy.x, xy.y) != null || level()!!.thingsAt(xy.x, xy.y).size > 1 } ?: false
 
     private fun doOpen() {
         isOpen = true

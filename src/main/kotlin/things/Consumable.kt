@@ -57,7 +57,7 @@ sealed class Consumable : Portable() {
         val m = dnamec() + " shatters"
         var announced = false
         level()?.also { level ->
-            xy()?.also { xy ->
+            xy().also { xy ->
                 level.actorAt(xy.x, xy.y)?.also { target ->
 
                     announced = true

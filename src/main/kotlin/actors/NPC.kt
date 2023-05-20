@@ -8,12 +8,43 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.sparks.Speak
 import render.tilesets.Glyph
+import things.NPCDen
 import ui.panels.Console
 import util.*
 import world.level.Level
 
 @Serializable
 sealed class NPC : Actor() {
+
+    enum class Tag {
+        NPC_AUROX,
+        NPC_MUSKOX,
+        NPC_CYCLOX,
+        NPC_TUSKER,
+        NPC_TUSKLET,
+        NPC_VOLTELOPE,
+        NPC_VOLTELOPE_FAWN,
+        NPC_SALAMAN,
+        NPC_TORTLE,
+        NPC_PIDGEY,
+        NPC_PIDGEY_BRUTE,
+    }
+
+    companion object {
+        fun create(tag: Tag): NPC = when (tag) {
+            Tag.NPC_AUROX -> Aurox()
+            Tag.NPC_MUSKOX -> MuskOx()
+            Tag.NPC_CYCLOX -> Cyclox()
+            Tag.NPC_TUSKER -> Tusker()
+            Tag.NPC_TUSKLET -> Tusklet()
+            Tag.NPC_VOLTELOPE -> Voltelope()
+            Tag.NPC_VOLTELOPE_FAWN -> VoltelopeFawn()
+            Tag.NPC_SALAMAN -> Salaman()
+            Tag.NPC_TORTLE -> Tortle()
+            Tag.NPC_PIDGEY -> Pidgey()
+            Tag.NPC_PIDGEY_BRUTE -> PidgeyBrute()
+        }
+    }
 
     @Transient val unhibernateRadius = 30f
     @Transient val hibernateRadius = 40f
@@ -24,6 +55,7 @@ sealed class NPC : Actor() {
     var hostile = false
     var metPlayer = false
     val placeMemory = mutableMapOf<String,XY>()
+    @Transient var den: NPCDen? = null
 
     fun spawnAt(level: Level, x: Int, y: Int): NPC {
         onSpawn()
@@ -147,5 +179,10 @@ sealed class NPC : Actor() {
             hostile = true
             Console.sayAct("", becomeHostileMsg(), this, attacker, null, Console.Reach.AUDIBLE)
         }
+    }
+
+    override fun die() {
+        den?.onDie(this)
+        super.die()
     }
 }

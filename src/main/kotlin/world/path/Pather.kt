@@ -60,7 +60,7 @@ object Pather {
         }
     }
 
-    fun nextStep(from: Entity, to: Entity): XY? = from.xy()?.let { xy -> maps.firstNotNullOfOrNull { it.nextStep(xy, to) } }
+    fun nextStep(from: Entity, to: Entity): XY? = from.xy().let { xy -> maps.firstNotNullOfOrNull { it.nextStep(xy, to) } }
 
     fun nextStep(from: XY, to: Entity): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
 

@@ -150,4 +150,5 @@ fun ThingTileSet() =
         setTile(Glyph.WARDROBE, SimpleTile(this, 10, 10))
         setTile(Glyph.RAILS_V, SimpleTile(this, 11, 10))
         setTile(Glyph.RAILS_H, SimpleTile(this, 12, 10))
+        setTile(Glyph.LEATHER, SimpleTile(this, 12, 11))
     }

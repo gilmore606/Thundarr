@@ -155,8 +155,8 @@ object Console : Panel() {
         }
         if (code.isNotEmpty()) process()
 
-        val x = source?.x ?: subject.xy()?.x ?: 0
-        val y = source?.y ?: subject.xy()?.y ?: 0
+        val x = source?.x ?: subject.xy().x
+        val y = source?.y ?: subject.xy().y
         if (subject is Player) say(out) else {
             announce(subject.level(), x, y, reach, out)
         }

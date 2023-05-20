@@ -21,7 +21,7 @@ class Smash(
     override fun name() = target.smashVerbName()
 
     override fun execute(actor: Actor, level: Level) {
-        target.xy()?.also { targetLoc ->
+        target.xy().also { targetLoc ->
             actor.animation = Whack(XY(actor.xy.x - targetLoc.x, actor.xy.y - targetLoc.y))
             level.addSpark(Smoke().at(targetLoc.x, targetLoc.y))
             Speaker.world(Speaker.SFX.HIT, source = actor.xy)

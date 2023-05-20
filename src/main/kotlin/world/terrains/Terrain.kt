@@ -23,6 +23,7 @@ sealed class Terrain(
 ) : Entity {
 
     companion object {
+        val xy = XY(0,0)
         fun get(type: Type) = when (type) {
             Type.BLANK -> Blank
             Type.TEMP1 -> Blank
@@ -124,7 +125,7 @@ sealed class Terrain(
     override fun glyphBatch() = Screen.terrainBatch
     override fun uiBatch() = Screen.uiTerrainBatch
     override fun level() = null
-    override fun xy() = null
+    override fun xy() = Terrain.xy
 
     open fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                               doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,

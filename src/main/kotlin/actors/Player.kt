@@ -113,12 +113,10 @@ open class Player : Actor() {
     fun toggleSleep() {
         level?.addSpark(Smoke().at(xy.x, xy.y))
         if (hasStatus(Status.Tag.ASLEEP)) {
-            removeStatus(Status.Tag.ASLEEP)
+            wakeFromSleep()
             TimeButtons.changeState(TimeButtons.State.PAUSE)
-            Console.say("You wake up.")
         } else {
-            Console.say("You lie down to sleep.")
-            addStatus(Asleep())
+            fallAsleep()
             TimeButtons.changeState(TimeButtons.State.PLAY)
         }
     }

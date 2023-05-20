@@ -9,9 +9,9 @@ interface ThingHolder {
     @Transient var level: Level?
 
     fun contents(): MutableList<Thing>
-    fun xy(): XY?
+    fun xy(): XY
     fun add(thing: Thing)
     fun remove(thing: Thing)
 
-    fun temperature(): Float = xy()?.let { level?.temperatureAt(it) } ?: 65f
+    fun temperature(): Float = level?.temperatureAt(xy()) ?: 65f
 }

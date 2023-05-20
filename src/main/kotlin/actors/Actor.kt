@@ -407,6 +407,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
     }
 
+    fun fallAsleep() {
+        addStatus(Asleep())
+        Console.sayAct("You fall asleep.", "%N falls asleep.", this)
+    }
+
+    fun wakeFromSleep() {
+        removeStatus(Status.Tag.ASLEEP)
+        Console.sayAct("You wake up.", "%N wakes up.", this)
+    }
+
     open fun onSleep() {
         if (hp < hpMax) {
             if (!hasStatus(Status.Tag.STARVING)) {
@@ -486,7 +496,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// useful utilities
 
-    fun getActor(id: String) = level?.director?.actors?.firstOrNull { it.id == id }
+    fun getActor(id: String) = level?.director?.getActor(id)
 
     protected fun doWeHave(thingTag: Thing.Tag): Thing? {
         for (i in 0 until contents.size) if (contents[i].tag == thingTag) return contents[i]
@@ -508,9 +518,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (level == null) return false
         if (entity == null) return false
         if (entity.level() != level) return false
-        entity.xy()?.also { entityXY ->
+        entity.xy().also { entityXY ->
             if (distanceBetween(entityXY, xy) > visualRange()) return false
-        } ?: run { return false }
+        }
 
         return entitiesSeen { it == entity }.isNotEmpty()
     }
@@ -544,7 +554,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false
 
-    protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy()?.x ?: 0, entity.xy()?.y ?: 0, xy.x, xy.y)
+    protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy().x, entity.xy().y, xy.x, xy.y)
 
     protected fun forCardinals(doThis: (tx: Int, ty: Int, dir: XY)->Unit) {
         CARDINALS.forEach { dir ->

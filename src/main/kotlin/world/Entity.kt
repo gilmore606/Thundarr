@@ -36,7 +36,7 @@ interface Entity {
     fun gender(): Gender = Gender.NEUTER
 
     fun level(): Level?
-    fun xy(): XY?
+    fun xy(): XY
 
     fun onRender(delta: Float) { }
 
