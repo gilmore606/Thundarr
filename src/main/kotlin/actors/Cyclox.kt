@@ -4,11 +4,13 @@ import actors.states.IdleWander
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
 import things.Hide
 import things.RawMeat
 
+@Serializable
 class Cyclox : NPC() {
     override fun glyph() = Glyph.CYCLOX
     override fun name() = "cyclox"

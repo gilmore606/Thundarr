@@ -6,7 +6,9 @@ import actors.actions.*
 import actors.actions.processes.WalkTo
 import actors.statuses.Status
 import audio.Speaker
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Transient
+import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.Raindrop
 import render.sparks.Spark
@@ -247,7 +249,7 @@ sealed class Level {
 
     fun advanceTime(delta: Float) = director.advanceTime(delta)
     fun linkTemporal(temporal: Temporal) = director.linkTemporal(temporal)
-    fun unlinkTemporal(temporal: Temporal) = director.unlinkTemporal(temporal)
+    fun unlinkTemporal(temporal: Temporal) = KtxAsync.launch { director.unlinkTemporal(temporal) }
 
     abstract fun isReady(): Boolean
 
