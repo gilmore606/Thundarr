@@ -28,6 +28,7 @@ sealed class NPC : Actor() {
         NPC_TORTLE,
         NPC_PIDGEY,
         NPC_PIDGEY_BRUTE,
+        NPC_GRIZZLER,
     }
 
     companion object {
@@ -43,6 +44,7 @@ sealed class NPC : Actor() {
             Tag.NPC_TORTLE -> Tortle()
             Tag.NPC_PIDGEY -> Pidgey()
             Tag.NPC_PIDGEY_BRUTE -> PidgeyBrute()
+            Tag.NPC_GRIZZLER -> Grizzler()
         }
     }
 
