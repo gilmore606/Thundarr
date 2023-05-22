@@ -1,5 +1,6 @@
 package world.gen.features
 
+import actors.NPC
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Glowstone
@@ -7,11 +8,13 @@ import util.*
 import world.Chunk
 import world.ChunkScratch
 import world.NaturalCavern
+import world.gen.AnimalSpawn
 import world.gen.Metamap
 import world.gen.biomes.Desert
 import world.gen.biomes.ForestHill
 import world.gen.biomes.Hill
 import world.gen.biomes.Mountain
+import world.gen.habitats.*
 import world.terrains.Terrain
 
 @Serializable
@@ -25,7 +28,7 @@ class Caves : Feature() {
     }
 
     private val cavePortalChance = 0.15f
-    private val cavePortalPoints = ArrayList<XY>()
+    private val cavePoints = ArrayList<XY>()
 
     var hasCavern = false
 
@@ -38,7 +41,7 @@ class Caves : Feature() {
             if (free == 1) entrances.add(XY(x,y))
         }
         if (entrances.isNotEmpty()) {
-            cavePortalPoints.clear()
+            cavePoints.clear()
             var cellCount = 0
             repeat (kotlin.math.min(entrances.size, Dice.oneTo(4))) {
                 val entrance = entrances.random()
@@ -46,7 +49,7 @@ class Caves : Feature() {
                 chunk.setRoofed(entrance.x, entrance.y, Chunk.Roofed.WINDOW)
             }
             if (cellCount > 6) {
-                val usablePoints = cavePortalPoints.filter { point ->
+                val usablePoints = cavePoints.filter { point ->
                     CARDINALS.hasOneWhere { !isWalkableAt(it.x + point.x, it.y + point.y) }
                 }.toMutableList()
                 if (usablePoints.isNotEmpty() && Dice.chance(cavePortalChance)) {
@@ -84,7 +87,7 @@ class Caves : Feature() {
                 }
             }
         }
-        if (!continuing) cavePortalPoints.add(XY(x, y))
+        if (!continuing) cavePoints.add(XY(x, y))
         return count
     }
 
@@ -103,4 +106,15 @@ class Caves : Feature() {
     override fun mapIcon() = if (hasCavern) Glyph.MAP_CAVE else null
     override fun mapPOITitle() = if (hasCavern) "cavern" else null
     override fun mapPOIDescription() = if (hasCavern) "An underground cave system." else null
+
+    override fun animalSpawns() = listOf(
+        AnimalSpawn(
+            { NPC.Tag.NPC_GRIZZLER },
+            setOf(Mountain, Hill, ForestHill, Desert),
+            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
+            1, 1, 1f
+        )
+    )
+
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = cavePoints.randomOrNull()
 }

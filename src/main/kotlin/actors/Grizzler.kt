@@ -3,11 +3,13 @@ package actors
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
 import things.Hide
 import things.RawMeat
 
+@Serializable
 class Grizzler : NPC() {
     override fun glyph() = Glyph.DEMONDOG
     override fun name() = "grizzler"

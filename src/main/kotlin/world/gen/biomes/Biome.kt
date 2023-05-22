@@ -1,10 +1,14 @@
 package world.gen.biomes
 
+import actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
 import util.Rect
+import util.XY
+import world.Chunk
+import world.gen.AnimalSpawnSource
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
@@ -17,7 +21,7 @@ import world.terrains.Wall
 sealed class Biome(
     val mapGlyph: Glyph,
     val baseTerrain: Terrain.Type,
-) {
+) : AnimalSpawnSource {
     open fun defaultTitle(habitat: Habitat) = "the wilderness"
     open fun trailChance() = 0.1f
     open fun plantDensity() = 1.0f
@@ -59,6 +63,15 @@ sealed class Biome(
         val blob = carto.growOblong(x1-x0, y1-y0)
         carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
         carto.addTrailBlock(x0,y0,x1,y1)
+    }
+
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? {
+        repeat (200) {
+            val x = chunk.x + Dice.zeroTil(CHUNK_SIZE)
+            val y = chunk.y + Dice.zeroTil(CHUNK_SIZE)
+            if (chunk.isWalkableAt(x, y)) return XY(x,y)
+        }
+        return null
     }
 }
 
