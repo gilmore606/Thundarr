@@ -1,5 +1,6 @@
 package actors
 
+import actors.states.IdleDen
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
@@ -21,6 +22,12 @@ class Grizzler : NPC() {
         Brains.set(this, 7f)
     }
     override fun armorTotal() = 2f
+
+    override fun idleState() = IdleDen(
+        0.4f, 12, true,
+        22.0f,
+        5.0f
+    )
 
     override fun onDeath(corpse: Container?) {
         corpse?.also {

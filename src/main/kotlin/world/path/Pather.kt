@@ -81,8 +81,9 @@ object Pather {
     }
 
     fun subscribe(subscriber: Entity, target: Entity, range: Float) {
-        log.info("subscribing $subscriber @ $range for target $target")
+        //log.info("subscribing $subscriber @ $range for target $target")
         val map = maps.firstOrNull { it.targetEntity == target } ?: StepMap().apply {
+            log.info("adding stepmap to $target")
             setTargetToEntity(target)
             changeRange(range)
             maps.add(this@apply)
