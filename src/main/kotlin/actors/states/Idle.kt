@@ -16,6 +16,20 @@ import world.journal.GameTime
 @Serializable
 sealed class Idle : State() {
 
+    protected fun wanderCheck(wanderRadius: Int, wanderChunkOnly: Boolean, npc: NPC): (XY)->Boolean = { wanderXy ->
+        val den = npc.den
+        if (den != null) {
+            val denXy = den.xy()
+            if (wanderChunkOnly && den.chunk() != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
+                false
+            } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
+                false
+            } else {
+                true
+            }
+        } else true
+    }
+
     override fun considerState(npc: NPC) {
         val canSeePlayer = npc.canSee(App.player)
         if (canSeePlayer && !npc.metPlayer) {
@@ -102,46 +116,6 @@ class IdleWander(
         if (Dice.chance(wanderChance)) {
             return wander(npc) { true }
         }
-        return super.pickAction(npc)
-    }
-}
-
-@Serializable
-class IdleHerd(
-    val wanderChance: Float,
-    val wanderRadius: Int,
-    val wanderChunkOnly: Boolean,
-    val sleepHour: Float,
-    val wakeHour: Float,
-) : Idle() {
-    override fun pickAction(npc: NPC): Action {
-        if (shouldSleep(sleepHour, wakeHour)) {
-            if (!npc.hasStatus(Status.Tag.ASLEEP)) {
-                npc.fallAsleep()
-                return Sleep()
-            }
-        } else {
-            if (npc.hasStatus(Status.Tag.ASLEEP) && hoursFromSleep(sleepHour, wakeHour) > 2) {
-                npc.wakeFromSleep()
-            }
-        }
-
-        if (Dice.chance(wanderChance)) {
-            return wander(npc) { wanderXy ->
-                val den = npc.den
-                if (den != null) {
-                    val denXy = den.xy()
-                    if (wanderChunkOnly && den.chunk() != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
-                        false
-                    } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
-                        false
-                    } else {
-                        true
-                    }
-                } else true
-            }
-        }
-
         return super.pickAction(npc)
     }
 }

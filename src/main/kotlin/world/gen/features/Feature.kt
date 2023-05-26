@@ -1,5 +1,6 @@
 package world.gen.features
 
+import actors.NPC
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -8,6 +9,8 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
+import world.gen.AnimalSpawn
+import world.gen.AnimalSpawnSource
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
@@ -15,28 +18,25 @@ import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
 
 @Serializable
-sealed class Feature {
+sealed class Feature : AnimalSpawnSource {
 
     open fun order(): Int = 0
     open fun stage(): Stage = Stage.TERRAIN
     enum class Stage { TERRAIN, BUILD }
 
+    open fun animalSpawns(): List<AnimalSpawn> = listOf()
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = null
+
     var worldX = 0
     var worldY = 0
 
-    @Transient
-    lateinit var carto: WorldCarto
-    @Transient
-    lateinit var meta: ChunkMeta
-    @Transient
-    lateinit var chunk: Chunk
-    @Transient
+    @Transient lateinit var carto: WorldCarto
+    @Transient lateinit var meta: ChunkMeta
+    @Transient lateinit var chunk: Chunk
+
     var x0: Int = 0
-    @Transient
     var y0: Int = 0
-    @Transient
     var x1: Int = 0
-    @Transient
     var y1: Int = 0
 
 

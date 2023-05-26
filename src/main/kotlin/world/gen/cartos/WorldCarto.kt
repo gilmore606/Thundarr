@@ -7,6 +7,8 @@ import ktx.async.KtxAsync
 import things.NPCDen
 import util.*
 import world.*
+import world.gen.AnimalSpawn
+import world.gen.AnimalSpawnSource
 import world.gen.animalSpawns
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
@@ -129,27 +131,31 @@ class WorldCarto(
     }
 
     private fun spawnAnimals() {
-        val groupsPool = animalSpawns().filter { it.biomes.contains(meta.biome) && it.habitats.contains(meta.habitat) }.shuffled()
         var groupsSpawned = 0
-        groupsPool.forEach { group ->
-            if (groupsSpawned < 2 && Dice.chance(group.frequency)) {
-                repeat(Dice.range(group.min, group.max)) {
-                    findAnimalSpawnLocation()?.also { location ->
-                        spawnThing(location.x, location.y, NPCDen(group.tag.invoke()))
-                    }
-                }
-                groupsSpawned++
-            }
+        // Spawn for chunk features
+        meta.features().forEach { feature ->
+            groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, feature.animalSpawns(), feature)
         }
+        // Spawn for general biome/habitat
+        groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, animalSpawns())
     }
 
-    private fun findAnimalSpawnLocation(): XY? {
-        repeat (200) {
-            val x = x0 + Dice.zeroTil(CHUNK_SIZE)
-            val y = y0 + Dice.zeroTil(CHUNK_SIZE)
-            if (isWalkableAt(x, y)) return XY(x,y)
+    private fun spawnAnimalsFromGroups(groupsSpawned: Int, groupsPool: List<AnimalSpawn>, source: AnimalSpawnSource? = null): Int {
+        val maxGroups = 2
+        var spawned = groupsSpawned
+        val pool = groupsPool.filter { it.biomes.contains(meta.biome) && it.habitats.contains(meta.habitat) }.shuffled()
+        pool.forEach { group ->
+            if (spawned < maxGroups && Dice.chance(group.frequency)) {
+                repeat(Dice.range(group.min, group.max)) {
+                    val animalType = group.tag.invoke()
+                    (source ?: meta.biome).animalSpawnPoint(chunk, animalType)?.also { location ->
+                        spawnThing(location.x, location.y, NPCDen(animalType))
+                    }
+                }
+                spawned++
+            }
         }
-        return null
+        return spawned
     }
 
     private suspend fun buildBiomeBlendMap() {

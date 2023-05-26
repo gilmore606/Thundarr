@@ -28,10 +28,13 @@ class StepMap() {
     var map = Array(1) { IntArray(1) { -1 } }
 
     fun addSubscriber(subscriber: Entity, range: Float) {
-        subscribers.add(subscriber)
-        done = false
+        if (subscriber !in subscribers) {
+            subscribers.add(subscriber)
+            done = false
+        }
         if (range > this.range) {
             changeRange(range)
+            done = false
         }
     }
 
