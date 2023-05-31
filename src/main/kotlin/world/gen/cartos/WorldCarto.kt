@@ -143,7 +143,11 @@ class WorldCarto(
     private fun spawnAnimalsFromGroups(groupsSpawned: Int, groupsPool: List<AnimalSpawn>, source: AnimalSpawnSource? = null): Int {
         val maxGroups = 2
         var spawned = groupsSpawned
-        val pool = groupsPool.filter { it.biomes.contains(meta.biome) && it.habitats.contains(meta.habitat) }.shuffled()
+        val pool = groupsPool.filter {
+            it.biomes.contains(meta.biome) &&
+                it.habitats.contains(meta.habitat) &&
+                meta.threatLevel >= it.minThreat && meta.threatLevel <= it.maxThreat
+        }.shuffled()
         pool.forEach { group ->
             if (spawned < maxGroups && Dice.chance(group.frequency)) {
                 repeat(Dice.range(group.min, group.max)) {

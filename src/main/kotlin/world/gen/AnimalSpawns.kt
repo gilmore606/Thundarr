@@ -9,6 +9,8 @@ class AnimalSpawn(
     val tag: ()->NPC.Tag,
     val biomes: Set<Biome>,
     val habitats: Set<Habitat>,
+    val minThreat: Float,
+    val maxThreat: Float,
     val min: Int,
     val max: Int,
     val frequency: Float,
@@ -20,45 +22,45 @@ fun animalSpawns() = listOf<AnimalSpawn>(
         { NPC.Tag.NPC_AUROX },
         setOf(Plain, Scrub),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        2, 4, 0.3f
+        0f, 1000f, 2, 4, 0.3f
     ),
     AnimalSpawn(
         { if (Dice.chance(0.5f)) NPC.Tag.NPC_TUSKER else NPC.Tag.NPC_TUSKLET },
         setOf(Scrub, Hill, ForestHill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        2, 6, 0.4f
+        0f, 1000f, 2, 6, 0.4f
     ),
     AnimalSpawn(
         { NPC.Tag.NPC_CYCLOX },
         setOf(Scrub, Desert),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        1, 2, 0.1f
+        0f, 1000f, 1, 2, 0.1f
     ),
     AnimalSpawn(
         { if (Dice.chance(0.5f)) NPC.Tag.NPC_VOLTELOPE else NPC.Tag.NPC_VOLTELOPE_FAWN },
         setOf(Plain, Scrub),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        2, 5, 0.3f
+        0f, 1000f, 2, 5, 0.3f
     ),
 
     AnimalSpawn(
         { NPC.Tag.NPC_SALAMAN },
         setOf(Swamp),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        1, 2, 0.4f
+        0f, 1000f, 1, 2, 0.4f
     ),
     AnimalSpawn(
         { NPC.Tag.NPC_TORTLE },
         setOf(Swamp, Hill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        1, 2, 0.2f
+        0f, 1000f, 1, 2, 0.2f
     ),
 
     AnimalSpawn(
         { if (Dice.chance(0.7f)) NPC.Tag.NPC_PIDGEY else NPC.Tag.NPC_PIDGEY_BRUTE },
         setOf(Forest, ForestHill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-        2, 3, 0.3f
+        0f, 1000f, 2, 3, 0.3f
     )
 
 )

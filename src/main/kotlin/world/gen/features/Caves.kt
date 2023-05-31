@@ -112,7 +112,7 @@ class Caves : Feature() {
             { NPC.Tag.NPC_GRIZZLER },
             setOf(Mountain, Hill, ForestHill, Desert),
             setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            1, 1, 1f
+            0f, 1000f, 1, 1, 1f
         )
     )
 
