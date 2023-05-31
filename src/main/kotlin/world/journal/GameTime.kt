@@ -7,7 +7,7 @@ data class GameTime(
     val time: Double
 ) {
     companion object {
-        const val TURNS_PER_DAY = 2000.0
+        const val TURNS_PER_DAY = 3000.0
         const val YEAR_ZERO = 2994
     }
 
