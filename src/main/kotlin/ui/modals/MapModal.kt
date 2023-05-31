@@ -30,6 +30,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     var revealAll = false
     var showHabitats = false
+    var showThreat = false
 
     var poiFloater: MapFloater? = null
 
@@ -113,6 +114,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
             Keydef.MOVE_SE -> { mapy++ ; mapx++ }
 
             Keydef.DEBUG_F9 -> { revealAll = !revealAll }
+            Keydef.DEBUG_F10 -> { showHabitats = !showHabitats }
+            Keydef.DEBUG_F11 -> { showThreat = !showThreat }
 
             else -> { }
         }
@@ -146,6 +149,9 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
                     }
                     if (showHabitats && meta.habitat != Blank) {
                         batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(meta.habitat.mapGlyph))
+                    }
+                    if (showThreat) {
+                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_COLOR_0), alpha = (meta.threatLevel * 0.06f))
                     }
                 }
             }

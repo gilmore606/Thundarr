@@ -24,6 +24,7 @@ object Forest : Biome(
     override fun plantDensity() = 1.4f
     override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (fertilityAt(x, y) > 0.6f) Terrain.Type.TERRAIN_SWAMP else Terrain.Type.TERRAIN_UNDERGROWTH
     override fun metaTravelCost() = 2f
+    override fun edgeDistanceThreatFactor() = 1f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) * 1.5f
     override fun terrainAt(x: Int, y: Int): Terrain.Type {

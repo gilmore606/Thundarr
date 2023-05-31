@@ -28,7 +28,7 @@ object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
     private const val fakeDelayMillis = 150L
-    private const val progressBarSegments = 13
+    private const val progressBarSegments = 14
     private const val SKIP_HISTORY = true
 
     const val chunkRadius = 100
@@ -74,6 +74,8 @@ object Metamap {
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
+    val spawnDistanceThreatFactor = 0.2f
+    val biomeDepthThreatFactor = 2f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -548,9 +550,6 @@ object Metamap {
                         if (Dice.chance(0.65f)) {
                             scratches[dx][dy].biome = Ruins
                             scratches[dx][dy].height = 1
-
-                            suggestedPlayerStart.x = xToChunkX(dx)
-                            suggestedPlayerStart.y = yToChunkY(dy)
                         }
                     }
                 }
@@ -593,8 +592,6 @@ object Metamap {
                         CARDINALS.forEach { dir ->
                             if (Dice.chance(0.85f)) digLavaFlow(volcano, dir, Dice.float(4f, 7f))
                         }
-                        //suggestedPlayerStart.x = xToChunkX(volcano.x)
-                        //suggestedPlayerStart.y = yToChunkY(volcano.y)
                         eruptions++
                     }
                 }
@@ -807,8 +804,6 @@ object Metamap {
                                         }
                                     }
                                 }
-                                //suggestedPlayerStart.x = xToChunkX(x)
-                                //suggestedPlayerStart.y = yToChunkY(y)
                             }
                         }
                     }
@@ -948,6 +943,49 @@ object Metamap {
             }
             forEachScratch { x, y, cell ->
                 if (cell.title == "") cell.title = cell.defaultTitle()
+            }
+
+            // Pick start location and calculate distance for all chunks
+            sayProgress("Choosing start location...")
+            // For now just pick a village
+            val startChunk = villages.random()
+            suggestedPlayerStart.x = xToChunkX(startChunk.x)
+            suggestedPlayerStart.y = yToChunkY(startChunk.y)
+            forEachScratch { x, y, cell ->
+                cell.spawnDistance = distanceBetween(startChunk.x, startChunk.y, x, y)
+            }
+
+            // Calculate biomeEdgeDistance
+            var biomesDone = false
+            while (!biomesDone) {
+                biomesDone = true
+                forEachScratch { x, y, cell ->
+                    if (cell.biomeEdgeDistance == -1f) {
+                        biomesDone = false
+                        var lowestEdgeDistance = 9999f
+                        var isEdge = false
+                        CARDINALS.from(x,y) { dx, dy, dir ->
+                            if (boundsCheck(dx,dy)) {
+                                val neighbor = scratches[dx][dy]
+                                if (neighbor.biome != cell.biome) {
+                                    cell.biomeEdgeDistance = 0f
+                                    isEdge = true
+                                } else if (neighbor.biomeEdgeDistance > -1f && neighbor.biomeEdgeDistance < lowestEdgeDistance) {
+                                    lowestEdgeDistance = neighbor.biomeEdgeDistance
+                                }
+                            }
+                        }
+                        if (!isEdge) cell.biomeEdgeDistance = lowestEdgeDistance + 1f
+                    }
+                }
+            }
+
+            // Combine spawnDistance and biomeEdgeDistance into threatLevel
+            forEachScratch { x, y, cell ->
+                cell.threatLevel = (
+                        cell.spawnDistance * spawnDistanceThreatFactor +
+                        (cell.biomeEdgeDistance * cell.biome.edgeDistanceThreatFactor() * biomeDepthThreatFactor)
+                        )
             }
 
             // END STAGE : WRITE ALL DATA

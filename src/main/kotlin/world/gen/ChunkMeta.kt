@@ -27,6 +27,9 @@ class ChunkMeta(
     val variance: Float = 0f,
     private var features: MutableList<Feature> = mutableListOf(),
     var cityDistance: Float = 0f,
+    var spawnDistance: Float = 0f,
+    var biomeEdgeDistance: Float = 0f,
+    var threatLevel: Float = 0f,
     var title: String = "the wilderness",
     var mapped: Boolean = false
 ) {
@@ -97,6 +100,9 @@ class ChunkScratch(
     var habitat: Habitat = world.gen.habitats.Blank
     private var features: MutableList<Feature> = mutableListOf()
     var cityDistance = 0f
+    var spawnDistance = 0f
+    var biomeEdgeDistance = -1f
+    var threatLevel = 0f
     var title = ""
 
     fun toChunkMeta() = ChunkMeta(
@@ -109,6 +115,9 @@ class ChunkScratch(
         variance = NoisePatches.get("metaVariance",x,y).toFloat(),
         features = features,
         cityDistance = cityDistance,
+        spawnDistance = spawnDistance,
+        biomeEdgeDistance = biomeEdgeDistance,
+        threatLevel = threatLevel,
         title = title,
         mapped = false
     ).apply {
