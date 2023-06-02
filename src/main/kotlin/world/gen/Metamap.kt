@@ -947,8 +947,16 @@ object Metamap {
 
             // Pick start location and calculate distance for all chunks
             sayProgress("Choosing start location...")
+            var startChunk: XY = XY(100,100)
             // For now just pick a village
-            val startChunk = villages.random()
+            // startChunk = villages.random()
+            // Pick a cabin chunk
+            forEachScratch { x, y, cell ->
+                if (cell.hasFeature(Cabin::class)) {
+                    startChunk = XY(x,y)
+                }
+            }
+
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)
             forEachScratch { x, y, cell ->

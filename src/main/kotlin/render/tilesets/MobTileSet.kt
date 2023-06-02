@@ -12,8 +12,6 @@ fun ActorTileSet() =
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))
-        setTile(Glyph.TRIBAL, SimpleTile(this, 3, 0))
-        setTile(Glyph.CITIZEN, SimpleTile(this, 1, 1))
         setTile(Glyph.HORSE, AnimatedTile(this).apply {
             frameMs = 300
             add(0, 2)
@@ -24,7 +22,6 @@ fun ActorTileSet() =
             add(2, 2)
             add(3, 2)
         })
-        setTile(Glyph.HERDER, SimpleTile(this, 1, 0))
         setTile(Glyph.WOLFMAN, SimpleTile(this, 0, 3))
         setTile(Glyph.SNAKEMAN, SimpleTile(this, 1, 3))
         setTile(Glyph.KARROK, SimpleTile(this, 2, 3))
@@ -46,4 +43,11 @@ fun ActorTileSet() =
         setTile(Glyph.TORTLE, SimpleTile(this, 5, 0))
         setTile(Glyph.PIDGEY, SimpleTile(this, 6, 2))
         setTile(Glyph.PIDGEY_BRUTE, SimpleTile(this, 6, 0))
+        setTile(Glyph.GOAT, SimpleTile(this, 2, 5))
+        setTile(Glyph.MANAPE, SimpleTile(this, 3, 5))
+
+        setTile(Glyph.PEASANT_1, SimpleTile(this, 0, 0))
+        setTile(Glyph.PEASANT_2, SimpleTile(this, 1, 0))
+        setTile(Glyph.PEASANT_3, SimpleTile(this, 2, 0))
+        setTile(Glyph.PEASANT_4, SimpleTile(this, 3, 0))
     }
