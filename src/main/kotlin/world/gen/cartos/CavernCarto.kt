@@ -231,7 +231,7 @@ class CavernCarto(
         repeat (Dice.range(5, 200)) {
             val x = Dice.zeroTil(width)
             val y = Dice.zeroTil(height)
-            if (chunk.isWalkableAt(x,y) && getTerrain(x,y) != TERRAIN_SHALLOW_WATER && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
+            if (isWalkableAt(x,y) && getTerrain(x,y) != TERRAIN_SHALLOW_WATER && neighborCount(x,y,TERRAIN_CAVEWALL) > 1) {
                 if (!chunk.thingsAt(x,y).hasOneWhere { it is LitThing }) {
                     if (chunk.lightAt(x,y).brightness() < 0.3f) {
                         spawnThing(x, y, Glowstone().withColor(

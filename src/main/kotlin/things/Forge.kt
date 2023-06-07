@@ -1,5 +1,6 @@
 package things
 
+import actors.Actor
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.LightColor
@@ -16,6 +17,6 @@ class Forge : LitThing() {
     override fun glyph() = Glyph.FORGE
     override fun isPortable() = false
     override fun isOpaque() = false
-    override fun isBlocking() = true
+    override fun isBlocking(actor: Actor) = true
     override val lightColor = LightColor(0.5f, 0.15f, 0f)
 }

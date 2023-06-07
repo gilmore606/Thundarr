@@ -25,7 +25,7 @@ sealed class Door : Thing(), Smashable {
     open fun maybeLocked(chance: Float) = this.apply { if (Dice.chance(chance)) isLocked = true }
 
     override fun isPortable() = false
-    override fun isBlocking() = !isOpen
+    override fun isBlocking(actor: Actor) = isLocked || (!isOpen && !actor.canOpenDoors())
     override fun isOpaque() = !isOpen
     override fun announceOnWalk() = false
     override fun glyph() = if (isOpen) openGlyph() else closedGlyph()
@@ -53,8 +53,8 @@ sealed class Door : Thing(), Smashable {
             toDo = { actor,level,x,y ->   }),
     )
 
-    override fun bumpAction(): Action? {
-        if (!isOpen && isOpenable() && App.player.dangerMode) {
+    override fun convertMoveAction(actor: Actor): Action? {
+        if (!isOpen && isOpenable() && actor.canOpenDoors()) {
             return Use(UseTag.OPEN, this, 1f, uses()[UseTag.OPEN]!!.toDo, xy()!!.x, xy()!!.y)
         }
         return null

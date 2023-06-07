@@ -75,6 +75,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun isSentient() = true
     open fun isHuman() = true
+    open fun canOpenDoors() = isHuman()
     open fun actionSpeed() = 1.5f - Speed.get(this) * 0.05f
     open fun visualRange() = 10f
 
@@ -172,7 +173,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             statuses.forEach { status ->
                 if (status.preventedAction(action, this)) return
             }
-            action.execute(this, level)
+            action.convertTo(this, level)?.also {
+                it.execute(this, level)
+            } ?: run {
+                action.execute(this, level)
+            }
         }
     }
 
@@ -552,7 +557,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         seenUpdatedAt = App.time
     }
 
-    protected fun canStep(dir: XY) = level?.isWalkableFrom(xy, dir) ?: false
+    protected fun canStep(dir: XY) = level?.isWalkableFrom(this, xy, dir) ?: false
 
     protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy().x, entity.xy().y, xy.x, xy.y)
 

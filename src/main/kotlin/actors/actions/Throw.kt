@@ -34,7 +34,7 @@ class Throw(
         if (roll < 0) {
             hitx += Dice.range(-1, 1)
             hity += Dice.range(-1, 1)
-            if (!level.isWalkableAt(hitx, hity)) {
+            if (!level.isWalkableAt(App.player, hitx, hity)) {
                 hitx = x
                 hity = y
             }

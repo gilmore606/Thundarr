@@ -97,7 +97,7 @@ sealed class Feature : AnimalSpawnSource {
     protected fun neighborCount(x: Int, y: Int, match: (Terrain.Type)->Boolean) = carto.neighborCount(x, y, match)
     protected fun neighborCount(x: Int, y: Int, dirs: List<XY>, match: (x: Int, y: Int)->Boolean) = carto.neighborCount(x, y, dirs, match)
     protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
-    protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
+    protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(App.player, x, y)
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x, y)
     protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
     protected fun safeSetTerrain(x: Int, y: Int, type: Terrain.Type) = carto.safeSetTerrain(x, y, type)

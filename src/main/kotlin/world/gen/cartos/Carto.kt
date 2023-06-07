@@ -1,6 +1,6 @@
 package world.gen.cartos
 
-import actors.NPC
+import actors.Actor
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -59,7 +59,7 @@ abstract class Carto(
     }
 
     protected fun setTerrainData(x: Int, y: Int, data: TerrainData) = chunk.setTerrainData(x, y, data)
-    fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(x, y)
+    fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(App.player, x, y)
 
     fun spawnThing(x: Int, y: Int, thing: Thing) {
         val dest = chunk.cellContainerAt(x, y)
@@ -82,7 +82,7 @@ abstract class Carto(
 
     // Can the given tile be carved into?
     protected fun isRock(x: Int, y: Int): Boolean {
-        return !Terrain.get(chunk.getTerrain(x, y)).isWalkable()
+        return !Terrain.get(chunk.getTerrain(x, y)).isWalkableBy(App.player)
     }
     protected fun isRock(xy: XY): Boolean = isRock(xy.x, xy.y)
 

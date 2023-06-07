@@ -53,7 +53,7 @@ sealed class Idle : State() {
             while (dirs.isNotEmpty()) {
                 val dir = dirs.removeAt(Dice.zeroTil(dirs.size))
                 val dest = xy + dir
-                if (level.isWalkableFrom(xy, dir) && isOK(dest)) {
+                if (level.isWalkableFrom(npc, xy, dir) && isOK(dest)) {
                     if (placeMemory["lastWander"] != dest && placeMemory["lastWander2"] != dest) {
                         placeMemory["lastWander2"]!!.x = placeMemory["lastWander"]!!.x
                         placeMemory["lastWander2"]!!.y = placeMemory["lastWander"]!!.y

@@ -20,7 +20,6 @@ class NPCDen(
     override fun glyph() = Glyph.BLANK
     override val tag = Tag.THING_NPCDEN
     override fun isOpaque() = false
-    override fun isBlocking() = false
     override fun isPortable() = false
 
     override fun onRestore(holder: ThingHolder) {

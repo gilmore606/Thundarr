@@ -13,7 +13,6 @@ import util.Madlib
 @Serializable
 sealed class Scenery : Thing() {
     override fun isPortable() = false
-    override fun isBlocking() = false
     override fun announceOnWalk() = false
     override fun onWalkedOnBy(actor: Actor) {
         if (actor is Player) { Console.say(walkOnMsg()) }

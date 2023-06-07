@@ -22,7 +22,7 @@ class WalkTo(
 
     override fun execute(actor: Actor, level: Level) {
         Pather.nextStep(actor, dest)?.also {
-            if (level.isWalkableFrom(actor.xy, it)) {
+            if (level.isWalkableFrom(actor, actor.xy, it)) {
                 Move(XY(it.x, it.y)).execute(actor, level)
             } else {
                 log.info("walkTo failed at unwalkable step $it")

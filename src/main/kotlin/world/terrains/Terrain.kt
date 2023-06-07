@@ -131,7 +131,7 @@ sealed class Terrain(
                               doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                                        vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit) { }
 
-    open fun isWalkable() = this.walkable
+    open fun isWalkableBy(actor: Actor) = this.walkable
     open fun isOpaque() = this.opaque
     open fun moveSpeed(actor: Actor) = 1f
     open fun stepSound(actor: Actor): Speaker.SFX? = null

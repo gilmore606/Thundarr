@@ -14,7 +14,7 @@ class Well : Thing() {
     override fun glyph() = Glyph.WELL
     override fun isPortable() = false
     override fun isOpaque() = false
-    override fun isBlocking() = true
+    override fun isBlocking(actor: Actor) = true
 
     override fun uses() = mapOf(
         UseTag.CONSUME to Use("drink from " + name(), 2.0f,

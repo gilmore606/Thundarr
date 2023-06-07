@@ -19,7 +19,7 @@ class Shrine : LitThing() {
     override fun glyph() = Glyph.SHRINE
     override fun isPortable() = false
     override fun isOpaque() = false
-    override fun isBlocking() = true
+    override fun isBlocking(actor: Actor) = true
     override fun ambientSound() = Speaker.PointAmbience(Speaker.Ambience.SHRINECHORD, 24f, 1f)
     override val lightColor = LightColor(0.5f, 0.5f, 0.1f)
 

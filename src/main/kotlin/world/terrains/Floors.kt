@@ -96,7 +96,7 @@ sealed class Floor(
         Terrain.get(chunk.getTerrain(x, y)).let { if (it is Floor && it.overlapsOn().contains(this.type)) it.glyph() else null }
 
     private fun givesShadowAt(chunk: Chunk, x: Int, y: Int) =
-        Terrain.get(chunk.getTerrain(x, y)).let { (!it.isWalkable() && it.isOpaque()) }
+        Terrain.get(chunk.getTerrain(x, y)).let { (!it.isWalkableBy(App.player) && it.isOpaque()) }
 
     override fun renderExtraQuads(level: Level, x: Int, y: Int, vis: Float, glyph: Glyph, light: LightColor,
                                   doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, ty0: Float, tx1: Float, ty1: Float,

@@ -1,5 +1,6 @@
 package things
 
+import actors.Actor
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.LightColor
@@ -11,7 +12,7 @@ import java.lang.Integer.max
 class Table : Container(), Smashable, LightSource {
 
     override fun isPortable() = false
-    override fun isBlocking() = true
+    override fun isBlocking(actor: Actor) = true
     override fun isOpaque() = false
 
     override val tag = Tag.THING_TABLE

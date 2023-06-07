@@ -83,7 +83,7 @@ open class Player : Actor() {
 
     fun tryMove(dir: XY) {
         level?.also { level ->
-            if (level.isWalkableFrom(xy, dir)) {
+            if (level.isWalkableFrom(this, xy, dir)) {
                 if (level.stainsAt(xy.x + dir.x, xy.y + dir.y)?.hasOneWhere { it is Fire } == true && !dangerMode) {
                     Console.say("You reconsider your dangerous idea of running into a burning fire.")
                     return

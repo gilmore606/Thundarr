@@ -95,8 +95,6 @@ class Chunk(
     @Transient
     val glyphCache = Array(width) { Array<Int?>(height) { null } }
     @Transient
-    private val walkableCache = Array(width) { Array<Boolean?>(height) { null } }
-    @Transient
     private val opaqueCache = Array(width) { Array<Boolean?>(height) { null } }
     @Transient
     private val randomCache = Array(width) { Array<Int?>(height) { null } }
@@ -223,13 +221,11 @@ class Chunk(
 
     fun onAddThing(x: Int, y: Int, thing: Thing) {
         updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
         if (thing is LightSource) { projectLightSource(XY(x, y), thing) }
     }
 
     fun onRemoveThing(x: Int, y: Int, thing: Thing) {
         updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
         if (thing is LightSource) { level.removeLightSource(thing) }
     }
 
@@ -261,7 +257,6 @@ class Chunk(
         this.terrains[x - this.x][y - this.y] = type
         this.terrainData[x - this.x][y - this.y] = null
         updateOpaque(x - this.x, y - this.y)
-        updateWalkable(x - this.x, y - this.y)
         roofed?.also {
             var newRoof = Roofed.OUTDOOR
             if (roofed) {
@@ -351,34 +346,23 @@ class Chunk(
         roofed[x - this.x][y - this.y] != Roofed.OUTDOOR
     } else false
 
-    fun isWalkableAt(x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
-        walkableCache[x - this.x][y - this.y] ?: updateWalkable(x - this.x, y - this.y)
+    fun isWalkableAt(actor: Actor, x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
+        if (Terrain.get(terrains[x - this.x][y - this.y]).isWalkableBy(actor)) {
+            var thingBlocking = false
+            things[x - this.x][y - this.y].contents.forEach { thing ->
+                thingBlocking = thingBlocking || thing.isBlocking(actor)
+            }
+            !thingBlocking
+        } else false
     } else false
 
-    fun isPathableBy(entity: Entity?, x: Int, y: Int): Boolean {
+    fun isPathableBy(actor: Actor, x: Int, y: Int): Boolean {
         if (boundsCheck(x, y)) {
-            if (isWalkableAt(x, y)) {
+            if (isWalkableAt(actor, x, y)) {
                 if (level.stainsAt(x, y)?.hasOneWhere { it is Fire } != true) {
                     return true
                 }
             }
-        }
-        return false
-    }
-
-    private fun updateWalkable(x: Int, y: Int): Boolean {
-        if (generating) return Terrain.get(terrains[x][y]).isWalkable()
-        if (boundsCheck(x + this.x, y + this.y)) {
-            var v = Terrain.get(terrains[x][y]).isWalkable()
-            if (v) {
-                var thingBlocking = false
-                things[x][y].contents.forEach { thing ->
-                    thingBlocking = thingBlocking || thing.isBlocking()
-                }
-                v = !thingBlocking
-            }
-            walkableCache[x][y] = v
-            return v
         }
         return false
     }

@@ -173,11 +173,11 @@ class LevelCarto(
         repeat (attempts) {
             val x = Dice.zeroTil(width)
             val y = Dice.zeroTil(height)
-            if (chunk.isWalkableAt(x,y)) {
+            if (isWalkableAt(x,y)) {
                 if (!chunk.thingsAt(x, y).hasOneWhere { it is CeilingLight }) {
                     if (chunk.lightAt(x, y).brightness() < 0.3f) {
-                        val color = if ((!chunk.isWalkableAt(x,y-1) && !chunk.isWalkableAt(x, y+1)) ||
-                            (!chunk.isWalkableAt(x-1,y) && !chunk.isWalkableAt(x+1, y))) {
+                        val color = if ((!isWalkableAt(x,y-1) && !isWalkableAt(x, y+1)) ||
+                            (!isWalkableAt(x-1,y) && !isWalkableAt(x+1, y))) {
                             hallColor
                         } else if (Dice.chance(0.2f)) {
                             specialColor

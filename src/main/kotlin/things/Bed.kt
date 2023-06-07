@@ -6,7 +6,6 @@ import render.tilesets.Glyph
 @Serializable
 sealed class Bed() : Thing() {
     override fun isPortable() = false
-    override fun isBlocking() = false
     override fun isOpaque() = false
     override fun flammability() = 0.4f
 }

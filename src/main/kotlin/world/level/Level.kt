@@ -106,7 +106,7 @@ sealed class Level {
                     val terrain = Terrain.get(chunk.getTerrain(x, y))
                     val glyph = terrain.glyph()
                     val roofed = isRoofedAt(x, y)
-                    val walkable = isWalkableAt(x, y)
+                    val walkable = isWalkableAt(App.player, x, y)
                     if (vis > 0f) {
                         val light = if (App.DEBUG_VISIBLE) Screen.fullLight else if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
                         doTile(
@@ -117,7 +117,7 @@ sealed class Level {
                             if ((!roofed && (!isOpaqueAt(x, y) || walkable))) {
                                 doWeather(x, y, weather.clouds(), weather.rain(), false)
                                 if (weather.shouldRaindrop()) addSpark(Raindrop().at(x, y))
-                            } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(x,y+1))) {
+                            } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(App.player, x,y+1))) {
                                 doWeather(x, y, weather.clouds(), weather.rain(), true)
                             }
                             chunk.stainsAt(x, y)?.forEach { stain ->
@@ -296,12 +296,12 @@ sealed class Level {
 
     fun setRoofedAt(x: Int, y: Int, roofed: Chunk.Roofed) = chunkAt(x,y)?.setRoofed(x, y, roofed)
 
-    fun isWalkableAt(x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(x,y) ?: false
+    fun isWalkableAt(actor: Actor, x: Int, y: Int) = chunkAt(x,y)?.isWalkableAt(actor, x, y) ?: false
 
-    fun isPathableBy(entity: Entity?, x: Int, y: Int) = chunkAt(x,y)?.isPathableBy(entity, x, y) ?: false
+    fun isPathableBy(actor: Actor, x: Int, y: Int) = chunkAt(x,y)?.isPathableBy(actor, x, y) ?: false
 
-    fun isWalkableFrom(xy: XY, toDir: XY) = isWalkableAt(xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
-    fun isWalkableFrom(x: Int, y: Int, toDir: XY) = isWalkableAt(x + toDir.x, y + toDir.y) && actorAt(x + toDir.x, y + toDir.y) == null
+    fun isWalkableFrom(actor: Actor, xy: XY, toDir: XY) = isWalkableAt(actor, xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
+    fun isWalkableFrom(actor: Actor, x: Int, y: Int, toDir: XY) = isWalkableAt(actor, x + toDir.x, y + toDir.y) && actorAt(x + toDir.x, y + toDir.y) == null
 
     fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
@@ -485,7 +485,7 @@ sealed class Level {
                 menu.addOption("examine " + group[0].name()) { Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW)) }
             }
         }
-        if (isWalkableAt(x, y) && !isAdjacentOrHere) {
+        if (isWalkableAt(App.player, x, y) && !isAdjacentOrHere) {
             menu.addOption("walk here") {
                 App.player.queue(WalkTo(this, x, y))
             }
@@ -499,7 +499,7 @@ sealed class Level {
                 }
             }
         }
-        if (App.player.thrownTag != null && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(x,y)) {
+        if (App.player.thrownTag != null && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(App.player, x,y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + (App.player.thrownTag)?.singularName + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
                     App.player.queue(Throw(thrown, x, y))
@@ -543,6 +543,14 @@ sealed class Level {
         }
     }
 
+    // Does actor moving to dir need to use a non-Move action?  (ex: open a door)
+    fun moveActionTo(actor: Actor, x: Int, y: Int, dir: XY): Action? {
+        thingsAt(x + dir.x, y + dir.y).forEach { thing ->
+            thing.convertMoveAction(actor)?.also { return it }
+        }
+        return null
+    }
+
     // What action does the player take when bumping into dir from xy?
     fun bumpActionTo(x: Int, y: Int, dir: XY): Action? {
         actorAt(x + dir.x,y + dir.y)?.also { target ->
@@ -552,7 +560,7 @@ sealed class Level {
             return Converse(target)
         } ?: run {
             thingsAt(x + dir.x, y + dir.y).forEach { thing ->
-                thing.bumpAction()?.also { return it }
+                thing.playerBumpAction()?.also { return it }
             }
             return Bump(x, y, dir)
         }

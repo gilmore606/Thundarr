@@ -70,7 +70,10 @@ sealed class Biome(
         repeat (200) {
             val x = chunk.x + Dice.zeroTil(CHUNK_SIZE)
             val y = chunk.y + Dice.zeroTil(CHUNK_SIZE)
-            if (chunk.isWalkableAt(x, y)) return XY(x,y)
+            // TODO: This should check if the animalType can walk on the square, not the player
+            // but we can't right now because we can only call this with an actual NPC, not the tag
+            // wat do?
+            if (chunk.isWalkableAt(App.player, x, y)) return XY(x,y)
         }
         return null
     }

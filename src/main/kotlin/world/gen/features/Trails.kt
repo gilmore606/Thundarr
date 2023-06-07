@@ -71,7 +71,7 @@ class Trails(
                 val signSpots = mutableListOf<XY>()
                 forEachCell { x,y ->
                     val t = getTerrain(x,y)
-                    if (t != Terrain.Type.TEMP5 && Terrain.get(t).isWalkable() && neighborCount(x,y,Terrain.Type.TEMP5) > 0) {
+                    if (t != Terrain.Type.TEMP5 && Terrain.get(t).isWalkableBy(App.player) && neighborCount(x,y,Terrain.Type.TEMP5) > 0) {
                         signSpots.add(XY(x,y))
                     }
                 }

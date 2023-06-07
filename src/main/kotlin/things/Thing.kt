@@ -122,7 +122,7 @@ sealed class Thing() : Entity {
 
     abstract val tag: Tag
     abstract fun isOpaque(): Boolean
-    abstract fun isBlocking(): Boolean
+    open fun isBlocking(actor: Actor): Boolean = false
     abstract fun isPortable(): Boolean
     open fun isIntangible() = false
     open fun announceOnWalk() = !isIntangible()
@@ -218,7 +218,8 @@ sealed class Thing() : Entity {
     }
 
     open fun onWalkedOnBy(actor: Actor) { }
-    open fun bumpAction(): Action? = null
+    open fun convertMoveAction(actor: Actor): Action? = null
+    open fun playerBumpAction(): Action? = null
 
     open fun onRestore(holder: ThingHolder) {
         this.holder = holder
@@ -266,7 +267,7 @@ sealed class Thing() : Entity {
 @Serializable
 sealed class Portable : Thing() {
     override fun isOpaque() = false
-    override fun isBlocking() = false
+    override fun isBlocking(actor: Actor) = false
     override fun isPortable() = true
 }
 

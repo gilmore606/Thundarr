@@ -29,7 +29,7 @@ class AutoMove(
     override fun durationFor(actor: Actor) = super.durationFor(actor) * (actor.level?.moveSpeedFor(actor, dir) ?: 1f)
 
     override fun execute(actor: Actor, level: Level) {
-        if (level.isWalkableFrom(actor.xy, dir)) {
+        if (level.isWalkableFrom(actor, actor.xy, dir)) {
             Move(XY(dir.x, dir.y)).execute(actor, level)
         } else {
             done = true

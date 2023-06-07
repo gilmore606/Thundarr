@@ -13,6 +13,9 @@ abstract class Action(
 
     open fun canQueueFor(actor: Actor) = true
 
+    // Should this instance of an action actually be a different action?   (ex: Move becomes Open for a door)
+    open fun convertTo(actor: Actor, level: Level): Action? = null
+
     // Do whatever happens when actor does this.
     abstract fun execute(actor: Actor, level: Level)
 

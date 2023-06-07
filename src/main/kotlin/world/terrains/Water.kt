@@ -42,11 +42,11 @@ sealed class Water(
 
 object ShallowWater : Water(Type.TERRAIN_SHALLOW_WATER, Glyph.SHALLOW_WATER) {
     override fun name() = "shallow water"
-    override fun isWalkable() = true
+    override fun isWalkableBy(actor: Actor) = true
 }
 
 object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {
-    override fun isWalkable() = false
+    override fun isWalkableBy(actor: Actor) = false
 }
 
 // Only used in generation, should never appear in the world
@@ -56,5 +56,5 @@ object Lava : Water(Type.TERRAIN_LAVA, Glyph.LAVA) {
     override fun name() = "lava"
     override fun surfGlyph() = Glyph.LAVA_SURF
     override fun glowColor() = LightColor(1f, 0.4f, 0.1f)
-    override fun isWalkable() = false
+    override fun isWalkableBy(actor: Actor) = false
 }

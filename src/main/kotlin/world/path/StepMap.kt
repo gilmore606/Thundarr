@@ -99,7 +99,7 @@ class StepMap() {
                                     if (scratch[tx][ty] < 0) {
                                         //waitForActorLock(level) don't need this since actors don't block walkable
                                         waitForCellLock(level, tx, ty)
-                                        if (level.isPathableBy(targetEntity, x + offsetX + dir.x, y + offsetY + dir.y)) {
+                                        if (targetEntity !is Actor || level.isPathableBy(targetEntity as Actor, x + offsetX + dir.x, y + offsetY + dir.y)) {
                                             scratch[tx][ty] = step + 1
                                             dirty = true
                                         }
