@@ -80,6 +80,7 @@ class StepMap() {
     suspend fun update() {
         targetEntity?.level()?.also { level ->
             clearScratch()
+            val walker = subscribers.firstOrNull()?.let { if (it is Actor) it else null }
             var step = 0
             val centerX = width / 2 + 1
             val centerY = height / 2 + 1
@@ -99,7 +100,7 @@ class StepMap() {
                                     if (scratch[tx][ty] < 0) {
                                         //waitForActorLock(level) don't need this since actors don't block walkable
                                         waitForCellLock(level, tx, ty)
-                                        if (targetEntity !is Actor || level.isPathableBy(targetEntity as Actor, x + offsetX + dir.x, y + offsetY + dir.y)) {
+                                        if (level.isPathableBy(walker ?: App.player, x + offsetX + dir.x, y + offsetY + dir.y)) {
                                             scratch[tx][ty] = step + 1
                                             dirty = true
                                         }

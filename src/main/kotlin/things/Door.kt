@@ -64,19 +64,19 @@ sealed class Door : Thing(), Smashable {
 
     private fun doOpen() {
         isOpen = true
-        level()?.onAddThing(xy()!!.x, xy()!!.y, this)
+        level()?.onAddThing(xy().x, xy().y, this)
         Speaker.world(Speaker.SFX.DOOR_OPEN, source = this.xy())
     }
 
     private fun doClose() {
         isOpen = false
-        level()?.onAddThing(xy()!!.x, xy()!!.y, this)
+        level()?.onAddThing(xy().x, xy().y, this)
         Speaker.world(Speaker.SFX.DOOR_CLOSE, source = this.xy())
     }
 
     private fun doKnock(actor: Actor) {
         Console.sayAct("You knock politely at %dd.", "%Dn knocks on %dd.", actor, this)
-        val soundSource = XY(xy()!!.x - (xy()!!.x - actor.xy.x), xy()!!.y - (xy()!!.y - actor.xy.y))
+        val soundSource = XY(xy().x - (xy().x - actor.xy.x), xy().y - (xy().y - actor.xy.y))
         Console.sayAct("You hear a knocking at %dn.", "", this, reach = Console.Reach.AUDIBLE, source = soundSource)
     }
 
