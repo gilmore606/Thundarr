@@ -287,4 +287,16 @@ sealed class Feature : AnimalSpawnSource {
 
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
     }
+
+    protected fun findSpawnPoint(chunk: Chunk, animalType: NPC.Tag, bounds: Rect): XY? {
+        val goat = NPC.create(animalType)
+        var tries = 0
+        while (tries < 500) {
+            tries++
+            val x = Dice.range(bounds.x0, bounds.x1)
+            val y = Dice.range(bounds.y0, bounds.y1)
+            if (chunk.isWalkableAt(goat, x, y)) return XY(x,y)
+        }
+        return null
+    }
 }

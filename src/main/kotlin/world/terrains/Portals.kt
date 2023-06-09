@@ -12,8 +12,9 @@ import world.Chunk
 sealed class Portal(
     type: Terrain.Type,
     glyph: Glyph
-) : Terrain(type, glyph, false, false, true, false) {
+) : Terrain(type, glyph, false, true, false) {
     override fun trailsOverwrite() = false
+    override fun isWalkableBy(actor: Actor) = false
     override fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) {
         actor.level?.exitAt(x, y)?.also { exitRecord ->
             val oldLevel = actor.level!!

@@ -1,10 +1,15 @@
 package world.gen.features
 
+import actors.NPC
 import kotlinx.serialization.Serializable
 import util.Dice
+import util.Rect
+import util.XY
+import world.Chunk
 import world.ChunkScratch
-import world.gen.biomes.Glacier
-import world.gen.biomes.Ocean
+import world.gen.AnimalSpawn
+import world.gen.biomes.*
+import world.gen.habitats.*
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 
@@ -19,6 +24,8 @@ class Lake : Feature() {
     }
 
     override fun trailDestinationChance() = 1f
+
+    var bounds = Rect(0, 0, 0, 0)
 
     override fun doDig() {
         if (Dice.chance(0.15f)) {
@@ -36,6 +43,7 @@ class Lake : Feature() {
         val height = Dice.range(12,31)
         val x = x0 + Dice.range(width, CHUNK_SIZE - width) - width / 2
         val y = y0 + Dice.range(height, CHUNK_SIZE - height) - height / 2
+        bounds = Rect(x, y, x + width - 1, y + height - 1)
         carto.addTrailBlock(x, y, x+width-1, y+height-1)
         digLakeBlobAt(x, y, width, height)
         if (Dice.chance(0.4f)) {
@@ -64,4 +72,16 @@ class Lake : Feature() {
     private fun digLakeBlobAt(x: Int, y: Int, width: Int, height: Int) {
         printGrid(growBlob(width, height), x, y, Terrain.Type.TEMP1)
     }
+
+    override fun animalSpawns() = listOf(
+        AnimalSpawn(
+            { NPC.Tag.NPC_GATOR },
+            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
+            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
+            0f, 1000f, 1, 3, 1f
+        )
+    )
+
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
+        findSpawnPoint(chunk, animalType, bounds)
 }

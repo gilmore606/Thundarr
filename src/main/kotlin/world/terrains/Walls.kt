@@ -21,12 +21,13 @@ sealed class Wall(
     glyph: Glyph,
     val damageToBreak: Float = 1f,
     val overrideOpaque: Boolean = true,
-) : Terrain(type, glyph, false, false, overrideOpaque, false, dataType = Type.GENERIC_WALL) {
+) : Terrain(type, glyph, false, overrideOpaque, false, dataType = Type.GENERIC_WALL) {
 
     @Serializable class Data(
         var damage: Float = 0f
     ) : TerrainData(Type.GENERIC_WALL)
 
+    override fun isWalkableBy(actor: Actor) = false
     open fun bumpMsg() = "You bump into solid rock."
     open fun isDiggable() = true
     open fun digResult(): Thing? = null

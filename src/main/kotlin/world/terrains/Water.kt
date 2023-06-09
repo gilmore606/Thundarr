@@ -11,7 +11,7 @@ import world.level.Level
 sealed class Water(
     type: Type,
     glyph: Glyph
-) : Terrain(type, glyph, false, true, false, false, dataType = Type.GENERIC_WATER){
+) : Terrain(type, glyph, true, false, false, dataType = Type.GENERIC_WATER) {
 
     override fun name() = "water"
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPWATER
@@ -42,11 +42,12 @@ sealed class Water(
 
 object ShallowWater : Water(Type.TERRAIN_SHALLOW_WATER, Glyph.SHALLOW_WATER) {
     override fun name() = "shallow water"
-    override fun isWalkableBy(actor: Actor) = true
+    override fun isWalkableBy(actor: Actor) = actor.canSwimShallow()
 }
 
 object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {
-    override fun isWalkableBy(actor: Actor) = false
+    override fun name() = "deep water"
+    override fun isWalkableBy(actor: Actor) = actor.canSwimDeep()
 }
 
 // Only used in generation, should never appear in the world
@@ -54,7 +55,7 @@ object ScratchWater : Water(Type.GENERIC_WATER, Glyph.BLANK) { }
 
 object Lava : Water(Type.TERRAIN_LAVA, Glyph.LAVA) {
     override fun name() = "lava"
+    override fun isWalkableBy(actor: Actor) = actor.canSwimLava()
     override fun surfGlyph() = Glyph.LAVA_SURF
     override fun glowColor() = LightColor(1f, 0.4f, 0.1f)
-    override fun isWalkableBy(actor: Actor) = false
 }

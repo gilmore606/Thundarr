@@ -76,6 +76,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     open fun isSentient() = true
     open fun isHuman() = true
     open fun canOpenDoors() = isHuman()
+    open fun canWalkOn(terrain: Terrain) = true
+    open fun canSwimShallow() = false
+    open fun canSwimDeep() = false
+    open fun canSwimLava() = false
+    open fun canFly() = false
     open fun actionSpeed() = 1.5f - Speed.get(this) * 0.05f
     open fun visualRange() = 10f
 

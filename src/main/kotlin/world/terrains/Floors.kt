@@ -12,7 +12,7 @@ sealed class Floor(
     type: Type,
     glyph: Glyph,
     canGrowPlants: Boolean
-) : Terrain(type, glyph, true, true, false, canGrowPlants, dataType = Type.GENERIC_FLOOR) {
+) : Terrain(type, glyph, true, false, canGrowPlants, dataType = Type.GENERIC_FLOOR) {
 
     @Serializable class Data(
         var extraQuads: Set<Quad>

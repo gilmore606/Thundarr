@@ -52,18 +52,18 @@ class Village(
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
 
     @Transient private var featureBuilt = false
-    @Transient private val uniqueHuts = mutableListOf<Decor>()
+    @Transient private val uniqueHuts = mutableListOf<Decor>(
+        BlacksmithShop(),
+        Schoolhouse(),
+        Church(),
+        StorageShed(),
+    )
 
     override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
     override fun trailDestinationChance() = 1f
 
     override fun doDig() {
-
-        uniqueHuts.add(BlacksmithShop())
-        uniqueHuts.add(Schoolhouse())
-        uniqueHuts.add(Church())
-        uniqueHuts.add(StorageShed())
 
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
         printGrid(growBlob(52, 52), x0 + 6, y0 + 6, Terrain.Type.TEMP2)

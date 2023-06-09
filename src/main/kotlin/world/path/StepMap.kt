@@ -38,12 +38,12 @@ class StepMap() {
         }
     }
 
-    suspend fun removeSubscriber(subscriber: Entity) {
+    fun removeSubscriber(subscriber: Entity) {
         subscribers.remove(subscriber)
         if (subscribers.isEmpty()) { done = true }
     }
 
-    suspend fun dispose() {
+    fun dispose() {
         targetEntity = null
         scratch = Array(1) { IntArray(1) { 0 } }
         map = Array(1) { IntArray(1) { 0 } }

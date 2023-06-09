@@ -42,13 +42,12 @@ class Cabin : Feature() {
     override fun animalSpawns() = listOf(
         AnimalSpawn(
             { NPC.Tag.NPC_HERMIT },
-            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain),
+            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
             setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
             0f, 1000f, 1, 1, 1f
         )
     )
 
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = XY(
-        Dice.range(bounds.x0 + 1, bounds.x1 - 1), Dice.range(bounds.y0 + 1, bounds.y1 - 1)
-    )
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
+        findSpawnPoint(chunk, animalType, bounds)
 }

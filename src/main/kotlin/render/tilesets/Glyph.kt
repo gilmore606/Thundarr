@@ -107,6 +107,7 @@ enum class Glyph {
     PIDGEY_BRUTE,
     GOAT,
     MANAPE,
+    GATOR,
 
     OAK_TREE,
     MAPLE_TREE,

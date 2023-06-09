@@ -15,7 +15,6 @@ import world.level.Level
 sealed class Terrain(
     val type: Type,
     private val glyph: Glyph,
-    private val walkable: Boolean,
     private val flyable: Boolean,
     private val opaque: Boolean,
     val canGrowPlants: Boolean,
@@ -131,7 +130,7 @@ sealed class Terrain(
                               doQuad: (x0: Double, y0: Double, x1: Double, y1: Double, tx0: Float, tx1: Float, ty0: Float, ty1: Float,
                                        vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit) { }
 
-    open fun isWalkableBy(actor: Actor) = this.walkable
+    open fun isWalkableBy(actor: Actor) = actor.canWalkOn(this)
     open fun isOpaque() = this.opaque
     open fun moveSpeed(actor: Actor) = 1f
     open fun stepSound(actor: Actor): Speaker.SFX? = null
@@ -147,7 +146,7 @@ sealed class Terrain(
     open fun debugData(data: TerrainData?): String { return "none" }
 }
 
-object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, true, false, false) {
+object Blank : Terrain(Type.BLANK, Glyph.BLANK, true, false, false) {
     override fun name() = "BLANK"
 }
 
