@@ -133,11 +133,15 @@ class WorldCarto(
     private fun spawnAnimals() {
         var groupsSpawned = 0
         // Spawn for chunk features
+        var spawnForBiomes = true
         meta.features().forEach { feature ->
             groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, feature.animalSpawns(), feature)
+            spawnForBiomes = spawnForBiomes && !feature.preventBiomeAnimalSpawns()
         }
         // Spawn for general biome/habitat
-        groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, animalSpawns())
+        if (spawnForBiomes) {
+            groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, animalSpawns())
+        }
     }
 
     private fun spawnAnimalsFromGroups(groupsSpawned: Int, groupsPool: List<AnimalSpawn>, source: AnimalSpawnSource? = null): Int {

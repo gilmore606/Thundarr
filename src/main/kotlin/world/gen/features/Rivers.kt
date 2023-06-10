@@ -1,11 +1,16 @@
 package world.gen.features
 
+import actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.*
+import world.Chunk
+import world.gen.AnimalSpawn
 import world.gen.NoisePatches
+import world.gen.biomes.*
 import world.gen.cartos.WorldCarto
+import world.gen.habitats.*
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 
@@ -208,4 +213,16 @@ class Rivers(
             else -> Glyph.MAP_RIVER_SE
         }
     }
+
+    override fun animalSpawns() = listOf(
+        AnimalSpawn(
+            { NPC.Tag.NPC_GATOR },
+            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
+            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
+            0f, 1000f, 1, 3, (exits.total { it.width.toFloat() } / exits.size) * 0.1f
+        )
+    )
+
+    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
+        findSpawnPoint(chunk, animalType, Rect(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1))
 }

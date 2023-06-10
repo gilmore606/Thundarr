@@ -17,6 +17,7 @@ class Farm(
 ) : Feature() {
     override fun order() = 3
     override fun stage() = Stage.BUILD
+    override fun preventBiomeAnimalSpawns() = !isAbandoned
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome in listOf(Plain, Scrub, Swamp)

@@ -78,7 +78,7 @@ class Lake : Feature() {
             { NPC.Tag.NPC_GATOR },
             setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
             setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            0f, 1000f, 1, 3, 1f
+            0f, 1000f, 1, 3, 0.5f
         )
     )
 

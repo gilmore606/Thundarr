@@ -22,6 +22,7 @@ class Village(
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun name() = name
+    override fun preventBiomeAnimalSpawns() = !isAbandoned
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)
