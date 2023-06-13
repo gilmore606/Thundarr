@@ -49,5 +49,5 @@ class Cabin : Feature() {
     )
 
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
-        findSpawnPoint(chunk, animalType, bounds)
+        findSpawnPointForNPCType(chunk, animalType, bounds)
 }

@@ -92,7 +92,7 @@ enum class Glyph {
     RATTHING,
     RATLORD,
     FLOATING_EYE,
-    WIZARD_SHIELD,
+    SHIELD_GUARD,
     WIZARD_SCYTHE,
     THRALL_ARCHER,
     FURWORM,

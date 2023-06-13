@@ -1,6 +1,7 @@
 package util
 
 import kotlinx.serialization.Serializable
+import world.level.CHUNK_SIZE
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -46,6 +47,13 @@ data class XY(var x: Int, var y: Int) {
         }
         return true
     }
+
+    fun dirPlusDiagonals(): List<XY> {
+        val i = DIRECTIONS_ROSE.indexOf(this)
+        val i2 = (if (i == 0) DIRECTIONS_ROSE.lastIndex else i - 1)
+        val i3 = (if (i == DIRECTIONS_ROSE.lastIndex) 0 else i + 1)
+        return listOf(this, DIRECTIONS_ROSE[i2], DIRECTIONS_ROSE[i3])
+    }
 }
 
 data class XYf(var x: Float, var y: Float) {
@@ -61,4 +69,16 @@ data class XYf(var x: Float, var y: Float) {
     override fun equals(other: Any?): Boolean {
         return (other is XYf) && (x == other.x && y == other.y)
     }
+}
+
+fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
+    NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
+    SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)
+    WEST -> XY(0, CHUNK_SIZE / 2 + offset)
+    EAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE / 2 + offset)
+    NORTHEAST -> XY(CHUNK_SIZE - 1, 0)
+    SOUTHEAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE - 1)
+    NORTHWEST -> XY(0, 0)
+    SOUTHWEST -> XY(0, CHUNK_SIZE - 1)
+    else -> XY(0,0)
 }

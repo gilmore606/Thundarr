@@ -1,7 +1,5 @@
 package render.tilesets
 
-import com.badlogic.gdx.graphics.Texture
-import render.Screen
 import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
@@ -31,7 +29,7 @@ fun ActorTileSet() =
         setTile(Glyph.RATLORD, SimpleTile(this, 3, 4))
         setTile(Glyph.FLOATING_EYE, SimpleTile(this, 2, 4))
         setTile(Glyph.WIZARD_SCYTHE, SimpleTile(this, 4, 0))
-        setTile(Glyph.WIZARD_SHIELD, SimpleTile(this, 4, 2))
+        setTile(Glyph.SHIELD_GUARD, SimpleTile(this, 4, 2))
         setTile(Glyph.THRALL_ARCHER, SimpleTile(this, 4, 1))
         setTile(Glyph.FURWORM, SimpleTile(this, 4, 3))
         setTile(Glyph.PIG, SimpleTile(this, 4, 4))

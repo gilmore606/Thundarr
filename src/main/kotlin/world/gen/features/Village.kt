@@ -1,5 +1,6 @@
 package world.gen.features
 
+import actors.VillageGuard
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -12,6 +13,7 @@ import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.path.DistanceMap
 import world.terrains.Terrain
+import java.lang.Math.max
 
 @Serializable
 class Village(
@@ -103,6 +105,21 @@ class Village(
         }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
         swapTerrain(Terrain.Type.TEMP2, meta.biome.bareTerrain(x0,y0))
+
+        if (!isAbandoned) {
+            spawnGuards()
+        }
+    }
+
+    private fun spawnGuards() {
+        val numGuards = 1.coerceAtLeast((size / 4))
+        val bounds = Rect(x0, y0, x1, y1)
+        repeat (numGuards) {
+            val guard = VillageGuard(bounds)
+            findSpawnPointForNPC(chunk, guard, bounds)?.also { spawnPoint ->
+                guard.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+            }
+        }
     }
 
     private fun layoutVillageVert() {

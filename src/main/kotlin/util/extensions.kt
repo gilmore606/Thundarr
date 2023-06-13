@@ -204,10 +204,6 @@ fun Int.toEnglish(): String {
     return str
 }
 
-fun Double.toGameTimeString() {
-
-}
-
 fun String.plural(): String {
     if (isNotEmpty()) {
         if (listOf(
@@ -298,6 +294,7 @@ val NO_DIRECTION = XY(0, 0)
 val CARDINALS = listOf(NORTH, SOUTH, WEST, EAST)
 val DIAGONALS = listOf(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST)
 val DIRECTIONS = listOf(NORTH, SOUTH, WEST, EAST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
+val DIRECTIONS_ROSE = listOf(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 
 fun List<XY>.from(x: Int, y: Int, doThis: (dx: Int, dy: Int, dir: XY)->Unit) {
     this.forEach { dir ->
@@ -320,17 +317,6 @@ fun List<XY>.nextNearestTo(origin: XY, exclude: List<XY>): XY {
     return nearest ?: throw RuntimeException()
 }
 
-fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
-    NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
-    SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)
-    WEST -> XY(0, CHUNK_SIZE / 2 + offset)
-    EAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE / 2 + offset)
-    NORTHEAST -> XY(CHUNK_SIZE - 1, 0)
-    SOUTHEAST -> XY(CHUNK_SIZE - 1, CHUNK_SIZE - 1)
-    NORTHWEST -> XY(0, 0)
-    SOUTHWEST -> XY(0, CHUNK_SIZE - 1)
-    else -> XY(0,0)
-}
 
 fun getBezier(t: Float, start: XYf, startControl: XYf, endControl: XYf, end: XYf): XYf {
     val u = 1 - t
