@@ -52,8 +52,8 @@ sealed class NPC : Actor() {
         }
     }
 
-    @Transient val unhibernateRadius = 30f
-    @Transient val hibernateRadius = 40f
+    @Transient val unhibernateRadius = 45f
+    @Transient val hibernateRadius = 60f
 
     var state: State = Hibernated()
     val stateStack = Stack<State>()

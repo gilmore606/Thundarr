@@ -1,6 +1,8 @@
 package actors.animations
 
 import render.Screen
+import java.lang.Float.max
+import java.lang.Float.min
 
 
 abstract class Animation(
@@ -28,6 +30,6 @@ abstract class Animation(
 
     open fun doOnRender(delta: Float) { }
 
-    fun progress() = (Screen.timeMs - startMs).toFloat() / durationMs.toFloat()
+    fun progress() = min(1f, (Screen.timeMs - startMs).toFloat() / durationMs.toFloat())
 
 }
