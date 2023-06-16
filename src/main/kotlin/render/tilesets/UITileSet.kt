@@ -28,6 +28,8 @@ fun UITileSet() =
         setTile(Glyph.SPEECH_BUBBLE, SimpleTile(this, 3, 3))
         setTile(Glyph.POW_ICON, SimpleTile(this, 0, 4))
         setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
+        setTile(Glyph.HOSTILE_OTHER_ICON, SimpleTile(this, 2, 5))
+        setTile(Glyph.FLEEING_ICON, SimpleTile(this, 1, 5))
         setTile(Glyph.WINDOW_SHADE, SimpleTile(this, 2, 4))
         setTile(Glyph.QUESTION_ICON, SimpleTile(this, 5, 4))
         setTile(Glyph.INVENTORY_ALL, SimpleTile(this, 5, 0))

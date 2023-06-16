@@ -13,7 +13,6 @@ class Tortle : NPC() {
     override fun shadowWidth() = 1.4f
     override fun name() = "tortle"
     override fun description() = "A large tortoise with a large raised head and sharp horns."
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 12f)
         Speed.set(this, 6f)

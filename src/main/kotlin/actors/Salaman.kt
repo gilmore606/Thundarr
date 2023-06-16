@@ -15,7 +15,6 @@ class Salaman : NPC() {
     override fun shadowWidth() = 1.4f
     override fun name() = "salaman"
     override fun description() = "A man-sized red salamander.  A curiously human face bobs at the end of its long neck."
-    override fun isHuman() = false
     override fun canSwimShallow() = true
     override fun onSpawn() {
         Strength.set(this, 10f)

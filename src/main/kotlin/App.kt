@@ -1,5 +1,6 @@
 import actors.AttractPlayer
 import actors.Player
+import actors.factions.Factions
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
@@ -34,6 +35,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     lateinit var save: SaveSlot
     var weather = Weather()
     var history = History()
+    var factions = Factions().apply { makeInitialFactions() }
 
     var time: Double = 200.0
     var gameTime: GameTime = GameTime(time)
@@ -133,6 +135,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     time = time,
                     weather = weather,
                     history = history,
+                    factions = factions,
                     consoleLines = Console.lines,
                     toolbarTags = Toolbar.getTagsForSave()
                 )
@@ -183,6 +186,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             level.setPov(player.xy.x, player.xy.y)
             weather = state.weather
             history = state.history
+            factions = state.factions
             updateTime(state.time)
             Console.restoreLines(state.consoleLines)
             Toolbar.loadTagsFromSave(state.toolbarTags)

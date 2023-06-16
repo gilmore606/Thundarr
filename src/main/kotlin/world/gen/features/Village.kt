@@ -1,6 +1,8 @@
 package world.gen.features
 
 import actors.VillageGuard
+import actors.factions.Faction
+import actors.factions.VillageFaction
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -62,6 +64,8 @@ class Village(
         StorageShed(),
     )
 
+    val factionID = App.factions.addFaction(VillageFaction(name))
+
     override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
     override fun trailDestinationChance() = 1f
@@ -113,9 +117,11 @@ class Village(
 
     private fun spawnGuards() {
         val numGuards = 1.coerceAtLeast((size / 4))
-        val bounds = Rect(x0, y0, x1, y1)
+        val bounds = Rect(x0 + 4, y0 + 4, x1 - 4, y1 - 4)
         repeat (numGuards) {
-            val guard = VillageGuard(bounds)
+            val guard = VillageGuard(bounds, name).apply {
+                joinFaction(factionID)
+            }
             findSpawnPointForNPC(chunk, guard, bounds)?.also { spawnPoint ->
                 guard.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
             }

@@ -234,9 +234,8 @@ sealed class Level {
     }
 
     fun onActorMovedFrom(actor: Actor, x: Int, y: Int) {
-        val light = actor.light()
         chunkAt(x, y)?.onRemoveActor(x, y, actor)
-        light?.also { removeLightSource(actor) }
+        removeLightSource(actor)
     }
 
     fun moveSpeedFor(actor: Actor, dir: XY): Float {

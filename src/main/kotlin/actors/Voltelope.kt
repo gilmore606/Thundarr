@@ -15,7 +15,6 @@ sealed class GenericVoltelope : NPC() {
     override fun glyph() = Glyph.VOLTELOPE
     override fun name() = "voltelope"
     override fun shadowWidth() = 1.7f
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 7f)
         Speed.set(this, 13f)

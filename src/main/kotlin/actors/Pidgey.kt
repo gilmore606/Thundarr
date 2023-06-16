@@ -10,7 +10,6 @@ import render.tilesets.Glyph
 @Serializable
 sealed class GenericPidgey : NPC() {
     override fun shadowWidth() = 1.3f
-    override fun isHuman() = false
     override fun armorTotal() = 0.0f
     override fun idleState() = IdleHerd(
         0.6f, 12, false,

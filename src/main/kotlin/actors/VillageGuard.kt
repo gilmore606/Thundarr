@@ -14,6 +14,7 @@ import util.Rect
 @Serializable
 class VillageGuard(
     val bounds: Rect,
+    val villageName: String,
 ) : NPC() {
     override fun name() = "guard"
     override fun glyph() = Glyph.SHIELD_GUARD
@@ -30,6 +31,13 @@ class VillageGuard(
         bounds
     )
     override fun canSwimShallow() = true
+
+    override fun meetPlayerMsg() = listOf(
+        "Hail traveller.",
+        "Watch yourself, barbarian.",
+        "Welcome to $villageName.",
+        "$villageName is a peaceful town."
+    ).random()
 
     private val lantern = LightColor(0.5f, 0.4f, 0.0f)
     private val lightStartHour = 20

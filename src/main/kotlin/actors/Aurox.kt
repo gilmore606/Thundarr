@@ -19,7 +19,6 @@ class Aurox : NPC() {
     override fun shadowXOffset() = 0.2f
     override fun name() = "aurox"
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 14f)
         Speed.set(this, 8f)

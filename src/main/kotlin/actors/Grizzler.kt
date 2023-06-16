@@ -15,7 +15,6 @@ class Grizzler : NPC() {
     override fun glyph() = Glyph.DEMONDOG
     override fun name() = "grizzler"
     override fun description() = "A large furry brown predator with glittering yellow eyes and large claws."
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 18f)
         Speed.set(this, 11f)

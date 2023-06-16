@@ -47,6 +47,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
     val statuses = mutableListOf<Status>()
 
+    open fun initialFactions() = mutableSetOf<String>().apply {
+        if (isHuman()) add(App.factions.humans)
+        if (isMonster()) add(App.factions.monsters)
+    }
+    val factions = initialFactions()
+
     @Transient val queuedActions: MutableList<Action> = mutableListOf()
 
     @Transient var seen = mutableMapOf<Entity, Float>()
@@ -74,7 +80,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
 
     open fun isSentient() = true
-    open fun isHuman() = true
+    open fun isHuman() = false
+    open fun isMonster() = false
     open fun canOpenDoors() = isHuman()
     open fun canWalkOn(terrain: Terrain) = true
     open fun canSwimShallow() = false
@@ -572,6 +579,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             val ty = xy.y + dir.y
             doThis(tx, ty, dir)
         }
+    }
+
+    fun joinFaction(factionID: String) {
+        factions.add(factionID)
     }
 
 }

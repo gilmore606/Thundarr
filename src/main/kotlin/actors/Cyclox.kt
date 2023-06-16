@@ -15,7 +15,6 @@ class Cyclox : NPC() {
     override fun glyph() = Glyph.CYCLOX
     override fun name() = "cyclox"
     override fun description() = "A large spheroid ruminant with wrinkly gray skin, and one giant eye."
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 15f)
         Speed.set(this, 9f)

@@ -1,7 +1,6 @@
 package actors
 
 import actors.actions.Action
-import actors.actions.Move
 import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
@@ -58,7 +57,7 @@ sealed class NPC : Actor() {
     var state: State = Hibernated()
     val stateStack = Stack<State>()
 
-    var hostile = false
+    var enemies = mutableListOf<String>() // actor ids
     var metPlayer = false
     val placeMemory = mutableMapOf<String,XY>()
     @Transient var den: NPCDen? = null
@@ -82,8 +81,8 @@ sealed class NPC : Actor() {
     open fun converseLines(): List<String> = listOf()
     open fun meetPlayerMsg(): String? = null
 
-    open fun isHostile(): Boolean = hostile
-    override fun willAggro(target: Actor) = isHostile() && target is Player
+    open fun isHostileTo(target: Actor): Boolean = enemies.contains(target.id)
+    override fun willAggro(target: Actor) = isHostileTo(target)
 
     override fun visualRange() = 8f + Speed.get(this)
 
@@ -113,10 +112,13 @@ sealed class NPC : Actor() {
             changeState(Hibernated())
         } else {
             val oldState = state
+            // Statuses get a chance to change our state
             statuses.forEach { it.considerState(this) }
             if (oldState == state) {
+                // If no change, we get a chance to change our state
                 considerState()
                 if (oldState == state) {
+                    // If no change, current state gets a chance to change our state
                     state.considerState(this)
                 }
             }
@@ -171,19 +173,22 @@ sealed class NPC : Actor() {
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)
-        if (isHostile()) drawIt(Glyph.HOSTILE_ICON)
+        state.drawStatusGlyphs(drawIt)
     }
 
     override fun examineDescription(): String {
         var d = description()
-        if (hostile) d += "  " + this.gender().ps.capitalize() + " seems very angry at you!"
+        if (isHostileTo(App.player)) d += "  " + this.gender().ps.capitalize() + " seems very angry at you!"
         return d
     }
 
     override fun receiveAggression(attacker: Actor) {
-        if (attacker is Player && !hostile) {
-            hostile = true
+        if (!isHostileTo(attacker)) {
+            enemies.add(attacker.id)
             Console.sayAct("", becomeHostileMsg(), this, attacker, null, Console.Reach.AUDIBLE)
+        }
+        factions.forEach { factionID ->
+            App.factions.byID(factionID)?.onMemberAttacked(attacker)
         }
     }
 

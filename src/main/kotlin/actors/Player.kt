@@ -39,6 +39,8 @@ open class Player : Actor() {
     override fun dname() = name()
     override fun iname() = name()
 
+    override fun initialFactions() = mutableSetOf(App.factions.humans)
+
     override fun visualRange() = 40f
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
@@ -187,7 +189,7 @@ open class Player : Actor() {
     // Is it safe to do auto-actions like auto-pickup, shift-move, etc?
     // If we can see hostiles, it's not safe.
     fun isAutoActionSafe(): Boolean {
-        if (entitiesSeen { it is NPC && it.isHostile() }.isNotEmpty()) {
+        if (entitiesSeen { it is NPC && it.isHostileTo(this) }.isNotEmpty()) {
             return false
         }
         return true

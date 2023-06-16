@@ -39,7 +39,6 @@ class Ratthing : NPC() {
     override fun corpse() = null
     override fun talkSound(actor: Actor) = Speaker.SFX.RAT
 
-    override fun isHostile() = true
     override fun idleState() = IdleInRoom()
 
 }

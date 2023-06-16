@@ -34,7 +34,6 @@ class Ratlord(
         Fight.set(this, 3f)
     }
     override fun meleeWeapon() = Ratman.weapon
-    override fun isHostile() = true
     override fun idleState() = IdleInRoom()
 
     override fun converseLines() = listOf(

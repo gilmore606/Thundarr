@@ -4,6 +4,7 @@ import actors.NPC
 import actors.actions.Action
 import actors.actions.Attack
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.XY
 
 @Serializable
@@ -30,5 +31,13 @@ class Attacking(
             }
         }
         return super.pickAction(npc)
+    }
+
+    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+        if (targetId == App.player.id) {
+            drawIt(Glyph.HOSTILE_ICON)
+        } else {
+            drawIt(Glyph.HOSTILE_OTHER_ICON)
+        }
     }
 }

@@ -167,7 +167,7 @@ class AttractPlayer : Player() {
 
                 // talk or fight or grab nearby stuff
                 entitiesNextToUs().forEach { entity ->
-                    if (entity is NPC && entity.isHostile()) {
+                    if (entity is NPC && entity.isHostileTo(this)) {
                         return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                     if (entity is Aurox || entity is MuskOx) {

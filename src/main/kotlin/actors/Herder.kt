@@ -26,6 +26,7 @@ class Herder : NPC() {
     override fun name() = "herdsman"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A peasant farm worker.  He looks oppressed, possibly by wizards."
+    override fun isHuman() = true
     override fun onSpawn() {
         Strength.set(this, 9f)
         Speed.set(this, 16f)

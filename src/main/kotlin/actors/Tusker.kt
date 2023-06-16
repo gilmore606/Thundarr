@@ -16,7 +16,6 @@ sealed class GenericTusker : NPC() {
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
     override fun description() = "A large, stout porcine animal covered in wiry bristles, with a protruding snout."
-    override fun isHuman() = false
     override fun onSpawn() {
         Strength.set(this, 10f)
         Speed.set(this, 9f)

@@ -4,14 +4,12 @@ import App
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Move
-import actors.actions.Sleep
 import actors.actions.Wait
-import actors.statuses.Status
 import audio.Speaker
 import kotlinx.serialization.Serializable
+import render.sparks.Speak
 import ui.panels.Console
 import util.*
-import world.journal.GameTime
 
 @Serializable
 sealed class Idle : State() {
@@ -34,13 +32,14 @@ sealed class Idle : State() {
         val canSeePlayer = npc.canSee(App.player)
         if (canSeePlayer && !npc.metPlayer) {
             npc.meetPlayerMsg()?.also {
-                Console.say(it)
+                Console.sayAct("", "%Dn says, \"$it\"", npc)
                 npc.talkSound(App.player)?.also { Speaker.world(it, source = npc.xy())}
+                npc.level?.addSpark(Speak().at(npc.xy.x, npc.xy.y))
             }
             npc.metPlayer = true
         }
 
-        if (npc.isHostile() && canSeePlayer) {
+        if (npc.isHostileTo(App.player) && canSeePlayer) {
             npc.changeState(npc.hostileResponseState(App.player.id))
         }
     }
