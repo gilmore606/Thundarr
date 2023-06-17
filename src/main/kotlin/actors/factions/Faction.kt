@@ -12,7 +12,7 @@ open class Faction(
 
     val id = UUID()
 
-    val hatedActors = mutableSetOf<String>()
+    val hatedActors = mutableSetOf<String>() // actor ids
 
     // Should the faction hate someone who attacks a member?
     open fun hateMemberAttacker() = false
@@ -28,4 +28,8 @@ open class Faction(
         hatedActors.add(actor.id)
     }
 
+    fun hatesActor(actor: Actor): Boolean {
+        if (hatedActors.contains(actor.id)) return true
+        return false
+    }
 }

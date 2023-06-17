@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.Action
+import actors.factions.Factions
 import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
@@ -81,7 +82,10 @@ sealed class NPC : Actor() {
     open fun converseLines(): List<String> = listOf()
     open fun meetPlayerMsg(): String? = null
 
-    open fun isHostileTo(target: Actor): Boolean = enemies.contains(target.id)
+    open fun isHostileTo(target: Actor): Boolean = enemies.contains(target.id) || factions.hasOneWhere {
+        App.factions.byID(it)?.hatesActor(target) ?: false
+    }
+
     override fun willAggro(target: Actor) = isHostileTo(target)
 
     override fun visualRange() = 8f + Speed.get(this)
