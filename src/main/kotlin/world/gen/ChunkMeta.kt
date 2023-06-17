@@ -83,6 +83,11 @@ class ChunkMeta(
         (it as Trails).exits
     } ?: listOf()
 
+    fun onSave() {
+        features.forEach { feature ->
+            feature.onSave()
+        }
+    }
 }
 
 class ChunkScratch(

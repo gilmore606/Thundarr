@@ -15,7 +15,7 @@ import util.Rect
 class VillageGuard(
     val bounds: Rect,
     val villageName: String,
-) : NPC() {
+) : Citizen() {
     override fun name() = "guard"
     override fun glyph() = Glyph.SHIELD_GUARD
     override fun description() = "A village guard."
@@ -44,6 +44,11 @@ class VillageGuard(
     private val lightEndHour = 6
     private val lightMinute = Dice.zeroTil(59)
 
-    override fun light() = if ((App.gameTime.hour > lightStartHour || App.gameTime.hour < lightEndHour) && App.gameTime.minute >= lightMinute) lantern else null
+    override fun light(): LightColor? {
+        val h = App.gameTime.hour
+        val m = App.gameTime.minute
+        if ((h > lightStartHour && m > lightMinute) || (h < lightEndHour && m < lightMinute)) return lantern
+        return null
+    }
 
 }

@@ -13,6 +13,7 @@ import render.tilesets.Glyph
 import things.LightSource
 import things.Thing
 import util.*
+import world.gen.Metamap
 import world.gen.cartos.AttractCarto
 import world.gen.cartos.WorldCarto
 import world.gen.decors.Decor
@@ -117,6 +118,7 @@ class Chunk(
     }
 
     fun randomPlayerStart(): XY {
+        // TODO: is this even needed?  wtf it does nothing
         var tries = 5000
         while (tries > 0) {
             val x = Dice.range(x, x + width - 1)
@@ -134,6 +136,11 @@ class Chunk(
             savedActors.forEach { actor ->
                 actor.moveTo(level, actor.xy.x, actor.xy.y)
                 actor.onRestore()
+            }
+            Metamap.metaAtWorld(x, y).also { meta ->
+                meta.features().forEach { feature ->
+                    feature.onRestore(level)
+                }
             }
         }
     }

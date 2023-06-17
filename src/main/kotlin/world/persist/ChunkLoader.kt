@@ -9,6 +9,7 @@ import util.log
 import world.level.AttractLevel
 import world.level.CHUNK_SIZE
 import world.Chunk
+import world.gen.Metamap
 import world.level.Level
 
 object ChunkLoader {
@@ -76,6 +77,7 @@ object ChunkLoader {
         jobs.add(coroutineScope.launch {
             log.debug("ChunkLoader saving chunk ${chunk.x} ${chunk.y}")
             App.save.putWorldChunk(chunk, callback)
+            App.save.updateWorldMeta(Metamap.metaAtWorld(chunk.x, chunk.y))
         })
         locked = false
     }

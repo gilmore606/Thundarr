@@ -15,6 +15,7 @@ import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.gen.gardenPlantSpawns
+import world.level.Level
 import world.terrains.Terrain
 
 @Serializable
@@ -40,6 +41,8 @@ sealed class Feature : AnimalSpawnSource {
     var x1: Int = 0
     var y1: Int = 0
 
+    open fun onRestore(level: Level) { }
+    open fun onSave() { }
 
     fun dig(carto: WorldCarto) {
         this.carto = carto
@@ -294,13 +297,13 @@ sealed class Feature : AnimalSpawnSource {
         return findSpawnPointForNPC(chunk, goat, bounds)
     }
 
-    protected fun findSpawnPointForNPC(chunk: Chunk, animal: NPC, bounds: Rect): XY? {
+    protected fun findSpawnPointForNPC(chunk: Chunk, npc: NPC, bounds: Rect): XY? {
         var tries = 0
         while (tries < 500) {
             tries++
             val x = Dice.range(bounds.x0, bounds.x1)
             val y = Dice.range(bounds.y0, bounds.y1)
-            if (chunk.isWalkableAt(animal, x, y)) return XY(x,y)
+            if (chunk.isWalkableAt(npc, x, y)) return XY(x,y)
         }
         return null
     }

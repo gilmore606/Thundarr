@@ -9,6 +9,7 @@ import util.*
 import world.*
 import world.gen.AnimalSpawn
 import world.gen.AnimalSpawnSource
+import world.gen.Metamap
 import world.gen.animalSpawns
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
@@ -47,7 +48,7 @@ class WorldCarto(
     lateinit var meta: ChunkMeta
 
     suspend fun carveWorldChunk() {
-        meta = App.save.getWorldMeta(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
+        meta = Metamap.metaAtWorld(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
 
         if (meta.biome == Ocean) {
             carveRoom(Rect(x0,y0,x1,y1), 0, TERRAIN_DEEP_WATER)

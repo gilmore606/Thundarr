@@ -4,8 +4,10 @@ import actors.NPC
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
+import kotlinx.serialization.Serializable
 import util.*
 
+@Serializable
 class IdlePatrol(
     val wanderChance: Float,
     val bounds: Rect,

@@ -1,6 +1,9 @@
 package world.gen.features
 
+import actors.Citizen
+import actors.NPC
 import actors.VillageGuard
+import actors.Villager
 import actors.factions.Faction
 import actors.factions.VillageFaction
 import kotlinx.serialization.Serializable
@@ -13,6 +16,7 @@ import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
+import world.level.Level
 import world.path.DistanceMap
 import world.terrains.Terrain
 import java.lang.Math.max
@@ -55,6 +59,12 @@ class Village(
     }
 
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
+
+    private val citizens = mutableSetOf<String>() // actor ids
+    private fun addCitizen(citizen: Citizen) {
+        citizens.add(citizen.id)
+        citizen.village = this
+    }
 
     @Transient private var featureBuilt = false
     @Transient private val uniqueHuts = mutableListOf<Decor>(
@@ -122,6 +132,7 @@ class Village(
             val guard = VillageGuard(bounds, name).apply {
                 joinFaction(factionID)
             }
+            addCitizen(guard)
             findSpawnPointForNPC(chunk, guard, bounds)?.also { spawnPoint ->
                 guard.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
             }
@@ -245,6 +256,13 @@ class Village(
                     }
                 }
             }
+
+            val citizen = Villager().apply { joinFaction(factionID) }
+            addCitizen(citizen)
+            findSpawnPointForNPC(chunk, citizen, Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2))?.also { spawnPoint ->
+                citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+            }
+
         }
         carto.addTrailBlock(x, y, x+width-1, y+height-1)
     }
@@ -319,4 +337,15 @@ class Village(
     override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE
     override fun mapPOITitle() = name
     override fun mapPOIDescription() = "The free human village of $name."
+
+    override fun onRestore(level: Level) {
+        citizens.forEach { citizenID ->
+            level.director.getActor(citizenID)?.also { citizen ->
+                if (citizen is Citizen) {
+                    citizen.village = this
+                }
+            }
+        }
+    }
+
 }

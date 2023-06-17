@@ -148,6 +148,7 @@ class SaveSlot(
     }
 
     suspend fun updateWorldMeta(meta: ChunkMeta) {
+        meta.onSave()
         transaction {
             WorldMetaTable.deleteWhere { (x eq meta.x) and (y eq meta.y) }
             WorldMetaTable.insert {

@@ -567,4 +567,18 @@ object Madlib {
             else -> adj.random() + " " + firstNames.random() + "'s " + post.random()
         }
     }
+
+    fun villagerName(gender: Entity.Gender): String {
+        val c1 = listOf("B","F","Fl","G","Gl","H","J","K","Kl","L","M","N","R","S","Sl","Sp","Sk","T",
+            "V","W")
+        val malec1 = listOf("Br","D","Dr","Gr","St","Tr","Kr","Vr")
+        val femalec1 = listOf("Wr","Q","P","Pr","Th","Wh","Y","Ly","Sh")
+        val v1 = listOf("an","in","on","un","en","am","im","om","um","em","and","ind","ond","und","end","od","ad","ar","er","es","as","ir")
+        val malec2 = listOf("or","ur","on","og","ug","ak","ek","ok","uk","ar","sar","kar","on","gar","kar","gan","em","er","en")
+        val femalec2 = listOf("a","ya","ee","y","i","ii","ia","aya","ai","ao","au","ie","ey","aa")
+
+        return c1.plus(if (gender == Entity.Gender.MALE) malec1 else femalec1).random() +
+                v1.random() +
+                (if (gender == Entity.Gender.MALE) malec2 else femalec2).random()
+    }
 }

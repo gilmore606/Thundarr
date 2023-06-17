@@ -79,6 +79,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             }
         }
 
+    open fun hasProperName() = false
+    override fun dname() = if (hasProperName()) (name()) else ("the " + name())
+    override fun dnamec() = if (hasProperName()) (name()) else ("The " + name())
+    override fun iname() = if (hasProperName()) (name()) else (name().aOrAn())
+    override fun inamec() = if (hasProperName()) (name()) else (name().aOrAn().capitalize())
+
     open fun isSentient() = true
     open fun isHuman() = false
     open fun isMonster() = false
