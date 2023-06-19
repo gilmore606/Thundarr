@@ -16,6 +16,7 @@ class VillageGuard(
     val bounds: Rect,
     val villageName: String,
 ) : Citizen() {
+    override fun toString() = name() + "(" + id + ")"
     override fun name() = "guard"
     override fun glyph() = Glyph.SHIELD_GUARD
     override fun description() = "A village guard."
@@ -28,7 +29,8 @@ class VillageGuard(
     override fun armorTotal() = 2.0f
     override fun idleState() = IdlePatrol(
         0.7f,
-        bounds
+        bounds,
+        stayOutdoors = true
     )
     override fun canSwimShallow() = true
 

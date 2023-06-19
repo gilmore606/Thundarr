@@ -471,7 +471,7 @@ sealed class Level {
             group[0].uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
                     menu.addOption(use.command) {
-                        App.player.queue(Use(tag, group[0], use.duration, use.toDo, x, y))
+                        App.player.queue(Use(tag, group[0], use.duration))
                     }
                 }
             }
@@ -511,7 +511,7 @@ sealed class Level {
                 held.uses().forEach { (tag, heldUse) ->
                     if (heldUse.canDo(App.player, x, y, true)) {
                         menu.addOption(heldUse.command) {
-                            App.player.queue(Use(tag, held, heldUse.duration, heldUse.toDo, x, y))
+                            App.player.queue(Use(tag, held, heldUse.duration))
                         }
                     }
                 }
@@ -526,7 +526,7 @@ sealed class Level {
                             near.uses().forEach { (tag, nearUse) ->
                                 if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
                                     menu.addOption(nearUse.command) {
-                                        App.player.queue(Use(tag, near, nearUse.duration, nearUse.toDo, x+ix, y+iy))
+                                        App.player.queue(Use(tag, near, nearUse.duration))
                                     }
                                 }
                             }

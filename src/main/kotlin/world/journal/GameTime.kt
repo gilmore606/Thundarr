@@ -47,4 +47,17 @@ data class GameTime(
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $year"
     }
+
+    fun isBefore(iHour: Int, iMinute: Int): Boolean {
+        if (hour < iHour) return true
+        if (hour > iHour) return false
+        if (minute < iMinute) return true
+        return false
+    }
+    fun isAfter(iHour: Int, iMinute: Int): Boolean {
+        if (hour > iHour) return true
+        if (hour < iHour) return false
+        if (minute > iMinute) return true
+        return false
+    }
 }

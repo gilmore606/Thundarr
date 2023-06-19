@@ -256,7 +256,7 @@ abstract class Modal(
                 thing.uses().forEach { (tag, it) ->
                     if (it.canDo(App.player, thing.xy()!!.x, thing.xy()!!.y, false)) {
                         addOption(it.command) {
-                            App.player.queue(Use(tag, thing, it.duration, it.toDo, thing.xy()!!.x, thing.xy()!!.y))
+                            App.player.queue(Use(tag, thing, it.duration))
                         }
                     }
                 }

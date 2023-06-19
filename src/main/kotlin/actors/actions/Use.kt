@@ -8,15 +8,12 @@ import world.level.Level
 class Use(
     val useTag: Thing.UseTag,
     val thing: Thing,
-    duration: Float,
-    private val toDo: (Actor, Level, Int, Int)->Unit,
-    private val x: Int,
-    private val y: Int
+    duration: Float = 1f,
 ): Action(duration) {
     override fun name() = "use things"
 
     override fun execute(actor: Actor, level: Level) {
-        toDo(actor, level, x, y)
+        thing.uses()[useTag]?.toDo?.invoke(actor, level, thing.xy().x, thing.xy().y)
     }
 
 }

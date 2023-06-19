@@ -257,7 +257,7 @@ sealed class Thing() : Entity {
         toolbarUseTag()?.also { tag ->
             val use = uses()[tag]!!
             if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
-                App.player.queue(actors.actions.Use(tag, instance, use.duration, use.toDo, App.player.xy.x, App.player.xy.y))
+                App.player.queue(actors.actions.Use(tag, instance, use.duration))
             }
         }
     }

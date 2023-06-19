@@ -2,6 +2,7 @@ package world
 
 import render.batches.QuadBatch
 import render.tilesets.Glyph
+import util.Rect
 import util.XY
 import util.aOrAn
 import world.level.Level

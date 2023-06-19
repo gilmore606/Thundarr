@@ -248,21 +248,16 @@ sealed class Feature : AnimalSpawnSource {
             }
         }
         // Draw inside door if needed
-        val hasInternalDoor = Dice.chance(if (isAbandoned) 0.1f else 0.5f)
         if (splitVert) {
             for (ty in y+2 until y+height-2) {
                 if (ty != splitDoor) {
                     setTerrain(x0+split, y0+ty, wallType)
-                } else if (hasInternalDoor) {
-                    spawnThing(x0+split, y0+ty, WoodDoor())
                 }
             }
         } else if (splitHoriz) {
             for (tx in x+2 until x+width-2) {
                 if (tx != splitDoor) {
                     setTerrain(x0+tx, y0+split, wallType)
-                } else if (hasInternalDoor) {
-                    spawnThing(x0+tx, y0+split, WoodDoor())
                 }
             }
         }

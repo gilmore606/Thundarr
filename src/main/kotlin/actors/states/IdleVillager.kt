@@ -7,10 +7,12 @@ import actors.actions.Say
 import actors.actions.Use
 import kotlinx.serialization.Serializable
 import things.Candlestick
+import things.Door
 import things.Thing
 import util.Dice
 import util.Rect
 import util.XY
+import util.log
 
 @Serializable
 class IdleVillager(
@@ -21,9 +23,28 @@ class IdleVillager(
 ) : Idle() {
     val scheduleMinute = Dice.zeroTil(50)
     val wanderChance = 0.4f
-    val commentChance = 0.1f
+    val commentChance = 0.05f
+
+    override fun toString() = "IdleVillager"
+
     override fun pickAction(npc: NPC): Action {
         if (npc is Villager) {
+            npc.entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
+                log.info("door $door next to us, previous = ${npc.previousTargetArea.rect}, door = ${door.xy()}")
+                if (npc.previousTargetArea.contains(door.xy()) || npc.previousTargetArea.isAdjacentTo(door.xy())) {
+                    log.info("door is part of previousTargetArea")
+                    if (!npc.previousTargetArea.contains(npc.xy())) {
+                        log.info("We are not in previousTargetArea!")
+                        return Use(Thing.UseTag.CLOSE, door as Door)
+                    }
+                } else if (npc.homeArea.contains(door.xy()) || npc.homeArea.isAdjacentTo(door.xy())) {
+                    log.info("door is part of homeArea")
+                    if (npc.targetArea == npc.homeArea && npc.homeArea.contains(npc.xy())) {
+                        log.info("we are home and going nowhere!")
+                        return Use(Thing.UseTag.CLOSE, door as Door)
+                    }
+                }
+            }
             if (npc.targetArea.contains(npc.xy)) {
                 // We're here, do whatever!
                 if (Dice.chance(commentChance)) {
@@ -34,7 +55,9 @@ class IdleVillager(
                 }
             } else {
                 // Go where we should be!
-                npc.stepToward(npc.targetArea.rect)?.also { return it }
+                npc.stepToward(npc.targetArea.rect)?.also { return it } ?: run {
+                    return wander(npc) { true }
+                }
             }
         }
         return super.pickAction(npc)
@@ -46,37 +69,52 @@ class IdleVillager(
 
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
-
-            val h = App.gameTime.hour
-            val m = App.gameTime.minute
-            if (h >= restHour && m >= scheduleMinute || h <= wakeHour && m <= scheduleMinute) {
+            if (npc.targetArea == Villager.defaultArea) {
+                npc.setTarget(npc.homeArea)
+            }
+            if (App.gameTime.isBefore(wakeHour, scheduleMinute) || App.gameTime.isAfter(sleepHour, scheduleMinute)) {
+                npc.pushState(Sleeping(wakeHour, scheduleMinute))
+                return
+            } else if (App.gameTime.isAfter(restHour, scheduleMinute)) {
                 if (npc.targetArea != npc.homeArea) {
                     npc.say("Time to head home.")
                     npc.setTarget(npc.homeArea)
                 }
-            } else if (h >= workHour && m >= scheduleMinute) {
+            } else if (App.gameTime.isAfter(workHour, scheduleMinute)) {
                 if (npc.targetArea == npc.homeArea) {
                     npc.village?.also { village ->
                         val newArea = village.workAreas.random()
                         npc.say("Time to go to the ${newArea.name}.")
-                        npc.setTarget(village.workAreas.random())
+                        npc.setTarget(newArea)
                     }
                 }
             }
 
             npc.entitiesSeen { it is Candlestick }.keys.firstOrNull()?.also { light ->
-                if ((light as Candlestick).lit && !npc.targetArea.contains(npc.xy)) {
+                if ((light as Candlestick).lit && npc.previousTargetArea.contains(light.xy())) {
                     // Is it lit, and we're leaving?  Extinguish it
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light, 0.5f,
-                    light.uses()[Thing.UseTag.SWITCH_OFF]!!.toDo, light.xy().x, light.xy().y)))
+                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light)))
                 } else if (!(light as Candlestick).lit && npc.targetArea.contains(npc.xy)) {
                     // Is it out, and we're staying here?  Light it
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light, 0.5f,
-                        light.uses()[Thing.UseTag.SWITCH_ON]!!.toDo, light.xy().x, light.xy().y)))
+                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light)))
                 }
             }
 
         }
         super.considerState(npc)
+    }
+
+    override fun converseLines(npc: NPC): List<String>? {
+        if (npc is Villager) {
+            if (!npc.targetArea.contains(npc.xy())) {
+                return listOf(
+                    "No time to chat, I've got to get " +
+                            (if (npc.targetArea == npc.homeArea) "home" else ("to the " + npc.targetArea.name)) +
+                            "."
+                )
+            }
+            return npc.targetArea.comments.toList()
+        }
+        return null
     }
 }

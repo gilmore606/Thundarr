@@ -79,7 +79,7 @@ sealed class NPC : Actor() {
 
     open fun onSpawn() { }
 
-    open fun converseLines(): List<String> = listOf()
+    open fun converseLines(): List<String> = state.converseLines(this) ?: listOf()
     open fun meetPlayerMsg(): String? = null
 
     open fun isHostileTo(target: Actor): Boolean = enemies.contains(target.id) || factions.hasOneWhere {
@@ -133,10 +133,11 @@ sealed class NPC : Actor() {
     open fun considerState() { }
 
     fun changeState(newState: State) {
+        val oldState = state
         state.leave(this)
         state = newState
         enterStateMsg(newState)?.also { Console.sayAct("", it, this) }
-        log.info("NPC $this becomes $newState")
+        log.info("NPC $this was $oldState, becomes $newState")
         newState.enter(this)
     }
 

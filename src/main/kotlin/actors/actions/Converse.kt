@@ -19,7 +19,7 @@ class Converse(
 
         if (actor is Player) {
             if (!target.onConverse(actor)) {
-                Console.say(target.dname().capitalize() + " seems uninterested in you.")
+                Console.say(target.dnamec() + " seems uninterested in you.")
             } else {
                 Speaker.world(target.talkSound(actor), source = target.xy)
             }

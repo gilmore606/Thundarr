@@ -51,7 +51,7 @@ sealed class Door : Thing(), Smashable {
 
     override fun convertMoveAction(actor: Actor): Action? {
         if (!isOpen && isOpenable() && actor.canOpenDoors()) {
-            return Use(UseTag.OPEN, this, 1f, uses()[UseTag.OPEN]!!.toDo, xy()!!.x, xy()!!.y)
+            return Use(UseTag.OPEN, this)
         }
         return null
     }

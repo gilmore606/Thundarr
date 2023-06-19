@@ -10,6 +10,8 @@ class GoDo(
     val targetAction: Action
     ) : State() {
 
+    override fun toString() =  "GoDo (at $targetXY, do $targetAction)"
+
     override fun enter(npc: NPC) {
         Pather.subscribe(npc, npc, npc.visualRange())
     }
@@ -27,5 +29,7 @@ class GoDo(
         }
         return super.pickAction(npc)
     }
+
+    override fun converseLines(npc: NPC) = listOf("No time to chat, I've got to go do something.")
 
 }

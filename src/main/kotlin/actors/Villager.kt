@@ -10,6 +10,10 @@ import world.path.Pather
 @Serializable
 class Villager() : Citizen() {
 
+    companion object {
+        val defaultArea = WorkArea("", Rect(0,0,0,0),setOf())
+    }
+
     @Serializable
     data class WorkArea(
         val name: String,
@@ -17,17 +21,26 @@ class Villager() : Citizen() {
         val comments: Set<String>
     ) {
         fun contains(xy: XY) = rect.contains(xy)
+        fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
     }
 
-    var homeArea: WorkArea = WorkArea("",Rect(0,0,0,0),setOf())
-    var targetArea: WorkArea = WorkArea("",Rect(0,0,0,0),setOf())
+    var homeArea = defaultArea
+    var targetArea = defaultArea
+    var previousTargetArea = defaultArea
+
+    override fun toString() = name()
 
     fun setTarget(newTarget: WorkArea) {
-        targetArea = newTarget
-        Pather.unsubscribeAll(this)
-        if (!targetArea.contains(xy)) {
-            log.info("$this changing target to ${targetArea.name}")
-            Pather.subscribe(this, targetArea.rect, 25f)
+        if (newTarget != targetArea) {
+            previousTargetArea = targetArea
+            targetArea = newTarget
+            Pather.unsubscribeAll(this)
+            if (!targetArea.contains(xy)) {
+                log.info("$this changing target to ${targetArea.name}")
+                Pather.subscribe(this, targetArea.rect, 25f)
+            } else {
+                log.info("$this targeting ${targetArea.name} but already there")
+            }
         }
     }
 
@@ -55,6 +68,5 @@ class Villager() : Citizen() {
     )
 
     override fun meetPlayerMsg() = "Welcome to ${village?.name ?: "our town"}."
-    override fun converseLines() = targetArea.comments.toList()
 
 }

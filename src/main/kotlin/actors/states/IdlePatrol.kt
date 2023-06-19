@@ -11,9 +11,12 @@ import util.*
 class IdlePatrol(
     val wanderChance: Float,
     val bounds: Rect,
+    val stayOutdoors: Boolean = false
 ) : Idle() {
 
     var heading: XY = CARDINALS.random()
+
+    override fun toString() = "IdlePatrol"
 
     override fun pickAction(npc: NPC): Action {
         if (!Dice.chance(wanderChance)) return Wait(1f)
@@ -24,7 +27,9 @@ class IdlePatrol(
             testdirs.forEach { dir ->
                 if (level.isWalkableFrom(npc, xy, dir)) {
                     if (bounds.contains(xy + dir)) {
-                        dirs.add(dir)
+                        if (!stayOutdoors || !level.isRoofedAt(xy.x + dir.x, xy.y + dir.y)) {
+                            dirs.add(dir)
+                        }
                     } else if (Dice.chance(0.3f)) {
                         heading = CARDINALS.random()
                     }

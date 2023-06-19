@@ -1,5 +1,6 @@
 package world.path
 
+import actors.Actor
 import util.*
 import world.Entity
 import world.level.Level
@@ -23,7 +24,9 @@ class AreaStepMap : StepMap() {
             clearScratch()
             for (ix in target.x0..target.x1) {
                 for (iy in target.y0..target.y1) {
-                    scratch[ix - offsetX][iy - offsetY] = 0
+                    if (level?.isWalkableAt(subscribers.first() as Actor, ix, iy) ?: true) {
+                        scratch[ix - offsetX][iy - offsetY] = 0
+                    }
                 }
             }
             super.update()

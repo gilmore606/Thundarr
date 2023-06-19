@@ -1,10 +1,8 @@
 package world.gen.features
 
 import actors.Citizen
-import actors.NPC
 import actors.VillageGuard
 import actors.Villager
-import actors.factions.Faction
 import actors.factions.VillageFaction
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -19,7 +17,6 @@ import world.gen.decors.*
 import world.level.Level
 import world.path.DistanceMap
 import world.terrains.Terrain
-import java.lang.Math.max
 
 @Serializable
 class Village(
@@ -269,9 +266,9 @@ class Village(
                     }
                 }
             }
-            val roomRect = Rect(x0+x+2, y0+y+2, x0+x+width-4, y0+y+height-4)
+            val interiorRect = Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3)
             val workArea = Villager.WorkArea(
-                areaName, roomRect, areaComments
+                areaName, interiorRect, areaComments
             )
             if (withCitizen) {
                 val citizen = Villager().apply {
@@ -279,7 +276,7 @@ class Village(
                     homeArea = workArea
                 }
                 addCitizen(citizen)
-                findSpawnPointForNPC(chunk, citizen, roomRect)?.also { spawnPoint ->
+                findSpawnPointForNPC(chunk, citizen, interiorRect)?.also { spawnPoint ->
                     citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
                 }
             } else {

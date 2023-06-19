@@ -200,11 +200,13 @@ class Stage : Decor() {
                 setTerrain(tx, ty, terrain)
             }
         }
-        againstWall { spawn(Candlestick())}
     }
-    override fun workAreaName() = "ampitheater"
+    override fun workAreaName() = "square"
     override fun workAreaComments() = mutableSetOf(
-        "Hey look at me!  I'm a barbarian!  RAAR."
+        "Hey look at me!  I'm a barbarian!  RAAR...just kidding.",
+        "Work hard my friends, for the wizard may come at any time!",
+        "Fear the wizard, and his evil works!",
+        "My friends, keep faith with the Lords of Light!"
     )
 }
 

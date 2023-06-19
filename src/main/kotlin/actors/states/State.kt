@@ -22,4 +22,6 @@ sealed class State {
 
     open fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) { }
 
+    open fun converseLines(npc: NPC): List<String>? = null
+
 }
