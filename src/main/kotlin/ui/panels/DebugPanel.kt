@@ -42,7 +42,6 @@ object DebugPanel : ShadedPanel() {
         drawString(terrain.type.toString(), padding, padding + 140)
         drawString("  $datatext", padding, padding + 160)
         Screen.cursorPosition?.also {
-            drawString("step : ${Pather.debugStepAt(it.x, it.y)} @ ${it.x} ${it.y}", padding, padding + 180)
             App.player.level?.lightAt(it.x, it.y)?.also { light ->
                 drawString("light: ${light.r} ${light.g} ${light.b}", padding, padding + 200)
             }

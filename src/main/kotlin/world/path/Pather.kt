@@ -9,10 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
-import util.RayCaster
-import util.XY
-import util.log
-import util.safeForEach
+import util.*
 import world.Entity
 import world.level.Level
 import java.lang.RuntimeException
@@ -28,7 +25,7 @@ object Pather {
     private var worker: Job? = null
     private var jobs = mutableSetOf<Job>()
 
-    private var playerMap: StepMap? = null
+    private var playerMap: EntityStepMap? = null
 
     init {
         relaunchWorker()
@@ -66,6 +63,8 @@ object Pather {
 
     fun nextStep(from: Entity, to: XY): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
 
+    fun nextStep(from: Entity, to: Rect): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
+
     fun buildPath(from: XY, to: Entity) = maps.firstOrNull { it.canReach(to) }.let { map ->
         mutableListOf<XY>().apply {
             val feet = XY(from.x, from.y)
@@ -82,10 +81,10 @@ object Pather {
 
     fun subscribe(subscriber: Entity, target: Entity, range: Float) {
         //log.info("subscribing $subscriber @ $range for target $target")
-        val map = maps.firstOrNull { it.targetEntity == target } ?: StepMap().apply {
+        val map = maps.firstOrNull { it.canReach(target) } ?: EntityStepMap().apply {
             log.info("adding stepmap to $target")
-            setTargetToEntity(target)
             changeRange(range)
+            setTargetToEntity(target)
             maps.add(this@apply)
             if (target is Player) {
                 playerMap = this@apply
@@ -94,9 +93,21 @@ object Pather {
         map.addSubscriber(subscriber, range)
     }
 
+    fun subscribe(subscriber: Entity, target: Rect, range: Float) {
+        subscriber.level()?.also { level ->
+            val map = maps.firstOrNull { it.canReach(target) } ?: AreaStepMap().apply {
+                log.info("adding stepmap to $target")
+                changeRange(range)
+                setTargetToRect(target, level)
+                maps.add(this@apply)
+            }
+            map.addSubscriber(subscriber, range)
+        }
+    }
+
     fun unsubscribe(subscriber: Entity, target: Entity) {
         jobs.add(coroutineScope.launch {
-            maps.firstOrNull { it.targetEntity == target }?.also {
+            maps.firstOrNull { it.canReach(target) }?.also {
                 it.removeSubscriber(subscriber)
             }
         })
@@ -126,5 +137,4 @@ object Pather {
         }
     }
 
-    fun debugStepAt(x: Int, y: Int): Int = maps.firstOrNull { it.targetEntity is Ratman }?.debugStepAt(x, y) ?: 0
 }

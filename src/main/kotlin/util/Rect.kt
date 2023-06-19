@@ -15,4 +15,7 @@ data class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
 
     fun contains(xy: XY): Boolean = (xy.x >= x0 && xy.y >= y0 && xy.x <= x1 && xy.y <= y1)
 
+    fun width() = (x1 - x0)
+    fun height() = (y1 - y0)
+
 }

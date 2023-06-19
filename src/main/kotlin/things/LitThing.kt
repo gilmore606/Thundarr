@@ -128,6 +128,36 @@ class CeilingLight : LitThing(), Smashable {
 }
 
 @Serializable
+class Candlestick : LitThing() {
+    override val tag = Tag.THING_CANDLESTICK
+    var lit = false
+    override fun glyph() = if (lit) Glyph.CANDLESTICK_ON else Glyph.CANDLESTICK_OFF
+    override fun name() = "candlestick"
+    override fun description() = "An iron candlestick holding three thick beeswax candles."
+    override val lightColor = LightColor(0.5f, 0.4f, 0.3f)
+    override fun light() = if (lit) lightColor else null
+
+    override fun uses() = mapOf(
+        UseTag.SWITCH_ON to Use("light " + name(), 0.5f,
+            canDo = { actor,x,y,targ -> !lit && isNextTo(actor) },
+            toDo = { actor,level,x,y ->
+                lit = true
+                level.addLightSource(x, y, this)
+                Console.sayAct("You light %dd.", "%Dn lights %dd.", actor, this)
+            }),
+        UseTag.SWITCH_OFF to Use("extinguish " + name(), 0.5f,
+            canDo = { actor,x,y,targ -> lit && isNextTo(actor) },
+            toDo = { actor,level,x,y ->
+                Console.sayAct("You snuff out %dd.", "%Dn snuffs out %dd.", actor, this)
+                lit = false
+                level.removeLightSource(this)
+            }
+        )
+    )
+
+}
+
+@Serializable
 class Glowstone : LitThing() {
     override val tag = Tag.THING_GLOWSTONE
     override fun glyph() = Glyph.GLOWING_CRYSTAL

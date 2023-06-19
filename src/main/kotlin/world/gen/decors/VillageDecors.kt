@@ -17,6 +17,7 @@ class Hut : Decor() {
     ).random()
     override fun doFurnish() {
         againstWall { spawn(Bedroll()) }
+        againstWall { spawn(Candlestick())}
         chance(0.3f) { againstWall { spawn(Trunk()) } }
         chance(0.6f) { awayFromWall { spawn(Table()) } }
     }
@@ -39,6 +40,7 @@ class HutBedroom : Decor() {
 class HutLivingRoom : Decor() {
     override fun description() = "A simple villager's living room."
     override fun doFurnish() {
+        againstWall { spawn(Candlestick())}
         chance(0.7f) { anyEmpty { spawn(Table()) } }
         if (clearCount > 15) {
             anyEmpty { spawn(Table()) }
@@ -58,6 +60,7 @@ class Schoolhouse : Decor() {
     override fun fitsInRoom(room: Room) = room.width >= 5 && room.height >= 5
 
     override fun doFurnish() {
+        againstWall { spawn(Candlestick())}
         repeat(Dice.oneTo(2)) { againstWall {
             spawn(Bookshelf())
             clearAround()
@@ -66,6 +69,12 @@ class Schoolhouse : Decor() {
             if (x % 2 == 0 && y % 2 == 0) spawn(Table())
         }
     }
+
+    override fun workAreaName() = "schoolhouse"
+    override fun workAreaComments() = super.workAreaComments().apply {
+        add("There's much to learn from the books of the ancients.")
+        add("Education is the only way to prosperity.")
+    }
 }
 
 @Serializable
@@ -73,11 +82,18 @@ class Church : Decor() {
     override fun description() = "A humble but lovingly constructed shrine to the Lords of Light."
     override fun abandonedDescription() = "An abandoned shrine to the Lords of Light, now covered in dust."
     override fun doFurnish() {
+        againstWall { spawn(Candlestick())}
         atCenter { spawn(
             if (!isAbandoned || Dice.chance(0.5f)) Shrine() else Boulder()
         ) }
         repeat(Dice.zeroTo(2)) { againstWall { spawn(Table()) }}
     }
+    override fun workAreaName() = "shrine"
+    override fun workAreaComments() = mutableSetOf(
+        "May the Lords of Light watch over our village.",
+        "I pray every day.  But do they hear?",
+        "Sometimes my faith is tested by this cruel world.",
+    )
 }
 
 @Serializable
@@ -86,6 +102,7 @@ class StorageShed : Decor() {
     override fun fitsInRoom(room: Room) = room.width <= 6 && room.height <= 6
 
     override fun doFurnish() {
+        againstWall { spawn(Candlestick())}
         repeat (Dice.range(4, 8)) {
             awayFromWall { spawn(if (Dice.flip()) Trunk() else FilingCabinet()) }
         }
@@ -93,6 +110,7 @@ class StorageShed : Decor() {
             againstWall { spawn(Table()) }
         }
     }
+    override fun workAreaName() = "storage shed"
 }
 
 @Serializable
@@ -100,6 +118,7 @@ class BlacksmithShop : Decor() {
     override fun description() = "A blacksmith's shop."
     override fun abandonedDescription() = "An abandoned blacksmith's shop."
     override fun doFurnish() {
+        againstWall { spawn(Candlestick())}
         forArea(x0+1, y0+1, x1-1, y1-1) { x,y ->
             setTerrain(x, y, Terrain.Type.TERRAIN_DIRT, roofed = true)
         }
@@ -108,6 +127,7 @@ class BlacksmithShop : Decor() {
             againstWall { spawn(Table()) }
         }
     }
+    override fun workAreaName() = "smithy"
 }
 
 @Serializable
@@ -135,6 +155,12 @@ class Garden(
             }
         }
     }
+    override fun workAreaName() = "garden"
+    override fun workAreaComments() = super.workAreaComments().apply {
+        add("Tilling the earth is a blessing and a curse.")
+        add("May the Lords of Light make this garden grow!")
+        add("We work so we can eat.  Simple as that.")
+    }
 }
 
 @Serializable
@@ -156,6 +182,11 @@ class Graveyard(
             }
         }
     }
+    override fun workAreaName() = "graveyard"
+    override fun workAreaComments() = mutableSetOf(
+        "The graves of my forefathers are sacred.",
+        "I come here to think...and to remember."
+    )
 }
 
 @Serializable
@@ -169,7 +200,12 @@ class Stage : Decor() {
                 setTerrain(tx, ty, terrain)
             }
         }
+        againstWall { spawn(Candlestick())}
     }
+    override fun workAreaName() = "ampitheater"
+    override fun workAreaComments() = mutableSetOf(
+        "Hey look at me!  I'm a barbarian!  RAAR."
+    )
 }
 
 @Serializable
@@ -177,8 +213,9 @@ class Barn : Decor() {
     override fun description() = "A barn.  It smells of hay and manure."
     override fun abandonedDescription() = "A barn that hasn't seen use in a long time."
     override fun doFurnish() {
-
+        againstWall { spawn(Candlestick())}
     }
+    override fun workAreaName() = "barn"
 }
 
 @Serializable
@@ -186,6 +223,6 @@ class Tavern : Decor() {
     override fun description() = "A roadside inn."
     override fun abandonedDescription() = "An abandoned inn."
     override fun doFurnish() {
-
+        againstWall { spawn(Candlestick())}
     }
 }

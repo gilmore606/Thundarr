@@ -148,7 +148,9 @@ fun ThingTileSet() =
         setTile(Glyph.BOOKSHELF, SimpleTile(this, 10, 8))
         setTile(Glyph.FORGE, SimpleTile(this, 10, 9))
         setTile(Glyph.WARDROBE, SimpleTile(this, 10, 10))
-        setTile(Glyph.RAILS_V, SimpleTile(this, 11, 10))
-        setTile(Glyph.RAILS_H, SimpleTile(this, 12, 10))
-        setTile(Glyph.LEATHER, SimpleTile(this, 12, 11))
+        setTile(Glyph.RAILS_V, SimpleTile(this, 11, 0))
+        setTile(Glyph.RAILS_H, SimpleTile(this, 12, 0))
+        setTile(Glyph.LEATHER, SimpleTile(this, 11, 1))
+        setTile(Glyph.CANDLESTICK_OFF, SimpleTile(this, 11, 2))
+        setTile(Glyph.CANDLESTICK_ON, SimpleTile(this, 11, 3))
     }

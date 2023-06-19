@@ -66,6 +66,8 @@ class Village(
         citizen.village = this
     }
 
+    val workAreas = mutableSetOf<Villager.WorkArea>()
+
     @Transient private var featureBuilt = false
     @Transient private val uniqueHuts = mutableListOf<Decor>(
         BlacksmithShop(),
@@ -239,6 +241,13 @@ class Village(
             buildVillageFeature(x, y, width, height)
             featureBuilt = true
         } else {
+            var withCitizen = false
+            var areaName = "home"
+            var areaComments = setOf(
+                "Ah, home and hearth.",
+                "It's good to be home.",
+                "It's not much, but it's my safe place.",
+            )
             buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned) { rooms ->
                 val abandoned = isAbandoned || Dice.chance(0.05f)
                 when (rooms.size) {
@@ -246,21 +255,35 @@ class Village(
                         uniqueHuts.filter { it.fitsInRoom(rooms[0]) }.randomOrNull()?.also { uniqueDecor ->
                             uniqueDecor.furnish(rooms[0], carto, abandoned)
                             uniqueHuts.remove(uniqueDecor)
+                            areaName = uniqueDecor.workAreaName()
+                            areaComments = uniqueDecor.workAreaComments()
                         } ?: run {
                             Hut().furnish(rooms[0], carto, abandoned)
+                            withCitizen = true
                         }
                     }
                     2 -> {
                         HutBedroom().furnish(rooms[0], carto, abandoned)
                         HutLivingRoom().furnish(rooms[1], carto, abandoned)
+                        withCitizen = true
                     }
                 }
             }
-
-            val citizen = Villager().apply { joinFaction(factionID) }
-            addCitizen(citizen)
-            findSpawnPointForNPC(chunk, citizen, Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2))?.also { spawnPoint ->
-                citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+            val roomRect = Rect(x0+x+2, y0+y+2, x0+x+width-4, y0+y+height-4)
+            val workArea = Villager.WorkArea(
+                areaName, roomRect, areaComments
+            )
+            if (withCitizen) {
+                val citizen = Villager().apply {
+                    joinFaction(factionID)
+                    homeArea = workArea
+                }
+                addCitizen(citizen)
+                findSpawnPointForNPC(chunk, citizen, roomRect)?.also { spawnPoint ->
+                    citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+                }
+            } else {
+                workAreas.add(workArea)
             }
 
         }
@@ -321,6 +344,13 @@ class Village(
         forEachCell { x, y ->
             if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {
                 placeWell(x, y)
+                workAreas.add(Villager.WorkArea(
+                    "town square",
+                        Rect(x-2, y-2, x+2, y+2),
+                    mutableSetOf(
+                        "Chop wood, carry water.",
+                    )
+                ))
                 placed = true
             }
         }
@@ -332,6 +362,11 @@ class Village(
             else -> Stage()
         }
         room.furnish(Decor.Room(Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2), listOf()), carto)
+        workAreas.add(Villager.WorkArea(
+            room.workAreaName(),
+            Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2),
+            room.workAreaComments()
+        ))
     }
 
     override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE

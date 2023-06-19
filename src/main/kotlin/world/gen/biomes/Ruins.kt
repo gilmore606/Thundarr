@@ -131,7 +131,7 @@ object Ruins : Biome(
                 setTerrain(carto, doorx, doory, Terrain.Type.TERRAIN_STONEFLOOR)
                 carto.setRoofed(doorx + carto.x0, doory + carto.y0, Chunk.Roofed.WINDOW)
                 if (Dice.chance(0.7f)) {
-                    carto.spawnThing(doorx + carto.x0, doory + carto.y0, ModernDoor().maybeLocked(0.3f))
+                    carto.spawnThing(doorx + carto.x0, doory + carto.y0, ModernDoor())
                 }
             }
         }

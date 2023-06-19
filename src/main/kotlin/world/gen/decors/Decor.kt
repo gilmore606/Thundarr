@@ -86,6 +86,13 @@ sealed class Decor {
     open fun getDescription(): String = if (isAbandoned) abandonedDescription() else description()
     open fun description() = ""
     open fun abandonedDescription() = "The room is covered in dust and cobwebs, clearly abandoned long ago."
+    open fun workAreaName() = "a workplace"
+    open fun workAreaComments() = mutableSetOf(
+        "Workin all day.  Beats dyin!",
+        "Seems like work is never done.",
+        "I try to stay busy.",
+    )
+
     abstract fun doFurnish()
 
     open fun onPlayerEnter() {

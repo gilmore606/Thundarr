@@ -218,7 +218,7 @@ sealed class Feature : AnimalSpawnSource {
                         if (!isAbandoned || Dice.chance(0.5f)) spawnThing(
                             x0 + tx,
                             y0 + ty,
-                            WoodDoor().maybeLocked(0.3f)
+                            WoodDoor()
                         )
                         chunk.setRoofed(x0 + tx, y0 + ty, Chunk.Roofed.WINDOW)
                     } else if (tx == x || tx == x + width - 1 || ty == y || ty == y + height - 1) {
@@ -254,7 +254,7 @@ sealed class Feature : AnimalSpawnSource {
                 if (ty != splitDoor) {
                     setTerrain(x0+split, y0+ty, wallType)
                 } else if (hasInternalDoor) {
-                    spawnThing(x0+split, y0+ty, WoodDoor().maybeLocked(0.3f))
+                    spawnThing(x0+split, y0+ty, WoodDoor())
                 }
             }
         } else if (splitHoriz) {
@@ -262,7 +262,7 @@ sealed class Feature : AnimalSpawnSource {
                 if (tx != splitDoor) {
                     setTerrain(x0+tx, y0+split, wallType)
                 } else if (hasInternalDoor) {
-                    spawnThing(x0+tx, y0+split, WoodDoor().maybeLocked(0.3f))
+                    spawnThing(x0+tx, y0+split, WoodDoor())
                 }
             }
         }

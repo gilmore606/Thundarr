@@ -215,6 +215,8 @@ enum class Glyph {
     RAILS_H,
     RAILS_V,
     LEATHER,
+    CANDLESTICK_OFF,
+    CANDLESTICK_ON,
 
     BLOODSTAIN,
     SCORCHMARK,

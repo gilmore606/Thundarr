@@ -158,7 +158,6 @@ class WorldCarto(
                 repeat(Dice.range(group.min, group.max)) {
                     val animalType = group.tag.invoke()
                     (source ?: meta.biome).animalSpawnPoint(chunk, animalType)?.also { location ->
-                        log.info("spawning $animalType at $location")
                         spawnThing(location.x, location.y, NPCDen(animalType))
                     }
                 }

@@ -517,6 +517,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return null
     }
 
+    fun stepToward(rect: Rect): Move? {
+        Pather.nextStep(this, rect)?.also { return Move(it) }
+        return null
+    }
+
     ///// useful utilities
 
     fun getActor(id: String) = level?.director?.getActor(id)
