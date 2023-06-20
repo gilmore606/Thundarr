@@ -31,9 +31,8 @@ class Cabin : Feature() {
         val x = Dice.range(3, 63 - width)
         val y = Dice.range(3, 63 - height)
         val fertility = if (Dice.chance(0.3f)) 0f else Dice.float(0.2f, 1f)
-        buildHut(x, y, width, height, fertility) { rooms ->
-            Hut().furnish(rooms[0], carto)
-        }
+        val room = buildHut(x, y, width, height, fertility)
+        Hut().furnish(room, carto)
 
         bounds = Rect(x0 + x, y0 + y, x0 + x+width-1, y0 + y+height-1)
         carto.addTrailBlock(bounds.x0, bounds.y0, bounds.x1, bounds.y1)

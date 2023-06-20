@@ -88,11 +88,14 @@ class Village(
                 flagsAt(x, y).add(WorldCarto.CellFlag.NO_PLANTS)
             }
         }
+        // Lay out buildings and collect list of rooms to furnish
         when (Dice.oneTo(4)) {
             1,2 -> layoutVillageBag()
             3 -> layoutVillageHoriz()
             4 -> layoutVillageVert()
         }
+        // Furnish all rooms
+        
         if (!isAbandoned && Dice.chance(0.7f)) {
             placeInMostPublic(
                 when (Dice.oneTo(10)) {
@@ -245,32 +248,23 @@ class Village(
                 "It's good to be home.",
                 "It's not much, but it's my safe place.",
             )
-            buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned) { rooms ->
-                val abandoned = isAbandoned || Dice.chance(0.05f)
-                when (rooms.size) {
-                    1 -> {
-                        uniqueHuts.filter { it.fitsInRoom(rooms[0]) }.randomOrNull()?.also { uniqueDecor ->
-                            uniqueDecor.furnish(rooms[0], carto, abandoned)
-                            uniqueHuts.remove(uniqueDecor)
-                            areaName = uniqueDecor.workAreaName()
-                            areaComments = uniqueDecor.workAreaComments()
-                        } ?: run {
-                            Hut().furnish(rooms[0], carto, abandoned)
-                            withCitizen = true
-                        }
-                    }
-                    2 -> {
-                        HutBedroom().furnish(rooms[0], carto, abandoned)
-                        HutLivingRoom().furnish(rooms[1], carto, abandoned)
-                        withCitizen = true
-                    }
-                }
+
+            val room = buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned)
+            val abandoned = isAbandoned || Dice.chance(0.05f)
+            uniqueHuts.filter { it.fitsInRoom(room) }.randomOrNull()?.also { uniqueDecor ->
+                uniqueDecor.furnish(room, carto, abandoned)
+                uniqueHuts.remove(uniqueDecor)
+                areaName = uniqueDecor.workAreaName()
+                areaComments = uniqueDecor.workAreaComments()
+            } ?: run {
+                Hut().furnish(room, carto, abandoned)
+                withCitizen = true
             }
             val interiorRect = Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3)
             val workArea = Villager.WorkArea(
                 areaName, interiorRect, areaComments
             )
-            if (withCitizen) {
+            if (withCitizen && !isAbandoned) {
                 val citizen = Villager().apply {
                     joinFaction(factionID)
                     homeArea = workArea

@@ -37,7 +37,7 @@ class Villager() : Citizen() {
             Pather.unsubscribeAll(this)
             if (!targetArea.contains(xy)) {
                 log.info("$this changing target to ${targetArea.name}")
-                Pather.subscribe(this, targetArea.rect, 25f)
+                Pather.subscribe(this, targetArea.rect, 36f)
             } else {
                 log.info("$this targeting ${targetArea.name} but already there")
             }
@@ -61,10 +61,10 @@ class Villager() : Citizen() {
     override fun isHuman() = true
 
     override fun idleState() = IdleVillager(
-        Dice.range(16, 20),
+        Dice.range(17, 20),
         Dice.range(21, 23),
-        Dice.range(4, 6),
-        Dice.range(7, 9),
+        Dice.range(4, 5),
+        Dice.range(6, 8),
     )
 
     override fun meetPlayerMsg() = "Welcome to ${village?.name ?: "our town"}."

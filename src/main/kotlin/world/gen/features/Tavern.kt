@@ -37,13 +37,12 @@ class Tavern(
         repeat(3) { fuzzTerrain(Terrain.Type.TEMP1, 0.4f) }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.bareTerrain(x, y))
 
-        buildHut(x-x0, y-y0, width, height, 0.3f, hasWindows = true, splittable = false,
+        val room = buildHut(x-x0, y-y0, width, height, 0.3f, hasWindows = true,
             buildByOutsideDoor = { x, y ->
                 spawnThing(x, y, HighwaySign(name))
             }
-        ) { rooms ->
-            Tavern().furnish(rooms[0], carto)
-        }
+        )
+        Tavern().furnish(room, carto)
     }
 
 }

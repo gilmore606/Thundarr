@@ -134,6 +134,7 @@ class Candlestick : LitThing() {
     override fun glyph() = if (lit) Glyph.CANDLESTICK_ON else Glyph.CANDLESTICK_OFF
     override fun name() = "candlestick"
     override fun description() = "An iron candlestick holding three thick beeswax candles."
+    override fun isPortable() = false
     override val lightColor = LightColor(0.5f, 0.4f, 0.3f)
     override fun light() = if (lit) lightColor else null
 

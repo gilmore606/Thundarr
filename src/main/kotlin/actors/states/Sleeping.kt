@@ -1,12 +1,14 @@
 package actors.states
 
 import actors.NPC
+import actors.Villager
 import actors.actions.Action
 import actors.actions.Sleep
 import actors.actions.Use
 import actors.actions.Wait
 import actors.statuses.Status
 import things.Candlestick
+import things.Door
 import things.Thing
 
 class Sleeping(
@@ -19,19 +21,19 @@ class Sleeping(
     override fun toString() = "Sleeping (til $wakeHour:$wakeMinute)"
 
     override fun considerState(npc: NPC) {
-        if (!npc.hasStatus(Status.Tag.ASLEEP)) {
-            npc.entitiesSeen { it is Candlestick }.keys.firstOrNull()?.also { light ->
-                if ((light as Candlestick).lit) {
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light)))
+        if (npc is Villager) {
+            if (!npc.hasStatus(Status.Tag.ASLEEP)) {
+                npc.entitiesSeen { it is Candlestick && it.lit && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
+                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light as Candlestick)))
                     return
                 }
+                if (shouldBeAsleep()) {
+                    npc.fallAsleep()
+                }
+            } else if (!shouldBeAsleep()) {
+                npc.wakeFromSleep()
+                npc.popState()
             }
-            if (shouldBeAsleep()) {
-                npc.fallAsleep()
-            }
-        } else if (!shouldBeAsleep()) {
-            npc.wakeFromSleep()
-            npc.popState()
         }
     }
 

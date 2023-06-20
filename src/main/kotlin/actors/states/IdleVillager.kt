@@ -30,17 +30,13 @@ class IdleVillager(
     override fun pickAction(npc: NPC): Action {
         if (npc is Villager) {
             npc.entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
-                log.info("door $door next to us, previous = ${npc.previousTargetArea.rect}, door = ${door.xy()}")
+                // Close the door behind us if we're leaving this area, or entering our home
                 if (npc.previousTargetArea.contains(door.xy()) || npc.previousTargetArea.isAdjacentTo(door.xy())) {
-                    log.info("door is part of previousTargetArea")
                     if (!npc.previousTargetArea.contains(npc.xy())) {
-                        log.info("We are not in previousTargetArea!")
                         return Use(Thing.UseTag.CLOSE, door as Door)
                     }
                 } else if (npc.homeArea.contains(door.xy()) || npc.homeArea.isAdjacentTo(door.xy())) {
-                    log.info("door is part of homeArea")
                     if (npc.targetArea == npc.homeArea && npc.homeArea.contains(npc.xy())) {
-                        log.info("we are home and going nowhere!")
                         return Use(Thing.UseTag.CLOSE, door as Door)
                     }
                 }

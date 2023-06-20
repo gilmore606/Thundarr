@@ -73,14 +73,11 @@ class Farm(
                     Rect(barnx0, barny0, barnx0 + barnWidth - 1, barny0 + barnHeight - 1)
                 }
             }
-            buildHut(
+            val room = buildHut(
                 barnRect.x0 - x0, barnRect.y0 - y0, barnWidth, barnHeight, 0.5f,
                 isAbandoned = isAbandoned, hasWindows = false, forceFloor = Terrain.Type.TERRAIN_DIRT
-            ) { rooms ->
-                rooms.forEach { room ->
-                    Barn().furnish(room, carto, isAbandoned)
-                }
-            }
+            )
+            Barn().furnish(room, carto, isAbandoned)
         }
 
         swapTerrain(Terrain.Type.TEMP1, Terrain.Type.TERRAIN_GRASS)

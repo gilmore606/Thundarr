@@ -71,13 +71,12 @@ class Graveyard(
                     Rect(shrinex, shriney, shrinex + shrineWidth - 1, shriney + shrineHeight - 1)
                 }
             }
-            buildHut(
+            val room = buildHut(
                 shrineRect.x0 - x0, shrineRect.y0 - y0, shrineWidth, shrineHeight, 0.5f,
-                isAbandoned = isAbandoned, hasWindows = true, splittable = false,
+                isAbandoned = isAbandoned, hasWindows = true,
                 forceFloor = Terrain.Type.TERRAIN_STONEFLOOR
-            ) { rooms ->
-                Church().furnish(rooms[0], carto, isAbandoned)
-            }
+            )
+            Church().furnish(room, carto, isAbandoned)
         }
 
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)

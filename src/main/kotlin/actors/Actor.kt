@@ -553,17 +553,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return entitiesSeen { it == entity }.isNotEmpty()
     }
 
-    fun entitiesNextToUs(matching: ((Entity)->Boolean)? = null): Set<Entity> {
+    fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {
         val entities = mutableSetOf<Entity>()
         level?.also { level ->
             DIRECTIONS.from(xy.x, xy.y) { dx, dy, _ ->
-                level.actorAt(dx, dy)?.also { entities.add(it) }
-                entities.addAll(level.thingsAt(dx, dy))
-            }
-            matching?.also { matching ->
-                val filtered = mutableSetOf<Entity>()
-                entities.forEach { if (matching(it)) filtered.add(it) }
-                return filtered
+                level.actorAt(dx, dy)?.also { if (matching(it)) entities.add(it) }
+                level.thingsAt(dx, dy).forEach { if (matching(it)) entities.add(it) }
             }
         }
         return entities

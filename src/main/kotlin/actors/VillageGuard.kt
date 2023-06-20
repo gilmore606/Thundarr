@@ -47,9 +47,8 @@ class VillageGuard(
     private val lightMinute = Dice.zeroTil(59)
 
     override fun light(): LightColor? {
-        val h = App.gameTime.hour
-        val m = App.gameTime.minute
-        if ((h > lightStartHour && m > lightMinute) || (h < lightEndHour && m < lightMinute)) return lantern
+        if (App.gameTime.isAfter(lightStartHour, lightMinute) ||
+            App.gameTime.isBefore(lightEndHour, lightMinute)) return lantern
         return null
     }
 

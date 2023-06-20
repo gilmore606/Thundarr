@@ -143,10 +143,10 @@ sealed class Feature : AnimalSpawnSource {
     }
 
     protected fun buildHut(x: Int, y: Int, width: Int, height: Int, fertility: Float,
-                           forceDoorDir: XY? = null, isAbandoned: Boolean = false, splittable: Boolean = true,
+                           forceDoorDir: XY? = null, isAbandoned: Boolean = false,
                            hasWindows: Boolean = true, forceFloor: Terrain.Type? = null, forceWall: Terrain.Type? = null,
                            buildByOutsideDoor: ((x: Int, y: Int)->Unit)? = null,
-                           forRooms: ((List<Decor.Room>)->Unit)) {
+                           ): Decor.Room {
         carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width - 1, y0 + y + height - 1)
         val villagePlantSpawns = gardenPlantSpawns()
         val wallType = forceWall ?: meta.biome.villageWallType()
@@ -169,45 +169,13 @@ sealed class Feature : AnimalSpawnSource {
         } else {
             if (doorDir == SOUTH) y+height-2 else y+1
         }
-        // Split into one or two rooms
-        var splitVert = false
-        var splitHoriz = false
-        var split = 0
-        var splitDoor = 0
-        val rooms = mutableListOf<Decor.Room>()
+
         val doorClearCell = XY(x0 + doorx - doorDir.x, y0 + doory - doorDir.y)
-        if (splittable && width > 9 && width > height && Dice.chance(0.6f)) {
-            splitVert = true
-            split = x + (width / 2) + Dice.range(-1, 1)
-            splitDoor = Dice.range(y+2, y+height-3)
-            if (split == doorx) split +=1
-            rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+split-1, y0+y+height-3),
-                listOf(doorClearCell, XY(x0 + split - 1, y0 + splitDoor))
-            ))
-            rooms.add(Decor.Room(
-                Rect(x0+split+1, y0+y+2, x0+x+width-3, y0+y+height-3),
-                listOf(doorClearCell, XY(x0 + split + 1, y0 + splitDoor))
-            ))
-        } else if (splittable && height > 9 && height > width && Dice.chance(0.6f)) {
-            splitHoriz = true
-            split = y + (height / 2) + Dice.range(-1, 1)
-            splitDoor = Dice.range(x+2, x+width-3)
-            if (split == doory) split += 1
-            rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+x+width-2, y0+split-1),
-                listOf(doorClearCell, XY(x0+splitDoor, y0+split-1))
-            ))
-            rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+split+1, x0+x+width-3, y0+y+height-3),
-                listOf(doorClearCell, XY(x0+splitDoor, y0+split+1))
-            ))
-        } else {
-            rooms.add(Decor.Room(
-                Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3),
-                listOf(doorClearCell)
-            ))
-        }
+
+        val room = (Decor.Room(
+            Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3),
+            listOf(doorClearCell)
+        ))
         // Draw yard/wall/floor terrain, with door and windows
         var windowBlockerCount = Dice.range(3, 10)
         for (tx in x until x+width) {
@@ -225,7 +193,6 @@ sealed class Feature : AnimalSpawnSource {
                         safeSetTerrain(x0 + tx, y0 + ty, Terrain.Type.TEMP3)
                     } else if (tx == x + 1 || tx == x + width - 2 || ty == y + 1 || ty == y + height - 2) {
                         if (windowBlockerCount < 1 && hasWindows &&
-                            !((splitVert && split == tx) || (splitHoriz && split == ty)) &&
                             ((tx > x + 1 && tx < x + width - 2) || (ty > y + 1 && ty < y + height - 2))
                         ) {
                             setTerrain(
@@ -247,22 +214,7 @@ sealed class Feature : AnimalSpawnSource {
                 }
             }
         }
-        // Draw inside door if needed
-        if (splitVert) {
-            for (ty in y+2 until y+height-2) {
-                if (ty != splitDoor) {
-                    setTerrain(x0+split, y0+ty, wallType)
-                }
-            }
-        } else if (splitHoriz) {
-            for (tx in x+2 until x+width-2) {
-                if (tx != splitDoor) {
-                    setTerrain(x0+tx, y0+split, wallType)
-                }
-            }
-        }
-        // Furnish rooms
-        forRooms?.invoke(rooms)
+
         // Grow yard
         safeSetTerrain(x0 + doorx + doorDir.x, y0 + doory + doorDir.y, dirtType)
         fuzzTerrain(Terrain.Type.TEMP3, 0.4f, listOf(wallType, Terrain.Type.TERRAIN_WINDOWWALL))
@@ -285,6 +237,8 @@ sealed class Feature : AnimalSpawnSource {
         }
 
         swapTerrain(Terrain.Type.TEMP3, meta.biome.baseTerrain)
+
+        return room
     }
 
     protected fun findSpawnPointForNPCType(chunk: Chunk, animalType: NPC.Tag, bounds: Rect): XY? {
