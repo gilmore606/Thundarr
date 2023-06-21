@@ -17,6 +17,8 @@ import world.gen.decors.*
 import world.level.Level
 import world.path.DistanceMap
 import world.terrains.Terrain
+import kotlin.math.max
+import kotlin.math.min
 
 @Serializable
 class Village(
@@ -65,8 +67,7 @@ class Village(
 
     val workAreas = mutableSetOf<Villager.WorkArea>()
 
-    @Transient private var featureBuilt = false
-    @Transient private val uniqueHuts = mutableListOf<Decor>(
+    @Transient private val shopDecors = mutableListOf<Decor>(
         BlacksmithShop(),
         Schoolhouse(),
         Church(),
@@ -79,6 +80,8 @@ class Village(
 
     override fun trailDestinationChance() = 1f
 
+    class HutSpec(val rect: Rect, val doorDir: XY) { }
+
     override fun doDig() {
 
         printGrid(growBlob(63, 63), x0, y0, Terrain.Type.TEMP1)
@@ -89,13 +92,35 @@ class Village(
             }
         }
         // Lay out buildings and collect list of rooms to furnish
-        when (Dice.oneTo(4)) {
+        val huts = when (Dice.oneTo(4)) {
             1,2 -> layoutVillageBag()
             3 -> layoutVillageHoriz()
-            4 -> layoutVillageVert()
+            else -> layoutVillageVert()
+        }.sortedByDescending { it.rect.area() }.toMutableList()
+
+        // Build feature
+        if (huts.size > 4 && Dice.chance(0.8f)) {
+            val hut = huts.removeFirst()
+            val decor = when (Dice.oneTo(3)) {
+                1,2 -> Garden(fertility, meta.biome, meta.habitat)
+                else -> Stage()
+            }
+            val rect = Rect(x0+hut.rect.x0+1,y0+hut.rect.y0+1,x0+hut.rect.x1-2,y0+hut.rect.y1-2)
+            decor.furnish(Decor.Room(rect, listOf()), carto, isAbandoned)
+            workAreas.add(Villager.WorkArea(decor.workAreaName(), rect, decor.workAreaComments()))
         }
-        // Furnish all rooms
-        
+
+        // Build all huts
+        val hutRooms = mutableListOf<Decor.Room>()
+        huts.forEach { hutSpec ->
+            val r = hutSpec.rect
+            val room = buildHut(r.x0, r.y0, (r.x1 - r.x0) + 1, (r.y1 - r.y0) + 1,
+                fertility + Dice.float(-0.3f, 0.3f), hutSpec.doorDir, isAbandoned)
+            hutRooms.add(room)
+            carto.addTrailBlock(r.x0, r.y0, r.x1, r.y1)
+        }
+
+        // Place public feature
         if (!isAbandoned && Dice.chance(0.7f)) {
             placeInMostPublic(
                 when (Dice.oneTo(10)) {
@@ -106,6 +131,7 @@ class Village(
                 }
             )
         }
+        // Add abandoned wear
         if (isAbandoned) {
             val wear = Dice.float(0.3f, 0.9f)
             forEachCell { x,y ->
@@ -115,12 +141,53 @@ class Village(
                         Terrain.Type.TERRAIN_DIRT -> 0.04f * wear
                         Terrain.Type.TEMP2 -> 0.06f * wear
                         else -> 0f
-                })) setTerrain(x, y, Terrain.Type.TEMP1)
+                    })) setTerrain(x, y, Terrain.Type.TEMP1)
             }
             fuzzTerrain(Terrain.Type.TEMP1, wear, listOf(Terrain.Type.TERRAIN_WOODWALL, Terrain.Type.TERRAIN_BRICKWALL, Terrain.Type.TERRAIN_WINDOWWALL))
         }
         swapTerrain(Terrain.Type.TEMP1, meta.biome.baseTerrain)
         swapTerrain(Terrain.Type.TEMP2, meta.biome.bareTerrain(x0,y0))
+
+        val idealHouseCount = max(huts.size / 2 + 1, min(3, huts.size))
+        val shopCount = min(shopDecors.size, huts.size - idealHouseCount)
+
+        // Build shops
+        repeat (shopCount) {
+            val hut = hutRooms.removeFirst()
+            val decor = shopDecors.random()
+            shopDecors.remove(decor)
+            decor.furnish(hut, carto, isAbandoned)
+            workAreas.add(Villager.WorkArea(
+                    decor.workAreaName(), hut.rect, decor.workAreaComments()
+                ))
+        }
+
+        // Build houses
+        repeat (hutRooms.size) {
+            val hut = hutRooms.removeFirst()
+            val hutDecor = Hut()
+            hutDecor.furnish(hut, carto, isAbandoned)
+            if (!isAbandoned) {
+                val newHomeArea = Villager.WorkArea(
+                    "home", hut.rect, setOf(
+                        "Ah, home and hearth.",
+                        "It's good to be home.",
+                        "It's not much, but it's my safe place.",
+                        "A villager's home is a castle.",
+                        "Home is where the heart is."
+                    ))
+                hutDecor.bedLocations.forEach { bedLocation ->
+                    val citizen = Villager(bedLocation).apply {
+                        joinFaction(factionID)
+                        homeArea = newHomeArea
+                    }
+                    addCitizen(citizen)
+                    findSpawnPointForNPC(chunk, citizen, hut.rect)?.also { spawnPoint ->
+                        citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+                    } ?: run { log.info("Failed to spawn citizen in ${hut.rect}")}
+                }
+            }
+        }
 
         if (!isAbandoned) {
             spawnGuards()
@@ -141,44 +208,40 @@ class Village(
         }
     }
 
-    private fun layoutVillageVert() {
-        var huts = 0
+    private fun layoutVillageVert(): MutableList<HutSpec> {
+        val huts = mutableListOf<HutSpec>()
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
         val xMidRight = xMid + Dice.oneTo(3)
         var cursorY= 32
-        while (cursorY > 14 && huts < size) {
+        while (cursorY > 14 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidLeft - width, cursorY - height, width, height, fertility, EAST)
-            huts++
+            huts.add(HutSpec(Rect(xMidLeft - width, cursorY - height, xMidLeft - 1, cursorY - 1), EAST))
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49 && huts < size) {
+        while (cursorY < 49 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidLeft - width, cursorY, width, height, fertility, EAST)
-            huts++
+            huts.add(HutSpec(Rect(xMidLeft - width, cursorY, xMidLeft - 1, cursorY + height - 1), EAST))
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         cursorY = 32
-        while (cursorY > 14 && huts < size) {
+        while (cursorY > 14 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidRight + 1, cursorY - height, width, height, fertility, WEST)
-            huts++
+            huts.add(HutSpec(Rect(xMidRight + 1, cursorY - height, xMidRight + width, cursorY - 1), WEST))
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49 && huts < size) {
+        while (cursorY < 49 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(xMidRight + 1, cursorY, width, height, fertility, WEST)
-            huts++
+            huts.add(HutSpec(Rect(xMidRight + 1, cursorY, xMidRight + width, cursorY + height - 1), WEST))
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
@@ -186,46 +249,43 @@ class Village(
             if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + xMid, y0 + iy, Terrain.Type.TEMP2)
             if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + xMid + 1, y0 + iy, Terrain.Type.TEMP2)
         }
+        return huts
     }
 
-    private fun layoutVillageHoriz() {
-        var huts = 0
+    private fun layoutVillageHoriz(): MutableList<HutSpec> {
+        val huts = mutableListOf<HutSpec>()
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
         val yMidBottom = yMid + Dice.oneTo(3)
         var cursorX = 32
-        while (cursorX > 14 && huts < size) {
+        while (cursorX > 14 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(cursorX - width, yMidTop - height, width, height, fertility, SOUTH)
-            huts++
+            huts.add(HutSpec(Rect(cursorX - width, yMidTop - height, cursorX - 1, yMidTop - 1), SOUTH))
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49 && huts < size) {
+        while (cursorX < 49 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(cursorX, yMidTop - height, width, height, fertility, SOUTH)
-            huts++
+            huts.add(HutSpec(Rect(cursorX, yMidTop - height, cursorX + width - 1, yMidTop - 1), SOUTH))
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         cursorX = 32
-        while (cursorX > 14 && huts < size) {
+        while (cursorX > 14 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(cursorX - width, yMidBottom, width, height, fertility, NORTH)
-            huts++
+            huts.add(HutSpec(Rect(cursorX - width, yMidBottom, cursorX - 1, yMidBottom + height - 1), NORTH))
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49 && huts < size) {
+        while (cursorX < 49 && huts.size < size) {
             val width = Dice.range(9, 13)
             val height = Dice.range(9, 13)
-            layoutHutOrFeature(cursorX, yMidBottom, width, height, fertility, NORTH)
-            huts++
+            huts.add(HutSpec(Rect(cursorX, yMidBottom, cursorX + width - 1, yMidBottom + height - 1), NORTH))
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
@@ -233,56 +293,12 @@ class Village(
             if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + ix, y0 + yMid, Terrain.Type.TEMP2)
             if (!isAbandoned || Dice.chance(0.95f)) setTerrain(x0 + ix, y0 + yMid + 1, Terrain.Type.TEMP2)
         }
+        return huts
     }
 
-    private fun layoutHutOrFeature(x: Int, y: Int, width: Int, height: Int, fertility: Float,
-                                   forceDoorDir: XY? = null) {
-        if (!featureBuilt && Dice.chance(0.15f)) {
-            buildVillageFeature(x, y, width, height)
-            featureBuilt = true
-        } else {
-            var withCitizen = false
-            var areaName = "home"
-            var areaComments = setOf(
-                "Ah, home and hearth.",
-                "It's good to be home.",
-                "It's not much, but it's my safe place.",
-            )
-
-            val room = buildHut(x, y, width, height, fertility + Dice.float(-0.3f, 0.3f), forceDoorDir, isAbandoned)
-            val abandoned = isAbandoned || Dice.chance(0.05f)
-            uniqueHuts.filter { it.fitsInRoom(room) }.randomOrNull()?.also { uniqueDecor ->
-                uniqueDecor.furnish(room, carto, abandoned)
-                uniqueHuts.remove(uniqueDecor)
-                areaName = uniqueDecor.workAreaName()
-                areaComments = uniqueDecor.workAreaComments()
-            } ?: run {
-                Hut().furnish(room, carto, abandoned)
-                withCitizen = true
-            }
-            val interiorRect = Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3)
-            val workArea = Villager.WorkArea(
-                areaName, interiorRect, areaComments
-            )
-            if (withCitizen && !isAbandoned) {
-                val citizen = Villager().apply {
-                    joinFaction(factionID)
-                    homeArea = workArea
-                }
-                addCitizen(citizen)
-                findSpawnPointForNPC(chunk, citizen, interiorRect)?.also { spawnPoint ->
-                    citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
-                }
-            } else {
-                workAreas.add(workArea)
-            }
-
-        }
-        carto.addTrailBlock(x, y, x+width-1, y+height-1)
-    }
-
-    private fun layoutVillageBag() {
-        val hutCount = this.size
+    private fun layoutVillageBag(): MutableList<HutSpec> {
+        val hutCount = this.size + 1
+        val huts = mutableListOf<HutSpec>()
         var built = 0
         var width = Dice.range(9, 13)
         var height = Dice.range(9, 13)
@@ -293,13 +309,10 @@ class Village(
                 val x = Dice.range(3, 63 - width)
                 val y = Dice.range(3, 63 - height)
                 var clearHere = true
-                for (tx in x until x+width) {
-                    for (ty in y until y+height) {
-                        if (getTerrain(x0+tx,y0+ty) !in listOf(Terrain.Type.TEMP1, Terrain.Type.TEMP2)) clearHere = false
-                    }
-                }
+                val hutRect = Rect(x, y, x + width - 1, y + height - 1)
+                huts.forEach { if (it.rect.overlaps(hutRect)) clearHere = false }
                 if (clearHere) {
-                    layoutHutOrFeature(x, y, width, height, fertility)
+                    huts.add(HutSpec(hutRect, CARDINALS.random()))
                     placed = true
                     built++
                 }
@@ -311,6 +324,7 @@ class Village(
             }
             if (width <= 6 || height <= 6) built = hutCount
         }
+        return huts
     }
 
     private fun placeInMostPublic(thing: Thing) {
@@ -345,19 +359,6 @@ class Village(
                 placed = true
             }
         }
-    }
-
-    private fun buildVillageFeature(x: Int, y: Int, width: Int, height: Int) {
-        val room = when (Dice.oneTo(3)) {
-            1,2 -> Garden(fertility, meta.biome, meta.habitat)
-            else -> Stage()
-        }
-        room.furnish(Decor.Room(Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2), listOf()), carto)
-        workAreas.add(Villager.WorkArea(
-            room.workAreaName(),
-            Rect(x0+x+1, y0+y+1, x0+x+width-2, y0+y+height-2),
-            room.workAreaComments()
-        ))
     }
 
     override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE

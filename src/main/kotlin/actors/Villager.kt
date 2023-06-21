@@ -5,10 +5,13 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.*
 import world.Entity
+import world.level.Level
 import world.path.Pather
 
 @Serializable
-class Villager() : Citizen() {
+class Villager(
+    val bedLocation: XY,
+) : Citizen() {
 
     companion object {
         val defaultArea = WorkArea("", Rect(0,0,0,0),setOf())
@@ -20,8 +23,20 @@ class Villager() : Citizen() {
         val rect: Rect,
         val comments: Set<String>
     ) {
+        override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
         fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
+        fun villagerCount(level: Level?): Int {
+            var count = 0
+            level?.also { level ->
+                for (ix in rect.x0..rect.x1) {
+                    for (iy in rect.y0..rect.y1) {
+                        if (level.actorAt(ix, iy) is Villager) count++
+                    }
+                }
+            }
+            return count
+        }
     }
 
     var homeArea = defaultArea
@@ -31,16 +46,17 @@ class Villager() : Citizen() {
     override fun toString() = name()
 
     fun setTarget(newTarget: WorkArea) {
+        if (newTarget == defaultArea) return
         if (newTarget != targetArea) {
-            previousTargetArea = targetArea
+            previousTargetArea = if (targetArea == defaultArea) homeArea else targetArea
             targetArea = newTarget
             Pather.unsubscribeAll(this)
-            if (!targetArea.contains(xy)) {
-                log.info("$this changing target to ${targetArea.name}")
-                Pather.subscribe(this, targetArea.rect, 36f)
-            } else {
-                log.info("$this targeting ${targetArea.name} but already there")
-            }
+        }
+        if (!targetArea.contains(xy)) {
+            log.info("$this changing target to ${targetArea}")
+            Pather.subscribe(this, targetArea.rect, 48f)
+        } else {
+            log.info("$this targeting ${targetArea} but already there")
         }
     }
 

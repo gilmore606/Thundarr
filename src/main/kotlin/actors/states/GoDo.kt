@@ -27,7 +27,7 @@ class GoDo(
         if (npc.xy() == targetXY) {
             npc.popState()
             return targetAction
-        } else if (failedSteps > 8) {
+        } else if (failedSteps > 4) {
             npc.popState()
             return Say("Aww, forget it.")
         } else {

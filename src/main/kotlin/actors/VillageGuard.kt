@@ -10,6 +10,7 @@ import render.tilesets.Glyph
 import util.Dice
 import util.LightColor
 import util.Rect
+import world.Chunk
 
 @Serializable
 class VillageGuard(
@@ -33,6 +34,8 @@ class VillageGuard(
         stayOutdoors = true
     )
     override fun canSwimShallow() = true
+
+    override fun canSpawnAt(chunk: Chunk, x: Int, y: Int): Boolean = !chunk.isRoofedAt(x, y)
 
     override fun meetPlayerMsg() = listOf(
         "Hail traveller.",

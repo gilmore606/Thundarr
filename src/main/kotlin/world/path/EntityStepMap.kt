@@ -73,9 +73,7 @@ class EntityStepMap(): StepMap() {
         if (from == targetEntity) {
             val lx = to.x - offsetX
             val ly = to.y - offsetY
-            log.info("path $lx $ly")
             if (lx in 0 until width && ly in 0 until height) {
-                log.info("pathing to $to")
                 val feet = XY(lx, ly)
                 var step = map[feet.x][feet.y] -1
                 var foundDir: XY? = null

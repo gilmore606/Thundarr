@@ -2,10 +2,7 @@ package actors.states
 
 import actors.NPC
 import actors.Villager
-import actors.actions.Action
-import actors.actions.Sleep
-import actors.actions.Use
-import actors.actions.Wait
+import actors.actions.*
 import actors.statuses.Status
 import things.Candlestick
 import things.Door
@@ -25,6 +22,10 @@ class Sleeping(
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
                 npc.entitiesSeen { it is Candlestick && it.lit && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
                     npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light as Candlestick)))
+                    return
+                }
+                if (npc.xy() != npc.bedLocation) {
+                    npc.pushState(GoDo(npc.bedLocation, Say(":yawns.")))
                     return
                 }
                 if (shouldBeAsleep()) {

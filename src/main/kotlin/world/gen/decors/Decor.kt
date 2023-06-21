@@ -105,10 +105,11 @@ sealed class Decor {
         if (Dice.chance(chance)) doThis()
     }
 
-    protected fun spawn(thing: Thing) {
+    protected fun spawn(thing: Thing, useXY: ((XY)->Unit)? = null) {
         if (isAbandoned && Dice.chance(0.3f)) return
         carto.spawnThing(cell.x, cell.y, thing)
         room.unclear(cell)
+        useXY?.invoke(cell)
     }
 
     protected fun spawnAt(x: Int, y: Int, thing: Thing) {

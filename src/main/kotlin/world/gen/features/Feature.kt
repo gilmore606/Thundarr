@@ -252,7 +252,7 @@ sealed class Feature : AnimalSpawnSource {
             tries++
             val x = Dice.range(bounds.x0, bounds.x1)
             val y = Dice.range(bounds.y0, bounds.y1)
-            if (chunk.isWalkableAt(npc, x, y)) return XY(x,y)
+            if (chunk.isWalkableAt(npc, x, y) && npc.canSpawnAt(chunk, x, y)) return XY(x,y)
         }
         return null
     }

@@ -13,6 +13,11 @@ class Say(
     override fun execute(actor: Actor, level: Level) {
         actor.level?.addSpark(Speak().at(actor.xy.x, actor.xy.y))
         Speaker.world(actor.talkSound(actor), source = actor.xy)
-        Console.sayAct("", "${actor.dnamec()} says, \"$text\"", actor)
+        if (text.startsWith(":")) {
+            val t = text.substring(1, text.lastIndex)
+            Console.sayAct("", "${actor.dnamec()} $t", actor)
+        } else {
+            Console.sayAct("", "${actor.dnamec()} says, \"$text\"", actor)
+        }
     }
 }

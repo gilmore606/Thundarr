@@ -3,48 +3,34 @@ package world.gen.decors
 import kotlinx.serialization.Serializable
 import things.*
 import util.Dice
+import util.XY
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
 import world.gen.gardenPlantSpawns
 import world.terrains.Terrain
+import java.lang.Math.max
+import java.lang.Math.min
 
 @Serializable
 class Hut : Decor() {
+    var bedLocations = mutableListOf<XY>()
+
     override fun description() = listOf(
         "A simple village hut.",
         "A single-room country dwelling.",
     ).random()
     override fun doFurnish() {
-        againstWall { spawn(Bedroll()) }
-        againstWall { spawn(Candlestick())}
-        chance(0.3f) { againstWall { spawn(Trunk()) } }
-        chance(0.6f) { awayFromWall { spawn(Table()) } }
-    }
-}
-
-@Serializable
-class HutBedroom : Decor() {
-    override fun description() = listOf(
-        "A spartan but cozy bedroom.",
-        "A somewhat dishevelled villager's bedroom.",
-        "A simple bedchamber.",
-    ).random()
-    override fun doFurnish() {
-        againstWall { spawn(Bedroll()) }
-        chance(0.4f) { againstWall { spawn(Trunk()) } }
-    }
-}
-
-@Serializable
-class HutLivingRoom : Decor() {
-    override fun description() = "A simple villager's living room."
-    override fun doFurnish() {
-        againstWall { spawn(Candlestick())}
-        chance(0.7f) { anyEmpty { spawn(Table()) } }
-        if (clearCount > 15) {
-            anyEmpty { spawn(Table()) }
+        val bedCount = max(1, min(3, (room.rect.area() / 12)))
+        repeat (bedCount) {
+            againstWall { spawn(Bedroll()) { bedXY ->
+                bedLocations.add(bedXY)
+            } }
         }
+        againstWall { spawn(Candlestick())}
+        chance(0.5f + bedCount * 0.1f) { againstWall { spawn(Trunk()) } }
+        chance(0.2f + bedCount * 0.2f) { awayFromWall { spawn(Table()) } }
+        chance(bedCount * 0.1f) { awayFromWall { spawn(Table()) } }
         if (clearCount > 20) {
             chance(0.6f) { againstWall { spawn(
                 if (Dice.chance(0.7f)) FilingCabinet() else Bookshelf()
@@ -99,7 +85,6 @@ class Church : Decor() {
 @Serializable
 class StorageShed : Decor() {
     override fun description() = "A musty-smelling storage shed."
-    override fun fitsInRoom(room: Room) = room.width <= 6 && room.height <= 6
 
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}

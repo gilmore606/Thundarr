@@ -11,6 +11,7 @@ import render.tilesets.Glyph
 import things.NPCDen
 import ui.panels.Console
 import util.*
+import world.Chunk
 import world.level.Level
 
 @Serializable
@@ -77,6 +78,7 @@ sealed class NPC : Actor() {
         return spawnAt(level, x, y)
     }
 
+    open fun canSpawnAt(chunk: Chunk, x: Int, y: Int): Boolean = true
     open fun onSpawn() { }
 
     open fun converseLines(): List<String> = state.converseLines(this) ?: listOf()

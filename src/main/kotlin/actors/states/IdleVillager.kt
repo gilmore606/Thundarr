@@ -13,6 +13,7 @@ import util.Dice
 import util.Rect
 import util.XY
 import util.log
+import world.path.Pather
 
 @Serializable
 class IdleVillager(
@@ -87,10 +88,11 @@ class IdleVillager(
             }
 
             npc.entitiesSeen { it is Candlestick }.keys.firstOrNull()?.also { light ->
-                if ((light as Candlestick).lit && npc.previousTargetArea.contains(light.xy())) {
-                    // Is it lit, and we're leaving?  Extinguish it
+                if ((light as Candlestick).lit && npc.previousTargetArea.contains(light.xy()) && (npc.targetArea != npc.previousTargetArea) &&
+                    npc.previousTargetArea.contains(npc.xy()) && npc.previousTargetArea.villagerCount(npc.level()) <= 1) {
+                    // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
                     npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light)))
-                } else if (!(light as Candlestick).lit && npc.targetArea.contains(npc.xy)) {
+                } else if (!(light as Candlestick).lit && npc.targetArea.contains(npc.xy) && npc.targetArea.contains(light.xy())) {
                     // Is it out, and we're staying here?  Light it
                     npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light)))
                 }
@@ -98,6 +100,12 @@ class IdleVillager(
 
         }
         super.considerState(npc)
+    }
+
+    override fun enter(npc: NPC) {
+        if (npc is Villager) {
+            npc.setTarget(npc.targetArea)
+        }
     }
 
     override fun converseLines(npc: NPC): List<String>? {
