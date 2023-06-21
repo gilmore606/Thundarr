@@ -19,7 +19,7 @@ class IdleDen(
     val wakeHour: Float,
 ) : Idle() {
     override fun pickAction(npc: NPC): Action {
-        npc.den?.also { Pather.subscribe(npc, it, wanderRadius.toFloat()) }
+        npc.den?.also { Pather.subscribe(npc, it.xy(), wanderRadius) }
 
         if (shouldSleep(sleepHour, wakeHour)) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
@@ -28,7 +28,7 @@ class IdleDen(
                         npc.fallAsleep()
                         return Sleep()
                     } else {
-                        npc.stepToward(npc.den!!)?.also {
+                        npc.stepToward(npc.den!!.xy())?.also {
                             return it
                         }
                     }

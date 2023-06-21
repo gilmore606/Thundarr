@@ -56,7 +56,7 @@ open class Player : Actor() {
     val autoPickUpTypes = mutableListOf<Thing.Tag>()
 
     init {
-        Pather.subscribe(this, this, 60f)
+        //Pather.subscribe(this, this, 60f)
     }
 
     open fun onSpawn() {

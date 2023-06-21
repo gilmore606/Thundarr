@@ -506,10 +506,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             if (use.canDo(this, xy.x, xy.y, false)) Use(useTag, thing, use.duration) else null
         }
 
-    fun stepToward(target: Entity): Move? {
-        Pather.nextStep(this, target)?.also { s ->
-            return Move(XY(s.x - xy.x, s.y - xy.y))
-        }
+    fun stepToward(target: Actor): Move? {
+        Pather.nextStep(this, target)?.also { return Move(it) }
         return null
     }
 

@@ -355,7 +355,8 @@ class Chunk(
 
     fun isWalkableAt(actor: Actor, x: Int, y: Int): Boolean = if (boundsCheck(x, y)) {
         if (Terrain.get(terrains[x - this.x][y - this.y]).isWalkableBy(actor)) {
-            var thingBlocking = level.actorAt(x, y) != null
+            //var thingBlocking = level.actorAt(x, y).let { it != null  && it != actor }
+            var thingBlocking = false
             things[x - this.x][y - this.y].contents.forEach { thing ->
                 thingBlocking = thingBlocking || thing.isBlocking(actor)
             }

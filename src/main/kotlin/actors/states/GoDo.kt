@@ -16,11 +16,11 @@ class GoDo(
     override fun toString() =  "GoDo (at $targetXY, do $targetAction)"
 
     override fun enter(npc: NPC) {
-        Pather.subscribe(npc, npc, npc.visualRange())
+        Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
     }
 
     override fun leave(npc: NPC) {
-        Pather.unsubscribe(npc, npc)
+        Pather.unsubscribe(npc, targetXY)
     }
 
     override fun pickAction(npc: NPC): Action {

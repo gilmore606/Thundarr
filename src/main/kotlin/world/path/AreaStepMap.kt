@@ -1,59 +1,35 @@
 package world.path
 
 import actors.Actor
-import util.*
-import world.Entity
-import world.level.Level
+import kotlinx.serialization.Serializable
+import util.DIRECTIONS
+import util.Rect
+import util.XY
+import util.from
 
+@Serializable
 class AreaStepMap : StepMap() {
 
-    var targetRect: Rect? = null
+    lateinit var target: Rect
 
-    fun setTargetToRect(newTarget: Rect, level: Level) {
-        this.level = level
-        targetRect = newTarget
-        offsetX = newTarget.x0 + newTarget.width() / 2 - width / 2
-        offsetY = newTarget.y0 + newTarget.height() / 2 - height / 2
-        outOfDate = true
+    fun init(walker: Actor, range: Int, target: Rect) {
+        init(walker, range)
+        this.target = target
     }
 
-    override fun toString() = "AreaStepMap(target=$targetRect)"
+    override fun toString() = "AreaStepMap(from $walker to $target)"
 
-    override suspend fun update() {
-        targetRect?.also { target ->
-            clearScratch()
-            for (ix in target.x0..target.x1) {
-                for (iy in target.y0..target.y1) {
-                    if (level?.isWalkableAt(subscribers.first() as Actor, ix, iy) ?: true) {
-                        scratch[ix - offsetX][iy - offsetY] = 0
-                    }
-                }
+    override fun printTarget() {
+        for (ix in target.x0..target.x1) {
+            for (iy in target.y0..target.y1) {
+                writeTargetCell(ix, iy)
             }
-            super.update()
         }
     }
 
-    override fun canReach(to: Rect) = to == targetRect
-
-    override fun nextStep(from: Entity, to: Rect): XY? {
-        val fromX = from.xy().x
-        val fromY = from.xy().y
-        if (to == targetRect) {
-            val lx = fromX - offsetX
-            val ly = fromY - offsetY
-            if (lx in 0 until width && ly in 0 until height) {
-                val nextstep = map[lx][ly] - 1
-                if (nextstep < 0) return null
-                var step: XY? = null
-                DIRECTIONS.from(lx, ly) { tx, ty, dir ->
-                    if (tx in 0 until width && ty in 0 until height) {
-                        if (map[tx][ty] == nextstep) {
-                            step = dir
-                        }
-                    }
-                }
-                step?.also { return it }
-            }
+    override fun nextStep(from: Actor, to: Rect): XY? {
+        if (from.id == walkerID && to == target) {
+            return getNextStep(from.xy().x, from.xy().y)
         }
         return null
     }

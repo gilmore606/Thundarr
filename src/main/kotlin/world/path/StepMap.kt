@@ -1,45 +1,42 @@
 package world.path
 
+import App
 import actors.Actor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
-import util.DIRECTIONS
-import util.Rect
-import util.XY
-import util.log
+import util.*
 import world.Entity
 import world.level.Level
 
-open class StepMap {
+@Serializable
+abstract class StepMap {
 
-    val subscribers = mutableSetOf<Entity>()
-    var range: Float = 1f
-    var width = (range * 2f).toInt()
-    var height = width
+    @Transient var walker: Actor? = null
+    var walkerID: String = ""
+    var range: Int = 1
+    var width = 2
+    var height = 2
     var offsetX = 0
     var offsetY = 0 // offset to level coords
-    var outOfDate = true
-    var done = false
-    var level: Level? = null
 
-    protected var scratch = Array(1) { IntArray(1) { -1 } }
-    var map = Array(1) { IntArray(1) { -1 } }
+    var dirty = true  // Do we need an update?
+    var expired = false  // Can we be disposed of?
 
-    fun addSubscriber(subscriber: Entity, range: Float) {
-        if (subscriber !in subscribers) {
-            subscribers.add(subscriber)
-            done = false
-        }
-        if (range > this.range) {
-            changeRange(range)
-            done = false
-        }
-    }
+    var scratch = Array(width) { IntArray(height) { -1 } }
+    var map = Array(width) { IntArray(height) { -1 } }
 
-    fun removeSubscriber(subscriber: Entity) {
-        subscribers.remove(subscriber)
-        if (subscribers.isEmpty()) { done = true }
+    open fun init(walker: Actor, range: Int) {
+        this.walker = walker
+        this.walkerID = walker.id
+        this.range = range
+        this.width = range * 2
+        this.height = range * 2
+        scratch = Array(width) { IntArray(height) { -1 } }
+        map = Array(width) { IntArray(height) { -1 } }
+        onActorMove(walker)
     }
 
     open fun dispose() {
@@ -47,29 +44,42 @@ open class StepMap {
         map = Array(1) { IntArray(1) { 0 } }
     }
 
-    fun changeRange(newRange: Float) {
-        val nextRange = java.lang.Float.min(Pather.maxRange, newRange)
-        if (nextRange != range) {
-            range = nextRange
-            log.debug("map $map changing range to $range")
-            scratch = Array((range * 2f).toInt() + 2) { IntArray((range * 2f).toInt() + 2) { -1 } }
-            map = Array((range * 2f).toInt() + 2) { IntArray((range * 2f).toInt() + 2) { -1 } }
-            width = (range * 2f).toInt()
-            height = width
-            outOfDate = true
+    open fun onActorMove(actor: Actor) {
+        if (actor.id == walkerID) {
+            dirty = true
+            offsetX = actor.xy.x - width / 2
+            offsetY = actor.xy.y - height / 2
         }
     }
 
-    open fun onActorMove(actor: Actor) { }
+    // Write step 0 into target cells on scratch
+    protected open fun printTarget() { }
 
     open fun nextStep(from: XY, to: Entity): XY? = null
-    open fun nextStep(from: Entity, to: XY): XY? = null
-    open fun nextStep(from: Entity, to: Rect): XY? = null
+    open fun nextStep(from: Actor, to: XY): XY? = null
+    open fun nextStep(from: Actor, to: Rect): XY? = null
+    open fun nextStep(from: Actor, to: Actor): XY? = null
 
-    open fun canReach(to: Entity) = false
-    open fun canReach(to: Rect) = false
+    protected fun getNextStep(fromX: Int, fromY: Int): XY? {
+        val lx = fromX - offsetX
+        val ly = fromY - offsetY
+        if (lx in 0 until width && ly in 0 until height) {
+            val nextstep = map[lx][ly] - 1
+            if (nextstep < 0) return null
+            var steps = mutableSetOf<XY>()
+            DIRECTIONS.from(lx, ly) { tx, ty, dir ->
+                if (tx in 0 until width && ty in 0 until height) {
+                    if (map[tx][ty] == nextstep) {
+                        steps.add(dir)
+                    }
+                }
+            }
+            if (steps.isNotEmpty()) return steps.random()
+        }
+        return null
+    }
 
-    protected fun clearScratch() {
+    private fun clearScratch() {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 scratch[x][y] = -1
@@ -77,7 +87,7 @@ open class StepMap {
         }
     }
 
-    protected fun promoteScratch() {
+    private fun promoteScratch() {
         KtxAsync.launch {
             val old = map
             map = scratch
@@ -98,13 +108,25 @@ open class StepMap {
         }
     }
 
-    open suspend fun update() {
-        level?.also { level ->
-            val walker = subscribers.firstOrNull()?.let { if (it is Actor) it else null }
-            var dirty = true
+    inline fun writeTargetCell(x: Int, y: Int) {
+        val ix = x - offsetX
+        val iy = y - offsetY
+        if ((ix in 0..width - 1) && (iy in 0..height - 1)) {
+            scratch[ix][iy] = 0
+        }
+    }
+
+    suspend fun update() {
+        if (walker == null) {
+            walker = App.level.director.getActor(walkerID)
+        }
+        walker?.level?.also { level ->
+            clearScratch()
+            printTarget()
             var step = 0
-            while (dirty) {
-                dirty = false
+            var notDone = true
+            while (notDone) {
+                notDone = false
                 for (x in 0 until width) {
                     for (y in 0 until height) {
                         if (scratch[x][y] == step) {
@@ -115,9 +137,9 @@ open class StepMap {
                                     if (scratch[tx][ty] < 0) {
                                         //waitForActorLock(level) don't need this since actors don't block walkable
                                         waitForCellLock(level, tx, ty)
-                                        if (level.isPathableBy(walker ?: App.player, x + offsetX + dir.x, y + offsetY + dir.y)) {
+                                        if (level.isPathableBy(walker!!, x + offsetX + dir.x, y + offsetY + dir.y)) {
                                             scratch[tx][ty] = step + 1
-                                            dirty = true
+                                            notDone = true
                                         }
                                     }
                                 }
@@ -127,9 +149,8 @@ open class StepMap {
                 }
                 step++
             }
-            // Buffer swap
             promoteScratch()
-            outOfDate = false
+            dirty = false
         }
     }
 }

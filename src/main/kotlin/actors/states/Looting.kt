@@ -17,7 +17,7 @@ class Looting(
 ) : State() {
 
     override fun enter(npc: NPC) {
-        Pather.subscribe(npc, npc, npc.visualRange())
+        Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
     }
 
     override fun leave(npc: NPC) {

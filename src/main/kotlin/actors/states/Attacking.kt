@@ -6,38 +6,52 @@ import actors.actions.Attack
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
+import util.distanceBetween
 import world.path.Pather
 
 @Serializable
 class Attacking(
-    val targetId: String
+    val targetID: String,
+    val origin: XY? = null,
+    val maxChaseRange: Int = 0,
 ) : State() {
 
-    override fun toString() = "Attacking (target $targetId)"
+    override fun toString() = "Attacking (target $targetID)"
 
     override fun enter(npc: NPC) {
-        App.level.director.getActor(targetId)?.also { target ->
-            Pather.subscribe(npc, target, npc.visualRange())
+        App.level.director.getActor(targetID)?.also { target ->
+            Pather.subscribe(npc, target, npc.visualRange().toInt())
         }
     }
 
     override fun leave(npc: NPC) {
-        App.level.director.getActor(targetId)?.also { target ->
+        App.level.director.getActor(targetID)?.also { target ->
             Pather.unsubscribe(npc, target)
         }
     }
 
     override fun considerState(npc: NPC) {
         npc.apply {
-            if (!canSee(getActor(targetId))) {
-                changeState(hostileLossState(targetId))
+            if (!canSee(getActor(targetID))) {
+                giveUp(npc)
             }
+            origin?.also { origin ->
+                if (distanceBetween(origin, npc.xy) > maxChaseRange) {
+                    giveUp(npc)
+                }
+            }
+        }
+    }
+
+    private fun giveUp(npc: NPC) {
+        npc.apply {
+            changeState(hostileLossState(targetID))
         }
     }
 
     override fun pickAction(npc: NPC): Action {
         npc.apply {
-            getActor(targetId)?.also { target ->
+            getActor(targetID)?.also { target ->
                 if (entitiesNextToUs().contains(target)) {
                     return Attack(target, XY(target.xy.x - npc.xy.x, target.xy.y - npc.xy.y))
                 } else {
@@ -49,7 +63,7 @@ class Attacking(
     }
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
-        if (targetId == App.player.id) {
+        if (targetID == App.player.id) {
             drawIt(Glyph.HOSTILE_ICON)
         } else {
             drawIt(Glyph.HOSTILE_OTHER_ICON)

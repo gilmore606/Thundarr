@@ -56,7 +56,7 @@ class Villager(
             Pather.unsubscribeAll(this)
         }
         if (!targetArea.contains(xy)) {
-            Pather.subscribe(this, targetArea.rect, 48f)
+            Pather.subscribe(this, targetArea.rect, 48)
         }
     }
 
