@@ -1,5 +1,6 @@
 package world.gen.features
 
+import actors.Actor
 import actors.Citizen
 import actors.VillageGuard
 import actors.Villager
@@ -73,6 +74,8 @@ class Village(
         Church(),
         StorageShed(),
     )
+
+    @Transient val guards = mutableListOf<VillageGuard>()  // only used during gen
 
     val factionID = App.factions.addFaction(VillageFaction(name))
 
@@ -151,6 +154,11 @@ class Village(
         val idealHouseCount = max(huts.size / 2 + 1, min(3, huts.size))
         val shopCount = min(shopDecors.size, huts.size - idealHouseCount)
 
+        // Spawn guards
+        if (!isAbandoned) {
+            spawnGuards()
+        }
+
         // Build shops
         repeat (shopCount) {
             val hut = hutRooms.removeFirst()
@@ -158,7 +166,7 @@ class Village(
             shopDecors.remove(decor)
             decor.furnish(hut, carto, isAbandoned)
             workAreas.add(Villager.WorkArea(
-                    decor.workAreaName(), hut.rect, decor.workAreaComments()
+                    decor.workAreaName(), hut.rect, decor.workAreaComments(), decor.needsOwner()
                 ))
         }
 
@@ -185,12 +193,21 @@ class Village(
                     findSpawnPointForNPC(chunk, citizen, hut.rect)?.also { spawnPoint ->
                         citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
                     } ?: run { log.info("Failed to spawn citizen in ${hut.rect}")}
+                    lockDoor(hut.doorXY, citizen)
                 }
             }
         }
 
-        if (!isAbandoned) {
-            spawnGuards()
+    }
+
+    private fun lockDoor(xy: XY?, owner: Actor) {
+        xy?.also { xy ->
+            log.info("trying for door at $xy")
+            chunk.thingsAt(xy.x, xy.y).firstOrNull { it is Door }?.also { door ->
+                log.info("locking door at $xy to $owner")
+                (door as Door).lockTo(owner)
+                guards.forEach { door.lockTo(it) }
+            }
         }
     }
 
@@ -202,6 +219,7 @@ class Village(
                 joinFaction(factionID)
             }
             addCitizen(guard)
+            guards.add(guard)
             findSpawnPointForNPC(chunk, guard, bounds)?.also { spawnPoint ->
                 guard.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
             }

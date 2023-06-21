@@ -113,6 +113,7 @@ class BlacksmithShop : Decor() {
         }
     }
     override fun workAreaName() = "smithy"
+    override fun needsOwner() = true
 }
 
 @Serializable

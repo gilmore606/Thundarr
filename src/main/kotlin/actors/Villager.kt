@@ -21,7 +21,8 @@ class Villager(
     data class WorkArea(
         val name: String,
         val rect: Rect,
-        val comments: Set<String>
+        val comments: Set<String>,
+        val needsOwner: Boolean = false
     ) {
         override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
@@ -40,6 +41,8 @@ class Villager(
     }
 
     var homeArea = defaultArea
+    var jobArea: WorkArea? = null
+
     var targetArea = defaultArea
     var previousTargetArea = defaultArea
 

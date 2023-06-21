@@ -174,7 +174,8 @@ sealed class Feature : AnimalSpawnSource {
 
         val room = (Decor.Room(
             Rect(x0+x+2, y0+y+2, x0+x+width-3, y0+y+height-3),
-            listOf(doorClearCell)
+            listOf(doorClearCell),
+            XY(x0 + doorx, y0 + doory)
         ))
         // Draw yard/wall/floor terrain, with door and windows
         var windowBlockerCount = Dice.range(3, 10)

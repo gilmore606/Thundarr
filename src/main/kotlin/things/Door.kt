@@ -8,20 +8,27 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
+import util.UUID
 import util.XY
 
 @Serializable
 sealed class Door : Thing(), Smashable {
 
     var isOpen = false
+    var lockID: String? = null
+
+    fun lockTo(actor: Actor) {
+        if (lockID == null) lockID = UUID()
+        lockID?.also { actor.keyIDs.add(it) }
+    }
 
     open fun openGlyph() = Glyph.DOOR_OPEN
     open fun closedGlyph() = Glyph.DOOR_CLOSED
 
-    open fun isOpenable() = true
+    open fun isOpenableBy(actor: Actor) = (lockID == null) || (lockID in actor.keyIDs)
 
     override fun isPortable() = false
-    override fun isBlocking(actor: Actor) = (!isOpen && !actor.canOpenDoors())
+    override fun isBlocking(actor: Actor) = (!isOpen && (!actor.canOpenDoors() || (lockID != null && !actor.keyIDs.contains(lockID))))
     override fun isOpaque() = !isOpen
     override fun announceOnWalk() = false
     override fun glyph() = if (isOpen) openGlyph() else closedGlyph()
@@ -33,7 +40,9 @@ sealed class Door : Thing(), Smashable {
         UseTag.OPEN to Use("open " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
             toDo = { actor,level,x,y ->
-                if (false) Console.sayAct("It's locked.", "", actor) else doOpen()
+                if (lockID != null && !actor.keyIDs.contains(lockID))
+                    Console.sayAct("It's locked.", "", actor)
+                else doOpen()
             }),
         UseTag.CLOSE to Use("close " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && isOpen && !isObstructed() },
@@ -41,16 +50,10 @@ sealed class Door : Thing(), Smashable {
         UseTag.USE to Use("knock on " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
             toDo = { actor,level,x,y -> doKnock(actor) }),
-//        UseTag.SWITCH_ON to Use("lock " + name(), 1.0f,
-//            canDo = { actor,x,y,targ -> isLockable() && isNextTo(actor) && !isOpen && !isLocked },
-//            toDo = { actor,level,x,y ->   }),
-//        UseTag.SWITCH_OFF to Use("unlock " + name(), 1.0f,
-//            canDo = { actor,x,y,targ -> isLockable() && isNextTo(actor) && !isOpen && isLocked },
-//            toDo = { actor,level,x,y ->   }),
     )
 
     override fun convertMoveAction(actor: Actor): Action? {
-        if (!isOpen && isOpenable() && actor.canOpenDoors()) {
+        if (!isOpen && isOpenableBy(actor) && actor.canOpenDoors()) {
             return Use(UseTag.OPEN, this)
         }
         return null

@@ -19,6 +19,7 @@ sealed class Decor {
     data class Room(
         val rect: Rect,
         val forbiddenCells: List<XY> = listOf(),
+        val doorXY: XY? = null
     ) {
         val width = rect.x1 - rect.x0 + 1
         val height = rect.y1 - rect.y0 + 1
@@ -92,6 +93,7 @@ sealed class Decor {
         "Seems like work is never done.",
         "I try to stay busy.",
     )
+    open fun needsOwner() = false
 
     abstract fun doFurnish()
 

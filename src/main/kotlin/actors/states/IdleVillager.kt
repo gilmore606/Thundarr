@@ -80,9 +80,9 @@ class IdleVillager(
             } else if (App.gameTime.isAfter(workHour, scheduleMinute)) {
                 if (npc.targetArea == npc.homeArea) {
                     npc.village?.also { village ->
-                        val newArea = village.workAreas.random()
-                        npc.say("Time to go to the ${newArea.name}.")
-                        npc.setTarget(newArea)
+                        val jobArea = npc.jobArea ?: village.workAreas.random()
+                        npc.say("Time to go to the ${jobArea.name}.")
+                        npc.setTarget(jobArea)
                     }
                 }
             }

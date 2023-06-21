@@ -43,6 +43,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var juice = 0f // How many turns am I owed?
     val contents = mutableListOf<Thing>()
     val lastSeenLocation = XY(-9999,-9999)
+    val keyIDs = mutableSetOf<String>()
 
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
     val statuses = mutableListOf<Status>()
