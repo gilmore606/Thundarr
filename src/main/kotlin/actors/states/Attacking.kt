@@ -6,11 +6,26 @@ import actors.actions.Attack
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
+import world.path.Pather
 
 @Serializable
 class Attacking(
     val targetId: String
 ) : State() {
+
+    override fun toString() = "Attacking (target $targetId)"
+
+    override fun enter(npc: NPC) {
+        App.level.director.getActor(targetId)?.also { target ->
+            Pather.subscribe(npc, target, npc.visualRange())
+        }
+    }
+
+    override fun leave(npc: NPC) {
+        App.level.director.getActor(targetId)?.also { target ->
+            Pather.unsubscribe(npc, target)
+        }
+    }
 
     override fun considerState(npc: NPC) {
         npc.apply {

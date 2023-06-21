@@ -56,10 +56,7 @@ class Villager(
             Pather.unsubscribeAll(this)
         }
         if (!targetArea.contains(xy)) {
-            log.info("$this changing target to ${targetArea}")
             Pather.subscribe(this, targetArea.rect, 48f)
-        } else {
-            log.info("$this targeting ${targetArea} but already there")
         }
     }
 
