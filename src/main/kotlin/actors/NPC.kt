@@ -53,8 +53,8 @@ sealed class NPC : Actor() {
         }
     }
 
-    @Transient val unhibernateRadius = 45f
-    @Transient val hibernateRadius = 60f
+    @Transient val unhibernateRadius = 65f
+    @Transient val hibernateRadius = 90f
 
     var state: State = Hibernated()
     val stateStack = Stack<State>()
@@ -95,8 +95,7 @@ sealed class NPC : Actor() {
     open fun becomeHostileMsg(): String = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!").random()
 
     open fun idleState(): Idle = IdleDoNothing()
-    open fun hostileResponseState(targetId: String) = Attacking(targetId)   // State change on hostile sighted
-    open fun hostileLossState(targetId: String) = idleState()  // Seek after losing hostile target?
+    open fun hostileResponseState(enemy: Actor): State? = Attacking(enemy.id)   // State change on hostile sighted
 
     final override fun hasActionJuice() = juice > 0f
     final override fun wantsToAct() = state.wantsToAct()

@@ -108,6 +108,12 @@ object Pather {
         }
     }
 
+    fun unsubscribe(walker: Actor, target: Rect) {
+        maps.firstOrNull { it is AreaStepMap && it.target == target && it.walkerID == walker.id }?.also {
+            it.expired = true
+        }
+    }
+
     fun unsubscribeAll(subscriber: Actor) {
         jobs.add(coroutineScope.launch {
             maps.forEach { if (it.walkerID == subscriber.id) it.expired = true }

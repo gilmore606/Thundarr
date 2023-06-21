@@ -1,15 +1,15 @@
 package actors
 
+import actors.states.Attacking
 import actors.states.IdlePatrol
 import actors.states.IdleWander
+import actors.states.State
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import util.Dice
-import util.LightColor
-import util.Rect
+import util.*
 import world.Chunk
 
 @Serializable
@@ -17,6 +17,10 @@ class VillageGuard(
     val bounds: Rect,
     val villageName: String,
 ) : Citizen() {
+
+    val maxChaseRange = 60
+    val boundsCenter = XY(bounds.x0 + (bounds.x1 - bounds.x0) / 2, bounds.y0 + (bounds.y1 - bounds.y0) / 2)
+
     override fun toString() = name() + "(" + id + ")"
     override fun name() = "guard"
     override fun glyph() = Glyph.SHIELD_GUARD
@@ -52,6 +56,13 @@ class VillageGuard(
     override fun light(): LightColor? {
         if (App.gameTime.isAfter(lightStartHour, lightMinute) ||
             App.gameTime.isBefore(lightEndHour, lightMinute)) return lantern
+        return null
+    }
+
+    override fun hostileResponseState(enemy: Actor): State? {
+        if (distanceBetween(enemy.xy, boundsCenter) < maxChaseRange) {
+            return Attacking(enemy.id, boundsCenter, maxChaseRange)
+        }
         return null
     }
 

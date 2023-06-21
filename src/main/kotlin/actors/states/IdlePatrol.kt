@@ -1,6 +1,7 @@
 package actors.states
 
 import actors.NPC
+import actors.VillageGuard
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
@@ -44,5 +45,13 @@ class IdlePatrol(
         }}
 
         return Wait(1f)
+    }
+
+    override fun considerState(npc: NPC) {
+        if (!bounds.contains(npc.xy)) {
+            npc.pushState(ReturnToArea(bounds))
+            return
+        }
+        super.considerState(npc)
     }
 }

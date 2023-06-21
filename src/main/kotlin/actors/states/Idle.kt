@@ -1,6 +1,7 @@
 package actors.states
 
 import App
+import actors.Actor
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Move
@@ -39,8 +40,10 @@ sealed class Idle : State() {
             npc.metPlayer = true
         }
 
-        if (npc.isHostileTo(App.player) && canSeePlayer) {
-            npc.changeState(npc.hostileResponseState(App.player.id))
+        npc.entitiesSeen { it is Actor && it.id in npc.enemies }.keys.toList().firstOrNull()?.also { enemy ->
+            npc.hostileResponseState(enemy as Actor)?.also { hostileState ->
+                npc.pushState(hostileState)
+            }
         }
     }
 

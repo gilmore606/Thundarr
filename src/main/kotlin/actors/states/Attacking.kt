@@ -33,19 +33,13 @@ class Attacking(
     override fun considerState(npc: NPC) {
         npc.apply {
             if (!canSee(getActor(targetID))) {
-                giveUp(npc)
+                popState()
             }
             origin?.also { origin ->
                 if (distanceBetween(origin, npc.xy) > maxChaseRange) {
-                    giveUp(npc)
+                    popState()
                 }
             }
-        }
-    }
-
-    private fun giveUp(npc: NPC) {
-        npc.apply {
-            changeState(hostileLossState(targetID))
         }
     }
 
