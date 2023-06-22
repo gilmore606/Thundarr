@@ -3,6 +3,7 @@ package actors.states
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Attack
+import actors.actions.Say
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
@@ -14,6 +15,7 @@ class Attacking(
     val targetID: String,
     val origin: XY? = null,
     val maxChaseRange: Int = 0,
+    val giveUpText: String? = null,
 ) : State() {
 
     override fun toString() = "Attacking (target $targetID)"
@@ -37,6 +39,7 @@ class Attacking(
             }
             origin?.also { origin ->
                 if (distanceBetween(origin, npc.xy) > maxChaseRange) {
+                    giveUpText?.also { npc.queue(Say(it)) }
                     popState()
                 }
             }

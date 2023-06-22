@@ -26,36 +26,57 @@ class Village(
     val name: String,
     val isAbandoned: Boolean = false,
     val size: Int,
+    val flavor: Flavor = Flavor.HUMAN
 ) : Stronghold() {
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun name() = name
     override fun preventBiomeAnimalSpawns() = !isAbandoned
 
+    @Serializable
+    enum class Flavor(
+        val displayName: String,
+        @Transient val neighborFeatures: List<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->Feature>> = listOf(
+            Triple(0.6f, { meta, village -> Farm.canBuildOn(meta) }, { isAbandoned, dir -> Farm(isAbandoned) }),
+            Triple(0.3f, { meta, village -> Graveyard.canBuildOn(meta) }, { isAbandoned, dir -> Graveyard(isAbandoned) }),
+            Triple(0.3f, { meta, village -> village.size > 8 && !village.isAbandoned && Tavern.canBuildOn(meta) },
+                { isAbandoned, dir -> Tavern(Madlib.tavernName(), dir) }),
+        ),
+        @Transient val shopDecors: MutableList<Decor> = mutableListOf(
+            BlacksmithShop(),
+            Schoolhouse(),
+            Church(),
+            StorageShed(),
+        ),
+        val homeComments: Set<String> = setOf(
+            "Ah, home and hearth.",
+            "It's good to be home.",
+            "It's not much, but it's my safe place.",
+            "A villager's home is a castle.",
+            "Home is where the heart is."
+        ),
+    ) {
+
+        HUMAN("human"),
+
+        THRALL("thrall",
+            neighborFeatures = listOf(
+                Triple(0.6f, { meta, village -> Farm.canBuildOn(meta) }, { isAbandoned, dir -> Farm(isAbandoned) }),
+                Triple(0.3f, { meta, village -> Graveyard.canBuildOn(meta) }, { isAbandoned, dir -> Graveyard(isAbandoned) }),
+            ),
+            homeComments = setOf(
+                "We just want to be left alone.",
+                "This miserable hovel is all the wizard allows us.",
+                "It's humble but it's all we have.",
+                "At least I can rest from wizard's labours, for a little while."
+            )
+        ),
+    }
+
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)
                 && !meta.hasFeature(Lake::class) && !meta.hasFeature(Rivers::class) && !meta.hasFeature(Coastlines::class)
                 && !meta.hasFeature(Highways::class) && meta.biome !in listOf(Ocean, Glacier)
-
-        val neighborFeatures = listOf<Triple<Float, (ChunkScratch, Village)->Boolean, (Boolean, XY)->Feature>>(
-
-            Triple(0.6f, { meta, village ->
-                Farm.canBuildOn(meta)
-                         }, { isAbandoned, dir ->
-                Farm(isAbandoned)
-            }),
-            Triple(0.3f, { meta, village ->
-                Graveyard.canBuildOn(meta)
-                         }, { isAbandoned, dir ->
-                Graveyard(isAbandoned)
-            }),
-            Triple(0.3f, { meta, village ->
-                village.size > 8 && !village.isAbandoned && Tavern.canBuildOn(meta)
-                         }, { isAbandoned, dir ->
-                Tavern(Madlib.tavernName(), dir)
-            }),
-
-        )
     }
 
     private val fertility = Dice.float(0.3f, 1f) * if (isAbandoned) 0.3f else 1f
@@ -68,16 +89,9 @@ class Village(
 
     val workAreas = mutableSetOf<Villager.WorkArea>()
 
-    @Transient private val shopDecors = mutableListOf<Decor>(
-        BlacksmithShop(),
-        Schoolhouse(),
-        Church(),
-        StorageShed(),
-    )
-
     @Transient val guards = mutableListOf<VillageGuard>()  // only used during gen
 
-    val factionID = App.factions.addFaction(VillageFaction(name))
+    val factionID = App.factions.addFaction(VillageFaction(name, flavor))
 
     override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
@@ -152,7 +166,7 @@ class Village(
         swapTerrain(Terrain.Type.TEMP2, meta.biome.bareTerrain(x0,y0))
 
         val idealHouseCount = max(huts.size / 2 + 1, min(3, huts.size))
-        val shopCount = min(shopDecors.size, huts.size - idealHouseCount)
+        val shopCount = min(flavor.shopDecors.size, huts.size - idealHouseCount)
 
         // Spawn guards
         if (!isAbandoned) {
@@ -160,14 +174,22 @@ class Village(
         }
 
         // Build shops
+        val ownerWorkAreas = mutableListOf<Villager.WorkArea>()
+        val shopDecors = mutableListOf<Decor>().apply { addAll(flavor.shopDecors) }
         repeat (shopCount) {
             val hut = hutRooms.removeFirst()
             val decor = shopDecors.random()
             shopDecors.remove(decor)
             decor.furnish(hut, carto, isAbandoned)
-            workAreas.add(Villager.WorkArea(
-                    decor.workAreaName(), hut.rect, decor.workAreaComments(), decor.needsOwner()
-                ))
+            val signXY = if (!decor.needsOwner()) { null } else {
+                (hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated())
+            }
+            val workArea = Villager.WorkArea(
+                    decor.workAreaName(), hut.rect, decor.workAreaComments(),
+                    decor.needsOwner(), signXY, decor.workAreaSignText(), decor.announceJobMsg()
+                )
+            workAreas.add(workArea)
+            if (decor.needsOwner()) ownerWorkAreas.add(workArea)
         }
 
         // Build houses
@@ -177,17 +199,21 @@ class Village(
             hutDecor.furnish(hut, carto, isAbandoned)
             if (!isAbandoned) {
                 val newHomeArea = Villager.WorkArea(
-                    "home", hut.rect, setOf(
-                        "Ah, home and hearth.",
-                        "It's good to be home.",
-                        "It's not much, but it's my safe place.",
-                        "A villager's home is a castle.",
-                        "Home is where the heart is."
-                    ))
+                    "home", hut.rect, flavor.homeComments)
                 hutDecor.bedLocations.forEach { bedLocation ->
-                    val citizen = Villager(bedLocation).apply {
+                    var newJobArea: Villager.WorkArea? = null
+                    if (ownerWorkAreas.isNotEmpty()) {
+                        newJobArea = ownerWorkAreas.removeFirst()
+                    }
+                    val citizen = Villager(bedLocation, flavor).apply {
                         joinFaction(factionID)
                         homeArea = newHomeArea
+                        fulltimeJobArea = newJobArea
+                        if (newJobArea != null) {
+                            val signText = newJobArea.signText!!.replace("%n", this.name())
+                            val sign = if (Dice.flip()) HighwaySign(signText) else TrailSign(signText)
+                            spawnThing(newJobArea.signXY!!.x, newJobArea.signXY!!.y, sign)
+                        }
                     }
                     addCitizen(citizen)
                     findSpawnPointForNPC(chunk, citizen, hut.rect)?.also { spawnPoint ->
@@ -202,9 +228,7 @@ class Village(
 
     private fun lockDoor(xy: XY?, owner: Actor) {
         xy?.also { xy ->
-            log.info("trying for door at $xy")
             chunk.thingsAt(xy.x, xy.y).firstOrNull { it is Door }?.also { door ->
-                log.info("locking door at $xy to $owner")
                 (door as Door).lockTo(owner)
                 guards.forEach { door.lockTo(it) }
             }
@@ -215,7 +239,7 @@ class Village(
         val numGuards = 1.coerceAtLeast((size / 4))
         val bounds = Rect(x0 + 4, y0 + 4, x1 - 4, y1 - 4)
         repeat (numGuards) {
-            val guard = VillageGuard(bounds, name).apply {
+            val guard = VillageGuard(bounds, name, flavor).apply {
                 joinFaction(factionID)
             }
             addCitizen(guard)
@@ -381,7 +405,7 @@ class Village(
 
     override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE
     override fun mapPOITitle() = name
-    override fun mapPOIDescription() = "The free human village of $name."
+    override fun mapPOIDescription() = "The ${flavor.displayName} village of $name."
 
     override fun onRestore(level: Level) {
         citizens.forEach { citizenID ->

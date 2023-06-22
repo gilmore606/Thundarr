@@ -784,7 +784,7 @@ object Metamap {
                                 scratches[x][y].removeFeature(RuinedBuildings::class)
                                 val placedDirs = mutableSetOf<XY>()
                                 // Place features around village
-                                Village.neighborFeatures.forEach { neighborData ->
+                                village.flavor.neighborFeatures.forEach { neighborData ->
                                     var placedFeature = false
                                     DIRECTIONS.from(x, y) { dx, dy, dir ->
                                         if (!placedFeature && dir !in placedDirs && boundsCheck(dx, dy) && Dice.chance(neighborData.first)

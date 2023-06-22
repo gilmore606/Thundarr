@@ -19,7 +19,8 @@ sealed class Decor {
     data class Room(
         val rect: Rect,
         val forbiddenCells: List<XY> = listOf(),
-        val doorXY: XY? = null
+        val doorXY: XY? = null,
+        val doorDir: XY? = null,
     ) {
         val width = rect.x1 - rect.x0 + 1
         val height = rect.y1 - rect.y0 + 1
@@ -60,8 +61,7 @@ sealed class Decor {
         }
     }
 
-    @Transient
-    lateinit var carto: Carto
+    @Transient lateinit var carto: Carto
     lateinit var room: Room
     var isAbandoned: Boolean = false
     protected val x0: Int get() = room.rect.x0
@@ -94,6 +94,8 @@ sealed class Decor {
         "I try to stay busy.",
     )
     open fun needsOwner() = false
+    open fun workAreaSignText() = listOf("%n's Shop", "Goods By %n").random()
+    open fun announceJobMsg() = "Time to go to work."
 
     abstract fun doFurnish()
 

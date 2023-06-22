@@ -2,7 +2,6 @@ package actors
 
 import actors.states.Attacking
 import actors.states.IdlePatrol
-import actors.states.IdleWander
 import actors.states.State
 import actors.stats.Brains
 import actors.stats.Speed
@@ -11,11 +10,13 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.*
 import world.Chunk
+import world.gen.features.Village
 
 @Serializable
 class VillageGuard(
     val bounds: Rect,
     val villageName: String,
+    val flavor: Village.Flavor,
 ) : Citizen() {
 
     val maxChaseRange = 60
@@ -48,10 +49,10 @@ class VillageGuard(
         "$villageName is a peaceful town."
     ).random()
 
-    private val lantern = LightColor(0.5f, 0.4f, 0.0f)
+    private val lantern = LightColor(0.4f, 0.2f, 0.0f)
     private val lightStartHour = 20
     private val lightEndHour = 6
-    private val lightMinute = Dice.zeroTil(59)
+    private val lightMinute = Dice.zeroTil(58)
 
     override fun light(): LightColor? {
         if (App.gameTime.isAfter(lightStartHour, lightMinute) ||
@@ -61,7 +62,12 @@ class VillageGuard(
 
     override fun hostileResponseState(enemy: Actor): State? {
         if (distanceBetween(enemy.xy, boundsCenter) < maxChaseRange) {
-            return Attacking(enemy.id, boundsCenter, maxChaseRange)
+            return Attacking(enemy.id, boundsCenter, maxChaseRange, listOf(
+                "And don't come back!",
+                "Stay out of $villageName!",
+                "Trouble us no more!",
+                "And stay out!",
+            ).random())
         }
         return null
     }

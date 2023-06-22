@@ -1,16 +1,19 @@
 package actors
 
+import actors.actions.Say
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.*
 import world.Entity
+import world.gen.features.Village
 import world.level.Level
 import world.path.Pather
 
 @Serializable
 class Villager(
     val bedLocation: XY,
+    val flavor: Village.Flavor,
 ) : Citizen() {
 
     companion object {
@@ -22,7 +25,10 @@ class Villager(
         val name: String,
         val rect: Rect,
         val comments: Set<String>,
-        val needsOwner: Boolean = false
+        val needsOwner: Boolean = false,
+        val signXY: XY? = null,
+        val signText: String? = null,
+        val announceJobMsg: String? = null
     ) {
         override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
@@ -41,10 +47,12 @@ class Villager(
     }
 
     var homeArea = defaultArea
-    var jobArea: WorkArea? = null
+    var fulltimeJobArea: WorkArea? = null
 
     var targetArea = defaultArea
     var previousTargetArea = defaultArea
+    var nextJobChangeHour: Int = 0
+    var nextJobChangeMin: Int = 0
 
     override fun toString() = name()
 
@@ -58,6 +66,17 @@ class Villager(
         if (!targetArea.contains(xy)) {
             Pather.subscribe(this, targetArea.rect, 48)
         }
+    }
+
+    fun pickJob() {
+        if (targetArea == fulltimeJobArea) return
+        village?.also { village ->
+            val jobArea = fulltimeJobArea ?: village.workAreas.random()
+            jobArea.announceJobMsg?.also { msg -> queue(Say(msg)) }
+            setTarget(jobArea)
+            nextJobChangeHour = App.gameTime.hour + Dice.range(2, 4)
+            nextJobChangeMin = Dice.oneTo(58)
+        } ?: run { fulltimeJobArea?.also { setTarget(it) } }
     }
 
     private val customGender = if (Dice.flip()) Entity.Gender.MALE else Entity.Gender.FEMALE

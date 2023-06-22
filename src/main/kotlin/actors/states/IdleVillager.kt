@@ -12,8 +12,6 @@ import things.Thing
 import util.Dice
 import util.Rect
 import util.XY
-import util.log
-import world.path.Pather
 
 @Serializable
 class IdleVillager(
@@ -79,11 +77,9 @@ class IdleVillager(
                 }
             } else if (App.gameTime.isAfter(workHour, scheduleMinute)) {
                 if (npc.targetArea == npc.homeArea) {
-                    npc.village?.also { village ->
-                        val jobArea = npc.jobArea ?: village.workAreas.random()
-                        npc.say("Time to go to the ${jobArea.name}.")
-                        npc.setTarget(jobArea)
-                    }
+                    npc.pickJob()
+                } else if (App.gameTime.isAfter(npc.nextJobChangeHour, npc.nextJobChangeMin)) {
+                    npc.pickJob()
                 }
             }
 

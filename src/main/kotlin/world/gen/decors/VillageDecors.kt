@@ -37,6 +37,7 @@ class Hut : Decor() {
             )}}
         }
     }
+    override fun announceJobMsg() = listOf("I'm going home.", "Time to go home.").random()
 }
 
 @Serializable
@@ -61,6 +62,7 @@ class Schoolhouse : Decor() {
         add("There's much to learn from the books of the ancients.")
         add("Education is the only way to prosperity.")
     }
+    override fun announceJobMsg() = listOf("Oh, I'm late for class.", "Time for class.", "I'm off to school.").random()
 }
 
 @Serializable
@@ -80,6 +82,7 @@ class Church : Decor() {
         "I pray every day.  But do they hear?",
         "Sometimes my faith is tested by this cruel world.",
     )
+    override fun announceJobMsg() = listOf("I need to pray.", "The Lords of Light call to me.", "Prayer time.").random()
 }
 
 @Serializable
@@ -96,6 +99,8 @@ class StorageShed : Decor() {
         }
     }
     override fun workAreaName() = "storage shed"
+    override fun announceJobMsg() = listOf("Time for some warehouse work.", "I'm going to the storage shed.", "I'll get it from storage.",
+        "They need me in the warehouse today.", "I'll go help out at the warehouse.").random()
 }
 
 @Serializable
@@ -114,6 +119,15 @@ class BlacksmithShop : Decor() {
     }
     override fun workAreaName() = "smithy"
     override fun needsOwner() = true
+    override fun workAreaSignText() = listOf(
+        "%n's Ironmongery",
+        "%n's Smithy",
+        "Ironworks by %n",
+        "%n Ironworks",
+        "%n's Metal Shop",
+        "%n's Forge",
+    ).random()
+    override fun announceJobMsg() = listOf("They need me at the smithy today.", "I'll go help at the smithy.", "I'm heading for the smithy.").random()
 }
 
 @Serializable
@@ -147,6 +161,8 @@ class Garden(
         add("May the Lords of Light make this garden grow!")
         add("We work so we can eat.  Simple as that.")
     }
+    override fun announceJobMsg() = listOf("Need to get those seeds planted.", "Better go help in the garden.", "I'm going to do some work outdoors.",
+        "Heading out to the fields, back later!").random()
 }
 
 @Serializable
@@ -194,6 +210,7 @@ class Stage : Decor() {
         "Fear the wizard, and his evil works!",
         "My friends, keep faith with the Lords of Light!"
     )
+    override fun announceJobMsg() = listOf("I need a break.", "I'm going outside for a while.", "I wonder what's going on at the square.").random()
 }
 
 @Serializable
