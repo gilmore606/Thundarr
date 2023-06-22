@@ -511,6 +511,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return null
     }
 
+    fun stepAwayFrom(target: Actor): Move? {
+        Pather.nextStepAwayFrom(this, target)?.also { return Move(it) }
+        return null
+    }
+
     fun stepToward(xy: XY): Move? {
         Pather.nextStep(this, xy)?.also { return Move(it) }
         return null

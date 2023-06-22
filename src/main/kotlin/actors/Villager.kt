@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.Say
+import actors.states.Fleeing
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -101,6 +102,7 @@ class Villager(
         Dice.range(4, 5),
         Dice.range(6, 8),
     )
+    override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
 
     override fun meetPlayerMsg() = "Welcome to ${village?.name ?: "our town"}."
 

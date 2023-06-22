@@ -36,6 +36,7 @@ class Attacking(
         npc.apply {
             if (!canSee(getActor(targetID))) {
                 popState()
+                return
             }
             origin?.also { origin ->
                 if (distanceBetween(origin, npc.xy) > maxChaseRange) {

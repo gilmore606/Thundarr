@@ -34,4 +34,10 @@ class ActorStepMap : StepMap() {
         return null
     }
 
+    override fun nextStepAwayFrom(from: Actor, to: Actor): XY? {
+        if (from.id == walkerID && to.id == targetID) {
+            return getNextStepAway(from.xy.x, from.xy.y)
+        }
+        return null
+    }
 }

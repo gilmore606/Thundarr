@@ -54,6 +54,7 @@ object Pather {
     fun nextStep(from: Actor, to: XY): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
     fun nextStep(from: Actor, to: Rect): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
     fun nextStep(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
+    fun nextStepAwayFrom(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStepAwayFrom(from, to) }
 
     fun buildPath(from: XY, to: Entity) = maps.firstOrNull { false }.let { map ->
         mutableListOf<XY>().apply {

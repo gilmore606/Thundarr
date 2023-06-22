@@ -59,6 +59,7 @@ abstract class StepMap {
     open fun nextStep(from: Actor, to: XY): XY? = null
     open fun nextStep(from: Actor, to: Rect): XY? = null
     open fun nextStep(from: Actor, to: Actor): XY? = null
+    open fun nextStepAwayFrom(from: Actor, to: Actor): XY? = null
 
     protected fun getNextStep(fromX: Int, fromY: Int): XY? {
         val lx = fromX - offsetX
@@ -66,7 +67,25 @@ abstract class StepMap {
         if (lx in 0 until width && ly in 0 until height) {
             val nextstep = map[lx][ly] - 1
             if (nextstep < 0) return null
-            var steps = mutableSetOf<XY>()
+            val steps = mutableSetOf<XY>()
+            DIRECTIONS.from(lx, ly) { tx, ty, dir ->
+                if (tx in 0 until width && ty in 0 until height) {
+                    if (map[tx][ty] == nextstep) {
+                        steps.add(dir)
+                    }
+                }
+            }
+            if (steps.isNotEmpty()) return steps.random()
+        }
+        return null
+    }
+
+    protected fun getNextStepAway(fromX: Int, fromY: Int): XY? {
+        val lx = fromX - offsetX
+        val ly = fromY - offsetY
+        if (lx in 0 until width && ly in 0 until height) {
+            val nextstep = map[lx][ly] + 1
+            val steps = mutableSetOf<XY>()
             DIRECTIONS.from(lx, ly) { tx, ty, dir ->
                 if (tx in 0 until width && ty in 0 until height) {
                     if (map[tx][ty] == nextstep) {
