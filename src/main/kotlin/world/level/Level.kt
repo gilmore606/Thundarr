@@ -247,7 +247,8 @@ sealed class Level {
     }
 
     fun advanceTime(delta: Float) = director.advanceTime(delta)
-    fun linkTemporal(temporal: Temporal) = director.linkTemporal(temporal)
+
+    fun linkTemporal(temporal: Temporal) = KtxAsync.launch { director.linkTemporal(temporal) }
     fun unlinkTemporal(temporal: Temporal) = KtxAsync.launch { director.unlinkTemporal(temporal) }
 
     abstract fun isReady(): Boolean
