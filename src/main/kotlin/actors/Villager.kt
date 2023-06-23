@@ -15,6 +15,7 @@ import world.path.Pather
 class Villager(
     val bedLocation: XY,
     val flavor: Village.Flavor,
+    val isChild: Boolean = false,
 ) : Citizen() {
 
     companion object {
@@ -29,7 +30,8 @@ class Villager(
         val needsOwner: Boolean = false,
         val signXY: XY? = null,
         val signText: String? = null,
-        val announceJobMsg: String? = null
+        val announceJobMsg: String? = null,
+        val childOK: Boolean = true,
     ) {
         override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
@@ -72,7 +74,7 @@ class Villager(
     fun pickJob() {
         if (targetArea == fulltimeJobArea) return
         village?.also { village ->
-            val jobArea = fulltimeJobArea ?: village.workAreas.random()
+            val jobArea = fulltimeJobArea ?: village.workAreas.filter { !isChild || it.childOK }.randomOrNull() ?: homeArea
             jobArea.announceJobMsg?.also { msg -> queue(Say(msg)) }
             setTarget(jobArea)
             nextJobChangeHour = App.gameTime.hour + Dice.range(2, 4)
@@ -81,8 +83,11 @@ class Villager(
     }
 
     private val customGender = if (Dice.flip()) Entity.Gender.MALE else Entity.Gender.FEMALE
-    private val customName = Madlib.villagerName(customGender)
-    private val customGlyph = when (Dice.zeroTo(3)) {
+    private val customName = Madlib.villagerName(customGender) + if (isChild) {
+        if (customGender == Entity.Gender.MALE) "ie" else "ki"
+    } else ""
+
+    private val customGlyph = if (isChild) Glyph.PEASANT_CHILD else when (Dice.zeroTo(3)) {
         0 -> Glyph.PEASANT_1
         1 -> Glyph.PEASANT_2
         2 -> Glyph.PEASANT_3
@@ -93,7 +98,11 @@ class Villager(
     override fun name() = customName
     override fun hasProperName() = true
     override fun glyph() = customGlyph
-    override fun description() = "A peasant villager in shabby handmade clothes, with weathered skin and a bleak expression."
+    override fun description() = if (isChild) {
+        "Like a villager, but small and mischevious.  Its face is smeared with mud."
+    } else {
+        "A peasant villager in shabby handmade clothes, with weathered skin and a bleak expression."
+    }
     override fun isHuman() = true
 
     override fun idleState() = IdleVillager(
@@ -104,6 +113,10 @@ class Villager(
     )
     override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
 
-    override fun meetPlayerMsg() = "Welcome to ${village?.name ?: "our town"}."
+    override fun meetPlayerMsg() = if (isChild) {
+        "Hello!"
+    } else {
+        "Welcome to ${village?.name ?: "our town"}."
+    }
 
 }

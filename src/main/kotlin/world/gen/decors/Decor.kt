@@ -96,6 +96,7 @@ sealed class Decor {
     open fun needsOwner() = false
     open fun workAreaSignText() = listOf("%n's Shop", "Goods By %n").random()
     open fun announceJobMsg() = "Time to go to work."
+    open fun workAreaChildOK() = false
 
     abstract fun doFurnish()
 

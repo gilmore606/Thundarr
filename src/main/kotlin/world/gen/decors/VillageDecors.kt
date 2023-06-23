@@ -63,6 +63,7 @@ class Schoolhouse : Decor() {
         add("Education is the only way to prosperity.")
     }
     override fun announceJobMsg() = listOf("Oh, I'm late for class.", "Time for class.", "I'm off to school.").random()
+    override fun workAreaChildOK() = true
 }
 
 @Serializable
@@ -83,6 +84,7 @@ class Church : Decor() {
         "Sometimes my faith is tested by this cruel world.",
     )
     override fun announceJobMsg() = listOf("I need to pray.", "The Lords of Light call to me.", "Prayer time.").random()
+    override fun workAreaChildOK() = true
 }
 
 @Serializable
@@ -163,6 +165,7 @@ class Garden(
     }
     override fun announceJobMsg() = listOf("Need to get those seeds planted.", "Better go help in the garden.", "I'm going to do some work outdoors.",
         "Heading out to the fields, back later!").random()
+    override fun workAreaChildOK() = true
 }
 
 @Serializable
@@ -211,6 +214,7 @@ class Stage : Decor() {
         "My friends, keep faith with the Lords of Light!"
     )
     override fun announceJobMsg() = listOf("I need a break.", "I'm going outside for a while.", "I wonder what's going on at the square.").random()
+    override fun workAreaChildOK() = true
 }
 
 @Serializable
@@ -221,6 +225,7 @@ class Barn : Decor() {
         againstWall { spawn(Candlestick())}
     }
     override fun workAreaName() = "barn"
+    override fun workAreaChildOK() = true
 }
 
 @Serializable

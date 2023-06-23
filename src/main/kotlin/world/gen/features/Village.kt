@@ -55,6 +55,7 @@ class Village(
             "A villager's home is a castle.",
             "Home is where the heart is."
         ),
+        val childChance: Float = 0.3f
     ) {
 
         HUMAN("human"),
@@ -186,7 +187,8 @@ class Village(
             }
             val workArea = Villager.WorkArea(
                     decor.workAreaName(), hut.rect, decor.workAreaComments(),
-                    decor.needsOwner(), signXY, decor.workAreaSignText(), decor.announceJobMsg()
+                    decor.needsOwner(), signXY, decor.workAreaSignText(),
+                    decor.announceJobMsg(), decor.workAreaChildOK()
                 )
             workAreas.add(workArea)
             if (decor.needsOwner()) ownerWorkAreas.add(workArea)
@@ -200,12 +202,16 @@ class Village(
             if (!isAbandoned) {
                 val newHomeArea = Villager.WorkArea(
                     "home", hut.rect, flavor.homeComments)
+                var isHeadOfHousehold = true
                 hutDecor.bedLocations.forEach { bedLocation ->
                     var newJobArea: Villager.WorkArea? = null
+                    var isChild = false
                     if (ownerWorkAreas.isNotEmpty()) {
                         newJobArea = ownerWorkAreas.removeFirst()
+                    } else {
+                        isChild = !isHeadOfHousehold && Dice.chance(flavor.childChance)
                     }
-                    val citizen = Villager(bedLocation, flavor).apply {
+                    val citizen = Villager(bedLocation, flavor, isChild).apply {
                         joinFaction(factionID)
                         homeArea = newHomeArea
                         fulltimeJobArea = newJobArea
@@ -220,6 +226,7 @@ class Village(
                         citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
                     } ?: run { log.info("Failed to spawn citizen in ${hut.rect}")}
                     lockDoor(hut.doorXY, citizen)
+                    isHeadOfHousehold = false
                 }
             }
         }

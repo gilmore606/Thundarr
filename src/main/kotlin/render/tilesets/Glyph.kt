@@ -81,6 +81,7 @@ enum class Glyph {
     PEASANT_2,
     PEASANT_3,
     PEASANT_4,
+    PEASANT_CHILD,
     MOK,
     HORSE,
     CATTLE,
