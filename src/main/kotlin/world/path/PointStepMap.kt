@@ -3,19 +3,14 @@ package world.path
 import actors.Actor
 import kotlinx.serialization.Serializable
 import util.XY
-import util.log
 
 @Serializable
-class PointStepMap : StepMap() {
-
-    lateinit var target: XY
-
-    fun init(walker: Actor, range: Int, target: XY) {
-        init(walker, range)
-        this.target = target
-    }
+data class PointStepMap(
+    val target: XY,
+) : StepMap() {
 
     override fun toString() = "PointStepMap(from $walker to $target)"
+    override fun getClone(): StepMap = this.copy()
 
     override fun printTarget() {
         writeTargetCell(target.x, target.y)

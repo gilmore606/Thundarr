@@ -3,13 +3,18 @@ package actors.states
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Say
+import actors.actions.Wait
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import util.XY
 import world.path.Pather
 
+// TODO: we lose targetAction on serialize!  find some way to serialize/abstract it
+
+@Serializable
 class GoDo(
     val targetXY: XY,
-    val targetAction: Action
+    @Transient val targetAction: Action? = null
     ) : State() {
 
     var failedSteps = 0
@@ -27,7 +32,7 @@ class GoDo(
     override fun pickAction(npc: NPC): Action {
         if (npc.xy() == targetXY) {
             npc.popState()
-            return targetAction
+            return targetAction ?: Wait(0.5f)
         } else if (failedSteps > 4) {
             npc.popState()
             return Say("Aww, forget it.")

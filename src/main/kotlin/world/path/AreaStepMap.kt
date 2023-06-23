@@ -2,22 +2,16 @@ package world.path
 
 import actors.Actor
 import kotlinx.serialization.Serializable
-import util.DIRECTIONS
 import util.Rect
 import util.XY
-import util.from
 
 @Serializable
-class AreaStepMap : StepMap() {
-
-    lateinit var target: Rect
-
-    fun init(walker: Actor, range: Int, target: Rect) {
-        init(walker, range)
-        this.target = target
-    }
+data class AreaStepMap(
+    val target: Rect,
+) : StepMap() {
 
     override fun toString() = "AreaStepMap(from $walker to $target)"
+    override fun getClone(): StepMap = this.copy()
 
     override fun printTarget() {
         for (ix in target.x0..target.x1) {

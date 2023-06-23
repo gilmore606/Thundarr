@@ -23,6 +23,7 @@ import world.Entity
 import world.level.Level
 import world.journal.JournalEntry
 import world.path.Pather
+import world.path.StepMap
 import world.stains.Blood
 import world.stains.Stain
 import world.terrains.Terrain
@@ -47,6 +48,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
     val statuses = mutableListOf<Status>()
+
+    var savedStepMaps: MutableList<StepMap> = mutableListOf()
 
     open fun initialFactions() = mutableSetOf<String>().apply {
         if (isHuman()) add(App.factions.humans)
@@ -131,6 +134,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             it.onRestore(this)
             if (it is Temporal) level?.linkTemporal(it)
         }
+        Pather.restoreActorMaps(this)
         isUnloading = false
     }
 

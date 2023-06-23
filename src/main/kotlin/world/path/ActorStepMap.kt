@@ -5,14 +5,11 @@ import kotlinx.serialization.Serializable
 import util.XY
 
 @Serializable
-class ActorStepMap : StepMap() {
-
-    lateinit var targetID: String
-
-    fun init(walker: Actor, range: Int, target: Actor) {
-        this.targetID = target.id
-        init(walker, range)
-    }
+data class ActorStepMap(
+    val targetID: String,
+) : StepMap() {
+    override fun toString() = "ActorStepMap(from $walker to $targetID)"
+    override fun getClone(): StepMap = prepareCopy(this.copy())
 
     override fun onActorMove(actor: Actor) {
         super.onActorMove(actor)

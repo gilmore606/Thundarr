@@ -4,10 +4,12 @@ import actors.NPC
 import actors.Villager
 import actors.actions.*
 import actors.statuses.Status
+import kotlinx.serialization.Serializable
 import things.Candlestick
 import things.Door
 import things.Thing
 
+@Serializable
 class Sleeping(
     val wakeHour: Int,
     val wakeMinute: Int,

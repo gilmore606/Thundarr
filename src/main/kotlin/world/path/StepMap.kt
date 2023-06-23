@@ -12,9 +12,8 @@ import world.Entity
 import world.level.Level
 
 @Serializable
-abstract class StepMap {
+sealed class StepMap {
 
-    @Transient var walker: Actor? = null
     var walkerID: String = ""
     var range: Int = 1
     var width = 2
@@ -22,13 +21,27 @@ abstract class StepMap {
     var offsetX = 0
     var offsetY = 0 // offset to level coords
 
-    var dirty = true  // Do we need an update?
-    var expired = false  // Can we be disposed of?
+    // We need this because the child data classes' copy method can't see the non-data sealed parent class
+    // Like most terrible things I've done, this is for serialization
+    protected fun prepareCopy(copy: StepMap) = copy.also {
+        it.walkerID = walkerID
+        it.range = range
+        it.width = width
+        it.height = height
+        it.offsetX = offsetX
+        it.offsetY = offsetY
+    }
 
-    var scratch = Array(width) { IntArray(height) { -1 } }
-    var map = Array(width) { IntArray(height) { -1 } }
+    @Transient var walker: Actor? = null
+    @Transient var dirty = true  // Do we need an update?
+    @Transient var expired = false  // Can we be disposed of?
 
-    open fun init(walker: Actor, range: Int) {
+    @Transient var scratch = Array(width) { IntArray(height) { -1 } }
+    @Transient var map = Array(width) { IntArray(height) { -1 } }
+
+    abstract fun getClone(): StepMap
+
+    open fun initialize(walker: Actor, range: Int) {
         this.walker = walker
         this.walkerID = walker.id
         this.range = range
@@ -42,6 +55,15 @@ abstract class StepMap {
     open fun dispose() {
         scratch = Array(1) { IntArray(1) { 0 } }
         map = Array(1) { IntArray(1) { 0 } }
+    }
+
+    open fun onRestore(forActor: Actor) {
+        this.walker = forActor
+        this.walkerID = forActor.id
+        this.dirty = true
+        this.expired = false
+        scratch = Array(width) { IntArray(height) { -1 } }
+        map = Array(width) { IntArray(height) { -1 } }
     }
 
     open fun onActorMove(actor: Actor) {

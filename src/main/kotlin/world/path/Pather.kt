@@ -72,8 +72,8 @@ object Pather {
 
     fun subscribe(walker: Actor, target: XY, range: Int) {
         if (!maps.hasOneWhere { it is PointStepMap && it.target == target && it.walkerID == walker.id }) {
-            val map = PointStepMap().apply {
-                init(walker, range, target)
+            val map = PointStepMap(target).apply {
+                initialize(walker, range)
             }
             maps.add(map)
         }
@@ -81,8 +81,8 @@ object Pather {
 
     fun subscribe(walker: Actor, target: Rect, range: Int) {
         if (!maps.hasOneWhere { it is AreaStepMap && it.target == target && it.walkerID == walker.id }) {
-            val map = AreaStepMap().apply {
-                init(walker, range, target)
+            val map = AreaStepMap(target).apply {
+                initialize(walker, range)
             }
             maps.add(map)
         }
@@ -90,8 +90,8 @@ object Pather {
 
     fun subscribe(walker: Actor, target: Actor, range: Int) {
         if (!maps.hasOneWhere { it is ActorStepMap && it.targetID == target.id && it.walkerID == walker.id }) {
-            val map = ActorStepMap().apply {
-                init(walker, range, target)
+            val map = ActorStepMap(target.id).apply {
+                initialize(walker, range)
             }
             maps.add(map)
         }
@@ -125,6 +125,32 @@ object Pather {
         while (level.director.actorsLocked) {
             log.info("...Pather waiting for actors lock...")
             delay(0L)
+        }
+    }
+
+    fun saveActorMaps(subscriber: Actor) {
+        subscriber.savedStepMaps.clear()
+        maps.safeForEach { map ->
+            if (map.walkerID == subscriber.id) {
+                subscriber.savedStepMaps.add(map.getClone())
+                KtxAsync.launch {
+                    map.expired = true
+                }
+            }
+        }
+    }
+
+    fun restoreActorMaps(subscriber: Actor) {
+        if (subscriber.savedStepMaps.isNotEmpty()) {
+            KtxAsync.launch {
+                subscriber.savedStepMaps.forEach { map ->
+                    if (!maps.hasOneWhere { it == map }) {
+                        map.onRestore(subscriber)
+                        maps.add(map)
+                    }
+                }
+                subscriber.savedStepMaps.clear()
+            }
         }
     }
 

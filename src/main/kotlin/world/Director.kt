@@ -4,14 +4,12 @@ import actors.Actor
 import actors.NPC
 import actors.Player
 import actors.states.Hibernated
-import actors.states.Idle
-import kotlinx.coroutines.delay
 import things.Temporal
 import util.XY
 import util.distanceBetween
 import util.filterOut
-import util.log
 import world.level.Level
+import world.path.Pather
 import world.persist.LevelKeeper
 
 // A delegate class for Level to manage actors in time and space.
@@ -61,6 +59,7 @@ class Director(val level: Level) {
             if (actor !is Player) {
                 detachActor(actor)
                 actor.isUnloading = true
+                Pather.saveActorMaps(actor)
                 unloadSet.add(actor)
             }
         }
