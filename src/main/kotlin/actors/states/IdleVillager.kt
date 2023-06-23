@@ -98,7 +98,7 @@ class IdleVillager(
         super.considerState(npc)
     }
 
-    override fun enter(npc: NPC) {
+    override fun onEnter(npc: NPC) {
         if (npc is Villager) {
             npc.setTarget(npc.targetArea)
         }

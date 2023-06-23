@@ -11,8 +11,21 @@ import render.tilesets.Glyph
 sealed class State {
     open fun wantsToAct() = true
 
-    open fun enter(npc: NPC) { }
-    open fun leave(npc: NPC) { }
+    var enterTime: Double = 0.0
+
+    fun enter(npc: NPC) {
+        enterTime = App.time
+        onEnter(npc)
+    }
+
+    fun leave(npc: NPC) {
+        onLeave(npc)
+    }
+
+    fun elapsed() = App.time - enterTime
+
+    protected open fun onEnter(npc: NPC) { }
+    protected open fun onLeave(npc: NPC) { }
     open fun onRestore(npc: NPC) { }
 
     // Consider my situation and possibly change to a new state.

@@ -15,13 +15,13 @@ class Fleeing(
 
     override fun toString() = "Fleeing (target $targetID)"
 
-    override fun enter(npc: NPC) {
+    override fun onEnter(npc: NPC) {
         App.level.director.getActor(targetID)?.also { target ->
             Pather.subscribe(npc, target, npc.visualRange().toInt())
         }
     }
 
-    override fun leave(npc: NPC) {
+    override fun onLeave(npc: NPC) {
         App.level.director.getActor(targetID)?.also { target ->
             Pather.unsubscribe(npc, target)
         }

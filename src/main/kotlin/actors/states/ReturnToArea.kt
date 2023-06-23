@@ -14,11 +14,11 @@ class ReturnToArea(
 
     override fun toString() = "ReturnToArea ($area)"
 
-    override fun enter(npc: NPC) {
+    override fun onEnter(npc: NPC) {
         Pather.subscribe(npc, area, 40)
     }
 
-    override fun leave(npc: NPC) {
+    override fun onLeave(npc: NPC) {
         Pather.unsubscribe(npc, area)
     }
 

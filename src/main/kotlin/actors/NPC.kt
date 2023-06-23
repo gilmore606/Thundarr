@@ -1,7 +1,6 @@
 package actors
 
 import actors.actions.Action
-import actors.factions.Factions
 import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
