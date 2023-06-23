@@ -1,10 +1,12 @@
 package actors.actions
 
 import actors.Actor
+import kotlinx.serialization.Serializable
 import util.XY
 import world.level.Level
 import world.terrains.Terrain
 
+@Serializable
 class Bump(
     private val x: Int,
     private val y: Int,

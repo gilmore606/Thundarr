@@ -79,12 +79,12 @@ class GearModal(
             if (things.isNotEmpty()) {
                 slots[ourSelection].things.forEach { thing ->
                     addOption(thing.listName()) {
-                        App.player.queue(Equip(thing))
+                        App.player.queue(Equip(thing.getKey()))
                         clearCompare()
                     }
                 }
                 addOption("(none)") {
-                    slots[ourSelection].current?.also { App.player.queue(Unequip(it)) }
+                    slots[ourSelection].current?.also { App.player.queue(Unequip(it.getKey())) }
                     clearCompare()
                 }
             } else {

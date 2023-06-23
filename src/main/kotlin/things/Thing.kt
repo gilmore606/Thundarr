@@ -20,6 +20,26 @@ import java.lang.RuntimeException
 @Serializable
 sealed class Thing() : Entity {
 
+    @Serializable
+    data class Key(
+        val xy: XY,
+        val id: String
+    ) {
+        @Transient var thing: Thing? = null
+        fun getThing(level: Level): Thing? = thing ?: run {
+            thing = level.thingByKey(xy.x, xy.y, id)
+            return thing
+        }
+    }
+
+    val id = UUID()
+    fun getKey() = Key(xy(), id)
+
+    open fun containsByID(byID: String): Thing? {
+        if (byID == this.id) return this
+        return null
+    }
+
     enum class Tag(
         val singularName: String,
         val pluralName: String,
@@ -257,7 +277,7 @@ sealed class Thing() : Entity {
         toolbarUseTag()?.also { tag ->
             val use = uses()[tag]!!
             if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
-                App.player.queue(actors.actions.Use(tag, instance, use.duration))
+                App.player.queue(actors.actions.Use(tag, instance.getKey(), use.duration))
             }
         }
     }

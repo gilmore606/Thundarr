@@ -39,6 +39,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     val id = UUID()
+    override fun getHolderKey() = ThingHolder.Key(ThingHolder.Type.ACTOR, actorKey = id)
+
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?
@@ -57,7 +59,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
     val factions = initialFactions()
 
-    @Transient val queuedActions: MutableList<Action> = mutableListOf()
+    val queuedActions: MutableList<Action> = mutableListOf()
 
     @Transient var seen = mutableMapOf<Entity, Float>()
     @Transient var seenUpdatedAt = 0.0
@@ -155,7 +157,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun onMove() {
         level?.thingsAt(xy.x, xy.y)?.forEach { thing ->
-            if (wantsToPickUp(thing)) queue(Get(thing))
+            if (wantsToPickUp(thing)) queue(Get(thing.getKey()))
         }
     }
 
@@ -295,9 +297,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun equipGear(gear: Gear) {
         equippedOn(gear.slot)?.also { current ->
-            queue(Unequip(current))
+            queue(Unequip(current.getKey()))
         }
-        queue(Equip(gear))
+        queue(Equip(gear.getKey()))
     }
 
     fun onEquip(gear: Gear) {
@@ -308,7 +310,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun unequipGear(gear: Gear) {
         if (gear.equipped) {
-            queue(Unequip(gear))
+            queue(Unequip(gear.getKey()))
         }
     }
 
@@ -507,7 +509,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun useThing(thing: Thing, useTag: Thing.UseTag): Use? =
         thing.uses()[useTag]?.let { use ->
-            if (use.canDo(this, xy.x, xy.y, false)) Use(useTag, thing, use.duration) else null
+            if (use.canDo(this, xy.x, xy.y, false)) Use(useTag, thing.getKey(), use.duration) else null
         }
 
     fun stepToward(target: Actor): Move? {

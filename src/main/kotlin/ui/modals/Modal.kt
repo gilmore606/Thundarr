@@ -200,28 +200,28 @@ abstract class Modal(
                     asWithContainer?.also { container ->
                         if (container.contents().size < container.itemLimit()) {
                             addOption("put one " + thing.name() + " " + container.preposition() + " " + container.name()) {
-                                App.player.queue(Drop(thing, container))
+                                App.player.queue(Drop(thing.getKey(), container.getHolderKey()))
                             }
                             addOption("put all " + thing.name().plural() + " " + container.preposition() + " " + container.name()) {
-                                these.forEach { App.player.queue(Drop(it, container)) }
+                                these.forEach { App.player.queue(Drop(it.getKey(), container.getHolderKey())) }
                             }
                         }
                     } ?: run {
                         asWithParent?.also { parent ->
                             if (!App.player.hasStatus(Status.Tag.BURDENED)) {
                                 addOption("take one " + thing.name()) {
-                                    App.player.queue(Get(thing))
+                                    App.player.queue(Get(thing.getKey()))
                                 }
                                 addOption("take all " + thing.name().plural()) {
-                                    these.forEach { App.player.queue(Get(it)) }
+                                    these.forEach { App.player.queue(Get(it.getKey())) }
                                 }
                             }
                         } ?: run {
                             addOption("drop one " + thing.name()) {
-                                App.player.queue(Drop(thing, groundAtPlayer()))
+                                App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey()))
                             }
                             addOption("drop all " + thing.name().plural()) {
-                                these.forEach { App.player.queue(Drop(it, groundAtPlayer())) }
+                                these.forEach { App.player.queue(Drop(it.getKey(), groundAtPlayer().getHolderKey())) }
                             }
                         }
                     }
@@ -229,19 +229,19 @@ abstract class Modal(
                     asWithContainer?.also { container ->
                         if (container.contents().size < container.itemLimit()) {
                             addOption("put " + thing.name() + " " + container.preposition() + " " + container.name()) {
-                                App.player.queue(Drop(thing, container))
+                                App.player.queue(Drop(thing.getKey(), container.getHolderKey()))
                             }
                         }
                     } ?: run {
                         asWithParent?.also {
                             if (!App.player.hasStatus(Status.Tag.BURDENED)) {
                                 addOption("take " + thing.name()) {
-                                    App.player.queue(Get(thing))
+                                    App.player.queue(Get(thing.getKey()))
                                 }
                             }
                         } ?: run {
                             addOption("drop " + thing.listName()) {
-                                App.player.queue(Drop(thing, groundAtPlayer()))
+                                App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey()))
                             }
                         }
                     }
@@ -254,9 +254,9 @@ abstract class Modal(
 
             if (asWithContainer == null && asWithParent == null) {
                 thing.uses().forEach { (tag, it) ->
-                    if (it.canDo(App.player, thing.xy()!!.x, thing.xy()!!.y, false)) {
+                    if (it.canDo(App.player, thing.xy().x, thing.xy().y, false)) {
                         addOption(it.command) {
-                            App.player.queue(Use(tag, thing, it.duration))
+                            App.player.queue(Use(tag, thing.getKey(), it.duration))
                         }
                     }
                 }

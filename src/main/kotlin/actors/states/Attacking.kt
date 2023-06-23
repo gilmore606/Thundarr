@@ -51,7 +51,7 @@ class Attacking(
         npc.apply {
             getActor(targetID)?.also { target ->
                 if (entitiesNextToUs().contains(target)) {
-                    return Attack(target, XY(target.xy.x - npc.xy.x, target.xy.y - npc.xy.y))
+                    return Attack(target.id, target.xy - npc.xy)
                 } else {
                     stepToward(target)?.also { return it }
                 }

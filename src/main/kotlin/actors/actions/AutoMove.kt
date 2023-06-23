@@ -1,13 +1,15 @@
-package actors.actions.processes
+package actors.actions
 
 import actors.Actor
 import actors.Player
 import actors.actions.Action
 import actors.actions.Move
 import audio.Speaker
+import kotlinx.serialization.Serializable
 import util.XY
 import world.level.Level
 
+@Serializable
 class AutoMove(
     val dir: XY
 ) : Action(1f) {

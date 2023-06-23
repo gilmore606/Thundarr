@@ -1,7 +1,7 @@
 package actors
 
 import actors.actions.*
-import actors.actions.processes.WalkTo
+import actors.actions.WalkTo
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
@@ -69,8 +69,8 @@ class AttractPlayer : Player() {
                             if (it is Torch) {
 
                             } else if (it is Brick) {
-                                if (roofedHere && Dice.chance(0.5f)) return Get(it)
-                            } else return Get(it)
+                                if (roofedHere && Dice.chance(0.5f)) return Get(it.getKey())
+                            } else return Get(it.getKey())
                         }
                     }
                 }
@@ -79,13 +79,13 @@ class AttractPlayer : Player() {
                 if (!roofedHere) {
                     if (Dice.chance(0.7f)) {
                         doWeHave(Thing.Tag.THING_BRICK)?.also { brick ->
-                            return Drop(brick, groundAtPlayer())
+                            return Drop(brick.getKey(), groundAtPlayer().getHolderKey())
                         }
                     }
                 } else {
                     doWeHave(Thing.Tag.THING_TORCH)?.also { torch ->
                         if ((torch as Torch).active) {
-                            return Drop(torch, groundAtPlayer())
+                            return Drop(torch.getKey(), groundAtPlayer().getHolderKey())
                         } else if (light.r < 0.7f && Dice.chance(0.2f)) {
                             return useThing(torch, Thing.UseTag.SWITCH)
                         }
@@ -95,7 +95,7 @@ class AttractPlayer : Player() {
                 // Wield weapons
                 doWeHave(Thing.Tag.THING_PICKAXE)?.also { pick ->
                     if (!(pick as Gear).equipped) {
-                        return Equip(pick)
+                        return Equip(pick.getKey())
                     } else {
                         // Dig
                         val digDirs = mutableListOf<XY>()
@@ -139,7 +139,7 @@ class AttractPlayer : Player() {
                                 if (Dice.chance(0.002f)) {
                                     Console.say("Screw this.")
                                     stopMining()
-                                    return WalkTo(level, lastOutdoor.x, lastOutdoor.y)
+                                    return WalkTo(lastOutdoor.x, lastOutdoor.y)
                                 }
                                 return Bump(xy.x, xy.y, digDirs.random())
                             }
@@ -147,7 +147,7 @@ class AttractPlayer : Player() {
                     }
                 } ?: doWeHave { it is MeleeWeapon }?.also { weapon ->
                     if (!(weapon as Gear).equipped) {
-                        return Equip(weapon)
+                        return Equip(weapon.getKey())
                     }
                 }
 
@@ -159,7 +159,7 @@ class AttractPlayer : Player() {
                         if (seen.isNotEmpty()) {
                             val target = seen.keys.random() as Herder
                             if (distanceTo(target) in 2f .. 8f) {
-                                return Throw(it, target.xy.x, target.xy.y)
+                                return Throw(it.getKey(), target.xy.x, target.xy.y)
                             }
                         }
                     }
@@ -168,16 +168,16 @@ class AttractPlayer : Player() {
                 // talk or fight or grab nearby stuff
                 entitiesNextToUs().forEach { entity ->
                     if (entity is NPC && entity.isHostileTo(this)) {
-                        return Attack(entity as Actor, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+                        return Attack((entity as Actor).id, XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
                     }
                     if (entity is Aurox || entity is MuskOx) {
                         if (Dice.chance(0.1f)) {
                             Speaker.world(Speaker.SFX.VOICE_MALELOW, 0.4f, source = this.xy)
-                            return Converse(entity as Actor)
+                            return Converse((entity as Actor).id)
                         }
                     }
                     if (entity is Consumable || entity is MeleeWeapon) {
-                        return Move(XY(entity.xy()!!.x - xy.x, entity.xy()!!.y - xy.y))
+                        return Move(XY(entity.xy().x - xy.x, entity.xy().y - xy.y))
                     }
                 }
             }

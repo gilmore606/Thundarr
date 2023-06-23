@@ -2,10 +2,12 @@ package actors.actions
 
 import actors.Actor
 import audio.Speaker
+import kotlinx.serialization.Serializable
 import render.sparks.Speak
 import ui.panels.Console
 import world.level.Level
 
+@Serializable
 class Say(
     private val text: String
 ) : Action(0.5f) {

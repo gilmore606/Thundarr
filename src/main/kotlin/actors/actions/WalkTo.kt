@@ -1,15 +1,14 @@
-package actors.actions.processes
+package actors.actions
 
 import actors.Actor
-import actors.actions.Action
-import actors.actions.Move
+import kotlinx.serialization.Serializable
 import util.XY
 import util.log
 import world.level.Level
 import world.path.Pather
 
+@Serializable
 class WalkTo(
-    level: Level,
     val x: Int,
     val y: Int
 ) : Action(1f) {

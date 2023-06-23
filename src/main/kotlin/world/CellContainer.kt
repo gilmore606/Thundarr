@@ -14,6 +14,8 @@ import world.stains.Stain
 @Serializable
 class CellContainer : ThingHolder {
 
+    override fun getHolderKey() = ThingHolder.Key(ThingHolder.Type.CELL, cellKey = xy)
+
     @Transient override var level: Level? = null
     val xy = XY(0,0)
     val contents = mutableListOf<Thing>()

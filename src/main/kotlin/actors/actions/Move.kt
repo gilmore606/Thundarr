@@ -2,10 +2,12 @@ package actors.actions
 
 import actors.Actor
 import audio.Speaker
+import kotlinx.serialization.Serializable
 import util.XY
 import util.log
 import world.level.Level
 
+@Serializable
 class Move(
     private val dir: XY
 ) : Action(1.0f) {

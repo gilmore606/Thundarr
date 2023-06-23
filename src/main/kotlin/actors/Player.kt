@@ -2,7 +2,7 @@ package actors
 
 import actors.actions.Action
 import actors.actions.Move
-import actors.actions.processes.AutoMove
+import actors.actions.AutoMove
 import actors.stats.Brains
 import actors.stats.Heart
 import actors.stats.Speed
@@ -23,7 +23,6 @@ import util.*
 import world.Entity
 import world.journal.GameTime
 import world.journal.Journal
-import world.path.Pather
 import world.stains.Fire
 
 @Serializable

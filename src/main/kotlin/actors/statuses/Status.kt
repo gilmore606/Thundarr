@@ -4,7 +4,7 @@ import actors.Actor
 import actors.NPC
 import actors.Player
 import actors.actions.*
-import actors.actions.processes.WalkTo
+import actors.actions.WalkTo
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Stat

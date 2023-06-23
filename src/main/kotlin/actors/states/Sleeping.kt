@@ -23,7 +23,7 @@ class Sleeping(
         if (npc is Villager) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
                 npc.entitiesSeen { it is Candlestick && it.lit && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light as Candlestick)))
+                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, (light as Thing).getKey())))
                     return
                 }
                 if (npc.xy() != npc.bedLocation) {

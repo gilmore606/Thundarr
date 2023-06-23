@@ -3,6 +3,7 @@ package actors.states
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Get
+import kotlinx.serialization.Serializable
 import things.Thing
 import util.XY
 import util.hasOneWhere
@@ -11,6 +12,7 @@ import world.level.Level
 import world.path.Pather
 
 // Trying to get a known seen item.
+@Serializable
 class Looting(
     val targetXY: XY,
     val thingTag: Thing.Tag
@@ -37,7 +39,7 @@ class Looting(
             if (xy() == targetXY) {
                 log.info("found loot")
                 popState()
-                theThing(level)?.also { return Get(it) }
+                theThing(level)?.also { return Get(it.getKey()) }
             } else {
                 stepToward(targetXY)?.also { return it }
             }

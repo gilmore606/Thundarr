@@ -19,6 +19,16 @@ sealed class Container : Portable(), ThingHolder {
     @Transient
     override var level: Level? = null
 
+    override fun containsByID(byID: String): Thing? {
+        super.containsByID(byID)?.also { return it }
+        contents().forEach {
+            it.containsByID(byID)?.also { return it }
+        }
+        return null
+    }
+
+    override fun getHolderKey() = ThingHolder.Key(ThingHolder.Type.CONTAINER, containerKey = getKey())
+
     open fun openVerb() = "look inside"
     open fun isEmptyMsg() = "It's empty."
     open fun preposition() = "in"

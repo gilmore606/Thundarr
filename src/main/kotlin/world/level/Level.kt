@@ -3,7 +3,7 @@ package world.level
 import actors.Actor
 import actors.Player
 import actors.actions.*
-import actors.actions.processes.WalkTo
+import actors.actions.WalkTo
 import actors.statuses.Status
 import audio.Speaker
 import kotlinx.coroutines.launch
@@ -22,7 +22,6 @@ import ui.panels.Console
 import util.*
 import world.Chunk
 import world.Director
-import world.Entity
 import world.gen.decors.Decor
 import world.path.Pather
 import world.stains.Fire
@@ -317,6 +316,16 @@ sealed class Level {
         stain.onAdd(this, x, y)
     }
 
+    fun thingByKey(x: Int, y: Int, id: String): Thing? {
+        thingsAt(x, y).forEach {
+            it.containsByID(id)?.also { return it }
+        }
+        actorAt(x, y)?.contents()?.forEach {
+            it.containsByID(id)?.also { return it }
+        }
+        return null
+    }
+
     fun onRender(delta: Float) {
         if (dirtyLights.isNotEmpty()) {
             shadowDirty = true
@@ -459,11 +468,11 @@ sealed class Level {
         groups.forEach { group ->
             if (isHere && group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
                 if (group.size == 1) {
-                    menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0])) }
+                    menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0].getKey())) }
                 } else {
-                    menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0])) }
+                    menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0].getKey())) }
                     menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
-                        group.forEach { App.player.queue(Get(it)) }
+                        group.forEach { App.player.queue(Get(it.getKey())) }
                     }
                 }
             }
@@ -472,13 +481,13 @@ sealed class Level {
             group[0].uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
                     menu.addOption(use.command) {
-                        App.player.queue(Use(tag, group[0], use.duration))
+                        App.player.queue(Use(tag, group[0].getKey(), use.duration))
                     }
                 }
             }
             if (isAdjacentOrHere && group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
                 menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
-                    App.player.queue(Smash(group[0] as Smashable))
+                    App.player.queue(Smash(group[0].getKey(), (group[0] as Smashable).smashVerbName()))
                 }
             }
             if (!group[0].isPortable() || isHere) {
@@ -487,7 +496,7 @@ sealed class Level {
         }
         if (isWalkableAt(App.player, x, y) && !isAdjacentOrHere) {
             menu.addOption("walk here") {
-                App.player.queue(WalkTo(this, x, y))
+                App.player.queue(WalkTo(x, y))
             }
         }
         var actorAt: Actor? = null
@@ -502,7 +511,7 @@ sealed class Level {
         if (App.player.thrownTag != null && !isAdjacentOrHere && visibilityAt(x,y) == 1f && isWalkableAt(App.player, x,y)) {
             App.player.getThrown()?.also { thrown ->
                 menu.addOption("throw " + (App.player.thrownTag)?.singularName + if (actorAt == null) " here" else " at " + actorAt!!.name()) {
-                    App.player.queue(Throw(thrown, x, y))
+                    App.player.queue(Throw(thrown.getKey(), x, y))
                 }
             }
         }
@@ -512,7 +521,7 @@ sealed class Level {
                 held.uses().forEach { (tag, heldUse) ->
                     if (heldUse.canDo(App.player, x, y, true)) {
                         menu.addOption(heldUse.command) {
-                            App.player.queue(Use(tag, held, heldUse.duration))
+                            App.player.queue(Use(tag, held.getKey(), heldUse.duration))
                         }
                     }
                 }
@@ -527,13 +536,13 @@ sealed class Level {
                             near.uses().forEach { (tag, nearUse) ->
                                 if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
                                     menu.addOption(nearUse.command) {
-                                        App.player.queue(Use(tag, near, nearUse.duration))
+                                        App.player.queue(Use(tag, near.getKey(), nearUse.duration))
                                     }
                                 }
                             }
                             if (near is Smashable && near.isSmashable()) {
                                 menu.addOption(near.smashVerbName() + " " + near.name()) {
-                                    App.player.queue(Smash(near))
+                                    App.player.queue(Smash(near.getKey(), near.smashVerbName()))
                                 }
                             }
                         }
@@ -555,9 +564,9 @@ sealed class Level {
     fun bumpActionTo(x: Int, y: Int, dir: XY): Action? {
         actorAt(x + dir.x,y + dir.y)?.also { target ->
             if (App.player.willAggro(target) || target.willAggro(App.player)) {
-                return Attack(target, dir)
+                return Attack(target.id, dir)
             }
-            return Converse(target)
+            return Converse(target.id)
         } ?: run {
             thingsAt(x + dir.x, y + dir.y).forEach { thing ->
                 thing.playerBumpAction()?.also { return it }

@@ -2,9 +2,11 @@ package things.recipes
 
 import actors.stats.Stat
 import actors.stats.skills.Survive
+import kotlinx.serialization.Serializable
 import things.Steak
 import things.Thing
 
+@Serializable
 abstract class Recipe {
     companion object {
         val all = listOf(

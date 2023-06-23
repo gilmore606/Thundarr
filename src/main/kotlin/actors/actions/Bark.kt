@@ -2,8 +2,10 @@ package actors.actions
 
 import actors.Actor
 import audio.Speaker
+import kotlinx.serialization.Serializable
 import world.level.Level
 
+@Serializable
 class Bark(
     val sfx: Speaker.SFX
     ) : Action(0.5f) {

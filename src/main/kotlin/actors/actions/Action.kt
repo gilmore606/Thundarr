@@ -1,9 +1,11 @@
 package actors.actions
 
 import actors.Actor
+import kotlinx.serialization.Serializable
 import world.level.Level
 
-abstract class Action(
+@Serializable
+sealed class Action(
     val duration: Float
 ) {
     abstract fun name(): String

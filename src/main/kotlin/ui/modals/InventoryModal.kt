@@ -193,7 +193,7 @@ class InventoryModal(
         val parent = this
         val ourSelection = selection
         if (selection >= firstRecipeSelection) {
-            App.player.queue(Make(getBench()!!, getBench()!!.possibleRecipes()[selection - firstRecipeSelection]))
+            App.player.queue(Make(getBench()!!.getKey(), getBench()!!.possibleRecipes()[selection - firstRecipeSelection]))
         } else {
             Screen.addModal(ContextMenu(
                 width + (parentModal?.width ?: 0) - 2,

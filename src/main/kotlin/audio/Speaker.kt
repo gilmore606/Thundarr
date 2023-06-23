@@ -21,6 +21,7 @@ object Speaker {
     var volumeMusic = 1.0
     var volumeUI = 1.0
 
+    @Serializable
     enum class Song(
         val file: String
         ) {
@@ -29,6 +30,7 @@ object Speaker {
         DUNGEON("equivalenttree.ogg")
     }
 
+    @Serializable
     enum class SFX(
         val files: List<String>,
         val pitchVariance: Float = 0f,

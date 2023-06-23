@@ -2,10 +2,12 @@ package actors.actions
 
 import actors.Actor
 import actors.Player
+import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
 import world.level.Level
 
+@Serializable
 class Sleep : Action(2f) {
 
     override fun name() = "sleep"

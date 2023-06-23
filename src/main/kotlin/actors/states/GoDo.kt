@@ -9,12 +9,10 @@ import kotlinx.serialization.Transient
 import util.XY
 import world.path.Pather
 
-// TODO: we lose targetAction on serialize!  find some way to serialize/abstract it
-
 @Serializable
 class GoDo(
     val targetXY: XY,
-    @Transient val targetAction: Action? = null
+    val targetAction: Action? = null
     ) : State() {
 
     var failedSteps = 0
