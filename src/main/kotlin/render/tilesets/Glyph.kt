@@ -111,6 +111,7 @@ enum class Glyph {
     GOAT,
     MANAPE,
     GATOR,
+    DOG,
 
     OAK_TREE,
     MAPLE_TREE,
