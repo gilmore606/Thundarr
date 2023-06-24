@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.actions.events.Event
 import actors.animations.Whack
 import actors.stats.Strength
 import actors.statuses.Dazed
@@ -20,7 +21,7 @@ import world.level.Level
 class Smash(
     private val targetKey: Thing.Key,
     private val verbName: String,
-): Action(1.0f) {
+): Action(1.0f), Event {
 
     override fun name() = verbName
 
@@ -49,6 +50,7 @@ class Smash(
                         }
                         target.onSmashFail()
                     }
+                    broadcastEvent(level, actor, target.xy())
                 }
             }
         }

@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.*
+import actors.actions.events.Event
 import actors.animations.Animation
 import actors.animations.Step
 import actors.stats.Speed
@@ -480,6 +481,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (this is Player) StatusPanel.refillCache()
     }
 
+    open fun witnessEvent(culprit: Actor?, event: Event, location: XY) { }
+
     ///// combat info
 
     fun tryDodge(attacker: Actor, weapon: Thing, bonus: Float): Float {
@@ -559,8 +562,24 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         entity.xy().also { entityXY ->
             if (distanceBetween(entityXY, xy) > visualRange()) return false
         }
-
         return entitiesSeen { it == entity }.isNotEmpty()
+    }
+
+    open fun canSee(targetXY: XY): Boolean {
+        if (level == null) return false
+        if (distanceBetween(targetXY, xy) > visualRange()) return false
+        var occluded = false
+        drawLine(targetXY, xy) { tx, ty ->
+            if (level?.isOpaqueAt(tx, ty) == true) occluded = true
+        }
+        return !occluded
+    }
+
+    // TODO : Implement this for real
+    open fun canHear(targetXY: XY, volume: Float): Boolean {
+        if (level == null) return false
+        if (distanceBetween(targetXY, xy) > visualRange()) return false
+        return true
     }
 
     fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {

@@ -1,10 +1,15 @@
 package actors.states
 
+import actors.Actor
+import actors.Citizen
 import actors.NPC
 import actors.Villager
 import actors.actions.Action
+import actors.actions.Get
 import actors.actions.Say
 import actors.actions.Use
+import actors.actions.events.Event
+import actors.actions.events.Knock
 import kotlinx.serialization.Serializable
 import things.Candlestick
 import things.Door
@@ -12,6 +17,7 @@ import things.Thing
 import util.Dice
 import util.Rect
 import util.XY
+import util.log
 
 @Serializable
 class IdleVillager(
@@ -26,12 +32,18 @@ class IdleVillager(
 
     override fun toString() = "IdleVillager"
 
+    override fun onEnter(npc: NPC) {
+        if (npc is Villager) {
+            npc.setTarget(npc.targetArea)
+        }
+    }
+
     override fun pickAction(npc: NPC): Action {
         if (npc is Villager) {
             npc.entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
                 // Close the door behind us if we're leaving this area, or entering our home
                 if (npc.previousTargetArea.contains(door.xy()) || npc.previousTargetArea.isAdjacentTo(door.xy())) {
-                    if (!npc.previousTargetArea.contains(npc.xy())) {
+                    if ((npc.targetArea != npc.previousTargetArea) && !npc.previousTargetArea.contains(npc.xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
                     }
                 } else if (npc.homeArea.contains(door.xy()) || npc.homeArea.isAdjacentTo(door.xy())) {
@@ -98,9 +110,13 @@ class IdleVillager(
         super.considerState(npc)
     }
 
-    override fun onEnter(npc: NPC) {
+    override fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) {
         if (npc is Villager) {
-            npc.setTarget(npc.targetArea)
+            if (event is Knock && culprit == null) {
+                npc.say("Who's that?")
+                // Answer the door!
+                npc.pushState(GoDo(event.door.xy(), Use(Thing.UseTag.OPEN, event.door.getKey())))
+            }
         }
     }
 

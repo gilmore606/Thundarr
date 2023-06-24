@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.actions.events.Event
 import actors.animations.Hop
 import actors.stats.skills.Throw
 import audio.Speaker
@@ -12,6 +13,7 @@ import things.Smashable
 import things.Thing
 import ui.panels.Console
 import util.Dice
+import util.NO_DIRECTION
 import util.XY
 import util.distanceBetween
 import world.level.Level
@@ -21,7 +23,8 @@ class Throw(
     private val thingKey: Thing.Key,
     private val x: Int,
     private val y: Int
-) : Action(1.0f) {
+) : Action(1.0f), Event {
+
     override fun name() = "throw"
 
     override fun execute(actor: Actor, level: Level) {
@@ -48,6 +51,8 @@ class Throw(
             }.at(actor.xy.x, actor.xy.y))
 
             level.addSpark(ProjectileShadow(x, y, 40f).at(actor.xy.x, actor.xy.y))
+
+            broadcastEvent(level, actor, XY(hitx, hity))
         }
     }
 
@@ -69,6 +74,7 @@ class Throw(
                 Console.sayAct("%Di misses %dd.", "%Dn throws %ii at %dd, but misses.", actor, target, thing)
                 target.receiveAggression(actor)
             }
+            Attack(target.id, NO_DIRECTION).broadcastEvent(level, actor, target.xy)
         } ?: run {
             if (roll >= 0) {
                 level.thingsAt(hitX, hitY).filter { it is Smashable }.randomOrNull()?.also { target ->
@@ -78,6 +84,7 @@ class Throw(
                     } else {
                         Console.sayAct("", "%Dn bounces off %dd.", thing, target)
                     }
+                    Smash(target.getKey(), "").broadcastEvent(level, actor, target.xy())
                 }
             }
         }

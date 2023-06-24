@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import things.Container
 import things.Thing
@@ -9,8 +10,8 @@ import world.level.Level
 
 @Serializable
 class Get(
-    private val thingKey: Thing.Key
-) : Action(0.5f) {
+    val thingKey: Thing.Key
+) : Action(0.5f), Event {
     override fun name() = "get things"
 
     override fun execute(actor: Actor, level: Level) {
@@ -18,6 +19,7 @@ class Get(
             var wasContainer: Container? = null
             if (thing.holder is Container) wasContainer = thing.holder as Container
 
+            val fromXY = thing.xy().copy()
             thing.moveTo(actor)
 
             wasContainer?.also { container ->
@@ -29,6 +31,8 @@ class Get(
             } ?: run {
                 Console.sayAct("You pick up %id.", "%DN picks up %id.", actor, thing)
             }
+
+            broadcastEvent(level, actor, fromXY)
         }
     }
 

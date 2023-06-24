@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.actions.events.Event
 import actors.animations.Whack
 import audio.Speaker
 import kotlinx.serialization.Serializable
@@ -16,7 +17,7 @@ import world.level.Level
 class Attack(
     private val targetID: String,
     private val dir: XY
-): Action(1.0f) {
+): Action(1.0f), Event {
     override fun name() = "attack"
 
     override fun durationFor(actor: Actor) = super.durationFor(actor) * actor.meleeWeapon().speed()
@@ -30,8 +31,8 @@ class Attack(
             if (target.canSee(actor)) {
                 bonus = target.tryDodge(actor, weapon, bonus + weapon.skill().bonus(actor))
             }
-            val roll = weapon.skill().resolve(actor, bonus)
 
+            val roll = weapon.skill().resolve(actor, bonus)
             if (roll >= 0) {
                 val damage = weapon.damage() + Dice.float(0f, weapon.damage())
                 val dealt = target.receiveDamage(damage, actor)
@@ -50,6 +51,8 @@ class Attack(
                 Console.sayAct(weapon.missSelfMsg(), weapon.missOtherMsg(), actor, target, weapon)
                 Speaker.world(weapon.missSound(), source = actor.xy)
             }
+
+            broadcastEvent(level, actor, target.xy)
         }
     }
 

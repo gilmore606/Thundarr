@@ -1,6 +1,7 @@
 package actors
 
 import actors.actions.Action
+import actors.actions.events.Event
 import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
@@ -158,6 +159,10 @@ sealed class NPC : Actor() {
         is Attacking -> "%Dn rushes toward you!"
         is Fleeing -> "%Dn turns to flee!"
         else -> null
+    }
+
+    override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
+        state.witnessEvent(this, culprit, event, location)
     }
 
     fun say(text: String?) {

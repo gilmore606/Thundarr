@@ -4,6 +4,7 @@ import actors.NPC
 import actors.actions.Action
 import actors.actions.Attack
 import actors.actions.Say
+import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY

@@ -1,10 +1,13 @@
 package actors.states
 
+import actors.Actor
 import actors.NPC
 import actors.actions.Action
 import actors.actions.Wait
+import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.XY
 
 // A State represents a goal the NPC is trying to achieve.
 @Serializable
@@ -32,6 +35,8 @@ sealed class State {
     open fun considerState(npc: NPC) { }
 
     open fun pickAction(npc: NPC): Action = Wait(1f)
+
+    open fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) { }
 
     open fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) { }
 

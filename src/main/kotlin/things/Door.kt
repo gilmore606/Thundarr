@@ -3,11 +3,11 @@ package things
 import actors.Actor
 import actors.actions.Action
 import actors.actions.Use
+import actors.actions.events.Knock
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console
-import util.Dice
 import util.UUID
 import util.XY
 
@@ -59,7 +59,7 @@ sealed class Door : Thing(), Smashable {
         return null
     }
 
-    private fun isObstructed() = xy().let { xy -> level()!!.actorAt(xy.x, xy.y) != null || level()!!.thingsAt(xy.x, xy.y).size > 1 } ?: false
+    private fun isObstructed() = xy().let { xy -> level()!!.actorAt(xy.x, xy.y) != null || level()!!.thingsAt(xy.x, xy.y).size > 1 }
 
     private fun doOpen() {
         isOpen = true
@@ -77,6 +77,7 @@ sealed class Door : Thing(), Smashable {
         Console.sayAct("You knock politely at %dd.", "%Dn knocks on %dd.", actor, this)
         val soundSource = XY(xy().x - (xy().x - actor.xy.x), xy().y - (xy().y - actor.xy.y))
         Console.sayAct("You hear a knocking at %dn.", "", this, reach = Console.Reach.AUDIBLE, source = soundSource)
+        Knock(this).broadcastEvent(actor.level!!, actor, xy())
     }
 
     override fun isSmashable() = !isOpen
