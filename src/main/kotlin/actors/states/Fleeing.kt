@@ -6,6 +6,7 @@ import actors.actions.Action
 import actors.actions.Say
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.log
 import world.path.Pather
 
 @Serializable
@@ -42,6 +43,7 @@ class Fleeing(
                 stepAwayFrom(it)?.also { return it }
             }
         }
+        log.info("FLEE HAD NO ACTION for $npc")
         return super.pickAction(npc)
     }
 

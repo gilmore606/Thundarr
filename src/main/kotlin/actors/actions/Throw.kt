@@ -52,7 +52,7 @@ class Throw(
 
             level.addSpark(ProjectileShadow(x, y, 40f).at(actor.xy.x, actor.xy.y))
 
-            broadcastEvent(level, actor, XY(hitx, hity))
+            broadcast(level, actor, XY(hitx, hity))
         }
     }
 
@@ -74,7 +74,7 @@ class Throw(
                 Console.sayAct("%Di misses %dd.", "%Dn throws %ii at %dd, but misses.", actor, target, thing)
                 target.receiveAggression(actor)
             }
-            Attack(target.id, NO_DIRECTION).broadcastEvent(level, actor, target.xy)
+            Attack(target.id, NO_DIRECTION).broadcast(level, actor, target.xy)
         } ?: run {
             if (roll >= 0) {
                 level.thingsAt(hitX, hitY).filter { it is Smashable }.randomOrNull()?.also { target ->
@@ -84,7 +84,7 @@ class Throw(
                     } else {
                         Console.sayAct("", "%Dn bounces off %dd.", thing, target)
                     }
-                    Smash(target.getKey(), "").broadcastEvent(level, actor, target.xy())
+                    Smash(target.getKey(), "").broadcast(level, actor, target.xy())
                 }
             }
         }

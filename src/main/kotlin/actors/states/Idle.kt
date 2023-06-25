@@ -40,7 +40,7 @@ sealed class Idle : State() {
             npc.metPlayer = true
         }
 
-        npc.entitiesSeen { it is Actor && it.id in npc.enemies }.keys.toList().firstOrNull()?.also { enemy ->
+        npc.entitiesSeen { it is Actor && npc.opinionOf(it) == NPC.Opinion.HATE }.keys.toList().firstOrNull()?.also { enemy ->
             npc.hostileResponseState(enemy as Actor)?.also { hostileState ->
                 npc.pushState(hostileState)
             }

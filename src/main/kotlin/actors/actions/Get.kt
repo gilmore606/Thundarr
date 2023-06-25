@@ -32,7 +32,7 @@ class Get(
                 Console.sayAct("You pick up %id.", "%DN picks up %id.", actor, thing)
             }
 
-            broadcastEvent(level, actor, fromXY)
+            broadcast(level, actor, fromXY)
         }
     }
 

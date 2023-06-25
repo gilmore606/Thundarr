@@ -10,7 +10,6 @@ class VillageFaction(
 ) : Faction(
     "$villageName citizens"
 ) {
-
-    override fun hateMemberAttacker() = true
+    override fun memberLove() = true
 
 }

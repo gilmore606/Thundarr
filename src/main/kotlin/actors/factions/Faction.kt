@@ -1,8 +1,11 @@
 package actors.factions
 
 import actors.Actor
+import actors.NPC
 import kotlinx.serialization.Serializable
 import util.UUID
+import util.XY
+import util.hasOneWhere
 import util.log
 
 @Serializable
@@ -12,24 +15,52 @@ open class Faction(
 
     val id = UUID()
 
-    val hatedActors = mutableSetOf<String>() // actor ids
+    private val opinions = mutableMapOf<String, NPC.Opinion>()
 
-    // Should the faction hate someone who attacks a member?
+    // Should the faction insta-hate someone who attacks a member?
     open fun hateMemberAttacker() = false
+    // Should the faction love fellow members (i.e. defend them?)
+    open fun memberLove() = false
+
+    open fun isHuman() = true
+    open fun isGood() = false
+    open fun isEvil() = false
 
     fun onMemberAttacked(attacker: Actor) {
         if (hateMemberAttacker()) {
-            hateActor(attacker)
+            downgradeOpinionOf(attacker)
         }
     }
 
-    fun hateActor(actor: Actor) {
-        log.info("faction $this ($id) now hates $actor (${actor.id})")
-        hatedActors.add(actor.id)
+    open fun hatesFaction(otherFaction: Faction): Boolean = false
+    open fun lovesFaction(otherFaction: Faction): Boolean = otherFaction == this && memberLove()
+
+    fun opinionOf(actor: Actor): NPC.Opinion {
+        if (opinions.containsKey(actor.id)) return opinions[actor.id]!! else {
+            var loved = false
+            actor.factions.forEach { id ->
+                App.factions.byID(id)?.also { actorFaction ->
+                    if (this.hatesFaction(actorFaction)) return NPC.Opinion.HATE
+                    else if (this.lovesFaction(actorFaction)) loved = true
+                }
+            }
+            return if (loved) NPC.Opinion.LOVE else NPC.Opinion.NEUTRAL
+        }
     }
 
-    fun hatesActor(actor: Actor): Boolean {
-        if (hatedActors.contains(actor.id)) return true
-        return false
+    fun upgradeOpinionOf(actor: Actor) {
+        if (opinions[actor.id] == NPC.Opinion.HATE) {
+            opinions.remove(actor.id)
+        } else {
+            opinions[actor.id] = NPC.Opinion.LOVE
+        }
+    }
+
+    fun downgradeOpinionOf(actor: Actor) {
+        if (opinions[actor.id] == NPC.Opinion.LOVE) {
+            opinions.remove(actor.id)
+        } else {
+            opinions[actor.id] = NPC.Opinion.HATE
+        }
     }
 }

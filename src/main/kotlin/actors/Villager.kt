@@ -62,9 +62,9 @@ class Villager(
     fun setTarget(newTarget: WorkArea) {
         if (newTarget == defaultArea) return
         if (newTarget != targetArea) {
+            Pather.unsubscribe(this, targetArea.rect)
             previousTargetArea = if (targetArea == defaultArea) homeArea else targetArea
             targetArea = newTarget
-            Pather.unsubscribeAll(this)
         }
         if (!targetArea.contains(xy)) {
             Pather.subscribe(this, targetArea.rect, 48)

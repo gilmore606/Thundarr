@@ -50,7 +50,7 @@ class Smash(
                         }
                         target.onSmashFail()
                     }
-                    broadcastEvent(level, actor, target.xy())
+                    broadcast(level, actor, target.xy())
                 }
             }
         }

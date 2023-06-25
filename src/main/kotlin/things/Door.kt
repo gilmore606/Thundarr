@@ -77,7 +77,7 @@ sealed class Door : Thing(), Smashable {
         Console.sayAct("You knock politely at %dd.", "%Dn knocks on %dd.", actor, this)
         val soundSource = XY(xy().x - (xy().x - actor.xy.x), xy().y - (xy().y - actor.xy.y))
         Console.sayAct("You hear a knocking at %dn.", "", this, reach = Console.Reach.AUDIBLE, source = soundSource)
-        Knock(this).broadcastEvent(actor.level!!, actor, xy())
+        Knock(this).broadcast(actor.level!!, actor, xy())
     }
 
     override fun isSmashable() = !isOpen

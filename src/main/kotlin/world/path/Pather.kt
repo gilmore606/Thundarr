@@ -14,7 +14,7 @@ import java.lang.RuntimeException
 
 object Pather {
 
-    private val maps = mutableListOf<StepMap>()
+    private var maps = mutableListOf<StepMap>()
 
     private val coroutineContext = newSingleThreadAsyncContext("pather")
     private val coroutineScope = CoroutineScope(coroutineContext)
@@ -27,24 +27,20 @@ object Pather {
 
     private fun relaunchWorker() {
         worker?.cancel()
-        worker = coroutineScope.launch {
+        worker = KtxAsync.launch {
             while (!App.isExiting) {
-                var doneMap: StepMap? = null
-                for (i in 0 until maps.size) {
-                    if (i < maps.size) {
-                        val map = maps[i]
-                        if (map.expired) doneMap = map
-                        else if (map.dirty) {
-                            map.update()
+                val newMaps = mutableListOf<StepMap>()
+                maps.forEach { map ->
+                    if (map.isActive()) {
+                        newMaps.add(map)
+                        if (map.needsUpdated()) {
+                            coroutineScope.launch { map.update() }
                         }
+                    } else {
+                        map.dispose()
                     }
                 }
-                doneMap?.also {
-                    it.dispose()
-                    KtxAsync.launch {
-                        maps.remove(it)
-                    }
-                }
+                maps = newMaps
                 delay(1L)
             }
         }
@@ -99,25 +95,25 @@ object Pather {
 
     fun unsubscribe(walker: Actor, target: XY) {
         maps.firstOrNull { it is PointStepMap && it.target == target && it.walkerID == walker.id }?.also {
-            it.expired = true
+            it.expire()
         }
     }
 
     fun unsubscribe(walker: Actor, target: Actor) {
         maps.firstOrNull { it is ActorStepMap && it.targetID == target.id && it.walkerID == walker.id }?.also {
-            it.expired = true
+            it.expire()
         }
     }
 
     fun unsubscribe(walker: Actor, target: Rect) {
         maps.firstOrNull { it is AreaStepMap && it.target == target && it.walkerID == walker.id }?.also {
-            it.expired = true
+            it.expire()
         }
     }
 
     fun unsubscribeAll(subscriber: Actor) {
         jobs.add(coroutineScope.launch {
-            maps.forEach { if (it.walkerID == subscriber.id) it.expired = true }
+            maps.forEach { if (it.walkerID == subscriber.id) it.expire() }
         })
     }
 
@@ -130,11 +126,11 @@ object Pather {
 
     fun saveActorMaps(subscriber: Actor) {
         subscriber.savedStepMaps.clear()
-        maps.safeForEach { map ->
-            if (map.walkerID == subscriber.id) {
-                subscriber.savedStepMaps.add(map.getClone())
-                KtxAsync.launch {
-                    map.expired = true
+        KtxAsync.launch {
+            maps.safeForEach { map ->
+                if (map.walkerID == subscriber.id) {
+                    subscriber.savedStepMaps.add(map.getClone())
+                    map.expire()
                 }
             }
         }

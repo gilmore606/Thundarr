@@ -7,6 +7,6 @@ class Monsters : Faction(
     "monsters"
 ) {
 
-
+    override fun hatesFaction(otherFaction: Faction) = otherFaction.isHuman()
 
 }

@@ -171,7 +171,7 @@ class Village(
 
         // Spawn guards
         if (!isAbandoned) {
-            spawnGuards()
+            //spawnGuards()
         }
 
         // Build shops

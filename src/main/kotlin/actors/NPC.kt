@@ -59,8 +59,10 @@ sealed class NPC : Actor() {
     var state: State = Hibernated()
     val stateStack = Stack<State>()
 
-    var enemies = mutableListOf<String>() // actor ids
+    enum class Opinion { HATE, NEUTRAL, LOVE }
+    val opinions = mutableMapOf<String, Opinion>()
     var metPlayer = false
+
     val placeMemory = mutableMapOf<String,XY>()
     @Transient var den: NPCDen? = null
 
@@ -84,15 +86,11 @@ sealed class NPC : Actor() {
     open fun converseLines(): List<String> = state.converseLines(this) ?: listOf()
     open fun meetPlayerMsg(): String? = null
 
-    open fun isHostileTo(target: Actor): Boolean = enemies.contains(target.id) || factions.hasOneWhere {
-        App.factions.byID(it)?.hatesActor(target) ?: false
-    }
+    open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
 
     override fun willAggro(target: Actor) = isHostileTo(target)
 
     override fun visualRange() = 8f + Speed.get(this)
-
-    open fun becomeHostileMsg(): String = listOf("%Dn bellows with rage!", "%Dn turns angrily toward you!").random()
 
     open fun idleState(): Idle = IdleDoNothing()
     open fun hostileResponseState(enemy: Actor): State? = Attacking(enemy.id)   // State change on hostile sighted
@@ -165,12 +163,6 @@ sealed class NPC : Actor() {
         state.witnessEvent(this, culprit, event, location)
     }
 
-    fun say(text: String?) {
-        text?.also { text ->
-            Console.sayAct("", this.dnamec() + " says, \""  + text + "\"", this)
-        }
-    }
-
     override fun onConverse(actor: Actor): Boolean {
         val converseLines = converseLines()
         if (converseLines.isNotEmpty()) {
@@ -194,11 +186,38 @@ sealed class NPC : Actor() {
 
     override fun receiveAggression(attacker: Actor) {
         if (!isHostileTo(attacker)) {
-            enemies.add(attacker.id)
-            Console.sayAct("", becomeHostileMsg(), this, attacker, null, Console.Reach.AUDIBLE)
+            downgradeOpinionOf(attacker)
+            factions.forEach { factionID ->
+                App.factions.byID(factionID)?.onMemberAttacked(attacker)
+            }
         }
-        factions.forEach { factionID ->
-            App.factions.byID(factionID)?.onMemberAttacked(attacker)
+    }
+
+    fun opinionOf(actor: Actor): Opinion {
+        if (opinions.containsKey(actor.id)) return opinions[actor.id]!! else {
+            var loved = false
+            factions.forEach { id ->
+                val opinion = App.factions.byID(id)?.opinionOf(actor)
+                if (opinion == Opinion.HATE) return opinion
+                else if (opinion == Opinion.LOVE) loved = true
+            }
+            return if (loved) Opinion.LOVE else Opinion.NEUTRAL
+        }
+    }
+
+    fun upgradeOpinionOf(actor: Actor) {
+        if (opinions[actor.id] == Opinion.HATE) {
+            opinions.remove(actor.id)
+        } else {
+            opinions[actor.id] = Opinion.LOVE
+        }
+    }
+
+    fun downgradeOpinionOf(actor: Actor) {
+        if (opinions[actor.id] == Opinion.LOVE) {
+            opinions.remove(actor.id)
+        } else {
+            opinions[actor.id] = Opinion.HATE
         }
     }
 

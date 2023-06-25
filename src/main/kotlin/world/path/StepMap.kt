@@ -34,12 +34,18 @@ sealed class StepMap {
 
     @Transient var walker: Actor? = null
     @Transient var dirty = true  // Do we need an update?
-    @Transient var expired = false  // Can we be disposed of?
+    @Transient protected var expired = false  // Can we be disposed of?
 
     @Transient var scratch = Array(width) { IntArray(height) { -1 } }
     @Transient var map = Array(width) { IntArray(height) { -1 } }
 
     abstract fun getClone(): StepMap
+
+    fun isActive() = !expired
+    fun needsUpdated() = !expired && dirty
+    fun expire() {
+        expired = true
+    }
 
     open fun initialize(walker: Actor, range: Int) {
         this.walker = walker
@@ -84,6 +90,7 @@ sealed class StepMap {
     open fun nextStepAwayFrom(from: Actor, to: Actor): XY? = null
 
     protected fun getNextStep(fromX: Int, fromY: Int): XY? {
+        if (expired) return null
         val lx = fromX - offsetX
         val ly = fromY - offsetY
         if (lx in 0 until width && ly in 0 until height) {
@@ -103,20 +110,27 @@ sealed class StepMap {
     }
 
     protected fun getNextStepAway(fromX: Int, fromY: Int): XY? {
+        if (expired) return null
+        log.info("FINDING STEP AWAY FOR $this")
         val lx = fromX - offsetX
         val ly = fromY - offsetY
         if (lx in 0 until width && ly in 0 until height) {
             val nextstep = map[lx][ly] + 1
             val steps = mutableSetOf<XY>()
+            val altSteps = mutableSetOf<XY>()
             DIRECTIONS.from(lx, ly) { tx, ty, dir ->
                 if (tx in 0 until width && ty in 0 until height) {
                     if (map[tx][ty] == nextstep) {
                         steps.add(dir)
+                    } else if (map[tx][ty] == nextstep - 1) {
+                        altSteps.add(dir)
                     }
                 }
             }
             if (steps.isNotEmpty()) return steps.random()
+            if (altSteps.isNotEmpty()) return altSteps.random()
         }
+        log.info("NO STEP AWAY FOUND!  for $this")
         return null
     }
 
@@ -152,7 +166,7 @@ sealed class StepMap {
     inline fun writeTargetCell(x: Int, y: Int) {
         val ix = x - offsetX
         val iy = y - offsetY
-        if ((ix in 0..width - 1) && (iy in 0..height - 1)) {
+        if ((ix in 0 until width) && (iy in 0 until height)) {
             scratch[ix][iy] = 0
         }
     }
@@ -161,6 +175,8 @@ sealed class StepMap {
         if (walker == null) {
             walker = App.level.director.getActor(walkerID)
         }
+        if (!dirty) return
+        //log.info("updating stepmap $this")
         walker?.level?.also { level ->
             clearScratch()
             printTarget()

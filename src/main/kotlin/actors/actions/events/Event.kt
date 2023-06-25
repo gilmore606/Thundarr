@@ -10,7 +10,7 @@ interface Event {
 
     fun eventSenses(): Set<Sense> = setOf(Sense.VISUAL, Sense.AUDIBLE)
 
-    fun broadcastEvent(level: Level, culprit: Actor?, location: XY) {
+    fun broadcast(level: Level, culprit: Actor?, location: XY) {
         level.director.actors.forEach { actor ->
             if (actor != culprit) {
                 val senses = eventSenses()

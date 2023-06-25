@@ -3,6 +3,7 @@ package world.path
 import actors.Actor
 import kotlinx.serialization.Serializable
 import util.XY
+import util.log
 
 @Serializable
 data class ActorStepMap(

@@ -330,6 +330,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
     }
 
+    fun say(text: String?) {
+        text?.also { text ->
+            Console.sayAct("", this.dnamec() + " says, \""  + text + "\"", this)
+        }
+    }
+
     fun gainHealth(amount: Float) {
         hp = min(hpMax, (hp + amount))
         level?.addSpark(HealthUp().at(xy.x, xy.y))

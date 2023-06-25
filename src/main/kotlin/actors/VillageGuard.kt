@@ -1,5 +1,6 @@
 package actors
 
+import actors.actions.events.Event
 import actors.states.Attacking
 import actors.states.IdlePatrol
 import actors.states.State

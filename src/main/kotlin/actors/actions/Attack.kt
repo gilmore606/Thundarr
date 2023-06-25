@@ -5,7 +5,6 @@ import actors.actions.events.Event
 import actors.animations.Whack
 import audio.Speaker
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import render.sparks.Pow
 import render.sparks.Smoke
 import ui.panels.Console
@@ -15,7 +14,7 @@ import world.level.Level
 
 @Serializable
 class Attack(
-    private val targetID: String,
+    val targetID: String,
     private val dir: XY
 ): Action(1.0f), Event {
     override fun name() = "attack"
@@ -52,7 +51,7 @@ class Attack(
                 Speaker.world(weapon.missSound(), source = actor.xy)
             }
 
-            broadcastEvent(level, actor, target.xy)
+            broadcast(level, actor, target.xy)
         }
     }
 

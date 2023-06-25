@@ -7,6 +7,6 @@ class Humans : Faction(
     "humans"
 ) {
 
-
+    override fun hatesFaction(otherFaction: Faction) = otherFaction is Monsters
 
 }
