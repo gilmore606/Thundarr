@@ -952,7 +952,7 @@ object Metamap {
             //startChunk = villages.random()
             // Pick a cabin chunk
             forEachScratch { x, y, cell ->
-                if (cell.hasFeature(Cabin::class)) {
+                if (cell.hasFeature(Farm::class)) {
                     startChunk = XY(x,y)
                 }
             }

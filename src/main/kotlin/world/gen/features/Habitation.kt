@@ -84,9 +84,11 @@ sealed class Habitation : Feature() {
 
         FARM("farm",
             homeComments = setOf(
-                "Tilling the soil brings new life."
+                "Tilling the soil brings new life.",
+                "Farm work is hard work, but it's honest.",
+                "The Lords make the plants grow; I only fulfill their work."
             ),
-            childChance = 0.5f
+            childChance = 0.5f,
         ),
 
         THRALL("thrall",
