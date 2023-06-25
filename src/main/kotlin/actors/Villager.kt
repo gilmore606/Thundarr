@@ -8,6 +8,7 @@ import render.tilesets.Glyph
 import things.Door
 import util.*
 import world.Entity
+import world.gen.features.Habitation
 import world.gen.features.Village
 import world.level.Level
 import world.path.Pather
@@ -15,7 +16,7 @@ import world.path.Pather
 @Serializable
 class Villager(
     val bedLocation: XY,
-    val flavor: Village.Flavor,
+    val flavor: Habitation.Flavor,
     val isChild: Boolean = false,
 ) : Citizen() {
 
@@ -69,8 +70,7 @@ class Villager(
 
     var targetArea = defaultArea
     var previousTargetArea = defaultArea
-    var nextJobChangeHour: Int = 0
-    var nextJobChangeMin: Int = 0
+    var nextJobChangeTime: DayTime = DayTime(0,0)
 
     override fun toString() = name()
 
@@ -88,12 +88,11 @@ class Villager(
 
     fun pickJob() {
         if (targetArea == fulltimeJobArea) return
-        village?.also { village ->
+        habitation?.also { village ->
             val jobArea = fulltimeJobArea ?: village.workAreas.filter { !isChild || it.childOK }.randomOrNull() ?: homeArea
             jobArea.announceJobMsg?.also { msg -> queue(Say(msg)) }
             setTarget(jobArea)
-            nextJobChangeHour = App.gameTime.hour + Dice.range(2, 4)
-            nextJobChangeMin = Dice.oneTo(58)
+            nextJobChangeTime = DayTime(App.gameTime.hour + Dice.range(2, 4), Dice.oneTo(58))
         } ?: run { fulltimeJobArea?.also { setTarget(it) } }
     }
 
@@ -111,27 +110,28 @@ class Villager(
 
     override fun gender() = customGender
     override fun name() = customName
-    override fun hasProperName() = true
     override fun glyph() = customGlyph
+    override fun hasProperName() = true
+    override fun isHuman() = true
     override fun description() = if (isChild) {
         "Like a villager, but small and mischevious.  Its face is smeared with mud."
     } else {
         "A peasant villager in shabby handmade clothes, with weathered skin and a bleak expression."
     }
-    override fun isHuman() = true
 
     override fun idleState() = IdleVillager(
-        Dice.range(17, 20),
-        Dice.range(21, 23),
-        Dice.range(4, 5),
-        Dice.range(6, 8),
+        DayTime.betweenHoursOf(17, 20),
+        DayTime.betweenHoursOf(21, 23),
+        DayTime.betweenHoursOf(4, 5),
+        DayTime.betweenHoursOf(6, 8),
     )
+
     override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
 
     override fun meetPlayerMsg() = if (isChild) {
         "Hello!"
     } else {
-        "Welcome to ${village?.name ?: "our town"}."
+        "Welcome to ${habitation?.name() ?: "our town"}."
     }
 
 }

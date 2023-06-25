@@ -14,7 +14,7 @@ import world.terrains.Terrain
 @Serializable
 class Farm(
     private val isAbandoned: Boolean = false
-) : Feature() {
+) : Habitation() {
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun preventBiomeAnimalSpawns() = !isAbandoned
@@ -28,7 +28,8 @@ class Farm(
     private val barnChance = 0.7f
 
     override fun cellTitle() = "farm"
-    override fun trailDestinationChance() = 0.5f
+    override fun name() = "farm"
+    override fun flavor() = Flavor.FARM
 
     override fun doDig() {
         val width = Dice.range(35, 50)

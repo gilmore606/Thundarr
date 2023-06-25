@@ -1,12 +1,13 @@
 package actors.factions
 
 import kotlinx.serialization.Serializable
+import world.gen.features.Habitation
 import world.gen.features.Village
 
 @Serializable
-class VillageFaction(
+class HabitationFaction(
     val villageName: String,
-    val flavor: Village.Flavor,
+    val flavor: Habitation.Flavor,
 ) : Faction(
     "$villageName citizens"
 ) {

@@ -11,13 +11,14 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.*
 import world.Chunk
+import world.gen.features.Habitation
 import world.gen.features.Village
 
 @Serializable
 class VillageGuard(
     val bounds: Rect,
     val villageName: String,
-    val flavor: Village.Flavor,
+    val flavor: Habitation.Flavor,
 ) : Citizen() {
 
     val maxChaseRange = 60
@@ -51,13 +52,12 @@ class VillageGuard(
     ).random()
 
     private val lantern = LightColor(0.4f, 0.2f, 0.0f)
-    private val lightStartHour = 20
-    private val lightEndHour = 6
-    private val lightMinute = Dice.zeroTil(58)
+    private val lightStartTime = DayTime.betweenHoursOf(20, 21)
+    private val lightEndTime = DayTime.betweenHoursOf(6, 7)
 
     override fun light(): LightColor? {
-        if (App.gameTime.isAfter(lightStartHour, lightMinute) ||
-            App.gameTime.isBefore(lightEndHour, lightMinute)) return lantern
+        if (App.gameTime.isAfter(lightStartTime) ||
+            App.gameTime.isBefore(lightEndTime)) return lantern
         return null
     }
 

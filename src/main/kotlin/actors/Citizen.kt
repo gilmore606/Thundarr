@@ -5,11 +5,12 @@ import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.XY
+import world.gen.features.Habitation
 import world.gen.features.Village
 
 @Serializable
 sealed class Citizen : NPC() {
-    @Transient var village: Village? = null
+    @Transient var habitation: Habitation? = null
 
     override fun receiveAggression(attacker: Actor) {
         if (!isHostileTo(attacker)) {

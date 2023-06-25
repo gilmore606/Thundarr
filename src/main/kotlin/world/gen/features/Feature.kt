@@ -21,6 +21,7 @@ import world.terrains.Terrain
 @Serializable
 sealed class Feature : AnimalSpawnSource {
 
+    open fun name() = ""
     open fun order(): Int = 0
     open fun stage(): Stage = Stage.TERRAIN
     enum class Stage { TERRAIN, BUILD }

@@ -1,6 +1,7 @@
 package world.journal
 
 import kotlinx.serialization.Serializable
+import util.DayTime
 
 @Serializable
 data class GameTime(
@@ -48,16 +49,18 @@ data class GameTime(
         dateString = "$monthName $monthDay, $year"
     }
 
-    fun isBefore(iHour: Int, iMinute: Int): Boolean {
-        if (hour < iHour) return true
-        if (hour > iHour) return false
-        if (minute < iMinute) return true
+    fun isBefore(dayTime: DayTime): Boolean {
+        if (hour < dayTime.hour) return true
+        if (hour > dayTime.hour) return false
+        if (minute < dayTime.min) return true
         return false
     }
-    fun isAfter(iHour: Int, iMinute: Int): Boolean {
-        if (hour > iHour) return true
-        if (hour < iHour) return false
-        if (minute > iMinute) return true
+    fun isAfter(dayTime: DayTime): Boolean {
+        if (hour > dayTime.hour) return true
+        if (hour < dayTime.hour) return false
+        if (minute > dayTime.min) return true
         return false
     }
+
+    fun dayTime() = DayTime(hour, minute)
 }

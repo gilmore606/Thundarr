@@ -1,19 +1,14 @@
 package world.gen.features
 
-import actors.NPC
+import actors.Villager
 import kotlinx.serialization.Serializable
 import util.Dice
 import util.Rect
-import util.XY
-import world.Chunk
 import world.ChunkScratch
-import world.gen.AnimalSpawn
-import world.gen.biomes.*
 import world.gen.decors.Hut
-import world.gen.habitats.*
 
 @Serializable
-class Cabin : Feature() {
+class Cabin : Habitation() {
     override fun order() = 0
     override fun stage() = Stage.BUILD
 
@@ -21,7 +16,9 @@ class Cabin : Feature() {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }
 
-    override fun trailDestinationChance() = 1f
+
+    override fun name() = "cabin"
+    override fun flavor() = Flavor.HERMIT
 
     var bounds = Rect(0, 0, 0, 0)
 
@@ -31,22 +28,22 @@ class Cabin : Feature() {
         val x = Dice.range(3, 63 - width)
         val y = Dice.range(3, 63 - height)
         val fertility = if (Dice.chance(0.3f)) 0f else Dice.float(0.2f, 1f)
-        val room = buildHut(x, y, width, height, fertility)
-        Hut().furnish(room, carto)
+        val hut = buildHut(x, y, width, height, fertility)
+        val hutDecor = Hut()
+        hutDecor.furnish(hut, carto)
+        val newHomeArea = Villager.WorkArea("home", hut.rect, flavor().homeComments)
 
         bounds = Rect(x0 + x, y0 + y, x0 + x+width-1, y0 + y+height-1)
         carto.addTrailBlock(bounds.x0, bounds.y0, bounds.x1, bounds.y1)
+
+        val hermit = Villager(hutDecor.bedLocations[0], flavor(), false).apply {
+            factionID?.also { joinFaction(it) }
+            homeArea = newHomeArea
+        }
+        addCitizen(hermit)
+        findSpawnPointForNPC(chunk, hermit, hut.rect)?.also { spawnPoint ->
+            hermit.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+        }
     }
 
-    override fun animalSpawns() = listOf(
-        AnimalSpawn(
-            { NPC.Tag.NPC_HERMIT },
-            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
-            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            0f, 1000f, 1, 1, 1f
-        )
-    )
-
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
-        findSpawnPointForNPCType(chunk, animalType, bounds)
 }

@@ -15,7 +15,7 @@ import world.terrains.Terrain
 class Tavern(
     private val name: String,
     private val villageDirection: XY
-) : Feature() {
+) : Habitation() {
     override fun order() = 4
     override fun stage() = Stage.BUILD
 
@@ -27,6 +27,9 @@ class Tavern(
     override fun mapIcon() = Glyph.MAP_BUILDING
     override fun mapPOITitle() = name
     override fun mapPOIDescription() = "A roadside inn."
+
+    override fun name() = name
+    override fun flavor() = Flavor.TAVERN
 
     override fun doDig() {
         val width = Dice.range(8, 12)

@@ -3,10 +3,9 @@ package world.gen.features
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Stronghold : Feature() {
+sealed class Stronghold : Habitation() {
 
     var empire: Int? = null
 
-    abstract fun name(): String
-
+    override fun name(): String = "???"
 }

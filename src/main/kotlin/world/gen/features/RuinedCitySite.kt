@@ -10,6 +10,7 @@ class RuinedCitySite(
     override fun order() = 4
     override fun stage() = Stage.BUILD
     override fun name() = name
+    override fun flavor() = Habitation.Flavor.THRALL
 
     override fun doDig() {
         // NOOP.  We only store this for a map marker.

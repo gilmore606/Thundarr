@@ -14,19 +14,15 @@ import kotlinx.serialization.Serializable
 import things.Candlestick
 import things.Door
 import things.Thing
-import util.Dice
-import util.Rect
-import util.XY
-import util.log
+import util.*
 
 @Serializable
 class IdleVillager(
-    val restHour: Int,
-    val sleepHour: Int,
-    val wakeHour: Int,
-    val workHour: Int,
+    val restTime: DayTime,
+    val sleepTime: DayTime,
+    val wakeTime: DayTime,
+    val workTime: DayTime,
 ) : Idle() {
-    val scheduleMinute = Dice.zeroTil(50)
     val wanderChance = 0.4f
     val commentChance = 0.05f
 
@@ -79,18 +75,18 @@ class IdleVillager(
             if (npc.targetArea == Villager.defaultArea) {
                 npc.setTarget(npc.homeArea)
             }
-            if (App.gameTime.isBefore(wakeHour, scheduleMinute) || App.gameTime.isAfter(sleepHour, scheduleMinute)) {
-                npc.pushState(Sleeping(wakeHour, scheduleMinute))
+            if (App.gameTime.isBefore(wakeTime) || App.gameTime.isAfter(sleepTime)) {
+                npc.pushState(Sleeping(wakeTime))
                 return
-            } else if (App.gameTime.isAfter(restHour, scheduleMinute)) {
+            } else if (App.gameTime.isAfter(restTime)) {
                 if (npc.targetArea != npc.homeArea) {
                     npc.say("Time to head home.")
                     npc.setTarget(npc.homeArea)
                 }
-            } else if (App.gameTime.isAfter(workHour, scheduleMinute)) {
+            } else if (App.gameTime.isAfter(workTime)) {
                 if (npc.targetArea == npc.homeArea) {
                     npc.pickJob()
-                } else if (App.gameTime.isAfter(npc.nextJobChangeHour, npc.nextJobChangeMin)) {
+                } else if (App.gameTime.isAfter(npc.nextJobChangeTime)) {
                     npc.pickJob()
                 }
             }
@@ -112,7 +108,7 @@ class IdleVillager(
 
     override fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) {
         if (npc is Villager) {
-            if (event is Knock && culprit == null) {
+            if (event is Knock && culprit == null && npc.homeArea.contains(npc.xy)) {
                 npc.say("Who's that?")
                 // Answer the door!
                 npc.pushState(GoDo(event.door.xy(), Use(Thing.UseTag.OPEN, event.door.getKey())))

@@ -8,16 +8,15 @@ import kotlinx.serialization.Serializable
 import things.Candlestick
 import things.Door
 import things.Thing
+import util.DayTime
 
 @Serializable
 class Sleeping(
-    val wakeHour: Int,
-    val wakeMinute: Int,
+    val wakeTime: DayTime
 ) : State() {
-    val sleptHour = App.gameTime.hour
-    val sleptMinute = App.gameTime.minute
+    val sleptTime = App.gameTime.dayTime()
 
-    override fun toString() = "Sleeping (til $wakeHour:$wakeMinute)"
+    override fun toString() = "Sleeping (til $wakeTime))"
 
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
@@ -52,10 +51,10 @@ class Sleeping(
     }
 
     private fun shouldBeAsleep(): Boolean {
-        if (App.gameTime.isBefore(wakeHour, wakeMinute)) {
+        if (App.gameTime.isBefore(wakeTime)) {
             return true
         }
-        if (!App.gameTime.isBefore(sleptHour, sleptMinute) && sleptHour >= wakeHour && sleptMinute > wakeMinute) {
+        if (!App.gameTime.isBefore(sleptTime) && sleptTime.isAfter(wakeTime)) {
             return true
         }
         return false
