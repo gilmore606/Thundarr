@@ -89,7 +89,7 @@ sealed class StepMap {
     open fun nextStep(from: Actor, to: Actor): XY? = null
     open fun nextStepAwayFrom(from: Actor, to: Actor): XY? = null
 
-    protected fun getNextStep(fromX: Int, fromY: Int): XY? {
+    protected fun getNextStep(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
         val lx = fromX - offsetX
         val ly = fromY - offsetY
@@ -97,19 +97,23 @@ sealed class StepMap {
             val nextstep = map[lx][ly] - 1
             if (nextstep < 0) return null
             val steps = mutableSetOf<XY>()
+            val altSteps = mutableSetOf<XY>()
             DIRECTIONS.from(lx, ly) { tx, ty, dir ->
                 if (tx in 0 until width && ty in 0 until height) {
                     if (map[tx][ty] == nextstep) {
-                        steps.add(dir)
+                        if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) steps.add(dir)
+                    } else if (map[tx][ty] == nextstep - 1) {
+                        if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) altSteps.add(dir)
                     }
                 }
             }
             if (steps.isNotEmpty()) return steps.random()
+            if (altSteps.isNotEmpty()) return altSteps.random()
         }
         return null
     }
 
-    protected fun getNextStepAway(fromX: Int, fromY: Int): XY? {
+    protected fun getNextStepAway(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
         val lx = fromX - offsetX
         val ly = fromY - offsetY
@@ -120,9 +124,9 @@ sealed class StepMap {
             DIRECTIONS.from(lx, ly) { tx, ty, dir ->
                 if (tx in 0 until width && ty in 0 until height) {
                     if (map[tx][ty] == nextstep) {
-                        steps.add(dir)
+                        if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) steps.add(dir)
                     } else if (map[tx][ty] == nextstep - 1) {
-                        altSteps.add(dir)
+                        if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) altSteps.add(dir)
                     }
                 }
             }

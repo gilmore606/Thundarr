@@ -38,6 +38,8 @@ sealed class State {
 
     open fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) { }
 
+    open fun receiveAggression(npc: NPC, attacker: Actor) { }
+
     open fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) { }
 
     open fun converseLines(npc: NPC): List<String>? = null

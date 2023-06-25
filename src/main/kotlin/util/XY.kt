@@ -8,6 +8,8 @@ import kotlin.math.sqrt
 // A mutable 2D vector suitable for passing coordinates.
 @Serializable
 data class XY(var x: Int, var y: Int) {
+    override fun toString() = "$x,$y"
+
     operator fun plus(b: XY): XY {
         return XY(x + b.x, y + b.y)
     }
@@ -57,6 +59,8 @@ data class XY(var x: Int, var y: Int) {
 }
 
 data class XYf(var x: Float, var y: Float) {
+    override fun toString() = "$x,$y"
+
     operator fun plus(b: XYf): XYf {
         return XYf(x + b.x, y + b.y)
     }

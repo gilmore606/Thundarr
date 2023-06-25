@@ -18,7 +18,7 @@ data class PointStepMap(
 
     override fun nextStep(from: Actor, to: XY): XY? {
         if (from.id == walkerID  && to == target) {
-            return getNextStep(from.xy().x, from.xy().y)
+            return getNextStep(from, from.xy().x, from.xy().y)
         }
         return null
     }

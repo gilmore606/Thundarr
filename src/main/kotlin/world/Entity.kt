@@ -27,10 +27,11 @@ interface Entity {
     fun glyphBatch(): QuadBatch
     fun uiBatch(): QuadBatch
     fun name(): String
-    fun dname() = "the " + name()
-    fun dnamec() = "The " + name()
-    fun iname() = name().aOrAn()
-    fun inamec() = name().aOrAn().capitalize()
+    fun hasProperName(): Boolean = false
+    fun dname() = if (hasProperName()) name() else "the " + name()
+    fun dnamec() = if (hasProperName()) name() else "The " + name()
+    fun iname() = if (hasProperName()) name() else name().aOrAn()
+    fun inamec() = if (hasProperName()) name() else name().aOrAn().capitalize()
     fun description(): String
     fun examineDescription(): String = description()
     fun examineInfo(): String = "You don't know anything interesting about " + iname() + "."

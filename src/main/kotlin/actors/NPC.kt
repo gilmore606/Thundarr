@@ -191,6 +191,7 @@ sealed class NPC : Actor() {
                 App.factions.byID(factionID)?.onMemberAttacked(attacker)
             }
         }
+        state.receiveAggression(this, attacker)
     }
 
     fun opinionOf(actor: Actor): Opinion {

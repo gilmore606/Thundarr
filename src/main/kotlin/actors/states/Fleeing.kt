@@ -42,8 +42,8 @@ class Fleeing(
             getActor(targetID)?.also {
                 stepAwayFrom(it)?.also { return it }
             }
+            popState()
         }
-        log.info("FLEE HAD NO ACTION for $npc")
         return super.pickAction(npc)
     }
 

@@ -23,7 +23,7 @@ data class AreaStepMap(
 
     override fun nextStep(from: Actor, to: Rect): XY? {
         if (from.id == walkerID && to == target) {
-            return getNextStep(from.xy().x, from.xy().y)
+            return getNextStep(from, from.xy().x, from.xy().y)
         }
         return null
     }

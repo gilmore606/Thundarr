@@ -1,14 +1,17 @@
 package actors.states
 
+import actors.Actor
 import actors.NPC
 import actors.Villager
 import actors.actions.*
+import actors.actions.events.Event
 import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import things.Candlestick
 import things.Door
 import things.Thing
 import util.DayTime
+import util.XY
 
 @Serializable
 class Sleeping(
@@ -48,6 +51,20 @@ class Sleeping(
     override fun pickAction(npc: NPC): Action {
         if (npc.hasStatus(Status.Tag.ASLEEP)) return Sleep()
         return Wait(0.5f)
+    }
+
+    override fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) {
+        when (event) {
+            is Shout -> {
+                // TODO: senses check?
+                npc.popState()
+                return
+            }
+        }
+    }
+
+    override fun receiveAggression(npc: NPC, attacker: Actor) {
+        npc.popState()
     }
 
     private fun shouldBeAsleep(): Boolean {
