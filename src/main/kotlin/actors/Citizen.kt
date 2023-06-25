@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.XY
 import world.gen.features.Habitation
-import world.gen.features.Village
 
 @Serializable
 sealed class Citizen : NPC() {
@@ -16,16 +15,18 @@ sealed class Citizen : NPC() {
         if (!isHostileTo(attacker)) {
             super.receiveAggression(attacker)
             queue(ShoutHelp(
-                "Guards!  ${attacker.inamec()} is attacking me!"
+                "Help!"
             ))
-            queue(ShoutAccuse(null, attacker))
         }
     }
 
     override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
         when (event) {
-            is ShoutAccuse -> downgradeOpinionOf(event.criminal)
-            is ShoutPraise -> upgradeOpinionOf(event.saint)
+            is ShoutOpinion -> when (event.opinion) {
+                Opinion.HATE -> downgradeOpinionOf(event.criminal)
+                Opinion.LOVE -> upgradeOpinionOf(event.criminal)
+                else -> { }
+            }
             is Attack -> {
                 culprit?.also { culprit ->
                     App.level.director.getActor(event.targetID)?.also { victim ->

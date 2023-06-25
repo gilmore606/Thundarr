@@ -4,10 +4,7 @@ import actors.Actor
 import actors.Citizen
 import actors.NPC
 import actors.Villager
-import actors.actions.Action
-import actors.actions.Get
-import actors.actions.Say
-import actors.actions.Use
+import actors.actions.*
 import actors.actions.events.Event
 import actors.actions.events.Knock
 import kotlinx.serialization.Serializable
@@ -45,6 +42,21 @@ class IdleVillager(
                 } else if (npc.homeArea.includesDoor(door)) {
                     if (npc.targetArea == npc.homeArea && npc.homeArea.contains(npc.xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
+                    }
+                }
+            }
+            if (Dice.chance(0.2f)) {
+                val subjects = mutableSetOf<String>()
+                npc.entitiesSeen { it is Villager }.keys.forEach { hearer ->
+                    subjects.addAll((hearer as Villager).couldLearnFrom(npc))
+                }
+                subjects.firstOrNull()?.also { subjectID ->
+                    App.level.director.getActor(subjectID)?.also { subject ->
+                        val opinion = npc.opinionOf(subject)
+                        return ShoutOpinion(
+                            if (opinion == NPC.Opinion.HATE) "Watch out for ${subject.dname()}!"
+                            else "Did you hear about ${subject.dname()}?",
+                            subject, opinion)
                     }
                 }
             }

@@ -72,6 +72,8 @@ class Villager(
     var previousTargetArea = defaultArea
     var nextJobChangeTime: DayTime = DayTime(0,0)
 
+    val family = mutableListOf<String>()
+
     override fun toString() = name()
 
     fun setTarget(newTarget: WorkArea) {

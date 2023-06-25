@@ -150,6 +150,8 @@ class Village(
                 val newHomeArea = Villager.WorkArea(
                     "home", hut.rect, flavor().homeComments)
                 var isHeadOfHousehold = true
+                val familyIDs = mutableListOf<String>()
+                val family = mutableListOf<Villager>()
                 hutDecor.bedLocations.forEach { bedLocation ->
                     var newJobArea: Villager.WorkArea? = null
                     var isChild = false
@@ -169,12 +171,15 @@ class Village(
                         }
                     }
                     addCitizen(citizen)
+                    familyIDs.add(citizen.id)
+                    family.add(citizen)
                     findSpawnPointForNPC(chunk, citizen, hut.rect)?.also { spawnPoint ->
                         citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
                     } ?: run { log.info("Failed to spawn citizen in ${hut.rect}")}
                     lockDoor(hut.doorXY, citizen)
                     isHeadOfHousehold = false
                 }
+                family.forEach { it.family.addAll(familyIDs) }
             }
         }
 

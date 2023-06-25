@@ -221,6 +221,12 @@ sealed class NPC : Actor() {
         }
     }
 
+    fun couldLearnFrom(npc: NPC): Set<String> = mutableSetOf<String>().apply {
+        npc.opinions.keys.forEach { person ->
+            if (!opinions.contains(person)) add(person)
+        }
+    }
+
     override fun die() {
         den?.onDie(this)
         super.die()

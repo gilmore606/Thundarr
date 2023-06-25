@@ -44,6 +44,9 @@ class Cabin : Habitation() {
         findSpawnPointForNPC(chunk, hermit, hut.rect)?.also { spawnPoint ->
             hermit.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
         }
+
+        // Make some workAreas (HuntingGround)
+
     }
 
 }
