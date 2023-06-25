@@ -18,6 +18,9 @@ class IdleDen(
     val sleepHour: Float,
     val wakeHour: Float,
 ) : Idle() {
+    override fun toString() = "IdleDen"
+
+    // TODO: Change this to just pass the den in constructor
     override fun pickAction(npc: NPC): Action {
         npc.den?.also { Pather.subscribe(npc, it.xy(), wanderRadius) }
 

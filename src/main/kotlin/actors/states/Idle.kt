@@ -94,10 +94,13 @@ sealed class Idle : State() {
 }
 
 @Serializable
-class IdleDoNothing : Idle()
+class IdleDoNothing : Idle() {
+    override fun toString() = "IdleDoNothing"
+}
 
 @Serializable
 class IdleInRoom : Idle() {
+    override fun toString() = "IdleInRoom"
     override fun pickAction(npc: NPC): Action {
         if (Dice.chance(0.5f)) return wander(npc) {
             npc.placeMemory["myRoom0"]?.let { room0 ->
@@ -114,6 +117,7 @@ class IdleInRoom : Idle() {
 class IdleWander(
     val wanderChance: Float
 ) : Idle() {
+    override fun toString() = "IdleWander($wanderChance)"
     override fun pickAction(npc: NPC): Action {
         if (Dice.chance(wanderChance)) {
             return wander(npc) { true }

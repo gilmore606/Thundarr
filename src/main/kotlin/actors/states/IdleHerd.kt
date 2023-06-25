@@ -17,6 +17,7 @@ class IdleHerd(
     val sleepHour: Float,
     val wakeHour: Float,
 ) : Idle() {
+    override fun toString() = "IdleHerd"
 
     override fun pickAction(npc: NPC): Action {
         if (shouldSleep(sleepHour, wakeHour)) {

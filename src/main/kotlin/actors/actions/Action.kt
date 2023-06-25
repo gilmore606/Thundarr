@@ -10,6 +10,8 @@ sealed class Action(
 ) {
     abstract fun name(): String
 
+    override fun toString() = "${name()}($duration)"
+
     // How many turns will this action take?
     open fun durationFor(actor: Actor) = this.duration * actor.actionSpeed()
 

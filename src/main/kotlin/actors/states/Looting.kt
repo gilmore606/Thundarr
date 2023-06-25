@@ -17,6 +17,7 @@ class Looting(
     val targetXY: XY,
     val thingTag: Thing.Tag
 ) : State() {
+    override fun toString() = "Looting($targetXY,$thingTag)"
 
     override fun onEnter(npc: NPC) {
         Pather.subscribe(npc, targetXY, npc.visualRange().toInt())

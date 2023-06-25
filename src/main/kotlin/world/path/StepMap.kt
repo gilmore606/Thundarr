@@ -111,7 +111,6 @@ sealed class StepMap {
 
     protected fun getNextStepAway(fromX: Int, fromY: Int): XY? {
         if (expired) return null
-        log.info("FINDING STEP AWAY FOR $this")
         val lx = fromX - offsetX
         val ly = fromY - offsetY
         if (lx in 0 until width && ly in 0 until height) {
@@ -130,7 +129,6 @@ sealed class StepMap {
             if (steps.isNotEmpty()) return steps.random()
             if (altSteps.isNotEmpty()) return altSteps.random()
         }
-        log.info("NO STEP AWAY FOUND!  for $this")
         return null
     }
 

@@ -115,7 +115,7 @@ fun manhattanDistance(xy0: XY, xy1: XY) = manhattanDistance(xy0.x, xy0.y, xy1.x,
 fun squareDistance(x0: Int, y0: Int, x1: Int, y1: Int): Float =
     max(abs(x1-x0), abs(y1-y0)).toFloat()
 
-fun UUID() = UUID.randomUUID().toString()
+fun UUID() = UUID.randomUUID().toString().drop(14)
 fun shortID() = Random.nextInt(100000000).toString()
 
 fun String.aOrAn(): String {

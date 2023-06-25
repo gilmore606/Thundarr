@@ -42,6 +42,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val id = UUID()
     override fun getHolderKey() = ThingHolder.Key(ThingHolder.Type.ACTOR, actorKey = id)
 
+    override fun toString() = "${name()} ($id)"
+
     var isUnloading = false
     val xy = XY(0,0)
     var juice = 0f // How many turns am I owed?

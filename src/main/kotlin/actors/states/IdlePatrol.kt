@@ -17,7 +17,7 @@ class IdlePatrol(
 
     var heading: XY = CARDINALS.random()
 
-    override fun toString() = "IdlePatrol"
+    override fun toString() = "IdlePatrol($bounds)"
 
     override fun pickAction(npc: NPC): Action {
         if (!Dice.chance(wanderChance)) return Wait(1f)

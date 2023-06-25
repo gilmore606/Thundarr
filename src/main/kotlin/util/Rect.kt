@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
+    override fun toString() = "[$x0,$y0-$x1,$y1]"
 
     fun isTouching(other: Rect): Boolean {
         if (x0 > other.x1 + 1) return false
