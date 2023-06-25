@@ -158,10 +158,7 @@ object Pather {
 
     fun onActorMove(actor: Actor) {
         if (worker?.isActive == false || worker == null) throw RuntimeException("Pather has crashed!")
-
-        coroutineScope.launch {
-            maps.safeForEach { it.onActorMove(actor) }
-        }
+        maps.safeForEach { it.onActorMove(actor) }
     }
 
 }
