@@ -5,6 +5,7 @@ import things.*
 import util.Dice
 import util.XY
 import world.gen.biomes.Biome
+import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
 import world.gen.gardenPlantSpawns

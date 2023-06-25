@@ -39,6 +39,7 @@ sealed class Habitation : Feature() {
             "Home is where the heart is."
         ),
         val childChance: Float = 0.4f,
+        val namePrefix: String = "",
     ) {
 
         HUMAN("human"),
@@ -46,9 +47,17 @@ sealed class Habitation : Feature() {
         HERMIT("hermit",
             homeComments = setOf(
                 "Sometimes I talk to myself, so I don't forget how.",
-                "There's only one person you can really trust."
+                "There's only one person you can really trust.",
+                "I must do my penance in solitude.",
             ),
-            childChance = 0f
+            childChance = 0f,
+            shopDecors = mutableListOf(
+                MeditationSpot(),
+                MeditationSpot(),
+                MeditationSpot(),
+                MeditationSpot()
+            ),
+            namePrefix = "hermit ",
         ),
 
         HUNTER("hunter",
@@ -56,6 +65,12 @@ sealed class Habitation : Feature() {
                 "I live off the land, as the Lords of Light intended.",
                 "Life's not easy out here, but it's free.",
                 "Hunting and foraging makes a body powerful hungry."
+            ),
+            shopDecors = mutableListOf(
+                HuntingGround(),
+                HuntingGround(),
+                HuntingGround(),
+                HuntingGround()
             )
         ),
 

@@ -59,6 +59,19 @@ sealed class Decor {
                 }
             }
         }
+        fun terrainAround(loc: XY, type: Terrain.Type, carto: Carto) {
+            for (ix in -1..1) {
+                for (iy in -1..1) {
+                    val lx = loc.x + ix - rect.x0
+                    val ly = loc.y + iy - rect.y0
+                    if (lx >= 0 && ly >= 0 && lx < width && ly < height) {
+                        clearAt[lx][ly] = false
+                        clears.remove(XY(lx + rect.x0, ly + rect.y0))
+                        carto.setTerrain(lx + rect.x0, ly + rect.y0, type)
+                    }
+                }
+            }
+        }
     }
 
     @Transient lateinit var carto: Carto
@@ -124,6 +137,10 @@ sealed class Decor {
 
     protected fun clearAround() {
         room.unclearAround(cell)
+    }
+
+    protected fun terrainAround(newTerrain: Terrain.Type) {
+        room.terrainAround(cell, newTerrain, carto)
     }
 
     protected fun againstWall(doThis: ()->Unit) {

@@ -99,7 +99,7 @@ class Villager(
     }
 
     private val customGender = if (Dice.flip()) Entity.Gender.MALE else Entity.Gender.FEMALE
-    private val customName = Madlib.villagerName(customGender) + if (isChild) {
+    private val customName = flavor.namePrefix + Madlib.villagerName(customGender) + if (isChild) {
         if (customGender == Entity.Gender.MALE) "ie" else "ki"
     } else ""
 
