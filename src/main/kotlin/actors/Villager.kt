@@ -5,6 +5,7 @@ import actors.states.Fleeing
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Door
 import util.*
 import world.Entity
 import world.gen.features.Village
@@ -36,6 +37,7 @@ class Villager(
         override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
         fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
+        fun includesDoor(door: Door) = contains(door.xy()) || isAdjacentTo(door.xy())
         fun villagerCount(level: Level?): Int {
             var count = 0
             level?.also { level ->
@@ -46,6 +48,19 @@ class Villager(
                 }
             }
             return count
+        }
+        fun villagers(level: Level?): Set<Villager> {
+            val villagers = mutableSetOf<Villager>()
+            level?.also { level ->
+                for (ix in rect.x0..rect.x1) {
+                    for (iy in rect.y0..rect.y1) {
+                        level.actorAt(ix, iy)?.also {
+                            if (it is Villager) villagers.add(it)
+                        }
+                    }
+                }
+            }
+            return villagers
         }
     }
 

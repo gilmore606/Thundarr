@@ -42,11 +42,11 @@ class IdleVillager(
         if (npc is Villager) {
             npc.entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
                 // Close the door behind us if we're leaving this area, or entering our home
-                if (npc.previousTargetArea.contains(door.xy()) || npc.previousTargetArea.isAdjacentTo(door.xy())) {
+                if (npc.previousTargetArea.includesDoor(door as Door)) {
                     if ((npc.targetArea != npc.previousTargetArea) && !npc.previousTargetArea.contains(npc.xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
                     }
-                } else if (npc.homeArea.contains(door.xy()) || npc.homeArea.isAdjacentTo(door.xy())) {
+                } else if (npc.homeArea.includesDoor(door)) {
                     if (npc.targetArea == npc.homeArea && npc.homeArea.contains(npc.xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
                     }
