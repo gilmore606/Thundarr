@@ -19,6 +19,8 @@ class Attacking(
     val giveUpText: String? = null,
 ) : State() {
 
+    var lastLocation: XY? = null
+
     override fun toString() = "Attacking (target $targetID)"
 
     override fun onEnter(npc: NPC) {
@@ -35,14 +37,19 @@ class Attacking(
 
     override fun considerState(npc: NPC) {
         npc.apply {
-            if (!canSee(getActor(targetID))) {
-                popState()
-                return
-            }
             origin?.also { origin ->
                 if (distanceBetween(origin, npc.xy) > maxChaseRange) {
-                    giveUpText?.also { npc.queue(Say(it)) }
-                    popState()
+                    giveUp(npc)
+                    return
+                }
+            }
+            getActor(targetID)?.also { target ->
+                if (!canSee(target)) {
+                    lastLocation?.also { lastLocation ->
+                        pushState(Seeking(lastLocation, targetID, origin, maxChaseRange, giveUpText))
+                        this@Attacking.lastLocation = null
+                        return
+                    }
                 }
             }
         }
@@ -51,14 +58,26 @@ class Attacking(
     override fun pickAction(npc: NPC): Action {
         npc.apply {
             getActor(targetID)?.also { target ->
+                lastLocation = target.xy.copy()
                 if (entitiesNextToUs().contains(target)) {
                     return Attack(target.id, target.xy - npc.xy)
-                } else {
+                } else if (canSee(target)) {
                     stepToward(target)?.also { return it }
+                } else if (lastLocation != null) {
+                    if (npc.xy == lastLocation) {
+                        giveUp(npc)
+                    } else {
+                        stepToward(lastLocation!!)?.also { return it }
+                    }
                 }
             }
         }
         return super.pickAction(npc)
+    }
+
+    private fun giveUp(npc: NPC) {
+        giveUpText?.also { npc.queue(Say(it)) }
+        npc.popState()
     }
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {

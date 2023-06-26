@@ -1,15 +1,10 @@
 package actors
 
-import actors.actions.Action
-import actors.actions.Wait
-import actors.states.Idle
 import actors.states.IdleInRoom
 import actors.states.Looting
-import actors.states.Seeking
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
-import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import audio.Speaker
 import kotlinx.serialization.Serializable
@@ -17,7 +12,6 @@ import render.tilesets.Glyph
 import things.Cheese
 import things.Teeth
 import things.Thing
-import util.Dice
 
 @Serializable
 class Ratman(
