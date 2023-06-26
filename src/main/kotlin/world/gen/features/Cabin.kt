@@ -17,7 +17,7 @@ class Cabin : Habitation() {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }
 
-    private val flavor = if (Dice.chance(1f)) Flavor.HERMIT else Flavor.HUNTER
+    private val flavor = if (Dice.chance(0.5f)) Flavor.HERMIT else Flavor.HUNTER
     override fun name() = "cabin"
     override fun flavor() = flavor
 
@@ -37,14 +37,8 @@ class Cabin : Habitation() {
         bounds = Rect(x0 + x, y0 + y, x0 + x+width-1, y0 + y+height-1)
         carto.addTrailBlock(bounds.x0, bounds.y0, bounds.x1, bounds.y1)
 
-        val hermit = Villager(hutDecor.bedLocations[0], flavor(), false).apply {
-            factionID?.also { joinFaction(it) }
-            homeArea = newHomeArea
-        }
-        addCitizen(hermit)
-        findSpawnPointForNPC(chunk, hermit, hut.rect)?.also { spawnPoint ->
-            hermit.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
-        }
+        val hermit = Villager(hutDecor.bedLocations[0], flavor(), false)
+        placeCitizen(hermit, hut.rect, newHomeArea)
 
         val areaCount = Dice.oneTo(3)
         val areas = mutableListOf<Rect>()

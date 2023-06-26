@@ -73,7 +73,9 @@ fun tileFragShader() = """
         
         float grey = 0.21 * hueShifted.r + 0.71 * hueShifted.g + 0.07 * hueShifted.b;
         float white = max(0.0, v_Grayout - 1.0);
-        gl_FragColor = vec4(hueShifted.r * (1.0 - v_Grayout) + grey * v_Grayout + white, hueShifted.g * (1.0 - v_Grayout) + grey * v_Grayout + white, hueShifted.b * (1.0 - v_Grayout) + grey * v_Grayout + white, sample.a);
+        float graydown = (1.0 - v_Grayout);
+        float grayup = grey * v_Grayout * 0.75;
+        gl_FragColor = vec4(hueShifted.r * graydown + grayup + white, hueShifted.g * graydown + grayup + white, hueShifted.b * graydown + grayup + white, sample.a);
        
        // water waves
        if (v_Waves > 0.0 && v_Grayout == 0.0) {

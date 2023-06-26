@@ -230,10 +230,56 @@ class Barn : Decor() {
 }
 
 @Serializable
-class Tavern : Decor() {
-    override fun description() = "A roadside inn."
+class Tavern(val name: String) : Decor() {
+    override fun description() = "A roadside inn: \"$name\"."
     override fun abandonedDescription() = "An abandoned inn."
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
+        againstWall { spawn(Candlestick())}
+
+        repeat (Dice.range(5, 8)) {
+            awayFromWall {
+                spawn(Table())
+                clearAround()
+            }
+        }
+    }
+    override fun workAreaName() = "tavern"
+    override fun workAreaComments() = mutableSetOf(
+        "I drink to forget.  But I forgot what I was forgetting.",
+        "Here's to the Lords of Light!",
+        "Always a good time in $name!",
+    )
+}
+
+@Serializable
+class TavernLoiterArea(val name: String): Decor() {
+    override fun description() = "The ground around $name is well trodden."
+    override fun doFurnish() {
+        againstWall { spawn(Lamppost()) }
+    }
+    override fun workAreaName() = "smoking spot"
+    override fun workAreaComments() = mutableSetOf(
+        "You got a smoke?",
+        "Sometimes I worry I drink too much.",
+        "My wife says I should quit drinking.  But why?",
+    )
+    override fun announceJobMsg() = listOf("I'm goin out for a smoke.", "Gonna step outside a minute.").random()
+}
+
+@Serializable
+class Barracks(val vertical: Boolean) : Decor() {
+    var bedLocations = mutableListOf<XY>()
+    override fun description() = "A dormitory barracks."
+    override fun doFurnish() {
+        forEachClear { x,y ->
+            if ((vertical && x % 2 == 0) || (!vertical && y % 2 == 0)) {
+                spawn(Bedroll()) { bedXY ->
+                    bedLocations.add(bedXY)
+                }
+            }
+        }
+        againstWall { spawn(Candlestick()) }
+        againstWall { spawn(Trunk()) }
     }
 }

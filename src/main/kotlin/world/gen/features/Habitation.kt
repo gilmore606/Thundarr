@@ -5,8 +5,7 @@ import actors.Villager
 import actors.factions.HabitationFaction
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import util.Madlib
-import util.XY
+import util.*
 import world.ChunkScratch
 import world.gen.decors.*
 import world.level.Level
@@ -41,7 +40,6 @@ sealed class Habitation : Feature() {
         val childChance: Float = 0.4f,
         val namePrefix: String = "",
     ) {
-
         HUMAN("human"),
 
         HERMIT("hermit",
@@ -80,7 +78,25 @@ sealed class Habitation : Feature() {
                 "Have an ale, it'll take the edge off."
             ),
             childChance = 0f
-        ),
+        ) {
+            override fun restTime() = DayTime(23, Dice.range(0, 30))
+            override fun sleepTime() = DayTime(23, Dice.range(35, 45))
+            override fun wakeTime() = DayTime.betweenHoursOf(8, 9)
+            override fun workTime() = DayTime.betweenHoursOf(9, 11)
+          },
+
+        INNKEEPER("innkeeper",
+            homeComments = setOf(
+                "Drinking helps me cope.",
+                "Have an ale, it'll take the edge off."
+            ),
+            childChance = 0f
+        ) {
+            override fun restTime() = DayTime(23, 35)
+            override fun sleepTime() = DayTime(23,50)
+            override fun wakeTime() = DayTime(4, 30)
+            override fun workTime() = DayTime(5, 0)
+          },
 
         FARM("farm",
             homeComments = setOf(
@@ -103,13 +119,29 @@ sealed class Habitation : Feature() {
                 "At least I can rest from wizard's labours, for a little while."
             ),
             childChance = 0.1f
-        ),
+        );
+
+        open fun restTime() = DayTime.betweenHoursOf(17, 20)
+        open fun sleepTime() = DayTime.betweenHoursOf(21, 23)
+        open fun wakeTime() = DayTime.betweenHoursOf(4, 5)
+        open fun workTime() = DayTime.betweenHoursOf(6, 8)
     }
 
     protected val citizens = mutableSetOf<String>() // actor ids
     protected fun addCitizen(citizen: Citizen) {
         citizens.add(citizen.id)
         citizen.habitation = this
+    }
+
+    protected fun placeCitizen(citizen: Citizen, spawnRect: Rect, homeArea: Villager.WorkArea? = null,
+                               fulltimeJobArea: Villager.WorkArea? = null) {
+        factionID?.also { citizen.joinFaction(it) }
+        homeArea?.also { if (citizen is Villager) citizen.homeArea = it }
+        fulltimeJobArea?.also { if (citizen is Villager) citizen.fulltimeJobArea = it }
+        addCitizen(citizen)
+        findSpawnPointForNPC(chunk, citizen, spawnRect)?.also { spawnPoint ->
+            citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+        } ?: run { log.warn("Failed to spawn citizen in ${spawnRect}") }
     }
 
     var factionID: String? = null

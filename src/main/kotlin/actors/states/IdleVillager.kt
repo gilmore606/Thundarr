@@ -1,15 +1,14 @@
 package actors.states
 
 import actors.Actor
-import actors.Citizen
 import actors.NPC
 import actors.Villager
 import actors.actions.*
 import actors.actions.events.Event
 import actors.actions.events.Knock
 import kotlinx.serialization.Serializable
-import things.Candlestick
 import things.Door
+import things.SwitchableLight
 import things.Thing
 import util.*
 
@@ -103,12 +102,12 @@ class IdleVillager(
                 }
             }
 
-            npc.entitiesSeen { it is Candlestick }.keys.firstOrNull()?.also { light ->
-                if ((light as Candlestick).lit && npc.previousTargetArea.contains(light.xy()) && (npc.targetArea != npc.previousTargetArea) &&
+            npc.entitiesSeen { it is SwitchableLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
+                if ((light as SwitchableLight).lit && npc.previousTargetArea.contains(light.xy()) && (npc.targetArea != npc.previousTargetArea) &&
                     npc.previousTargetArea.contains(npc.xy()) && npc.previousTargetArea.villagerCount(npc.level()) <= 1) {
                     // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
                     npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
-                } else if (!(light as Candlestick).lit && npc.targetArea.contains(npc.xy) && npc.targetArea.contains(light.xy())) {
+                } else if (!(light).lit && npc.targetArea.contains(npc.xy) && npc.targetArea.contains(light.xy())) {
                     // Is it out, and we're staying here?  Light it
                     npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light.getKey())))
                 }

@@ -7,8 +7,7 @@ import actors.actions.*
 import actors.actions.events.Event
 import actors.statuses.Status
 import kotlinx.serialization.Serializable
-import things.Candlestick
-import things.Door
+import things.SwitchableLight
 import things.Thing
 import util.DayTime
 import util.XY
@@ -24,7 +23,7 @@ class Sleeping(
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
-                npc.entitiesSeen { it is Candlestick && it.lit && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
+                npc.entitiesSeen { it is SwitchableLight && !it.leaveLit() && it.lit && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
                     var awakeRoomies = false
                     npc.targetArea.villagers(npc.level).forEach { villager ->
                         if (villager.state !is Sleeping) awakeRoomies = true

@@ -128,15 +128,14 @@ class CeilingLight : LitThing(), Smashable {
 }
 
 @Serializable
-class Candlestick : LitThing() {
-    override val tag = Tag.THING_CANDLESTICK
+sealed class SwitchableLight : LitThing() {
     var lit = false
-    override fun glyph() = if (lit) Glyph.CANDLESTICK_ON else Glyph.CANDLESTICK_OFF
-    override fun name() = "candlestick"
-    override fun description() = "An iron candlestick holding three thick beeswax candles."
     override fun isPortable() = false
-    override val lightColor = LightColor(0.6f, 0.5f, 0.3f)
     override fun light() = if (lit) lightColor else null
+    override fun glyph() = if (lit) glyphLit() else glyphDark()
+    abstract fun glyphLit(): Glyph
+    abstract fun glyphDark(): Glyph
+    open fun leaveLit() = false
 
     override fun uses() = mapOf(
         UseTag.SWITCH_ON to Use("light " + name(), 0.5f,
@@ -147,7 +146,7 @@ class Candlestick : LitThing() {
                 Console.sayAct("You light %dd.", "%Dn lights %dd.", actor, this)
             }),
         UseTag.SWITCH_OFF to Use("extinguish " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> lit && isNextTo(actor) },
+            canDo = { actor,x,y,targ -> lit && isNextTo(actor) && !leaveLit() },
             toDo = { actor,level,x,y ->
                 Console.sayAct("You snuff out %dd.", "%Dn snuffs out %dd.", actor, this)
                 lit = false
@@ -155,7 +154,28 @@ class Candlestick : LitThing() {
             }
         )
     )
+}
 
+@Serializable
+class Candlestick : SwitchableLight() {
+    override val tag = Tag.THING_CANDLESTICK
+    override fun glyphLit() = Glyph.CANDLESTICK_ON
+    override fun glyphDark() = Glyph.CANDLESTICK_OFF
+    override fun name() = "candlestick"
+    override fun description() = "An iron candlestick holding three thick beeswax candles."
+    override val lightColor = LightColor(0.6f, 0.5f, 0.3f)
+}
+
+@Serializable
+class Lamppost : SwitchableLight() {
+    override val tag = Tag.THING_LAMPPOST
+    override fun glyphLit() = Glyph.LAMPPOST_ON
+    override fun glyphDark() = Glyph.LAMPPOST_OFF
+    override fun leaveLit() = true
+    override fun name() = "lamppost"
+    override fun description() = "A wrought iron lamppost."
+    override val lightColor = LightColor(0.5f, 0.8f, 0f)
+    init { lit = true }
 }
 
 @Serializable

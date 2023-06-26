@@ -153,4 +153,6 @@ fun ThingTileSet() =
         setTile(Glyph.LEATHER, SimpleTile(this, 11, 1))
         setTile(Glyph.CANDLESTICK_OFF, SimpleTile(this, 11, 2))
         setTile(Glyph.CANDLESTICK_ON, SimpleTile(this, 11, 3))
+        setTile(Glyph.LAMPPOST_OFF, SimpleTile(this, 11, 4))
+        setTile(Glyph.LAMPPOST_ON, SimpleTile(this, 11, 5))
     }

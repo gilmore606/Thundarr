@@ -160,22 +160,15 @@ class Village(
                     } else {
                         isChild = !isHeadOfHousehold && Dice.chance(flavor.childChance)
                     }
-                    val citizen = Villager(bedLocation, flavor, isChild).apply {
-                        factionID?.also { joinFaction(it) }
-                        homeArea = newHomeArea
-                        fulltimeJobArea = newJobArea
-                        if (newJobArea != null) {
-                            val signText = newJobArea.signText!!.replace("%n", this.name())
-                            val sign = if (Dice.flip()) HighwaySign(signText) else TrailSign(signText)
-                            spawnThing(newJobArea.signXY!!.x, newJobArea.signXY!!.y, sign)
-                        }
+                    val citizen = Villager(bedLocation, flavor, isChild)
+                    if (newJobArea != null) {
+                        val signText = newJobArea.signText!!.replace("%n", this.name())
+                        val sign = if (Dice.flip()) HighwaySign(signText) else TrailSign(signText)
+                        spawnThing(newJobArea.signXY!!.x, newJobArea.signXY!!.y, sign)
                     }
-                    addCitizen(citizen)
+                    placeCitizen(citizen, hut.rect, newHomeArea, newJobArea)
                     familyIDs.add(citizen.id)
                     family.add(citizen)
-                    findSpawnPointForNPC(chunk, citizen, hut.rect)?.also { spawnPoint ->
-                        citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
-                    } ?: run { log.info("Failed to spawn citizen in ${hut.rect}")}
                     lockDoor(hut.doorXY, citizen)
                     isHeadOfHousehold = false
                 }
@@ -198,14 +191,9 @@ class Village(
         val numGuards = 1.coerceAtLeast((size / 4))
         val bounds = Rect(x0 + 4, y0 + 4, x1 - 4, y1 - 4)
         repeat (numGuards) {
-            val guard = VillageGuard(bounds, name, flavor).apply {
-                factionID?.also { joinFaction(it) }
-            }
-            addCitizen(guard)
+            val guard = VillageGuard(bounds, name, flavor)
+            placeCitizen(guard, bounds)
             guards.add(guard)
-            findSpawnPointForNPC(chunk, guard, bounds)?.also { spawnPoint ->
-                guard.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
-            }
         }
     }
 

@@ -219,6 +219,8 @@ enum class Glyph {
     LEATHER,
     CANDLESTICK_OFF,
     CANDLESTICK_ON,
+    LAMPPOST_OFF,
+    LAMPPOST_ON,
 
     BLOODSTAIN,
     SCORCHMARK,

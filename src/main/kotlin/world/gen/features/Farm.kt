@@ -106,14 +106,8 @@ class Farm(
             houseDecor.furnish(hut, carto, isAbandoned = isAbandoned)
             if (!isAbandoned) {
                 val newHomeArea = Villager.WorkArea("home", hut.rect, flavor().homeComments)
-                val farmer = Villager(houseDecor.bedLocations[0], flavor(), isChild = false).apply {
-                    factionID?.also { joinFaction(it) }
-                    homeArea = newHomeArea
-                }
-                addCitizen(farmer)
-                findSpawnPointForNPC(chunk, farmer, hut.rect)?.also { spawnPoint ->
-                    farmer.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
-                }
+                val farmer = Villager(houseDecor.bedLocations[0], flavor(), isChild = false)
+                placeCitizen(farmer, hut.rect, newHomeArea)
             }
         }
 

@@ -121,12 +121,7 @@ class Villager(
         "A peasant villager in shabby handmade clothes, with weathered skin and a bleak expression."
     }
 
-    override fun idleState() = IdleVillager(
-        DayTime.betweenHoursOf(17, 20),
-        DayTime.betweenHoursOf(21, 23),
-        DayTime.betweenHoursOf(4, 5),
-        DayTime.betweenHoursOf(6, 8),
-    )
+    override fun idleState() = IdleVillager(flavor.restTime(), flavor.sleepTime(), flavor.wakeTime(), flavor.workTime())
 
     override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
 

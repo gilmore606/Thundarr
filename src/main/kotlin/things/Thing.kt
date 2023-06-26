@@ -139,6 +139,7 @@ sealed class Thing() : Entity {
         THING_HIDE("hide", "hides", { Hide() }),
         THING_SCALYHIDE("scaly hide", "scaly hides", { ScalyHide() }),
         THING_CANDLESTICK("candlestick", "candlesticks", { Candlestick() }),
+        THING_LAMPPOST("lamppost", "lampposts", { Lamppost() }),
     }
 
     abstract val tag: Tag
