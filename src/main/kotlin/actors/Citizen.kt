@@ -4,6 +4,7 @@ import actors.actions.*
 import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import util.Dice
 import util.XY
 import util.log
 import world.gen.features.Habitation
@@ -22,7 +23,6 @@ sealed class Citizen : NPC() {
     }
 
     override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
-        log.info("$this heard $event")
         when (event) {
             is ShoutOpinion -> {
                 when (event.opinion) {
@@ -40,7 +40,34 @@ sealed class Citizen : NPC() {
                     }
                 }
             }
+            is Smash -> {
+                culprit?.also { culprit ->
+                    say(listOf(
+                        "What do you think you're doing?!", "You can't do that!", "Stop!"
+                    ).random())
+                    downgradeOpinionOf(culprit)
+                }
+            }
         }
         super.witnessEvent(culprit, event, location)
+    }
+
+    override fun pickAction(): Action? {
+        if (Dice.chance(0.2f)) {
+            val subjects = mutableSetOf<String>()
+            entitiesSeen { it is Citizen }.keys.forEach { hearer ->
+                subjects.addAll((hearer as Citizen).couldLearnFrom(this))
+            }
+            subjects.firstOrNull()?.also { subjectID ->
+                App.level.director.getActor(subjectID)?.also { subject ->
+                    val opinion = opinionOf(subject)
+                    return ShoutOpinion(
+                        if (opinion == NPC.Opinion.HATE) "Watch out for ${subject.dname()}!"
+                        else "Did you hear about ${subject.dname()}?",
+                        subject, opinion)
+                }
+            }
+        }
+        return null
     }
 }

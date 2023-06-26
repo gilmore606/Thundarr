@@ -99,8 +99,10 @@ sealed class NPC : Actor() {
     final override fun wantsToAct() = state.wantsToAct()
     final override fun defaultAction(): Action {
         doConsiderState()
+        this.pickAction()?.also { return it }
         return state.pickAction(this)
     }
+    open fun pickAction(): Action? = null
 
     override fun onRestore() {
         super.onRestore()

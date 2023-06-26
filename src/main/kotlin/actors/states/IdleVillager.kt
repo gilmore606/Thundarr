@@ -44,21 +44,6 @@ class IdleVillager(
                     }
                 }
             }
-            if (Dice.chance(0.2f)) {
-                val subjects = mutableSetOf<String>()
-                npc.entitiesSeen { it is Villager }.keys.forEach { hearer ->
-                    subjects.addAll((hearer as Villager).couldLearnFrom(npc))
-                }
-                subjects.firstOrNull()?.also { subjectID ->
-                    App.level.director.getActor(subjectID)?.also { subject ->
-                        val opinion = npc.opinionOf(subject)
-                        return ShoutOpinion(
-                            if (opinion == NPC.Opinion.HATE) "Watch out for ${subject.dname()}!"
-                            else "Did you hear about ${subject.dname()}?",
-                            subject, opinion)
-                    }
-                }
-            }
             if (npc.targetArea.contains(npc.xy)) {
                 // We're here, do whatever!
                 if (!npc.isChild && Dice.chance(commentChance)) {

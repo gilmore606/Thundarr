@@ -37,8 +37,8 @@ class Tavern(
     override fun flavor() = Flavor.TAVERN
 
     override fun doDig() {
-        val width = Dice.range(12, 15)
-        val height = Dice.range(12, 15)
+        val width = Dice.range(10, 15)
+        val height = Dice.range(10, 15)
         val x = x0 + Dice.range(25, 35 - width) - villageDirection.x * 14
         val y = y0 + Dice.range(25, 35 - height) - villageDirection.y * 14
         carveBlock(x-1, y-1, x + width, y + height, Terrain.Type.TEMP1)
@@ -64,7 +64,7 @@ class Tavern(
             wallx1 = wallx0
             wallyinc = 1
             tavernRect = Rect(hut.rect.x0 + 4, hut.rect.y0, hut.rect.x1, hut.rect.y1)
-            bedroomRect = Rect(hut.rect.x0, hut.rect.x0 + 2, hut.rect.y0, hut.rect.y1)
+            bedroomRect = Rect(hut.rect.x0, hut.rect.y0, hut.rect.x0 + 2, hut.rect.y1)
             loiterRect = Rect(hut.rect.x1 + 2, hut.rect.y0 + 1, hut.rect.x1 + 4, hut.rect.y1 - 1)
         } else if (hut.doorDir == WEST) {
             wallx0 = hut.rect.x1 - 3
