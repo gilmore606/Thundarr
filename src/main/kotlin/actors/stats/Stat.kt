@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import ui.panels.Console
 import util.Dice
 
-val allStats = listOf(Strength, Speed, Brains, Heart)
+val allStats = listOf(Strength, Speed, Brains, Heart, Senses)
 
 abstract class Stat(
     val tag: Tag,
@@ -17,8 +17,8 @@ abstract class Stat(
 
     private val ipPerImprove = 5f
 
-    enum class Tag { STR, SPD, BRN, HRT,
-                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC }
+    enum class Tag { STR, SPD, BRN, HRT, SEN,
+                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC, SNEAK }
 
     companion object {
         fun get(tag: Tag) = when (tag) {
@@ -26,6 +26,7 @@ abstract class Stat(
             Tag.SPD -> Speed
             Tag.BRN -> Brains
             Tag.HRT -> Heart
+            Tag.SEN -> Senses
             Tag.DIG -> Dig
             Tag.FIGHT -> Fight
             Tag.DODGE -> Dodge
@@ -33,6 +34,7 @@ abstract class Stat(
             Tag.BUILD -> Build
             Tag.SURVIVE -> Survive
             Tag.MEDIC -> Medic
+            Tag.SNEAK -> Sneak
         }
     }
 

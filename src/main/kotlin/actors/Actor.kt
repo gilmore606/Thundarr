@@ -64,6 +64,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     val queuedActions: MutableList<Action> = mutableListOf()
 
+    @Transient var currentSenses: Float = 0f
+    @Transient var currentStealth: Float = 0f
+
     @Transient var seen = mutableMapOf<Entity, Float>()
     @Transient var seenUpdatedAt = 0.0
 
@@ -606,9 +609,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     private fun updateSeen() {
+        updateSenseRolls()
         seen.clear()
         caster.populateSeenEntities(seen, this)
         seenUpdatedAt = App.time
+    }
+
+    private fun updateSenseRolls() {
+
     }
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(this, xy, dir) ?: false

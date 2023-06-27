@@ -11,7 +11,7 @@ import ui.input.Mouse
 import util.*
 import java.lang.Integer.max
 
-class SkillsModal(val actor: Actor) : Modal(370, 500, "- ${actor.name()} -") {
+class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
 
     val header = 80
     val padding = 18
