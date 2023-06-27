@@ -18,7 +18,8 @@ sealed class Terrain(
     private val flyable: Boolean,
     private val opaque: Boolean,
     val canGrowPlants: Boolean,
-    val dataType: Type = type  // should match TerrainData.forType
+    val dataType: Type = type,  // should match TerrainData.forType
+    val sneakDifficulty: Float = 0f,
 ) : Entity {
 
     companion object {

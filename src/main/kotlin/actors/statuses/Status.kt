@@ -51,6 +51,8 @@ sealed class Status : StatEffector {
     override fun statEffects() = defaultStatEffects
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
 
+    open fun preventVision() = false
+
     open fun onAddStack(actor: Actor, added: Status) { }
 
     open fun advanceTime(actor: Actor, delta: Float) { }

@@ -4,11 +4,13 @@ import actors.actions.*
 import actors.actions.events.Event
 import actors.animations.Animation
 import actors.animations.Step
+import actors.stats.Senses
 import actors.stats.Speed
 import actors.stats.Stat
 import actors.stats.Strength
 import actors.stats.skills.Dodge
 import actors.stats.skills.Skill
+import actors.stats.skills.Sneak
 import actors.statuses.*
 import audio.Speaker
 import kotlinx.serialization.Serializable
@@ -65,7 +67,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val queuedActions: MutableList<Action> = mutableListOf()
 
     @Transient var currentSenses: Float = 0f
-    @Transient var currentStealth: Float = 0f
+    @Transient var currentSneak: Float = 0f
 
     @Transient var seen = mutableMapOf<Entity, Float>()
     @Transient var seenUpdatedAt = 0.0
@@ -560,24 +562,38 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
+    // Can we see at all?
+    open fun canSee(): Boolean = statuses.hasNoneWhere { it.preventVision() }
+    open fun canSeeInDark(): Boolean = false
+
+    // Is Entity in our seen list?
     open fun canSee(entity: Entity?): Boolean {
         if (level == null) return false
         if (entity == null) return false
         if (entity.level() != level) return false
-        entity.xy().also { entityXY ->
-            if (distanceBetween(entityXY, xy) > visualRange()) return false
-        }
         return entitiesSeen { it == entity }.isNotEmpty()
     }
 
-    open fun canSee(targetXY: XY): Boolean {
+    // Given our senses and lighting, can we see XY?
+    // updateSeen() uses this with checkOcclusion = false
+    open fun canSee(targetXY: XY, checkOcclusion: Boolean = true): Boolean {
         if (level == null) return false
+        if (!canSee()) return false
         if (distanceBetween(targetXY, xy) > visualRange()) return false
-        var occluded = false
-        drawLine(targetXY, xy) { tx, ty ->
-            if (level?.isOpaqueAt(tx, ty) == true) occluded = true
+        if (checkOcclusion) {
+            var occluded = false
+            drawLine(targetXY, xy) { tx, ty ->
+                if (level?.isOpaqueAt(tx, ty) == true) occluded = true
+            }
+            if (occluded) return false
         }
-        return !occluded
+        if (canSeeInDark()) return true
+        val light = level?.lightAt(targetXY.x, targetXY.y)?.brightness() ?: 0f
+        if (light < 0.3f) return false
+        if (light > 0.75f) return true
+        val diff = 3 - (light / 0.2f) // 1 = lowlight 4 = high
+        if (currentSenses > diff) return true
+        return false
     }
 
     // TODO : Implement this for real
@@ -585,6 +601,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (level == null) return false
         if (distanceBetween(targetXY, xy) > visualRange()) return false
         return true
+    }
+
+    open fun sneakCheck(perceiver: Actor): Boolean {
+        return this.currentSneak - perceiver.currentSenses > 0
     }
 
     fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {
@@ -599,7 +619,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun entitiesSeen(matching: ((Entity)->Boolean)? = null): Map<Entity, Float> {
-        if (seenUpdatedAt < App.time) updateSeen()
+        if (seenUpdatedAt < App.time) {
+            updateSenseRolls()
+            updateSeen()
+        }
         matching?.also { matching ->
             val filtered = mutableMapOf<Entity, Float>()
             seen.keys.forEach { if (matching(it)) filtered[it] = seen[it]!! }
@@ -609,14 +632,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     private fun updateSeen() {
-        updateSenseRolls()
         seen.clear()
         caster.populateSeenEntities(seen, this)
         seenUpdatedAt = App.time
     }
 
     private fun updateSenseRolls() {
+        currentSenses = Senses.resolve(this, 0f, true)
 
+        val terrain = Terrain.get(level?.getTerrain(xy.x, xy.y) ?: Terrain.Type.TERRAIN_DIRT)
+        currentSneak = Sneak.resolve(this, terrain.sneakDifficulty, true)
     }
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(this, xy, dir) ?: false

@@ -38,7 +38,7 @@ class Attacking(
     override fun considerState(npc: NPC) {
         npc.apply {
             origin?.also { origin ->
-                if (distanceBetween(origin, npc.xy) > maxChaseRange) {
+                if (distanceBetween(origin, xy) > maxChaseRange) {
                     giveUp(npc)
                     return
                 }
@@ -46,8 +46,13 @@ class Attacking(
             getActor(targetID)?.also { target ->
                 if (!canSee(target)) {
                     lastLocation?.also { lastLocation ->
-                        pushState(Seeking(lastLocation, targetID, origin, maxChaseRange, giveUpText))
                         this@Attacking.lastLocation = null
+                        say(seekTargetMsg())
+                        pushState(Seeking(lastLocation, targetID, origin, maxChaseRange, giveUpText))
+                        return
+                    } ?: run {
+                        say(lostTargetMsg())
+                        giveUp(npc)
                         return
                     }
                 }
@@ -58,7 +63,6 @@ class Attacking(
     override fun pickAction(npc: NPC): Action {
         npc.apply {
             getActor(targetID)?.also { target ->
-                lastLocation = target.xy.copy()
                 if (entitiesNextToUs().contains(target)) {
                     return Attack(target.id, target.xy - npc.xy)
                 } else if (canSee(target)) {
@@ -67,6 +71,7 @@ class Attacking(
                     if (npc.xy == lastLocation) {
                         giveUp(npc)
                     } else {
+                        lastLocation = target.xy.copy()
                         stepToward(lastLocation!!)?.also { return it }
                     }
                 }

@@ -11,7 +11,8 @@ import world.level.Level
 sealed class Water(
     type: Type,
     glyph: Glyph
-) : Terrain(type, glyph, true, false, false, dataType = Type.GENERIC_WATER) {
+) : Terrain(type, glyph, true, false, false,
+    dataType = Type.GENERIC_WATER, sneakDifficulty = 4f) {
 
     override fun name() = "water"
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPWATER

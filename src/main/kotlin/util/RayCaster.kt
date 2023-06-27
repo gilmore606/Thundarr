@@ -1,8 +1,6 @@
 package util
 
 import actors.Actor
-import actors.Player
-import kotlinx.coroutines.delay
 import world.Entity
 import world.level.Level
 import java.lang.RuntimeException
@@ -243,15 +241,16 @@ class RayCaster {
         }
     }
 
-    fun populateSeenEntities(entities: MutableMap<Entity, Float>, actor: Actor) {
-        actor.level?.also { level ->
+    fun populateSeenEntities(entities: MutableMap<Entity, Float>, seer: Actor) {
+        seer.level?.also { level ->
+            val range = seer.visualRange()
             lineCache.forEach { line ->
-                populateSeenOctant(level, entities, line, actor.xy.x, actor.xy.y, actor.visualRange())
+                populateSeenOctant(seer, level, entities, line, seer.xy.x, seer.xy.y, range)
             }
         }
     }
 
-    private fun populateSeenOctant(level: Level, resultSet: MutableMap<Entity, Float>, line: ShadowLine, povX: Int, povY: Int, range: Float)
+    private fun populateSeenOctant(seer: Actor, level: Level, resultSet: MutableMap<Entity, Float>, line: ShadowLine, povX: Int, povY: Int, range: Float)
     {
         line.reset()
         var fullShadow = false
@@ -277,11 +276,13 @@ class RayCaster {
                     } else {
                         if (!fullShadow) {
                             val projection = line.projectTile(row, col)
-                            val visible = !line.isInShadow(projection)
+                            val visible = !line.isInShadow(projection) && seer.canSee(XY(castX, castY), checkOcclusion = false)
                             if (visible) {
                                 // collect targets
                                 level.actorAt(castX, castY)?.also {
-                                    resultSet[it] = distance
+                                    if (it.sneakCheck(seer)) {
+                                        resultSet[it] = distance
+                                    }
                                 }
                                 level.thingsAt(castX, castY).forEach {
                                     resultSet[it] = distance

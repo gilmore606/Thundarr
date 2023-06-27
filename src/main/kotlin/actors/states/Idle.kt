@@ -30,6 +30,7 @@ sealed class Idle : State() {
     }
 
     override fun considerState(npc: NPC) {
+        // TODO: replace this junk with something robust
         val canSeePlayer = npc.canSee(App.player)
         if (canSeePlayer && !npc.metPlayer) {
             npc.meetPlayerMsg()?.also {

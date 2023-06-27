@@ -44,4 +44,6 @@ sealed class State {
 
     open fun converseLines(npc: NPC): List<String>? = null
 
+    open fun canSee() = true
+
 }

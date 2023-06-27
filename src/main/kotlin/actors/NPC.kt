@@ -91,6 +91,7 @@ sealed class NPC : Actor() {
     override fun willAggro(target: Actor) = isHostileTo(target)
 
     override fun visualRange() = 8f + Speed.get(this)
+    override fun canSee() = super.canSee() && state.canSee()
 
     open fun idleState(): Idle = IdleDoNothing()
     open fun hostileResponseState(enemy: Actor): State? = Attacking(enemy.id)   // State change on hostile sighted
@@ -133,33 +134,37 @@ sealed class NPC : Actor() {
     // Do any special state changes for this kind of NPC
     open fun considerState() { }
 
-    fun changeState(newState: State) {
+    fun changeState(newState: State, suppressMessages: Boolean = false) {
         val oldState = state
         state.leave(this)
         state = newState
-        enterStateMsg(newState)?.also { Console.sayAct("", it, this) }
-        log.info("NPC $this was $oldState, becomes $newState")
+        if (!suppressMessages) enterStateMsg(newState)?.also { say(it) }
+        //log.info("NPC $this was $oldState, becomes $newState")
         newState.enter(this)
     }
 
     fun pushState(newState: State) {
         stateStack.push(state)
-        changeState(newState)
+        changeState(newState, true)
     }
 
     fun popState() {
         stateStack.pop()?.also {
-            changeState(it)
+            changeState(it, true)
         } ?: run {
-            changeState(idleState())
+            changeState(idleState(), true)
         }
     }
 
     open fun enterStateMsg(newState: State): String? = when (newState) {
-        is Attacking -> "%Dn rushes toward you!"
-        is Fleeing -> "%Dn turns to flee!"
+        is Attacking -> ":rushes toward you!"
+        is Fleeing -> ":turns to flee!"
+        is Seeking -> ":looks around, hunting."
         else -> null
     }
+
+    open fun seekTargetMsg() = if (isHuman()) "Couldn't have gone far..." else ":looks frustrated."
+    open fun lostTargetMsg() = if (isHuman()) "Damn, lost em." else ":looks dejected."
 
     override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
         state.witnessEvent(this, culprit, event, location)

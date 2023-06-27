@@ -43,7 +43,7 @@ object DebugPanel : ShadedPanel() {
         drawString("  $datatext", padding, padding + 160)
         Screen.cursorPosition?.also {
             App.player.level?.lightAt(it.x, it.y)?.also { light ->
-                drawString("light: ${light.r} ${light.g} ${light.b}", padding, padding + 200)
+                drawString("light: ${light.r} ${light.g} ${light.b} B: ${light.brightness()}", padding, padding + 200)
             }
             App.player.level?.roofedAt(it.x, it.y)?.also { roofed ->
                 App.player.level?.lightsAt(it.x, it.y)?.also { lights ->

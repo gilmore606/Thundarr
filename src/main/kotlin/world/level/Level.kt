@@ -397,10 +397,12 @@ sealed class Level {
             Chunk.Roofed.OUTDOOR -> ambientLight
             Chunk.Roofed.WINDOW -> windowLight
         }
-        val brightness = light.brightness()
-        val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y)).toFloat()
-        val nearboost = if (distance < 1f) 0.6f else if (distance < 3f) 0.3f else if (distance < 4f) 0.1f else 0f
-        val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
+        // this bit adds a blue glow around the player
+//        val brightness = light.brightness()
+//        val distance = java.lang.Float.min(MAX_LIGHT_RANGE, distanceBetween(x, y, App.player.xy.x, App.player.xy.y))
+//        val nearboost = if (distance < 1f) 0.6f else if (distance < 3f) 0.3f else if (distance < 4f) 0.1f else 0f
+//        val falloff = 1f + (nearboost - 0.02f * distance) * (1f - brightness)
+        val falloff = 1f
         return ambientResult.apply {
             r = light.r * falloff
             g = light.g * falloff

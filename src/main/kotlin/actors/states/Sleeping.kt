@@ -20,6 +20,8 @@ class Sleeping(
 
     override fun toString() = "Sleeping (til $wakeTime))"
 
+    override fun canSee() = false
+
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
