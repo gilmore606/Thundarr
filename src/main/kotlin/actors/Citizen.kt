@@ -2,6 +2,7 @@ package actors
 
 import actors.actions.*
 import actors.actions.events.Event
+import actors.states.GoDo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.Dice
@@ -30,6 +31,9 @@ sealed class Citizen : NPC() {
                     Opinion.LOVE -> upgradeOpinionOf(event.criminal)
                     else -> { }
                 }
+            }
+            is ShoutHelp -> {
+                pushState(GoDo(location))
             }
             is Attack -> {
                 culprit?.also { culprit ->
@@ -62,7 +66,7 @@ sealed class Citizen : NPC() {
                 App.level.director.getActor(subjectID)?.also { subject ->
                     val opinion = opinionOf(subject)
                     return ShoutOpinion(
-                        if (opinion == NPC.Opinion.HATE) "Watch out for ${subject.dname()}!"
+                        if (opinion == Opinion.HATE) "Watch out for ${subject.dname()}!"
                         else "Did you hear about ${subject.dname()}?",
                         subject, opinion)
                 }
