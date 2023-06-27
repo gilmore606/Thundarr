@@ -4,6 +4,7 @@ import actors.NPC
 import actors.actions.Action
 import actors.actions.Say
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.XY
 import util.distanceBetween
 import world.path.Pather
@@ -60,4 +61,13 @@ class Seeking(
         }
         return super.pickAction(npc)
     }
+
+    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+        if (targetID == App.player.id) {
+            drawIt(Glyph.HOSTILE_ICON)
+        } else {
+            drawIt(Glyph.HOSTILE_OTHER_ICON)
+        }
+    }
+
 }

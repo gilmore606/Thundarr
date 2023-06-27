@@ -1,11 +1,15 @@
 package actors
 
+import actors.actions.Get
 import actors.actions.Say
+import actors.actions.events.Event
 import actors.states.Fleeing
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Container
 import things.Door
+import things.Thing
 import util.*
 import world.Entity
 import world.gen.features.Habitation
@@ -73,6 +77,7 @@ class Villager(
     var nextJobChangeTime: DayTime = DayTime(0,0)
 
     val family = mutableListOf<String>()
+    val ownedThings = mutableListOf<String>()
 
     override fun toString() = name()
 
@@ -96,6 +101,42 @@ class Villager(
             setTarget(jobArea)
             nextJobChangeTime = DayTime(App.gameTime.hour + Dice.range(2, 4), Dice.oneTo(58))
         } ?: run { fulltimeJobArea?.also { setTarget(it) } }
+    }
+
+    override fun onMove() {
+        if (ownedThings.isEmpty()) {
+            if (homeArea.contains(this.xy)) {
+                for (ix in homeArea.rect.x0 .. homeArea.rect.x1) {
+                    for (iy in homeArea.rect.y0 .. homeArea.rect.y1) {
+                        level?.thingsAt(ix, iy)?.forEach { thing ->
+                            ownedThings.add(thing.id)
+                            if (thing is Container) {
+                                thing.contents().forEach { content ->
+                                    ownedThings.add(content.id)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        super.onMove()
+    }
+
+    override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
+        if (event is Get) {
+            if (homeArea.contains(location)) {
+                if (ownedThings.contains(event.thingKey.id)) {
+                    culprit?.also { culprit ->
+                        say(listOf(
+                            "Stop, thief!", "That's mine, you bastard!", "You can't steal from me!"
+                        ).random())
+                        downgradeOpinionOf(culprit)
+                    }
+                }
+            }
+        }
+        super.witnessEvent(culprit, event, location)
     }
 
     private val customGender = if (Dice.flip()) Entity.Gender.MALE else Entity.Gender.FEMALE
