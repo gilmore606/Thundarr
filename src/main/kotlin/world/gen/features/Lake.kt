@@ -11,17 +11,22 @@ import world.gen.AnimalSpawn
 import world.gen.biomes.*
 import world.gen.habitats.*
 import world.level.CHUNK_SIZE
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
 class Lake : Feature() {
     override fun order() = 3
     override fun stage() = Stage.TERRAIN
+    override fun canBeQuestDestination() = Dice.chance(0.5f)
+    override fun createQuest() = FetchQuest()
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome !in listOf(Ocean, Glacier)
     }
+
+    override fun name() = "lake"
 
     override fun trailDestinationChance() = 1f
 

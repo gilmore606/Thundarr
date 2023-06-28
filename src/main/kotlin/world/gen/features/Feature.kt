@@ -33,7 +33,7 @@ sealed class Feature : AnimalSpawnSource {
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = null
 
     open fun canBeQuestDestination() = false
-    open fun createQuest(): Quest { throw RuntimeException("$this can't create quests!") }
+    open fun createQuest(): Quest? = null
 
     var worldX = 0
     var worldY = 0

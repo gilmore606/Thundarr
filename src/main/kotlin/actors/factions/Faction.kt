@@ -15,6 +15,7 @@ open class Faction(
 ) {
 
     val id = UUID()
+    override fun toString() = "faction $name"
 
     private val opinions = mutableMapOf<String, NPC.Opinion>()
 
@@ -65,5 +66,9 @@ open class Faction(
         } else {
             opinions[actor.id] = NPC.Opinion.HATE
         }
+    }
+
+    fun addQuest(quest: Quest) {
+        quests.add(quest)
     }
 }

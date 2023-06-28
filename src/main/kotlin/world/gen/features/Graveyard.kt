@@ -7,6 +7,7 @@ import world.gen.biomes.*
 import world.gen.decors.Church
 import world.gen.decors.Decor
 import world.gen.decors.Graveyard
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
@@ -15,6 +16,8 @@ class Graveyard(
 ) : Feature() {
     override fun order() = 3
     override fun stage() = Stage.BUILD
+    override fun canBeQuestDestination() = true
+    override fun createQuest() = FetchQuest()
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome in listOf(Plain, Scrub, Hill, ForestHill, Mountain, Forest, Swamp, Desert, Suburb)
@@ -24,6 +27,7 @@ class Graveyard(
     private val graveyardChance = 0.8f
     private val shrineChance = 0.5f
     override fun trailDestinationChance() = 0.5f
+    override fun name() = "graveyard"
 
     override fun doDig() {
         val width = Dice.range(16, 30)

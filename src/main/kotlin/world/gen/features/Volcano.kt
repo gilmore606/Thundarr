@@ -5,12 +5,16 @@ import kotlinx.serialization.Serializable
 import util.CARDINALS
 import util.Dice
 import util.hasOneWhere
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
 class Volcano : Feature() {
     override fun order() = 2
     override fun stage() = Stage.BUILD
+    override fun canBeQuestDestination() = true
+    override fun createQuest() = FetchQuest()
+    override fun name() = "volcano"
 
     override fun trailDestinationChance() = 1f
 

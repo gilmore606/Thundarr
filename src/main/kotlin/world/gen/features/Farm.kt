@@ -11,6 +11,7 @@ import world.gen.decors.Barn
 import world.gen.decors.Decor
 import world.gen.decors.Garden
 import world.gen.decors.Hut
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
@@ -20,6 +21,9 @@ class Farm(
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else if (Dice.chance(0.2f)) 1 else 0
+    override fun canBeQuestDestination() = Dice.chance(0.4f)
+    override fun createQuest() = FetchQuest()
+
     override fun preventBiomeAnimalSpawns() = !isAbandoned
 
     companion object {

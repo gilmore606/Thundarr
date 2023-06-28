@@ -1,6 +1,7 @@
 package world.gen
 
 import App
+import actors.factions.Factions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1046,25 +1047,44 @@ object Metamap {
 
     private suspend fun addQuests() {
         sayProgress("Inventing quests...")
+        val dests = mutableListOf<Feature>()
+        forEachScratch { x, y, cell ->
+            cell.features().forEach { feature ->
+                if (feature.canBeQuestDestination()) {
+                    dests.add(feature)
+                }
+            }
+        }
+        log.info("found ${dests.size} possible quest destinations.")
         forEachScratch { x, y, cell ->
             cell.features().forEach { feature ->
                 if (feature is Habitation) {
-                    addQuestsToSource(feature)
+                    addQuestsToSource(feature, dests)
                 }
             }
         }
     }
 
-    private fun addQuestsToSource(source: Habitation) {
+    private fun addQuestsToSource(source: Habitation, dests: MutableList<Feature>) {
         val count = source.numberOfQuestsDesired()
         if (count < 1) return
 
         log.info("adding $count quests at $source")
-        // Collect all quest dests 'near' us
-
-        // Use dests to make quests
-        repeat (count) {
-
+        val maxQuestRange = 800
+        val eligibles = dests.filter { it != source && distanceBetween(it.worldX, it.worldY, source.worldX, source.worldY) < maxQuestRange }.toMutableList()
+        if (eligibles.isEmpty()) log.warn("Found no eligible quest dests for $source!") else {
+            repeat (count) {
+                if (eligibles.isEmpty()) log.warn("Ran out of quest dests for $source on attempt #$it") else {
+                    val dest = eligibles.random()
+                    dests.remove(dest)
+                    eligibles.remove(dest)
+                    dest.createQuest()?.also { quest ->
+                        quest.metaSetup(dest, source)
+                        log.info("  adding quest $quest in $dest")
+                        source.faction()?.addQuest(quest)
+                    }
+                }
+            }
         }
     }
 

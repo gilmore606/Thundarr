@@ -153,6 +153,7 @@ sealed class Habitation(
             field = App.factions.addFaction(HabitationFaction(name(), flavor()))
             field
         } else field
+    fun faction() = factionID?.let { App.factions.byID(it) }
 
     val workAreas = mutableSetOf<Villager.WorkArea>()
 

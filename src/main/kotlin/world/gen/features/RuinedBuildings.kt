@@ -10,6 +10,7 @@ import world.ChunkScratch
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
@@ -18,6 +19,9 @@ class RuinedBuildings(
 ) : Feature() {
     override fun order() = 1
     override fun stage() = Stage.BUILD
+    override fun canBeQuestDestination() = Dice.chance(0.1f)
+    override fun createQuest() = FetchQuest()
+    override fun name() = "ruined building"
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)

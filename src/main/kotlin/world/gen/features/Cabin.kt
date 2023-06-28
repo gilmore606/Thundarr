@@ -7,6 +7,7 @@ import util.Rect
 import world.ChunkScratch
 import world.gen.decors.Decor
 import world.gen.decors.Hut
+import world.quests.FetchQuest
 
 @Serializable
 class Cabin(
@@ -15,6 +16,8 @@ class Cabin(
     override fun order() = 0
     override fun stage() = Stage.BUILD
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else if (Dice.chance(0.2f)) 1 else 0
+    override fun canBeQuestDestination() = Dice.chance(0.1f)
+    override fun createQuest() = FetchQuest()
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)

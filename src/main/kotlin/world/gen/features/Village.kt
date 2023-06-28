@@ -16,6 +16,7 @@ import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.level.Level
 import world.path.DistanceMap
+import world.quests.FetchQuest
 import world.terrains.Terrain
 import kotlin.math.max
 import kotlin.math.min
@@ -31,6 +32,8 @@ class Village(
     override fun stage() = Stage.BUILD
     override fun name() = name
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else Dice.oneTo(size / 2)
+    override fun canBeQuestDestination() = true
+    override fun createQuest() = FetchQuest()
     override fun preventBiomeAnimalSpawns() = !isAbandoned
     override fun flavor() = flavor
 

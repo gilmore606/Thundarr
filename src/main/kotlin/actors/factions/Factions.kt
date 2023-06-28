@@ -1,6 +1,7 @@
 package actors.factions
 
 import kotlinx.serialization.Serializable
+import util.log
 
 @Serializable
 class Factions {

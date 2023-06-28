@@ -34,6 +34,7 @@ sealed class Thing() : Entity {
 
     val id = UUID()
     fun getKey() = Key(xy(), id)
+    override fun toString() = "${name()}($id)"
 
     open fun containsByID(byID: String): Thing? {
         if (byID == this.id) return this

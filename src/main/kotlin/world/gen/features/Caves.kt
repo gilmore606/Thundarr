@@ -15,12 +15,16 @@ import world.gen.biomes.ForestHill
 import world.gen.biomes.Hill
 import world.gen.biomes.Mountain
 import world.gen.habitats.*
+import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
 class Caves : Feature() {
     override fun order() = 4
     override fun stage() = Stage.BUILD
+    override fun canBeQuestDestination() = Dice.chance(0.5f)
+    override fun createQuest() = FetchQuest()
+    override fun name() = "caves"
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
