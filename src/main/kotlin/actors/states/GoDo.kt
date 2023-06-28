@@ -7,6 +7,7 @@ import actors.actions.Wait
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.XY
+import util.log
 import world.path.Pather
 
 @Serializable
@@ -33,6 +34,7 @@ class GoDo(
             return targetAction ?: Wait(0.5f)
         } else if (failedSteps > 4) {
             npc.popState()
+            log.info("$this gave up GoDo for $targetAction")
             return Say("Aww, forget it.")
         } else {
             npc.stepToward(targetXY)?.also { failedSteps = 0; return it } ?: run { failedSteps++ }

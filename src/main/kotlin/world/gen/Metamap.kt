@@ -1,7 +1,6 @@
 package world.gen
 
 import App
-import actors.factions.Factions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1080,8 +1079,9 @@ object Metamap {
                     eligibles.remove(dest)
                     dest.createQuest()?.also { quest ->
                         quest.metaSetup(dest, source)
+                        dest.addQuestAsDest(quest)
                         log.info("  adding quest $quest in $dest")
-                        source.faction()?.addQuest(quest)
+                        source.addQuestAsSource(quest)
                     }
                 }
             }

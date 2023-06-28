@@ -7,8 +7,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.*
 import world.ChunkScratch
+import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.level.Level
+import world.quests.Quest
 
 @Serializable
 sealed class Habitation(
@@ -16,6 +18,7 @@ sealed class Habitation(
 ) : Feature() {
 
     open fun numberOfQuestsDesired() = 0  // Return >0 to have quests with an NPC here as source
+    val questIDsAsSource = mutableListOf<String>()
 
     override fun trailDestinationChance() = 1f
 
@@ -145,6 +148,14 @@ sealed class Habitation(
         addCitizen(citizen)
         findSpawnPointForNPC(chunk, citizen, spawnRect)?.also { spawnPoint ->
             citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+            questsNeedingGiver.randomOrNull()?.also { quest ->
+                if (quest.couldBeGivenBy(citizen)) {
+                    quest.onGiverSpawn(citizen)
+                    questsNeedingGiver.remove(quest)
+                    log.info("  assigned $quest to $citizen")
+                }
+            }
+
         } ?: run { log.warn("Failed to spawn citizen in ${spawnRect}") }
     }
 
@@ -169,4 +180,28 @@ sealed class Habitation(
         }
     }
 
+    @Transient val questsAsSource = mutableListOf<Quest>()
+    @Transient val questsNeedingGiver = mutableListOf<Quest>()
+
+    fun addQuestAsSource(quest: Quest) {
+        faction()?.also { faction ->
+            faction.addQuest(quest)
+            questIDsAsSource.add(quest.id)
+        } ?: run { log.warn("Tried to add quest to $this but faction() was null!") }
+    }
+
+    override fun dig(carto: WorldCarto) {
+        questIDsAsSource.forEach { questID ->
+            App.factions.questByID(questID)?.also { quest ->
+                questsAsSource.add(quest)
+                if (quest.needsGiver()) {
+                    questsNeedingGiver.add(quest)
+                }
+            }
+        }
+        super.dig(carto)
+        questsAsSource.forEach { quest ->
+            quest.digSource(this)
+        }
+    }
 }

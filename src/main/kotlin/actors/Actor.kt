@@ -591,7 +591,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val light = level?.lightAt(targetXY.x, targetXY.y)?.brightness() ?: 0f
         if (light < 0.3f) return false
         if (light > 0.75f) return true
-        val diff = 3 - (light / 0.2f) // 1 = lowlight 4 = high
+        val diff = 4 - (light / 0.1f) // 1 = lowlight 4 = high
         if (currentSenses > diff) return true
         return false
     }

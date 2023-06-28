@@ -18,7 +18,6 @@ import world.gen.gardenPlantSpawns
 import world.level.Level
 import world.quests.Quest
 import world.terrains.Terrain
-import java.lang.RuntimeException
 
 @Serializable
 sealed class Feature : AnimalSpawnSource {
@@ -52,7 +51,12 @@ sealed class Feature : AnimalSpawnSource {
     open fun onRestore(level: Level) { }
     open fun onSave() { }
 
-    fun dig(carto: WorldCarto) {
+    private val questsToDig: MutableList<String> = mutableListOf()
+    fun addQuestAsDest(quest: Quest) {
+        questsToDig.add(quest.id)
+    }
+
+    open fun dig(carto: WorldCarto) {
         this.carto = carto
         this.meta = carto.meta
         this.chunk = carto.chunk
@@ -60,7 +64,15 @@ sealed class Feature : AnimalSpawnSource {
         this.x1 = carto.x1
         this.y0 = carto.y0
         this.y1 = carto.y1
+
         doDig()
+
+        questsToDig.forEach { questID ->
+            App.factions.questByID(questID)?.also { quest ->
+                log.info("digging for $quest in $this")
+                quest.dig(this)
+            }
+        }
     }
 
     abstract fun doDig()

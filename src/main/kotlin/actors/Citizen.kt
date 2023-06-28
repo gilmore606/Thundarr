@@ -5,21 +5,24 @@ import actors.actions.events.Event
 import actors.states.GoDo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import util.Dice
 import util.XY
 import util.log
 import world.gen.features.Habitation
+import world.quests.Quest
 
 @Serializable
 sealed class Citizen : NPC() {
     @Transient var habitation: Habitation? = null
 
+    val questsGiven = mutableListOf<String>()
+    var hasQuestIcon = false
+
     override fun receiveAggression(attacker: Actor) {
         if (!isHostileTo(attacker)) {
             super.receiveAggression(attacker)
-            queue(ShoutHelp(
-                "Help!"
-            ))
+            queue(ShoutHelp("Help!"))
         }
     }
 
@@ -73,5 +76,19 @@ sealed class Citizen : NPC() {
             }
         }
         return null
+    }
+
+    override fun advanceTime(delta: Float) {
+        questsGiven.forEach { questID ->
+            App.factions.questByID(questID)?.also { quest ->
+                if (quest.shouldFlagGiver()) hasQuestIcon = true
+            }
+        }
+        super.advanceTime(delta)
+    }
+
+    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+        if (hasQuestIcon) drawIt(Glyph.QUESTION_ICON)
+        super.drawStatusGlyphs(drawIt)
     }
 }

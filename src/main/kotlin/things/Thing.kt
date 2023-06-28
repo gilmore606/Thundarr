@@ -148,6 +148,7 @@ sealed class Thing() : Entity {
     open fun isBlocking(actor: Actor): Boolean = false
     abstract fun isPortable(): Boolean
     open fun isIntangible() = false
+    open fun isAlwaysVisible() = false
     open fun announceOnWalk() = !isIntangible()
 
     @Transient var holder: ThingHolder? = null

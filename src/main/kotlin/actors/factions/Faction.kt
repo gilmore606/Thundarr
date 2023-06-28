@@ -19,7 +19,7 @@ open class Faction(
 
     private val opinions = mutableMapOf<String, NPC.Opinion>()
 
-    val quests = mutableListOf<Quest>()
+    val quests = mutableListOf<String>()
 
     // Should the faction insta-hate someone who attacks a member?
     open fun hateMemberAttacker() = false
@@ -69,6 +69,7 @@ open class Faction(
     }
 
     fun addQuest(quest: Quest) {
-        quests.add(quest)
+        App.factions.addQuest(quest)
+        quests.add(quest.id)
     }
 }

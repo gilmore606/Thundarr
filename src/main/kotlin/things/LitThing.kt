@@ -131,6 +131,7 @@ class CeilingLight : LitThing(), Smashable {
 sealed class SwitchableLight : LitThing() {
     var lit = false
     override fun isPortable() = false
+    override fun isAlwaysVisible() = true
     override fun light() = if (lit) lightColor else null
     override fun glyph() = if (lit) glyphLit() else glyphDark()
     abstract fun glyphLit(): Glyph
