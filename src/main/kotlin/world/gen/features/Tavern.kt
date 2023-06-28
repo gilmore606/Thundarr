@@ -19,10 +19,12 @@ import world.terrains.Terrain
 @Serializable
 class Tavern(
     private val name: String,
-    private val villageDirection: XY
-) : Habitation() {
+    private val villageDirection: XY,
+    private val tavernAbandoned: Boolean = false
+) : Habitation(tavernAbandoned) {
     override fun order() = 4
     override fun stage() = Stage.BUILD
+    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else Dice.oneTo(3)
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)

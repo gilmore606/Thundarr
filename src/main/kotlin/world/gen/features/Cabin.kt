@@ -9,9 +9,12 @@ import world.gen.decors.Decor
 import world.gen.decors.Hut
 
 @Serializable
-class Cabin : Habitation() {
+class Cabin(
+    private val cabinAbandoned: Boolean = false
+) : Habitation(cabinAbandoned) {
     override fun order() = 0
     override fun stage() = Stage.BUILD
+    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else if (Dice.chance(0.2f)) 1 else 0
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)

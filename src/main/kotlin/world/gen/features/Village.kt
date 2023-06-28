@@ -23,13 +23,14 @@ import kotlin.math.min
 @Serializable
 class Village(
     val name: String,
-    val isAbandoned: Boolean = false,
+    private val villageAbandoned: Boolean = false,
     val size: Int,
     val flavor: Flavor = Flavor.HUMAN
-) : Stronghold() {
+) : Stronghold(villageAbandoned) {
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun name() = name
+    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else Dice.oneTo(size / 2)
     override fun preventBiomeAnimalSpawns() = !isAbandoned
     override fun flavor() = flavor
 

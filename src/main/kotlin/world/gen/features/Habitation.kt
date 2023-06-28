@@ -11,7 +11,11 @@ import world.gen.decors.*
 import world.level.Level
 
 @Serializable
-sealed class Habitation : Feature() {
+sealed class Habitation(
+    val isAbandoned: Boolean
+) : Feature() {
+
+    open fun numberOfQuestsDesired() = 0  // Return >0 to have quests with an NPC here as source
 
     override fun trailDestinationChance() = 1f
 

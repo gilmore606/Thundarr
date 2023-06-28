@@ -16,7 +16,9 @@ import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.gen.gardenPlantSpawns
 import world.level.Level
+import world.quests.Quest
 import world.terrains.Terrain
+import java.lang.RuntimeException
 
 @Serializable
 sealed class Feature : AnimalSpawnSource {
@@ -30,8 +32,13 @@ sealed class Feature : AnimalSpawnSource {
     open fun animalSpawns(): List<AnimalSpawn> = listOf()
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = null
 
+    open fun canBeQuestDestination() = false
+    open fun createQuest(): Quest { throw RuntimeException("$this can't create quests!") }
+
     var worldX = 0
     var worldY = 0
+
+    override fun toString() = "${name()} ($worldX,$worldY)"
 
     @Transient lateinit var carto: WorldCarto
     @Transient lateinit var meta: ChunkMeta

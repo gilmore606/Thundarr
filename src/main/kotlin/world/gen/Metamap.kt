@@ -28,7 +28,7 @@ object Metamap {
 
     private const val fakeDelaysInWorldgenText = false
     private const val fakeDelayMillis = 150L
-    private const val progressBarSegments = 14
+    private const val progressBarSegments = 15
     private const val SKIP_HISTORY = true
 
     const val chunkRadius = 100
@@ -774,7 +774,7 @@ object Metamap {
                             if (!villages.hasOneWhere { manhattanDistance(it.x, it.y, x, y) < minVillageDistance }) {
                                 val village = Village(
                                     Madlib.villageName(),
-                                    isAbandoned = Dice.chance(villageAbandonedChance),
+                                    villageAbandoned = Dice.chance(villageAbandonedChance),
                                     size = Dice.range(5, 18)
                                 )
                                 placedOne = true
@@ -996,6 +996,10 @@ object Metamap {
                         )
             }
 
+            // Add quests to inhabited Habitations
+            // TODO: someday we'll have to do this after history gen
+            addQuests()
+
             // END STAGE : WRITE ALL DATA
             sayProgress("Saving generated world...")
             for (ix in -chunkRadius until chunkRadius) {
@@ -1030,6 +1034,7 @@ object Metamap {
     }
 
     fun finishBuildWorld() {
+
         worldRejected = false
         isWorking = false
     }
@@ -1037,6 +1042,30 @@ object Metamap {
     fun rejectWorld() {
         worldRejected = true
         isWorking = false
+    }
+
+    private suspend fun addQuests() {
+        sayProgress("Inventing quests...")
+        forEachScratch { x, y, cell ->
+            cell.features().forEach { feature ->
+                if (feature is Habitation) {
+                    addQuestsToSource(feature)
+                }
+            }
+        }
+    }
+
+    private fun addQuestsToSource(source: Habitation) {
+        val count = source.numberOfQuestsDesired()
+        if (count < 1) return
+
+        log.info("adding $count quests at $source")
+        // Collect all quest dests 'near' us
+
+        // Use dests to make quests
+        repeat (count) {
+
+        }
     }
 
     private fun countRiverDescendants(mouth: XY) {

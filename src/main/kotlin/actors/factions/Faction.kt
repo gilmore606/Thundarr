@@ -7,6 +7,7 @@ import util.UUID
 import util.XY
 import util.hasOneWhere
 import util.log
+import world.quests.Quest
 
 @Serializable
 open class Faction(
@@ -16,6 +17,8 @@ open class Faction(
     val id = UUID()
 
     private val opinions = mutableMapOf<String, NPC.Opinion>()
+
+    val quests = mutableListOf<Quest>()
 
     // Should the faction insta-hate someone who attacks a member?
     open fun hateMemberAttacker() = false

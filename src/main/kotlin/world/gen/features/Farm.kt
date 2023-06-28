@@ -15,10 +15,11 @@ import world.terrains.Terrain
 
 @Serializable
 class Farm(
-    private val isAbandoned: Boolean = false
-) : Habitation() {
+    private val farmAbandoned: Boolean = false
+) : Habitation(farmAbandoned) {
     override fun order() = 3
     override fun stage() = Stage.BUILD
+    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else if (Dice.chance(0.2f)) 1 else 0
     override fun preventBiomeAnimalSpawns() = !isAbandoned
 
     companion object {
