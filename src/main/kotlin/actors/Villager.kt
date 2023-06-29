@@ -6,7 +6,7 @@ import actors.actions.events.Event
 import actors.states.Fleeing
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
-import render.tilesets.Glyph
+import render.tilesets.Glyph.*
 import things.Container
 import things.Door
 import things.Thing
@@ -144,16 +144,40 @@ class Villager(
         if (customGender == Entity.Gender.MALE) "ie" else "ki"
     } else ""
 
-    private val customGlyph = if (isChild) Glyph.PEASANT_CHILD else when (Dice.zeroTo(3)) {
-        0 -> Glyph.PEASANT_1
-        1 -> Glyph.PEASANT_2
-        2 -> Glyph.PEASANT_3
-        else -> Glyph.PEASANT_4
+    private val customGlyph = if (isChild) PEASANT_CHILD else when (Dice.zeroTo(3)) {
+        0 -> PEASANT_1
+        1 -> PEASANT_2
+        2 -> PEASANT_3
+        else -> PEASANT_4
     }
+
+    val portraitGlyph = when (customGlyph) {
+        PEASANT_1 -> if (customGender == Entity.Gender.MALE) setOf(
+            PORTRAIT_PALE_M_1, PORTRAIT_PALE_M_2, PORTRAIT_PALE_M_3, PORTRAIT_PALE_M_4, PORTRAIT_PALE_M_5, PORTRAIT_PALE_M_6,
+        ) else setOf(
+            PORTRAIT_PALE_W_1, PORTRAIT_PALE_W_2, PORTRAIT_PALE_W_3, PORTRAIT_PALE_W_4, PORTRAIT_PALE_W_5, PORTRAIT_PALE_W_6,
+        )
+        PEASANT_2 -> if (customGender == Entity.Gender.MALE) setOf(
+            PORTRAIT_TAN_M_1, PORTRAIT_TAN_M_2, PORTRAIT_TAN_M_3, PORTRAIT_TAN_M_4, PORTRAIT_TAN_M_5, PORTRAIT_TAN_M_6,
+        ) else setOf(
+            PORTRAIT_TAN_W_1, PORTRAIT_TAN_W_2, PORTRAIT_TAN_W_3, PORTRAIT_TAN_W_4, PORTRAIT_TAN_W_5, PORTRAIT_TAN_W_6,
+        )
+        PEASANT_3 -> if (customGender == Entity.Gender.MALE) setOf(
+            PORTRAIT_WHITE_M_1, PORTRAIT_WHITE_M_2, PORTRAIT_WHITE_M_3, PORTRAIT_WHITE_M_4, PORTRAIT_WHITE_M_5, PORTRAIT_WHITE_M_6,
+        ) else setOf(
+            PORTRAIT_WHITE_W_1, PORTRAIT_WHITE_W_2, PORTRAIT_WHITE_W_3, PORTRAIT_WHITE_W_4, PORTRAIT_WHITE_W_5, PORTRAIT_WHITE_W_6,
+        )
+        else -> if (customGender == Entity.Gender.MALE) setOf(
+            PORTRAIT_BLACK_M_1, PORTRAIT_BLACK_M_2, PORTRAIT_BLACK_M_3, PORTRAIT_BLACK_M_4, PORTRAIT_BLACK_M_5, PORTRAIT_BLACK_M_6,
+        ) else setOf(
+            PORTRAIT_BLACK_W_1, PORTRAIT_BLACK_W_2, PORTRAIT_BLACK_W_3, PORTRAIT_BLACK_W_4, PORTRAIT_BLACK_W_5, PORTRAIT_BLACK_W_6,
+        )
+    }.random()
 
     override fun gender() = customGender
     override fun name() = customName
     override fun glyph() = customGlyph
+    override fun portraitGlyph() = portraitGlyph
     override fun hasProperName() = true
     override fun isHuman() = true
     override fun description() = if (isChild) {

@@ -2,10 +2,13 @@ package ui.modals
 
 import actors.NPC
 import audio.Speaker
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
+import render.batches.QuadBatch
 import ui.input.Keydef
 import ui.input.Mouse
 import util.Stack
@@ -19,6 +22,17 @@ class ConverseModal(
     650, 400, talker.iname(),
     position = position,
 ) {
+    val portrait = talker.portraitGlyph()
+    val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
+
+    override fun drawEverything() {
+        super.drawEverything()
+        portraitBatch.clear()
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        drawPortrait()
+        portraitBatch.draw()
+    }
 
     interface Source {
         fun getConversationTopic(topic: String): Scene?
@@ -38,7 +52,6 @@ class ConverseModal(
         val options: List<Option>
     )
 
-    val padding = 22
 
     var scene: Scene? = null
     val topicStack = Stack<String>()
@@ -47,8 +60,13 @@ class ConverseModal(
 
     var selection = -1
     var maxSelection = 0
+
+    val padding = 22
     var optionStartY = 0
     val optionSpacing = 32
+    val headerPad = 50
+    val portraitSize = 96
+    val portraitXpad = if (portrait == null) 0 else 112
 
     init {
         zoomWhenOpen = 1.8f
@@ -80,13 +98,14 @@ class ConverseModal(
         }
         nextOptions.add(Option("bye", "Goodbye.") { endConversation() })
 
-        wrappedText = wrapText(nextResponse, width, padding, Screen.font)
+        wrappedText = wrapText(nextResponse, width - portraitXpad, padding, Screen.font)
         scene = Scene(newTopic.topic, nextResponse, nextOptions)
         maxSelection = nextOptions.size - 1
         selection = 0
 
         log.info("text: ${scene?.text}")
         log.info("options: ${scene?.options}")
+        log.info("portrait: ${talker.portraitGlyph()}")
     }
 
     fun endConversation() {
@@ -168,7 +187,7 @@ class ConverseModal(
         super.drawText()
         if (isAnimating()) return
 
-        drawWrappedText(wrappedText, padding, padding + 50, 24, Screen.font)
+        drawWrappedText(wrappedText, padding + portraitXpad, padding + headerPad, 24, Screen.font)
 
         scene?.also { scene ->
             optionStartY = height - padding - (scene.options.size * optionSpacing)
@@ -190,6 +209,13 @@ class ConverseModal(
         if (!isAnimating() && selection >= 0) {
             drawSelectionBox(padding - boxPadding, boxY - boxPadding,
                 width - (padding*2) + boxPadding*2 - 4, optionSpacing + boxPadding*2 - 4)
+        }
+    }
+
+    private fun drawPortrait() {
+        portrait?.also { portrait ->
+            portraitBatch.addPixelQuad(x + padding, y + padding + headerPad,
+                x + padding + portraitSize, y + padding + headerPad + portraitSize, portraitBatch.getTextureIndex(portrait))
         }
     }
 }

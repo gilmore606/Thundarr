@@ -87,6 +87,7 @@ sealed class NPC : Actor() {
 
     open fun commentLines(): List<String> = state.commentLines(this) ?: listOf()
     open fun meetPlayerMsg(): String? = null
+    open fun portraitGlyph(): Glyph? = null
 
     open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
 

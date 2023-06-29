@@ -27,6 +27,9 @@ object SpriteSheets {
         ),
         MapSprites(
             "sheets/tiles_map.png", 10, 8, Screen.textureFilter
+        ),
+        PortraitSprites(
+            "sheets/tiles_portrait.png", 10, 10, Texture.TextureFilter.Nearest
         )
     }
 

@@ -74,6 +74,7 @@ object Screen : KtxScreen {
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
+    val portraitTileSet = PortraitTileSet()
     val terrainBatch = QuadBatch(terrainTileSet)
     val thingBatch = QuadBatch(thingTileSet)
     val actorBatch = QuadBatch(actorTileSet)
