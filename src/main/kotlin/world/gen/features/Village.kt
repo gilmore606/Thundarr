@@ -31,7 +31,7 @@ class Village(
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun name() = name
-    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else Dice.oneTo(size / 2)
+    override fun numberOfQuestsDesired() = if (isAbandoned) 0 else max(1, min(Dice.oneTo(size / 3), 4))
     override fun canBeQuestDestination() = true
     override fun createQuest() = FetchQuest()
     override fun preventBiomeAnimalSpawns() = !isAbandoned

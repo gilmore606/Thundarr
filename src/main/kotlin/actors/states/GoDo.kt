@@ -42,6 +42,6 @@ class GoDo(
         return super.pickAction(npc)
     }
 
-    override fun converseLines(npc: NPC) = listOf("No time to chat, I've got to go do something.")
+    override fun commentLines(npc: NPC) = listOf("No time to chat, I've got to go do something.")
 
 }

@@ -6,18 +6,19 @@ import actors.states.GoDo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
+import ui.modals.ConverseModal
 import util.Dice
 import util.XY
-import util.log
 import world.gen.features.Habitation
-import world.quests.Quest
 
 @Serializable
-sealed class Citizen : NPC() {
+sealed class Citizen : NPC(), ConverseModal.Source {
     @Transient var habitation: Habitation? = null
 
     val questsGiven = mutableListOf<String>()
-    var hasQuestIcon = false
+    var hasQuestsToGive = false
+    fun questsGiven() = questsGiven.mapNotNull { App.factions.questByID(it) }
+    var introducedToPlayer = false
 
     override fun receiveAggression(attacker: Actor) {
         if (!isHostileTo(attacker)) {
@@ -79,16 +80,34 @@ sealed class Citizen : NPC() {
     }
 
     override fun advanceTime(delta: Float) {
-        questsGiven.forEach { questID ->
-            App.factions.questByID(questID)?.also { quest ->
-                if (quest.shouldFlagGiver()) hasQuestIcon = true
-            }
+        questsGiven().forEach { quest ->
+            if (quest.shouldFlagGiver()) hasQuestsToGive = true
         }
         super.advanceTime(delta)
     }
 
-    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
-        if (hasQuestIcon) drawIt(Glyph.QUESTION_ICON)
-        super.drawStatusGlyphs(drawIt)
+    override fun hasConversation() = hasQuestsToGive
+    override fun conversationSources() = mutableListOf<ConverseModal.Source>(this).apply { addAll(questsGiven()) }
+    override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+        if (topic == "hello") {
+            return ConverseModal.Scene("",
+                if (introducedToPlayer) "Hello again, Thundarr." else {
+                    introducedToPlayer = true
+                    "Nice to meet you Thundarr, I'm ${name()}."
+                },
+                listOf())
+        }
+        return null
+    }
+
+    override fun commentLines(): List<String> {
+        if (hasQuestsToGive) {
+            val lines = mutableListOf<String>()
+            questsGiven().forEach { quest ->
+                lines.addAll(quest.commentLines())
+            }
+            if (lines.isNotEmpty()) return lines
+        }
+        return super.commentLines()
     }
 }

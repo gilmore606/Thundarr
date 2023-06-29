@@ -6,9 +6,11 @@ import actors.states.*
 import actors.stats.Speed
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.Screen
 import render.sparks.Speak
 import render.tilesets.Glyph
 import things.NPCDen
+import ui.modals.ConverseModal
 import ui.panels.Console
 import util.*
 import world.Chunk
@@ -83,7 +85,7 @@ sealed class NPC : Actor() {
     open fun canSpawnAt(chunk: Chunk, x: Int, y: Int): Boolean = true
     open fun onSpawn() { }
 
-    open fun converseLines(): List<String> = state.converseLines(this) ?: listOf()
+    open fun commentLines(): List<String> = state.commentLines(this) ?: listOf()
     open fun meetPlayerMsg(): String? = null
 
     open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
@@ -170,8 +172,14 @@ sealed class NPC : Actor() {
         state.witnessEvent(this, culprit, event, location)
     }
 
+    open fun hasConversation() = false
+    open fun conversationSources(): List<ConverseModal.Source> = listOf()
+
     override fun onConverse(actor: Actor): Boolean {
-        val converseLines = converseLines()
+        if (actor is Player && hasConversation()) {
+            startConversation()
+        }
+        val converseLines = commentLines()
         if (converseLines.isNotEmpty()) {
             Console.announce(level, xy.x, xy.y, Console.Reach.AUDIBLE, this.dnamec() + " says, \"" + converseLines.random() + "\"")
             level?.addSpark(Speak().at(xy.x, xy.y))
@@ -180,8 +188,13 @@ sealed class NPC : Actor() {
         return false
     }
 
+    fun startConversation() {
+        Screen.addModal(ConverseModal(this))
+    }
+
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)
+        if (hasConversation()) drawIt(Glyph.QUESTION_ICON)
         state.drawStatusGlyphs(drawIt)
     }
 

@@ -78,5 +78,5 @@ class Sleeping(
         return false
     }
 
-    override fun converseLines(npc: NPC) = listOf("Zzz...")
+    override fun commentLines(npc: NPC) = listOf("Zzz...")
 }

@@ -19,4 +19,6 @@ class FetchQuest : Quest() {
         unspawnedItem = Paperback()
     }
 
+    override fun commentLines() = listOf("Damn, why'd I ever lose it?", "I wish someone could help me.")
+
 }

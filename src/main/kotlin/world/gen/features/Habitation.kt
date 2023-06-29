@@ -147,7 +147,9 @@ sealed class Habitation(
         fulltimeJobArea?.also { if (citizen is Villager) citizen.fulltimeJobArea = it }
         addCitizen(citizen)
         findSpawnPointForNPC(chunk, citizen, spawnRect)?.also { spawnPoint ->
+
             citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
+
             questsNeedingGiver.randomOrNull()?.also { quest ->
                 if (quest.couldBeGivenBy(citizen)) {
                     quest.onGiverSpawn(citizen)

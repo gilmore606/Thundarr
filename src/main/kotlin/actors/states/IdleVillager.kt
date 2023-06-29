@@ -47,7 +47,7 @@ class IdleVillager(
             if (npc.targetArea.contains(npc.xy)) {
                 // We're here, do whatever!
                 if (!npc.isChild && Dice.chance(commentChance)) {
-                    return Say(npc.targetArea.comments.random())
+                    return Say(npc.commentLines().random())
                 }
                 if (Dice.chance(wanderChance)) {
                     return wander(npc, wanderCheck(npc.targetArea.rect))
@@ -112,8 +112,9 @@ class IdleVillager(
         }
     }
 
-    override fun converseLines(npc: NPC): List<String>? {
+    override fun commentLines(npc: NPC): List<String>? {
         if (npc is Villager) {
+
             if (npc.isChild) {
                 return listOf(
                     "You look dumb.", "Your face is a butt.", "You smell like a butt!", "Why is your head weird?", "You're funny."
@@ -122,8 +123,7 @@ class IdleVillager(
             if (!npc.targetArea.contains(npc.xy())) {
                 return listOf(
                     "No time to chat, I've got to get " +
-                            (if (npc.targetArea == npc.homeArea) "home" else ("to the " + npc.targetArea.name)) +
-                            "."
+                            (if (npc.targetArea == npc.homeArea) "home" else ("to the " + npc.targetArea.name)) + "."
                 )
             }
             return npc.targetArea.comments.toList()

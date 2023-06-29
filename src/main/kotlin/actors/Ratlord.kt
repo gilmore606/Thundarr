@@ -5,7 +5,6 @@ import actors.states.Looting
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
-import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import audio.Speaker
 import kotlinx.serialization.Serializable
@@ -13,7 +12,6 @@ import render.tilesets.Glyph
 import things.Cheese
 import things.Teeth
 import things.Thing
-import util.Dice
 
 @Serializable
 class Ratlord(
@@ -36,14 +34,14 @@ class Ratlord(
     override fun meleeWeapon() = Ratman.weapon
     override fun idleState() = IdleInRoom()
 
-    override fun converseLines() = listOf(
+    override fun commentLines() = listOf(
         "Ttthhhee rebelliouthh one!  Killl him!",
         "You dare to defy $wizardName?  Die!",
         "The ethhcaped thhlave!  He itthh here!",
         "The penalty for ethcape ith death!"
     )
     override fun talkSound(actor: Actor) = Speaker.SFX.RAT
-    override fun meetPlayerMsg() = this.dnamec() + " says, \"" + converseLines().random() + "\""
+    override fun meetPlayerMsg() = this.dnamec() + " says, \"" + commentLines().random() + "\""
     fun findCheeseLines() = listOf(
         "Arrgg cheethe!  I can't rethithht!",
         "What?!  Cheethe rationth!",

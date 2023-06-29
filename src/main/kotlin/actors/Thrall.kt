@@ -7,7 +7,6 @@ import actors.stats.Strength
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Fist
 
 @Serializable
 class Thrall(
@@ -25,7 +24,7 @@ class Thrall(
         Brains.set(this, 10f)
     }
 
-    override fun converseLines() = listOf(
+    override fun commentLines() = listOf(
         "We slave all day for that wizard.  And for what?",
         "Your bonds are gone!  You've got to get out of here, before they see!",
         "Are you escaping?  Take me with you...",
@@ -34,7 +33,7 @@ class Thrall(
         "The wizard is so cruel to us.  How can we go on this way?"
     )
     override fun talkSound(actor: Actor) = Speaker.SFX.VOICE_MALEHIGH
-    override fun meetPlayerMsg() = this.dnamec() + " says, \"" + converseLines().random() + "\""
+    override fun meetPlayerMsg() = this.dnamec() + " says, \"" + commentLines().random() + "\""
 
     override fun idleState() = IdleInRoom()
 }

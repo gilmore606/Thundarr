@@ -33,7 +33,7 @@ class Herder : NPC() {
         Brains.set(this, 11f)
         Dodge.set(this, 4f)
     }
-    override fun converseLines() = listOf(
+    override fun commentLines() = listOf(
         "Shoveling ox poo all day for a wizard.  It's a living.",
         "The love of an ox, is not like that of a square.  You know what I mean?",
         "You sure are a big guy!",
