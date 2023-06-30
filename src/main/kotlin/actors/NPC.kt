@@ -173,14 +173,18 @@ sealed class NPC : Actor() {
         state.witnessEvent(this, culprit, event, location)
     }
 
+    open fun hasQuestion() = false
     open fun hasConversation() = false
     open fun conversationSources(): List<ConverseModal.Source> = listOf()
     open fun willTrade() = false
+    open fun willConverse() = hasQuestion() || hasConversation() || willTrade()
     open fun tradeMsg() = "I have wares to trade, if barbarian has coin."
 
     override fun onConverse(actor: Actor): Boolean {
-        if (actor is Player && hasConversation()) {
+        if (actor is Player && willConverse()) {
+            level?.addSpark(Speak().at(xy.x, xy.y))
             startConversation()
+            return true
         }
         val converseLines = commentLines()
         if (converseLines.isNotEmpty()) {
@@ -197,8 +201,9 @@ sealed class NPC : Actor() {
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)
-        if (hasConversation()) drawIt(Glyph.QUESTION_ICON)
-        if (willTrade()) drawIt(Glyph.TRADE_ICON)
+        if (hasQuestion()) drawIt(Glyph.QUESTION_ICON)
+        else if (willTrade()) drawIt(Glyph.TRADE_ICON)
+        else if (hasConversation()) drawIt(Glyph.CONVERSATION_ICON)
         state.drawStatusGlyphs(drawIt)
     }
 

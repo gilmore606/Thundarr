@@ -25,6 +25,7 @@ class Tavern(
     override fun order() = 4
     override fun stage() = Stage.BUILD
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else Dice.oneTo(3)
+    override fun numberOfLoreHavers() = if (Dice.flip()) 1 else 0
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = meta.biome !in listOf(Ocean, Glacier)

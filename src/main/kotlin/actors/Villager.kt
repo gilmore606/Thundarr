@@ -239,6 +239,7 @@ class Villager(
     override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
 
     override fun couldGiveQuest(quest: Quest) = !isChild
+    override fun couldHaveLore() = !isChild
 
     override fun meetPlayerMsg() = if (isChild) {
         "Hello!"

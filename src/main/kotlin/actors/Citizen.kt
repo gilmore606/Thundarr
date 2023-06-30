@@ -10,6 +10,8 @@ import ui.modals.ConverseModal
 import util.Dice
 import util.XY
 import world.gen.features.Habitation
+import world.lore.Lore
+import world.lore.MoonLore1
 import world.quests.Quest
 
 @Serializable
@@ -20,6 +22,7 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     var hasQuestsToGive = false
     fun questsGiven() = questsGiven.mapNotNull { App.factions.questByID(it) }
     var introducedToPlayer = false
+    val lore = mutableListOf<Lore>()
 
     override fun receiveAggression(attacker: Actor) {
         if (!isHostileTo(attacker)) {
@@ -88,9 +91,14 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     }
 
     open fun couldGiveQuest(quest: Quest) = false
+    open fun couldHaveLore() = true
 
-    override fun hasConversation() = hasQuestsToGive
-    override fun conversationSources() = mutableListOf<ConverseModal.Source>(this).apply { addAll(questsGiven()) }
+    override fun hasQuestion() = hasQuestsToGive
+    override fun hasConversation() = lore.isNotEmpty()
+    override fun conversationSources() = mutableListOf<ConverseModal.Source>(this).apply {
+        addAll(questsGiven())
+        addAll(lore)
+    }
     override fun getConversationTopic(topic: String): ConverseModal.Scene? {
         if (topic == "hello") {
             return ConverseModal.Scene("",
@@ -107,6 +115,9 @@ sealed class Citizen : NPC(), ConverseModal.Source {
             val lines = mutableListOf<String>()
             questsGiven().forEach { quest ->
                 lines.addAll(quest.commentLines())
+            }
+            lore.forEach { lore ->
+                lines.addAll(lore.comments())
             }
             if (lines.isNotEmpty()) return lines
         }

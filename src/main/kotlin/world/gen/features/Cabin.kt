@@ -18,6 +18,7 @@ class Cabin(
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else if (Dice.chance(0.2f)) 1 else 0
     override fun canBeQuestDestination() = Dice.chance(0.1f)
     override fun createQuest() = FetchQuest()
+    override fun numberOfLoreHavers() = if (Dice.flip()) 1 else 0
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)

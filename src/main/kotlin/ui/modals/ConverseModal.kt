@@ -37,6 +37,7 @@ class ConverseModal(
 
     interface Source {
         fun getConversationTopic(topic: String): Scene?
+        fun optionsForText(text: String): List<Option> = listOf()
     }
 
     class Option(
@@ -50,7 +51,7 @@ class ConverseModal(
     class Scene(
         val topic: String,
         val text: String,
-        val options: List<Option>
+        val options: List<Option> = listOf()
     )
 
 
@@ -88,12 +89,19 @@ class ConverseModal(
 
         var nextResponse = ""
         val nextOptions = mutableListOf<Option>()
-        talker.conversationSources().forEach { source ->
+        val sources = talker.conversationSources()
+        sources.forEach { source ->
             source.getConversationTopic(toTopic.topic)?.also { addScene ->
                 nextResponse += (if (nextResponse.isBlank()) "" else " ") + addScene.text
                 nextOptions.addAll(addScene.options)
             }
         }
+        sources.forEach { source ->
+            source.optionsForText(nextResponse).forEach { addOption ->
+                nextOptions.add(addOption)
+            }
+        }
+
         if (topicStack.isNotEmpty()) {
             nextOptions.add(Option("back", if (nextOptions.isEmpty()) "Anyway..." else "Never mind."))
         } else if (talker.willTrade()) {
@@ -105,10 +113,6 @@ class ConverseModal(
         scene = Scene(newTopic.topic, nextResponse, nextOptions)
         maxSelection = nextOptions.size - 1
         selection = 0
-
-        log.info("text: ${scene?.text}")
-        log.info("options: ${scene?.options}")
-        log.info("portrait: ${talker.portraitGlyph()}")
     }
 
     fun openTrade() {

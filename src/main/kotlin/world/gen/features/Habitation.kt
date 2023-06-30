@@ -10,6 +10,9 @@ import world.ChunkScratch
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.level.Level
+import world.lore.Lore
+import world.lore.MoonLore1
+import world.lore.WizardLore1
 import world.quests.Quest
 
 @Serializable
@@ -19,6 +22,8 @@ sealed class Habitation(
 
     open fun numberOfQuestsDesired() = 0  // Return >0 to have quests with an NPC here as source
     val questIDsAsSource = mutableListOf<String>()
+
+    open fun numberOfLoreHavers() = 0
 
     override fun trailDestinationChance() = 1f
 
@@ -202,8 +207,27 @@ sealed class Habitation(
             }
         }
         super.dig(carto)
+        addLore()
         questsAsSource.forEach { quest ->
             quest.digSource(this)
+        }
+    }
+
+    private fun addLore() {
+        repeat (numberOfLoreHavers()) {
+            val newLore = Lore.random
+            var tries = 20
+            while (tries > 0) {
+                tries--
+                citizens.randomOrNull()?.also { citizenID ->
+                    App.level.director.getActor(citizenID)?.also { citizen ->
+                        if ((citizen as Citizen).couldHaveLore()) {
+                            citizen.lore.add(newLore)
+                            tries = 0
+                        }
+                    }
+                }
+            }
         }
     }
 }

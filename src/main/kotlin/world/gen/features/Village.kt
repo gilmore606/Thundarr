@@ -34,6 +34,7 @@ class Village(
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else max(1, min(Dice.oneTo(size / 3), 4))
     override fun canBeQuestDestination() = true
     override fun createQuest() = FetchQuest()
+    override fun numberOfLoreHavers() = if (Dice.flip()) 2 else 1
     override fun preventBiomeAnimalSpawns() = !isAbandoned
     override fun flavor() = flavor
 
