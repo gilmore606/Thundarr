@@ -151,7 +151,7 @@ sealed class Habitation(
             citizen.spawnAt(App.level, spawnPoint.x, spawnPoint.y)
 
             questsNeedingGiver.randomOrNull()?.also { quest ->
-                if (quest.couldBeGivenBy(citizen)) {
+                if (quest.couldBeGivenBy(citizen) && citizen.couldGiveQuest(quest)) {
                     quest.onGiverSpawn(citizen)
                     questsNeedingGiver.remove(quest)
                     log.info("  assigned $quest to $citizen")

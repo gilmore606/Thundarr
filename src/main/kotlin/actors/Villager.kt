@@ -6,6 +6,8 @@ import actors.actions.events.Event
 import actors.states.Fleeing
 import actors.states.IdleVillager
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import render.tilesets.Glyph.*
 import things.Container
 import things.Door
@@ -16,6 +18,7 @@ import world.gen.features.Habitation
 import world.gen.features.Village
 import world.level.Level
 import world.path.Pather
+import world.quests.Quest
 
 @Serializable
 class Villager(
@@ -81,6 +84,79 @@ class Villager(
 
     override fun toString() = name()
 
+
+    @Transient private val glyphPairs = setOf(
+        Pair(PORTRAIT_PALE_M_1, PEASANT_PALE_RED),
+        Pair(PORTRAIT_PALE_M_2, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_PALE_M_3, PEASANT_PALE_RED),
+        Pair(PORTRAIT_PALE_M_4, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_PALE_M_5, PEASANT_PALE_DARK),
+        Pair(PORTRAIT_PALE_M_6, PEASANT_PALE_DARK),
+        Pair(PORTRAIT_PALE_M_7, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_PALE_M_8, PEASANT_PALE_DARK),
+        Pair(PORTRAIT_PALE_W_1, PEASANT_PALE_RED),
+        Pair(PORTRAIT_PALE_W_2, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_PALE_W_3, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_PALE_W_4, PEASANT_PALE_DARK),
+        Pair(PORTRAIT_PALE_W_5, PEASANT_PALE_RED),
+        Pair(PORTRAIT_PALE_W_6, PEASANT_PALE_DARK),
+        Pair(PORTRAIT_PALE_W_7, PEASANT_PALE_GREEN),
+        Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
+        Pair(PORTRAIT_WHITE_M_1, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_M_2, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_M_3, PEASANT_WHITE_RED),
+        Pair(PORTRAIT_WHITE_M_4, PEASANT_WHITE_GREEN),
+        Pair(PORTRAIT_WHITE_M_5, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_M_6, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_M_7, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_M_8, PEASANT_WHITE_RED),
+        Pair(PORTRAIT_WHITE_W_1, PEASANT_WHITE_BLOND),
+        Pair(PORTRAIT_WHITE_W_2, PEASANT_WHITE_RED),
+        Pair(PORTRAIT_WHITE_W_3, PEASANT_WHITE_GREEN),
+        Pair(PORTRAIT_WHITE_W_4, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_WHITE_W_5, PEASANT_WHITE_BLOND),
+        Pair(PORTRAIT_WHITE_W_6, PEASANT_WHITE_RED),
+        Pair(PORTRAIT_WHITE_W_7, PEASANT_WHITE_DARK),
+        Pair(PORTRAIT_TAN_M_1, PEASANT_TAN_BLOND),
+        Pair(PORTRAIT_TAN_M_2, PEASANT_TAN_BLOND),
+        Pair(PORTRAIT_TAN_M_3, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_M_4, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_M_5, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_M_6, PEASANT_TAN_RED),
+        Pair(PORTRAIT_TAN_M_7, PEASANT_TAN_BLOND),
+        Pair(PORTRAIT_TAN_M_8, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_W_1, PEASANT_TAN_GREEN),
+        Pair(PORTRAIT_TAN_W_2, PEASANT_TAN_RED),
+        Pair(PORTRAIT_TAN_W_3, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_W_4, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_W_5, PEASANT_TAN_DARK),
+        Pair(PORTRAIT_TAN_W_6, PEASANT_TAN_RED),
+        Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_GREEN),
+        Pair(PORTRAIT_BLACK_M_1, PEASANT_BLACK_BLOND),
+        Pair(PORTRAIT_BLACK_M_2, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_M_3, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_M_4, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_M_5, PEASANT_BLACK_RED),
+        Pair(PORTRAIT_BLACK_M_6, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_M_7, PEASANT_BLACK_GREEN),
+        Pair(PORTRAIT_BLACK_W_1, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_W_2, PEASANT_BLACK_RED),
+        Pair(PORTRAIT_BLACK_W_3, PEASANT_BLACK_BLOND),
+        Pair(PORTRAIT_BLACK_W_4, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_W_5, PEASANT_BLACK_DARK),
+        Pair(PORTRAIT_BLACK_W_6, PEASANT_BLACK_GREEN),
+    )
+
+    lateinit var portraitGlyph: Glyph
+    lateinit var customGlyph: Glyph
+
+    init {
+        glyphPairs.random().apply {
+            portraitGlyph = first
+            customGlyph = second
+        }
+    }
+
     fun setTarget(newTarget: WorkArea) {
         if (newTarget == defaultArea) return
         if (newTarget != targetArea) {
@@ -144,36 +220,6 @@ class Villager(
         if (customGender == Entity.Gender.MALE) "ie" else "ki"
     } else ""
 
-    private val customGlyph = if (isChild) PEASANT_CHILD else when (Dice.zeroTo(3)) {
-        0 -> PEASANT_1
-        1 -> PEASANT_2
-        2 -> PEASANT_3
-        else -> PEASANT_4
-    }
-
-    val portraitGlyph = when (customGlyph) {
-        PEASANT_1 -> if (customGender == Entity.Gender.MALE) setOf(
-            PORTRAIT_PALE_M_1, PORTRAIT_PALE_M_2, PORTRAIT_PALE_M_3, PORTRAIT_PALE_M_4, PORTRAIT_PALE_M_5, PORTRAIT_PALE_M_6,
-        ) else setOf(
-            PORTRAIT_PALE_W_1, PORTRAIT_PALE_W_2, PORTRAIT_PALE_W_3, PORTRAIT_PALE_W_4, PORTRAIT_PALE_W_5, PORTRAIT_PALE_W_6,
-        )
-        PEASANT_2 -> if (customGender == Entity.Gender.MALE) setOf(
-            PORTRAIT_TAN_M_1, PORTRAIT_TAN_M_2, PORTRAIT_TAN_M_3, PORTRAIT_TAN_M_4, PORTRAIT_TAN_M_5, PORTRAIT_TAN_M_6,
-        ) else setOf(
-            PORTRAIT_TAN_W_1, PORTRAIT_TAN_W_2, PORTRAIT_TAN_W_3, PORTRAIT_TAN_W_4, PORTRAIT_TAN_W_5, PORTRAIT_TAN_W_6,
-        )
-        PEASANT_3 -> if (customGender == Entity.Gender.MALE) setOf(
-            PORTRAIT_WHITE_M_1, PORTRAIT_WHITE_M_2, PORTRAIT_WHITE_M_3, PORTRAIT_WHITE_M_4, PORTRAIT_WHITE_M_5, PORTRAIT_WHITE_M_6,
-        ) else setOf(
-            PORTRAIT_WHITE_W_1, PORTRAIT_WHITE_W_2, PORTRAIT_WHITE_W_3, PORTRAIT_WHITE_W_4, PORTRAIT_WHITE_W_5, PORTRAIT_WHITE_W_6,
-        )
-        else -> if (customGender == Entity.Gender.MALE) setOf(
-            PORTRAIT_BLACK_M_1, PORTRAIT_BLACK_M_2, PORTRAIT_BLACK_M_3, PORTRAIT_BLACK_M_4, PORTRAIT_BLACK_M_5, PORTRAIT_BLACK_M_6,
-        ) else setOf(
-            PORTRAIT_BLACK_W_1, PORTRAIT_BLACK_W_2, PORTRAIT_BLACK_W_3, PORTRAIT_BLACK_W_4, PORTRAIT_BLACK_W_5, PORTRAIT_BLACK_W_6,
-        )
-    }.random()
-
     override fun gender() = customGender
     override fun name() = customName
     override fun glyph() = customGlyph
@@ -189,6 +235,8 @@ class Villager(
     override fun idleState() = IdleVillager(flavor.restTime(), flavor.sleepTime(), flavor.wakeTime(), flavor.workTime())
 
     override fun hostileResponseState(enemy: Actor) = Fleeing(enemy.id)
+
+    override fun couldGiveQuest(quest: Quest) = !isChild
 
     override fun meetPlayerMsg() = if (isChild) {
         "Hello!"

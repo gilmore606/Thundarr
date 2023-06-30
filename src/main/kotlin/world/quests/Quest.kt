@@ -34,7 +34,7 @@ sealed class Quest(
     open fun needsGiver() = true
 
     // Could citizen give out this quest?
-    open fun couldBeGivenBy(citizen: Citizen) = citizen is Villager
+    open fun couldBeGivenBy(citizen: Citizen) = true
 
     // Modify the giver on spawn
     open fun onGiverSpawn(giver: Citizen) {

@@ -10,6 +10,7 @@ import ui.modals.ConverseModal
 import util.Dice
 import util.XY
 import world.gen.features.Habitation
+import world.quests.Quest
 
 @Serializable
 sealed class Citizen : NPC(), ConverseModal.Source {
@@ -85,6 +86,8 @@ sealed class Citizen : NPC(), ConverseModal.Source {
         }
         super.advanceTime(delta)
     }
+
+    open fun couldGiveQuest(quest: Quest) = false
 
     override fun hasConversation() = hasQuestsToGive
     override fun conversationSources() = mutableListOf<ConverseModal.Source>(this).apply { addAll(questsGiven()) }

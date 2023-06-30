@@ -14,7 +14,7 @@ object SpriteSheets {
         val filter: Texture.TextureFilter = Texture.TextureFilter.Nearest
     ) {
         ActorSprites(
-            "sheets/tiles_mob.png", 7, 7, Screen.textureFilter
+            "sheets/tiles_mob.png", 11, 11, Screen.textureFilter
         ),
         TerrainSprites(
             "sheets/tiles_terrain.png", 12, 14, Screen.textureFilter

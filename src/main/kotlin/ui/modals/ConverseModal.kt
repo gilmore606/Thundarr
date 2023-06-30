@@ -101,7 +101,7 @@ class ConverseModal(
         }
         nextOptions.add(Option("bye", "Goodbye.") { endConversation() })
 
-        wrappedText = wrapText(nextResponse, width - portraitXpad, padding, Screen.font)
+        wrappedText = wrapText("\"" + nextResponse + "\"", width - portraitXpad, padding, Screen.font)
         scene = Scene(newTopic.topic, nextResponse, nextOptions)
         maxSelection = nextOptions.size - 1
         selection = 0
