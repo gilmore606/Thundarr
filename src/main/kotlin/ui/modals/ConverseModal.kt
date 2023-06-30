@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
 import render.batches.QuadBatch
+import render.tilesets.Glyph
 import ui.input.Keydef
 import ui.input.Mouse
 import util.Stack
@@ -66,7 +67,7 @@ class ConverseModal(
     val optionSpacing = 32
     val headerPad = 50
     val portraitSize = 96
-    val portraitXpad = if (portrait == null) 0 else 112
+    val portraitXpad = if (portrait == null) 0 else 120
 
     init {
         zoomWhenOpen = 1.8f
@@ -95,6 +96,8 @@ class ConverseModal(
         }
         if (topicStack.isNotEmpty()) {
             nextOptions.add(Option("back", if (nextOptions.isEmpty()) "Anyway..." else "Never mind."))
+        } else if (talker.willTrade()) {
+            nextOptions.add(Option("trade", talker.tradeMsg()) { openTrade() } )
         }
         nextOptions.add(Option("bye", "Goodbye.") { endConversation() })
 
@@ -106,6 +109,11 @@ class ConverseModal(
         log.info("text: ${scene?.text}")
         log.info("options: ${scene?.options}")
         log.info("portrait: ${talker.portraitGlyph()}")
+    }
+
+    fun openTrade() {
+        dismiss()
+        Screen.addModal(TradeModal(talker))
     }
 
     fun endConversation() {
@@ -170,7 +178,7 @@ class ConverseModal(
         val localX = screenX - x
         val localY = screenY - y
         if (localX in 1 until width) {
-            val hoverOption = (localY - optionStartY - 1) / optionSpacing
+            val hoverOption = (localY - optionStartY + 4) / optionSpacing
             if (hoverOption in 0..maxSelection) {
                 return hoverOption
             }
@@ -195,7 +203,7 @@ class ConverseModal(
             scene.options.forEach { option ->
                 drawString(
                     option.question, padding, optionStartY + n * optionSpacing,
-                    if (n == selection) Screen.fontColorBold else Screen.fontColor
+                    if (n == selection) Screen.fontColorBold else Screen.fontColorDull
                 )
                 n++
             }
@@ -204,16 +212,24 @@ class ConverseModal(
 
     override fun drawBackground() {
         super.drawBackground()
-        val boxPadding = -2
-        val boxY = optionStartY + optionSpacing * selection
-        if (!isAnimating() && selection >= 0) {
-            drawSelectionBox(padding - boxPadding, boxY - boxPadding,
-                width - (padding*2) + boxPadding*2 - 4, optionSpacing + boxPadding*2 - 4)
+        if (!isAnimating()) {
+            val boxPadding = -2
+            val boxY = optionStartY + optionSpacing * selection
+            if (selection >= 0) {
+                drawSelectionBox(
+                    padding - boxPadding, boxY - boxPadding,
+                    width - (padding * 2) + boxPadding * 2 - 4, optionSpacing + boxPadding * 2 - 4
+                )
+            }
         }
     }
 
     private fun drawPortrait() {
+        val shadePad = 8
         portrait?.also { portrait ->
+            portraitBatch.addPixelQuad(x + padding - shadePad, y + padding + headerPad - shadePad,
+                x + padding + portraitSize + shadePad, y + padding + headerPad + portraitSize + shadePad, portraitBatch.getTextureIndex(
+                    Glyph.PORTRAIT_SHADE))
             portraitBatch.addPixelQuad(x + padding, y + padding + headerPad,
                 x + padding + portraitSize, y + padding + headerPad + portraitSize, portraitBatch.getTextureIndex(portrait))
         }

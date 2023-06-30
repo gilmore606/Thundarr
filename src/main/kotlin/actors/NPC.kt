@@ -175,6 +175,8 @@ sealed class NPC : Actor() {
 
     open fun hasConversation() = false
     open fun conversationSources(): List<ConverseModal.Source> = listOf()
+    open fun willTrade() = false
+    open fun tradeMsg() = "I have wares to trade, if barbarian has coin."
 
     override fun onConverse(actor: Actor): Boolean {
         if (actor is Player && hasConversation()) {
@@ -196,6 +198,7 @@ sealed class NPC : Actor() {
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)
         if (hasConversation()) drawIt(Glyph.QUESTION_ICON)
+        if (willTrade()) drawIt(Glyph.TRADE_ICON)
         state.drawStatusGlyphs(drawIt)
     }
 

@@ -4,6 +4,7 @@ import render.tileholders.SimpleTile
 
 fun PortraitTileSet() =
     TileSet(SpriteSheets.Sheet.PortraitSprites).apply {
+        setTile(Glyph.PORTRAIT_SHADE, SimpleTile(this, 0, 9))
 
         setTile(Glyph.PORTRAIT_PALE_M_1, SimpleTile(this, 0, 0))
         setTile(Glyph.PORTRAIT_PALE_M_2, SimpleTile(this, 0, 1))
@@ -11,6 +12,8 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_PALE_M_4, SimpleTile(this, 0, 3))
         setTile(Glyph.PORTRAIT_PALE_M_5, SimpleTile(this, 0, 4))
         setTile(Glyph.PORTRAIT_PALE_M_6, SimpleTile(this, 0, 5))
+        setTile(Glyph.PORTRAIT_PALE_M_7, SimpleTile(this, 0, 6))
+        setTile(Glyph.PORTRAIT_PALE_M_8, SimpleTile(this, 0, 7))
 
         setTile(Glyph.PORTRAIT_PALE_W_1, SimpleTile(this, 1, 0))
         setTile(Glyph.PORTRAIT_PALE_W_2, SimpleTile(this, 1, 1))
@@ -18,6 +21,8 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_PALE_W_4, SimpleTile(this, 1, 3))
         setTile(Glyph.PORTRAIT_PALE_W_5, SimpleTile(this, 1, 4))
         setTile(Glyph.PORTRAIT_PALE_W_6, SimpleTile(this, 1, 5))
+        setTile(Glyph.PORTRAIT_PALE_W_7, SimpleTile(this, 1, 6))
+        setTile(Glyph.PORTRAIT_PALE_W_8, SimpleTile(this, 1, 7))
 
         setTile(Glyph.PORTRAIT_WHITE_M_1, SimpleTile(this, 2, 0))
         setTile(Glyph.PORTRAIT_WHITE_M_2, SimpleTile(this, 2, 1))
@@ -25,6 +30,8 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_WHITE_M_4, SimpleTile(this, 2, 3))
         setTile(Glyph.PORTRAIT_WHITE_M_5, SimpleTile(this, 2, 4))
         setTile(Glyph.PORTRAIT_WHITE_M_6, SimpleTile(this, 2, 5))
+        setTile(Glyph.PORTRAIT_WHITE_M_7, SimpleTile(this, 2, 6))
+        setTile(Glyph.PORTRAIT_WHITE_M_8, SimpleTile(this, 2, 7))
 
         setTile(Glyph.PORTRAIT_WHITE_W_1, SimpleTile(this, 3, 0))
         setTile(Glyph.PORTRAIT_WHITE_W_2, SimpleTile(this, 3, 1))
@@ -32,6 +39,7 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_WHITE_W_4, SimpleTile(this, 3, 3))
         setTile(Glyph.PORTRAIT_WHITE_W_5, SimpleTile(this, 3, 4))
         setTile(Glyph.PORTRAIT_WHITE_W_6, SimpleTile(this, 3, 5))
+        setTile(Glyph.PORTRAIT_WHITE_W_7, SimpleTile(this, 3, 6))
 
         setTile(Glyph.PORTRAIT_TAN_M_1, SimpleTile(this, 4, 0))
         setTile(Glyph.PORTRAIT_TAN_M_2, SimpleTile(this, 4, 1))
@@ -39,6 +47,8 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_TAN_M_4, SimpleTile(this, 4, 3))
         setTile(Glyph.PORTRAIT_TAN_M_5, SimpleTile(this, 4, 4))
         setTile(Glyph.PORTRAIT_TAN_M_6, SimpleTile(this, 4, 5))
+        setTile(Glyph.PORTRAIT_TAN_M_7, SimpleTile(this, 4, 6))
+        setTile(Glyph.PORTRAIT_TAN_M_8, SimpleTile(this, 4, 7))
 
         setTile(Glyph.PORTRAIT_TAN_W_1, SimpleTile(this, 5, 0))
         setTile(Glyph.PORTRAIT_TAN_W_2, SimpleTile(this, 5, 1))
@@ -46,6 +56,7 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_TAN_W_4, SimpleTile(this, 5, 3))
         setTile(Glyph.PORTRAIT_TAN_W_5, SimpleTile(this, 5, 4))
         setTile(Glyph.PORTRAIT_TAN_W_6, SimpleTile(this, 5, 5))
+        setTile(Glyph.PORTRAIT_TAN_W_7, SimpleTile(this, 5, 6))
 
         setTile(Glyph.PORTRAIT_BLACK_M_1, SimpleTile(this, 6, 0))
         setTile(Glyph.PORTRAIT_BLACK_M_2, SimpleTile(this, 6, 1))
@@ -53,6 +64,7 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_BLACK_M_4, SimpleTile(this, 6, 3))
         setTile(Glyph.PORTRAIT_BLACK_M_5, SimpleTile(this, 6, 4))
         setTile(Glyph.PORTRAIT_BLACK_M_6, SimpleTile(this, 6, 5))
+        setTile(Glyph.PORTRAIT_BLACK_M_7, SimpleTile(this, 6, 6))
 
         setTile(Glyph.PORTRAIT_BLACK_W_1, SimpleTile(this, 7, 0))
         setTile(Glyph.PORTRAIT_BLACK_W_2, SimpleTile(this, 7, 1))

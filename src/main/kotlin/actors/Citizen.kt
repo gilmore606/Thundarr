@@ -94,8 +94,7 @@ sealed class Citizen : NPC(), ConverseModal.Source {
                 if (introducedToPlayer) "Hello again, Thundarr." else {
                     introducedToPlayer = true
                     "Nice to meet you Thundarr, I'm ${name()}."
-                },
-                listOf())
+                }, listOf())
         }
         return null
     }

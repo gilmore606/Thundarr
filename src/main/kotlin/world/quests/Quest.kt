@@ -28,6 +28,8 @@ sealed class Quest(
 
     var giverID: String? = null
 
+    var haggled = false // Did we haggle for the reward?
+
     // Do we need a specific giver assigned?
     open fun needsGiver() = true
 
@@ -60,6 +62,7 @@ sealed class Quest(
     open fun mentionMsg(): String = "I've got a job for you.  Interested?"
     open fun offerMsg(): String = "I need you to do a certain thing.  Will you help?"
     open fun thanksMsg(): String = "Thanks again for your help."
+    open fun haggleMsg(): String = "I don't have much, but I could possibly scrape up...$$$?  How does that sound?"
     open fun acceptMsg(): String = "Thanks, and good luck.  Come back when you've done it."
     open fun refuseMsg(): String = "That's too bad.  I suppose I'll find someone eventually."
     open fun remindMsg(): String = "You take care of that thing yet?"
@@ -76,8 +79,13 @@ sealed class Quest(
                 else -> null
             }
             "quest_${id}_offer" -> Scene(topic, offerMsg(), listOf(
+                Option("quest_${id}_haggle", "What's in it for Thundarr?") { haggled = true },
                 Option("quest_${id}_accept", "I'll see what I can do.") { this.accept() },
                 Option("quest_${id}_refuse", "I just don't have time.") { this.refuse() },
+            ))
+            "quest_${id}_haggle" -> Scene(topic, haggleMsg().replace("$$$", "\$${cashReward()}"), listOf(
+                Option("quest_${id}_accept", "It's a deal.") { this.accept() },
+                Option("quest_${id}_refuse", "Sorry, not worth it.") { this.refuse() },
             ))
             "quest_${id}_accept" -> Scene(topic, acceptMsg(), listOf())
             "quest_${id}_refuse" -> Scene(topic, refuseMsg(), listOf())
