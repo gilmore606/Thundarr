@@ -432,7 +432,6 @@ class Chunk(
         if (boundsCheck(x, y)) {
             lights[x - this.x][y - this.y].forEach { (lightSource, _) ->
                 level.lightSourceLocation(lightSource)?.also { location ->
-                    log.debug("Dirtying light at $location")
                     level.dirtyLights[lightSource] = location
                 }
             }

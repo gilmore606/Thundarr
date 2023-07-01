@@ -88,11 +88,11 @@ class IdleVillager(
             }
 
             entitiesSeen { it is SwitchableLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
-                if ((light as SwitchableLight).lit && previousTargetArea.contains(light.xy()) && (targetArea != previousTargetArea) &&
+                if ((light as SwitchableLight).active && previousTargetArea.contains(light.xy()) && (targetArea != previousTargetArea) &&
                     previousTargetArea.contains(xy()) && previousTargetArea.villagerCount(level()) <= 1) {
                     // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
                     pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
-                } else if (!(light).lit && targetArea.contains(npc.xy) && targetArea.contains(light.xy())) {
+                } else if (!(light).active && targetArea.contains(npc.xy) && targetArea.contains(light.xy())) {
                     // Is it out, and we're staying here?  Light it
                     pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light.getKey())))
                 }

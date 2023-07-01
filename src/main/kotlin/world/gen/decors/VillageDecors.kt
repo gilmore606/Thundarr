@@ -272,13 +272,11 @@ class Barracks(val vertical: Boolean) : Decor() {
     var bedLocations = mutableListOf<XY>()
     override fun description() = "A dormitory barracks."
     override fun doFurnish() {
-        forEachClear { x,y ->
-            if ((vertical && x % 2 == 0) || (!vertical && y % 2 == 0)) {
-                spawn(Bedroll()) { bedXY ->
-                    bedLocations.add(bedXY)
-                }
+        repeat (8) { awayFromWall {
+            spawn(Bedroll()) { bedXY ->
+                bedLocations.add(bedXY)
             }
-        }
+        }}
         againstWall { spawn(Candlestick()) }
         againstWall { spawn(Trunk()) }
     }

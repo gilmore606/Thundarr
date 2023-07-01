@@ -62,7 +62,9 @@ sealed class NPC : Actor() {
     val stateStack = Stack<State>()
 
     enum class Opinion { HATE, NEUTRAL, LOVE }
-    val opinions = mutableMapOf<String, Opinion>()
+    @Serializable data class OpinionRecord(val opinion: Opinion, val time: Double = App.gameTime.time)
+
+    val opinions = mutableMapOf<String, OpinionRecord>()
     var metPlayer = false
 
     val placeMemory = mutableMapOf<String,XY>()
@@ -224,7 +226,7 @@ sealed class NPC : Actor() {
     }
 
     fun opinionOf(actor: Actor): Opinion {
-        if (opinions.containsKey(actor.id)) return opinions[actor.id]!! else {
+        if (opinions.containsKey(actor.id)) return opinions[actor.id]!!.opinion else {
             var loved = false
             factions.forEach { id ->
                 val opinion = App.factions.byID(id)?.opinionOf(actor)
@@ -236,18 +238,18 @@ sealed class NPC : Actor() {
     }
 
     fun upgradeOpinionOf(actor: Actor) {
-        if (opinions[actor.id] == Opinion.HATE) {
+        if (opinions[actor.id]?.opinion == Opinion.HATE) {
             opinions.remove(actor.id)
         } else {
-            opinions[actor.id] = Opinion.LOVE
+            opinions[actor.id] = OpinionRecord(Opinion.LOVE)
         }
     }
 
     fun downgradeOpinionOf(actor: Actor) {
-        if (opinions[actor.id] == Opinion.LOVE) {
+        if (opinions[actor.id]?.opinion == Opinion.LOVE) {
             opinions.remove(actor.id)
         } else {
-            opinions[actor.id] = Opinion.HATE
+            opinions[actor.id] = OpinionRecord(Opinion.HATE)
         }
     }
 

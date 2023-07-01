@@ -45,7 +45,7 @@ object ChunkLoader {
         jobs.add(coroutineScope.launch {
             if (App.save.hasWorldChunk(x, y)) {
                 log.debug("Loading chunk at $x $y")
-                val chunk = App.save.getWorldChunk(x, y).apply { onRestore(level) }
+                val chunk = App.save.getWorldChunk(x, y)
                 deliverChunk(chunk, callback)
             } else {
                 makeWorldChunk(level, x, y, callback)

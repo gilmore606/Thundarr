@@ -188,6 +188,7 @@ class WorldLevel() : Level() {
         val oldChunk = chunks[cx][cy]
         chunks[cx][cy] = chunk
         loadedChunks.add(chunk)
+        chunk.onRestore(this)
         shadowDirty = true
         dirtyLightsAroundChunk(chunk)
         oldChunk?.also { if (!hasAttachedChunk(it)) unloadChunk(it) }

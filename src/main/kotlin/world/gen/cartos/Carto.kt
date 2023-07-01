@@ -66,9 +66,6 @@ abstract class Carto(
         dest?.reconnect(level, x, y)
         thing.moveTo(dest)
         thing.onSpawn()
-        if (thing is LitThing && thing.active) {
-            thing.reproject()
-        }
     }
 
     protected fun regionAt(x: Int, y: Int): Int? = try {

@@ -9,6 +9,7 @@ import ui.panels.Console
 import util.Dice
 import util.LightColor
 import util.hasOneWhere
+import util.log
 import world.CellContainer
 import java.lang.Float.max
 import kotlin.random.Random
@@ -21,8 +22,11 @@ interface LightSource {
 
 @Serializable
 sealed class LitThing : Portable(), LightSource {
+
     abstract val lightColor: LightColor
     var active: Boolean = false
+
+    override fun toString() = "${name()}(light=${light()})(active=$active)"
 
     open fun extinguishSelfMsg() = "Your %d sputters and dies."
     open fun extinguishOtherMsg() = "%Dn's %d goes out."
@@ -32,25 +36,20 @@ sealed class LitThing : Portable(), LightSource {
     open fun lightOtherMsg() = "%Dn's %d turns on."
 
     override fun listTag() = if (active) "(lit)" else ""
-
     override fun category() = Category.TOOL
 
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)
-        if (light() != null && holder is CellContainer) {
-            holder.level?.dirtyLights?.set(this, holder.xy)
-        }
+        reproject()
     }
 
-    override fun light(): LightColor? = lightColor
+    override fun light(): LightColor? = if (active) lightColor else null
 
     fun becomeLit() {
         active = true
         holder?.also { holder ->
             holder.xy().also { xy ->
-                holder.level?.addLightSource(xy.x, xy.y,
-                    if (holder is Actor) holder else this
-                )
+                reproject()
                 if (holder is Actor) {
                     Console.sayAct(lightSelfMsg(), lightOtherMsg(), holder, this)
                 } else {
@@ -65,10 +64,9 @@ sealed class LitThing : Portable(), LightSource {
         holder?.also { holder ->
             holder.level?.also { level ->
                 holder.xy().also { xy ->
-                    level.removeLightSource(if (holder is Actor) holder else this )
+                    reproject()
                     if (holder is Actor) {
                         Console.sayAct(extinguishSelfMsg(), extinguishOtherMsg(), holder, this)
-                        holder.light()?.also { level.addLightSource(xy.x, xy.y, holder) }
                     } else {
                         Console.sayAct("", extinguishMsg(), this, this)
                     }
@@ -77,10 +75,16 @@ sealed class LitThing : Portable(), LightSource {
         }
     }
 
+    override fun onSpawn() {
+        super.onSpawn()
+        reproject()
+    }
+
     fun reproject() {
         holder?.also { holder ->
             holder.level?.also { level ->
                 holder.xy().also { xy ->
+                    log.info("reproject called on $this")
                     level.removeLightSource(if (holder is Actor) holder else this )
                     level.addLightSource(xy.x, xy.y, if (holder is Actor) holder else this)
                 }
@@ -129,28 +133,26 @@ class CeilingLight : LitThing(), Smashable {
 
 @Serializable
 sealed class SwitchableLight : LitThing() {
-    var lit = false
     override fun isPortable() = false
     override fun isAlwaysVisible() = true
-    override fun light() = if (lit) lightColor else null
-    override fun glyph() = if (lit) glyphLit() else glyphDark()
+    override fun glyph() = if (active) glyphLit() else glyphDark()
     abstract fun glyphLit(): Glyph
     abstract fun glyphDark(): Glyph
     open fun leaveLit() = false
 
     override fun uses() = mapOf(
         UseTag.SWITCH_ON to Use("light " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> !lit && isNextTo(actor) },
+            canDo = { actor,x,y,targ -> !active && isNextTo(actor) },
             toDo = { actor,level,x,y ->
-                lit = true
+                active = true
                 level.addLightSource(x, y, this)
                 Console.sayAct("You light %dd.", "%Dn lights %dd.", actor, this)
             }),
         UseTag.SWITCH_OFF to Use("extinguish " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> lit && isNextTo(actor) && !leaveLit() },
+            canDo = { actor,x,y,targ -> active && isNextTo(actor) && !leaveLit() },
             toDo = { actor,level,x,y ->
                 Console.sayAct("You snuff out %dd.", "%Dn snuffs out %dd.", actor, this)
-                lit = false
+                active = false
                 level.removeLightSource(this)
             }
         )
@@ -176,7 +178,10 @@ class Lamppost : SwitchableLight() {
     override fun name() = "lamppost"
     override fun description() = "A wrought iron lamppost."
     override val lightColor = LightColor(0.5f, 0.8f, 0f)
-    init { lit = true }
+    override fun onCreate() {
+        super.onCreate()
+        active = true
+    }
 }
 
 @Serializable
