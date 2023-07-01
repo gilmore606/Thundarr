@@ -38,6 +38,9 @@ class Caves : Feature() {
 
     override fun trailDestinationChance() = 0.4f
 
+    override fun loreKnowabilityRadius() = 150
+    override fun loreName() = "caverns"
+
     override fun doDig() {
         val entrances = mutableSetOf<XY>()
         forEachTerrain(Terrain.Type.TERRAIN_CAVEWALL) { x, y ->

@@ -10,6 +10,7 @@ import world.ChunkScratch
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
 import world.level.Level
+import world.lore.DirectionsLore
 import world.lore.Lore
 import world.lore.MoonLore1
 import world.lore.WizardLore1
@@ -214,16 +215,23 @@ sealed class Habitation(
     }
 
     private fun addLore() {
+        val lores = mutableListOf<Lore>().apply {
+            addAll(Lore.static)
+            add(DirectionsLore(XY(worldX, worldY)))
+        }
         repeat (numberOfLoreHavers()) {
-            val newLore = Lore.random
-            var tries = 20
-            while (tries > 0) {
-                tries--
-                citizens.randomOrNull()?.also { citizenID ->
-                    App.level.director.getActor(citizenID)?.also { citizen ->
-                        if ((citizen as Citizen).couldHaveLore()) {
-                            citizen.lore.add(newLore)
-                            tries = 0
+            if (lores.isNotEmpty()) {
+                val newLore = lores.random()
+                lores.remove(newLore)
+                var tries = 20
+                while (tries > 0) {
+                    tries--
+                    citizens.randomOrNull()?.also { citizenID ->
+                        App.level.director.getActor(citizenID)?.also { citizen ->
+                            if ((citizen as Citizen).couldHaveLore()) {
+                                citizen.lore.add(newLore)
+                                tries = 0
+                            }
                         }
                     }
                 }

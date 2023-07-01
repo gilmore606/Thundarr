@@ -18,6 +18,9 @@ class Volcano : Feature() {
 
     override fun trailDestinationChance() = 1f
 
+    override fun loreKnowabilityRadius() = 800
+    override fun loreName() = "an active volcano"
+
     override fun doDig() {
         val width = Dice.range(40,56)
         val height = Dice.range(40,56)

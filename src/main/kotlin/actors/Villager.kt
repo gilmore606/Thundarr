@@ -5,6 +5,10 @@ import actors.actions.Say
 import actors.actions.events.Event
 import actors.states.Fleeing
 import actors.states.IdleVillager
+import actors.stats.Brains
+import actors.stats.Senses
+import actors.stats.Speed
+import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -29,6 +33,71 @@ class Villager(
 
     companion object {
         val defaultArea = WorkArea("", Rect(0,0,0,0),setOf())
+
+        val glyphPairsMale = setOf(
+            Pair(PORTRAIT_PALE_M_1, PEASANT_PALE_RED),
+            Pair(PORTRAIT_PALE_M_2, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_PALE_M_3, PEASANT_PALE_RED),
+            Pair(PORTRAIT_PALE_M_4, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_PALE_M_5, PEASANT_PALE_DARK),
+            Pair(PORTRAIT_PALE_M_6, PEASANT_PALE_DARK),
+            Pair(PORTRAIT_PALE_M_7, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_PALE_M_8, PEASANT_PALE_DARK),
+            Pair(PORTRAIT_WHITE_M_1, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_M_2, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_M_3, PEASANT_WHITE_RED),
+            Pair(PORTRAIT_WHITE_M_4, PEASANT_WHITE_GREEN),
+            Pair(PORTRAIT_WHITE_M_5, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_M_6, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_M_7, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_M_8, PEASANT_WHITE_RED),
+            Pair(PORTRAIT_TAN_M_1, PEASANT_TAN_BLOND),
+            Pair(PORTRAIT_TAN_M_2, PEASANT_TAN_BLOND),
+            Pair(PORTRAIT_TAN_M_3, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_M_4, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_M_5, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_M_6, PEASANT_TAN_RED),
+            Pair(PORTRAIT_TAN_M_7, PEASANT_TAN_BLOND),
+            Pair(PORTRAIT_TAN_M_8, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_BLACK_M_1, PEASANT_BLACK_BLOND),
+            Pair(PORTRAIT_BLACK_M_2, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_M_3, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_M_4, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_M_5, PEASANT_BLACK_RED),
+            Pair(PORTRAIT_BLACK_M_6, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_M_7, PEASANT_BLACK_GREEN),
+        )
+
+        val glyphPairsFemale = setOf(
+            Pair(PORTRAIT_PALE_W_1, PEASANT_PALE_RED),
+            Pair(PORTRAIT_PALE_W_2, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_PALE_W_3, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_PALE_W_4, PEASANT_PALE_DARK),
+            Pair(PORTRAIT_PALE_W_5, PEASANT_PALE_RED),
+            Pair(PORTRAIT_PALE_W_6, PEASANT_PALE_DARK),
+            Pair(PORTRAIT_PALE_W_7, PEASANT_PALE_GREEN),
+            Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
+            Pair(PORTRAIT_WHITE_W_1, PEASANT_WHITE_BLOND),
+            Pair(PORTRAIT_WHITE_W_2, PEASANT_WHITE_RED),
+            Pair(PORTRAIT_WHITE_W_3, PEASANT_WHITE_GREEN),
+            Pair(PORTRAIT_WHITE_W_4, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_WHITE_W_5, PEASANT_WHITE_BLOND),
+            Pair(PORTRAIT_WHITE_W_6, PEASANT_WHITE_RED),
+            Pair(PORTRAIT_WHITE_W_7, PEASANT_WHITE_DARK),
+            Pair(PORTRAIT_TAN_W_1, PEASANT_TAN_GREEN),
+            Pair(PORTRAIT_TAN_W_2, PEASANT_TAN_RED),
+            Pair(PORTRAIT_TAN_W_3, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_W_4, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_W_5, PEASANT_TAN_DARK),
+            Pair(PORTRAIT_TAN_W_6, PEASANT_TAN_RED),
+            Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_GREEN),
+            Pair(PORTRAIT_BLACK_W_1, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_W_2, PEASANT_BLACK_RED),
+            Pair(PORTRAIT_BLACK_W_3, PEASANT_BLACK_BLOND),
+            Pair(PORTRAIT_BLACK_W_4, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_W_5, PEASANT_BLACK_DARK),
+            Pair(PORTRAIT_BLACK_W_6, PEASANT_BLACK_GREEN),
+        )
     }
 
     @Serializable
@@ -85,84 +154,12 @@ class Villager(
     override fun toString() = name()
 
 
-    @Transient private val glyphPairsMale = setOf(
-        Pair(PORTRAIT_PALE_M_1, PEASANT_PALE_RED),
-        Pair(PORTRAIT_PALE_M_2, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_PALE_M_3, PEASANT_PALE_RED),
-        Pair(PORTRAIT_PALE_M_4, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_PALE_M_5, PEASANT_PALE_DARK),
-        Pair(PORTRAIT_PALE_M_6, PEASANT_PALE_DARK),
-        Pair(PORTRAIT_PALE_M_7, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_PALE_M_8, PEASANT_PALE_DARK),
-        Pair(PORTRAIT_WHITE_M_1, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_M_2, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_M_3, PEASANT_WHITE_RED),
-        Pair(PORTRAIT_WHITE_M_4, PEASANT_WHITE_GREEN),
-        Pair(PORTRAIT_WHITE_M_5, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_M_6, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_M_7, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_M_8, PEASANT_WHITE_RED),
-        Pair(PORTRAIT_TAN_M_1, PEASANT_TAN_BLOND),
-        Pair(PORTRAIT_TAN_M_2, PEASANT_TAN_BLOND),
-        Pair(PORTRAIT_TAN_M_3, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_M_4, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_M_5, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_M_6, PEASANT_TAN_RED),
-        Pair(PORTRAIT_TAN_M_7, PEASANT_TAN_BLOND),
-        Pair(PORTRAIT_TAN_M_8, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_BLACK_M_1, PEASANT_BLACK_BLOND),
-        Pair(PORTRAIT_BLACK_M_2, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_M_3, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_M_4, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_M_5, PEASANT_BLACK_RED),
-        Pair(PORTRAIT_BLACK_M_6, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_M_7, PEASANT_BLACK_GREEN),
-    )
-
-    @Transient private val glyphPairsFemale = setOf(
-        Pair(PORTRAIT_PALE_W_1, PEASANT_PALE_RED),
-        Pair(PORTRAIT_PALE_W_2, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_PALE_W_3, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_PALE_W_4, PEASANT_PALE_DARK),
-        Pair(PORTRAIT_PALE_W_5, PEASANT_PALE_RED),
-        Pair(PORTRAIT_PALE_W_6, PEASANT_PALE_DARK),
-        Pair(PORTRAIT_PALE_W_7, PEASANT_PALE_GREEN),
-        Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
-        Pair(PORTRAIT_WHITE_W_1, PEASANT_WHITE_BLOND),
-        Pair(PORTRAIT_WHITE_W_2, PEASANT_WHITE_RED),
-        Pair(PORTRAIT_WHITE_W_3, PEASANT_WHITE_GREEN),
-        Pair(PORTRAIT_WHITE_W_4, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_WHITE_W_5, PEASANT_WHITE_BLOND),
-        Pair(PORTRAIT_WHITE_W_6, PEASANT_WHITE_RED),
-        Pair(PORTRAIT_WHITE_W_7, PEASANT_WHITE_DARK),
-        Pair(PORTRAIT_TAN_W_1, PEASANT_TAN_GREEN),
-        Pair(PORTRAIT_TAN_W_2, PEASANT_TAN_RED),
-        Pair(PORTRAIT_TAN_W_3, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_W_4, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_W_5, PEASANT_TAN_DARK),
-        Pair(PORTRAIT_TAN_W_6, PEASANT_TAN_RED),
-        Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_GREEN),
-        Pair(PORTRAIT_BLACK_W_1, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_W_2, PEASANT_BLACK_RED),
-        Pair(PORTRAIT_BLACK_W_3, PEASANT_BLACK_BLOND),
-        Pair(PORTRAIT_BLACK_W_4, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_W_5, PEASANT_BLACK_DARK),
-        Pair(PORTRAIT_BLACK_W_6, PEASANT_BLACK_GREEN),
-    )
-
-    val portraitGlyph: Glyph
-    val customGlyph: Glyph
+    var portraitGlyph: Glyph = Glyph.BLANK
+    var customGlyph: Glyph = Glyph.BLANK
     private val customGender = if (Dice.flip()) Entity.Gender.MALE else Entity.Gender.FEMALE
     private val customName = flavor.namePrefix + Madlib.villagerName(customGender) + if (isChild) {
         if (customGender == Entity.Gender.MALE) "ie" else "ki"
     } else ""
-
-    init {
-        (if (customGender == Entity.Gender.MALE) glyphPairsMale else glyphPairsFemale).random().apply {
-            portraitGlyph = first
-            customGlyph = second
-        }
-    }
 
     fun setTarget(newTarget: WorkArea) {
         if (newTarget == defaultArea) return
@@ -228,6 +225,17 @@ class Villager(
     override fun portraitGlyph() = portraitGlyph
     override fun hasProperName() = true
     override fun isHuman() = true
+    override fun onSpawn() {
+        Strength.set(this, 10f)
+        Speed.set(this, 10f)
+        Brains.set(this, 10f)
+        Senses.set(this, 10f)
+
+        (if (customGender == Entity.Gender.MALE) glyphPairsMale else glyphPairsFemale).random().apply {
+            portraitGlyph = first
+            customGlyph = second
+        }
+    }
     override fun description() = if (isChild) {
         "Like a villager, but small and mischevious.  Its face is smeared with mud."
     } else {

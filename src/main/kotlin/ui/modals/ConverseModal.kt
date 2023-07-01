@@ -44,9 +44,7 @@ class ConverseModal(
         val topic: String,
         val question: String,
         val onPick: (()->Unit)? = null,
-    ) {
-        var wrappedQuestion = mutableListOf<String>()
-    }
+    )
 
     class Scene(
         val topic: String,

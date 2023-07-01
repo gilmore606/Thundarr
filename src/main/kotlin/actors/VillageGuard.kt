@@ -5,6 +5,7 @@ import actors.states.Attacking
 import actors.states.IdlePatrol
 import actors.states.State
 import actors.stats.Brains
+import actors.stats.Senses
 import actors.stats.Speed
 import actors.stats.Strength
 import kotlinx.serialization.Serializable
@@ -33,6 +34,7 @@ class VillageGuard(
         Strength.set(this, 14f)
         Speed.set(this, 12f)
         Brains.set(this, 10f)
+        Senses.set(this, 12f)
     }
     override fun armorTotal() = 2.0f
     override fun idleState() = IdlePatrol(
@@ -50,6 +52,8 @@ class VillageGuard(
         "Welcome to $villageName.",
         "$villageName is a peaceful town."
     ).random()
+
+    override fun couldHaveLore() = false
 
     private val lantern = LightColor(0.4f, 0.2f, 0.0f)
     private val lightStartTime = DayTime.betweenHoursOf(20, 21)

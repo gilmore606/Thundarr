@@ -34,6 +34,10 @@ sealed class Feature : AnimalSpawnSource {
     open fun canBeQuestDestination() = false
     open fun createQuest(): Quest? = null
 
+    // How close must this be to be known as part of someone's area lore?
+    open fun loreKnowabilityRadius() = 0
+    open fun loreName() = "something"
+
     var worldX = 0
     var worldY = 0
 

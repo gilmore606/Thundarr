@@ -30,22 +30,19 @@ sealed class Idle : State() {
     }
 
     override fun considerState(npc: NPC) {
-        // TODO: replace this junk with something robust
-        val canSeePlayer = npc.canSee(App.player)
-        if (canSeePlayer && !npc.metPlayer) {
-            npc.meetPlayerMsg()?.also {
-                Console.sayAct("", "%Dn says, \"$it\"", npc)
-                npc.talkSound(App.player)?.also { Speaker.world(it, source = npc.xy())}
-                npc.level?.addSpark(Speak().at(npc.xy.x, npc.xy.y))
-            }
-            npc.metPlayer = true
-        }
-
-        npc.entitiesSeen { it is Actor && npc.opinionOf(it) == NPC.Opinion.HATE }.keys.toList().firstOrNull()?.also { enemy ->
-            npc.hostileResponseState(enemy as Actor)?.also { hostileState ->
-                npc.pushState(hostileState)
+        npc.apply {
+            // TODO: replace this junk with something robust
+            val canSeePlayer = canSee(App.player)
+            if (canSeePlayer && !metPlayer) {
+                meetPlayerMsg()?.also {
+                    Console.sayAct("", "%Dn says, \"$it\"", npc)
+                    talkSound(App.player)?.also { Speaker.world(it, source = xy()) }
+                    level?.addSpark(Speak().at(xy.x, xy.y))
+                }
+                metPlayer = true
             }
         }
+        super.considerState(npc)
     }
 
     protected fun wander(npc: NPC, isOK: ((XY)->Boolean) = { true }): Action {

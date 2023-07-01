@@ -7,7 +7,7 @@ import ui.modals.ConverseModal
 sealed class Lore : ConverseModal.Source {
 
     companion object {
-        val random = setOf(MoonLore1(), WizardLore1()).random()
+        val static = setOf(MoonLore1(), WizardLore1())
     }
 
     class Subject(

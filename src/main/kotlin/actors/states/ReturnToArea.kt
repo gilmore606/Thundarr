@@ -27,7 +27,6 @@ class ReturnToArea(
             npc.popState()
             return
         }
-        super.considerState(npc)
     }
 
     override fun pickAction(npc: NPC): Action {

@@ -12,6 +12,7 @@ class Say(
     private val text: String
 ) : Action(0.5f) {
     override fun name() = "speak"
+    override fun toString() = "Say($text)"
     override fun execute(actor: Actor, level: Level) {
         actor.level?.addSpark(Speak().at(actor.xy.x, actor.xy.y))
         Speaker.world(actor.talkSound(actor), source = actor.xy)

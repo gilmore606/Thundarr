@@ -13,7 +13,7 @@ class Use(
     private val useDuration: Float = 1f,
 ): Action(useDuration), Event {
     override fun name() = "use things"
-
+    override fun toString() = "Use($useTag,$thingKey)"
     override fun eventSenses() = setOf(Event.Sense.VISUAL)
 
     override fun execute(actor: Actor, level: Level) {

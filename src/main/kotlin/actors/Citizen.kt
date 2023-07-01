@@ -91,7 +91,7 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     }
 
     open fun couldGiveQuest(quest: Quest) = false
-    open fun couldHaveLore() = true
+    open fun couldHaveLore() = lore.isEmpty()
 
     override fun hasQuestion() = hasQuestsToGive
     override fun hasConversation() = lore.isNotEmpty()

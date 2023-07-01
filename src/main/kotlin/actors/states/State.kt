@@ -32,7 +32,16 @@ sealed class State {
     open fun onRestore(npc: NPC) { }
 
     // Consider my situation and possibly change to a new state.
-    open fun considerState(npc: NPC) { }
+    open fun considerState(npc: NPC) {
+        npc.apply {
+            entitiesSeen { it is Actor && opinionOf(it) == NPC.Opinion.HATE }.keys.toList().firstOrNull()
+                ?.also { enemy ->
+                    hostileResponseState(enemy as Actor)?.also { hostileState ->
+                        pushState(hostileState)
+                    }
+                }
+        }
+    }
 
     open fun pickAction(npc: NPC): Action = Wait(1f)
 

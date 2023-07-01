@@ -31,34 +31,34 @@ class IdleVillager(
     }
 
     override fun pickAction(npc: NPC): Action {
-        if (npc is Villager) {
-            npc.entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
+        if (npc is Villager) { npc.apply {
+            entitiesNextToUs { it is Door && it.isOpen }.firstOrNull()?.also { door ->
                 // Close the door behind us if we're leaving this area, or entering our home
-                if (npc.previousTargetArea.includesDoor(door as Door)) {
-                    if ((npc.targetArea != npc.previousTargetArea) && !npc.previousTargetArea.contains(npc.xy())) {
+                if (previousTargetArea.includesDoor(door as Door)) {
+                    if ((targetArea != previousTargetArea) && !previousTargetArea.contains(xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
                     }
-                } else if (npc.homeArea.includesDoor(door)) {
-                    if (npc.targetArea == npc.homeArea && npc.homeArea.contains(npc.xy())) {
+                } else if (homeArea.includesDoor(door)) {
+                    if (targetArea == homeArea && homeArea.contains(xy())) {
                         return Use(Thing.UseTag.CLOSE, (door as Thing).getKey())
                     }
                 }
             }
-            if (npc.targetArea.contains(npc.xy)) {
+            if (targetArea.contains(xy)) {
                 // We're here, do whatever!
-                if (!npc.isChild && Dice.chance(commentChance)) {
+                if (!isChild && Dice.chance(commentChance)) {
                     return Say(npc.commentLines().random())
                 }
                 if (Dice.chance(wanderChance)) {
-                    return wander(npc, wanderCheck(npc.targetArea.rect))
+                    return wander(npc, wanderCheck(targetArea.rect))
                 }
             } else {
                 // Go where we should be!
-                npc.stepToward(npc.targetArea.rect)?.also { return it } ?: run {
+                stepToward(targetArea.rect)?.also { return it } ?: run {
                     return wander(npc) { true }
                 }
             }
-        }
+        }}
         return super.pickAction(npc)
     }
 
@@ -67,38 +67,38 @@ class IdleVillager(
     }
 
     override fun considerState(npc: NPC) {
-        if (npc is Villager) {
-            if (npc.targetArea == Villager.defaultArea) {
-                npc.setTarget(npc.homeArea)
+        if (npc is Villager) { npc.apply {
+            if (targetArea == Villager.defaultArea) {
+                setTarget(homeArea)
             }
             if (App.gameTime.isBefore(wakeTime) || App.gameTime.isAfter(sleepTime)) {
-                npc.pushState(Sleeping(wakeTime))
+                pushState(Sleeping(wakeTime))
                 return
             } else if (App.gameTime.isAfter(restTime)) {
-                if (npc.targetArea != npc.homeArea) {
-                    npc.say("Time to head home.")
-                    npc.setTarget(npc.homeArea)
+                if (targetArea != homeArea) {
+                    say("Time to head home.")
+                    setTarget(homeArea)
                 }
             } else if (App.gameTime.isAfter(workTime)) {
-                if (npc.targetArea == npc.homeArea) {
-                    npc.pickJob()
-                } else if (App.gameTime.isAfter(npc.nextJobChangeTime)) {
-                    npc.pickJob()
+                if (targetArea == homeArea) {
+                    pickJob()
+                } else if (App.gameTime.isAfter(nextJobChangeTime)) {
+                    pickJob()
                 }
             }
 
-            npc.entitiesSeen { it is SwitchableLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
-                if ((light as SwitchableLight).lit && npc.previousTargetArea.contains(light.xy()) && (npc.targetArea != npc.previousTargetArea) &&
-                    npc.previousTargetArea.contains(npc.xy()) && npc.previousTargetArea.villagerCount(npc.level()) <= 1) {
+            entitiesSeen { it is SwitchableLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
+                if ((light as SwitchableLight).lit && previousTargetArea.contains(light.xy()) && (targetArea != previousTargetArea) &&
+                    previousTargetArea.contains(xy()) && previousTargetArea.villagerCount(level()) <= 1) {
                     // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
-                } else if (!(light).lit && npc.targetArea.contains(npc.xy) && npc.targetArea.contains(light.xy())) {
+                    pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
+                } else if (!(light).lit && targetArea.contains(npc.xy) && targetArea.contains(light.xy())) {
                     // Is it out, and we're staying here?  Light it
-                    npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light.getKey())))
+                    pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light.getKey())))
                 }
             }
 
-        }
+        }}
         super.considerState(npc)
     }
 

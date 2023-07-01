@@ -280,7 +280,7 @@ class RayCaster {
                             if (visible) {
                                 // collect targets
                                 level.actorAt(castX, castY)?.also {
-                                    if (it.sneakCheck(seer)) resultSet[it] = distance
+                                    if (!it.sneakCheck(seer, distance)) resultSet[it] = distance
                                 }
                                 level.thingsAt(castX, castY).forEach {
                                     resultSet[it] = distance

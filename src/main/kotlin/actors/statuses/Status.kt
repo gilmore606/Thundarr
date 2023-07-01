@@ -186,6 +186,7 @@ class Asleep() : Status() {
     override fun statEffects() = mapOf(
         Speed.tag to -10f
     )
+    override fun preventVision() = true
     override fun preventedAction(action: Action, actor: Actor): Boolean {
         if (action !is Sleep) {
             if (actor is Player) Console.say("You can't do anything in your sleep.")

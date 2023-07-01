@@ -71,6 +71,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     @Transient var seen = mutableMapOf<Entity, Float>()
     @Transient var seenUpdatedAt = 0.0
+    @Transient var seenPrevious = mutableMapOf<Entity, Float>()
 
     var hp: Float = 20f
     var hpMax: Float = 20f
@@ -603,8 +604,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return true
     }
 
-    open fun sneakCheck(perceiver: Actor): Boolean {
-        return this.currentSneak - perceiver.currentSenses > 0
+    open fun sneakCheck(perceiver: Actor, distance: Float): Boolean {
+        val sneak = this.currentSneak -
+                (if (perceiver.seenPrevious.containsKey(this)) 6 else 0) +
+                (distance / 3f) - 5
+        return (sneak.toInt() - perceiver.currentSenses) > 0
     }
 
     fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {
@@ -632,7 +636,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     private fun updateSeen() {
-        seen.clear()
+        seenPrevious = seen
+        seen = mutableMapOf()
         caster.populateSeenEntities(seen, this)
         seenUpdatedAt = App.time
     }
@@ -641,7 +646,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         currentSenses = Senses.resolve(this, 0f, true)
 
         val terrain = Terrain.get(level?.getTerrain(xy.x, xy.y) ?: Terrain.Type.TERRAIN_DIRT)
-        currentSneak = Sneak.resolve(this, terrain.sneakDifficulty, true)
+        currentSneak = Sneak.resolve(this, terrain.sneakDifficulty - 6, true)
     }
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(this, xy, dir) ?: false
