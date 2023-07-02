@@ -206,6 +206,7 @@ class Stage : Decor() {
                 setTerrain(tx, ty, terrain)
             }
         }
+        againstWall { spawn(Lamppost()) }
     }
     override fun workAreaName() = "square"
     override fun workAreaComments() = mutableSetOf(

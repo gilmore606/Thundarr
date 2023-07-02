@@ -84,7 +84,6 @@ sealed class LitThing : Portable(), LightSource {
         holder?.also { holder ->
             holder.level?.also { level ->
                 holder.xy().also { xy ->
-                    log.info("reproject called on $this")
                     level.removeLightSource(if (holder is Actor) holder else this )
                     level.addLightSource(xy.x, xy.y, if (holder is Actor) holder else this)
                 }
@@ -177,7 +176,7 @@ class Lamppost : SwitchableLight() {
     override fun leaveLit() = true
     override fun name() = "lamppost"
     override fun description() = "A wrought iron lamppost."
-    override val lightColor = LightColor(0.5f, 0.8f, 0f)
+    override val lightColor = LightColor(0.4f, 0.6f, 0f)
     override fun onCreate() {
         super.onCreate()
         active = true

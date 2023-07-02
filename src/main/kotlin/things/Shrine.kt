@@ -21,7 +21,7 @@ class Shrine : LitThing() {
     override fun isOpaque() = false
     override fun isBlocking(actor: Actor) = true
     override fun ambientSound() = Speaker.PointAmbience(Speaker.Ambience.SHRINECHORD, 24f, 1f)
-    override val lightColor = LightColor(0.5f, 0.5f, 0.1f)
+    override val lightColor = LightColor(0.1f, 0.1f, 0.4f)
 
     override fun uses() = mapOf(
         UseTag.CONSUME to Use("pray to " + name(), 2.0f,

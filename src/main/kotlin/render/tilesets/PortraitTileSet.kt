@@ -5,6 +5,7 @@ import render.tileholders.SimpleTile
 fun PortraitTileSet() =
     TileSet(SpriteSheets.Sheet.PortraitSprites).apply {
         setTile(Glyph.PORTRAIT_SHADE, SimpleTile(this, 0, 9))
+        setTile(Glyph.PORTRAIT_SPEECH_BUBBLE, SimpleTile(this, 1, 9))
 
         setTile(Glyph.PORTRAIT_PALE_M_1, SimpleTile(this, 0, 0))
         setTile(Glyph.PORTRAIT_PALE_M_2, SimpleTile(this, 0, 1))

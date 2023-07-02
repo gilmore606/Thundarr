@@ -26,12 +26,14 @@ class ConverseModal(
     val portrait = talker.portraitGlyph()
     val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
 
+    var bubbleProgress: Float? = null
+
     override fun drawEverything() {
         super.drawEverything()
         portraitBatch.clear()
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL20.GL_BLEND)
-        drawPortrait()
+        if (!isAnimating()) drawPortrait()
         portraitBatch.draw()
     }
 
@@ -74,6 +76,13 @@ class ConverseModal(
         changeTopic(Option("hello", ""))
     }
 
+    override fun onRender(delta: Float) {
+        bubbleProgress?.also {
+            bubbleProgress = it + delta * 1.3f
+            if (it + delta > 1f) bubbleProgress = null
+        }
+    }
+
     fun changeTopic(newTopic: Option) {
         var toTopic = newTopic
         if (newTopic.topic == "back") {
@@ -111,6 +120,8 @@ class ConverseModal(
         scene = Scene(newTopic.topic, nextResponse, nextOptions)
         maxSelection = nextOptions.size - 1
         selection = 0
+        bubbleProgress = 0f
+        Speaker.world(talker.talkSound(App.player), source = talker.xy)
     }
 
     fun openTrade() {
@@ -234,6 +245,12 @@ class ConverseModal(
                     Glyph.PORTRAIT_SHADE))
             portraitBatch.addPixelQuad(x + padding, y + padding + headerPad,
                 x + padding + portraitSize, y + padding + headerPad + portraitSize, portraitBatch.getTextureIndex(portrait))
+            bubbleProgress?.also { progress ->
+                val bubbleOffset = 16 - (progress * 20f).toInt()
+                portraitBatch.addPixelQuad(x + padding + 40, y + padding + headerPad + bubbleOffset + 32,
+                    x + padding + portraitSize + 8, y + padding + headerPad + portraitSize + bubbleOffset,
+                    portraitBatch.getTextureIndex(Glyph.PORTRAIT_SPEECH_BUBBLE), alpha = 1f - progress)
+            }
         }
     }
 }

@@ -64,14 +64,14 @@ class Attacking(
         npc.apply {
             getActor(targetID)?.also { target ->
                 if (entitiesNextToUs().contains(target)) {
-                    return Attack(target.id, target.xy - npc.xy)
+                    return Attack(target.id, target.xy - xy)
                 } else if (canSee(target)) {
+                    lastLocation = target.xy.copy()
                     stepToward(target)?.also { return it }
                 } else if (lastLocation != null) {
-                    if (npc.xy == lastLocation) {
+                    if (xy == lastLocation) {
                         giveUp(npc)
                     } else {
-                        lastLocation = target.xy.copy()
                         stepToward(lastLocation!!)?.also { return it }
                     }
                 }

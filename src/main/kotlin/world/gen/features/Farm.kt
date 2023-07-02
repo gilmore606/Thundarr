@@ -100,13 +100,13 @@ class Farm(
             val hx = Dice.range(3, 60 - hw)
             val hy = Dice.range(3, 60 - hh)
             clearHere = true
-            hRect = Rect(hx, hy, hx + hw -1,  hy +hh -1)
+            hRect = Rect(x0 + hx, y0 + hy, x0 + hx + hw -1,  y0 + hy +hh -1)
             if (field.overlaps(hRect)) clearHere = false
             else if (barnRect.overlaps(hRect)) clearHere = false
             tries++
         }
         hRect?.also { hRect ->
-            val hut = buildHut(hRect.x0, hRect.y0, hRect.width(), hRect.height(), 1f, isAbandoned = isAbandoned)
+            val hut = buildHut(hRect.x0 - x0, hRect.y0 - y0, hRect.width(), hRect.height(), 1f, isAbandoned = isAbandoned)
             val houseDecor = Hut()
             houseDecor.furnish(hut, carto, isAbandoned = isAbandoned)
             if (!isAbandoned) {

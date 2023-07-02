@@ -4,6 +4,7 @@ import actors.actions.Action
 import actors.actions.events.Event
 import actors.states.*
 import actors.stats.Speed
+import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -183,6 +184,7 @@ sealed class NPC : Actor() {
     open fun tradeMsg() = "I have wares to trade, if barbarian has coin."
 
     override fun onConverse(actor: Actor): Boolean {
+        if (hasStatus(Status.Tag.ASLEEP)) return false
         if (actor is Player && willConverse()) {
             level?.addSpark(Speak().at(xy.x, xy.y))
             startConversation()
