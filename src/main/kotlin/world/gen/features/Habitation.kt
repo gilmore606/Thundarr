@@ -21,10 +21,9 @@ sealed class Habitation(
     val isAbandoned: Boolean
 ) : Feature() {
 
+    open fun numberOfLoreHavers() = 0
     open fun numberOfQuestsDesired() = 0  // Return >0 to have quests with an NPC here as source
     val questIDsAsSource = mutableListOf<String>()
-
-    open fun numberOfLoreHavers() = 0
 
     override fun trailDestinationChance() = 1f
 
@@ -140,10 +139,15 @@ sealed class Habitation(
         open fun workTime() = DayTime.betweenHoursOf(6, 8)
     }
 
+    protected val skinSet = Villager.skinSets.random()
     protected val citizens = mutableSetOf<String>() // actor ids
     protected fun addCitizen(citizen: Citizen) {
         citizens.add(citizen.id)
         citizen.habitation = this
+        if (citizen is Villager) {
+            val skin = if (Dice.chance(0.8f)) skinSet.random() else Villager.allSkins.random()
+            citizen.setSkin(skin)
+        }
     }
 
     protected fun placeCitizen(citizen: Citizen, spawnRect: Rect, homeArea: Villager.WorkArea? = null,
