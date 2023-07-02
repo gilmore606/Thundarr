@@ -109,12 +109,14 @@ class QuadBatch(
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
                      textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
-                     hue: Float? = null, alpha: Float = 1f) {
+                     hue: Float? = null, alpha: Float = 1f, mirror: Boolean = false) {
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / Screen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / Screen.height.toDouble()) * 2f - 1f
-        addQuad(glx0, gly0, glx1, gly1, 0f, 0f, 1f, 1f, textureIndex,
+        val itx0 = if (mirror) 1f else 0f
+        val itx1 = if (mirror) 0f else 1f
+        addQuad(glx0, gly0, glx1, gly1, itx0, 0f, itx1, 1f, textureIndex,
                 lightR, lightG, lightB, alpha, 0f, hue ?: Screen.uiHue.toFloat())
     }
 

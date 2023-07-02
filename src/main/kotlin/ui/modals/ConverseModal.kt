@@ -15,6 +15,7 @@ import ui.input.Mouse
 import util.Stack
 import util.log
 import util.wrapText
+import java.lang.Math.max
 
 class ConverseModal(
     private val talker: NPC,
@@ -56,20 +57,21 @@ class ConverseModal(
     )
 
 
-    var scene: Scene? = null
-    val topicStack = Stack<String>()
+    private var scene: Scene? = null
+    private val topicStack = Stack<String>()
 
-    var wrappedText = mutableListOf<String>()
+    private var wrappedText = mutableListOf<String>()
 
     var selection = -1
-    var maxSelection = 0
+    private var maxSelection = 0
 
+    private val textSpacing = 24
     val padding = 22
-    var optionStartY = 0
-    val optionSpacing = 32
-    val headerPad = 50
-    val portraitSize = 96
-    val portraitXpad = if (portrait == null) 0 else 120
+    private var optionStartY = 0
+    private val optionSpacing = 32
+    private val headerPad = 50
+    private val portraitSize = 96
+    private val portraitXpad = if (portrait == null) 0 else 120
 
     init {
         zoomWhenOpen = 1.8f
@@ -82,6 +84,14 @@ class ConverseModal(
             bubbleProgress = it + delta * 1.3f
             if (it + delta > 1f) bubbleProgress = null
         }
+    }
+
+    private fun adjustHeight() {
+        height = padding * 2 +
+                max(portraitSize + 16, wrappedText.size * textSpacing) +
+                (scene?.options?.size ?: 1) * optionSpacing +
+                84
+        onResize(Screen.width, Screen.height)
     }
 
     private fun changeTopic(newTopic: Option) {
@@ -126,6 +136,7 @@ class ConverseModal(
 
         wrappedText = wrapText("\"" + nextResponse + "\"", width - portraitXpad, padding, Screen.font)
         scene = Scene(newTopic.topic, nextResponse, nextOptions)
+        adjustHeight()
         maxSelection = nextOptions.size - 1
         selection = 0
         bubbleProgress = 0f
@@ -216,10 +227,10 @@ class ConverseModal(
         super.drawText()
         if (isAnimating()) return
 
-        drawWrappedText(wrappedText, padding + portraitXpad, padding + headerPad, 24, Screen.font)
+        drawWrappedText(wrappedText, padding + portraitXpad, padding + headerPad, textSpacing, Screen.font)
 
         scene?.also { scene ->
-            optionStartY = height - padding - (scene.options.size * optionSpacing)
+            optionStartY = height - padding - (scene.options.size * optionSpacing) + 4
             var n = 0
             scene.options.forEach { option ->
                 drawString(
@@ -252,7 +263,8 @@ class ConverseModal(
                 x + padding + portraitSize + shadePad, y + padding + headerPad + portraitSize + shadePad, portraitBatch.getTextureIndex(
                     Glyph.PORTRAIT_SHADE))
             portraitBatch.addPixelQuad(x + padding, y + padding + headerPad,
-                x + padding + portraitSize, y + padding + headerPad + portraitSize, portraitBatch.getTextureIndex(portrait))
+                x + padding + portraitSize, y + padding + headerPad + portraitSize,
+                portraitBatch.getTextureIndex(portrait), mirror = talker.mirrorGlyph)
             bubbleProgress?.also { progress ->
                 val bubbleOffset = 16 - (progress * 20f).toInt()
                 portraitBatch.addPixelQuad(x + padding + 40, y + padding + headerPad + bubbleOffset + 32,
