@@ -19,6 +19,11 @@ class Stack<T> {
         return null
     }
 
+    fun clear() {
+        elements.clear()
+        top = 0
+    }
+
     fun isEmpty() = elements.isEmpty()
     fun isNotEmpty() = elements.isNotEmpty()
 }

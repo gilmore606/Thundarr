@@ -87,8 +87,8 @@ sealed class Quest(
                 Option("quest_${id}_accept", "It's a deal.") { this.accept() },
                 Option("quest_${id}_refuse", "Sorry, not worth it.") { this.refuse() },
             ))
-            "quest_${id}_accept" -> Scene(topic, acceptMsg(), listOf())
-            "quest_${id}_refuse" -> Scene(topic, refuseMsg(), listOf())
+            "quest_${id}_accept" -> Scene(topic, acceptMsg(), listOf(), clearStack = true)
+            "quest_${id}_refuse" -> Scene(topic, refuseMsg(), listOf(), clearStack = true)
             else -> null
         }
 

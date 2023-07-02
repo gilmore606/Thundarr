@@ -6,6 +6,7 @@ import actors.actions.Action
 import actors.actions.Wait
 import actors.actions.events.Event
 import kotlinx.serialization.Serializable
+import render.Screen
 import render.tilesets.Glyph
 import util.XY
 
@@ -51,8 +52,17 @@ sealed class State {
 
     open fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) { }
 
-    open fun commentLines(npc: NPC): List<String>? = null
+    open fun allowsConversation(): Boolean = true
+    open fun commentLine(): String? = null
 
     open fun canSee() = true
+
+    open fun idleBounceMs() = 750
+    open fun idleBounce() = -0.04f
+    open fun animOffsetY(npc: NPC): Float {
+        if ((Screen.timeMs + npc.idleBounceOffset) % idleBounceMs() < idleBounceMs() / 2) {
+            return idleBounce()
+        } else return 0f
+    }
 
 }

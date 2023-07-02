@@ -5,6 +5,7 @@ import actors.actions.events.Event
 import actors.states.*
 import actors.stats.Speed
 import actors.statuses.Status
+import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -88,9 +89,14 @@ sealed class NPC : Actor() {
     open fun canSpawnAt(chunk: Chunk, x: Int, y: Int): Boolean = true
     open fun onSpawn() { }
 
-    open fun commentLines(): List<String> = state.commentLines(this) ?: listOf()
     open fun meetPlayerMsg(): String? = null
     open fun portraitGlyph(): Glyph? = null
+
+    val idleBounceOffset = Dice.zeroTo(800)
+    override fun animOffsetY(): Float {
+        val off = super.animOffsetY()
+        return if (off == 0f) state.animOffsetY(this) else off
+    }
 
     open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
 
@@ -180,28 +186,34 @@ sealed class NPC : Actor() {
     open fun hasConversation() = false
     open fun conversationSources(): List<ConverseModal.Source> = listOf()
     open fun willTrade() = false
-    open fun willConverse() = hasQuestion() || hasConversation() || willTrade()
+    open fun willConverse() = (hasQuestion() || hasConversation() || willTrade()) && state.allowsConversation()
     open fun tradeMsg() = "I have wares to trade, if barbarian has coin."
 
     override fun onConverse(actor: Actor): Boolean {
         if (hasStatus(Status.Tag.ASLEEP)) return false
         if (actor is Player && willConverse()) {
             level?.addSpark(Speak().at(xy.x, xy.y))
-            startConversation()
+            Screen.addModal(ConverseModal(this))
             return true
         }
-        val converseLines = commentLines()
-        if (converseLines.isNotEmpty()) {
-            Console.announce(level, xy.x, xy.y, Console.Reach.AUDIBLE, this.dnamec() + " says, \"" + converseLines.random() + "\"")
-            level?.addSpark(Speak().at(xy.x, xy.y))
+        if (state.allowsConversation() && spoutComment()) return true
+        return false
+    }
+
+    open fun spoutComment(): Boolean {
+        state.commentLine()?.also {
+            say(it)
+            return true
+        }
+        val lines = commentLines()
+        if (lines.isNotEmpty()) {
+            say(lines.random())
             return true
         }
         return false
     }
 
-    fun startConversation() {
-        Screen.addModal(ConverseModal(this))
-    }
+    open fun commentLines(): List<String> = listOf()
 
     override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
         super.drawStatusGlyphs(drawIt)

@@ -10,16 +10,14 @@ import actors.stats.Senses
 import actors.stats.Speed
 import actors.stats.Strength
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import render.tilesets.Glyph
 import render.tilesets.Glyph.*
 import things.Container
 import things.Door
-import things.Thing
+import ui.modals.ConverseModal
 import util.*
 import world.Entity
 import world.gen.features.Habitation
-import world.gen.features.Village
 import world.level.Level
 import world.path.Pather
 import world.quests.Quest
@@ -110,7 +108,7 @@ class Villager(
         val signText: String? = null,
         val announceJobMsg: String? = null,
         val childOK: Boolean = true,
-    ) {
+    ) : ConverseModal.Source {
         override fun toString() = "$name ($rect)"
         fun contains(xy: XY) = rect.contains(xy)
         fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
@@ -138,6 +136,13 @@ class Villager(
                 }
             }
             return villagers
+        }
+
+        override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+//            when (topic) {
+//                "hello" -> { ConverseModal.Scene(topic, )}
+//            }
+            return null
         }
     }
 
@@ -249,10 +254,28 @@ class Villager(
     override fun couldGiveQuest(quest: Quest) = !isChild
     override fun couldHaveLore() = !isChild
 
+    override fun conversationSources() = super.conversationSources().apply {
+        if (targetArea.contains(xy)) add(targetArea)
+    }
+
     override fun meetPlayerMsg() = if (isChild) {
         "Hello!"
     } else {
         "Welcome to ${habitation?.name() ?: "our town"}."
     }
+
+    override fun commentLines(): List<String> = if (isChild) {
+        listOf(
+            "You look dumb.", "Your face is a butt.", "You smell like a butt!",
+            "Why is your head weird?", "You're funny."
+        )
+    } else if (targetArea.contains(xy)) {
+        targetArea.comments.toMutableList().apply {
+            questsGiven().forEach { addAll(it.commentLines()) }
+            lore.forEach { addAll(it.commentLines()) }
+        }
+    } else listOf(
+        "No time to chat, I've got places to be."
+    )
 
 }

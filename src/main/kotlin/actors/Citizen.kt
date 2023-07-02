@@ -5,13 +5,11 @@ import actors.actions.events.Event
 import actors.states.GoDo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import render.tilesets.Glyph
 import ui.modals.ConverseModal
 import util.Dice
 import util.XY
 import world.gen.features.Habitation
 import world.lore.Lore
-import world.lore.MoonLore1
 import world.quests.Quest
 
 @Serializable
@@ -101,13 +99,19 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     }
     override fun getConversationTopic(topic: String): ConverseModal.Scene? {
         if (topic == "hello") {
-            return ConverseModal.Scene("",
-                if (introducedToPlayer) "Hello again, Thundarr." else {
-                    introducedToPlayer = true
-                    "Nice to meet you Thundarr, I'm ${name()}."
-                }, listOf())
+            return ConverseModal.Scene("", helloConversationText(), if (willTrade()) listOf(
+                ConverseModal.Option("trade", tradeMsg()) { }
+            ) else listOf())
         }
         return null
+    }
+
+    open fun helloConversationText(): String {
+        var t = if (introducedToPlayer) "Hello again, Thundarr." else {
+            introducedToPlayer = true
+            "Nice to meet you Thundarr, I'm ${name()}."
+        }
+        return t
     }
 
     override fun commentLines(): List<String> {
@@ -117,7 +121,7 @@ sealed class Citizen : NPC(), ConverseModal.Source {
                 lines.addAll(quest.commentLines())
             }
             lore.forEach { lore ->
-                lines.addAll(lore.comments())
+                lines.addAll(lore.commentLines())
             }
             if (lines.isNotEmpty()) return lines
         }

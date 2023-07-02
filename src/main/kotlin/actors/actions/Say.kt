@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Speak
@@ -9,18 +10,16 @@ import world.level.Level
 
 @Serializable
 class Say(
-    private val text: String
+    private val text: String = "",
+    private val randomComment: Boolean = false
 ) : Action(0.5f) {
     override fun name() = "speak"
     override fun toString() = "Say($text)"
     override fun execute(actor: Actor, level: Level) {
-        actor.level?.addSpark(Speak().at(actor.xy.x, actor.xy.y))
-        Speaker.world(actor.talkSound(actor), source = actor.xy)
-        if (text.startsWith(":")) {
-            val t = text.drop(1)
-            Console.sayAct("", "${actor.dnamec()} $t", actor)
+        if (randomComment && actor is NPC) {
+            actor.spoutComment()
         } else {
-            Console.sayAct("", "${actor.dnamec()} says, \"$text\"", actor)
+            actor.say(text)
         }
     }
 }

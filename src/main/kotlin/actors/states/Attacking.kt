@@ -23,6 +23,8 @@ class Attacking(
 
     override fun toString() = "Attacking (target $targetID)"
 
+    override fun allowsConversation() = false
+
     override fun onEnter(npc: NPC) {
         App.level.director.getActor(targetID)?.also { target ->
             Pather.subscribe(npc, target, npc.visualRange().toInt())
@@ -92,4 +94,7 @@ class Attacking(
             drawIt(Glyph.HOSTILE_OTHER_ICON)
         }
     }
+
+    override fun idleBounceMs() = 500
+    override fun idleBounce() = -0.06f
 }

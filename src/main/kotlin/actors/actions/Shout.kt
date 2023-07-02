@@ -20,8 +20,6 @@ sealed class Shout(
 
     override fun execute(actor: Actor, level: Level) {
         text?.also { text ->
-            actor.level?.addSpark(Speak().at(actor.xy.x, actor.xy.y))
-            Speaker.world(actor.talkSound(actor), source = actor.xy)
             actor.say(text)
             log.info("SHOUTING: $this shouts $text")
         }

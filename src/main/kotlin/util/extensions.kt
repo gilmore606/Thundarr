@@ -248,11 +248,18 @@ fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.s
     val wrapped = ArrayList<String>()
     var remaining = text
     var nextLine = ""
-    var linePixelsLeft = (width - padding * 2)
+    val linePixelsMax = (width - padding * 2)
+    var linePixelsLeft = linePixelsMax
     val spaceWidth = GlyphLayout(font, " ").width.toInt()
     while (remaining.isNotEmpty() || remaining == " ") {
         // get next word
-        val space = remaining.indexOf(' ')
+        var space = remaining.indexOf(' ')
+        var returnspace = remaining.indexOf('\n')
+        var hitReturn = false
+        if (returnspace >= 0 && returnspace < space) {
+            space = returnspace
+            hitReturn = true
+        }
         var word = ""
         if (space >= 0) {
             word = remaining.substring(0, space)
@@ -265,11 +272,16 @@ fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.s
             val wordWidth = GlyphLayout(font, word).width.toInt()
             if (nextLine == "" || wordWidth <= linePixelsLeft) {
                 nextLine += word + " "
+                if (hitReturn) {
+                    wrapped.add(nextLine)
+                    nextLine = ""
+                    linePixelsLeft = linePixelsMax
+                }
                 linePixelsLeft -= wordWidth + spaceWidth
             } else {
                 wrapped.add(nextLine)
                 nextLine = word + " "
-                linePixelsLeft = (width - padding * 2) - wordWidth - spaceWidth
+                linePixelsLeft = linePixelsMax - wordWidth - spaceWidth
             }
         }
     }

@@ -51,7 +51,8 @@ class ConverseModal(
     class Scene(
         val topic: String,
         val text: String,
-        val options: List<Option> = listOf()
+        val options: List<Option> = listOf(),
+        val clearStack: Boolean = false,
     )
 
 
@@ -83,11 +84,15 @@ class ConverseModal(
         }
     }
 
-    fun changeTopic(newTopic: Option) {
+    private fun changeTopic(newTopic: Option) {
         var toTopic = newTopic
         if (newTopic.topic == "back") {
-            val previousKeyword = topicStack.pop() ?: throw RuntimeException("went back in convo but nothing on stack!")
-            toTopic = Option(previousKeyword, "")
+            if (topicStack.isEmpty()) {
+                toTopic = Option("hello", "")
+            } else {
+                val previousKeyword = topicStack.pop()
+                toTopic = Option(previousKeyword!!, "")
+            }
         } else {
             scene?.topic?.also { topicStack.push(it) }
         }
@@ -97,10 +102,12 @@ class ConverseModal(
         var nextResponse = ""
         val nextOptions = mutableListOf<Option>()
         val sources = talker.conversationSources()
+        var clearStack = false
         sources.forEach { source ->
             source.getConversationTopic(toTopic.topic)?.also { addScene ->
-                nextResponse += (if (nextResponse.isBlank()) "" else " ") + addScene.text
+                nextResponse += (if (nextResponse.isBlank()) "" else "\n") + addScene.text
                 nextOptions.addAll(addScene.options)
+                clearStack = clearStack || addScene.clearStack
             }
         }
         sources.forEach { source ->
@@ -108,11 +115,12 @@ class ConverseModal(
                 nextOptions.add(addOption)
             }
         }
-
         if (topicStack.isNotEmpty()) {
-            nextOptions.add(Option("back", if (nextOptions.isEmpty()) "Anyway..." else "Never mind."))
-        } else if (talker.willTrade()) {
-            nextOptions.add(Option("trade", talker.tradeMsg()) { openTrade() } )
+            nextOptions.add(Option("back", if (nextOptions.isEmpty())
+                (if (clearStack) "Something else..." else "Anyway...") else "Never mind."))
+        }
+        if (clearStack) {
+            topicStack.clear()
         }
         nextOptions.add(Option("bye", "Goodbye.") { endConversation() })
 

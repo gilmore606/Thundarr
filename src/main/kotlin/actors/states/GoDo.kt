@@ -6,6 +6,7 @@ import actors.actions.Say
 import actors.actions.Wait
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import util.Dice
 import util.XY
 import util.log
 import world.path.Pather
@@ -19,6 +20,11 @@ class GoDo(
     var failedSteps = 0
 
     override fun toString() =  "GoDo (at $targetXY, do $targetAction)"
+
+    override fun commentLine() = if (Dice.chance(0.6f)) listOf(
+        "Just a moment, I need to take care of this.",
+        "Hang on a minute.",
+    ).random() else null
 
     override fun onEnter(npc: NPC) {
         Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
@@ -41,7 +47,4 @@ class GoDo(
         }
         return super.pickAction(npc)
     }
-
-    override fun commentLines(npc: NPC) = listOf("No time to chat, I've got to go do something.")
-
 }

@@ -70,4 +70,6 @@ class Seeking(
         }
     }
 
+    override fun idleBounceMs() = 600
+
 }

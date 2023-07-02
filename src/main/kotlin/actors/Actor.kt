@@ -334,7 +334,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun say(text: String?) {
         text?.also { text ->
-            Console.sayAct("", this.dnamec() + " says, \""  + text + "\"", this)
+            val t = if (text.startsWith(":")) {
+                "${dnamec()} ${text.drop(1)}"
+            } else {
+                "${dnamec()} says, \"$text\""
+            }
+            Console.sayAct("", t, this)
+            level?.addSpark(Speak().at(xy.x, xy.y))
+            Speaker.world(talkSound(App.player), source = xy)
         }
     }
 

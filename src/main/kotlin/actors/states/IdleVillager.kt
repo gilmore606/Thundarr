@@ -20,7 +20,7 @@ class IdleVillager(
     val workTime: DayTime,
 ) : Idle() {
     val wanderChance = 0.4f
-    val commentChance = 0.05f
+    val commentChance = 0.03f
 
     override fun toString() = "IdleVillager"
 
@@ -47,7 +47,7 @@ class IdleVillager(
             if (targetArea.contains(xy)) {
                 // We're here, do whatever!
                 if (!isChild && Dice.chance(commentChance)) {
-                    return Say(npc.commentLines().random())
+                    return Say(randomComment = true)
                 }
                 if (Dice.chance(wanderChance)) {
                     return wander(npc, wanderCheck(targetArea.rect))
@@ -103,31 +103,13 @@ class IdleVillager(
     }
 
     override fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) {
-        if (npc is Villager) {
-            if (event is Knock && culprit == null && npc.homeArea.contains(npc.xy)) {
-                npc.say("Who's that?")
+        if (npc is Villager) { npc.apply {
+            if (event is Knock && culprit == null && homeArea.contains(xy)) {
+                say("Who's that?")
                 // Answer the door!
-                npc.pushState(GoDo(event.door.xy(), Use(Thing.UseTag.OPEN, event.door.getKey())))
+                pushState(GoDo(event.door.xy(), Use(Thing.UseTag.OPEN, event.door.getKey())))
             }
-        }
+        }}
     }
 
-    override fun commentLines(npc: NPC): List<String>? {
-        if (npc is Villager) {
-
-            if (npc.isChild) {
-                return listOf(
-                    "You look dumb.", "Your face is a butt.", "You smell like a butt!", "Why is your head weird?", "You're funny."
-                )
-            }
-            if (!npc.targetArea.contains(npc.xy())) {
-                return listOf(
-                    "No time to chat, I've got to get " +
-                            (if (npc.targetArea == npc.homeArea) "home" else ("to the " + npc.targetArea.name)) + "."
-                )
-            }
-            return npc.targetArea.comments.toList()
-        }
-        return null
-    }
 }

@@ -15,6 +15,8 @@ import util.*
 @Serializable
 sealed class Idle : State() {
 
+    override fun idleBounceMs() = 1000
+
     protected fun wanderCheck(wanderRadius: Int, wanderChunkOnly: Boolean, npc: NPC): (XY)->Boolean = { wanderXy ->
         val den = npc.den
         if (den != null) {
@@ -34,11 +36,7 @@ sealed class Idle : State() {
             // TODO: replace this junk with something robust
             val canSeePlayer = canSee(App.player)
             if (canSeePlayer && !metPlayer) {
-                meetPlayerMsg()?.also {
-                    Console.sayAct("", "%Dn says, \"$it\"", npc)
-                    talkSound(App.player)?.also { Speaker.world(it, source = xy()) }
-                    level?.addSpark(Speak().at(xy.x, xy.y))
-                }
+                meetPlayerMsg()?.also { say(it) }
                 metPlayer = true
             }
         }

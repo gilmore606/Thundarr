@@ -21,6 +21,8 @@ class Sleeping(
     override fun toString() = "Sleeping (til $wakeTime))"
 
     override fun canSee() = false
+    override fun allowsConversation() = false
+    override fun idleBounce() = 0f
 
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
@@ -77,6 +79,4 @@ class Sleeping(
         }
         return false
     }
-
-    override fun commentLines(npc: NPC) = listOf("Zzz...")
 }

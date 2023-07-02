@@ -16,6 +16,8 @@ class Fleeing(
 
     override fun toString() = "Fleeing (target $targetID)"
 
+    override fun commentLine() = "I've got to get out of here!"
+
     override fun onEnter(npc: NPC) {
         App.level.director.getActor(targetID)?.also { target ->
             Pather.subscribe(npc, target, npc.visualRange().toInt())
@@ -51,4 +53,6 @@ class Fleeing(
         drawIt(Glyph.FLEEING_ICON)
     }
 
+    override fun idleBounceMs() = 500
+    override fun idleBounce() = -0.05f
 }

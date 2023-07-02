@@ -131,8 +131,10 @@ class Tavern(
         placeCitizen(innkeeper, tavernRect, bedArea, tavernArea)
 
         repeat (Dice.range(2, 5)) { n ->
-            val drunk = Villager(bedroomDecor.bedLocations[n+1], flavor())
-            placeCitizen(drunk, bedroomRect, bedArea)
+            if (n < bedroomDecor.bedLocations.size - 1) {
+                val drunk = Villager(bedroomDecor.bedLocations[n + 1], flavor())
+                placeCitizen(drunk, bedroomRect, bedArea)
+            }
         }
 
     }

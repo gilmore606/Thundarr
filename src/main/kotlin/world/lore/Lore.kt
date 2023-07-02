@@ -18,7 +18,7 @@ sealed class Lore : ConverseModal.Source {
     )
 
     open fun helloText(): String? = null
-    open fun comments(): Set<String> = setOf()
+    open fun commentLines(): Set<String> = setOf()
     abstract fun subjects(): Set<Subject>
 
     override fun getConversationTopic(topic: String): ConverseModal.Scene? {
@@ -62,7 +62,7 @@ class MoonLore1: Lore() {
         Subject("moon_link_destroy", "destroys his evil", "How can they be destroyed?",
         "That I do not know.  Find these machines, and perhaps the Lords of Light will find a way.")
     )
-    override fun comments() = setOf(
+    override fun commentLines() = setOf(
         "Will the Moon ever heal?",
         "I feel the moon's evil."
     )
@@ -83,7 +83,7 @@ class WizardLore1: Lore() {
         "Oh ho, that's not easy!  The wizards guard them jealously, as you'd expect -- yet some have been lost!  Each is different.  For each wizard "
             + "you must seek his fatal weakness.  That is all I can say.")
     )
-    override fun comments() = setOf(
+    override fun commentLines() = setOf(
         "Curse these evil wizards!",
         "Someday the land will be free of wizardry."
     )
