@@ -38,7 +38,7 @@ class Caves : Feature() {
 
     override fun trailDestinationChance() = 0.4f
 
-    override fun loreKnowabilityRadius() = 150
+    override fun loreKnowabilityRadius() = 250
     override fun loreName() = "caverns"
 
     override fun doDig() {

@@ -949,13 +949,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            //startChunk = villages.random()
+            startChunk = villages.random()
             // Pick a cabin chunk
-            forEachScratch { x, y, cell ->
-                if (cell.hasFeature(Tavern::class)) {
-                    startChunk = XY(x,y)
-                }
-            }
+//            forEachScratch { x, y, cell ->
+//                if (cell.hasFeature(Village::class)) {
+//                    startChunk = XY(x,y)
+//                }
+//            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)

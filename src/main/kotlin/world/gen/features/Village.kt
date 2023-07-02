@@ -37,7 +37,7 @@ class Village(
     override fun numberOfLoreHavers() = if (Dice.flip()) 2 else 1
     override fun preventBiomeAnimalSpawns() = !isAbandoned
     override fun flavor() = flavor
-    override fun loreKnowabilityRadius() = 500
+    override fun loreKnowabilityRadius() = 1000
     override fun loreName() = "the village of $name"
 
     companion object {

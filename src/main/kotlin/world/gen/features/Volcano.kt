@@ -18,7 +18,7 @@ class Volcano : Feature() {
 
     override fun trailDestinationChance() = 1f
 
-    override fun loreKnowabilityRadius() = 800
+    override fun loreKnowabilityRadius() = 1000
     override fun loreName() = "an active volcano"
 
     override fun doDig() {

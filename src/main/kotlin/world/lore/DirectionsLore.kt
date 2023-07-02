@@ -1,11 +1,13 @@
 package world.lore
 
 import kotlinx.serialization.Serializable
+import ui.modals.ConverseModal
 import util.XY
 import util.distanceBetween
 import util.toEnglishList
 import world.gen.Metamap
 import world.gen.features.Feature
+import java.lang.Math.abs
 
 @Serializable
 class DirectionsLore(
@@ -13,30 +15,41 @@ class DirectionsLore(
 ): Lore() {
     var directionsListMsg: String = "x, y, or z"
 
-    val directions = mutableMapOf<String, String>()
+    val directions = mutableMapOf<String, Pair<String,Feature>>()
 
     init {
         findDirections()
     }
 
+    data class Neighbor(val feature: Feature, val distance: Float) {
+        var description: String = ""
+    }
+
     private fun findDirections() {
         // Collect list of all knowable features nearby
-        val neighbors = mutableMapOf<Feature,String>()
-        for (ix in (sourceXY.x - 960)/64 .. (sourceXY.x + 960)/64) {
-            for (iy in (sourceXY.y - 960)/64 .. (sourceXY.y + 960)/64) {
+        var neighbors = mutableListOf<Neighbor>()
+        for (ix in (sourceXY.x - 1280)/64 .. (sourceXY.x + 1280)/64) {
+            for (iy in (sourceXY.y - 1280)/64 .. (sourceXY.y + 1280)/64) {
                 val meta = Metamap.metaAtWorld(ix*64, iy*64)
                 meta.features().forEach { feature ->
                     val distance = distanceBetween(sourceXY.x, sourceXY.y, feature.worldX, feature.worldY)
                     if (distance < feature.loreKnowabilityRadius() && distance > 32) {
-                        neighbors[feature] = describeTravelDistance(distance)
+                        neighbors.add(Neighbor(feature, distance))
                     }
                 }
             }
         }
+        neighbors.sortBy { it.distance }
+        if (neighbors.size > 5) {
+            neighbors = neighbors.subList(0, 4)
+        }
+        neighbors.forEach {
+            it.description = it.feature.loreName().capitalize() + " is " + describeTravelDistance(it.distance) + " " +
+            sourceXY.describeDirectionTo(XY(it.feature.worldX, it.feature.worldY)) + "."
+        }
         // Describe distance + dir
-        neighbors.keys.forEach { neighbor ->
-            directions[neighbor.loreName()] = neighbor.loreName().capitalize() + " is " + neighbors[neighbor] + " " +
-                    describeDirection(sourceXY, XY(neighbor.worldX, neighbor.worldY)) + "."
+        neighbors.forEach { neighbor ->
+            directions[neighbor.feature.loreName()] = Pair(neighbor.description, neighbor.feature)
         }
         // Draw line to habitation and check for terrain/river crossings
 
@@ -49,8 +62,20 @@ class DirectionsLore(
             directionsListMsg)
     ).apply {
         directions.forEach { direction ->
-            add(Subject("directions_${direction.key}", direction.key, "How do I get to ${direction.key}?", direction.value))
+            add(Subject("directions_${direction.key}", direction.key, "How do I get to ${direction.key}?",
+                direction.value.first + " I'll mark it on your map."))
         }
+    }
+
+    override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+        if (topic.startsWith("directions_")) {
+            val keyString = topic.drop(11)
+            directions[keyString]?.also { pair ->
+                val feature = pair.second
+                Metamap.markChunkMappedAt(feature.worldX, feature.worldY)
+            }
+        }
+        return super.getConversationTopic(topic)
     }
 
     private fun describeTravelDistance(distance: Float): String {
@@ -72,16 +97,4 @@ class DirectionsLore(
         } else return "a long journey"
     }
 
-    private fun describeDirection(from: XY, to: XY): String {
-        val xd = to.x - from.x
-        val yd = to.y - from.y
-        if (xd > yd * 2) {
-            return if (xd > 0) "east" else "west"
-        } else if (yd > xd * 2) {
-            return if (yd > 0) "south" else "north"
-        } else if (xd > 0 && yd > 0) return "southeast"
-        else if (xd < 0 && yd < 0) return "northwest"
-        else if (xd < 0 && yd > 0) return "southwest"
-        else return "southeast"
-    }
 }

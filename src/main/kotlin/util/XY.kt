@@ -56,6 +56,19 @@ data class XY(var x: Int, var y: Int) {
         val i3 = (if (i == DIRECTIONS_ROSE.lastIndex) 0 else i + 1)
         return listOf(this, DIRECTIONS_ROSE[i2], DIRECTIONS_ROSE[i3])
     }
+
+    fun describeDirectionTo(to: XY): String {
+        val xd = to.x - x
+        val yd = to.y - y
+        return if (Math.abs(xd) > Math.abs(yd * 2)) {
+            if (xd > 0) "east" else "west"
+        } else if (Math.abs(yd) > Math.abs(xd * 2)) {
+            if (yd > 0) "south" else "north"
+        } else if (xd < 0 && yd < 0) "northwest"
+        else if (xd > 0 && yd > 0) "southeast"
+        else if (xd > 0 && yd < 0) "northeast"
+        else "southwest"
+    }
 }
 
 data class XYf(var x: Float, var y: Float) {
