@@ -46,6 +46,7 @@ object Screen : KtxScreen {
     var cameraMenuShift = 0.8
     var uiHue = 0.0
     var showSeenAreas = true
+    var showRadar = true
     private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150
@@ -70,11 +71,12 @@ object Screen : KtxScreen {
     var renderTilesWide = 120
     var renderTilesHigh = 50
 
-    private val terrainTileSet = TerrainTileSet()
+    val terrainTileSet = TerrainTileSet()
     val thingTileSet = ThingTileSet()
     val actorTileSet = ActorTileSet()
     val uiTileSet = UITileSet()
     val portraitTileSet = PortraitTileSet()
+    val mapTileSet = MapTileSet()
     val terrainBatch = QuadBatch(terrainTileSet)
     val thingBatch = QuadBatch(thingTileSet)
     val actorBatch = QuadBatch(actorTileSet)

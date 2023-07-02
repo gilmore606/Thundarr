@@ -197,6 +197,7 @@ object Keyboard : KtxInputAdapter {
                 ZOOM_OUT -> { Screen.mouseScrolled(1.43f) }
 
                 SEEN_TOGGLE -> { Screen.showSeenAreas = !Screen.showSeenAreas }
+                RADAR_TOGGLE -> { Screen.showRadar = !Screen.showRadar }
 
                 OPEN_INV -> { App.openInventory() }
                 OPEN_GEAR -> { App.openGear() }

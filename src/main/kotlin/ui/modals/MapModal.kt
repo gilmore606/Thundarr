@@ -18,8 +18,8 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
     private val paddingX = 30
     private val paddingY = 70
 
-    val playerX = Metamap.chunkXtoX(App.player.xy.x)
-    val playerY = Metamap.chunkYtoY(App.player.xy.y)
+    private val playerX = Metamap.chunkXtoX(App.player.xy.x)
+    private val playerY = Metamap.chunkYtoY(App.player.xy.y)
 
     var cellSize = 20
     var mapx = 0
@@ -36,7 +36,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
-    val mapBatch = QuadBatch(MapTileSet())
+    private val mapBatch = QuadBatch(Screen.mapTileSet)
 
     override fun onAdd() {
         centerView()
