@@ -31,7 +31,8 @@ class Villager(
 
     enum class Skin(
         val maleGlyphs: Set<Pair<Glyph, Glyph>>,
-        val femaleGlyphs: Set<Pair<Glyph, Glyph>>
+        val femaleGlyphs: Set<Pair<Glyph, Glyph>>,
+        val childGlyph: Glyph
     ) {
         PALE(
             setOf(
@@ -53,7 +54,8 @@ class Villager(
                 Pair(PORTRAIT_PALE_W_6, PEASANT_PALE_DARK),
                 Pair(PORTRAIT_PALE_W_7, PEASANT_PALE_GREEN),
                 Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
-            )
+            ),
+            PEASANT_PALE_CHILD
         ),
         WHITE(
             setOf(
@@ -74,7 +76,8 @@ class Villager(
                 Pair(PORTRAIT_WHITE_W_5, PEASANT_WHITE_BLOND),
                 Pair(PORTRAIT_WHITE_W_6, PEASANT_WHITE_RED),
                 Pair(PORTRAIT_WHITE_W_7, PEASANT_WHITE_DARK),
-            )
+            ),
+            PEASANT_WHITE_CHILD
         ),
         TAN(
             setOf(
@@ -95,7 +98,8 @@ class Villager(
                 Pair(PORTRAIT_TAN_W_5, PEASANT_TAN_DARK),
                 Pair(PORTRAIT_TAN_W_6, PEASANT_TAN_RED),
                 Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_GREEN),
-            )
+            ),
+            PEASANT_TAN_CHILD
         ),
         BLACK(
             setOf(
@@ -114,7 +118,8 @@ class Villager(
                 Pair(PORTRAIT_BLACK_W_4, PEASANT_BLACK_DARK),
                 Pair(PORTRAIT_BLACK_W_5, PEASANT_BLACK_DARK),
                 Pair(PORTRAIT_BLACK_W_6, PEASANT_BLACK_GREEN),
-            )
+            ),
+            PEASANT_BLACK_CHILD
         )
     }
 
@@ -227,9 +232,13 @@ class Villager(
     }
 
     fun setSkin(skin: Villager.Skin) {
-        (if (customGender == Entity.Gender.MALE) skin.maleGlyphs else skin.femaleGlyphs).random().apply {
-            portraitGlyph = first
-            customGlyph = second
+        if (isChild) {
+            customGlyph = skin.childGlyph
+        } else {
+            (if (customGender == Entity.Gender.MALE) skin.maleGlyphs else skin.femaleGlyphs).random().apply {
+                portraitGlyph = first
+                customGlyph = second
+            }
         }
     }
 
