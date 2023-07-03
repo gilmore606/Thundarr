@@ -7,6 +7,7 @@ import render.batches.QuadBatch
 import render.tilesets.Glyph
 import util.log
 import world.gen.Metamap
+import world.level.CHUNK_SIZE
 import world.level.WorldLevel
 
 object RadarPanel : ShadedPanel() {
@@ -38,29 +39,35 @@ object RadarPanel : ShadedPanel() {
         mapBatch.clear()
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
+        Gdx.gl.glScissor(x + 5, yMargin + 5, width - 10, height - 10)
         drawTerrain()
         mapBatch.draw()
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
     }
 
     private fun drawTerrain() {
         val tileSize = 27
         val cx = Metamap.chunkXtoX(App.player.xy.x)
         val cy = Metamap.chunkYtoY(App.player.xy.y)
-        for (ix in 0..6) {
-            for (iy in 0 .. 6) {
-                val meta = Metamap.metaAt(cx + ix - 3, cy + iy - 3)
-                val screenX = this.x + ix * tileSize + 5
-                val screenY = this.y + iy * tileSize + 5
+        val offx = (App.player.xy.x - Metamap.xToChunkX(cx) - CHUNK_SIZE/2).toFloat() / CHUNK_SIZE.toFloat()
+        val offy = (App.player.xy.y - Metamap.yToChunkY(cy) - CHUNK_SIZE/2).toFloat() / CHUNK_SIZE.toFloat()
+
+        for (ix in 0..8) {
+            for (iy in 0 .. 8) {
+                val meta = Metamap.metaAt(cx + ix - 4, cy + iy - 4)
+                val screenX = this.x + ix * tileSize + 5 - (offx * tileSize).toInt() - tileSize
+                val screenY = this.y + iy * tileSize + 5 - (offy * tileSize).toInt() - tileSize
                 meta.mapIcons.forEach { mapIcon ->
                     mapBatch.addPixelQuad(screenX, screenY, screenX + tileSize, screenY + tileSize,
                         mapBatch.getTextureIndex(mapIcon))
                 }
-                if (ix == 3 && iy == 3) {
-                    mapBatch.addPixelQuad(screenX, screenY, screenX + tileSize, screenY + tileSize,
-                        mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
-                }
             }
         }
+        val playerX = this.x + 3 * tileSize + 5
+        val playerY = this.y + 3 * tileSize + 5
+        mapBatch.addPixelQuad(playerX, playerY, playerX + tileSize, playerY + tileSize,
+            mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
     }
 
 }
