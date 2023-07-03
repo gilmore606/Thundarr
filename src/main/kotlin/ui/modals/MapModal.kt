@@ -158,6 +158,22 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         }
     }
 
+    override fun drawText() {
+        if (!showThreat) return
+        val x0 = x + paddingX
+        val y0 = y + paddingY
+        for (x in 0 until (1120 / cellSize)) {
+            for (y in 0 until (800 / cellSize)) {
+                val meta = Metamap.metaAt(x + mapx, y + mapy)
+                val ox = x * cellSize
+                val oy = y * cellSize
+                val px0 = x0 + ox + cellSize / 3
+                val py0 = y0 + oy + cellSize / 3
+                drawStringAbsolute(meta.threatLevel.toString(), px0, py0, Screen.fontColor, Screen.smallFont)
+            }
+        }
+    }
+
     override fun drawEverything() {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glEnable(GL20.GL_BLEND)

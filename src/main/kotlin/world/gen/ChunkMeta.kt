@@ -29,7 +29,7 @@ class ChunkMeta(
     var cityDistance: Float = 0f,
     var spawnDistance: Float = 0f,
     var biomeEdgeDistance: Float = 0f,
-    var threatLevel: Float = 0f,
+    var threatLevel: Int = 0,
     var title: String = "the wilderness",
     var mapped: Boolean = false
 ) {
@@ -107,7 +107,7 @@ class ChunkScratch(
     var cityDistance = 0f
     var spawnDistance = 0f
     var biomeEdgeDistance = -1f
-    var threatLevel = 0f
+    var threatLevel = 0
     var title = ""
 
     fun toChunkMeta() = ChunkMeta(

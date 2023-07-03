@@ -1,7 +1,7 @@
 package world.level
 
 import audio.Speaker
-import ktx.async.KtxAsync
+import ui.panels.Console
 import util.*
 import world.Chunk
 import world.gen.Metamap
@@ -29,7 +29,7 @@ class WorldLevel() : Level() {
     private var playerChunk: Chunk? = null   // chunk the player is currently in
     private var ambienceChunk: Chunk? = null   // chunk the player has advanced into, for weather/ambient effects.  Changes later than playerChunk!
     private var ambienceChunkXY = XY(-999,-999)
-    private val ambienceTransitionSlop = 4  // how many cells into a chunk do we go before transition?
+    private val chunkTransitionSlop = 4  // how many cells into a chunk do we go before transition?
 
     override fun allChunks() = loadedChunks
     override fun levelId() = "world"
@@ -96,16 +96,31 @@ class WorldLevel() : Level() {
         }
         val slopx = abs(pov.x - chunkX)
         val slopy = abs(pov.y - chunkY)
-        if (slopx >= ambienceTransitionSlop && slopx <= (CHUNK_SIZE - ambienceTransitionSlop) && slopy >= ambienceTransitionSlop && slopy <= (CHUNK_SIZE - ambienceTransitionSlop)) {
+        if (slopx >= chunkTransitionSlop && slopx <= (CHUNK_SIZE - chunkTransitionSlop) && slopy >= chunkTransitionSlop && slopy <= (CHUNK_SIZE - chunkTransitionSlop)) {
             // If we have the current chunk do the transition
             ambienceChunkXY.x = chunkX
             ambienceChunkXY.y = chunkY
             chunkAt(pov.x, pov.y)?.also { chunk ->
-                transitionAmbienceToChunk(chunk)
+                crossChunks(chunk)
             } ?: run {
                 ambienceChunk = null
             }
         }
+    }
+
+    private fun crossChunks(newChunk: Chunk) {
+        transitionAmbienceToChunk(newChunk)
+        val threat = App.player.threatLevel()
+        if (threat > 0 && App.player.lastChunkThreatLevel <= 0) {
+            Console.say("You feel uneasy.")
+        } else if (threat > 0 && threat > App.player.lastChunkThreatLevel) {
+            Console.say("Your anxiety grows stronger.")
+        } else if (threat >= 0 && threat < App.player.lastChunkThreatLevel) {
+            Console.say("You feel less anxious.")
+        } else if (threat <= 0 && App.player.lastChunkThreatLevel > 0) {
+            Console.say("A sense of relief washes over you.")
+        }
+        App.player.lastChunkThreatLevel = threat
     }
 
     // Save all live chunks and remove their actors.

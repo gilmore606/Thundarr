@@ -108,6 +108,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     private fun addGamePanels() {
+        Screen.addPanel(EnvPanel)
         Screen.addPanel(StatusPanel)
         Screen.addPanel(LookPanel)
         Screen.addPanel(ActorPanel)

@@ -23,6 +23,8 @@ open class EnclosedLevel(
 
     protected val building: Building? = App.save.getBuildingForLevel(levelId)
 
+    var threatLevel: Int = 1
+
     init {
         ChunkLoader.getLevelChunk(this, levelId) { receiveChunk(it) }
     }

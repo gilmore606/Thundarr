@@ -53,6 +53,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val lastSeenLocation = XY(-9999,-9999)
     val keyIDs = mutableSetOf<String>()
 
+    var cash = 0
+    var xpLevel = 1
     val stats = mutableMapOf<Stat.Tag, Stat.Value>()
     val statuses = mutableListOf<Status>()
 

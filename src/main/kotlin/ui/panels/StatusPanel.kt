@@ -57,12 +57,14 @@ object StatusPanel : ShadedPanel() {
     }
 
     override fun drawText() {
-        drawString(App.level.statusText(), padding, padding, Screen.fontColorBold, Screen.smallFont)
-        drawString(App.gameTime.timeString, padding, padding + 25, Screen.fontColorDull, Screen.smallFont)
-        drawString(App.gameTime.dateString, padding, padding + 45, Screen.fontColorDull, Screen.smallFont)
+        drawString("lvl", padding, padding, Screen.fontColor, Screen.smallFont)
+        drawString("XP", padding + 70, padding, Screen.fontColor, Screen.smallFont)
+        drawString("    ${App.player.xpLevel}", padding, padding, Screen.fontColorBold, Screen.font)
+        drawString("    ${App.player.xp}", padding + 70, padding, Screen.fontColorBold, Screen.font)
+        drawString("$${App.player.cash}", padding, padding + 28, Screen.fontColorGreen, Screen.font)
 
-        drawString("hp", padding, padding + 70, Screen.fontColorDull, Screen.smallFont)
-        drawString(App.player.hp.toInt().toString() + "/" + App.player.hpMax.toInt().toString(), padding + 20, padding + 70)
+        drawString("hp", padding, padding + 65, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.player.hp.toInt().toString() + "/" + App.player.hpMax.toInt().toString(), padding + 20, padding + 65)
         for (i in 0 .. tagStrs.lastIndex) {
             drawString(tagStrs[i], tagXs[i], tagYs[i], tagColors[i], Screen.smallFont)
         }
@@ -91,8 +93,8 @@ object StatusPanel : ShadedPanel() {
     }
 
     override fun drawEntities() {
-        Screen.uiBatch.addHealthBar(x + padding + 75, y + padding + 71,
-            x + width - padding * 2 + 2, y + padding + 71 + 12,
+        Screen.uiBatch.addHealthBar(x + padding + 75, y + padding + 66,
+            x + width - padding * 2 + 2, y + padding + 66 + 12,
             App.player.hp.toInt(), App.player.hpMax.toInt())
     }
 

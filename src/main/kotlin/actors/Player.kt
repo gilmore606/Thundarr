@@ -21,8 +21,11 @@ import ui.panels.Console
 import ui.panels.TimeButtons
 import util.*
 import world.Entity
+import world.gen.Metamap
 import world.journal.GameTime
 import world.journal.Journal
+import world.level.EnclosedLevel
+import world.level.WorldLevel
 import world.stains.Fire
 
 @Serializable
@@ -45,10 +48,13 @@ open class Player : Actor() {
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
 
+    var xp = 0
+    var lastChunkThreatLevel = 0
+
     var calories = 1000f
     private val caloriesMax = 2000f
     private val caloriesEatMax = 1800f
-    private val caloriesPerDay = 2500f
+    private val caloriesPerDay = 2800f
     private val caloriesHunger = -2000f
     private val caloriesStarving = -4000f
 
@@ -196,5 +202,14 @@ open class Player : Actor() {
 
     fun debugMove(dir: XY) {
         moveTo(level, xy.x + (dir.x * 20), xy.y + (dir.y * 20))
+    }
+
+    fun threatLevel(): Int {
+        level?.also { level ->
+            return if (level is WorldLevel) Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).threatLevel
+            else if (level is EnclosedLevel) level.threatLevel
+            else 1
+        }
+        return 1
     }
 }

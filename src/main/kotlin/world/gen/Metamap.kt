@@ -74,8 +74,9 @@ object Metamap {
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
-    val spawnDistanceThreatFactor = 0.2f
-    val biomeDepthThreatFactor = 2f
+    val maxThreatLevel = 40
+    val spawnDistanceThreatFactor = 0.24f
+    val biomeDepthThreatFactor = 0.7f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -990,10 +991,10 @@ object Metamap {
 
             // Combine spawnDistance and biomeEdgeDistance into threatLevel
             forEachScratch { x, y, cell ->
-                cell.threatLevel = (
+                cell.threatLevel = max(1, min(maxThreatLevel, (
                         cell.spawnDistance * spawnDistanceThreatFactor +
                         (cell.biomeEdgeDistance * cell.biome.edgeDistanceThreatFactor() * biomeDepthThreatFactor)
-                        )
+                        ).toInt()))
             }
 
             // Add quests to inhabited Habitations
