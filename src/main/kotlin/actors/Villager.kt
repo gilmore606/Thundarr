@@ -44,6 +44,7 @@ class Villager(
                 Pair(PORTRAIT_PALE_M_6, PEASANT_PALE_DARK),
                 Pair(PORTRAIT_PALE_M_7, PEASANT_PALE_BLOND),
                 Pair(PORTRAIT_PALE_M_8, PEASANT_PALE_DARK),
+                Pair(PORTRAIT_PALE_M_9, PEASANT_PALE_GREEN)
             ),
             setOf(
                 Pair(PORTRAIT_PALE_W_1, PEASANT_PALE_RED),
@@ -54,6 +55,7 @@ class Villager(
                 Pair(PORTRAIT_PALE_W_6, PEASANT_PALE_DARK),
                 Pair(PORTRAIT_PALE_W_7, PEASANT_PALE_GREEN),
                 Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
+                Pair(PORTRAIT_PALE_W_9, PEASANT_PALE_GREEN)
             ),
             PEASANT_PALE_CHILD
         ),
@@ -67,6 +69,7 @@ class Villager(
                 Pair(PORTRAIT_WHITE_M_6, PEASANT_WHITE_DARK),
                 Pair(PORTRAIT_WHITE_M_7, PEASANT_WHITE_DARK),
                 Pair(PORTRAIT_WHITE_M_8, PEASANT_WHITE_RED),
+                Pair(PORTRAIT_WHITE_M_9, PEASANT_WHITE_BLOND)
             ),
             setOf(
                 Pair(PORTRAIT_WHITE_W_1, PEASANT_WHITE_BLOND),
@@ -76,6 +79,8 @@ class Villager(
                 Pair(PORTRAIT_WHITE_W_5, PEASANT_WHITE_BLOND),
                 Pair(PORTRAIT_WHITE_W_6, PEASANT_WHITE_RED),
                 Pair(PORTRAIT_WHITE_W_7, PEASANT_WHITE_DARK),
+                Pair(PORTRAIT_WHITE_W_8, PEASANT_WHITE_GREEN),
+                Pair(PORTRAIT_WHITE_W_9, PEASANT_WHITE_BLOND)
             ),
             PEASANT_WHITE_CHILD
         ),
@@ -89,6 +94,7 @@ class Villager(
                 Pair(PORTRAIT_TAN_M_6, PEASANT_TAN_RED),
                 Pair(PORTRAIT_TAN_M_7, PEASANT_TAN_BLOND),
                 Pair(PORTRAIT_TAN_M_8, PEASANT_TAN_DARK),
+                Pair(PORTRAIT_TAN_M_9, PEASANT_TAN_GREEN)
             ),
             setOf(
                 Pair(PORTRAIT_TAN_W_1, PEASANT_TAN_GREEN),
@@ -97,7 +103,9 @@ class Villager(
                 Pair(PORTRAIT_TAN_W_4, PEASANT_TAN_DARK),
                 Pair(PORTRAIT_TAN_W_5, PEASANT_TAN_DARK),
                 Pair(PORTRAIT_TAN_W_6, PEASANT_TAN_RED),
-                Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_GREEN),
+                Pair(PORTRAIT_TAN_W_7, PEASANT_TAN_BLOND),
+                Pair(PORTRAIT_TAN_W_8, PEASANT_TAN_GREEN),
+                Pair(PORTRAIT_TAN_W_9, PEASANT_TAN_BLOND)
             ),
             PEASANT_TAN_CHILD
         ),
@@ -110,6 +118,8 @@ class Villager(
                 Pair(PORTRAIT_BLACK_M_5, PEASANT_BLACK_RED),
                 Pair(PORTRAIT_BLACK_M_6, PEASANT_BLACK_DARK),
                 Pair(PORTRAIT_BLACK_M_7, PEASANT_BLACK_GREEN),
+                Pair(PORTRAIT_BLACK_M_8, PEASANT_BLACK_BLOND),
+                Pair(PORTRAIT_BLACK_M_9, PEASANT_BLACK_BLOND)
             ),
             setOf(
                 Pair(PORTRAIT_BLACK_W_1, PEASANT_BLACK_DARK),
@@ -118,6 +128,10 @@ class Villager(
                 Pair(PORTRAIT_BLACK_W_4, PEASANT_BLACK_DARK),
                 Pair(PORTRAIT_BLACK_W_5, PEASANT_BLACK_DARK),
                 Pair(PORTRAIT_BLACK_W_6, PEASANT_BLACK_GREEN),
+                Pair(PORTRAIT_BLACK_W_7, PEASANT_BLACK_GREEN),
+                Pair(PORTRAIT_BLACK_W_8, PEASANT_BLACK_RED),
+                Pair(PORTRAIT_BLACK_W_9, PEASANT_BLACK_BLOND)
+
             ),
             PEASANT_BLACK_CHILD
         )
