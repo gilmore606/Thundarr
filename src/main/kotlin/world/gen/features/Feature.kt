@@ -38,6 +38,8 @@ sealed class Feature : AnimalSpawnSource {
     open fun loreKnowabilityRadius() = 0
     open fun loreName() = "something"
 
+    open fun xpValue() = 1
+
     var worldX = 0
     var worldY = 0
 

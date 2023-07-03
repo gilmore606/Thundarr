@@ -349,7 +349,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun gainHealth(amount: Float) {
         hp = min(hpMax, (hp + amount))
-        level?.addSpark(HealthUp().at(xy.x, xy.y))
+        level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
     }
 
     // Take damage and react to attacker if any.  Return damage that actually got through.

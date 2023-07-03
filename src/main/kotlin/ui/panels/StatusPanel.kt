@@ -58,9 +58,9 @@ object StatusPanel : ShadedPanel() {
 
     override fun drawText() {
         drawString("lvl", padding, padding, Screen.fontColor, Screen.smallFont)
-        drawString("XP", padding + 70, padding, Screen.fontColor, Screen.smallFont)
+        drawString("XP", padding + 50, padding, Screen.fontColor, Screen.smallFont)
         drawString("    ${App.player.xpLevel}", padding, padding, Screen.fontColorBold, Screen.font)
-        drawString("    ${App.player.xp}", padding + 70, padding, Screen.fontColorBold, Screen.font)
+        drawString("    ${App.player.xp}", padding + 50, padding, Screen.fontColorBold, Screen.font)
         drawString("$${App.player.cash}", padding, padding + 28, Screen.fontColorGreen, Screen.font)
 
         drawString("hp", padding, padding + 65, Screen.fontColorDull, Screen.smallFont)
@@ -89,6 +89,10 @@ object StatusPanel : ShadedPanel() {
         if (App.player.dangerMode) {
             Screen.uiBatch.addPixelQuad(x - 46, y + 70, x - 46 + 31, y + 70 + 31,
                 Screen.uiBatch.getTextureIndex(Glyph.ANGRY_THUNDARR))
+        }
+        if (App.player.levelUpsAvailable > 0) {
+            Screen.uiBatch.addPixelQuad(x - 44, y + padding - 4, x - 4, y + padding + 36,
+                Screen.uiBatch.getTextureIndex(Glyph.PLUS_ICON_BLUE))
         }
     }
 

@@ -40,6 +40,7 @@ class Caves : Feature() {
 
     override fun loreKnowabilityRadius() = 250
     override fun loreName() = "caverns"
+    override fun xpValue() = 3
 
     override fun doDig() {
         val entrances = mutableSetOf<XY>()

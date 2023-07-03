@@ -24,4 +24,5 @@ class RuinedCitySite(
     override fun mapPOIDescription() = "The ruins of the fabled lost city of $name."
     override fun loreKnowabilityRadius() = 1200
     override fun loreName() = "the ruins of $name"
+    override fun xpValue() = 20
 }

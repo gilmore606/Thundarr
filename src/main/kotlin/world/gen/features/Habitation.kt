@@ -26,6 +26,7 @@ sealed class Habitation(
     val questIDsAsSource = mutableListOf<String>()
 
     override fun trailDestinationChance() = 1f
+    override fun xpValue() = 2
 
     @Serializable
     enum class Flavor(

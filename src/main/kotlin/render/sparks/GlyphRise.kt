@@ -2,7 +2,9 @@ package render.sparks
 
 import render.tilesets.Glyph
 
-class HealthUp : Spark() {
+class GlyphRise(
+    val withGlyph: Glyph
+) : Spark() {
 
     init {
         alpha = 1.1f
@@ -12,7 +14,7 @@ class HealthUp : Spark() {
     private val driftSpeed = 0.6f
     private val fadeSpeed = 1.0f
 
-    override fun glyph() = Glyph.HEALTH_ICON
+    override fun glyph() = withGlyph
     override fun duration() = 1.5f
     override fun isLit() = false
 

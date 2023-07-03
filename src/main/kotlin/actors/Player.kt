@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import ktx.async.KtxAsync
 import render.Screen
+import render.sparks.GlyphRise
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
@@ -30,6 +31,47 @@ import world.stains.Fire
 
 @Serializable
 open class Player : Actor() {
+
+    companion object {
+        private const val caloriesMax = 2000f
+        private const val caloriesEatMax = 1800f
+        private const val caloriesPerDay = 2800f
+        private const val caloriesHunger = -2000f
+        private const val caloriesStarving = -4000f
+
+        private val xpForLevel = listOf(
+            0,
+            200,
+            500,
+            1000,
+            2000,
+            4000,
+            8000,
+            16000,
+            32000,
+            64000,
+            104000,
+            156000,
+            228000,
+            325000,
+            452000,
+            619000,
+            831000,
+            1093000,
+            1410000,
+            1787000,
+            2230000,
+            2745000,
+            3338000,
+            4015000,
+            4782000,
+            5639000,
+            6596000,
+            7663000,
+            8850000,
+            9999999
+        )
+    }
 
     var journal: Journal = Journal()
     var dangerMode: Boolean = false
@@ -49,14 +91,10 @@ open class Player : Actor() {
     override fun defaultAction(): Action? = null
 
     var xp = 0
+    var levelUpsAvailable = 0
     var lastChunkThreatLevel = 0
 
     var calories = 1000f
-    private val caloriesMax = 2000f
-    private val caloriesEatMax = 1800f
-    private val caloriesPerDay = 2800f
-    private val caloriesHunger = -2000f
-    private val caloriesStarving = -4000f
 
     val autoPickUpTypes = mutableListOf<Thing.Tag>()
 
@@ -135,6 +173,11 @@ open class Player : Actor() {
 
     fun getThrown(): Thing? = thrownTag?.let { tag -> contents.firstOrNull { it.tag == tag } }
 
+    override fun onMove() {
+        super.onMove()
+        if (level is WorldLevel) Metamap.markChunkVisitedAt(xy.x, xy.y)
+    }
+
     override fun advanceTime(delta: Float) {
         super.advanceTime(delta)
         calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
@@ -211,5 +254,28 @@ open class Player : Actor() {
             else 1
         }
         return 1
+    }
+
+    fun gainXP(added: Int) {
+        val effLevel = xpLevel + levelUpsAvailable
+        if (effLevel >= xpForLevel.size - 1) return
+        xp += added
+        if (xp >= xpForLevel[effLevel]) {
+            earnLevelUp()
+        }
+    }
+
+    private fun earnLevelUp() {
+        levelUpsAvailable++
+        Console.say("You feel your inner potential has grown!")
+        level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
+    }
+
+    fun levelUp() {
+        if (levelUpsAvailable < 1) return
+        levelUpsAvailable--
+        xpLevel++
+        Console.say("You feel your inner potential has been realized!")
+        level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
     }
 }

@@ -35,6 +35,8 @@ class ChunkMeta(
 ) {
 
     var mappedTime = 0.0
+    var visited: Boolean = false
+    var visitedTime = 0.0
     val mapIcons = mutableListOf<Glyph>()
     fun mapPOITitle(): String? = features.firstNotNullOfOrNull { it.mapPOITitle() }
     fun mapPOIDescription(): String? = features.firstNotNullOfOrNull { it.mapPOIDescription() }
@@ -87,6 +89,12 @@ class ChunkMeta(
         features.forEach { feature ->
             feature.onSave()
         }
+    }
+
+    fun xpValue(): Int {
+        var v = biome.xpValue()
+        features.forEach { v += it.xpValue() }
+        return (v * ((threatLevel - 1f) * 1.5f + 1f)).toInt()
     }
 }
 
@@ -199,4 +207,5 @@ class ChunkScratch(
     } ?: listOf()
 
     fun defaultTitle() = features.firstNotNullOfOrNull { it.cellTitle() } ?: biome.defaultTitle(habitat)
+
 }

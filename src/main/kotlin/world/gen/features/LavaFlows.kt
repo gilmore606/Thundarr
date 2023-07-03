@@ -13,6 +13,7 @@ class LavaFlows(
 ) : Feature() {
     override fun order() = 1
     override fun stage() = Stage.BUILD
+    override fun xpValue() = 8
 
     @Serializable
     class LavaExit(

@@ -17,6 +17,7 @@ object Suburb: Biome(
     override fun trailChance() = 0f
     override fun plantDensity() = 0.2f
     override fun metaTravelCost() = 1.5f
+    override fun xpValue() = 4
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fertility = fertilityAt(x, y)

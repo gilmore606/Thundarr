@@ -39,6 +39,7 @@ class Village(
     override fun flavor() = flavor
     override fun loreKnowabilityRadius() = 1000
     override fun loreName() = "the village of $name"
+    override fun xpValue() = 12
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(RuinedCitySite::class) && !meta.hasFeature(Volcano::class)

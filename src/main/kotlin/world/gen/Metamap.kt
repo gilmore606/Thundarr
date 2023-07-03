@@ -107,7 +107,22 @@ object Metamap {
             val meta = metaCache[cx][cy]
             if (!meta.mapped) {
                 meta.mapped = true
+                meta.mappedTime = App.gameTime.time
                 update(meta)
+            }
+        }
+    }
+
+    fun markChunkVisitedAt(x: Int, y: Int) {
+        val cx = chunkXtoX(x)
+        val cy = chunkYtoY(y)
+        if (boundsCheck(cx,cy)) {
+            val meta = metaCache[cx][cy]
+            if (!meta.visited) {
+                meta.visited = true
+                meta.visitedTime = App.gameTime.time
+                update(meta)
+                App.player.gainXP(meta.xpValue())
             }
         }
     }
