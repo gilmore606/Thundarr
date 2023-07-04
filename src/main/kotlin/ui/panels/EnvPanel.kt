@@ -21,7 +21,7 @@ object EnvPanel : ShadedPanel() {
     }
 
     override fun drawText() {
-        val threat = App.player.threatLevel() - App.player.xpLevel
+        val threat = App.player.threatLevel()
         val threatDesc = if (threat < 0) "relaxed"
             else if (threat == 0) "cautious"
             else if (threat == 1) "anxious"

@@ -1,6 +1,8 @@
 package things
 
 import actors.Actor
+import actors.NPC
+import actors.Player
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -24,14 +26,21 @@ class Shrine : LitThing() {
     override val lightColor = LightColor(0.1f, 0.1f, 0.4f)
 
     override fun uses() = mapOf(
-        UseTag.CONSUME to Use("pray to " + name(), 2.0f,
+        UseTag.USE to Use("pray to " + name(), 2.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) },
             toDo = { actor,level,x,y -> doPray(actor) }
         )
     )
 
-    private fun doPray(actor: Actor) {
-        Console.sayAct("You whisper a prayer for protection to the Lords of Light.",  "%DN kneels before %dd and whispers a prayer.", actor, this)
+    fun doPray(actor: Actor, priest: NPC? = null) {
+        Console.sayAct("You whisper a prayer to the Lords of Light.",  "%DN kneels before %dd and whispers a prayer.", actor, this)
+        if (actor is Player) {
+            Speaker.world(Speaker.SFX.PRAYER, source = xy())
+            if (actor.levelUpsAvailable > 0) {
+                actor.levelUp()
+                return
+            }
+        }
     }
 
 }

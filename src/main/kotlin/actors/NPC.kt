@@ -275,6 +275,15 @@ sealed class NPC : Actor() {
 
     override fun die() {
         den?.onDie(this)
+        App.player.gainXP(effectiveXPvalue())
         super.die()
     }
+
+    private fun effectiveXPvalue(): Int {
+        var xp = xpValue()
+        if (xpLevel < App.player.xpLevel) xp = (xp * 0.5).toInt()
+        return xp
+    }
+
+    open fun xpValue() = 10
 }

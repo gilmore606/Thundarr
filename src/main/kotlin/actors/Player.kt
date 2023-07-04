@@ -249,11 +249,14 @@ open class Player : Actor() {
 
     fun threatLevel(): Int {
         level?.also { level ->
-            return if (level is WorldLevel) Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).threatLevel
-            else if (level is EnclosedLevel) level.threatLevel
-            else 1
+            val threat = when {
+                (level is WorldLevel) -> Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).threatLevel
+                (level is EnclosedLevel) -> level.threatLevel
+                else -> 1
+            }
+            return threat - xpLevel
         }
-        return 1
+        return 0
     }
 
     fun gainXP(added: Int) {
@@ -277,5 +280,9 @@ open class Player : Actor() {
         xpLevel++
         Console.say("You feel your inner potential has been realized!")
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
+
+        Heart.improve(this, fullLevel = true)
+        hpMax += 5
+        hp  = hpMax
     }
 }
