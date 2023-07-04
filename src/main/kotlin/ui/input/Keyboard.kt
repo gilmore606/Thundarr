@@ -31,6 +31,7 @@ object Keyboard : KtxInputAdapter {
 
     var CTRL = false
     var ALT = false
+    var lastShiftUp = System.currentTimeMillis()
 
     var modKeyDown = 0
 
@@ -129,6 +130,8 @@ object Keyboard : KtxInputAdapter {
             CTRL = false
             isMod = true
             Screen.clearCursorLine()
+        } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
+            lastShiftUp = System.currentTimeMillis()
         }
         lastKey = -1
         if (isMod && modKeyDown > 0) {
@@ -151,13 +154,14 @@ object Keyboard : KtxInputAdapter {
         }
     }
 
+    private fun isShiftHeld() = Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT) || Gdx.input.isKeyPressed(
+        META_SHIFT_ON) || (System.currentTimeMillis() - lastShiftUp < 50)
+
     private fun processDir(dir: XY) {
         if (CTRL) {
             Screen.moveCursor(dir)
             Screen.rightClickCursorTile()
-        } else if (Gdx.input.isKeyPressed(SHIFT_LEFT) || Gdx.input.isKeyPressed(SHIFT_RIGHT) || Gdx.input.isKeyPressed(
-                META_SHIFT_ON)) {
-            log.info("START EXPLORE")
+        } else if (isShiftHeld()) {
             App.player.tryAutoMove(dir)
         } else if (CURSOR_MODE) {
             Screen.moveCursor(dir)
