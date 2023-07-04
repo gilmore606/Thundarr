@@ -46,7 +46,7 @@ class ChunkMeta(
         mapIcons.clear()
         mapIcons.add(biome.mapGlyph)
         features.forEach { feature ->
-            feature.mapIcon()?.also { mapIcons.add(it) }
+            feature.mapIcon(biome)?.also { mapIcons.add(it) }
         }
     }
 

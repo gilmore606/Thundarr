@@ -15,6 +15,7 @@ import world.gen.biomes.Biome
 import world.gen.biomes.*
 import world.gen.biomes.Blank
 import world.gen.features.*
+import world.gen.features.Building
 import world.gen.habitats.*
 import world.history.History
 import world.level.CHUNK_SIZE
@@ -74,6 +75,7 @@ object Metamap {
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
+    val randomBuildingChance = 0.002f
     val maxThreatLevel = 40
     val spawnDistanceThreatFactor = 0.24f
     val biomeDepthThreatFactor = 0.7f
@@ -882,6 +884,10 @@ object Metamap {
                             Madlib.tavernName(), NO_DIRECTION
                         ))
                     }
+                    // Buildings
+                    if (Building.canBuildOn(cell) && Dice.chance(randomBuildingChance)) {
+                        cell.addFeature(Building())
+                    }
                 }
             }
 
@@ -965,13 +971,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            startChunk = villages.random()
+//            startChunk = villages.random()
             // Pick a cabin chunk
-//            forEachScratch { x, y, cell ->
-//                if (cell.hasFeature(Village::class)) {
-//                    startChunk = XY(x,y)
-//                }
-//            }
+            forEachScratch { x, y, cell ->
+                if (cell.hasFeature(Building::class)) {
+                    startChunk = XY(x,y)
+                }
+            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)

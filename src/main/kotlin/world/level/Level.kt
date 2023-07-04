@@ -299,8 +299,8 @@ sealed class Level {
 
     fun isPathableBy(actor: Actor, x: Int, y: Int) = chunkAt(x,y)?.isPathableBy(actor, x, y) ?: false
 
-    fun isWalkableFrom(actor: Actor, xy: XY, toDir: XY) = isWalkableAt(actor, xy.x + toDir.x, xy.y + toDir.y) && actorAt(xy.x + toDir.x, xy.y + toDir.y) == null
-    fun isWalkableFrom(actor: Actor, x: Int, y: Int, toDir: XY) = isWalkableAt(actor, x + toDir.x, y + toDir.y) && actorAt(x + toDir.x, y + toDir.y) == null
+    fun isWalkableFrom(actor: Actor, xy: XY, toDir: XY) = isWalkableAt(actor, xy.x + toDir.x, xy.y + toDir.y) && setOf(null, actor).contains(actorAt(xy.x + toDir.x, xy.y + toDir.y))
+    fun isWalkableFrom(actor: Actor, x: Int, y: Int, toDir: XY) = isWalkableAt(actor, x + toDir.x, y + toDir.y) && setOf(null, actor).contains(actorAt(x + toDir.x, y + toDir.y))
 
     fun visibilityAt(x: Int, y: Int) = chunkAt(x,y)?.visibilityAt(x,y) ?: 0f
 
@@ -582,6 +582,12 @@ sealed class Level {
         director.actors.forEach { actor ->
             if (visibilityAt(actor.xy.x, actor.xy.y) == 1f && actor !is Player) add(actor)
         }
+    }
+
+    fun freeCardinalMovesFrom(from: XY, walker: Actor): Set<XY> {
+        val free = mutableSetOf<XY>()
+        CARDINALS.forEach { if (isWalkableFrom(walker, from, it)) free.add(it) }
+        return free
     }
 
     protected open fun unloadChunk(chunk: Chunk, levelId: String = "world") {

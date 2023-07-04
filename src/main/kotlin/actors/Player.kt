@@ -141,7 +141,13 @@ open class Player : Actor() {
     }
 
     fun tryAutoMove(dir: XY) {
-        queue(AutoMove(dir))
+        level?.also { level ->
+            if (CARDINALS.contains(dir) && level.freeCardinalMovesFrom(xy + dir, this).size <= 2) {
+                queue(AutoMove(dir, isHallway = true))
+            } else {
+                queue(AutoMove(dir))
+            }
+        }
     }
 
     override fun willAggro(target: Actor) = dangerMode

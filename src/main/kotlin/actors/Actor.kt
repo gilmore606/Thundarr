@@ -660,6 +660,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     protected fun canStep(dir: XY) = level?.isWalkableFrom(this, xy, dir) ?: false
 
+    fun freeCardinalMoves(): Set<XY> = level?.freeCardinalMovesFrom(xy, this) ?: setOf()
+
     protected fun distanceTo(entity: Entity) = distanceBetween(entity.xy().x, entity.xy().y, xy.x, xy.y)
 
     protected fun forCardinals(doThis: (tx: Int, ty: Int, dir: XY)->Unit) {
