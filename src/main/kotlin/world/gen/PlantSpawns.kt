@@ -34,7 +34,12 @@ fun plantSpawns() = listOf<PlantSpawn>(
     PlantSpawn({ BirchTree() },
         setOf(Forest, Plain, Swamp, Suburb),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB),
-        1f, 0.7f, 1f
+        1f, 0.75f, 1f
+    ),
+    PlantSpawn({ BirchTree() },
+        setOf(Plain),
+        setOf(AlpineA, AlpineB, TemperateA, TemperateB, TropicalA, TropicalB),
+        0.05f, 0.5f, 1f
     ),
     PlantSpawn({ AppleTree() },
         setOf(Forest, ForestHill, Plain, Suburb),
@@ -59,15 +64,15 @@ fun plantSpawns() = listOf<PlantSpawn>(
     PlantSpawn({ PalmTree() },
         setOf(Desert, Forest, Plain, Swamp, Suburb),
         setOf(TropicalA, TropicalB),
-        1f, 0.7f, 1f
+        1f, 0.75f, 1f
     ),
     PlantSpawn({ CoconutTree() },
         setOf(Forest, ForestHill, Plain, Swamp),
         setOf(TropicalA, TropicalB),
-        0.4f, 0.7f, 1f
+        0.4f, 0.75f, 1f
     ),
     PlantSpawn({ DeadTree() },
-        setOf(Mountain, Forest, ForestHill, Hill, Swamp, Suburb),
+        setOf(Mountain, Forest, ForestHill, Hill, Scrub, Swamp, Suburb),
         setOf(TemperateA, TemperateB, AlpineA, AlpineB),
         0.3f, 0.6f, 1f
     ),

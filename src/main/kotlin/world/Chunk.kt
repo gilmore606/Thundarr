@@ -241,7 +241,7 @@ class Chunk(
     fun onRemoveActor(x: Int, y: Int, actor: Actor) { }
 
     fun thingsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {
-        things[x - this.x][y - this.y].contents
+        things[x - this.x][y - this.y].contents.filter { !it.isIntangible() }.toMutableList()
     } else noThing
 
     fun stainsAt(x: Int, y: Int) = if (boundsCheck(x, y)) {

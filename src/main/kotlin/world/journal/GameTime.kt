@@ -10,9 +10,12 @@ data class GameTime(
     companion object {
         const val TURNS_PER_DAY = 2500.0
         const val YEAR_ZERO = 2994
+
+        val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+        const val DAYS_PER_MONTH = 30
+        const val DAYS_PER_YEAR = 360
     }
 
-    private val monthNames = listOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     val timeString: String
     val dateString: String
     val minute: Int
@@ -22,6 +25,7 @@ data class GameTime(
     val monthDay: Int
     val monthName: String
     val year: Int
+    val date: Int
     init {
         day = (time / TURNS_PER_DAY).toInt()
         val timeOfDay = time - (day * TURNS_PER_DAY)
@@ -38,12 +42,13 @@ data class GameTime(
         }
         amhour += 1
         val minstr = if (minute < 10) "0$minute" else "$minute"
-        val zyear = (day / 360)
-        val yearDay = day - (zyear * 360)
-        month = yearDay / 30
-        monthDay = (yearDay - month * 30) + 1
+        val zyear = (day / DAYS_PER_YEAR)
+        val yearDay = day - (zyear * DAYS_PER_YEAR)
+        month = yearDay / DAYS_PER_MONTH
+        monthDay = (yearDay - month * DAYS_PER_MONTH) + 1
         monthName = monthNames[month]
         year = YEAR_ZERO + zyear
+        date = year * DAYS_PER_YEAR + (month * DAYS_PER_MONTH) + day
 
         timeString = "$amhour:$minstr $ampm"
         dateString = "$monthName $monthDay, $year"

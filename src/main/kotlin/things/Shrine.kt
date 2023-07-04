@@ -15,6 +15,8 @@ class Shrine : LitThing() {
         active = true
     }
 
+    var lastPrayedDate = 0
+
     override val tag = Tag.THING_SHRINE
     override fun name() = "shrine"
     override fun description() = "A stone shrine erected to honor the Lords of Light."
@@ -35,10 +37,20 @@ class Shrine : LitThing() {
     fun doPray(actor: Actor, priest: NPC? = null) {
         Console.sayAct("You whisper a prayer to the Lords of Light.",  "%DN kneels before %dd and whispers a prayer.", actor, this)
         if (actor is Player) {
-            Speaker.world(Speaker.SFX.PRAYER, source = xy())
             if (actor.levelUpsAvailable > 0) {
+                Speaker.world(Speaker.SFX.PRAYER, source = xy())
                 actor.levelUp()
                 return
+            }
+            if (lastPrayedDate == App.gameTime.date) {
+                Console.say("A voice speaks from deep inside the shrine: \"The Lords help those who help themselves...\"")
+                return
+            }
+            lastPrayedDate = App.gameTime.date
+            Speaker.world(Speaker.SFX.PRAYER, source = xy())
+            if (actor.hp < actor.hpMax) {
+                Console.say("You feel a warm glow spread out from your heart, through your body, healing every wound as it flows.")
+                actor.healDamage(actor.hpMax - actor.hp)
             }
         }
     }

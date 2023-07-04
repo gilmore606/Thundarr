@@ -27,6 +27,7 @@ sealed class Biome(
     open fun plantDensity() = 1.0f
     open fun cabinChance() = 0.0f
     open fun cavesChance() = 0.0f
+    open fun outcroppingChance() = 0.0f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
     open fun canHaveRain() = true
@@ -41,7 +42,6 @@ sealed class Biome(
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun postProcess(carto: WorldCarto) { }
-    open fun carveExtraTerrain(carto: WorldCarto) { }
     open fun placeExtraThings(carto: WorldCarto) { }
     open fun wallsBlockTrails() = true
     open fun metaTravelCost() = 1f
@@ -61,10 +61,30 @@ sealed class Biome(
             carto.setFlag(x + carto.x0, y + carto.y0, flag)
         }
     }
+
     protected fun digLake(carto: WorldCarto, x0: Int, y0: Int, x1: Int, y1: Int) {
         val blob = carto.growOblong(x1-x0, y1-y0)
         carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, GENERIC_WATER)
         carto.addTrailBlock(x0,y0,x1,y1)
+    }
+
+    protected fun addOutcropping(carto: WorldCarto) {
+        val w = Dice.range(3, 12)
+        val h = Dice.range(3, 12)
+        val x0 = Dice.range(3, CHUNK_SIZE - w - 3)
+        val y0 = Dice.range(3, CHUNK_SIZE - h - 3)
+        val x1 = x0+w-1
+        val y1 = y0+h-1
+        val blob = carto.growOblong(x1-x0, y1-y0)
+        carto.printGrid(blob, x0 + carto.x0, y0 + carto.y0, Terrain.Type.TEMP5)
+        carto.fringeTerrain(TEMP5, TERRAIN_ROCKS, Dice.float(0.2f, 0.9f), GENERIC_WATER)
+        carto.swapTerrain(TEMP5, TERRAIN_CAVEWALL)
+    }
+
+    open fun carveExtraTerrain(carto: WorldCarto) {
+        if (Dice.chance(outcroppingChance())) {
+            addOutcropping(carto)
+        }
     }
 
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? {
@@ -107,6 +127,7 @@ object Glacier : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun bareTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
+    override fun outcroppingChance() = 0.2f
     override fun xpValue() = 3
 }
 
@@ -118,6 +139,8 @@ object Plain : Biome(
     override fun defaultTitle(habitat: Habitat) = habitat.grasslandName()
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) TERRAIN_SWAMP else super.riverBankTerrain(x, y)
     override fun plantDensity() = 0.5f
+    override fun cabinChance() = 0.001f
+    override fun outcroppingChance() = 0.05f
     override fun xpValue() = 0
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
@@ -141,6 +164,7 @@ object Hill : Biome(
     override fun defaultTitle(habitat: Habitat) = "hills"
     override fun trailChance() = 0.2f
     override fun cavesChance() = 0.6f
+    override fun cabinChance() = 0.05f
     override fun plantDensity() = 0.3f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun villageWallType() = TERRAIN_BRICKWALL
@@ -159,6 +183,7 @@ object Hill : Biome(
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
+        super.carveExtraTerrain(carto)
         carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.7f, GENERIC_WATER)
         repeat (2) { carto.varianceFuzzTerrain(TERRAIN_ROCKS, TERRAIN_CAVEWALL) }
     }
@@ -197,6 +222,7 @@ object ForestHill : Biome(
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
+        super.carveExtraTerrain(carto)
         carto.fringeTerrain(TERRAIN_CAVEWALL, TERRAIN_ROCKS, 0.6f, TERRAIN_TEMPERATE_FORESTWALL)
         carto.fringeTerrain(TERRAIN_TEMPERATE_FORESTWALL, TERRAIN_UNDERGROWTH, 0.6f, TERRAIN_CAVEWALL)
         carto.varianceFuzzTerrain(TERRAIN_ROCKS, TERRAIN_CAVEWALL)
@@ -212,6 +238,7 @@ object Mountain : Biome(
     override fun defaultTitle(habitat: Habitat) = "mountains"
     override fun ambientSoundDay() = Speaker.Ambience.MOUNTAIN
     override fun ambientSoundNight() = Speaker.Ambience.MOUNTAIN
+    override fun cabinChance() = 0.05f
     override fun cavesChance() = 0.8f
     override fun riverBankAltTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun wallsBlockTrails() = true
@@ -245,12 +272,14 @@ object Swamp : Biome(
     override fun ambientSoundDay() = Speaker.Ambience.SWAMP
     override fun ambientSoundNight() = Speaker.Ambience.SWAMP
     override fun trailChance() = 0.4f
+    override fun cabinChance() = 0.03f
+    override fun outcroppingChance() = 0.05f
     override fun plantDensity() = 1f
     override fun riverBankTerrain(x: Int, y: Int) = TERRAIN_UNDERGROWTH
     override fun bareTerrain(x: Int, y: Int) = TERRAIN_GRASS
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
     override fun metaTravelCost() = 2f
-    override fun edgeDistanceThreatFactor() = 1f
+    override fun edgeDistanceThreatFactor() = 2f
     override fun xpValue() = 4
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
@@ -267,6 +296,7 @@ object Swamp : Biome(
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
+        super.carveExtraTerrain(carto)
         repeat(Dice.oneTo(9)) {
             val x = Dice.zeroTil(CHUNK_SIZE-13)
             val y = Dice.zeroTil(CHUNK_SIZE-13)
@@ -283,6 +313,8 @@ object Scrub : Biome(
     override fun defaultTitle(habitat: Habitat) = habitat.scrubName()
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) TERRAIN_ROCKS else TERRAIN_GRASS
     override fun plantDensity() = 0.25f
+    override fun cabinChance() = 0.005f
+    override fun outcroppingChance() = 0.1f
     override fun xpValue() = 1
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
 
@@ -306,6 +338,7 @@ object Desert : Biome(
     override fun defaultTitle(habitat: Habitat) = "desert"
     override fun canHaveRain() = false
     override fun cavesChance() = 0.8f
+    override fun cabinChance() = 0.01f
     override fun ambientSoundDay() = Speaker.Ambience.DESERT
     override fun ambientSoundNight() = Speaker.Ambience.DESERT
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
@@ -316,7 +349,7 @@ object Desert : Biome(
     override fun villageWallType() = if (Dice.flip()) TERRAIN_BRICKWALL else TERRAIN_CAVEWALL
     override fun villageFloorType() = if (Dice.chance(0.2f)) TERRAIN_HARDPAN else TERRAIN_STONEFLOOR
     override fun metaTravelCost() = 0.7f
-    override fun edgeDistanceThreatFactor() = 0.6f
+    override fun edgeDistanceThreatFactor() = 1f
     override fun xpValue() = 3
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {

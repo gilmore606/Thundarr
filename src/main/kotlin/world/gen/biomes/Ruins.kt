@@ -49,6 +49,7 @@ object Ruins : Biome(
     }
 
     override fun carveExtraTerrain(carto: WorldCarto) {
+        super.carveExtraTerrain(carto)
         val gridsize = Dice.range(2, 4)
         val cellsize = CHUNK_SIZE / gridsize
         val variance = cellsize / 6

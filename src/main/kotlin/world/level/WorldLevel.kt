@@ -110,6 +110,7 @@ class WorldLevel() : Level() {
 
     private fun crossChunks(newChunk: Chunk) {
         transitionAmbienceToChunk(newChunk)
+
         val threat = App.player.threatLevel()
         if (threat > 0 && App.player.lastChunkThreatLevel <= 0) {
             Console.say("You feel uneasy.")
