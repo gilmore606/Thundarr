@@ -60,7 +60,7 @@ class WorldCarto(
 
             meta.biome.carveExtraTerrain(this)
             digFeatures(Feature.Stage.BUILD)
-            if (Dice.chance(0.01f) || forStarter) buildStructureDungeon()
+            if (forStarter) buildStructureDungeon()
 
             // Plants and stuff
             buildFertilityMap()
@@ -280,7 +280,7 @@ class WorldCarto(
         }
     }
 
-    private fun buildStructureDungeon() {
+    fun buildStructureDungeon() {
         val facing = CARDINALS.random()
         carvePrefab(getPrefab(), Random.nextInt(x0, x1 - 20), Random.nextInt(y0, y1 - 20), facing)
         if (forStarter) {

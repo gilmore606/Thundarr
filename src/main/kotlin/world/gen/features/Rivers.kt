@@ -183,8 +183,9 @@ class Rivers(
         }
     }
 
-    override fun mapIcon(): Glyph? {
+    override fun mapIcon(onBiome: Biome?): Glyph? {
         if (exits.isEmpty()) return null
+        if (onBiome is Ocean) return null
         var isNorth = false
         var isSouth = false
         var isEast = false

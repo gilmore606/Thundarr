@@ -6,6 +6,7 @@ import render.tilesets.Glyph
 import things.TrailSign
 import util.*
 import world.ChunkScratch
+import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
 import world.gen.biomes.Ruins
 import world.gen.biomes.Suburb
@@ -147,7 +148,7 @@ class Trails(
         }
     }
 
-    override fun mapIcon(): Glyph? {
+    override fun mapIcon(onBiome: Biome?): Glyph? {
         if (exits.isEmpty()) return null
         var isNorth = false
         var isSouth = false

@@ -6,6 +6,7 @@ import things.HighwaySign
 import things.WreckedCar
 import util.*
 import world.gen.NoisePatches
+import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.level.CHUNK_SIZE
 import world.terrains.Highway
@@ -91,7 +92,7 @@ class Highways(
         }
     }
 
-    override fun mapIcon(): Glyph? {
+    override fun mapIcon(onBiome: Biome?): Glyph? {
         if (exits.isEmpty()) return null
         var isNorth = false
         var isSouth = false

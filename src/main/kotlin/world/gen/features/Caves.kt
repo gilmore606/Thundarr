@@ -10,10 +10,7 @@ import world.ChunkScratch
 import world.NaturalCavern
 import world.gen.AnimalSpawn
 import world.gen.Metamap
-import world.gen.biomes.Desert
-import world.gen.biomes.ForestHill
-import world.gen.biomes.Hill
-import world.gen.biomes.Mountain
+import world.gen.biomes.*
 import world.gen.habitats.*
 import world.quests.FetchQuest
 import world.terrains.Terrain
@@ -111,7 +108,7 @@ class Caves : Feature() {
         Metamap.update(meta)
     }
 
-    override fun mapIcon() = if (hasCavern) Glyph.MAP_CAVE else null
+    override fun mapIcon(onBiome: Biome?) = if (hasCavern) Glyph.MAP_CAVE else null
     override fun mapPOITitle() = if (hasCavern) "cavern" else null
     override fun mapPOIDescription() = if (hasCavern) "An underground cave system." else null
 

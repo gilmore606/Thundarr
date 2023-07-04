@@ -10,6 +10,7 @@ import render.tilesets.Glyph
 import things.*
 import util.*
 import world.ChunkScratch
+import world.gen.biomes.Biome
 import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
@@ -358,7 +359,7 @@ class Village(
         }
     }
 
-    override fun mapIcon(): Glyph? = Glyph.MAP_VILLAGE
+    override fun mapIcon(onBiome: Biome?): Glyph? = Glyph.MAP_VILLAGE
     override fun mapPOITitle() = name
     override fun mapPOIDescription() = "The ${flavor.displayName} village of $name."
 

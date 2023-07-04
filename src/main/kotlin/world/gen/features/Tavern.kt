@@ -8,6 +8,7 @@ import things.HighwaySign
 import things.WoodDoor
 import util.*
 import world.ChunkScratch
+import world.gen.biomes.Biome
 import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.decors.Barracks
@@ -32,7 +33,7 @@ class Tavern(
     }
 
     override fun trailDestinationChance() = 1f
-    override fun mapIcon() = Glyph.MAP_BUILDING
+    override fun mapIcon(onBiome: Biome?) = Glyph.MAP_BUILDING
     override fun mapPOITitle() = name
     override fun mapPOIDescription() = "A roadside inn."
 

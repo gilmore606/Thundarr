@@ -85,7 +85,7 @@ sealed class Feature : AnimalSpawnSource {
 
     open fun cellTitle(): String? = null
 
-    open fun mapIcon(): Glyph? = null
+    open fun mapIcon(onBiome: Biome? = null): Glyph? = null
     open fun mapPOITitle(): String? = null
     open fun mapPOIDescription(): String? = null
 
