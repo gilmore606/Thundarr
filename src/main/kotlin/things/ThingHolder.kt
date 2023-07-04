@@ -31,5 +31,5 @@ interface ThingHolder {
     fun add(thing: Thing)
     fun remove(thing: Thing)
 
-    fun temperature(): Float = level?.temperatureAt(xy()) ?: 65f
+    fun temperature(): Float = level?.temperatureAt(xy())?.toFloat() ?: 65f
 }

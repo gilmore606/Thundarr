@@ -38,7 +38,7 @@ object DebugPanel : ShadedPanel() {
 
         val meta = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y)
         drawString("threat ${App.player.threatLevel()}", padding, padding + 120)
-        drawString("spawnDist: ${meta.spawnDistance} biomeEdgeDist: ${meta.biomeEdgeDistance}", padding, padding + 140)
+        drawString("temperature ${meta.temperature}", padding, padding + 140)
 
         val terrain = Terrain.get(App.level.getTerrain(App.player.xy.x, App.player.xy.y))
         val tdata = App.level.getTerrainData(App.player.xy.x, App.player.xy.y)

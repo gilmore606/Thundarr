@@ -37,12 +37,15 @@ class AutoMove(
     override fun execute(actor: Actor, level: Level) {
         if (isHallway) {
             val free = actor.freeCardinalMoves().toMutableList()
-            if (!isFirstMove && (free.size > 2 || free.size == 1)) {
+            if (free.isEmpty()) {
+                done = true
+            } else if (!isFirstMove && (free.size > 2 || free.size == 1)) {
                 done = true
             } else {
                 if (dir !in free) {
                     free.remove(dir.flipped())
-                    dir = free.first()
+                    if (free.isEmpty()) done = true
+                    else dir = free.first()
                 }
                 Move(XY(dir.x, dir.y)).execute(actor, level)
             }

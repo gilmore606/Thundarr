@@ -18,6 +18,8 @@ class Weather {
 
     val overallRaininess = 0.3f   // 0.4f
 
+    var envString: String = "clear"
+
     var weatherIntensity = 0f
     var windX = 0f
     var windY = 0f
@@ -86,6 +88,7 @@ class Weather {
         val cloudLight = min(1f, (level.ambientLight.brightness() - 0.5f) * 2f)
         cloudIntensity = max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
         rainIntensity = max(0f, (weatherIntensity - 0.5f) * 2f)
+        updateEnvString()
     }
 
     private fun updateWeather(hour: Int, minute: Int, level: Level) {
@@ -143,6 +146,22 @@ class Weather {
         if (m.isNotEmpty() && App.player.level == level &&
             level.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
             Console.say(m)
+    }
+
+    private fun updateEnvString() {
+        envString = when {
+            rainIntensity > 0.7f -> "stormy"
+            rainIntensity > 0.3f -> "rainy"
+            rainIntensity > 0.05f -> "drizzling"
+            cloudIntensity > 0.65f -> "overcast"
+            cloudIntensity > 0.3f -> "cloudy"
+            else -> "clear"
+        } + when {
+            windSpeed > (maxWindSpeed * 0.8f) -> ", blustery"
+            windSpeed > (maxWindSpeed * 0.6f) -> ", windy"
+            windSpeed > (maxWindSpeed * 0.2f) -> ", breezy"
+            else -> ", calm"
+        }
     }
 
 }

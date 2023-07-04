@@ -348,7 +348,6 @@ sealed class Level {
 
         allChunks().forEach { it.onRender(delta) }
         director.actors.forEach { it.onRender(delta) }
-
     }
 
     open fun updateVisibility() {
@@ -595,7 +594,7 @@ sealed class Level {
         chunk.unload(actorsToSave, levelId)
     }
 
-    open fun temperatureAt(xy: XY): Float {
-        return 65f
+    open fun temperatureAt(xy: XY): Int {
+        return 65
     }
 }

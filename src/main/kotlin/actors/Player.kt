@@ -94,6 +94,9 @@ open class Player : Actor() {
     var levelUpsAvailable = 0
     var lastChunkThreatLevel = 0
 
+    var temperature = 70
+    var feltTemperature = 70
+
     var calories = 1000f
 
     val autoPickUpTypes = mutableListOf<Thing.Tag>()
@@ -186,6 +189,11 @@ open class Player : Actor() {
 
     override fun advanceTime(delta: Float) {
         super.advanceTime(delta)
+        updateTemperature()
+        updateCalories(delta)
+    }
+
+    private fun updateCalories(delta: Float) {
         calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
         if (calories < caloriesEatMax) {
             removeStatus(Status.Tag.SATIATED)
@@ -251,6 +259,13 @@ open class Player : Actor() {
 
     fun debugMove(dir: XY) {
         moveTo(level, xy.x + (dir.x * 20), xy.y + (dir.y * 20))
+    }
+
+    private fun updateTemperature() {
+        level?.also { level ->
+            temperature = level.temperatureAt(xy)
+            feltTemperature = temperature - 12
+        }
     }
 
     fun threatLevel(): Int {

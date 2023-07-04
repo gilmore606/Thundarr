@@ -78,7 +78,7 @@ object Metamap {
     val randomBuildingChance = 0.002f
     val maxThreatLevel = 40
     val spawnDistanceThreatFactor = 0.24f
-    val biomeDepthThreatFactor = 0.7f
+    val biomeDepthThreatFactor = 1f
 
     val outOfBoundsMeta = ChunkMeta(biome = Ocean)
 
@@ -971,13 +971,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-//            startChunk = villages.random()
+            startChunk = villages.random()
             // Pick a cabin chunk
-            forEachScratch { x, y, cell ->
-                if (cell.hasFeature(Building::class)) {
-                    startChunk = XY(x,y)
-                }
-            }
+//            forEachScratch { x, y, cell ->
+//                if (cell.hasFeature(Building::class)) {
+//                    startChunk = XY(x,y)
+//                }
+//            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)
@@ -1016,6 +1016,14 @@ object Metamap {
                         cell.spawnDistance * spawnDistanceThreatFactor +
                         (cell.biomeEdgeDistance * cell.biome.edgeDistanceThreatFactor() * biomeDepthThreatFactor)
                         ).toInt()))
+                if (cell.hasFeature(Village::class) ||
+                    DIRECTIONS.hasOneWhere { boundsCheck(it.x+x,it.y+y) && scratches[it.x+x][it.y+y].hasFeature(Village::class) } ) {
+                    cell.threatLevel = max(1, cell.threatLevel - 1)
+                }
+                if (cell.hasFeature(RuinedCitySite::class) ||
+                    DIRECTIONS.hasOneWhere { boundsCheck(it.x+x,it.y+y) && scratches[it.x+x][it.y+y].hasFeature(RuinedCitySite::class) } ) {
+                    cell.threatLevel += 1
+                }
             }
 
             // Add quests to inhabited Habitations

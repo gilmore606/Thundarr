@@ -11,7 +11,7 @@ object EnvPanel : ShadedPanel() {
 
     init {
         this.width = RIGHT_PANEL_WIDTH
-        this.height = 130
+        this.height = 155
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -23,18 +23,23 @@ object EnvPanel : ShadedPanel() {
     override fun drawText() {
         val threat = App.player.threatLevel()
         val threatDesc = if (threat < 0) "relaxed"
-            else if (threat == 0) "cautious"
-            else if (threat == 1) "anxious"
+            else if (threat == 0 || threat == 1) "cautious"
+            else if (threat == 2 || threat == 3) "nervous"
             else "dreadful"
 
-        drawString(App.level.statusText(), padding, padding, Screen.fontColorBold, Screen.smallFont)
+        drawString(App.level.statusText(), padding, padding, Screen.fontColorBold, Screen.font)
 
-        drawString(App.gameTime.timeString, padding, padding + 28, Screen.fontColor, Screen.smallFont)
+        drawString(App.gameTime.timeString, padding, padding + 26, Screen.fontColor, Screen.font)
 
         drawString(App.gameTime.dateString, padding, padding + 50, Screen.fontColorDull, Screen.smallFont)
 
-        drawString("cool, windy", padding, padding + 72, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.weather.envString, padding, padding + 72, Screen.fontColorDull, Screen.smallFont)
 
-        drawString(threatDesc, padding, padding + 94, Screen.fontColorDull, Screen.smallFont)
+        val t1 = App.player.temperature
+        val t2 = App.player.feltTemperature
+        drawString(if (t1 == t2) "${t1}F" else "${t1}F (feels ${t2}F)",
+            padding, padding + 94, Screen.fontColorDull, Screen.smallFont)
+
+        drawString(threatDesc, padding, padding + 116, Screen.fontColorDull, Screen.smallFont)
     }
 }

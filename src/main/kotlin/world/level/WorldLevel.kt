@@ -84,6 +84,12 @@ class WorldLevel() : Level() {
     override fun statusText(): String = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).title
     override fun timeScale() = 2.0f
 
+    // TODO: take time-of-day, fires into account
+    override fun temperatureAt(xy: XY): Int {
+        val base = Metamap.metaAtWorld(xy.x, xy.y).temperature
+        return base
+    }
+
     override fun onSetPov() {
         populateChunks()
         // Have we moved far enough into a new chunk for transition?
