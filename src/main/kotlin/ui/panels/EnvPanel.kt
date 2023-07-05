@@ -11,7 +11,7 @@ object EnvPanel : ShadedPanel() {
 
     init {
         this.width = RIGHT_PANEL_WIDTH
-        this.height = 155
+        this.height = 162
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -31,15 +31,15 @@ object EnvPanel : ShadedPanel() {
 
         drawString(App.gameTime.timeString, padding, padding + 26, Screen.fontColor, Screen.font)
 
-        drawString(App.gameTime.dateString, padding, padding + 50, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.gameTime.dateString, padding, padding + 54, Screen.fontColorDull, Screen.smallFont)
 
-        drawString(App.weather.envString, padding, padding + 72, Screen.fontColorDull, Screen.smallFont)
+        drawString(App.weather.envString, padding, padding + 76, Screen.fontColorDull, Screen.smallFont)
 
         val t1 = App.player.temperature
         val t2 = App.player.feltTemperature
         drawString(if (t1 == t2) "${t1}F" else "${t1}F (feels ${t2}F)",
-            padding, padding + 94, Screen.fontColorDull, Screen.smallFont)
+            padding, padding + 98, Screen.fontColorDull, Screen.smallFont)
 
-        drawString(threatDesc, padding, padding + 116, Screen.fontColorDull, Screen.smallFont)
+        drawString(threatDesc, padding, padding + 120, Screen.fontColorDull, Screen.smallFont)
     }
 }

@@ -149,6 +149,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         }
     }
 
+    fun wipeStateAndReturnToMenu() {
+        Screen.panels.filterAnd({ it !is Modal }) { Screen.removePanel(it) }
+        Speaker.clearMusic()
+        pendingJob = KtxAsync.launch {
+            LevelKeeper.hibernateAll()
+            save.eraseAll()
+            delay(500)
+            log.info("State wiped.")
+            startAttract()
+        }
+    }
+
     fun savePrefs() {
         save.putPrefsState(
             PrefsState(

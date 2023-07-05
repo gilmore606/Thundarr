@@ -21,8 +21,8 @@ class WorldLevel() : Level() {
     }
 
     private val dayTemperatures = listOf(
-        -11, -12, -13, -14, -15, -13, -10, -8, -5, 0, 2, 4,
-        7, 11, 13, 15, 12, 10, 7, 3, 0, -2, -5, -9
+        -11, -12, -13, -14, -15, -13, -10, -8, -5, 0, 3, 6,
+        8, 11, 13, 15, 12, 10, 7, 3, 0, -2, -5, -9
     )
 
     var needStarterDungeon = false

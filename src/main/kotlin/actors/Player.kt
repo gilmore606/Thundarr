@@ -118,9 +118,9 @@ open class Player : Actor() {
     override fun die() {
         super.die()
         KtxAsync.launch {
-            delay(1000L)
             Screen.brightnessTarget = 0f
-            App.saveStateAndReturnToMenu()
+            delay(1000L)
+            App.wipeStateAndReturnToMenu()
         }
     }
 
