@@ -49,8 +49,9 @@ class Fleeing(
         return super.pickAction(npc)
     }
 
-    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+    override fun drawStatusGlyph(drawIt: (Glyph) -> Unit): Boolean {
         drawIt(Glyph.FLEEING_ICON)
+        return true
     }
 
     override fun idleBounceMs() = 500

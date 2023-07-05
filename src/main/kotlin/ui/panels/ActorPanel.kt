@@ -1,7 +1,6 @@
 package ui.panels
 
 import actors.Actor
-import actors.Player
 import render.Screen
 import render.tilesets.Glyph
 
@@ -50,7 +49,7 @@ object ActorPanel : ShadedPanel() {
             val y0 = y + padding + spacing * n + 1
             actor.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
                 actor.uiBatch().getTextureIndex(actor.glyph(), actor.level(), actor.xy().x, actor.xy().y), hue = actor.hue())
-            actor.drawStatusGlyphs { statusGlyph ->
+            actor.drawStatusGlyph { statusGlyph ->
                 Screen.uiBatch.addPixelQuad(x0, y0 - 12, x0 + 32, y0 + 20,
                     Screen.uiBatch.getTextureIndex(statusGlyph))
             }

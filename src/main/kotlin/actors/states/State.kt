@@ -50,7 +50,7 @@ sealed class State {
 
     open fun receiveAggression(npc: NPC, attacker: Actor) { }
 
-    open fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) { }
+    open fun drawStatusGlyph(drawIt: (Glyph) -> Unit): Boolean { return false }
 
     open fun allowsConversation(): Boolean = true
     open fun commentLine(): String? = null

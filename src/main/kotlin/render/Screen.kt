@@ -22,7 +22,6 @@ import things.Thing
 import ui.input.Keyboard
 import ui.input.Mouse
 import ui.modals.ContextMenu
-import ui.modals.MapModal
 import ui.modals.Modal
 import ui.modals.ToolbarAddModal
 import ui.panels.*
@@ -274,7 +273,7 @@ object Screen : KtxScreen {
             )
         }
         if (vis == 1f) {
-            actor.drawStatusGlyphs { statusGlyph ->
+            actor.drawStatusGlyph { statusGlyph ->
                 uiWorldBatch.addTileQuad(
                     tx, ty,
                     uiBatch.getTextureIndex(statusGlyph), 1f, fullLight,

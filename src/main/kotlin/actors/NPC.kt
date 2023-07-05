@@ -5,7 +5,6 @@ import actors.actions.events.Event
 import actors.states.*
 import actors.stats.Speed
 import actors.statuses.Status
-import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -13,7 +12,6 @@ import render.sparks.Speak
 import render.tilesets.Glyph
 import things.NPCDen
 import ui.modals.ConverseModal
-import ui.panels.Console
 import util.*
 import world.Chunk
 import world.level.Level
@@ -62,6 +60,8 @@ sealed class NPC : Actor() {
 
     var state: State = Hibernated()
     val stateStack = Stack<State>()
+
+    var conversationGlyph: Glyph? = null
 
     enum class Opinion { HATE, NEUTRAL, LOVE }
     @Serializable data class OpinionRecord(val opinion: Opinion, val time: Double = App.gameTime.time)
@@ -182,15 +182,16 @@ sealed class NPC : Actor() {
         state.witnessEvent(this, culprit, event, location)
     }
 
-    open fun hasQuestion() = false
-    open fun hasConversation() = false
+    override fun advanceTime(delta: Float) {
+        super.advanceTime(delta)
+        updateConversationGlyph()
+    }
+
+    open fun updateConversationGlyph() { }
     open fun conversationSources(): List<ConverseModal.Source> = listOf()
-    open fun willTrade() = false
-    open fun willConverse() = (hasQuestion() || hasConversation() || willTrade()) && state.allowsConversation()
-    open fun tradeMsg() = "I have wares to trade, if barbarian has coin."
+    open fun willConverse() = conversationSources().size > 1 && state.allowsConversation()
 
     override fun onConverse(actor: Actor): Boolean {
-        if (hasStatus(Status.Tag.ASLEEP)) return false
         if (actor is Player && willConverse()) {
             level?.addSpark(Speak().at(xy.x, xy.y))
             Screen.addModal(ConverseModal(this))
@@ -215,12 +216,14 @@ sealed class NPC : Actor() {
 
     open fun commentLines(): List<String> = listOf()
 
-    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
-        super.drawStatusGlyphs(drawIt)
-        if (hasQuestion()) drawIt(Glyph.QUESTION_ICON)
-        else if (willTrade()) drawIt(Glyph.TRADE_ICON)
-        else if (hasConversation()) drawIt(Glyph.CONVERSATION_ICON)
-        state.drawStatusGlyphs(drawIt)
+    override fun drawStatusGlyph(drawIt: (Glyph) -> Unit): Boolean {
+        if (super.drawStatusGlyph(drawIt)) return true
+        if (state.drawStatusGlyph(drawIt)) return true
+        conversationGlyph?.also {
+            drawIt(it)
+            return true
+        }
+        return false
     }
 
     override fun examineDescription(): String {

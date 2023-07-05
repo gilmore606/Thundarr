@@ -87,12 +87,13 @@ class Attacking(
         npc.popState()
     }
 
-    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
+    override fun drawStatusGlyph(drawIt: (Glyph) -> Unit): Boolean {
         if (targetID == App.player.id) {
             drawIt(Glyph.HOSTILE_ICON)
         } else {
             drawIt(Glyph.HOSTILE_OTHER_ICON)
         }
+        return true
     }
 
     override fun idleBounceMs() = 500

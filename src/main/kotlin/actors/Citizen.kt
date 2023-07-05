@@ -5,6 +5,7 @@ import actors.actions.events.Event
 import actors.states.GoDo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import render.tilesets.Glyph
 import ui.modals.ConverseModal
 import util.Dice
 import util.XY
@@ -91,12 +92,19 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     open fun couldGiveQuest(quest: Quest) = false
     open fun couldHaveLore() = lore.isEmpty()
 
-    override fun hasQuestion() = hasQuestsToGive
-    override fun hasConversation() = lore.isNotEmpty()
+    override fun updateConversationGlyph() {
+        conversationGlyph = when {
+            hasQuestsToGive -> Glyph.QUESTION_ICON
+            lore.isNotEmpty() -> Glyph.CONVERSATION_ICON
+            else -> null
+        }
+    }
+
     override fun conversationSources() = mutableListOf<ConverseModal.Source>(this).apply {
         addAll(questsGiven())
         addAll(lore)
     }
+
     override fun getConversationTopic(talker: NPC, topic: String): ConverseModal.Scene? {
         if (topic == "hello") {
             return ConverseModal.Scene("", helloConversationText())

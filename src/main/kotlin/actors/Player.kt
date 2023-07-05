@@ -124,9 +124,12 @@ open class Player : Actor() {
         }
     }
 
-    override fun drawStatusGlyphs(drawIt: (Glyph) -> Unit) {
-        super.drawStatusGlyphs(drawIt)
-        if (dangerMode) drawIt(Glyph.HOSTILE_ICON)
+    override fun drawStatusGlyph(drawIt: (Glyph) -> Unit): Boolean {
+        if (dangerMode) {
+            drawIt(Glyph.HOSTILE_ICON)
+            return true
+        }
+        return super.drawStatusGlyph(drawIt)
     }
 
     fun tryMove(dir: XY) {

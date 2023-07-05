@@ -267,10 +267,15 @@ class Villager(
     override fun couldGiveQuest(quest: Quest) = !isChild
     override fun couldHaveLore() = !isChild
 
-    override fun hasConversation() = super.hasConversation() || fulltimeJob != null
+    override fun updateConversationGlyph() {
+        super.updateConversationGlyph()
+        if (conversationGlyph == null && targetJob.hasConversationFor(this)) {
+            conversationGlyph = Glyph.CONVERSATION_ICON
+        }
+    }
 
     override fun conversationSources() = super.conversationSources().apply {
-        if (targetJob.contains(this@Villager)) add(targetJob)
+        if (targetJob.hasConversationFor(this@Villager)) add(targetJob)
     }
 
     override fun meetPlayerMsg() = if (isChild) {

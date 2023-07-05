@@ -37,7 +37,6 @@ sealed class Job(
     fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
     fun includesDoor(door: Door) = contains(door.xy()) || isAdjacentTo(door.xy())
 
-
     fun villagerCount(level: Level?): Int {
         var count = 0
         level?.also { level ->
@@ -63,6 +62,8 @@ sealed class Job(
         }
         return villagers
     }
+
+    open fun hasConversationFor(talker: NPC) = (talker is Villager && talker.fulltimeJob == this && this.contains(talker))
 
     open fun converseHello(talker: NPC): ConverseModal.Scene? =
         if (talker is Villager && talker.fulltimeJob == this) converseHelloOwner() else null

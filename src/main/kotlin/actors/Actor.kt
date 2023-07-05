@@ -168,8 +168,15 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     open fun onConverse(actor: Actor): Boolean = false
 
-    open fun drawStatusGlyphs(drawIt: (Glyph)->Unit) {
-        statuses.forEach { it.statusGlyph(this)?.also { drawIt(it) } }
+    open fun drawStatusGlyph(drawIt: (Glyph)->Unit): Boolean {
+        var drawn = false
+        statuses.forEach { it.statusGlyph(this)?.also {
+            if (!drawn) {
+                drawIt(it)
+                drawn = true
+            }
+        } }
+        return drawn
     }
 
     open fun willAggro(target: Actor) = false
