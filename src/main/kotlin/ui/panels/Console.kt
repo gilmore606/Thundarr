@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
+import render.tilesets.Glyph
 import util.XY
 import util.log
 import world.Entity
@@ -223,6 +224,14 @@ object Console : Panel() {
                 Screen.width / 2 - floatWidth / 2,
                 Screen.height / 2 - floatHeightAbovePlayer + if (Metamap.isWorking) 150 else 0,
                 floatColor, Screen.smallFont)
+        }
+    }
+
+    override fun drawBackground() {
+        if (mouseInside) {
+            Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
+                Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
+                Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.5f)
         }
     }
 

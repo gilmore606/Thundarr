@@ -23,7 +23,7 @@ object SpriteSheets {
             "sheets/tiles_thing.png", 13, 11, Screen.textureFilter
         ),
         UISprites(
-            "sheets/tiles_ui.png", 6, 6, Texture.TextureFilter.Nearest
+            "sheets/tiles_ui.png", 6, 7, Texture.TextureFilter.Nearest
         ),
         MapSprites(
             "sheets/tiles_map.png", 10, 8, Screen.textureFilter
