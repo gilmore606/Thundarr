@@ -32,6 +32,10 @@ class Village(
     override fun order() = 3
     override fun stage() = Stage.BUILD
     override fun name() = name
+    override fun cellTitle() = if (isAbandoned) "abandoned village" else name
+    override fun mapIcon(onBiome: Biome?): Glyph? = Glyph.MAP_VILLAGE
+    override fun mapPOITitle() = name
+    override fun mapPOIDescription() = "The ${flavor.displayName} village of $name."
     override fun numberOfQuestsDesired() = if (isAbandoned) 0 else max(1, min(Dice.oneTo(size / 3), 4))
     override fun canBeQuestDestination() = true
     override fun createQuest() = FetchQuest()
@@ -52,7 +56,6 @@ class Village(
 
     @Transient val guards = mutableListOf<VillageGuard>()  // only used during gen
 
-    override fun cellTitle() = if (isAbandoned) "abandoned village" else name
 
     class HutSpec(val rect: Rect, val doorDir: XY) { }
 
@@ -358,9 +361,5 @@ class Village(
             }
         }
     }
-
-    override fun mapIcon(onBiome: Biome?): Glyph? = Glyph.MAP_VILLAGE
-    override fun mapPOITitle() = name
-    override fun mapPOIDescription() = "The ${flavor.displayName} village of $name."
 
 }

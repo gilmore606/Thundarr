@@ -407,6 +407,7 @@ object Madlib {
             "Forgotten",
             "Nameless",
             "Spine",
+            "Silent",
             wizardNameWord(),
             wizardNameWord(),
             wizardNameWord(),
@@ -425,6 +426,9 @@ object Madlib {
         "Blasted",
         "Bleached",
         "Skull",
+        "Glass",
+        "Litter",
+        "Silent",
         wizardNameWord(),
         wizardNameWord(),
         wizardNameWord(),
@@ -448,6 +452,8 @@ object Madlib {
         "Howling",
         "Weeping",
         "Rashes",
+        "Pox",
+        "Mucus",
         wizardNameWord(),
         wizardNameWord(),
         wizardNameWord(),
@@ -457,7 +463,7 @@ object Madlib {
 
     fun forestName(): String {
         val adjs = listOf("Horror", "Fear", "Gloom", "Spider", "Beetle", "Death", "Moon", "Moss",
-            "Weeping", "Howling",
+            "Weeping", "Howling", "Suicide", "Rime", "Tangle",
             wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord(), wizardNameWord())
         return when (Dice.oneTo(4)) {
             1 -> { adjs.random() + "wood" }
@@ -467,24 +473,35 @@ object Madlib {
         }
     }
 
+    fun lakeName(): String {
+        return when (Dice.oneTo(4)) {
+            1 -> { "Lake " + wizardNameWord() }
+            2 -> { firstNames.random() + " Lake" }
+            3 -> { (villagePre.random()).capitalize() + " Lake" }
+            else -> { "Lake " + prophetName() }
+        }
+    }
+
+    val villagePre = listOf("iron", "owl", "deer", "oak", "sparrow", "robin", "mud", "snake", "turnip",
+        "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hound", "water", "rabbit", "hare",
+        "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",
+        "north", "south", "larry", "bill", "maude", "sally", "chester", "white", "black", "gray", "blue",
+        "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull",
+        "fail", "bleak", "fear", "gale", "frost", "anger", "hunger", "hope", "faith", "mel", "kayle", "figs",
+        "turd", "waste", "dust", "ruby", "kirby", "stan", "buffa", "cow", "chicken", "caul", "omen",
+        "comet", "moon", "demon", "motor", "trucker", "kill", "dismal", "dubya", "yeezy", "prince", "beggar",
+        "hobo", "bum", "drifter", "booze"
+    )
+
     fun villageName(): String {
-        val pre = listOf("iron", "owl", "deer", "oak", "sparrow", "robin", "mud", "snake", "turnip",
-            "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hound", "water", "rabbit", "hare",
-            "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",
-            "north", "south", "larry", "bill", "maude", "sally", "chester", "white", "black", "gray", "blue",
-            "hawk", "eagle", "rat", "possum", "wall", "archer", "arrow", "axe", "anvil", "sharp", "dull",
-            "fail", "bleak", "fear", "gale", "frost", "anger", "hunger", "hope", "faith", "mel", "kayle", "figs",
-            "turd", "waste", "dust", "ruby", "kirby", "stan", "buffa", "cow", "chicken", "caul", "omen",
-            "comet", "moon", "demon", "motor", "trucker", "kill", "dismal", "dubya", "yeezy", "prince", "beggar",
-            "hobo", "bum", "drifter", "booze"
-        )
+
         val post = listOf("ton", "town", "ville", " Town", "more", "bury", "dale", "field", "bend", "dell",
             "pool", "mouth", "ham", "wick", "ford", "hope", "meet", "stead", "vale", "point", "sted", "ston",
             " Hollow", " Holler", " Camp", "topia", " Valley", " Gulch", " Bend", " Fork", " Mill", " Grove",
             "land", "stein", "ward", "gard", "'s Folly", "'s End"
         )
 
-        var name = pre.random() + post.random()
+        var name = villagePre.random() + post.random()
         if (Dice.chance(0.1f)) name = listOf("North", "East", "South", "West", "New", "Old").random() + " " + name.capitalize()
 
         return name.capitalize()

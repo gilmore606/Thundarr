@@ -2,6 +2,7 @@ package world.gen.features
 
 import actors.NPC
 import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
 import util.Dice
 import util.Rect
 import util.XY
@@ -15,20 +16,27 @@ import world.quests.FetchQuest
 import world.terrains.Terrain
 
 @Serializable
-class Lake : Feature() {
+class Lake(
+    val name: String,
+) : Feature() {
     override fun order() = 3
     override fun stage() = Stage.TERRAIN
+    override fun name() = name
+    override fun cellTitle() = name
+    override fun mapIcon(onBiome: Biome?): Glyph? = Glyph.MAP_LAKE
+    override fun mapPOITitle() = name
+    override fun mapPOIDescription() = ""
+    override fun trailDestinationChance() = 1f
     override fun canBeQuestDestination() = Dice.chance(0.5f)
     override fun createQuest() = FetchQuest()
+    override fun loreKnowabilityRadius() = 500
+    override fun xpValue() = 8
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome !in listOf(Ocean, Glacier)
     }
 
-    override fun name() = "lake"
-
-    override fun trailDestinationChance() = 1f
 
     var bounds = Rect(0, 0, 0, 0)
 

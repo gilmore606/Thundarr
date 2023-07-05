@@ -54,7 +54,7 @@ object Metamap {
     val mountainRangeWetness = 6
     val randomHillChance = 0.015f
     val randomForestChance = 0.015f
-    val oasisChance = 0.015f
+    val oasisChance = 0.01f
     val citiesRiverMouth = 6
     val citiesRiver = 8
     val citiesCoast = 8
@@ -75,7 +75,8 @@ object Metamap {
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
-    val randomBuildingChance = 0.002f
+    val randomBuildingChance = 0.003f
+    val randomLakeChance = 0.004f
     val maxThreatLevel = 40
     val spawnDistanceThreatFactor = 0.24f
     val biomeDepthThreatFactor = 1f
@@ -653,7 +654,7 @@ object Metamap {
                     Desert -> {
                         if (biomeNeighbors(x, y, Desert, true) == 8 && Dice.chance(oasisChance)) {
                             cell.biome = if (Dice.flip()) Plain else Scrub
-                            cell.addFeature(Lake())
+                            cell.addFeature(Lake(Madlib.lakeName()))
                         }
                     }
                     else -> { }
@@ -842,12 +843,12 @@ object Metamap {
                 }
                 // Lakes
                 if (Lake.canBuildOn(cell) && Dice.chance(when (cell.rivers().size) {
-                        0 -> 0.02f
+                        0 -> 0.003f
                         1 -> 0.3f
-                        2 -> 0.06f
-                        else -> 0.1f
+                        2 -> 0.01f
+                        else -> 0.05f
                     })) {
-                    cell.addFeature(Lake())
+                    cell.addFeature(Lake(Madlib.lakeName()))
                 }
                 // Ruined buildings
                 cell.cityDistance = cityCells.minOf { distanceBetween(x,y,it.x,it.y) }
@@ -887,6 +888,10 @@ object Metamap {
                     // Buildings
                     if (Building.canBuildOn(cell) && Dice.chance(randomBuildingChance)) {
                         cell.addFeature(Building())
+                    }
+                    // Lakes
+                    if (Lake.canBuildOn(cell) && cell.biome != Desert && Dice.chance(randomLakeChance)) {
+                        cell.addFeature(Lake(Madlib.lakeName()))
                     }
                 }
             }
@@ -971,13 +976,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            startChunk = villages.random()
+//            startChunk = villages.random()
             // Pick a cabin chunk
-//            forEachScratch { x, y, cell ->
-//                if (cell.hasFeature(Building::class)) {
-//                    startChunk = XY(x,y)
-//                }
-//            }
+            forEachScratch { x, y, cell ->
+                if (cell.hasFeature(Lake::class)) {
+                    startChunk = XY(x,y)
+                }
+            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)
