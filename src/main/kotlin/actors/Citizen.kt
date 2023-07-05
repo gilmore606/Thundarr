@@ -97,11 +97,9 @@ sealed class Citizen : NPC(), ConverseModal.Source {
         addAll(questsGiven())
         addAll(lore)
     }
-    override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+    override fun getConversationTopic(talker: NPC, topic: String): ConverseModal.Scene? {
         if (topic == "hello") {
-            return ConverseModal.Scene("", helloConversationText(), if (willTrade()) listOf(
-                ConverseModal.Option("trade", tradeMsg()) { }
-            ) else listOf())
+            return ConverseModal.Scene("", helloConversationText())
         }
         return null
     }

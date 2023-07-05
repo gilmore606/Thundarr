@@ -1,6 +1,7 @@
 package world.quests
 
 import actors.Citizen
+import actors.NPC
 import actors.Villager
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import kotlinx.serialization.Serializable
@@ -69,28 +70,28 @@ sealed class Quest(
 
     open fun commentLines(): List<String> = listOf()
 
-    override fun getConversationTopic(topic: String): Scene? = when (topic) {
-            "hello" -> when (state)  {
-                State.AVAILABLE -> Scene(topic, mentionMsg(), listOf(
-                    Option("quest_${id}_offer", "Tell me more about the job.")
-                ))
-                State.OPEN -> Scene(topic, remindMsg(), listOf())
-                State.WON -> Scene("", thanksMsg(), listOf())
-                else -> null
-            }
-            "quest_${id}_offer" -> Scene(topic, offerMsg(), listOf(
-                Option("quest_${id}_haggle", "What's in it for Thundarr?") { haggled = true },
-                Option("quest_${id}_accept", "I'll see what I can do.") { this.accept() },
-                Option("quest_${id}_refuse", "I just don't have time.") { this.refuse() },
+    override fun getConversationTopic(talker: NPC, topic: String): Scene? = when (topic) {
+        "hello" -> when (state)  {
+            State.AVAILABLE -> Scene(topic, mentionMsg(), listOf(
+                Option("quest_${id}_offer", "Tell me more about the job.")
             ))
-            "quest_${id}_haggle" -> Scene(topic, haggleMsg().replace("$$$", "\$${cashReward()}"), listOf(
-                Option("quest_${id}_accept", "It's a deal.") { this.accept() },
-                Option("quest_${id}_refuse", "Sorry, not worth it.") { this.refuse() },
-            ))
-            "quest_${id}_accept" -> Scene(topic, acceptMsg(), listOf(), clearStack = true)
-            "quest_${id}_refuse" -> Scene(topic, refuseMsg(), listOf(), clearStack = true)
+            State.OPEN -> Scene(topic, remindMsg(), listOf())
+            State.WON -> Scene("", thanksMsg(), listOf())
             else -> null
         }
+        "quest_${id}_offer" -> Scene(topic, offerMsg(), listOf(
+            Option("quest_${id}_haggle", "What's in it for Thundarr?") { haggled = true },
+            Option("quest_${id}_accept", "I'll see what I can do.") { this.accept() },
+            Option("quest_${id}_refuse", "I just don't have time.") { this.refuse() },
+        ))
+        "quest_${id}_haggle" -> Scene(topic, haggleMsg().replace("$$$", "\$${cashReward()}"), listOf(
+            Option("quest_${id}_accept", "It's a deal.") { this.accept() },
+            Option("quest_${id}_refuse", "Sorry, not worth it.") { this.refuse() },
+        ))
+        "quest_${id}_accept" -> Scene(topic, acceptMsg(), listOf(), clearStack = true)
+        "quest_${id}_refuse" -> Scene(topic, refuseMsg(), listOf(), clearStack = true)
+        else -> null
+    }
 
     protected fun accept() {
         state = State.OPEN

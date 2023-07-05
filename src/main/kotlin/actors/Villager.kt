@@ -3,6 +3,7 @@ package actors
 import actors.actions.Get
 import actors.actions.Say
 import actors.actions.events.Event
+import actors.jobs.Job
 import actors.states.Fleeing
 import actors.states.IdleVillager
 import actors.stats.Brains
@@ -13,12 +14,9 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import render.tilesets.Glyph.*
 import things.Container
-import things.Door
-import ui.modals.ConverseModal
 import util.*
 import world.Entity
 import world.gen.features.Habitation
-import world.level.Level
 import world.path.Pather
 import world.quests.Quest
 
@@ -27,6 +25,8 @@ class Villager(
     val bedLocation: XY,
     val flavor: Habitation.Flavor,
     val isChild: Boolean = false,
+    private val initialHomeJob: Job,
+    private val initialFulltimeJob: Job? = null,
 ) : Citizen() {
 
     enum class Skin(
@@ -138,7 +138,6 @@ class Villager(
     }
 
     companion object {
-        val defaultArea = WorkArea("", Rect(0,0,0,0),setOf())
         val skinSets = setOf<Set<Skin>>(
             setOf(Skin.PALE, Skin.WHITE),
             setOf(Skin.PALE, Skin.WHITE),
@@ -155,60 +154,11 @@ class Villager(
         )
         val allSkins = setOf(Skin.PALE, Skin.WHITE, Skin.TAN, Skin.BLACK)
     }
+    var homeJob = initialHomeJob
+    var fulltimeJob: Job? = initialFulltimeJob
 
-    @Serializable
-    data class WorkArea(
-        val name: String,
-        val rect: Rect,
-        val comments: Set<String>,
-        val needsOwner: Boolean = false,
-        val signXY: XY? = null,
-        val signText: String? = null,
-        val announceJobMsg: String? = null,
-        val childOK: Boolean = true,
-    ) : ConverseModal.Source {
-        override fun toString() = "$name ($rect)"
-        fun contains(xy: XY) = rect.contains(xy)
-        fun isAdjacentTo(xy: XY) = rect.isAdjacentTo(xy)
-        fun includesDoor(door: Door) = contains(door.xy()) || isAdjacentTo(door.xy())
-        fun villagerCount(level: Level?): Int {
-            var count = 0
-            level?.also { level ->
-                for (ix in rect.x0..rect.x1) {
-                    for (iy in rect.y0..rect.y1) {
-                        if (level.actorAt(ix, iy) is Villager) count++
-                    }
-                }
-            }
-            return count
-        }
-        fun villagers(level: Level?): Set<Villager> {
-            val villagers = mutableSetOf<Villager>()
-            level?.also { level ->
-                for (ix in rect.x0..rect.x1) {
-                    for (iy in rect.y0..rect.y1) {
-                        level.actorAt(ix, iy)?.also {
-                            if (it is Villager) villagers.add(it)
-                        }
-                    }
-                }
-            }
-            return villagers
-        }
-
-        override fun getConversationTopic(topic: String): ConverseModal.Scene? {
-//            when (topic) {
-//                "hello" -> { ConverseModal.Scene(topic, )}
-//            }
-            return null
-        }
-    }
-
-    var homeArea = defaultArea
-    var fulltimeJobArea: WorkArea? = null
-
-    var targetArea = defaultArea
-    var previousTargetArea = defaultArea
+    var targetJob = homeJob
+    var previousTargetJob = homeJob
     var nextJobChangeTime: DayTime = DayTime(0,0)
 
     val family = mutableListOf<String>()
@@ -223,26 +173,25 @@ class Villager(
         if (customGender == Entity.Gender.MALE) "ie" else "ki"
     } else ""
 
-    fun setTarget(newTarget: WorkArea) {
-        if (newTarget == defaultArea) return
-        if (newTarget != targetArea) {
-            Pather.unsubscribe(this, targetArea.rect)
-            previousTargetArea = if (targetArea == defaultArea) homeArea else targetArea
-            targetArea = newTarget
+    fun setTarget(newTarget: Job) {
+        if (newTarget != targetJob) {
+            Pather.unsubscribe(this, targetJob.rect)
+            previousTargetJob = targetJob
+            targetJob = newTarget
         }
-        if (!targetArea.contains(xy)) {
-            Pather.subscribe(this, targetArea.rect, 48)
+        if (!targetJob.contains(this)) {
+            Pather.subscribe(this, targetJob.rect, 48)
         }
     }
 
     fun pickJob() {
-        if (targetArea == fulltimeJobArea) return
+        if (targetJob == fulltimeJob) return
         habitation?.also { village ->
-            val jobArea = fulltimeJobArea ?: village.workAreas.filter { !isChild || it.childOK }.randomOrNull() ?: homeArea
-            jobArea.announceJobMsg?.also { msg -> queue(Say(msg)) }
-            setTarget(jobArea)
+            val newJob = fulltimeJob ?: village.jobs.filter { !isChild || it.childOK }.randomOrNull() ?: homeJob
+            newJob.announceJobMsg()?.also { msg -> queue(Say(msg)) }
+            setTarget(newJob)
             nextJobChangeTime = DayTime(App.gameTime.hour + Dice.range(2, 4), Dice.oneTo(58))
-        } ?: run { fulltimeJobArea?.also { setTarget(it) } }
+        } ?: run { fulltimeJob?.also { setTarget(it) } }
     }
 
     fun setSkin(skin: Villager.Skin) {
@@ -257,10 +206,11 @@ class Villager(
     }
 
     override fun onMove() {
+        // Record ownedThings to detect robbery
         if (ownedThings.isEmpty()) {
-            if (homeArea.contains(this.xy)) {
-                for (ix in homeArea.rect.x0 .. homeArea.rect.x1) {
-                    for (iy in homeArea.rect.y0 .. homeArea.rect.y1) {
+            if (homeJob.contains(this)) {
+                for (ix in homeJob.rect.x0 .. homeJob.rect.x1) {
+                    for (iy in homeJob.rect.y0 .. homeJob.rect.y1) {
                         level?.thingsAt(ix, iy)?.forEach { thing ->
                             ownedThings.add(thing.id)
                             if (thing is Container) {
@@ -278,7 +228,7 @@ class Villager(
 
     override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {
         if (event is Get) {
-            if (homeArea.contains(location)) {
+            if (homeJob.contains(location)) {
                 if (ownedThings.contains(event.thingKey.id)) {
                     culprit?.also { culprit ->
                         say(listOf(
@@ -317,8 +267,10 @@ class Villager(
     override fun couldGiveQuest(quest: Quest) = !isChild
     override fun couldHaveLore() = !isChild
 
+    override fun hasConversation() = super.hasConversation() || fulltimeJob != null
+
     override fun conversationSources() = super.conversationSources().apply {
-        if (targetArea.contains(xy)) add(targetArea)
+        if (targetJob.contains(this@Villager)) add(targetJob)
     }
 
     override fun meetPlayerMsg() = if (isChild) {
@@ -332,8 +284,8 @@ class Villager(
             "You look dumb.", "Your face is a butt.", "You smell like a butt!",
             "Why is your head weird?", "You're funny."
         )
-    } else if (targetArea.contains(xy)) {
-        targetArea.comments.toMutableList().apply {
+    } else if (targetJob.contains(this)) {
+        targetJob.comments(this).toMutableList().apply {
             questsGiven().forEach { addAll(it.commentLines()) }
             lore.forEach { addAll(it.commentLines()) }
         }

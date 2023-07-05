@@ -1,9 +1,11 @@
 package world.gen.features
 
 import actors.Actor
-import actors.Citizen
 import actors.VillageGuard
 import actors.Villager
+import actors.jobs.Job
+import actors.jobs.WellJob
+import actors.jobs.WorkJob
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -15,7 +17,6 @@ import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.level.Level
 import world.path.DistanceMap
 import world.quests.FetchQuest
 import world.terrains.Terrain
@@ -84,7 +85,7 @@ class Village(
             }
             val rect = Rect(x0+hut.rect.x0+1,y0+hut.rect.y0+1,x0+hut.rect.x1-2,y0+hut.rect.y1-2)
             decor.furnish(Decor.Room(rect, listOf()), carto, isAbandoned)
-            workAreas.add(Villager.WorkArea(decor.workAreaName(), rect, decor.workAreaComments()))
+            jobs.add(decor.job())
         }
 
         // Build all huts
@@ -134,23 +135,18 @@ class Village(
         }
 
         // Build shops
-        val ownerWorkAreas = mutableListOf<Villager.WorkArea>()
+        val ownerJobs = mutableListOf<Job>()
         val shopDecors = mutableListOf<Decor>().apply { addAll(flavor.shopDecors) }
         repeat (shopCount) {
             val hut = hutRooms.removeFirst()
             val decor = shopDecors.random()
             shopDecors.remove(decor)
             decor.furnish(hut, carto, isAbandoned)
-            val signXY = if (!decor.needsOwner()) { null } else {
-                (hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated())
+            val shopJob = decor.job().apply {
+                signXY = hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated()
             }
-            val workArea = Villager.WorkArea(
-                    decor.workAreaName(), hut.rect, decor.workAreaComments(),
-                    decor.needsOwner(), signXY, decor.workAreaSignText(),
-                    decor.announceJobMsg(), decor.workAreaChildOK()
-                )
-            workAreas.add(workArea)
-            if (decor.needsOwner()) ownerWorkAreas.add(workArea)
+            jobs.add(shopJob)
+            if (shopJob.needsOwner) ownerJobs.add(shopJob)
         }
 
         // Build houses
@@ -159,26 +155,27 @@ class Village(
             val hutDecor = Hut()
             hutDecor.furnish(hut, carto, isAbandoned)
             if (!isAbandoned) {
-                val newHomeArea = Villager.WorkArea(
-                    "home", hut.rect, flavor().homeComments)
+                val newHomeJob = hutDecor.job()
                 var isHeadOfHousehold = true
                 val familyIDs = mutableListOf<String>()
                 val family = mutableListOf<Villager>()
                 hutDecor.bedLocations.forEach { bedLocation ->
-                    var newJobArea: Villager.WorkArea? = null
+                    var newJob: Job? = null
                     var isChild = false
-                    if (ownerWorkAreas.isNotEmpty()) {
-                        newJobArea = ownerWorkAreas.removeFirst()
+                    if (ownerJobs.isNotEmpty()) {
+                        newJob = ownerJobs.removeFirst()
                     } else {
                         isChild = !isHeadOfHousehold && Dice.chance(flavor.childChance)
                     }
-                    val citizen = Villager(bedLocation, flavor, isChild)
-                    if (newJobArea != null) {
-                        val signText = newJobArea.signText!!.replace("%n", this.name())
-                        val sign = if (Dice.flip()) HighwaySign(signText) else TrailSign(signText)
-                        spawnThing(newJobArea.signXY!!.x, newJobArea.signXY!!.y, sign)
+                    val citizen = Villager(bedLocation, flavor, isChild, newHomeJob, newJob)
+                    newJob?.signText()?.also { text ->
+                        newJob.signXY?.also { signXY ->
+                            val signText = text.replace("%n", citizen.name())
+                            val sign = if (Dice.flip()) HighwaySign(signText) else TrailSign(signText)
+                            spawnThing(signXY.x, signXY.y, sign)
+                        }
                     }
-                    placeCitizen(citizen, hut.rect, newHomeArea, newJobArea)
+                    placeCitizen(citizen, hut.rect)
                     familyIDs.add(citizen.id)
                     family.add(citizen)
                     lockDoor(hut.doorXY, citizen)
@@ -350,13 +347,7 @@ class Village(
         forEachCell { x, y ->
             if (!placed && distanceMap.distanceAt(x, y) == distanceMap.maxDistance) {
                 placeWell(x, y)
-                workAreas.add(Villager.WorkArea(
-                    "town square",
-                        Rect(x-2, y-2, x+2, y+2),
-                    mutableSetOf(
-                        "Chop wood, carry water.",
-                    )
-                ))
+                jobs.add(WellJob(Rect(x-2, y-2, x+2, y+2)))
                 placed = true
             }
         }

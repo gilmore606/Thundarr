@@ -3,6 +3,7 @@ package world.gen.features
 import actors.Citizen
 import actors.Villager
 import actors.factions.HabitationFaction
+import actors.jobs.Job
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import util.*
@@ -12,8 +13,6 @@ import world.gen.decors.*
 import world.level.Level
 import world.lore.DirectionsLore
 import world.lore.Lore
-import world.lore.MoonLore1
-import world.lore.WizardLore1
 import world.quests.Quest
 
 @Serializable
@@ -151,11 +150,8 @@ sealed class Habitation(
         }
     }
 
-    protected fun placeCitizen(citizen: Citizen, spawnRect: Rect, homeArea: Villager.WorkArea? = null,
-                               fulltimeJobArea: Villager.WorkArea? = null) {
+    protected fun placeCitizen(citizen: Citizen, spawnRect: Rect) {
         factionID?.also { citizen.joinFaction(it) }
-        homeArea?.also { if (citizen is Villager) citizen.homeArea = it }
-        fulltimeJobArea?.also { if (citizen is Villager) citizen.fulltimeJobArea = it }
         addCitizen(citizen)
         findSpawnPointForNPC(chunk, citizen, spawnRect)?.also { spawnPoint ->
 
@@ -179,7 +175,7 @@ sealed class Habitation(
         } else field
     fun faction() = factionID?.let { App.factions.byID(it) }
 
-    val workAreas = mutableSetOf<Villager.WorkArea>()
+    val jobs = mutableSetOf<Job>()
 
     abstract fun flavor(): Flavor
 

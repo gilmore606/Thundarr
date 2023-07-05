@@ -1,5 +1,7 @@
 package world.gen.decors
 
+import actors.jobs.HomeJob
+import actors.jobs.Job
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import things.Thing
@@ -100,16 +102,8 @@ sealed class Decor {
     open fun getDescription(): String = if (isAbandoned) abandonedDescription() else description()
     open fun description() = ""
     open fun abandonedDescription() = "The room is covered in dust and cobwebs, clearly abandoned long ago."
-    open fun workAreaName() = "a workplace"
-    open fun workAreaComments() = mutableSetOf(
-        "Workin all day.  Beats dyin!",
-        "Seems like work is never done.",
-        "I try to stay busy.",
-    )
-    open fun needsOwner() = false
-    open fun workAreaSignText() = listOf("%n's Shop", "Goods By %n").random()
-    open fun announceJobMsg() = "Time to go to work."
-    open fun workAreaChildOK() = false
+
+    open fun job(): Job = HomeJob(room.rect)
 
     abstract fun doFurnish()
 

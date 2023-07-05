@@ -52,8 +52,8 @@ class Farm(
         val gardenDecor = Garden(0.5f, meta.biome, meta.habitat, Terrain.Type.TERRAIN_DIRT)
         gardenDecor.furnish(Decor.Room(field), carto, isAbandoned)
         carto.addTrailBlock(field.x0, field.y0, field.x1, field.y1)
-        val gardenArea = Villager.WorkArea("fields", field, gardenDecor.workAreaComments())
-        workAreas.add(gardenArea)
+        val gardenJob = gardenDecor.job()
+        jobs.add(gardenJob)
 
         var barnRect = Rect(0,0,0,0)
         if (Dice.chance(barnChance)) {
@@ -87,8 +87,8 @@ class Farm(
             )
             val decor = Barn()
             decor.furnish(room, carto, isAbandoned)
-            val barnArea = Villager.WorkArea("barn", room.rect, decor.workAreaComments())
-            workAreas.add(barnArea)
+            val barnJob = decor.job()
+            jobs.add(barnJob)
         }
 
         val hw = Dice.range(6, 10)
@@ -110,9 +110,9 @@ class Farm(
             val houseDecor = Hut()
             houseDecor.furnish(hut, carto, isAbandoned = isAbandoned)
             if (!isAbandoned) {
-                val newHomeArea = Villager.WorkArea("home", hut.rect, flavor().homeComments)
-                val farmer = Villager(houseDecor.bedLocations[0], flavor(), isChild = false)
-                placeCitizen(farmer, hut.rect, newHomeArea)
+                val newHomeJob = houseDecor.job()
+                val farmer = Villager(houseDecor.bedLocations[0], flavor(), isChild = false, newHomeJob)
+                placeCitizen(farmer, hut.rect)
             }
         }
 

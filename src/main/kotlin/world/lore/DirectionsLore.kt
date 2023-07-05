@@ -1,5 +1,6 @@
 package world.lore
 
+import actors.NPC
 import kotlinx.serialization.Serializable
 import ui.modals.ConverseModal
 import util.XY
@@ -67,7 +68,7 @@ class DirectionsLore(
         }
     }
 
-    override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+    override fun getConversationTopic(talker: NPC, topic: String): ConverseModal.Scene? {
         if (topic.startsWith("directions_")) {
             val keyString = topic.drop(11)
             directions[keyString]?.also { pair ->
@@ -75,7 +76,7 @@ class DirectionsLore(
                 Metamap.markChunkMappedAt(feature.worldX, feature.worldY)
             }
         }
-        return super.getConversationTopic(topic)
+        return super.getConversationTopic(talker, topic)
     }
 
     private fun describeTravelDistance(distance: Float): String {

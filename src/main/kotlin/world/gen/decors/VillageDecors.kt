@@ -1,5 +1,6 @@
 package world.gen.decors
 
+import actors.jobs.*
 import kotlinx.serialization.Serializable
 import things.*
 import util.Dice
@@ -38,7 +39,7 @@ class Hut : Decor() {
             )}}
         }
     }
-    override fun announceJobMsg() = listOf("I'm going home.", "Time to go home.").random()
+    override fun job() = HomeJob(room.rect)
 }
 
 @Serializable
@@ -58,13 +59,7 @@ class Schoolhouse : Decor() {
         }
     }
 
-    override fun workAreaName() = "schoolhouse"
-    override fun workAreaComments() = super.workAreaComments().apply {
-        add("There's much to learn from the books of the ancients.")
-        add("Education is the only way to prosperity.")
-    }
-    override fun announceJobMsg() = listOf("Oh, I'm late for class.", "Time for class.", "I'm off to school.").random()
-    override fun workAreaChildOK() = true
+    override fun job() = SchoolJob(room.rect)
 }
 
 @Serializable
@@ -78,14 +73,7 @@ class Church : Decor() {
         ) }
         repeat(Dice.zeroTo(2)) { againstWall { spawn(Table()) }}
     }
-    override fun workAreaName() = "shrine"
-    override fun workAreaComments() = mutableSetOf(
-        "May the Lords of Light watch over our village.",
-        "I pray every day.  But do they hear?",
-        "Sometimes my faith is tested by this cruel world.",
-    )
-    override fun announceJobMsg() = listOf("I need to pray.", "The Lords of Light call to me.", "Prayer time.").random()
-    override fun workAreaChildOK() = true
+    override fun job() = ChurchJob(room.rect)
 }
 
 @Serializable
@@ -101,9 +89,12 @@ class StorageShed : Decor() {
             againstWall { spawn(Table()) }
         }
     }
-    override fun workAreaName() = "storage shed"
-    override fun announceJobMsg() = listOf("Time for some warehouse work.", "I'm going to the storage shed.", "I'll get it from storage.",
-        "They need me in the warehouse today.", "I'll go help out at the warehouse.").random()
+
+    override fun job() = WorkJob(
+        "storage shed", "worker", room.rect, false, false,
+        setOf("Time for some warehouse work.", "I'm going to the storage shed.", "I'll get it from storage.",
+            "They need me in the warehouse today.", "I'll go help out at the warehouse.")
+    )
 }
 
 @Serializable
@@ -120,17 +111,7 @@ class BlacksmithShop : Decor() {
             againstWall { spawn(Table()) }
         }
     }
-    override fun workAreaName() = "smithy"
-    override fun needsOwner() = true
-    override fun workAreaSignText() = listOf(
-        "%n's Ironmongery",
-        "%n's Smithy",
-        "Ironworks by %n",
-        "%n Ironworks",
-        "%n's Metal Shop",
-        "%n's Forge",
-    ).random()
-    override fun announceJobMsg() = listOf("They need me at the smithy today.", "I'll go help at the smithy.", "I'm heading for the smithy.").random()
+    override fun job() = ForgeJob(room.rect)
 }
 
 @Serializable
@@ -158,15 +139,7 @@ class Garden(
             }
         }
     }
-    override fun workAreaName() = "garden"
-    override fun workAreaComments() = super.workAreaComments().apply {
-        add("Tilling the earth is a blessing and a curse.")
-        add("May the Lords of Light make this garden grow!")
-        add("We work so we can eat.  Simple as that.")
-    }
-    override fun announceJobMsg() = listOf("Need to get those seeds planted.", "Better go help in the garden.", "I'm going to do some work outdoors.",
-        "Heading out to the fields, back later!").random()
-    override fun workAreaChildOK() = true
+    override fun job() = FarmJob(sizeName(), room.rect)
 }
 
 @Serializable
@@ -188,10 +161,11 @@ class Graveyard(
             }
         }
     }
-    override fun workAreaName() = "graveyard"
-    override fun workAreaComments() = mutableSetOf(
-        "The graves of my forefathers are sacred.",
-        "I come here to think...and to remember."
+    override fun job() = WorkJob(
+        "graveyard", "penitent", room.rect, false, true, setOf(
+            "The graves of my forefathers are sacred.",
+            "I come here to think...and to remember.",
+        )
     )
 }
 
@@ -208,15 +182,14 @@ class Stage : Decor() {
         }
         againstWall { spawn(Lamppost()) }
     }
-    override fun workAreaName() = "square"
-    override fun workAreaComments() = mutableSetOf(
-        "Hey look at me!  I'm a barbarian!  RAAR...just kidding.",
-        "Work hard my friends, for the wizard may come at any time!",
-        "Fear the wizard, and his evil works!",
-        "My friends, keep faith with the Lords of Light!"
+    override fun job() = WorkJob(
+        "square", "performer", room.rect, false, true, setOf(
+            "Hey look at me!  I'm a barbarian!  RAAR...just kidding.",
+            "Work hard my friends, for the wizard may come at any time!",
+            "Fear the wizard, and his evil works!",
+            "My friends, keep faith with the Lords of Light!"
+        )
     )
-    override fun announceJobMsg() = listOf("I need a break.", "I'm going outside for a while.", "I wonder what's going on at the square.").random()
-    override fun workAreaChildOK() = true
 }
 
 @Serializable
@@ -226,8 +199,11 @@ class Barn : Decor() {
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
     }
-    override fun workAreaName() = "barn"
-    override fun workAreaChildOK() = true
+    override fun job() = WorkJob(
+        "barn", "farmer", room.rect, false, true, setOf(
+            "Nobody likes cleaning the barn.", "Animals, why are you so smelly?"
+        )
+    )
 }
 
 @Serializable
@@ -245,12 +221,7 @@ class Tavern(val name: String) : Decor() {
             }
         }
     }
-    override fun workAreaName() = "tavern"
-    override fun workAreaComments() = mutableSetOf(
-        "I drink to forget.  But I forgot what I was forgetting.",
-        "Here's to the Lords of Light!",
-        "Always a good time in $name!",
-    )
+    override fun job() = TavernJob(name, room.rect)
 }
 
 @Serializable
@@ -259,13 +230,7 @@ class TavernLoiterArea(val name: String): Decor() {
     override fun doFurnish() {
         againstWall { spawn(Lamppost()) }
     }
-    override fun workAreaName() = "smoking spot"
-    override fun workAreaComments() = mutableSetOf(
-        "You got a smoke?",
-        "Sometimes I worry I drink too much.",
-        "My wife says I should quit drinking.  But why?",
-    )
-    override fun announceJobMsg() = listOf("I'm goin out for a smoke.", "Gonna step outside a minute.").random()
+    override fun job() = TavernLoiterJob(name, room.rect)
 }
 
 @Serializable

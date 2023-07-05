@@ -27,9 +27,9 @@ class Sleeping(
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
-                npc.entitiesSeen { it is SwitchableLight && !it.leaveLit() && it.active && npc.targetArea.contains(it.xy()) }.keys.firstOrNull()?.also { light ->
+                npc.entitiesSeen { it is SwitchableLight && !it.leaveLit() && it.active && npc.targetJob.contains(it) }.keys.firstOrNull()?.also { light ->
                     var awakeRoomies = false
-                    npc.targetArea.villagers(npc.level).forEach { villager ->
+                    npc.targetJob.villagers(npc.level).forEach { villager ->
                         if (villager.state !is Sleeping) awakeRoomies = true
                     }
                     if (!awakeRoomies) {

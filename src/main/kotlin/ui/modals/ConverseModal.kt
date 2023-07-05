@@ -39,7 +39,7 @@ class ConverseModal(
     }
 
     interface Source {
-        fun getConversationTopic(topic: String): Scene?
+        fun getConversationTopic(talker: NPC, topic: String): Scene?
         fun optionsForText(text: String): List<Option> = listOf()
     }
 
@@ -114,7 +114,7 @@ class ConverseModal(
         val sources = talker.conversationSources()
         var clearStack = false
         sources.forEach { source ->
-            source.getConversationTopic(toTopic.topic)?.also { addScene ->
+            source.getConversationTopic(talker, toTopic.topic)?.also { addScene ->
                 nextResponse += (if (nextResponse.isBlank()) "" else "\n") + addScene.text
                 nextOptions.addAll(addScene.options)
                 clearStack = clearStack || addScene.clearStack

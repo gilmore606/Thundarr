@@ -110,31 +110,28 @@ class Tavern(
 
         val tavernDecor = Tavern(name)
         tavernDecor.furnish(tavernHut, carto)
-        val signXY = (hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated())
-        val tavernArea = Villager.WorkArea("common room", tavernRect, tavernDecor.workAreaComments(),
-            tavernDecor.needsOwner(), signXY, tavernDecor.workAreaSignText(), tavernDecor.announceJobMsg())
-        workAreas.add(tavernArea)
+        val tavernJob = tavernDecor.job().apply {
+            signXY = (hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated())
+        }
+        jobs.add(tavernJob)
         val sign = HighwaySign(name)
-        spawnThing(signXY.x, signXY.y, sign)
+        spawnThing(tavernJob.signXY!!.x, tavernJob.signXY!!.y, sign)
 
         val loiterDecor = TavernLoiterArea(name)
         loiterDecor.furnish(loiterHut, carto)
-        val loiterArea = Villager.WorkArea("smoking area", loiterRect, loiterDecor.workAreaComments(),
-            announceJobMsg = loiterDecor.announceJobMsg())
-        workAreas.add(loiterArea)
+        val loiterJob = loiterDecor.job()
+        jobs.add(loiterJob)
 
         val bedroomDecor = Barracks(hut.doorDir in setOf(EAST, WEST))
         bedroomDecor.furnish(bedroomHut, carto)
-        val bedArea = Villager.WorkArea("bunkhouse", bedroomRect, bedroomDecor.workAreaComments(),
-            announceJobMsg = bedroomDecor.announceJobMsg())
-
-        val innkeeper = Villager(bedroomDecor.bedLocations[0], Flavor.INNKEEPER)
-        placeCitizen(innkeeper, tavernRect, bedArea, tavernArea)
+        val bedJob = bedroomDecor.job()
+        val innkeeper = Villager(bedroomDecor.bedLocations[0], Flavor.INNKEEPER, false, bedJob, tavernJob)
+        placeCitizen(innkeeper, tavernRect)
 
         repeat (Dice.range(2, 5)) { n ->
             if (n < bedroomDecor.bedLocations.size - 1) {
-                val drunk = Villager(bedroomDecor.bedLocations[n + 1], flavor())
-                placeCitizen(drunk, bedroomRect, bedArea)
+                val drunk = Villager(bedroomDecor.bedLocations[n + 1], flavor(), false, bedJob)
+                placeCitizen(drunk, bedroomRect)
             }
         }
 

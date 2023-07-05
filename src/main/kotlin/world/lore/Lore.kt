@@ -1,5 +1,6 @@
 package world.lore
 
+import actors.NPC
 import kotlinx.serialization.Serializable
 import ui.modals.ConverseModal
 
@@ -21,7 +22,7 @@ sealed class Lore : ConverseModal.Source {
     open fun commentLines(): Set<String> = setOf()
     abstract fun subjects(): Set<Subject>
 
-    override fun getConversationTopic(topic: String): ConverseModal.Scene? {
+    override fun getConversationTopic(talker: NPC, topic: String): ConverseModal.Scene? {
         if (topic == "hello") {
             helloText()?.also { helloText ->
                 return ConverseModal.Scene(topic, helloText)

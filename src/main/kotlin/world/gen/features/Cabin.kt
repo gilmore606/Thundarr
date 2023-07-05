@@ -39,13 +39,12 @@ class Cabin(
         val hut = buildHut(x, y, width, height, fertility)
         val hutDecor = Hut()
         hutDecor.furnish(hut, carto)
-        val newHomeArea = Villager.WorkArea("home", hut.rect, flavor().homeComments)
+        val newHomeJob = hutDecor.job()
 
         bounds = Rect(x0 + x, y0 + y, x0 + x+width-1, y0 + y+height-1)
         carto.addTrailBlock(bounds.x0, bounds.y0, bounds.x1, bounds.y1)
 
-        val hermit = Villager(hutDecor.bedLocations[0], flavor(), false)
-        placeCitizen(hermit, hut.rect, newHomeArea)
+        val hermit = Villager(hutDecor.bedLocations[0], flavor(), false, newHomeJob)
 
         val areaCount = Dice.oneTo(3)
         val areas = mutableListOf<Rect>()
@@ -75,11 +74,8 @@ class Cabin(
                 val decor = decors.random()
                 decors.remove(decor)
                 decor.furnish(Decor.Room(rect), carto)
-                val workArea = Villager.WorkArea(
-                    decor.workAreaName(), rect, decor.workAreaComments(),
-                    announceJobMsg = decor.announceJobMsg()
-                )
-                workAreas.add(workArea)
+                val newJob = decor.job()
+                jobs.add(newJob)
             }
         }
 
