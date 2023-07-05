@@ -33,6 +33,8 @@ object Ruins : Biome(
     override fun metaTravelCost() = 2f
     override fun edgeDistanceThreatFactor() = 3f
     override fun xpValue() = 8
+    override fun temperatureBase() = 4
+    override fun temperatureAmplitude() = 0.8f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

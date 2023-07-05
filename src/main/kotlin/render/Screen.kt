@@ -104,11 +104,8 @@ object Screen : KtxScreen {
     const val fontSizeSmall = 14
     const val titleFontSize = 24
     const val subTitleFontSize = 20
-//    val fontColorDull = Color(0.75f, 0.7f, 0.2f, 0.8f)
-//    val fontColor = Color(0.9f, 0.9f, 0.7f, 0.8f)
-//    val fontColorBold = Color(1f, 1f, 1f, 1f)
-    val fontColor = Color(0.9f, 0.9f, 0.8f, 1f)
-    val fontColorDull = Color(0.7f, 0.7f, 0.6f, 1f)
+    val fontColor = Color(0.95f, 0.92f, 0.8f, 1f)
+    val fontColorDull = Color(0.73f, 0.73f, 0.6f, 1f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val fontColorRed = Color(1f, 0.1f, 0.1f, 1f)
     val fontColorGreen = Color(0.1f, 1f, 0.1f, 1f)

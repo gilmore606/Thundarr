@@ -264,7 +264,73 @@ open class Player : Actor() {
     private fun updateTemperature() {
         level?.also { level ->
             temperature = level.temperatureAt(xy)
-            feltTemperature = temperature - 12
+            feltTemperature = temperature + App.weather.feltTemperature()
+            var clothing = 0
+            gear.values.forEach { gear ->
+                if (gear is Clothing) {
+                    clothing += gear.wornTemperature()
+                }
+            }
+            if (clothing > 0) {
+                if (feltTemperature > 68) {
+                    feltTemperature += clothing / 2
+                } else {
+                    feltTemperature += clothing
+                }
+            } else if (clothing < 0) {
+                if (feltTemperature < 50) {
+                    feltTemperature += clothing
+                } else {
+                    feltTemperature += clothing / 2
+                }
+            }
+
+            if (feltTemperature > Heatstroke.threshold) {
+                removeStatus(Status.Tag.HOT)
+                removeStatus(Status.Tag.COLD)
+                removeStatus(Status.Tag.FREEZING)
+                if (!hasStatus(Status.Tag.HEATSTROKE)) {
+                    Console.say("You begin to slowly succumb to the roasting heat.")
+                    addStatus(Heatstroke())
+                }
+            } else if (feltTemperature > Hot.threshold) {
+                var told = false
+                if (removeStatus(Status.Tag.HEATSTROKE)) {
+                    Console.say("The heat no longer feels life threatening.")
+                    told = true
+                }
+                removeStatus(Status.Tag.COLD)
+                removeStatus(Status.Tag.FREEZING)
+                if (!hasStatus(Status.Tag.HOT)) {
+                    if (!told) Console.say("You feel sluggish in the oppressive heat.")
+                    addStatus(Hot())
+                }
+            } else if (feltTemperature < Freezing.threshold) {
+                removeStatus(Status.Tag.HOT)
+                removeStatus(Status.Tag.HEATSTROKE)
+                removeStatus(Status.Tag.COLD)
+                if (!hasStatus(Status.Tag.FREEZING)) {
+                    Console.say("You don't feel so cold now.  You feel peaceful.")
+                    addStatus(Freezing())
+                }
+            } else if (feltTemperature < Cold.threshold) {
+                removeStatus(Status.Tag.HOT)
+                removeStatus(Status.Tag.HEATSTROKE)
+                var told = false
+                if (removeStatus(Status.Tag.FREEZING)) {
+                    Console.say("You snap out of your reverie.  Must...push on...")
+                    told = true
+                }
+                if (!hasStatus(Status.Tag.COLD)) {
+                    if (!told) Console.say("You shiver uncontrollably.")
+                    addStatus(Cold())
+                }
+            } else {
+                if (removeStatus(Status.Tag.HOT)) Console.say("You wipe the sweat from your brow.")
+                if (removeStatus(Status.Tag.HEATSTROKE)) Console.say("You wipe your brow with great relief.")
+                if (removeStatus(Status.Tag.COLD)) Console.say("You don't feel so cold.")
+                if (removeStatus(Status.Tag.FREEZING)) Console.say("Ah, blessed warmth!")
+            }
         }
     }
 

@@ -15,7 +15,15 @@ const val CHUNKS_AHEAD = 3
 
 class WorldLevel() : Level() {
 
-    private val chunksWide = CHUNKS_AHEAD * 2 + 1
+    companion object {
+        private const val chunksWide = CHUNKS_AHEAD * 2 + 1
+        private const val chunkTransitionSlop = 4  // how many cells into a chunk do we go before transition?
+    }
+
+    private val dayTemperatures = listOf(
+        -11, -12, -13, -14, -15, -13, -10, -8, -5, 0, 2, 4,
+        7, 11, 13, 15, 12, 10, 7, 3, 0, -2, -5, -9
+    )
 
     var needStarterDungeon = false
 
@@ -29,7 +37,6 @@ class WorldLevel() : Level() {
     private var playerChunk: Chunk? = null   // chunk the player is currently in
     private var ambienceChunk: Chunk? = null   // chunk the player has advanced into, for weather/ambient effects.  Changes later than playerChunk!
     private var ambienceChunkXY = XY(-999,-999)
-    private val chunkTransitionSlop = 4  // how many cells into a chunk do we go before transition?
 
     override fun allChunks() = loadedChunks
     override fun levelId() = "world"
@@ -84,10 +91,21 @@ class WorldLevel() : Level() {
     override fun statusText(): String = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).title
     override fun timeScale() = 2.0f
 
-    // TODO: take time-of-day, fires into account
+    // TODO: take season, fires into account
     override fun temperatureAt(xy: XY): Int {
-        val base = Metamap.metaAtWorld(xy.x, xy.y).temperature
-        return base
+        val meta = Metamap.metaAtWorld(xy.x, xy.y)
+        val base = meta.temperature + meta.biome.temperatureBase() + App.weather.temperature()
+        val daytime = (dayTemperatures[App.gameTime.hour].toFloat() * meta.biome.temperatureAmplitude()).toInt()
+        var t = base + daytime
+        if (t > 100) {
+            t = 100 + ((t - 100).toFloat() * 0.6f).toInt()
+        }
+        val roof = roofedAt(xy.x, xy.y)
+        if (roof != Chunk.Roofed.OUTDOOR) {
+            val mod = if (roof == Chunk.Roofed.WINDOW) 0.8f else 0.5f
+            t = 68 + ((t - 68f) * mod).toInt()
+        }
+        return t
     }
 
     override fun onSetPov() {

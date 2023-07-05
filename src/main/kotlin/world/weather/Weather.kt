@@ -38,6 +38,10 @@ class Weather {
     fun clouds() = cloudIntensity
     fun rain() = rainIntensity
 
+    fun temperature() = (-4f * windSpeed + -5f * rainIntensity + -5f * cloudIntensity).toInt()
+
+    fun feltTemperature() = (-6f * windSpeed + -6f * rainIntensity).toInt()
+
     fun shouldRaindrop(): Boolean {
         framesBeforeRaindrop--
         if (framesBeforeRaindrop < 0 && rainIntensity > 0.2f) {

@@ -38,8 +38,10 @@ sealed class Status : StatEffector {
 
     abstract val tag: Tag
     enum class Tag {
-        WIRED, DAZED, BURDENED, ENCUMBERED, SATIATED, HUNGRY, STARVING,
-        STUNNED, ASLEEP, BANDAGED, SICK
+        BURDENED, ENCUMBERED,
+        COLD, FREEZING, HOT, HEATSTROKE,
+        SATIATED, HUNGRY, STARVING,
+        WIRED, DAZED, STUNNED, ASLEEP, BANDAGED, SICK
     }
 
     abstract fun description(): String
@@ -137,6 +139,86 @@ class Satiated() : Status() {
             return true
         }
         return false
+    }
+}
+
+@Serializable
+class Cold(): Status() {
+    companion object {
+        const val threshold = 40
+    }
+    override val tag = Tag.COLD
+    override fun name() = "cold"
+    override fun description() = "You're shivering with cold."
+    override fun panelTag() = "cold"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -1f,
+        Brains.tag to -2f,
+        Speed.tag to -2f
+    )
+}
+
+@Serializable
+class Freezing(): Status() {
+    companion object {
+        const val threshold = 20
+    }
+    override val tag = Tag.FREEZING
+    override fun name() = "freezing"
+    override fun description() = "You're freezing to death."
+    override fun panelTag() = "frz"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -2f,
+        Brains.tag to -4f,
+        Speed.tag to -3f
+    )
+    override fun advanceTime(actor: Actor, delta: Float) {
+        if (Dice.chance(0.05f * delta)) {
+            Console.say("You're freezing to death!")
+            actor.receiveDamage(1f, internal = true)
+        }
+    }
+}
+
+@Serializable
+class Hot(): Status() {
+    companion object {
+        const val threshold = 95
+    }
+    override val tag = Tag.HOT
+    override fun name() = "hot"
+    override fun description() = "You're dizzy and sweating."
+    override fun panelTag() = "hot"
+    override fun panelTagColor() = tagColors[TagColor.BAD]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -1f,
+        Brains.tag to -2f,
+        Speed.tag to -2f
+    )
+}
+
+@Serializable
+class Heatstroke(): Status() {
+    companion object {
+        const val threshold = 115
+    }
+    override val tag = Tag.HEATSTROKE
+    override fun name() = "heat"
+    override fun description() = "You're slowly dying of heatstroke."
+    override fun panelTag() = "heat"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun statEffects() = mapOf(
+        Strength.tag to -2f,
+        Brains.tag to -3f,
+        Speed.tag to -2f
+    )
+    override fun advanceTime(actor: Actor, delta: Float) {
+        if (Dice.chance(0.04f * delta)) {
+            Console.say("You're dying of heatstroke!")
+            actor.receiveDamage(1f, internal = true)
+        }
     }
 }
 

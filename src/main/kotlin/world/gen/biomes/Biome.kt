@@ -31,6 +31,8 @@ sealed class Biome(
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
     open fun canHaveRain() = true
+    open fun temperatureBase() = 0
+    open fun temperatureAmplitude() = 1f
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
     open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
     open fun bareTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
@@ -115,6 +117,8 @@ object Ocean : Biome(
 ) {
     override fun defaultTitle(habitat: Habitat) = "ocean"
     override fun trailChance() = 0f
+    override fun temperatureBase() = 5
+    override fun temperatureAmplitude() = 0.6f
 }
 
 @Serializable
@@ -129,6 +133,7 @@ object Glacier : Biome(
     override fun trailSideTerrain(x: Int, y: Int) = TERRAIN_ROCKS
     override fun outcroppingChance() = 0.2f
     override fun xpValue() = 3
+    override fun temperatureBase() = -15
 }
 
 @Serializable
@@ -172,6 +177,8 @@ object Hill : Biome(
     override fun metaTravelCost() = 1.5f
     override fun edgeDistanceThreatFactor() = 1f
     override fun xpValue() = 3
+    override fun temperatureBase() = -3
+    override fun temperatureAmplitude() = 0.9f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) - NoisePatches.get("mountainShapes", x, y).toFloat() * 0.6f
 
@@ -207,6 +214,7 @@ object ForestHill : Biome(
     override fun metaTravelCost() = 2f
     override fun edgeDistanceThreatFactor() = 2f
     override fun xpValue() = 4
+    override fun temperatureAmplitude() = 0.7f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
             (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 3f).toFloat()
@@ -249,6 +257,8 @@ object Mountain : Biome(
     override fun metaTravelCost() = 3f
     override fun edgeDistanceThreatFactor() = 3f
     override fun xpValue() = 5
+    override fun temperatureBase() = -8
+    override fun temperatureAmplitude() = 1.2f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val v = NoisePatches.get("mountainShapes", x, y).toFloat()
@@ -281,6 +291,8 @@ object Swamp : Biome(
     override fun metaTravelCost() = 2f
     override fun edgeDistanceThreatFactor() = 2f
     override fun xpValue() = 4
+    override fun temperatureBase() = 5
+    override fun temperatureAmplitude() = 0.9f
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
 
@@ -317,6 +329,7 @@ object Scrub : Biome(
     override fun outcroppingChance() = 0.1f
     override fun xpValue() = 1
     override fun villageFloorType() = if (Dice.flip()) TERRAIN_DIRT else TERRAIN_WOODFLOOR
+    override fun temperatureAmplitude() = 1.15f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)
@@ -351,6 +364,8 @@ object Desert : Biome(
     override fun metaTravelCost() = 0.7f
     override fun edgeDistanceThreatFactor() = 1f
     override fun xpValue() = 3
+    override fun temperatureBase() = 12
+    override fun temperatureAmplitude() = 1.3f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

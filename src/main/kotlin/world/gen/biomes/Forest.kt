@@ -27,6 +27,8 @@ object Forest : Biome(
     override fun metaTravelCost() = 2f
     override fun edgeDistanceThreatFactor() = 1f
     override fun xpValue() = 3
+    override fun temperatureBase() = 5
+    override fun temperatureAmplitude() = 0.7f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) * 1.5f
     override fun terrainAt(x: Int, y: Int): Terrain.Type {

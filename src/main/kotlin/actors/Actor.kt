@@ -447,12 +447,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (this is Player) StatusPanel.refillCache()
     }
 
-    fun removeStatus(statusTag: Status.Tag) {
+    fun removeStatus(statusTag: Status.Tag): Boolean {
         statuses.firstOrNull { it.tag == statusTag }?.also { status ->
             statuses.remove(status)
             onRemoveStatus(status)
             if (status.proneGlyph()) updateRotateGlyph()
+            return true
         }
+        return false
     }
 
     fun fallAsleep() {
