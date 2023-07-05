@@ -4,6 +4,7 @@ import actors.NPC
 import actors.Villager
 import kotlinx.serialization.Serializable
 import things.Door
+import things.Shrine
 import ui.modals.ConverseModal
 import util.Rect
 import util.XY
@@ -148,7 +149,8 @@ class ChurchJob(
 
     override fun converseHelloOwner() = ConverseModal.Scene(
         "hello", "I minister to this village for the Lords of Light.", listOf(
-            ConverseModal.Option("pray", "Will you pray for me now?") { }
+            ConverseModal.Option("pray", "Will you pray for me?") { talker -> prayForPlayer(talker) },
+            ConverseModal.Option("lords", "Who are the Lords of Light?")
         )
     )
 
@@ -156,7 +158,15 @@ class ChurchJob(
         super.getConversationTopic(talker, topic)?.also { return it }
         return when (topic) {
             "pray" -> ConverseModal.Scene("", "Pray with me now, barbarian.")
+            "lords" -> ConverseModal.Scene("", "The Lords of Light are beyond our time and space.  They speak to us in dreams," +
+                    "and teach us to live in peace.  Honor them, and your days shall be long.")
             else -> null
+        }
+    }
+
+    private fun prayForPlayer(priest: NPC) {
+        priest.entitiesSeen { it is Shrine }.keys.forEach { shrine ->
+            (shrine as Shrine).doPray(App.player, priest = priest)
         }
     }
 }

@@ -1,10 +1,12 @@
 package ui.panels
 
+import App
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
+import ui.input.Mouse
 import util.log
 import world.gen.Metamap
 import world.level.CHUNK_SIZE
@@ -70,4 +72,11 @@ object RadarPanel : ShadedPanel() {
             mapBatch.getTextureIndex(Glyph.MAP_PLAYER))
     }
 
+    override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (screenX in x..x+width && screenY in y..y+height) {
+            App.openMap()
+            return true
+        }
+        return false
+    }
 }

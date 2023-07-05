@@ -46,7 +46,7 @@ class ConverseModal(
     class Option(
         val topic: String,
         val question: String,
-        val onPick: (()->Unit)? = null,
+        val onPick: ((NPC)->Unit)? = null,
     )
 
     class Scene(
@@ -107,7 +107,7 @@ class ConverseModal(
             scene?.topic?.also { topicStack.push(it) }
         }
 
-        toTopic.onPick?.invoke()
+        toTopic.onPick?.invoke(talker)
 
         var nextResponse = ""
         val nextOptions = mutableListOf<Option>()

@@ -275,7 +275,7 @@ class Villager(
     }
 
     override fun conversationSources() = super.conversationSources().apply {
-        if (targetJob.hasConversationFor(this@Villager)) add(targetJob)
+        if (targetJob.hasConversationFor(this@Villager)) add(1, targetJob)
     }
 
     override fun meetPlayerMsg() = if (isChild) {

@@ -201,7 +201,7 @@ object Console : Panel() {
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         super.mouseMovedTo(screenX, screenY)
-        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing) {
+        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing && screenX < this.width - RIGHT_PANEL_WIDTH) {
             mouseInside = true
             this.burst = 1.2f
         } else mouseInside = false
