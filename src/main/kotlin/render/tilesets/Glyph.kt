@@ -279,6 +279,7 @@ enum class Glyph {
     MAP_CAVE,
     MAP_BUILDING,
     MAP_LAKE,
+    MAP_PEAK,
     MAP_ROAD_NSE,
     MAP_ROAD_NSW,
     MAP_ROAD_NWE,

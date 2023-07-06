@@ -38,3 +38,11 @@ class MeditationSpot: Decor() {
         }
     }
 }
+
+@Serializable
+class MountainPeak : Decor() {
+    override fun description() = "You've reached the peak of the mountain."
+    override fun doFurnish() {
+
+    }
+}

@@ -98,11 +98,11 @@ object Console : Panel() {
     fun clear() {
         lines.clear()
         repeat (maxLines) { lines.add("") }
-        lines.add("Welcome to Numeria.")
     }
 
     fun say(text: String) {
         if (text == "") return
+        if (App.attractMode) return
         burst = min(if (App.attractMode) burstMax * 0.5f else burstMax, burst + if (App.attractMode) burstOnSay * 0.5f else burstOnSay)
         burstFloor = 1f
         lastLineMs = System.currentTimeMillis()
@@ -117,6 +117,7 @@ object Console : Panel() {
     }
 
     fun sayFromThread(text: String) {
+        if (App.attractMode) return
         KtxAsync.launch {
             say(text)
         }

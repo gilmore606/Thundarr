@@ -40,6 +40,8 @@ sealed class Feature : AnimalSpawnSource {
 
     open fun xpValue() = 1
 
+    open fun temperatureMod() = 0
+
     var worldX = 0
     var worldY = 0
 

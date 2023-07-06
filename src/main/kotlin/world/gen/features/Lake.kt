@@ -34,7 +34,7 @@ class Lake(
 
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
-                && meta.biome !in listOf(Ocean, Glacier)
+                && meta.biome !in listOf(Ocean, Glacier, Desert)
     }
 
 

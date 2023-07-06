@@ -482,6 +482,19 @@ object Madlib {
         }
     }
 
+    val mountainNames = listOf("Eagle", "Hawk", "Owl", "Spruce", "Pine", "Cold", "Frigid", "Forsaken", "Lonely", "Icicle", "Spider",
+        "Granite", "Karst", "Frost", "Gale", "Goat", "Hopeless", "Hunger", "Silent", "Shoulder", "Bald", "Flattop", "Devil")
+
+    fun peakName(): String {
+        return when (Dice.oneTo(5)) {
+            1 -> { "Mount " + firstNames.random() }
+            2 -> { "Mount " + prophetName() }
+            3 -> { mountainNames.random() + " Mountain" }
+            4 -> { wizardNameWord() + " Mountain" }
+            else -> { "Mount " + wizardNameWord() }
+        }
+    }
+
     val villagePre = listOf("iron", "owl", "deer", "oak", "sparrow", "robin", "mud", "snake", "turnip",
         "carrot", "onion", "cheese", "coon", "bear", "wolf", "fox", "hound", "water", "rabbit", "hare",
         "elm", "birch", "pine", "brook", "tarn", "brass", "barn", "loch", "lark", "roche", "east", "west",

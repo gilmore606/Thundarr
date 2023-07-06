@@ -14,6 +14,7 @@ class LavaFlows(
     override fun order() = 1
     override fun stage() = Stage.BUILD
     override fun xpValue() = 8
+    override fun temperatureMod() = 8
 
     @Serializable
     class LavaExit(

@@ -97,6 +97,7 @@ class WorldLevel() : Level() {
         val base = meta.temperature + meta.biome.temperatureBase() + App.weather.temperature()
         val daytime = (dayTemperatures[App.gameTime.hour].toFloat() * meta.biome.temperatureAmplitude()).toInt()
         var t = base + daytime
+        meta.features().forEach { t += it.temperatureMod() }
         if (t > 100) {
             t = 100 + ((t - 100).toFloat() * 0.6f).toInt()
         }

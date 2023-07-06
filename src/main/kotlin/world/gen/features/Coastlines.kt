@@ -14,6 +14,8 @@ class Coastlines(
     override fun order() = 1
     override fun stage() = Stage.TERRAIN
 
+    override fun temperatureMod() = -5
+
     override fun doDig() {
         val cornerWater = carto.growOblong(8, 8)
         exits.forEach { edge ->

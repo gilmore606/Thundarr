@@ -50,10 +50,11 @@ object Metamap {
     val riverWidth = 0.15f
     val minMountainHeight = 20
     val maxRangePeakDistance = 3f
-    val isolatedMountainDensity = 0.4f
+    val isolatedMountainDensity = 0.2f
     val mountainRangeWetness = 6
     val randomHillChance = 0.015f
     val randomForestChance = 0.015f
+    val randomMountainChance = 0.01f
     val oasisChance = 0.01f
     val citiesRiverMouth = 6
     val citiesRiver = 8
@@ -76,7 +77,7 @@ object Metamap {
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
     val randomBuildingChance = 0.003f
-    val randomLakeChance = 0.004f
+    val randomLakeChance = 0.006f
     val maxThreatLevel = 40
     val spawnDistanceThreatFactor = 0.24f
     val biomeDepthThreatFactor = 1f
@@ -590,7 +591,7 @@ object Metamap {
                 } else if (cell.biome == Mountain) {
                     if (biomeNeighbors(x,y,Mountain,true) == 0) {
                         if (!Dice.chance(isolatedMountainDensity)) {
-                            cell.biome = Plain
+                            cell.biome = Scrub
                         } else {
                             isolatedPeaks.add(XY(x,y))
                             if (biomeNeighbors(x,y,Desert,true) > 4) {
@@ -649,6 +650,12 @@ object Metamap {
                         if (biomeNeighbors(x, y, Plain, true) == 8) {
                             if (Dice.chance(randomHillChance)) cell.biome = if (Dice.flip()) Hill else ForestHill
                             if (Dice.chance(randomForestChance)) cell.biome = Forest
+                            if (Dice.chance(randomMountainChance)) {
+                                cell.biome = Mountain
+                                CARDINALS.from(x, y) { dx, dy, dir ->
+                                    if (Dice.chance(0.6f)) scratches[dx][dy].biome = Hill
+                                }
+                            }
                         }
                     }
                     Desert -> {
@@ -831,6 +838,18 @@ object Metamap {
                 placed++
             }
 
+            // Place mountain peaks
+            forEachScratch { x, y, cell ->
+                if (cell.biome == Mountain) {
+                    val neighbors = biomeNeighbors(x, y, Mountain, allDirections = true)
+                    if (neighbors == 0) {
+                        cell.addFeature(Peak(Madlib.peakName()))
+                    } else if (neighbors > 4 && Dice.chance(0.1f)) {
+                        cell.addFeature(Peak(Madlib.peakName()))
+                    }
+                }
+            }
+
             // Place random cell features
             forEachScratch { x, y, cell ->
                 // Cabins
@@ -890,7 +909,7 @@ object Metamap {
                         cell.addFeature(Building())
                     }
                     // Lakes
-                    if (Lake.canBuildOn(cell) && cell.biome != Desert && Dice.chance(randomLakeChance)) {
+                    if (Lake.canBuildOn(cell) && Dice.chance(randomLakeChance)) {
                         cell.addFeature(Lake(Madlib.lakeName()))
                     }
                 }
@@ -976,13 +995,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            startChunk = villages.random()
+            //startChunk = villages.random()
             // Pick a cabin chunk
-//            forEachScratch { x, y, cell ->
-//                if (cell.hasFeature(Lake::class)) {
-//                    startChunk = XY(x,y)
-//                }
-//            }
+            forEachScratch { x, y, cell ->
+                if (cell.hasFeature(Peak::class)) {
+                    startChunk = XY(x,y)
+                }
+            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)
