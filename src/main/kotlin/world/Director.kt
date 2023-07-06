@@ -38,12 +38,17 @@ class Director(val level: Level) {
     private fun addActor(new: Actor) {
         actorsLocked = true
         actors.add(new)
+        sortActors()
         actorsLocked = false
     }
     private fun removeActor(old: Actor) {
         actorsLocked = true
         actors.remove(old)
+        sortActors()
         actorsLocked = false
+    }
+    private fun sortActors() {
+        actors.sortBy { it.xy.y }
     }
 
     fun detachActor(actor: Actor) {
@@ -152,6 +157,9 @@ class Director(val level: Level) {
     }
 
     fun advanceTime(delta: Float) {
+        actorsLocked = true
+        sortActors()
+        actorsLocked = false
         actors.filterOut({ it.level != level }) { it.advanceTime(delta) }
         temporals.filterOut({ it.temporalDone() }) { it.advanceTime(delta) }
     }

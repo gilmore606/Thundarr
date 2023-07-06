@@ -159,7 +159,7 @@ sealed class Level {
     fun forEachActorToRender(
         doThis: (x: Int, y: Int, actor: Actor, vis: Float) -> Unit,
         delta: Float) =
-        director.actors.sortedBy { it.xy.y }.forEach { actor ->
+        director.actors.forEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)

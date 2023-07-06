@@ -45,14 +45,14 @@ class MeditationSpot: Decor() {
 class MountainPeak : Decor() {
     override fun description() = "You take in the view from the mountain peak."
     override fun doFurnish() {
-        if (Dice.chance(0.2f)) {
+        if (Dice.chance(0.3f)) {
             atCenter {
-                spawn(Shrine())
+                spawn(if (Dice.flip()) Shrine() else Gravestone())
                 terrainAround(if (Dice.flip()) Terrain.Type.TERRAIN_STONEFLOOR else Terrain.Type.TERRAIN_ROCKS)
             }
         }
         if (Dice.chance(0.7f)) {
-            repeat (Dice.oneTo(5)) {
+            repeat (Dice.oneTo(6)) {
                 awayFromWall {
                     spawn(if (Dice.chance(0.8f)) Bonepile() else Gravestone())
                 }
@@ -61,7 +61,7 @@ class MountainPeak : Decor() {
         if (Dice.chance(0.5f)) {
             awayFromWall {
                 spawn(Campfire())
-                if (Dice.chance(0.2f)) {
+                if (Dice.chance(0.3f)) {
                     terrainAround(if (Dice.flip()) Terrain.Type.TERRAIN_SAND else Terrain.Type.TERRAIN_CAVEFLOOR)
                 }
             }

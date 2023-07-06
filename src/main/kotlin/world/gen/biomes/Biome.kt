@@ -7,6 +7,7 @@ import render.tilesets.Glyph
 import util.Dice
 import util.Rect
 import util.XY
+import util.log
 import world.Chunk
 import world.gen.AnimalSpawnSource
 import world.gen.NoisePatches
@@ -89,7 +90,7 @@ sealed class Biome(
         val height = Dice.range(5, 12)
         val x = Dice.range(5, CHUNK_SIZE - 20) + carto.x0
         val y = Dice.range(5, CHUNK_SIZE - 20) + carto.y0
-        carto.printGrid(carto.growBlob(width, height), x, y, Terrain.Type.TERRAIN_SHALLOW_WATER)
+        carto.printGrid(carto.growBlob(width, height), x, y, Terrain.Type.GENERIC_WATER)
     }
 
     open fun carveExtraTerrain(carto: WorldCarto) {
@@ -97,6 +98,7 @@ sealed class Biome(
             addOutcropping(carto)
         }
         if (Dice.chance(pondChance())) {
+            log.info("digging random pond!")
             addPond(carto)
         }
     }
@@ -158,7 +160,7 @@ object Plain : Biome(
     override fun plantDensity() = 0.5f
     override fun cabinChance() = 0.001f
     override fun outcroppingChance() = 0.05f
-    override fun pondChance() = 0.02f
+    override fun pondChance() = 0.03f
     override fun xpValue() = 0
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {

@@ -3,11 +3,14 @@ package ui.panels
 import actors.Actor
 import render.Screen
 import render.tilesets.Glyph
+import util.manhattanDistance
+import java.lang.Math.min
 
 object ActorPanel : ShadedPanel() {
 
     private const val padding = 12
     private const val spacing = 44
+    private const val maxActors = 8
 
     private var lastTime = -1.0
     private var lastCheckMs = System.currentTimeMillis()
@@ -45,20 +48,34 @@ object ActorPanel : ShadedPanel() {
 
     override fun drawEntities() {
         actors.forEachIndexed { n, actor ->
-            val x0 = x + padding - 1
-            val y0 = y + padding + spacing * n + 1
-            actor.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
-                actor.uiBatch().getTextureIndex(actor.glyph(), actor.level(), actor.xy().x, actor.xy().y), hue = actor.hue())
-            actor.drawStatusGlyph { statusGlyph ->
-                Screen.uiBatch.addPixelQuad(x0, y0 - 12, x0 + 32, y0 + 20,
-                    Screen.uiBatch.getTextureIndex(statusGlyph))
+            if (n < maxActors) {
+                val x0 = x + padding - 1
+                val y0 = y + padding + spacing * n + 1
+                actor.uiBatch().addPixelQuad(
+                    x0,
+                    y0,
+                    x0 + 32,
+                    y0 + 32,
+                    actor.uiBatch().getTextureIndex(actor.glyph(), actor.level(), actor.xy().x, actor.xy().y),
+                    hue = actor.hue()
+                )
+                actor.drawStatusGlyph { statusGlyph ->
+                    Screen.uiBatch.addPixelQuad(
+                        x0, y0 - 12, x0 + 32, y0 + 20,
+                        Screen.uiBatch.getTextureIndex(statusGlyph)
+                    )
+                }
+                if (actor == LookPanel.entity) {
+                    Screen.uiBatch.addPixelQuad(
+                        x0 + 36, y0 + 16, x0 + width - padding * 2 - 34, y0 + 36,
+                        Screen.uiBatch.getTextureIndex(Glyph.CURSOR)
+                    )
+                }
+                Screen.uiBatch.addHealthBar(
+                    x0 + 38, y0 + 20,
+                    x0 + width - padding * 2 - 38, y0 + 32, actor.hp.toInt(), actor.hpMax.toInt()
+                )
             }
-            if (actor == LookPanel.entity) {
-                Screen.uiBatch.addPixelQuad(x0 + 36, y0 + 16, x0 + width - padding * 2 - 34, y0 + 36,
-                    Screen.uiBatch.getTextureIndex(Glyph.CURSOR))
-            }
-            Screen.uiBatch.addHealthBar(x0 + 38, y0 + 20,
-                x0 + width - padding * 2 - 38, y0 + 32, actor.hp.toInt(), actor.hpMax.toInt())
         }
     }
 
@@ -68,7 +85,8 @@ object ActorPanel : ShadedPanel() {
         } ?: run {
             if (actors.isNotEmpty()) actors = ArrayList()
         }
-        this.height = actors.size * spacing + padding
+        actors.sortBy { manhattanDistance(App.player.xy, it.xy) }
+        this.height = min(maxActors, actors.size) * spacing + padding
     }
 
     fun targetAfter(actor: Actor, dir: Int): Actor? {
