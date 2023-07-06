@@ -141,6 +141,7 @@ sealed class Terrain(
     open fun trailsOverwrite() = true
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
+    open fun onStep(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
 
     open fun pruneVerticalOrphans() = false
 

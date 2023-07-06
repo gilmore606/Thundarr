@@ -22,6 +22,7 @@ object Forest : Biome(
     override fun trailChance() = 0.2f
     override fun cabinChance() = 0.15f
     override fun outcroppingChance() = 0.05f
+    override fun pondChance() = 0.1f
     override fun plantDensity() = 1.4f
     override fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (fertilityAt(x, y) > 0.6f) Terrain.Type.TERRAIN_SWAMP else Terrain.Type.TERRAIN_UNDERGROWTH
     override fun metaTravelCost() = 2f

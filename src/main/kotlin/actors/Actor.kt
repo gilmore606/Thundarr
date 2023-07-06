@@ -157,6 +157,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (oldLevel != level) oldLevel?.director?.detachActor(this)
         level?.onActorMovedTo(this, x, y)
         if (oldLevel != level) level?.director?.attachActor(this)
+        level?.getTerrain(x, y)?.also { terrain ->
+            Terrain.get(terrain).onStep(this, x, y, level.getTerrainData(x, y))
+        }
         onMove()
     }
 

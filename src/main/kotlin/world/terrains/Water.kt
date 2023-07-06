@@ -1,6 +1,7 @@
 package world.terrains
 
 import actors.Actor
+import actors.Player
 import audio.Speaker
 import render.sparks.Splash
 import render.tilesets.Glyph
@@ -44,6 +45,11 @@ sealed class Water(
 object ShallowWater : Water(Type.TERRAIN_SHALLOW_WATER, Glyph.SHALLOW_WATER) {
     override fun name() = "shallow water"
     override fun isWalkableBy(actor: Actor) = actor.canSwimShallow()
+    override fun onStep(actor: Actor, x: Int, y: Int, data: TerrainData?) {
+        if (actor is Player) {
+            actor.addWetness(0.25f)
+        }
+    }
 }
 
 object DeepWater : Water(Type.TERRAIN_DEEP_WATER, Glyph.DEEP_WATER) {

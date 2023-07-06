@@ -16,6 +16,7 @@ object Suburb: Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_GRASS
     override fun trailChance() = 0f
     override fun plantDensity() = 0.2f
+    override fun pondChance() = 0.03f
     override fun metaTravelCost() = 1.5f
     override fun xpValue() = 4
 

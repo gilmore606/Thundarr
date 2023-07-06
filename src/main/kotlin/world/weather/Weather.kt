@@ -174,9 +174,7 @@ class Weather {
     private fun updatePlayerWetness() {
         if (rainIntensity > 0.1f) {
             if (App.player.level?.isRoofedAt(App.player.xy.x, App.player.xy.y) == false) {
-                val current = App.player.status(Status.Tag.WET)?.let { (it as Wet).wetness } ?: 0f
-                val wet = min(current + rainIntensity * 0.2f, min(1f, rainIntensity * 2f))
-                App.player.addStatus(Wet(wet))
+                App.player.addWetness(rainIntensity * 0.2f, min(1f, rainIntensity * 2f))
             }
         }
     }

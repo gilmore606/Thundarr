@@ -319,7 +319,7 @@ class Wet(
         Speed.tag to -1f
     )
     override fun duration() = 10f
-    override fun maxDuration() = 40f
+    override fun maxDuration() = 30f
     fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -16).toInt()
 }
 

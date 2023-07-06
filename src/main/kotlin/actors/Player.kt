@@ -28,6 +28,7 @@ import world.journal.Journal
 import world.level.EnclosedLevel
 import world.level.WorldLevel
 import world.stains.Fire
+import java.lang.Float.min
 
 @Serializable
 open class Player : Actor() {
@@ -85,10 +86,11 @@ open class Player : Actor() {
 
     override fun initialFactions() = mutableSetOf(App.factions.humans)
 
-    override fun visualRange() = 40f
+    override fun visualRange() = 26f
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null
+    override fun canSwimShallow() = true
 
     var xp = 0
     var levelUpsAvailable = 0
@@ -262,6 +264,12 @@ open class Player : Actor() {
 
     fun debugMove(dir: XY) {
         moveTo(level, xy.x + (dir.x * 20), xy.y + (dir.y * 20))
+    }
+
+    fun addWetness(amount: Float, max: Float = 1f) {
+        val current = status(Status.Tag.WET)?.let { (it as Wet).wetness } ?: 0f
+        val wet = min(current + amount, max)
+        addStatus(Wet(wet))
     }
 
     private fun updateTemperature() {
