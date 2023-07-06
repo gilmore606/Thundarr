@@ -267,9 +267,13 @@ open class Player : Actor() {
     }
 
     fun addWetness(amount: Float, max: Float = 1f) {
-        val current = status(Status.Tag.WET)?.let { (it as Wet).wetness } ?: 0f
-        val wet = min(current + amount, max)
-        addStatus(Wet(wet))
+        val wetStatus = status(Status.Tag.WET) as Wet?
+        val current = wetStatus?.let { (it as Wet).wetness } ?: 0f
+        if (current <= 0f) {
+            addStatus(Wet().apply { wetness = amount })
+        } else {
+            wetStatus?.addWetness(amount)
+        }
     }
 
     private fun updateTemperature() {

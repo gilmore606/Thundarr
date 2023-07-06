@@ -19,6 +19,7 @@ import ui.panels.Console
 import util.Dice
 import util.toEnglishList
 import world.journal.GameTime
+import java.lang.Float.min
 
 @Serializable
 sealed class Status : StatEffector {
@@ -280,7 +281,7 @@ class Asleep() : Status() {
 
 @Serializable
 sealed class TimeStatus : Status() {
-    private var addTime = 0.0
+    protected var addTime = 0.0
     var turnsLeft = 0f
 
     open fun duration() = 8f
@@ -307,9 +308,8 @@ sealed class TimeStatus : Status() {
 }
 
 @Serializable
-class Wet(
-    val wetness: Float
-): TimeStatus() {
+class Wet(): TimeStatus() {
+    var wetness = 1f
     override val tag = Tag.WET
     override fun name() = "wet"
     override fun description() = "You're soaking wet."
@@ -319,8 +319,12 @@ class Wet(
         Speed.tag to -1f
     )
     override fun duration() = 10f
-    override fun maxDuration() = 30f
+    override fun maxDuration() = 40f
     fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -16).toInt()
+    fun addWetness(added: Float) {
+        wetness = min(1f, wetness + added)
+        addTime += duration() * added * 2f
+    }
 }
 
 @Serializable
