@@ -324,6 +324,7 @@ class Wet(): TimeStatus() {
     fun addWetness(added: Float) {
         wetness = min(1f, wetness + added)
         addTime += duration() * added * 2f
+        turnsLeft = min(maxDuration(), turnsLeft + wetness * duration())
     }
 }
 

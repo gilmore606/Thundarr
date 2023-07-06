@@ -45,10 +45,11 @@ class Lake(
             // Big lake!
             val width = Dice.range(40,56)
             val height = Dice.range(40,56)
-            digLakeBlobAt(Dice.range(3, 6), Dice.range(3,6), width, height)
+            digLakeBlobAt(x0 + Dice.range(3, 6), y0 + Dice.range(3,6), width, height)
             if (Dice.chance(0.5f)) {
                 // Big lake island
-                printGrid(growBlob(Dice.range(4,12), Dice.range(4,12)), Dice.range(10, 45), Dice.range(10, 45), meta.biome.baseTerrain)
+                printGrid(growBlob(Dice.range(4,12), Dice.range(4,12)),
+                    x0 + Dice.range(10, 45), y0 + Dice.range(10, 45), meta.biome.baseTerrain)
             }
             return
         }

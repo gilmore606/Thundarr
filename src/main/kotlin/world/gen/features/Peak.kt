@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.Dice
 import util.Rect
 import world.ChunkScratch
 import world.gen.biomes.Biome
@@ -34,6 +35,7 @@ class Peak(
     }
 
     override fun doDig() {
+        printGrid(growBlob(Dice.range(14,20), Dice.range(14,20)), x0 + 20, y0 + 20, meta.biome.baseTerrain)
         MountainPeak().furnish(Decor.Room(
             Rect(x0 + 22, y0 + 22, x1 - 22, y1 - 22)
         ), carto)
