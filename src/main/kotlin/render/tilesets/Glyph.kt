@@ -3,7 +3,7 @@ package render.tilesets
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Glyph {
+enum class Glyph(val tall: Boolean = false) {
     BLANK,
 
     BRICK_WALL,
@@ -131,6 +131,7 @@ enum class Glyph {
     MANAPE,
     GATOR,
     DOG,
+    JERIF(tall = true),
 
     OAK_TREE,
     MAPLE_TREE,

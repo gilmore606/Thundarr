@@ -229,7 +229,7 @@ object Console : Panel() {
     }
 
     override fun drawBackground() {
-        if (mouseInside) {
+        if (mouseInside && !App.attractMode) {
             Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
                 Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
                 Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.5f)

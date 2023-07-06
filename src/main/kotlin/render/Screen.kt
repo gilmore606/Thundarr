@@ -255,14 +255,16 @@ object Screen : KtxScreen {
                 )
             }
         }
+        val glyph = actor.glyph()
         actorBatch.addTileQuad(
             tx, ty,
-            actorBatch.getTextureIndex(actor.glyph(), App.level, tx, ty), vis, light,
+            actorBatch.getTextureIndex(glyph, App.level, tx, ty), vis, light,
             offsetX = if (vis == 1f) actor.animOffsetX() else 0f,
             offsetY = if (vis == 1f) actor.animOffsetY() else 0f,
             hue = actor.hue(),
             mirror = if (vis == 1f) actor.mirrorGlyph else false,
-            rotate = if (vis == 1f) actor.rotateGlyph else false
+            rotate = if (vis == 1f) actor.rotateGlyph else false,
+            isTall = glyph.tall
         )
         actor.gearDrawList.forEach { gear ->
             val trans = gear.glyphTransform()

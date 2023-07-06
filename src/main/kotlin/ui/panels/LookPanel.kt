@@ -66,11 +66,12 @@ object LookPanel : ShadedPanel() {
 
     override fun drawEntities() {
         entity?.also { entity ->
+            val glyph = entity.glyph()
             val x0 = x + padding - 10
-            val y0 = y + padding - 12
-            entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + 32,
+            val y0 = y + padding - 12 - (if (glyph.tall) 32 else 0)
+            entity.uiBatch().addPixelQuad(x0, y0, x0 + 32, y0 + (if (glyph.tall) 64 else 32),
                 entity.uiBatch().getTextureIndex(entity.glyph(), entity.level(), entity.xy().x, entity.xy().y),
-                hue = entity.hue())
+                hue = entity.hue(), isTall = glyph.tall)
         }
     }
 

@@ -77,10 +77,11 @@ class QuadBatch(
                     textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f,
                     scale: Double = 1.0, alpha: Float = 1f, hue: Float = 0f,
-                    grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false, waves: Float = 0f) {
+                    grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false,
+                    waves: Float = 0f, isTall: Boolean = false) {
         val scaleOffset = (1.0 - scale) * 0.5
         val x0 = Screen.tileXtoGlx(col + offsetX + scaleOffset)
-        val y0 = Screen.tileYtoGly(row + offsetY + scaleOffset)
+        val y0 = Screen.tileYtoGly((row - (if (isTall) 1 else 0)) + offsetY + scaleOffset)
         val x1 = Screen.tileXtoGlx(col + offsetX + 1.0 - scaleOffset * 2.0)
         val y1 = Screen.tileYtoGly(row + offsetY + 1.0 - scaleOffset * 2.0)
         val lightR = min(visibility, light.r + App.level.weather.lightning.r) * Screen.brightness
@@ -89,7 +90,7 @@ class QuadBatch(
         val grayOut = grayBlend ?: if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
         val itx0 = if (mirror) 1f else 0f
         val itx1 = if (mirror) 0f else 1f
-        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate, waves)
+        addQuad(x0, y0, x1, y1, itx0, 0f, itx1, if (isTall) 2f else 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate, waves)
     }
 
     fun addPartialQuad(x0: Double, y0: Double, x1: Double, y1: Double,
@@ -109,14 +110,14 @@ class QuadBatch(
 
     fun addPixelQuad(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
                      textureIndex: Int, lightR: Float = 1f, lightG: Float = 1f, lightB: Float = 1f,
-                     hue: Float? = null, alpha: Float = 1f, mirror: Boolean = false) {
+                     hue: Float? = null, alpha: Float = 1f, mirror: Boolean = false, isTall: Boolean = false) {
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / Screen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / Screen.height.toDouble()) * 2f - 1f
         val itx0 = if (mirror) 1f else 0f
         val itx1 = if (mirror) 0f else 1f
-        addQuad(glx0, gly0, glx1, gly1, itx0, 0f, itx1, 1f, textureIndex,
+        addQuad(glx0, gly0, glx1, gly1, itx0, 0f, itx1, if (isTall) 2f else 1f, textureIndex,
                 lightR, lightG, lightB, alpha, 0f, hue ?: Screen.uiHue.toFloat())
     }
 

@@ -159,6 +159,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
     }
 
     override fun drawText() {
+        super.drawText()
         if (!showThreat) return
         val x0 = x + paddingX
         val y0 = y + paddingY

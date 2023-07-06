@@ -65,4 +65,5 @@ fun ActorTileSet() =
         setTile(Glyph.PEASANT_BLACK_BLOND, SimpleTile(this, 10, 3))
         setTile(Glyph.PEASANT_BLACK_CHILD, SimpleTile(this, 10, 4))
         setTile(Glyph.DOG, SimpleTile(this, 1, 6))
+        setTile(Glyph.JERIF, SimpleTile(this, 2, 6))
     }
