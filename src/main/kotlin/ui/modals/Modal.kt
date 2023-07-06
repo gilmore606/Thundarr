@@ -74,6 +74,8 @@ abstract class Modal(
         Screen.addModal(nextModal)
     }
 
+    var darkenUnder = true
+
     override fun myTextBatch() = textBatch
     override fun myBoxBatch() = boxBatch
     override fun myThingBatch() = thingBatch
@@ -101,6 +103,17 @@ abstract class Modal(
     }
 
     override fun drawBackground() {
+        if (darkenUnder && Screen.topModal == this) {
+            Screen.underModal?.also { under ->
+                myBoxBatch().addPixelQuad(under.x, under.y, under.x + under.width, under.y + under.height,
+                    myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = 0.4f)
+                under.sidecar?.also {
+                    myBoxBatch().addPixelQuad(it.x, it.y, it.x + it.width, it.y + it.height,
+                        myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = 0.4f)
+                }
+            }
+        }
+
         val anim = min(1f, (Screen.timeMs - launchTimeMs) / animTime)
         val xSquish = ((1f - anim) * width / 2f).toInt()
         val ySquish = ((1f - anim) * height / 2f).toInt()

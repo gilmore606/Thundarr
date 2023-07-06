@@ -31,6 +31,8 @@ class MapFloater(
         this.borderWidth = 1
 
         this.height = wrappedDescription.size * 20 + 55
+
+        this.darkenUnder = false
     }
 
 

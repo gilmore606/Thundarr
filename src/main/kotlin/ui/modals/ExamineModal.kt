@@ -39,6 +39,7 @@ class ExamineModal(
                 width - 150, y + 4
             ).apply {
                 this.parentModal = parent
+                this.darkenUnder = false
                 addInventoryOptions(this, entity, forExamine = true)
                 x = this@ExamineModal.x - maxOptionWidth - 30
             }

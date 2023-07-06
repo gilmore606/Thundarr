@@ -159,6 +159,7 @@ object Screen : KtxScreen {
 
     val panels: ArrayList<Panel> = ArrayList()
     var topModal: Modal? = null
+    var underModal: Modal? = null
 
     var cursorPosition: XY? = null
     private var cursorLine: MutableList<XY> = mutableListOf()
@@ -335,22 +336,27 @@ object Screen : KtxScreen {
         App.level.onRender(delta)
         var dismissedPanel: Panel? = null
         var topModalFound: Modal? = null
+        var underModalFound: Modal? = null
         for (i in 0 until panels.size) {
             panels[i].also {
                 it.onRender(delta)
                 if (it.dismissed) dismissedPanel = it
-                else if (it is Modal) topModalFound = it
+                else if (it is Modal) {
+                    underModalFound = topModalFound
+                    topModalFound = it
+                }
             }
         }
         dismissedPanel?.also {
             if (it is Modal) it.closeSound()?.also { sound -> Speaker.ui(sound, screenX = it.x) }
             panels.remove(it)
             it.dispose()
-            topModal = topModalFound
-            if (topModal == null) {
-                this@Screen.cameraOffsetX = 0.0
-                this@Screen.cameraOffsetY = 0.0
-            }
+        }
+        topModal = topModalFound
+        underModal = underModalFound
+        if (topModal == null) {
+            this@Screen.cameraOffsetX = 0.0
+            this@Screen.cameraOffsetY = 0.0
         }
 
         drawEverything(delta)
