@@ -268,6 +268,7 @@ open class Player : Actor() {
         level?.also { level ->
             temperature = level.temperatureAt(xy)
             feltTemperature = temperature + App.weather.feltTemperature()
+            feltTemperature += App.player.status(Status.Tag.WET)?.let { (it as Wet).temperatureMod() } ?: 0
             var clothing = 0
             gear.values.forEach { gear ->
                 if (gear is Clothing) {

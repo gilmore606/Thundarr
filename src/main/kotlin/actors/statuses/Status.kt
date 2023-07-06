@@ -39,7 +39,7 @@ sealed class Status : StatEffector {
     abstract val tag: Tag
     enum class Tag {
         BURDENED, ENCUMBERED,
-        COLD, FREEZING, HOT, HEATSTROKE,
+        WET, COLD, FREEZING, HOT, HEATSTROKE,
         SATIATED, HUNGRY, STARVING,
         WIRED, DAZED, STUNNED, ASLEEP, BANDAGED, SICK
     }
@@ -281,7 +281,7 @@ class Asleep() : Status() {
 @Serializable
 sealed class TimeStatus : Status() {
     private var addTime = 0.0
-    private var turnsLeft = 0f
+    var turnsLeft = 0f
 
     open fun duration() = 8f
     open fun maxDuration() = duration()  // override to enable re-up dosing
@@ -304,6 +304,23 @@ sealed class TimeStatus : Status() {
     }
     open fun onStackMsg() = ""
     open fun onStackOtherMsg() = ""
+}
+
+@Serializable
+class Wet(
+    val wetness: Float
+): TimeStatus() {
+    override val tag = Tag.WET
+    override fun name() = "wet"
+    override fun description() = "You're soaking wet."
+    override fun panelTag() = "wet"
+    override fun panelTagColor() = tagColors[TagColor.NORMAL]!!
+    override fun statEffects() = mapOf(
+        Speed.tag to -1f
+    )
+    override fun duration() = 10f
+    override fun maxDuration() = 40f
+    fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -16).toInt()
 }
 
 @Serializable

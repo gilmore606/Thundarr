@@ -9,6 +9,7 @@ import render.tilesets.Glyph
 import ui.modals.ConverseModal
 import util.Dice
 import util.XY
+import util.hasOneWhere
 import world.gen.features.Habitation
 import world.lore.Lore
 import world.quests.Quest
@@ -18,7 +19,6 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     @Transient var habitation: Habitation? = null
 
     val questsGiven = mutableListOf<String>()
-    var hasQuestsToGive = false
     fun questsGiven() = questsGiven.mapNotNull { App.factions.questByID(it) }
     var introducedToPlayer = false
     val lore = mutableListOf<Lore>()
@@ -82,19 +82,13 @@ sealed class Citizen : NPC(), ConverseModal.Source {
         return null
     }
 
-    override fun advanceTime(delta: Float) {
-        questsGiven().forEach { quest ->
-            if (quest.shouldFlagGiver()) hasQuestsToGive = true
-        }
-        super.advanceTime(delta)
-    }
-
     open fun couldGiveQuest(quest: Quest) = false
     open fun couldHaveLore() = lore.isEmpty()
 
     override fun updateConversationGlyph() {
+        val hasQuests = questsGiven().hasOneWhere { it.shouldFlagGiver() }
         conversationGlyph = when {
-            hasQuestsToGive -> Glyph.QUESTION_ICON
+            hasQuests -> Glyph.QUESTION_ICON
             lore.isNotEmpty() -> Glyph.CONVERSATION_ICON
             else -> null
         }
@@ -121,16 +115,14 @@ sealed class Citizen : NPC(), ConverseModal.Source {
     }
 
     override fun commentLines(): List<String> {
-        if (hasQuestsToGive) {
-            val lines = mutableListOf<String>()
-            questsGiven().forEach { quest ->
-                lines.addAll(quest.commentLines())
-            }
-            lore.forEach { lore ->
-                lines.addAll(lore.commentLines())
-            }
-            if (lines.isNotEmpty()) return lines
+        val lines = mutableListOf<String>()
+        questsGiven().forEach { quest ->
+            lines.addAll(quest.commentLines())
         }
+        lore.forEach { lore ->
+            lines.addAll(lore.commentLines())
+        }
+        if (lines.isNotEmpty()) return lines
         return super.commentLines()
     }
 }

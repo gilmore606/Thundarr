@@ -1,5 +1,7 @@
 package world.weather
 
+import actors.statuses.Status
+import actors.statuses.Wet
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
@@ -93,6 +95,7 @@ class Weather {
         cloudIntensity = max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
         rainIntensity = max(0f, (weatherIntensity - 0.5f) * 2f)
         updateEnvString()
+        updatePlayerWetness()
     }
 
     private fun updateWeather(hour: Int, minute: Int, level: Level) {
@@ -168,4 +171,13 @@ class Weather {
         }
     }
 
+    private fun updatePlayerWetness() {
+        if (rainIntensity > 0.1f) {
+            if (App.player.level?.isRoofedAt(App.player.xy.x, App.player.xy.y) == false) {
+                val current = App.player.status(Status.Tag.WET)?.let { (it as Wet).wetness } ?: 0f
+                val wet = min(current + rainIntensity * 0.2f, min(1f, rainIntensity * 2f))
+                App.player.addStatus(Wet(wet))
+            }
+        }
+    }
 }

@@ -364,16 +364,24 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val armor = armorTotal()
         val amount = if (internal) raw else raw - armor
         if (amount > 0f) {
-            if (Dice.chance(bleedChance() * amount * 0.35f)) {
-                bloodstain()?.also { stain ->
-                    level?.addStain(stain, xy.x, xy.y)
-                    if (Dice.chance(0.2f * amount)) {
-                        bloodstain()?.also { level?.addStain(it, xy.x - 1 + Dice.zeroTo(2), xy.y - 1 + Dice.zeroTo(2)) }
+            if (!internal) {
+                if (Dice.chance(bleedChance() * amount * 0.35f)) {
+                    bloodstain()?.also { stain ->
+                        level?.addStain(stain, xy.x, xy.y)
+                        if (Dice.chance(0.2f * amount)) {
+                            bloodstain()?.also {
+                                level?.addStain(
+                                    it,
+                                    xy.x - 1 + Dice.zeroTo(2),
+                                    xy.y - 1 + Dice.zeroTo(2)
+                                )
+                            }
+                        }
                     }
                 }
-            }
-            repeat (amount.toInt()) {
-                gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
+                repeat(amount.toInt()) {
+                    gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
+                }
             }
             hp = max(0f, hp - amount)
             if (Dice.chance(amount * 0.1f)) {
@@ -493,6 +501,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun hasStatus(statusTag: Status.Tag) = statuses.hasOneWhere { it.tag == statusTag }
+
+    fun status(statusTag: Status.Tag) = statuses.firstOrNull { it.tag == statusTag }
 
     fun statEffectors(stat: Stat) = ArrayList<StatEffector>().apply {
         addAll(statuses.filter { it.statEffects().containsKey(stat.tag) })
