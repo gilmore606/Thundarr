@@ -150,6 +150,7 @@ sealed class Thing() : Entity {
     open fun isIntangible() = false
     open fun isAlwaysVisible() = false
     open fun announceOnWalk() = !isIntangible()
+    open fun sleepComfort() = -0.1f
 
     @Transient var holder: ThingHolder? = null
 

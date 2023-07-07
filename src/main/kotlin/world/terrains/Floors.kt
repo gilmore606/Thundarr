@@ -123,6 +123,7 @@ object CaveFloor : Floor(Type.TERRAIN_CAVEFLOOR, Glyph.CAVE_FLOOR, true) {
     override fun moveSpeed(actor: Actor) = 0.8f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
     override fun fertilityBonus() = -0.4f
+    override fun sleepComfort() = 0f
 }
 
 object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR, false, -2f) {
@@ -130,6 +131,7 @@ object StoneFloor : Floor(Type.TERRAIN_STONEFLOOR, Glyph.STONE_FLOOR, false, -2f
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
     override fun trailsOverwrite() = false
+    override fun sleepComfort() = 0f
 }
 
 object WoodFloor: Floor(Type.TERRAIN_WOODFLOOR, Glyph.WOOD_FLOOR, false, -2f) {
@@ -137,6 +139,7 @@ object WoodFloor: Floor(Type.TERRAIN_WOODFLOOR, Glyph.WOOD_FLOOR, false, -2f) {
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
     override fun trailsOverwrite() = false
+    override fun sleepComfort() = 0f
 }
 
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true, -1f) {
@@ -145,6 +148,7 @@ object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true, -1f) {
     override fun moveSpeed(actor: Actor) = 1.0f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
     override fun fertilityBonus() = -0.2f
+    override fun sleepComfort() = -0.2f
 }
 
 object Trail : Floor(Type.TERRAIN_TRAIL, Glyph.TRAIL, false, -1f) {
@@ -152,6 +156,7 @@ object Trail : Floor(Type.TERRAIN_TRAIL, Glyph.TRAIL, false, -1f) {
     override fun overlapsOn() = setOf(Type.TERRAIN_ROCKS, Type.TERRAIN_DIRT, Type.TERRAIN_GRASS, Type.TERRAIN_SAND, Type.TERRAIN_HARDPAN, Type.TERRAIN_UNDERGROWTH)
     override fun moveSpeed(actor: Actor) = 0.8f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+    override fun sleepComfort() = -0.2f
 }
 
 object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, true, 1f) {
@@ -171,6 +176,7 @@ object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
     override fun name() = "grass"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
+    override fun sleepComfort() = 0f
 }
 
 object Undergrowth : Floor(Type.TERRAIN_UNDERGROWTH, Glyph.UNDERGROWTH, true, 2f) {
@@ -195,6 +201,7 @@ object Beach : Floor(Type.TERRAIN_BEACH, Glyph.BEACH, true) {
     override fun trailsOverwrite() = false
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
+    override fun sleepComfort() = 0f
 }
 
 object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH, true) {
@@ -203,6 +210,7 @@ object Sand : Floor(Type.TERRAIN_SAND, Glyph.BEACH, true) {
     override fun moveSpeed(actor: Actor) = 1.3f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
     override fun fertilityBonus() = -0.2f
+    override fun sleepComfort() = 0.2f
 }
 
 object Hardpan : Floor(Type.TERRAIN_HARDPAN, Glyph.HARDPAN, true, -1f) {
@@ -210,12 +218,14 @@ object Hardpan : Floor(Type.TERRAIN_HARDPAN, Glyph.HARDPAN, true, -1f) {
     override fun overlapsOn() = setOf(Type.TERRAIN_DIRT, Type.TERRAIN_ROCKS)
     override fun moveSpeed(actor: Actor) = 0.8f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+    override fun sleepComfort() = -0.2f
 }
 
 object Pavement : Floor(Type.TERRAIN_PAVEMENT, Glyph.PAVEMENT, false, -2f) {
     override fun name() = "pavement"
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
+    override fun sleepComfort() = -0.1f
 }
 
 object Rubble : Floor(Type.TERRAIN_RUBBLE, Glyph.RUBBLE, false, 2f) {
@@ -229,6 +239,7 @@ sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H, false, -2f) 
     override fun moveSpeed(actor: Actor) = 0.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
     override fun trailsOverwrite() = false
+    override fun sleepComfort() = -0.1f
 }
 
 object HighwayH : Highway() {

@@ -139,6 +139,7 @@ sealed class Terrain(
     open fun fertilityBonus() = 0f
     open fun glowColor(): LightColor? = null
     open fun trailsOverwrite() = true
+    open fun sleepComfort() = -0.5f
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
     open fun onStep(actor: Actor, x: Int, y: Int, data: TerrainData?) { }

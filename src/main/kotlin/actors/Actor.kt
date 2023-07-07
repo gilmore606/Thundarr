@@ -485,15 +485,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         Console.sayAct("You wake up.", "%N wakes up.", this)
     }
 
-    open fun onSleep() {
+    open fun onSleep(delta: Float) {
         if (hp < hpMax) {
-            if (!hasStatus(Status.Tag.STARVING)) {
-                if (Dice.chance(0.3f)) {
-                    var healmax = 5 + if (hasStatus(Status.Tag.HUNGRY)) -2 else if (hasStatus(Status.Tag.SATIATED)) 1 else 0
-                    healmax += (statuses.firstOrNull { it.tag == Status.Tag.BANDAGED } as Bandaged?)?.quality?.toInt() ?: -3
-                    val heal = Dice.range(0, Math.max(1, healmax))
-                    healDamage(heal.toFloat())
-                }
+            if (Dice.chance(0.3f)) {
+                var healmax = 3
+                val heal = Dice.range(0, Math.max(1, healmax))
+                healDamage(heal.toFloat())
             }
         }
     }

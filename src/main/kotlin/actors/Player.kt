@@ -28,6 +28,7 @@ import world.journal.Journal
 import world.level.EnclosedLevel
 import world.level.WorldLevel
 import world.stains.Fire
+import world.terrains.Terrain
 import java.lang.Float.min
 
 @Serializable
@@ -40,21 +41,23 @@ open class Player : Actor() {
         private const val caloriesHunger = -2000f
         private const val caloriesStarving = -4000f
 
+        private const val healSpeed = 0.3f
+
         class Lvl(val xp: Int, val name: String)
-        private val levels = listOf(
-            Lvl(0, "escaped"),
-            Lvl(200, "beggar"),
-            Lvl(500,"lost"),
-            Lvl(1000,"mendicant"),
-            Lvl(2000,"wanderer"),
-            Lvl(4000,"seeker"),
-            Lvl(8000,"tracker"),
-            Lvl(16000,"woodman"),
-            Lvl(32000,"hunter"),
-            Lvl(64000,"explorer"),
-            Lvl(104000,"fearless"),
-            Lvl(156000,"warrior"),
-            Lvl(228000,""),
+        val levels = listOf(
+            Lvl(0, "Runaway"),
+            Lvl(200, "Beggar"),
+            Lvl(500,"Lost"),
+            Lvl(1000,"Mendicant"),
+            Lvl(2000,"Wanderer"),
+            Lvl(4000,"Seeker"),
+            Lvl(8000,"Tracker"),
+            Lvl(16000,"Woodman"),
+            Lvl(32000,"Hunter"),
+            Lvl(64000,"Explorer"),
+            Lvl(104000,"Delver"),
+            Lvl(156000,"Intrepid"),
+            Lvl(228000,"Fearless"),
             Lvl(325000,""),
             Lvl(452000,""),
             Lvl(619000,""),
@@ -66,12 +69,12 @@ open class Player : Actor() {
             Lvl(2745000,""),
             Lvl(3338000,""),
             Lvl(4015000,""),
-            Lvl(4782000,"protector"),
-            Lvl(5639000,"hero"),
-            Lvl(6596000,"champion"),
-            Lvl(7663000,"warlord"),
-            Lvl(8850000,"conqueror"),
-            Lvl(9999999,"barbarian"),
+            Lvl(4782000,"Protector"),
+            Lvl(5639000,"Hero"),
+            Lvl(6596000,"Champion"),
+            Lvl(7663000,"Warlord"),
+            Lvl(8850000,"Conqueror"),
+            Lvl(9999999,"Barbarian"),
         )
     }
 
@@ -242,6 +245,37 @@ open class Player : Actor() {
         }
     }
 
+    override fun onSleep(delta: Float) {
+        var comfort = 0f
+        var inBed = false
+        statuses.forEach { comfort += it.comfort() }
+        level?.thingsAt(xy.x, xy.y)?.forEach {
+            if (!inBed) {
+                comfort += it.sleepComfort()
+                inBed = it is Bed
+            }
+        }
+        if (!inBed) {
+            comfort += Terrain.get(level?.getTerrain(xy.x, xy.y) ?: Terrain.Type.BLANK).sleepComfort()
+        }
+        if (level?.isRoofedAt(xy.x, xy.y) == false) comfort += -0.3f
+
+        if (Dice.chance(0.1f)) {
+            Console.say(when {
+                comfort <= -0.5f -> "You toss and turn uncomfortably."
+                else -> "You dream of large women."
+            })
+            log.info("sleep comfort: $comfort")
+        }
+
+        if (hp < hpMax && comfort > -0.5f) {
+            val healChance = (0.5f + (comfort * 0.5f)) * healSpeed
+            if (Dice.chance(healChance)) {
+                healDamage((hpMax / 20f), null)
+            }
+        }
+    }
+
     override fun wantsToPickUp(thing: Thing) = isAutoActionSafe() && autoPickUpTypes.contains(thing.tag)
 
     open fun addAutoPickUpType(type: Thing.Tag) {
@@ -253,7 +287,7 @@ open class Player : Actor() {
         Console.say("You give up on your $type collection.")
     }
 
-    override fun canSee(entity: Entity?) = entity != null && entity.level() == level && level!!.visibilityAt(entity.xy()!!.x, entity.xy()!!.y) == 1f
+    override fun canSee(entity: Entity?) = entity != null && entity.level() == level && level!!.visibilityAt(entity.xy().x, entity.xy().y) == 1f
 
     // Is it safe to do auto-actions like auto-pickup, shift-move, etc?
     // If we can see hostiles, it's not safe.
@@ -290,16 +324,32 @@ open class Player : Actor() {
                 }
             }
             if (clothing > 0) {
-                if (feltTemperature > 68) {
+                if (temperature > 68) {
                     feltTemperature += clothing / 2
                 } else {
                     feltTemperature += clothing
                 }
             } else if (clothing < 0) {
-                if (feltTemperature < 50) {
+                if (temperature < 50) {
                     feltTemperature += clothing
                 } else {
                     feltTemperature += clothing / 2
+                }
+            }
+            if (hasStatus(Status.Tag.ASLEEP)) {
+                level.thingsAt(xy.x, xy.y).firstOrNull { it is Bed }?.also {
+                    if (temperature > 68) {
+                        feltTemperature -= 5
+                    } else if (temperature < 50) {
+                        feltTemperature += 15
+                    }
+                } ?: run {
+                    if (temperature < 50) {
+                        feltTemperature -= 5
+                    }
+                }
+                if (!level.isRoofedAt(xy.x, xy.y)) {
+                    feltTemperature += if (temperature < 50) -8 else 0
                 }
             }
 

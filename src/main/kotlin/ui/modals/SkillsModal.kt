@@ -1,9 +1,11 @@
 package ui.modals
 
 import actors.Actor
+import actors.Player
 import actors.stats.*
 import audio.Speaker
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
 import ui.input.Keyboard
 import ui.input.Keydef
@@ -13,7 +15,7 @@ import java.lang.Integer.max
 
 class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
 
-    val header = 80
+    val header = 110
     val padding = 18
     val statSpacing = 32
     val skillSpacing = 24
@@ -44,6 +46,9 @@ class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
 
     override fun drawModalText() {
         super.drawModalText()
+
+        drawSubTitle("the ${Player.levels[App.player.xpLevel-1].name}")
+
         stats.forEachIndexed { n, stat ->
             val total = stat.get(actor)
             val bonus = statBonuses[n]

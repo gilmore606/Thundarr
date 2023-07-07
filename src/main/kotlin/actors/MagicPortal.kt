@@ -54,6 +54,7 @@ class MagicPortal : NPC() {
 
     private fun banishSelf() {
         level?.addSpark(Smoke().at(xy.x, xy.y))
+        App.weather.flashLightning(lightColor)
         Console.say("The portal vanishes with a crack of energy dispersal, leaving a puff of green vapor.")
         die()
     }

@@ -8,6 +8,7 @@ sealed class Bed() : Thing() {
     override fun isPortable() = false
     override fun isOpaque() = false
     override fun flammability() = 0.4f
+    override fun sleepComfort() = 0.6f
 }
 
 @Serializable
@@ -19,4 +20,5 @@ class Bedroll : Bed() {
     override fun isPortable() = true
     override fun weight() = 1.5f
     override fun flammability() = 0.7f
+    override fun sleepComfort() = 0.4f
 }

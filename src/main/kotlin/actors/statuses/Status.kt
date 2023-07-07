@@ -55,6 +55,7 @@ sealed class Status : StatEffector {
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
 
     open fun preventVision() = false
+    open fun comfort() = 0f
 
     open fun onAddStack(actor: Actor, added: Status) { }
 
@@ -133,6 +134,7 @@ class Satiated() : Status() {
     override fun statEffects() = mapOf(
         Speed.tag to -1f
     )
+    override fun comfort() = 0.2f
 
     override fun preventedAction(action: Action, actor: Actor): Boolean {
         if (action is Use && action.useTag == Thing.UseTag.CONSUME) {
@@ -158,6 +160,7 @@ class Cold(): Status() {
         Brains.tag to -2f,
         Speed.tag to -2f
     )
+    override fun comfort() = -0.5f
 }
 
 @Serializable
@@ -175,6 +178,7 @@ class Freezing(): Status() {
         Brains.tag to -4f,
         Speed.tag to -3f
     )
+    override fun comfort() = -1f
     override fun advanceTime(actor: Actor, delta: Float) {
         if (Dice.chance(0.05f * delta)) {
             Console.say("You're freezing to death!")
@@ -198,6 +202,7 @@ class Hot(): Status() {
         Brains.tag to -2f,
         Speed.tag to -2f
     )
+    override fun comfort() = -0.2f
 }
 
 @Serializable
@@ -215,6 +220,7 @@ class Heatstroke(): Status() {
         Brains.tag to -3f,
         Speed.tag to -2f
     )
+    override fun comfort() = -0.7f
     override fun advanceTime(actor: Actor, delta: Float) {
         if (Dice.chance(0.04f * delta)) {
             Console.say("You're dying of heatstroke!")
@@ -235,6 +241,7 @@ class Hungry() : Status() {
         Brains.tag to -1f,
         Speed.tag to -1f
     )
+    override fun comfort() = -0.5f
 }
 
 @Serializable
@@ -249,6 +256,7 @@ class Starving() : Status() {
         Brains.tag to -2f,
         Speed.tag to -2f
     )
+    override fun comfort() = -1f
     override fun advanceTime(actor: Actor, delta: Float) {
         if (Dice.chance(0.02f * delta)) {
             Console.say("You're starving to death!")
@@ -318,6 +326,7 @@ class Wet(): TimeStatus() {
     override fun statEffects() = mapOf(
         Speed.tag to -1f
     )
+    override fun comfort() = -0.5f
     override fun duration() = 10f
     override fun maxDuration() = 40f
     fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -16).toInt()
@@ -344,6 +353,7 @@ class Bandaged(
         val healPerDay = 16f + quality * 2f
         actor.healDamage((delta / GameTime.TURNS_PER_DAY).toFloat() * healPerDay)
     }
+    override fun comfort() = 0.3f
 }
 
 @Serializable
@@ -359,6 +369,7 @@ class Sick(): TimeStatus() {
         Strength.tag to -1f,
         Brains.tag to -1f
     )
+    override fun comfort() = -0.3f
     override fun duration() = Dice.float(40f, 80f)
     override fun maxDuration() = 300f
     override fun preventedAction(action: Action, actor: Actor): Boolean {
