@@ -107,6 +107,7 @@ enum class Glyph(val tall: Boolean = false) {
     HERDER,
     WOLFMAN,
     MOB_SHADOW,
+    MOB_WATER_SHADOW,
     SNAKEMAN,
     KARROK,
     THRALL,

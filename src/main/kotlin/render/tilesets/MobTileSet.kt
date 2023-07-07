@@ -7,6 +7,7 @@ fun ActorTileSet() =
     TileSet(SpriteSheets.Sheet.ActorSprites).apply {
 
         setTile(Glyph.MOB_SHADOW, SimpleTile(this, 3, 1))
+        setTile(Glyph.MOB_WATER_SHADOW, SimpleTile(this, 3, 0))
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))

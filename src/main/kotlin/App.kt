@@ -330,7 +330,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     BigSplashModal(
                         "Survive!",
                         "\"Hurry Thundarr -- into the portal!  There's no time!\"\n \nAt Princess Ariel's urging, I dove " +
-                                "into the swirling magic, transporting me out of the evil wizard's dungeons." +
+                                "into the swirling magic, transporting me out of $wizardFullName's dungeons." +
                                 "  With luck, I will meet her and my friend Ookla again soon.  But now I must make my way alone in Numeria.",
                         "Onward!",
                         true,

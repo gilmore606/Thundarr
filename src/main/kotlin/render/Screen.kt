@@ -29,6 +29,8 @@ import util.*
 import world.persist.LevelKeeper
 import world.stains.Fire
 import world.stains.Stain
+import world.terrains.Terrain
+import world.terrains.Water
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
@@ -247,10 +249,12 @@ object Screen : KtxScreen {
         val ly = ty - pov.y + renderTilesHigh
         val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
 
-        if (vis == 1f) {
+        val shadow = if (Terrain.get(actor.level?.getTerrain(actor.xy.x, actor.xy.y) ?: Terrain.Type.BLANK) is Water)
+            Glyph.MOB_WATER_SHADOW else Glyph.MOB_SHADOW
+        if (vis == 1f && shadow == Glyph.MOB_SHADOW) {
             actor.renderShadow { x0, y0, x1, y1 ->
                 actorBatch.addPartialQuad(
-                    x0, y0, x1, y1, actorBatch.getTextureIndex(Glyph.MOB_SHADOW),
+                    x0, y0, x1, y1, actorBatch.getTextureIndex(shadow),
                     1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f
                 )
             }
@@ -276,6 +280,14 @@ object Screen : KtxScreen {
             )
         }
         if (vis == 1f) {
+            if (shadow == Glyph.MOB_WATER_SHADOW) {
+                actor.renderShadow { x0, y0, x1, y1 ->
+                    actorBatch.addPartialQuad(
+                        x0, y0, x1, y1, actorBatch.getTextureIndex(shadow),
+                        1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f
+                    )
+                }
+            }
             actor.drawStatusGlyph { statusGlyph ->
                 uiWorldBatch.addTileQuad(
                     tx, ty,
