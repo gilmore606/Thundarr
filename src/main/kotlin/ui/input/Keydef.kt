@@ -48,7 +48,7 @@ enum class Keydef(
     OPEN_SKILLS("Open skills", BACKSPACE, true, KeydefSection.UI),
     OPEN_MAP("Open map", M, true, KeydefSection.UI),
     OPEN_JOURNAL("Open journal", O, true, KeydefSection.UI),
-    TOOLBAR_SHOW("Show toolbar", GRAVE, true, KeydefSection.UI),
+    TOOLBAR_SHOW("Show toolbar", NUM_0, true, KeydefSection.UI),
 
     CANCEL("Cancel / Menu", ESCAPE, false, KeydefSection.HIDDEN),
     SHORTCUT1("Shortcut 1", NUM_1, false, KeydefSection.HIDDEN),
@@ -60,6 +60,8 @@ enum class Keydef(
     SHORTCUT7("Shortcut 7", NUM_7, false, KeydefSection.HIDDEN),
     SHORTCUT8("Shortcut 8", NUM_8, false, KeydefSection.HIDDEN),
     SHORTCUT9("Shortcut 9", NUM_9, false, KeydefSection.HIDDEN),
+
+    DEBUG_CONSOLE("Debug_Console", GRAVE, false, KeydefSection.HIDDEN),
     DEBUG_F9("Debug_F9", F9, false, KeydefSection.HIDDEN),
     DEBUG_F10("Debug_F10", F10, false, KeydefSection.HIDDEN),
     DEBUG_F11("Debug_F11", F11, false, KeydefSection.HIDDEN),

@@ -185,4 +185,10 @@ class Weather {
             }
         }
     }
+
+    fun forceWeather(intensity: Float) {
+        weatherIntensity = intensity
+        weatherIntensityTarget = intensity
+        updateTime(App.gameTime.hour, App.gameTime.minute, App.level)
+    }
 }

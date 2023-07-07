@@ -1,11 +1,13 @@
 package ui.panels
 
 import actors.Player
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
 import render.tilesets.Glyph
+import ui.input.Keydef
 import util.XY
 import util.log
 import world.Entity
@@ -33,7 +35,7 @@ object Console : Panel() {
     private var floatText = ""
     private var floatAge = 0f
     private var floatWidth = 0
-    private var floatFadeTime = 1.6f
+    private var floatFadeTime = 2f
 
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
@@ -43,6 +45,9 @@ object Console : Panel() {
     private var burst = 1f
     private var burstFloor = 1f
     private var mouseInside = false
+
+    var inputActive = false
+    var inputCommand = ""
 
     private val pronounSubs = mutableMapOf<String,(Entity?,Entity?,Entity?)->String>().apply {
         set("n") { s,d,i -> s?.name() ?: "???" } // subject
@@ -108,12 +113,16 @@ object Console : Panel() {
         lastLineMs = System.currentTimeMillis()
         if (text == lines.last()) return
         log.info("  \"$text\"")
-        lines.add(text)
+        addLine(text)
+    }
+
+    private fun addLine(line: String) {
+        lines.add(line)
         scroll += lineSpacing.toFloat()
         if (lines.size > maxLines) {
             lines.removeFirst()
         }
-        resetFloat(text)
+        resetFloat(line)
     }
 
     fun sayFromThread(text: String) {
@@ -183,7 +192,7 @@ object Console : Panel() {
         if (burstFloor == 1f && Screen.timeMs - dimDelayMs > lastLineMs) {
             burstFloor = dimLevel
         }
-        if (!mouseInside) burst = max(burstFloor, burst - burstDecay * delta)
+        if (!(mouseInside || inputActive)) burst = max(burstFloor, burst - burstDecay * delta)
 
         color.apply {
             r = min(1f, Screen.fontColor.r * burst)
@@ -211,7 +220,7 @@ object Console : Panel() {
     override fun drawText() {
         var offset = scroll.toInt() + padding
         lines.forEachIndexed { n, line ->
-            if (mouseInside || (n >= lines.size - maxLinesShown)) {
+            if ((mouseInside || inputActive) || (n >= lines.size - maxLinesShown)) {
                 drawString(
                     line, padding, offset,
                     if (n == lines.lastIndex) color else colorDull
@@ -229,7 +238,7 @@ object Console : Panel() {
     }
 
     override fun drawBackground() {
-        if (mouseInside && !App.attractMode) {
+        if ((mouseInside || inputActive) && !App.attractMode) {
             Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
                 Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
                 Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.5f)
@@ -241,5 +250,78 @@ object Console : Panel() {
         floatAge = 0f
         floatWidth = measure(floatText, Screen.smallFont)
         floatFadeTime = 1f + (floatText.length * 0.04f)
+    }
+
+    fun openDebug() {
+        log.info("opening debug console")
+        inputActive = true
+        lines.add("> _")
+        inputCommand = ""
+        burst = 1.2f
+    }
+
+    fun keycodeDown(keycode: Int) {
+        val line = lines.last()
+        when (keycode) {
+            Input.Keys.ENTER -> {
+                inputActive = false
+                lines.removeLast()
+                addLine("> $inputCommand")
+                debugCommand(inputCommand)
+                inputCommand = ""
+            }
+            Input.Keys.BACKSPACE -> {
+                if (inputCommand.isNotEmpty()) inputCommand = inputCommand.dropLast(1)
+                updateCommand()
+            }
+            Input.Keys.SPACE -> {
+                inputCommand += " "
+                updateCommand()
+            }
+            Input.Keys.GRAVE -> {
+                inputActive = false
+                lines.removeLast()
+                inputCommand = ""
+            }
+            else -> {
+                inputCommand += Input.Keys.toString(keycode).toLowerCase()
+                updateCommand()
+            }
+        }
+    }
+
+    private fun updateCommand() {
+        lines.removeLast()
+        lines.add("> ${inputCommand}_")
+    }
+
+    private fun debugCommand(commandString: String) {
+        val words = commandString.split(" ")
+        val command = words[0]
+        when (command) {
+            "help", "?" -> {
+                say("Commands:")
+                say("  HP <amount> - Change hp to amount (or full if no amount)")
+                say("  GET <item> - Spawn item in inventory")
+                say("  SPAWN <npc> - Spawn NPC in front of you")
+                say("  TIME <hours> - Advance time n hours")
+                say("  WEATHER <value> - Change weather to 0.0 - 1.0 (or 0 if no value)")
+            }
+            "hp" -> { debugHp(words) }
+            "weather" -> { debugWeather(words) }
+            else -> say("I don't understand that.")
+        }
+    }
+
+    private fun debugHp(words: List<String>) {
+        val newhp = if (words.size > 1) words[1].toInt().toFloat() else App.player.hpMax
+        App.player.hp = newhp
+        say("hp set to $newhp / ${App.player.hpMax}.")
+    }
+
+    private fun debugWeather(words: List<String>) {
+        val newWeather = if (words.size > 1) words[1].toFloat() else 0f
+        App.weather.forceWeather(newWeather)
+        say("Weather forced to $newWeather.")
     }
 }

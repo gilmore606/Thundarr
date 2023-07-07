@@ -17,6 +17,7 @@ import ui.panels.DebugPanel
 import ui.panels.Toolbar
 import util.*
 import ui.input.Keydef.*
+import ui.panels.Console
 
 object Keyboard : KtxInputAdapter {
 
@@ -173,6 +174,11 @@ object Keyboard : KtxInputAdapter {
     }
 
     private fun pressKey(keycode: Int) {
+        if (Console.inputActive) {
+            Console.keycodeDown(keycode)
+            return
+        }
+
         when (keycode) {
             ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
         }
@@ -222,6 +228,8 @@ object Keyboard : KtxInputAdapter {
                 SHORTCUT7 -> { Toolbar.onKey(7) }
                 SHORTCUT8 -> { Toolbar.onKey(8) }
                 SHORTCUT9 -> { Toolbar.onKey(9) }
+
+                DEBUG_CONSOLE -> { Console.openDebug() }
 
                 else -> when (keycode) {
                     I -> { App.player.debugMove(NORTH) }
