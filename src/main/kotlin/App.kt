@@ -299,6 +299,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             loadingModal.abort()
             delay(500)
+            App.player.tempInvisible = true
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
             Console.say(
@@ -325,6 +326,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                         true
                     )
                 )
+                App.player.tempInvisible = false
             } else {
                 Screen.addModal(
                     BigSplashModal(
@@ -338,6 +340,9 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                     )
                 )
                 MagicPortal().spawnAt(level, App.player.xy.x + 1, App.player.xy.y)
+                delay(1000)
+                weather.flashLightning(LightColor(1f, 0.7f, 1f))
+                App.player.tempInvisible = false
             }
         }
     }

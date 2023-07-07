@@ -77,7 +77,8 @@ open class Player : Actor() {
     var journal: Journal = Journal()
     var dangerMode: Boolean = false
     var thrownTag: Thing.Tag? = null
-    override fun glyph() = Glyph.PLAYER
+    var tempInvisible: Boolean = false
+    override fun glyph() = if (tempInvisible) Glyph.BLANK else Glyph.PLAYER
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A stalwart blond barbarian.  His good looks are somewhat marred by a permanent scowl."

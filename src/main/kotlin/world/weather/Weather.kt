@@ -86,6 +86,13 @@ class Weather {
         lightning.b = bolt
     }
 
+    fun flashLightning(color: LightColor) {
+        lightning.r = color.r
+        lightning.g = color.g
+        lightning.b = color.b
+        Speaker.world(Speaker.SFX.THUNDER_NEAR)
+    }
+
     fun updateTime(hour: Int, minute: Int, level: Level) {
         if (hour != lastWeatherHour) {
             lastWeatherHour = hour
