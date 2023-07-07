@@ -40,37 +40,38 @@ open class Player : Actor() {
         private const val caloriesHunger = -2000f
         private const val caloriesStarving = -4000f
 
-        private val xpForLevel = listOf(
-            0,
-            200,
-            500,
-            1000,
-            2000,
-            4000,
-            8000,
-            16000,
-            32000,
-            64000,
-            104000,
-            156000,
-            228000,
-            325000,
-            452000,
-            619000,
-            831000,
-            1093000,
-            1410000,
-            1787000,
-            2230000,
-            2745000,
-            3338000,
-            4015000,
-            4782000,
-            5639000,
-            6596000,
-            7663000,
-            8850000,
-            9999999
+        class Lvl(val xp: Int, val name: String)
+        private val levels = listOf(
+            Lvl(0, "escaped"),
+            Lvl(200, "beggar"),
+            Lvl(500,"lost"),
+            Lvl(1000,"mendicant"),
+            Lvl(2000,"wanderer"),
+            Lvl(4000,"seeker"),
+            Lvl(8000,"tracker"),
+            Lvl(16000,"woodman"),
+            Lvl(32000,"hunter"),
+            Lvl(64000,"explorer"),
+            Lvl(104000,"fearless"),
+            Lvl(156000,"warrior"),
+            Lvl(228000,""),
+            Lvl(325000,""),
+            Lvl(452000,""),
+            Lvl(619000,""),
+            Lvl(831000,""),
+            Lvl(1093000,""),
+            Lvl(1410000,""),
+            Lvl(1787000,""),
+            Lvl(2230000,""),
+            Lvl(2745000,""),
+            Lvl(3338000,""),
+            Lvl(4015000,""),
+            Lvl(4782000,"protector"),
+            Lvl(5639000,"hero"),
+            Lvl(6596000,"champion"),
+            Lvl(7663000,"warlord"),
+            Lvl(8850000,"conqueror"),
+            Lvl(9999999,"barbarian"),
         )
     }
 
@@ -365,9 +366,9 @@ open class Player : Actor() {
 
     fun gainXP(added: Int) {
         val effLevel = xpLevel + levelUpsAvailable
-        if (effLevel >= xpForLevel.size - 1) return
+        if (effLevel >= levels.size - 1) return
         xp += added
-        if (xp >= xpForLevel[effLevel]) {
+        if (xp >= levels[effLevel].xp) {
             earnLevelUp()
         }
     }
@@ -382,7 +383,7 @@ open class Player : Actor() {
         if (levelUpsAvailable < 1) return
         levelUpsAvailable--
         xpLevel++
-        Console.say("You feel your inner potential has been realized!")
+        Console.say("You feel your potential realized.  You are Thundarr the ${levels[xpLevel].name.capitalize()}.")
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
 
         Heart.improve(this, fullLevel = true)
