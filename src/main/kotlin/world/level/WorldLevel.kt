@@ -41,7 +41,9 @@ class WorldLevel() : Level() {
     override fun allChunks() = loadedChunks
     override fun levelId() = "world"
 
-    override fun isReady() = loadedChunks.size >= chunksWide * chunksWide
+    override fun isReady(): Boolean {
+        return loadedChunks.size >= chunksWide * chunksWide
+    }
 
     override fun getNewPlayerEntranceFrom(): XY? {
         // Brand new start.
@@ -225,7 +227,7 @@ class WorldLevel() : Level() {
             log.error("Received outdated chunk intended for cx $cx cy $cy !  Dropping")
             return
         }
-        log.debug("Received hot chunk $cx $cy !")
+        //log.info("Received new chunk $cx $cy (${loadedChunks.size} total)")
         val oldChunk = chunks[cx][cy]
         chunks[cx][cy] = chunk
         loadedChunks.add(chunk)

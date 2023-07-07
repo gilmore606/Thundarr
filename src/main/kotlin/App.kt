@@ -1,4 +1,5 @@
 import actors.AttractPlayer
+import actors.MagicPortal
 import actors.Player
 import actors.factions.Factions
 import audio.Speaker
@@ -194,7 +195,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
 
             level = LevelKeeper.getLevel(state.levelId)
-            if (level !is WorldLevel) LevelKeeper.getLevel("world")
+            if (level !is WorldLevel) LevelKeeper.getLevel("world") // load the world too if we loaded indoors
 
             player = state.player
             level.setPov(player.xy.x, player.xy.y)
@@ -207,7 +208,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             while (!level.isReady()) {
                 log.info("Waiting for level...")
-                delay(100)
+                delay(250)
             }
             movePlayerIntoLevel(player.xy.x, player.xy.y)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
@@ -254,7 +255,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             var rejected = true
             while (rejected) {
                 val loadingModal = LoadingModal(
-                    "Generating new world -- please wait a moment...", withProgress = true
+                    "Building new world -- please wait a moment...", withProgress = true
                 )
                 Screen.addModal(loadingModal)
                 Screen.brightnessTarget = 0f
@@ -285,12 +286,18 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player = Player()
             player.onSpawn()
 
+            val loadingModal = LoadingModal(
+                "Loading initial world..."
+            )
+            Screen.addModal(loadingModal)
+
             var playerStart: XY? = null
-            while (playerStart == null) {
+            while (playerStart == null || !level.isReady()) {
                 log.debug("Waiting for new level entrance...")
                 delay(200)
                 playerStart = level.getNewPlayerEntranceFrom()
             }
+            loadingModal.abort()
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
@@ -322,12 +329,15 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Screen.addModal(
                     BigSplashModal(
                         "Survive!",
-                        "For many years I labored in chains.  But today, the Lords of Light smile on me -- on a work gang detail, I managed to slip away unnoticed and hide.  Now I must make my way alone in Numeria.",
+                        "\"Hurry Thundarr -- into the portal!  There's no time!\"\n \nAt Princess Ariel's urging, I dove " +
+                                "into the swirling magic, transporting me out of the evil wizard's dungeons." +
+                                "  With luck, I will meet her and my friend Ookla again soon.  But now I must make my way alone in Numeria.",
                         "Onward!",
                         true,
                         true
                     )
                 )
+                MagicPortal().spawnAt(level, App.player.xy.x + 1, App.player.xy.y)
             }
         }
     }

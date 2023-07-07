@@ -440,6 +440,9 @@ object Screen : KtxScreen {
         lastPov.y = pov.y
         cameraPovX = pov.x.toDouble()
         cameraPovY = pov.y.toDouble()
+        cameraLastMoveX = 0.0
+        cameraLastMoveY = 0.0
+        log.info("Screen.recenterCamera()")
     }
 
     fun clearCursor() {

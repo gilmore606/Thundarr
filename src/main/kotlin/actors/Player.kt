@@ -86,7 +86,7 @@ open class Player : Actor() {
 
     override fun initialFactions() = mutableSetOf(App.factions.humans)
 
-    override fun visualRange() = 26f
+    override fun visualRange() = 30f
     override fun hasActionJuice() = queuedActions.isNotEmpty()
     override fun wantsToAct() = true
     override fun defaultAction(): Action? = null

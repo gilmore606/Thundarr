@@ -34,6 +34,10 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
 
     fun addProgress(more: Float) { progress = min(1f, progress + more) }
 
+    fun abort() {
+        dismissed = true
+    }
+
     override fun onRender(delta: Float) {
         super.onRender(delta)
         if (dismissed) return

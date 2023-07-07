@@ -24,7 +24,7 @@ object ChunkLoader {
     init {
         coroutineScope.launch {
             while (!App.isExiting) {
-                delay(100L)
+                delay(250L)
                 if (jobs.isNotEmpty()) {
                     jobs = jobs.filter { it.isActive }.toMutableSet()
                 }
@@ -37,7 +37,7 @@ object ChunkLoader {
 
     fun getWorldChunkAt(level: Level, x: Int, y: Int, callback: (Chunk)->Unit) {
         if (openRequests.hasOneWhere { it.x == x && it.y == y }) {
-            log.info("Ignoring request for already-loading chunk at $x $y")
+            //log.info("Ignoring request for already-loading chunk at $x $y")
             return
         }
         openRequests.add(XY(x,y))

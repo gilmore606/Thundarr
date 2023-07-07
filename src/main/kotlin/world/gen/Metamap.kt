@@ -52,9 +52,9 @@ object Metamap {
     val maxRangePeakDistance = 3f
     val isolatedMountainDensity = 0.2f
     val mountainRangeWetness = 6
-    val randomHillChance = 0.015f
+    val randomHillChance = 0.02f
     val randomForestChance = 0.015f
-    val randomMountainChance = 0.01f
+    val randomMountainChance = 0.02f
     val oasisChance = 0.01f
     val citiesRiverMouth = 6
     val citiesRiver = 8
@@ -647,13 +647,13 @@ object Metamap {
                         else if (biomeNeighbors(x, y, Mountain) > 1 && Dice.chance(0.5f)) cell.biome = ForestHill
                     }
                     Plain -> {
-                        if (biomeNeighbors(x, y, Plain, true) == 8) {
+                        if (biomeNeighbors(x, y, Plain, true) + biomeNeighbors(x, y, Scrub, true) >= 8) {
                             if (Dice.chance(randomHillChance)) cell.biome = if (Dice.flip()) Hill else ForestHill
                             if (Dice.chance(randomForestChance)) cell.biome = Forest
                             if (Dice.chance(randomMountainChance)) {
                                 cell.biome = Mountain
                                 CARDINALS.from(x, y) { dx, dy, dir ->
-                                    if (Dice.chance(0.6f)) scratches[dx][dy].biome = Hill
+                                    if (Dice.chance(0.7f)) scratches[dx][dy].biome = if (Dice.flip()) Hill else ForestHill
                                 }
                             }
                         }
@@ -998,7 +998,7 @@ object Metamap {
             //startChunk = villages.random()
             // Pick a cabin chunk
             forEachScratch { x, y, cell ->
-                if (cell.hasFeature(Peak::class)) {
+                if (cell.hasFeature(Lake::class)) {
                     startChunk = XY(x,y)
                 }
             }
