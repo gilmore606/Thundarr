@@ -47,7 +47,18 @@ class WorldLevel() : Level() {
 
     override fun getNewPlayerEntranceFrom(): XY? {
         // Brand new start.
-        return Metamap.suggestedPlayerStart
+        var entrance = Metamap.suggestedPlayerStart
+        var tries = 0
+        while (tries < 200) {
+            tries++
+            val dx = entrance.x + Dice.zeroTo(62)
+            val dy = entrance.y + Dice.zeroTo(62)
+            if (isWalkableAt(App.player, dx, dy)) {
+                entrance = XY(dx,dy)
+                return entrance
+            }
+        }
+        return entrance
     }
 
     override fun getPlayerEntranceFrom(fromLevelId: String): XY? {

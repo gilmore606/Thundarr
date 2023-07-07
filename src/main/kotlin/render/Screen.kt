@@ -115,8 +115,8 @@ object Screen : KtxScreen {
             spaceX = -1
             kerning = true
             genMipMaps = true
-            minFilter = TextureFilter.MipMapNearestNearest
-            magFilter = TextureFilter.MipMapNearestNearest
+            minFilter = TextureFilter.MipMapLinearLinear
+            magFilter = TextureFilter.MipMapLinearLinear
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
@@ -127,8 +127,8 @@ object Screen : KtxScreen {
             spaceX = -1
             kerning = true
             genMipMaps = true
-            minFilter = TextureFilter.MipMapNearestNearest
-            magFilter = TextureFilter.MipMapNearestNearest
+            minFilter = TextureFilter.MipMapLinearLinear
+            magFilter = TextureFilter.MipMapLinearLinear
             color = Color(1f, 1f, 0.8f, 0.9f)
             borderColor = Color(0f, 0f, 0f, 0.5f)
         })
