@@ -75,6 +75,7 @@ abstract class Modal(
     }
 
     var darkenUnder = true
+    var darkenUnderSidecar = true
 
     override fun myTextBatch() = textBatch
     override fun myBoxBatch() = boxBatch
@@ -107,9 +108,13 @@ abstract class Modal(
             Screen.underModal?.also { under ->
                 myBoxBatch().addPixelQuad(under.x, under.y, under.x + under.width, under.y + under.height,
                     myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = 0.4f)
-                under.sidecar?.also {
-                    myBoxBatch().addPixelQuad(it.x, it.y, it.x + it.width, it.y + it.height,
-                        myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = 0.4f)
+                if (darkenUnderSidecar) {
+                    under.sidecar?.also {
+                        myBoxBatch().addPixelQuad(
+                            it.x, it.y, it.x + it.width, it.y + it.height,
+                            myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = 0.4f
+                        )
+                    }
                 }
             }
         }

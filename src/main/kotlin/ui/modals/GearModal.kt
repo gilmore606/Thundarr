@@ -33,7 +33,7 @@ class GearModal(
         fillSlots()
 
         sidecar = CompareSidecar(this)
-        (sidecar as CompareSidecar).showGear1(slots[selection]?.current)
+        (sidecar as CompareSidecar).showList(slots[selection].slot)
     }
 
     override fun drawModalText() {
@@ -100,9 +100,9 @@ class GearModal(
 
     override fun changeSelection(newSelection: Int) {
         super.changeSelection(newSelection)
-        if (newSelection > -1) {
-            (sidecar as CompareSidecar).showGear1(slots[newSelection].current)
-        }
+        (sidecar as CompareSidecar).showList(
+            if (newSelection > -1) slots[newSelection].slot else null
+        )
     }
 
     override fun childSucceeded() {

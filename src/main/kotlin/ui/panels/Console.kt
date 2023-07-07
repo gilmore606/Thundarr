@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import render.Screen
 import render.tilesets.Glyph
+import things.Thing
 import ui.input.Keydef
 import util.XY
 import util.log
@@ -302,13 +303,14 @@ object Console : Panel() {
             "help", "?" -> {
                 say("Commands:")
                 say("  HP <amount> - Change hp to amount (or full if no amount)")
-                say("  GET <item> - Spawn item in inventory")
+                say("  GET <item> - Spawn item on ground")
                 say("  SPAWN <npc> - Spawn NPC in front of you")
                 say("  TIME <hours> - Advance time n hours")
                 say("  WEATHER <value> - Change weather to 0.0 - 1.0 (or 0 if no value)")
             }
             "hp" -> { debugHp(words) }
             "weather" -> { debugWeather(words) }
+            "get" -> { debugGet(words) }
             else -> say("I don't understand that.")
         }
     }
@@ -323,5 +325,20 @@ object Console : Panel() {
         val newWeather = if (words.size > 1) words[1].toFloat() else 0f
         App.weather.forceWeather(newWeather)
         say("Weather forced to $newWeather.")
+    }
+
+    private fun debugGet(words: List<String>) {
+        if (words.size <= 1) {
+            say("Usage: GET <item name>")
+            return
+        }
+        val itemName = words.drop(1).joinToString(" ")
+        Thing.Tag.values().firstOrNull { it.singularName.contains(itemName, ignoreCase = true) }?.also { tag ->
+            val thing = tag.spawn.invoke()
+            thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
+            say("Spawned ${thing}.")
+        } ?: run {
+            say("I don't know about anything called '${words[1]}'.")
+        }
     }
 }

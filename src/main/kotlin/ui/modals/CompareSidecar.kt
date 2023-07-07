@@ -10,9 +10,12 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
 
     var gear1: Gear? = null
     var gear2: Gear? = null
+    var slot: Gear.Slot? = null
     private var gear1desc = ArrayList<String>()
     private var gear2desc = ArrayList<String>()
+    private var slotList = ArrayList<String>()
 
+    private val listWidth = 200
     private val widthPerGear = 250
     private val padding = 18
     private val statSpacing = 24
@@ -41,9 +44,20 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
         adjustSize()
     }
 
-    fun adjustSize() {
+    fun showList(newSlot: Gear.Slot?) {
+        slot = newSlot
+        slotList.clear()
+        slot?.also { slot ->
+            App.player.contents.filter { it is Gear && it.slot == slot }.forEach { gear ->
+                slotList.add(gear.name())
+            }
+        }
+        adjustSize()
+    }
+
+    private fun adjustSize() {
         if (gear1 == null && gear2 == null) {
-            width = 0
+            if (slotList.isNotEmpty()) width = listWidth else width = 0
         } else if (gear2 != null) {
             width = widthPerGear * 2
         } else {
@@ -55,6 +69,14 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 350) {
         super.drawModalText()
         gear1?.also { drawExamText(it, 0, gear1desc) }
         gear2?.also { drawExamText(it, widthPerGear, gear2desc, gear1) }
+        if (gear1 == null && gear2 == null && slotList.isNotEmpty()) {
+            slot?.also { slot ->
+                drawString("${slot.title} gear", padding, padding + 10, font = Screen.subTitleFont)
+                slotList.forEachIndexed { n, item ->
+                    drawString(item, padding + 16, padding + (n * 20) + 50, font = Screen.smallFont)
+                }
+            }
+        }
     }
 
     private fun drawExamText(gear: Gear, x0: Int, desc: List<String>, compareTo: Gear? = null) {

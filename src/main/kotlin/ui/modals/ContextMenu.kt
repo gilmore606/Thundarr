@@ -46,6 +46,8 @@ class ContextMenu(
         this.shadowOffset = 6
         this.borderWidth = 1
         this.headerPad = 16
+        this.darkenUnder = true
+        this.darkenUnderSidecar = false
         changeSelection(0)
     }
 

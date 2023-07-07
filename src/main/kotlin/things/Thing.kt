@@ -259,6 +259,7 @@ sealed class Thing() : Entity {
         if (this is Temporal) holder?.level?.linkTemporal(this)
         onMoveTo(from, to)
     }
+    fun moveTo(xy:  XY) = moveTo(xy.x, xy.y)
     fun moveTo(x: Int, y: Int) = moveTo(level()?.cellContainerAt(x, y) ?: throw RuntimeException("moved $this to local coords but it wasn't in a level!"))
     fun moveTo(level: Level, x: Int, y: Int) = moveTo(level.cellContainerAt(x, y))
 
