@@ -948,15 +948,22 @@ object Metamap {
                     }
                 }
             }
-            fun nameArea(areaID: Int, name: String) {
+            fun nameArea(areaID: Int, name: String, alsoRun: ((ChunkScratch)->Unit)? = null) {
                 forEachScratch { x, y, cell ->
-                    if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle(cell.habitat))
+                    if (areaMap[x][y] == areaID && cell.title == "" && cell.defaultTitle() == cell.biome.defaultTitle(cell.habitat)) {
                         cell.title = name
+                        alsoRun?.invoke(cell)
+                    }
                 }
             }
             areas[Ruins]?.sortByDescending { it.size }
             areas[Ruins]?.forEachIndexed { n, area ->
-                nameArea(area.areaID, if (n < 6) Madlib.bigCityName() else Madlib.smallCityName())
+                val name = if (n < 6) Madlib.bigCityName() else Madlib.smallCityName()
+                nameArea(area.areaID, name) { cell ->
+                    cell.features().firstOrNull { it is RuinedCitySite }?.also { site ->
+                        (site as RuinedCitySite).name = name
+                    }
+                }
             }
             areas[Swamp]?.forEachIndexed { n, area ->
                 nameArea(area.areaID, Madlib.swampName())
@@ -1376,7 +1383,7 @@ object Metamap {
                     }
                     actualSite?.also { actualSite ->
                         cityCells.add(actualSite)
-                        scratches[actualSite.x][actualSite.y].addFeature(RuinedCitySite("Fix Later"))
+                        scratches[actualSite.x][actualSite.y].addFeature(RuinedCitySite())
                         placed = true
                     }
                 }

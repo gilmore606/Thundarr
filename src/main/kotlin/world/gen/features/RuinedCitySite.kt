@@ -6,9 +6,8 @@ import world.gen.biomes.Biome
 import world.quests.FetchQuest
 
 @Serializable
-class RuinedCitySite(
-    val name: String,
-) : Stronghold() {
+class RuinedCitySite() : Stronghold() {
+    var name: String = "???"
     override fun order() = 4
     override fun stage() = Stage.BUILD
     override fun name() = name
