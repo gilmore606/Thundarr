@@ -79,10 +79,10 @@ abstract class SelectionModal(
         batch?.addPixelQuad(x0, y0, x0 + 32, y0 + 32, batch.getTextureIndex(entity.glyph()), hue = entity.hue())
     }
 
-    protected fun drawOptionShade(space: Int = 0, forceY: Int? = null) {
+    protected fun drawOptionShade(space: Int = 0, forceY: Int? = null, rightSpace: Int = 0) {
         if (!isAnimating() && selection >= 0) {
             drawSelectionBox(padding + space,
-                forceY ?: (headerPad + selection * spacing + 1), width - padding * 2 - 4 - space, selectionBoxHeight)
+                forceY ?: (headerPad + selection * spacing + 1), width - padding * 2 - 4 - space - rightSpace, selectionBoxHeight)
         }
     }
 

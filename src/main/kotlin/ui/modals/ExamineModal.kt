@@ -14,48 +14,15 @@ import world.Entity
 class ExamineModal(
     val entity: Entity,
     position: Position = Position.LEFT
-) : Modal(400, 400, entity.name(), position), ContextMenu.ParentModal {
+) : Modal(400, 400, entity.name(), position) {
 
     private val padding = 22
     private val statSpacing = 24
     private var statY = 0
-    private var menuDeployed = false
 
     private val wrappedDesc = wrapText(entity.examineDescription(), width - 64, padding, Screen.font)
     private val wrappedInfo = wrapText(entity.examineInfo(), width, padding, Screen.font)
 
-    override fun onRender(delta: Float) {
-        super.onRender(delta)
-        if (entity is Thing && !menuDeployed && !isAnimating()) {
-            menuDeployed = true
-            deployUseMenu()
-        }
-    }
-
-    private fun deployUseMenu() {
-        val parent = this
-        if (entity is Thing) {
-            val menu = ContextMenu(
-                width - 150, y + 4
-            ).apply {
-                this.parentModal = parent
-                this.darkenUnder = false
-                addInventoryOptions(this, entity, forExamine = true)
-                x = this@ExamineModal.x - maxOptionWidth - 30
-            }
-            if (menu.options.isNotEmpty()) {
-                Screen.addModal(menu)
-            }
-        }
-    }
-
-    override fun childSucceeded() {
-        dismiss()
-    }
-
-    override fun childCancelled() {
-        dismiss()
-    }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         dismiss()

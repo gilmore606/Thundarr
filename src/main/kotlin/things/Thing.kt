@@ -216,6 +216,7 @@ sealed class Thing() : Entity {
     override fun description() =  ""
     open fun listTag() = if (tag == App.player.thrownTag) "(throwing)" else ""
     fun listName() = name() + " " + listTag()
+    open fun canListGrouped() = listTag() == ""
 
     override fun examineInfo(): String {
         if (thrownDamage(App.player, 6f) > defaultThrownDamage()) {

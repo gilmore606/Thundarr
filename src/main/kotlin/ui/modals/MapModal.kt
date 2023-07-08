@@ -91,7 +91,7 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         when (key) {
             Keydef.CANCEL, Keydef.OPEN_MAP -> dismiss()
             Keydef.OPEN_SKILLS -> replaceWith(SkillsModal(App.player))
-            Keydef.OPEN_INV -> replaceWith(InventoryModal(App.player))
+            Keydef.OPEN_INV -> replaceWith(ThingsModal(App.player))
             Keydef.OPEN_GEAR -> replaceWith(GearModal(App.player))
             Keydef.OPEN_JOURNAL -> replaceWith(JournalModal())
             Keydef.ZOOM_OUT -> {

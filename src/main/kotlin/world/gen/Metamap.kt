@@ -1095,7 +1095,6 @@ object Metamap {
     }
 
     fun finishBuildWorld() {
-
         worldRejected = false
         isWorking = false
     }

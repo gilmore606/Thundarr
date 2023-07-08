@@ -287,6 +287,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             player = Player()
             player.onSpawn()
+            player.tempInvisible = true
 
             val loadingModal = LoadingModal(
                 "Loading initial world..."
@@ -301,7 +302,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             }
             loadingModal.abort()
             delay(500)
-            player.tempInvisible = true
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
             Console.say(
@@ -450,7 +450,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     fun openSettings() { Screen.addModal(SettingsModal()) }
     fun openControls() { Screen.addModal(ControlsModal()) }
     fun openCredits() { Screen.addModal(CreditsModal()) }
-    fun openInventory(withContainer: Container? = null) { Screen.addModal(InventoryModal(player, withContainer)) }
+    fun openInventory(withContainer: Container? = null) { Screen.addModal(ThingsModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }
     fun openSkills() { Screen.addModal(SkillsModal(player)) }
     fun openMap() { Screen.addModal(MapModal()) }

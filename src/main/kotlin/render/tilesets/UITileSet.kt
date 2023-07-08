@@ -40,4 +40,6 @@ fun UITileSet() =
         setTile(Glyph.INVENTORY_TOOLS, SimpleTile(this, 5, 3))
         setTile(Glyph.INVENTORY_MISC, SimpleTile(this, 5, 5))
         setTile(Glyph.CONSOLE_SHADE, SimpleTile(this, 0, 6))
+        setTile(Glyph.ARROW_UP, SimpleTile(this, 1, 6))
+        setTile(Glyph.ARROW_DOWN, SimpleTile(this, 2, 6))
     }

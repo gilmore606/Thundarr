@@ -79,6 +79,8 @@ enum class Glyph(val tall: Boolean = false) {
     INVENTORY_CONSUMABLES,
     INVENTORY_MISC,
     CONSOLE_SHADE,
+    ARROW_UP,
+    ARROW_DOWN,
 
     PLAYER,
     PEASANT_PALE_DARK,

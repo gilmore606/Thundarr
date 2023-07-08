@@ -34,6 +34,7 @@ sealed class Container : Portable(), ThingHolder {
     open fun preposition() = "in"
     open fun itemLimit() = 100
     open fun isOpenable() = true
+    open fun canAccept(thing: Thing) = contents().size < itemLimit()
 
     override fun onRestore(holder: ThingHolder) {
         super.onRestore(holder)

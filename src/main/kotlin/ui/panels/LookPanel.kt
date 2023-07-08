@@ -2,7 +2,7 @@ package ui.panels
 
 import actors.Player
 import render.Screen
-import ui.modals.InventoryModal
+import ui.modals.ThingsModal
 import util.XY
 import util.wrapText
 import world.Entity
@@ -77,7 +77,7 @@ object LookPanel : ShadedPanel() {
 
     private fun showPos() = Screen.cursorPosition ?: App.player.xy
 
-    private fun isInventory(): InventoryModal? = Screen.panels.firstOrNull { it is InventoryModal } as InventoryModal?
+    private fun isInventory(): ThingsModal? = Screen.panels.firstOrNull { it is ThingsModal } as ThingsModal?
 
     private fun showEntity(): Entity? {
         val inventory = isInventory()

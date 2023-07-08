@@ -181,6 +181,8 @@ abstract class Modal(
         return false
     }
 
+    open fun onMouseScrolled(amount: Float) { }
+
     fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button) {
         onMouseUp(screenX, screenY, button)
         sidecar?.onMouseUp(screenX, screenY, button)
@@ -208,99 +210,6 @@ abstract class Modal(
     }
 
     open fun advanceTime(turns: Float) { sidecar?.advanceTime(turns) }
-
-    protected fun addInventoryOptions(menu: ContextMenu, thing: Thing, these: List<Thing> = listOf(thing),
-                                      asWithContainer: Container? = null, asWithParent: Modal? = null, forExamine: Boolean = false) {
-        menu.apply {
-            val portable = thing.isPortable()
-            if (portable) {
-                if (these.size > 1) {
-                    asWithContainer?.also { container ->
-                        if (container.contents().size < container.itemLimit()) {
-                            addOption("put one " + thing.name() + " " + container.preposition() + " " + container.name()) {
-                                App.player.queue(Drop(thing.getKey(), container.getHolderKey()))
-                            }
-                            addOption("put all " + thing.name().plural() + " " + container.preposition() + " " + container.name()) {
-                                these.forEach { App.player.queue(Drop(it.getKey(), container.getHolderKey())) }
-                            }
-                        }
-                    } ?: run {
-                        asWithParent?.also { parent ->
-                            if (!App.player.hasStatus(Status.Tag.BURDENED)) {
-                                addOption("take one " + thing.name()) {
-                                    App.player.queue(Get(thing.getKey()))
-                                }
-                                addOption("take all " + thing.name().plural()) {
-                                    these.forEach { App.player.queue(Get(it.getKey())) }
-                                }
-                            }
-                        } ?: run {
-                            addOption("drop one " + thing.name()) {
-                                App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey()))
-                            }
-                            addOption("drop all " + thing.name().plural()) {
-                                these.forEach { App.player.queue(Drop(it.getKey(), groundAtPlayer().getHolderKey())) }
-                            }
-                        }
-                    }
-                } else {
-                    asWithContainer?.also { container ->
-                        if (container.contents().size < container.itemLimit()) {
-                            addOption("put " + thing.name() + " " + container.preposition() + " " + container.name()) {
-                                App.player.queue(Drop(thing.getKey(), container.getHolderKey()))
-                            }
-                        }
-                    } ?: run {
-                        asWithParent?.also {
-                            if (!App.player.hasStatus(Status.Tag.BURDENED)) {
-                                addOption("take " + thing.name()) {
-                                    App.player.queue(Get(thing.getKey()))
-                                }
-                            }
-                        } ?: run {
-                            addOption("drop " + thing.listName()) {
-                                App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey()))
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!forExamine) addOption("examine " + thing.name()) {
-                Screen.addModal(ExamineModal(thing, Position.CENTER_LOW).apply { zoomWhenOpen = asWithParent?.zoomWhenOpen ?: 1f })
-            }
-
-            if (asWithContainer == null && asWithParent == null) {
-                thing.uses().forEach { (tag, it) ->
-                    if (it.canDo(App.player, thing.xy().x, thing.xy().y, false)) {
-                        addOption(it.command) {
-                            App.player.queue(Use(tag, thing.getKey(), it.duration))
-                        }
-                    }
-                }
-                if (portable && thing.tag != App.player.thrownTag) {
-                    addOption("ready " + thing.name().plural() + " for throwing") {
-                        App.player.readyForThrowing(thing.tag)
-                    }
-                }
-                thing.toolbarName()?.also { hotbarName ->
-                    addOption("add to toolbar (" + hotbarName + ")") {
-                        Toolbar.beginAdd(thing)
-                    }
-                }
-                if (App.player.autoPickUpTypes.contains(thing.tag)) {
-                    addOption("stop auto-pickup of " + thing.tag.pluralName) {
-                        App.player.removeAutoPickUpType(thing.tag)
-                    }
-                } else if (portable) {
-                    addOption("auto-pickup " + thing.tag.pluralName) {
-                        App.player.addAutoPickUpType(thing.tag)
-                    }
-                }
-            }
-        }
-
-    }
 
     override fun drawsGrouped() = false
     override fun drawsSeparate() = true

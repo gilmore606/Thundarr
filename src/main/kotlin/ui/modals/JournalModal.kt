@@ -24,7 +24,7 @@ class JournalModal : Modal(600, 600, "- yOUr dEEDs -") {
     override fun onKeyDown(key: Keydef) {
         when (key) {
             Keydef.OPEN_JOURNAL, Keydef.CANCEL -> dismiss()
-            Keydef.OPEN_INV -> replaceWith(InventoryModal(App.player))
+            Keydef.OPEN_INV -> replaceWith(ThingsModal(App.player))
             Keydef.OPEN_SKILLS -> replaceWith(SkillsModal(App.player))
             Keydef.OPEN_GEAR -> replaceWith(GearModal(App.player))
             Keydef.OPEN_MAP -> replaceWith(MapModal())

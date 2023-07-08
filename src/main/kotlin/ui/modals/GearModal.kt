@@ -136,7 +136,7 @@ class GearModal(
     override fun onKeyDown(key: Keydef) {
         when (key) {
             Keydef.OPEN_GEAR, Keydef.CANCEL -> dismiss()
-            Keydef.OPEN_INV -> replaceWith(InventoryModal(App.player))
+            Keydef.OPEN_INV -> replaceWith(ThingsModal(App.player))
             Keydef.OPEN_SKILLS -> replaceWith(SkillsModal(App.player))
             Keydef.OPEN_JOURNAL -> replaceWith(JournalModal())
             Keydef.OPEN_MAP -> replaceWith(MapModal())

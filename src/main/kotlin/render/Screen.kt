@@ -543,6 +543,10 @@ object Screen : KtxScreen {
     }
 
     fun mouseScrolled(amount: Float) {
+        if (topModal != null) {
+            topModal!!.onMouseScrolled(amount)
+            return
+        }
         zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
         updateZoomTarget()
     }

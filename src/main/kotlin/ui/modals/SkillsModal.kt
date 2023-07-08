@@ -131,7 +131,7 @@ class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
             Keydef.MOVE_S -> selectNext()
             Keydef.MOVE_W, Keydef.MOVE_E -> switchSide()
             Keydef.CANCEL, Keydef.OPEN_SKILLS -> dismiss()
-            Keydef.OPEN_INV -> replaceWith(InventoryModal(App.player))
+            Keydef.OPEN_INV -> replaceWith(ThingsModal(App.player))
             Keydef.OPEN_GEAR -> replaceWith(GearModal(App.player))
             Keydef.OPEN_JOURNAL -> replaceWith(JournalModal())
             Keydef.OPEN_MAP -> replaceWith(MapModal())

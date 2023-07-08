@@ -143,11 +143,6 @@ class ConverseModal(
         Speaker.world(talker.talkSound(App.player), source = talker.xy)
     }
 
-    fun openTrade() {
-        dismiss()
-        Screen.addModal(TradeModal(talker))
-    }
-
     fun endConversation() {
         dismiss()
     }
