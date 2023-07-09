@@ -8,6 +8,7 @@ import things.Thing
 import util.*
 import world.CellContainer
 import world.level.Level
+import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.random.Random
 
@@ -32,6 +33,8 @@ class Fire : Stain(), LightSource {
     override fun flicker() = flicker
 
     var size = 1f
+
+    fun temperatureAtDistance(distance: Float): Int = ((size * 14f) / max(1f,distance)).toInt()
 
     override fun onRestore(holder: CellContainer) {
         super.onRestore(holder)

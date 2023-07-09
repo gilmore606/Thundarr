@@ -304,6 +304,7 @@ object Console : Panel() {
                 say("Commands:")
                 say("  HP <amount> - Change hp to amount (or full if no amount)")
                 say("  GET <item> - Spawn item on ground")
+                say("  GET <number> <item> - Spawn number of item on ground")
                 say("  SPAWN <npc> - Spawn NPC in front of you")
                 say("  TIME <hours> - Advance time n hours")
                 say("  WEATHER <value> - Change weather to 0.0 - 1.0 (or 0 if no value)")
@@ -332,11 +333,18 @@ object Console : Panel() {
             say("Usage: GET <item name>")
             return
         }
-        val itemName = words.drop(1).joinToString(" ")
+        var amount = words[1].toIntOrNull() ?: 0
+        var itemName = words.drop(2).joinToString(" ")
+        if (amount < 1) {
+            amount = 1
+            itemName = words.drop(1).joinToString(" ")
+        }
         Thing.Tag.values().firstOrNull { it.singularName.contains(itemName, ignoreCase = true) }?.also { tag ->
-            val thing = tag.spawn.invoke()
-            thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
-            say("Spawned ${thing}.")
+            repeat (amount) {
+                val thing = tag.spawn.invoke()
+                thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
+            }
+            say("Spawned ${amount} ${tag}.")
         } ?: run {
             say("I don't know about anything called '${words[1]}'.")
         }

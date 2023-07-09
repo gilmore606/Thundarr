@@ -30,6 +30,8 @@ import world.level.WorldLevel
 import world.stains.Fire
 import world.terrains.Terrain
 import java.lang.Float.min
+import java.lang.Math.abs
+import java.lang.Math.max
 
 @Serializable
 open class Player : Actor() {
@@ -323,9 +325,15 @@ open class Player : Actor() {
             temperature = level.temperatureAt(xy)
             feltTemperature = temperature + App.weather.feltTemperature()
             feltTemperature += App.player.status(Status.Tag.WET)?.let { (it as Wet).temperatureMod() } ?: 0
-            forXY(-3, -3, 3, 3) { ix, iy ->
 
+            var fireheat = 0
+            forXY(xy.x-3,xy.y-3, xy.x+3,xy.y+3) { ix, iy ->
+                level.stainsAt(ix, iy)?.firstOrNull { it is Fire }?.also { fire ->
+                    val distance = distanceBetween(ix, iy, xy.x, xy.y)
+                    fireheat += (fire as Fire).temperatureAtDistance(distance)
+                }
             }
+            feltTemperature += fireheat
 
             var clothing = 0
             gear.values.forEach { gear ->
