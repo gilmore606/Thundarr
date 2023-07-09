@@ -533,7 +533,7 @@ object Screen : KtxScreen {
         }
     }
 
-    fun buttonBarsShown() = LeftButtons.isShown() || TimeButtons.isShown() || Toolbar.isShown()
+    private fun buttonBarsShown() = LeftButtons.isShown() || TimeButtons.isShown() || Toolbar.isShown()
 
     fun updateCursorLine() {
         cursorPosition?.also { cursor -> cursorLine = App.level.getPathToPOV(cursor).toMutableList() }

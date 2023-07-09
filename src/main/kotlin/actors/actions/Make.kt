@@ -18,29 +18,29 @@ class Make(
 
     override fun execute(actor: Actor, level: Level) {
         benchKey.getThing(level)?.also { bench ->
-            if (bench is Workbench) {
-                val roll = recipe.skill().resolve(actor, recipe.difficulty())
-                if (roll < 0f) {
-                    if (actor is Player) Console.say(recipe.makeFailMsg())
-                    if (roll < -2f) {
-                        recipe.ingredients().random().also { thingTag ->
-                            bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
-                        }
-                    } else if (roll < -5f) {
-                        consumeAllIngredients(bench)
-                    }
-                } else {
-                    if (actor is Player) Console.say(recipe.makeSuccessMsg())
-                    consumeAllIngredients(bench)
-                    recipe.product().moveTo(bench)
-                }
-            }
+//            if (bench is Workbench) {
+//                val roll = recipe.skill().resolve(actor, recipe.difficulty())
+//                if (roll < 0f) {
+//                    if (actor is Player) Console.say(recipe.makeFailMsg())
+//                    if (roll < -2f) {
+//                        recipe.ingredients().random().also { thingTag ->
+//                            bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
+//                        }
+//                    } else if (roll < -5f) {
+//                        consumeAllIngredients(bench)
+//                    }
+//                } else {
+//                    if (actor is Player) Console.say(recipe.makeSuccessMsg())
+//                    consumeAllIngredients(bench)
+//                    recipe.product().moveTo(bench)
+//                }
+//            }
         }
     }
 
     private fun consumeAllIngredients(bench: Workbench) {
-            recipe.ingredients().forEach { thingTag ->
-                bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
-            }
+//            recipe.ingredients().forEach { thingTag ->
+//                bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
+//            }
     }
 }

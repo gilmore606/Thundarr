@@ -34,7 +34,6 @@ object LookPanel : ShadedPanel() {
             drawString(entity.name(), padding + 28, padding)
             drawWrappedText(wrapped, padding, padding + 30)
         }
-
     }
 
     private fun drawWrappedText(text: List<String>, x0: Int, y0: Int) {

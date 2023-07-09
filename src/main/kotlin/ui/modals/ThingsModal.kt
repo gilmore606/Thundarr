@@ -30,6 +30,8 @@ class ThingsModal(
 
     companion object {
         private const val minHeight = 400
+        private const val tabSize = 24
+        private const val footerPad = 30
     }
 
     var cursorLocalX = 0
@@ -99,8 +101,6 @@ class ThingsModal(
     var tab = Tab.ALL
     var hoveredTab: Tab? = null
     var tabY = 0
-    val tabSize = 24
-    val footerPad = 30
 
     var weightTotalText = ""
     var weightMaxText = ""
@@ -185,11 +185,11 @@ class ThingsModal(
             }
 
             if (scrollOffset > 0) {
-                drawQuad(width - 33, headerPad - 47, 24, 24, Glyph.ARROW_UP)
+                drawQuad(width - 33, headerPad - 46, 24, 24, Glyph.ARROW_UP)
                 upArrowLit = true
             } else upArrowLit = false
-            if (maxSelection + scrollOffset < grouped.lastIndex - 1) {
-                drawQuad(width - 33, height - 40, 24, 24, Glyph.ARROW_DOWN)
+            if (maxSelection + scrollOffset < grouped.lastIndex) {
+                drawQuad(width - 33, height - 41, 24, 24, Glyph.ARROW_DOWN)
                 downArrowLit = true
             } else downArrowLit = false
             if (upArrowLit || downArrowLit) {
@@ -199,7 +199,7 @@ class ThingsModal(
                 val barw = 14
                 val barFullHeight = maxItemsShown * spacing + 2
                 val thumby = bary + (scrollOffset * (barFullHeight / grouped.size))
-                val thumbh = (((maxItemsShown + 1).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt()
+                val thumbh = (((maxItemsShown).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt()
                 drawQuad(barx, bary, barw, barFullHeight, Glyph.BOX_SHADOW, alpha = 0.4f)
                 drawQuad(barx, thumby, barw, thumbh, Glyph.BOX_SHADOW, alpha = 0.8f)
             } else scrollBarLit = false
@@ -220,8 +220,8 @@ class ThingsModal(
         } else {
             hoveredTab = null
             if (selection < 0 && maxItemsShown < grouped.size) {
-                scrollOffset = grouped.size - maxItemsShown - 1
-                changeSelection(maxItemsShown - 1)
+                scrollOffset = grouped.size - maxItemsShown
+                changeSelection(maxSelection)
                 return
             }
             super.selectPrevious()
@@ -235,7 +235,7 @@ class ThingsModal(
                 hoveredTab = null
             }
         } else {
-            if (selection == maxSelection && (maxItemsShown + scrollOffset) < grouped.size - 1) {
+            if (selection == maxSelection && (maxItemsShown + scrollOffset) < grouped.size) {
                 scrollOffset++
                 updateGrouped()
                 return
@@ -384,7 +384,7 @@ class ThingsModal(
     }
 
     override fun onMouseScrolled(amount: Float) {
-        scrollOffset = max(0, min((scrollOffset + amount).toInt(), grouped.size - maxItemsShown - 1))
+        scrollOffset = max(0, min((scrollOffset + amount).toInt(), grouped.size - maxItemsShown))
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
@@ -413,7 +413,7 @@ class ThingsModal(
         if (scrollStart > -1) {
             val offset = (cursorLocalY - scrollStart) / spacing + scrollOffsetStart
             if (offset != scrollOffset) {
-                scrollOffset = max(0, min(offset, grouped.size - maxItemsShown - 1))
+                scrollOffset = max(0, min(offset, grouped.size - maxItemsShown))
                 updateGrouped()
             }
             return null
@@ -474,7 +474,7 @@ class ThingsModal(
                 weightTotal += thing.weight()
                 var placed = false
                 forEach {
-                    if (it.tag == thing.tag && thing.canListGrouped()) {
+                    if (it.tag == thing.tag && it.singleName == thing.listName() && thing.canListGrouped()) {
                         it.things.add(thing)
                         it.paramText = mode.listParam.calculate(it.things)
                         it.name = it.things.size.toString() + " " + it.things[0].name().plural()
@@ -482,7 +482,7 @@ class ThingsModal(
                     }
                 }
                 if (!placed) {
-                    add(Group(thing.name(), thing.name(), mode.listParam.calculate(listOf(thing)), thing.tag, mutableListOf(thing)))
+                    add(Group(thing.name(), thing.listName(), mode.listParam.calculate(listOf(thing)), thing.tag, mutableListOf(thing)))
                 }
             }
         }.sortedBy { it.singleName }

@@ -144,9 +144,9 @@ sealed class Thing() : Entity {
     }
 
     abstract val tag: Tag
-    abstract fun isOpaque(): Boolean
+    open fun isOpaque(): Boolean = false
     open fun isBlocking(actor: Actor): Boolean = false
-    abstract fun isPortable(): Boolean
+    open fun isPortable(): Boolean = true
     open fun isIntangible() = false
     open fun isAlwaysVisible() = false
     open fun announceOnWalk() = !isIntangible()
@@ -206,7 +206,7 @@ sealed class Thing() : Entity {
 
     protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
     protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false
-    protected fun isNextTo(actor: Actor) = holder?.let { it.xy().let { xy ->
+    fun isNextTo(actor: Actor) = holder?.let { it.xy().let { xy ->
         Math.abs(xy.x - actor.xy.x) < 2 && Math.abs(xy.y - actor.xy.y) < 2
     }} ?: false
     protected fun isNextTo(x: Int, y: Int) = holder?.let { it.xy().let { xy ->
@@ -216,7 +216,7 @@ sealed class Thing() : Entity {
     override fun description() =  ""
     open fun listTag() = if (tag == App.player.thrownTag) "(throwing)" else ""
     fun listName() = name() + " " + listTag()
-    open fun canListGrouped() = listTag() == ""
+    open fun canListGrouped() = true
 
     override fun examineInfo(): String {
         if (thrownDamage(App.player, 6f) > defaultThrownDamage()) {
