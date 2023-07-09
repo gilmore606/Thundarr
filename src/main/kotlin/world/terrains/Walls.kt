@@ -7,10 +7,7 @@ import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
 import render.tilesets.Glyph
-import things.Brick
-import things.Log
-import things.Rock
-import things.Thing
+import things.*
 import ui.panels.Console
 import util.Dice
 import util.LightColor
@@ -79,7 +76,7 @@ sealed class Wall(
 object BrickWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.BRICK_WALL, 3f) {
     override fun name() = "brick wall"
     override fun bumpMsg() = "You bump into a brick wall."
-    override fun digResult() = if (Dice.chance(0.4f)) Brick() else null
+    override fun digResult() = Brick()
     override fun digToFloorTerrain() = Terrain.Type.TERRAIN_STONEFLOOR
     override fun trailsOverwrite() = false
 }
@@ -94,7 +91,7 @@ object MetalWall : Wall(Type.TERRAIN_METALWALL, Glyph.METAL_WALL, 10f) {
 object CaveWall : Wall(Type.TERRAIN_BRICKWALL, Glyph.CLIFF_WALL, 4f) {
     override fun name() = "rock face"
     override fun bumpMsg() = "You bump into a rock face."
-    override fun digResult() = if (Dice.chance(0.4f)) Rock() else null
+    override fun digResult() = if (Dice.chance(0.4f)) Boulder() else if (Dice.chance(0.1f)) Rock() else null
     override fun digToFloorTerrain() = Type.TERRAIN_CAVEFLOOR
 }
 
