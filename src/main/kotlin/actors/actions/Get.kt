@@ -1,6 +1,7 @@
 package actors.actions
 
 import actors.Actor
+import actors.Player
 import actors.actions.events.Event
 import kotlinx.serialization.Serializable
 import things.Container
@@ -33,6 +34,12 @@ class Get(
             }
 
             broadcast(level, actor, fromXY)
+
+            if (actor is Player) {
+                if (!actor.autoPickUpTypes.contains(thing.tag) && !actor.ignoredAutoPickupTypes.contains(thing.tag)) {
+                    actor.addAutoPickUpType(thing.tag)
+                }
+            }
         }
     }
 

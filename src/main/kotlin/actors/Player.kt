@@ -107,6 +107,7 @@ open class Player : Actor() {
     var calories = 1000f
 
     val autoPickUpTypes = mutableListOf<Thing.Tag>()
+    val ignoredAutoPickupTypes = mutableListOf<Thing.Tag>()
 
     init {
         //Pather.subscribe(this, this, 60f)
@@ -204,7 +205,10 @@ open class Player : Actor() {
     }
 
     private fun updateCalories(delta: Float) {
-        calories -= (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
+        var burn = (caloriesPerDay * delta / GameTime.TURNS_PER_DAY).toFloat()
+        statuses.forEach { burn *= it.calorieBurnMod() }
+        calories -= burn
+
         if (calories < caloriesEatMax) {
             removeStatus(Status.Tag.SATIATED)
         }
@@ -280,10 +284,12 @@ open class Player : Actor() {
 
     open fun addAutoPickUpType(type: Thing.Tag) {
         autoPickUpTypes.add(type)
+        ignoredAutoPickupTypes.remove(type)
         Console.say("You remind yourself to pick up any " + type.pluralName + " you find.")
     }
     open fun removeAutoPickUpType(type: Thing.Tag) {
         autoPickUpTypes.remove(type)
+        ignoredAutoPickupTypes.add(type)
         Console.say("You give up on your $type collection.")
     }
 

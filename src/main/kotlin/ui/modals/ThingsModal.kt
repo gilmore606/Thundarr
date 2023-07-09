@@ -152,8 +152,8 @@ class ThingsModal(
         if (mode.listParam == ParamType.WEIGHT) {
             drawString("capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
             drawString(weightMaxText, padding + 75, height - 30, Screen.fontColor, Screen.smallFont)
-            drawString("total ", padding + 232, height - 30, Screen.fontColorDull, Screen.smallFont)
-            drawString(weightTotalText, padding + 280, height - 30, Screen.fontColor, Screen.smallFont)
+            drawString("total ", padding + 241, height - 30, Screen.fontColorDull, Screen.smallFont)
+            drawString(weightTotalText, padding + 297, height - 30, Screen.fontColor, Screen.smallFont)
         }
     }
 
@@ -199,7 +199,7 @@ class ThingsModal(
                 val barw = 14
                 val barFullHeight = maxItemsShown * spacing + 2
                 val thumby = bary + (scrollOffset * (barFullHeight / grouped.size))
-                val thumbh = (((maxItemsShown).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt() + 2
+                val thumbh = (((maxItemsShown).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt() + 54
                 drawQuad(barx, bary, barw, barFullHeight, Glyph.BOX_SHADOW, alpha = 0.4f)
                 drawQuad(barx, thumby, barw, thumbh, Glyph.BOX_SHADOW, alpha = 0.8f)
             } else scrollBarLit = false

@@ -56,6 +56,7 @@ sealed class Status : StatEffector {
 
     open fun preventVision() = false
     open fun comfort() = 0f
+    open fun calorieBurnMod() = 1f // 1f = unchanged
 
     open fun onAddStack(actor: Actor, added: Status) { }
 
@@ -108,6 +109,7 @@ class Encumbered() : Status() {
         Speed.tag to -2f,
         Dodge.tag to -2f
     )
+    override fun calorieBurnMod() = 1.2f
 }
 
 @Serializable
@@ -121,6 +123,7 @@ class Burdened() : Status() {
         Speed.tag to -4f,
         Dodge.tag to -3f
     )
+    override fun calorieBurnMod() = 1.4f
 }
 
 @Serializable
@@ -135,6 +138,7 @@ class Satiated() : Status() {
         Speed.tag to -1f
     )
     override fun comfort() = 0.2f
+    override fun calorieBurnMod() = 0.7f
 
     override fun preventedAction(action: Action, actor: Actor): Boolean {
         if (action is Use && action.useTag == Thing.UseTag.CONSUME) {
@@ -161,6 +165,7 @@ class Cold(): Status() {
         Speed.tag to -2f
     )
     override fun comfort() = -0.5f
+    override fun calorieBurnMod() = 1.3f
 }
 
 @Serializable
@@ -175,14 +180,15 @@ class Freezing(): Status() {
     override fun panelTagColor() = tagColors[TagColor.FATAL]!!
     override fun statEffects() = mapOf(
         Strength.tag to -2f,
-        Brains.tag to -4f,
-        Speed.tag to -3f
+        Brains.tag to -3f,
+        Speed.tag to -4f
     )
     override fun comfort() = -1f
+    override fun calorieBurnMod() = 2f
     override fun advanceTime(actor: Actor, delta: Float) {
-        if (Dice.chance(0.05f * delta)) {
+        if (Dice.chance(0.1f * delta)) {
             Console.say("You're freezing to death!")
-            actor.receiveDamage(1f, internal = true)
+            actor.receiveDamage(Dice.float(0.5f, 2.5f), internal = true)
         }
     }
 }
@@ -242,6 +248,7 @@ class Hungry() : Status() {
         Speed.tag to -1f
     )
     override fun comfort() = -0.5f
+    override fun calorieBurnMod() = 0.8f
 }
 
 @Serializable
@@ -257,6 +264,7 @@ class Starving() : Status() {
         Speed.tag to -2f
     )
     override fun comfort() = -1f
+    override fun calorieBurnMod() = 0.7f
     override fun advanceTime(actor: Actor, delta: Float) {
         if (Dice.chance(0.02f * delta)) {
             Console.say("You're starving to death!")
@@ -329,7 +337,7 @@ class Wet(): TimeStatus() {
     override fun comfort() = -0.5f
     override fun duration() = 10f
     override fun maxDuration() = 40f
-    fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -16).toInt()
+    fun temperatureMod() = (wetness * (turnsLeft / maxDuration()) * -28).toInt()
     fun addWetness(added: Float) {
         wetness = min(1f, wetness + added)
         addTime += duration() * added * 2f
@@ -354,6 +362,7 @@ class Bandaged(
         actor.healDamage((delta / GameTime.TURNS_PER_DAY).toFloat() * healPerDay)
     }
     override fun comfort() = 0.3f
+    override fun calorieBurnMod() = 1.4f
 }
 
 @Serializable
@@ -370,6 +379,7 @@ class Sick(): TimeStatus() {
         Brains.tag to -1f
     )
     override fun comfort() = -0.3f
+    override fun calorieBurnMod() = 1.2f
     override fun duration() = Dice.float(40f, 80f)
     override fun maxDuration() = 300f
     override fun preventedAction(action: Action, actor: Actor): Boolean {
@@ -423,6 +433,7 @@ class Wired : TimeStatus() {
     )
     override fun duration() = 10f
     override fun maxDuration() = 20f
+    override fun calorieBurnMod() = 1.2f
 }
 
 @Serializable

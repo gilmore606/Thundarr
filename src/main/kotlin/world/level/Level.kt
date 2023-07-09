@@ -159,7 +159,13 @@ sealed class Level {
     fun forEachActorToRender(
         doThis: (x: Int, y: Int, actor: Actor, vis: Float) -> Unit,
         delta: Float) =
-        director.actors.forEach { actor ->
+        // TODO:
+//        Exception in thread "main" java.util.ConcurrentModificationException
+//    at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:911)
+//    at java.util.ArrayList$Itr.next(ArrayList.java:861)
+//    at world.level.Level.forEachActorToRender(Level.kt:604)
+//    at render.Screen.drawEverything(Screen.kt:689)
+        director.actors.safeForEach { actor ->
             val x = actor.xy.x
             val y = actor.xy.y
             val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
