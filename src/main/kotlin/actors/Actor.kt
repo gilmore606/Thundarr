@@ -591,6 +591,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return c
     }
 
+    fun hasA(thingTag: Thing.Tag): Boolean = doWeHave(thingTag) != null
+
     // Can we see at all?
     open fun canSee(): Boolean = statuses.hasNoneWhere { it.preventVision() }
     open fun canSeeInDark(): Boolean = false
