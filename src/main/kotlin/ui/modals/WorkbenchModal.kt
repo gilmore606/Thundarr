@@ -22,7 +22,7 @@ class WorkbenchModal(
     private val padding = 22
     private val spacing = 27
     private val col2x = 300
-    private val headerPad = 190
+    private val headerPad = 210
     private val wrappedDesc = wrapText((bench as Thing).examineDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
 
     private val allRecipes = bench.getRecipes()
@@ -68,6 +68,7 @@ class WorkbenchModal(
     }
 
     private fun doSelect() {
+        Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
         val recipe = if (selectionColumn == 0) goodRecipes[selection] else badRecipes[selection]
         Screen.addModal(RecipeModal(this, recipe))
     }
@@ -149,9 +150,9 @@ class WorkbenchModal(
         }
     }
 
-    override fun advanceTime(turns: Float) {
+    override fun advanceTime(delta: Float) {
         updateRecipes()
-        super.advanceTime(turns)
+        super.advanceTime(delta)
     }
 
     private fun updateRecipes() {
@@ -166,7 +167,7 @@ class WorkbenchModal(
 
     private fun adjustHeight() {
         val maxItems = max(maxSelection[0], maxSelection[1])
-        height = max(minHeight, headerPad + spacing * maxItems + padding)
+        height = max(minHeight, headerPad + spacing * maxItems + padding + 30)
         onResize(Screen.width, Screen.height)
     }
 

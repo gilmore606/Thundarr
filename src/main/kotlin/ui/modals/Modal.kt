@@ -209,7 +209,7 @@ abstract class Modal(
             myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW))
     }
 
-    open fun advanceTime(turns: Float) { sidecar?.advanceTime(turns) }
+    override fun advanceTime(delta: Float) { sidecar?.advanceTime(delta) }
 
     override fun drawsGrouped() = false
     override fun drawsSeparate() = true

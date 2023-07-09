@@ -42,6 +42,8 @@ abstract class Panel {
 
     open fun onRender(delta: Float) { }
 
+    open fun advanceTime(delta: Float) { }
+
     fun renderText() {
         this.drawText()
     }

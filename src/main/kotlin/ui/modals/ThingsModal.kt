@@ -199,7 +199,7 @@ class ThingsModal(
                 val barw = 14
                 val barFullHeight = maxItemsShown * spacing + 2
                 val thumby = bary + (scrollOffset * (barFullHeight / grouped.size))
-                val thumbh = (((maxItemsShown).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt()
+                val thumbh = (((maxItemsShown).toFloat() / grouped.size.toFloat()) * barFullHeight.toFloat()).toInt() + 2
                 drawQuad(barx, bary, barw, barFullHeight, Glyph.BOX_SHADOW, alpha = 0.4f)
                 drawQuad(barx, thumby, barw, thumbh, Glyph.BOX_SHADOW, alpha = 0.8f)
             } else scrollBarLit = false

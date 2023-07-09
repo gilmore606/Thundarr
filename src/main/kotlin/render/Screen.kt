@@ -757,7 +757,7 @@ object Screen : KtxScreen {
     }
 
     fun advanceTime(turns: Float) {
-        topModal?.advanceTime(turns)
+        panels.forEach { it.advanceTime(turns) }
     }
 
     override fun dispose() {

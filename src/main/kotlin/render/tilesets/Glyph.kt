@@ -81,6 +81,7 @@ enum class Glyph(val tall: Boolean = false) {
     CONSOLE_SHADE,
     ARROW_UP,
     ARROW_DOWN,
+    CHECK_MARK,
 
     PLAYER,
     PEASANT_PALE_DARK,

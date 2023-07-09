@@ -18,6 +18,7 @@ abstract class Recipe {
         )
     }
     abstract fun name(): String
+    open fun description(): String = ""
     abstract fun ingredients(): List<Thing.Tag>
     abstract fun product(): Thing
     abstract fun glyph(): Glyph
@@ -42,6 +43,7 @@ abstract class FoodRecipe : Recipe() {
 
 object SteakRecipe : FoodRecipe() {
     override fun name() = "seared steak"
+    override fun description() = "You can cook a delicious steak from the meat of almost anything."
     override fun ingredients() = listOf(Thing.Tag.THING_RAWMEAT)
     override fun product() = Steak()
     override fun glyph() = Glyph.MEAT
@@ -51,6 +53,7 @@ object SteakRecipe : FoodRecipe() {
 
 object ChickenRecipe : FoodRecipe() {
     override fun name() = "roast chicken"
+    override fun description() = "Roasted chicken meat is far tastier and more nutritious."
     override fun ingredients() = listOf(Thing.Tag.THING_CHICKENLEG)
     override fun product() = Steak()
     override fun glyph() = Glyph.MEAT
@@ -60,7 +63,8 @@ object ChickenRecipe : FoodRecipe() {
 
 object TestRecipe : FoodRecipe() {
     override fun name() = "wizard stew"
-    override fun ingredients() = listOf(Thing.Tag.THING_CHICKENLEG, Thing.Tag.THING_WIZARDCAP_MUSHROOM)
+    override fun description() = "A wizard stew doesn't contain actual wizard, unfortunately.  Just mushrooms and meat."
+    override fun ingredients() = listOf(Thing.Tag.THING_CHICKENLEG, Thing.Tag.THING_WIZARDCAP_MUSHROOM, Thing.Tag.THING_PEAR, Thing.Tag.THING_APPLE)
     override fun product() = Stew()
     override fun glyph() = Glyph.STEW
     override fun skill() = Survive
