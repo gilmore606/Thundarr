@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import ui.modals.ConverseModal
 import util.XY
 import util.distanceBetween
+import util.forXY
 import util.toEnglishList
 import world.gen.Metamap
 import world.gen.features.Feature
@@ -29,14 +30,12 @@ class DirectionsLore(
     private fun findDirections() {
         // Collect list of all knowable features nearby
         var neighbors = mutableListOf<Neighbor>()
-        for (ix in (sourceXY.x - 1280)/64 .. (sourceXY.x + 1280)/64) {
-            for (iy in (sourceXY.y - 1280)/64 .. (sourceXY.y + 1280)/64) {
-                val meta = Metamap.metaAtWorld(ix*64, iy*64)
-                meta.features().forEach { feature ->
-                    val distance = distanceBetween(sourceXY.x, sourceXY.y, feature.worldX, feature.worldY)
-                    if (distance < feature.loreKnowabilityRadius() && distance > 32) {
-                        neighbors.add(Neighbor(feature, distance))
-                    }
+        forXY((sourceXY.x-1280)/64,(sourceXY.y-1280)/64, (sourceXY.x+1280)/64,(sourceXY.y+1280)/64) { ix,iy ->
+            val meta = Metamap.metaAtWorld(ix*64, iy*64)
+            meta.features().forEach { feature ->
+                val distance = distanceBetween(sourceXY.x, sourceXY.y, feature.worldX, feature.worldY)
+                if (distance < feature.loreKnowabilityRadius() && distance > 32) {
+                    neighbors.add(Neighbor(feature, distance))
                 }
             }
         }

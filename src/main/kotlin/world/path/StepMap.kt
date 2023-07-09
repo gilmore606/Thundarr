@@ -137,10 +137,8 @@ sealed class StepMap {
     }
 
     private fun clearScratch() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                scratch[x][y] = -1
-            }
+        forXY(0,0, width-1,height-1) { x,y ->
+            scratch[x][y] = -1
         }
     }
 
@@ -178,7 +176,6 @@ sealed class StepMap {
             walker = App.level.director.getActor(walkerID)
         }
         if (!dirty) return
-        //log.info("updating stepmap $this")
         walker?.level?.also { level ->
             clearScratch()
             printTarget()

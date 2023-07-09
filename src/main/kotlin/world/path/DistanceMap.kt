@@ -2,6 +2,7 @@ package world.path
 
 import util.DIRECTIONS
 import util.XY
+import util.forXY
 import util.from
 import world.Chunk
 import world.level.CHUNK_SIZE
@@ -19,24 +20,20 @@ class DistanceMap(
 
     init {
         var step = 0
-        for (ix in 0 until chunk.width) {
-            for (iy in 0 until chunk.height) {
-                if (isTarget(ix + chunk.x, iy + chunk.y)) map[ix][iy] = step
-            }
+        forXY(0,0, chunk.width-1,chunk.height-1) { ix,iy ->
+            if (isTarget(ix + chunk.x, iy + chunk.y)) map[ix][iy] = step
         }
         var dirty = true
         while (dirty) {
             dirty = false
-            for (x in 0 until chunk.width) {
-                for (y in 0 until chunk.height) {
-                    if (map[x][y] == step) {
-                        DIRECTIONS.from(x, y) { tx, ty, dir ->
-                            if (tx in 0 until chunk.width && ty in 0 until chunk.height) {
-                                if (map[tx][ty] < 0) {
-                                    if (isWalkable(chunk.x + tx, chunk.y + ty)) {
-                                        map[tx][ty] = step + 1
-                                        dirty = true
-                                    }
+            forXY(0,0, chunk.width-1,chunk.height-1) { x,y ->
+                if (map[x][y] == step) {
+                    DIRECTIONS.from(x, y) { tx, ty, dir ->
+                        if (tx in 0 until chunk.width && ty in 0 until chunk.height) {
+                            if (map[tx][ty] < 0) {
+                                if (isWalkable(chunk.x + tx, chunk.y + ty)) {
+                                    map[tx][ty] = step + 1
+                                    dirty = true
                                 }
                             }
                         }

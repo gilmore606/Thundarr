@@ -8,6 +8,7 @@ import things.Shrine
 import ui.modals.ConverseModal
 import util.Rect
 import util.XY
+import util.forXY
 import world.Entity
 import world.level.Level
 
@@ -41,10 +42,8 @@ sealed class Job(
     fun villagerCount(level: Level?): Int {
         var count = 0
         level?.also { level ->
-            for (ix in rect.x0..rect.x1) {
-                for (iy in rect.y0..rect.y1) {
-                    if (level.actorAt(ix, iy) is Villager) count++
-                }
+            forXY(rect) { ix,iy ->
+                if (level.actorAt(ix, iy) is Villager) count++
             }
         }
         return count
@@ -53,11 +52,9 @@ sealed class Job(
     fun villagers(level: Level?): Set<Villager> {
         val villagers = mutableSetOf<Villager>()
         level?.also { level ->
-            for (ix in rect.x0..rect.x1) {
-                for (iy in rect.y0..rect.y1) {
-                    level.actorAt(ix, iy)?.also {
-                        if (it is Villager) villagers.add(it)
-                    }
+            forXY(rect) { ix,iy ->
+                level.actorAt(ix, iy)?.also {
+                    if (it is Villager) villagers.add(it)
                 }
             }
         }

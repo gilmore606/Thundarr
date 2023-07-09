@@ -13,16 +13,15 @@ class Evolver(
     fun evolve(repeats: Int = 1) {
         val adds = ArrayList<XY>()
         repeat(repeats) {
-            for (ix in 0 until width) {
-                for (iy in 0 until height) {
-                    var n = 0
-                    (if (cardinalsOnly) CARDINALS else DIRECTIONS).from(ix, iy) { dx, dy, _ ->
-                        if (readCell(dx, dy)) n++
-                    }
-                    if (rule(ix, iy, n)) {
-                        adds.add(XY(ix, iy))
-                    }
+            forXY(0,0, width-1,height-1) { ix,iy ->
+                var n = 0
+                (if (cardinalsOnly) CARDINALS else DIRECTIONS).from(ix, iy) { dx, dy, _ ->
+                    if (readCell(dx, dy)) n++
                 }
+                if (rule(ix, iy, n)) {
+                    adds.add(XY(ix, iy))
+                }
+
             }
             adds.forEach { writeCell(it.x, it.y) }
             adds.clear()

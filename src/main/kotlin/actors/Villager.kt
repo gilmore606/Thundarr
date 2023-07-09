@@ -209,14 +209,12 @@ class Villager(
         // Record ownedThings to detect robbery
         if (ownedThings.isEmpty()) {
             if (homeJob.contains(this)) {
-                for (ix in homeJob.rect.x0 .. homeJob.rect.x1) {
-                    for (iy in homeJob.rect.y0 .. homeJob.rect.y1) {
-                        level?.thingsAt(ix, iy)?.forEach { thing ->
-                            ownedThings.add(thing.id)
-                            if (thing is Container) {
-                                thing.contents().forEach { content ->
-                                    ownedThings.add(content.id)
-                                }
+                forXY(homeJob.rect) { ix,iy ->
+                    level?.thingsAt(ix, iy)?.forEach { thing ->
+                        ownedThings.add(thing.id)
+                        if (thing is Container) {
+                            thing.contents().forEach { content ->
+                                ownedThings.add(content.id)
                             }
                         }
                     }

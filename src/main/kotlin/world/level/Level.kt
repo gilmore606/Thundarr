@@ -535,22 +535,20 @@ sealed class Level {
             }
         }
         if (isHere) {
-            for (ix in -1..1) {
-                for (iy in -1..1) {
-                    if (ix != 0 || iy != 0) {
-                        thingsAt(x+ix, y+iy).groupByTag().forEach { nearGroup ->
-                            val near = nearGroup.first()
-                            near.uses().forEach { (tag, nearUse) ->
-                                if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
-                                    menu.addOption(nearUse.command) {
-                                        App.player.queue(Use(tag, near.getKey(), nearUse.duration))
-                                    }
+            forXY(-1,-1, 1,1) { ix,iy ->
+                if (ix != 0 || iy != 0) {
+                    thingsAt(x+ix, y+iy).groupByTag().forEach { nearGroup ->
+                        val near = nearGroup.first()
+                        near.uses().forEach { (tag, nearUse) ->
+                            if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
+                                menu.addOption(nearUse.command) {
+                                    App.player.queue(Use(tag, near.getKey(), nearUse.duration))
                                 }
                             }
-                            if (near is Smashable && near.isSmashable()) {
-                                menu.addOption(near.smashVerbName() + " " + near.name()) {
-                                    App.player.queue(Smash(near.getKey(), near.smashVerbName()))
-                                }
+                        }
+                        if (near is Smashable && near.isSmashable()) {
+                            menu.addOption(near.smashVerbName() + " " + near.name()) {
+                                App.player.queue(Smash(near.getKey(), near.smashVerbName()))
                             }
                         }
                     }

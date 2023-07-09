@@ -45,10 +45,8 @@ abstract class Carto(
     open val floorTerrain = Terrain.Type.TERRAIN_STONEFLOOR
 
     fun clear() {
-        for (x in x0 .. x1) {
-            for (y in y0 .. y1) {
-                chunk.setTerrain(x, y, wallTerrain)
-            }
+        forXY(x0,y0, x1,y1) { x,y ->
+            chunk.setTerrain(x, y, wallTerrain)
         }
     }
 
@@ -115,14 +113,12 @@ abstract class Carto(
     protected fun carveRoom(room: Rect, regionId: Int,
                             type: Terrain.Type = floorTerrain,
                             skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
-        for (x in room.x0..room.x1) {
-            for (y in room.y0..room.y1) {
-                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
-                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
-                            setTerrain(x, y, type)
-                            setRegionAt(x, y, regionId)
-                        }
+        forXY(room) { x,y ->
+            if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                    if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
+                        setTerrain(x, y, type)
+                        setRegionAt(x, y, regionId)
                     }
                 }
             }
@@ -329,11 +325,9 @@ abstract class Carto(
     }
 
     protected fun setRoofedInRock() {
-        for (y in y0  .. y1) {
-            for (x in x0 .. x1) {
-                if (isRock(x, y) && neighborBlockerCount(x, y) < 8) {
-                    chunk.setRoofed(x, y, Chunk.Roofed.OUTDOOR)
-                }
+        forXY(x0,y0, x1,y1) { x,y ->
+            if (isRock(x, y) && neighborBlockerCount(x, y) < 8) {
+                chunk.setRoofed(x, y, Chunk.Roofed.OUTDOOR)
             }
         }
     }
@@ -346,13 +340,11 @@ abstract class Carto(
 
     // Cartos should always run this at the end to overlap floor tiles and occlude shadows.
     protected fun setOverlaps() {
-        for (y in y0..y1) {
-            for (x in x0..x1) {
-                val terrain = Terrain.get(getTerrain(x,y))
-                if (terrain is Floor) {
-                    val quadData = terrain.makeOverlaps(chunk,x,y)
-                    setTerrainData(x, y, quadData)
-                }
+        forXY(x0,y0, x1,y1) { x,y ->
+            val terrain = Terrain.get(getTerrain(x,y))
+            if (terrain is Floor) {
+                val quadData = terrain.makeOverlaps(chunk,x,y)
+                setTerrainData(x, y, quadData)
             }
         }
     }
@@ -381,10 +373,8 @@ abstract class Carto(
     }
 
     protected fun randomFill(x0: Int, y0: Int, x1: Int, y1: Int, density: Float, fill: Terrain.Type) {
-        for (x in x0..x1) {
-            for (y in y0..y1) {
-                if (Dice.chance(density)) setTerrain(x,y,fill)
-            }
+        forXY(x0,y0, x1,y1) { x,y ->
+            if (Dice.chance(density)) setTerrain(x,y,fill)
         }
     }
 
@@ -493,30 +483,26 @@ abstract class Carto(
             for (y in 0 until height) if (grid[0][y] || grid[width-1][y]) hitEdges = true
             growBlobStep(grid, 2, 0.5f)
         }
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                var n = 0
-                CARDINALS.from(x,y) { dx, dy, _ ->
-                    if (dx >= 0 && dy >= 0 && dx < width && dy < height && grid[dx][dy]) n++
-                }
-                if (n == 4 && !grid[x][y]) grid[x][y] = true
-                if (n == 0 && grid[x][y]) grid[x][y] = false
+        forXY(0,0, width-1,height-1) { x,y ->
+            var n = 0
+            CARDINALS.from(x,y) { dx, dy, _ ->
+                if (dx >= 0 && dy >= 0 && dx < width && dy < height && grid[dx][dy]) n++
             }
+            if (n == 4 && !grid[x][y]) grid[x][y] = true
+            if (n == 0 && grid[x][y]) grid[x][y] = false
         }
         return grid
     }
 
     private fun growBlobStep(grid: Array<Array<Boolean>>, threshold: Int, density: Float) {
         val adds = ArrayList<XY>()
-        for (x in 0 until grid.size) {
-            for (y in 0 until grid[0].size) {
-                if (!grid[x][y]) {
-                    var n = 0
-                    DIRECTIONS.from(x, y) { dx, dy, _ ->
-                        if (dx >= 0 && dy >= 0 && dx < grid.size && dy < grid[0].size && grid[dx][dy]) n++
-                    }
-                    if (n >= threshold && Dice.chance(density)) adds.add(XY(x, y))
+        forXY(0,0, grid.size-1,grid[0].size-1) { x,y ->
+            if (!grid[x][y]) {
+                var n = 0
+                DIRECTIONS.from(x, y) { dx, dy, _ ->
+                    if (dx >= 0 && dy >= 0 && dx < grid.size && dy < grid[0].size && grid[dx][dy]) n++
                 }
+                if (n >= threshold && Dice.chance(density)) adds.add(XY(x, y))
             }
         }
         adds.forEach { grid[it.x][it.y] = true }
@@ -538,53 +524,45 @@ abstract class Carto(
         grid[width-2][1] = false
         val adds = mutableSetOf<XY>()
         repeat ((height + width) / 4) {
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    if (grid[x][y]) {
-                        var neighbors = 0
-                        for (ix in -1 .. 1) {
-                            for (iy in -1 .. 1) {
-                                val nx = ix + x
-                                val ny = iy + y
-                                if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
-                                    neighbors++
-                                }
-                            }
+            forXY(0,0, width-1,height-1) { x,y ->
+                if (grid[x][y]) {
+                    var neighbors = 0
+                    forXY(-1,-1, 1,1) { ix,iy ->
+                        val nx = ix + x
+                        val ny = iy + y
+                        if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
+                            neighbors++
                         }
-                        if (Dice.chance(0.06f * neighbors)) adds.add(XY(x, y))
                     }
+                    if (Dice.chance(0.06f * neighbors)) adds.add(XY(x, y))
                 }
             }
             adds.forEach { grid[it.x][it.y] = false }
             adds.clear()
         }
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                var neighbors = 0
-                CARDINALS.forEach { dir ->
-                    val nx = dir.x + x
-                    val ny = dir.y + y
-                    if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
-                        neighbors++
-                    }
+        forXY(0,0, width-1,height-1) { x,y ->
+            var neighbors = 0
+            CARDINALS.forEach { dir ->
+                val nx = dir.x + x
+                val ny = dir.y + y
+                if (nx >= 0 && ny >= 0 && nx < width && ny < height && !grid[nx][ny]) {
+                    neighbors++
                 }
-                if (grid[x][y] && neighbors == 4) {
-                    grid[x][y] = false
-                } else if (!grid[x][y] && neighbors == 0) {
-                    grid[x][y] = true
-                }
+            }
+            if (grid[x][y] && neighbors == 4) {
+                grid[x][y] = false
+            } else if (!grid[x][y] && neighbors == 0) {
+                grid[x][y] = true
             }
         }
         return grid
     }
 
     fun printGrid(blob: Array<Array<Boolean>>, x: Int, y: Int, terrain: Terrain.Type) {
-        for (ix in x..x + blob.size - 1) {
-            for (iy in y .. y + blob[0].size - 1) {
-                if (boundsCheck(ix, iy)) {
-                    if (blob[ix - x][iy - y]) {
-                        setTerrain(ix, iy, terrain)
-                    }
+        forXY(x,y, x+blob.size-1, y+blob[0].size-1) { ix,iy ->
+            if (boundsCheck(ix, iy)) {
+                if (blob[ix - x][iy - y]) {
+                    setTerrain(ix, iy, terrain)
                 }
             }
         }

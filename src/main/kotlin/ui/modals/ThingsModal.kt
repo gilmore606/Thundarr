@@ -70,14 +70,15 @@ class ThingsModal(
         val isSidecar: Boolean,
         val hasSidecar: Boolean,
         val listParam: ParamType,
+        val showTotal: Boolean,
         val context: Context,
         val emptyMsg: String,
     ) {
-        MAIN_BACKPACK(false, false, ParamType.WEIGHT, Context.BACKPACK, "You have %t."),
-        MAIN_CONTAINER(false, true, ParamType.WEIGHT, Context.TO_CONTAINER, "You have %t."),
-        SIDE_CONTAINER(true, true, ParamType.WEIGHT, Context.FROM_CONTAINER, "It holds %t."),
-        MAIN_VENDOR(false, true, ParamType.SELLPRICE, Context.TO_VENDOR, "You have %t to sell."),
-        SIDE_VENDOR(true, true, ParamType.BUYPRICE, Context.FROM_VENDOR, "There's %t for sale."),
+        MAIN_BACKPACK(false, false, ParamType.WEIGHT, true, Context.BACKPACK, "You have %t."),
+        MAIN_CONTAINER(false, true, ParamType.WEIGHT, true, Context.TO_CONTAINER, "You have %t."),
+        SIDE_CONTAINER(true, true, ParamType.WEIGHT, false, Context.FROM_CONTAINER, "It holds %t."),
+        MAIN_VENDOR(false, true, ParamType.SELLPRICE, true, Context.TO_VENDOR, "You have %t to sell."),
+        SIDE_VENDOR(true, true, ParamType.BUYPRICE, true, Context.FROM_VENDOR, "There's %t for sale."),
     }
 
     class Group(
@@ -149,7 +150,7 @@ class ThingsModal(
             }
         }
 
-        if (mode.listParam == ParamType.WEIGHT) {
+        if (mode.listParam == ParamType.WEIGHT && mode.showTotal) {
             drawString("capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
             drawString(weightMaxText, padding + 75, height - 30, Screen.fontColor, Screen.smallFont)
             drawString("total ", padding + 241, height - 30, Screen.fontColorDull, Screen.smallFont)
@@ -160,6 +161,16 @@ class ThingsModal(
     override fun drawEntities() {
         super.drawEntities()
         if (!isAnimating()) {
+            if (mode.context == Context.FROM_VENDOR || mode.context == Context.FROM_CONTAINER) {
+                val x0 = x + padding
+                val y0 = y + padding
+                val batch = if (mode.context == Context.FROM_VENDOR) myActorBatch() else myThingBatch()
+                val glyph = if (mode.context == Context.FROM_VENDOR) null else (thingHolder as Thing).glyph()
+                glyph?.also { glyph ->
+                    batch?.addPixelQuad(x0, y0, x0 + 48, y0 + 48, batch.getTextureIndex(glyph))
+                }
+            }
+
             for (i in scrollOffset..scrollOffset+maxSelection) {
                 if (i <= grouped.lastIndex) {
                     val group = grouped[i]
@@ -176,7 +187,12 @@ class ThingsModal(
                 if (this.hoveredTab == tab) {
                     drawSelectionBox(tab.x - 2, tabY + 8, tabSize - 4, tabSize - 4)
                 }
-                drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon, alpha = if (this.tab == tab) 1f else 0.4f)
+                val alpha = if (hoveredTab != null) {
+                    if (this.tab == tab) 1f else 0.5f
+                } else {
+                    if (this.tab == tab && tab != Tab.ALL) 0.5f else 0.1f
+                }
+                drawQuad(tab.x, tabY, tabSize, tabSize, tab.icon, alpha = alpha)
             }
 
             if (scrollStart > -1) {

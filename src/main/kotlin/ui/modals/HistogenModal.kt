@@ -8,6 +8,7 @@ import render.tilesets.Glyph
 import render.tilesets.MapTileSet
 import ui.input.Keydef
 import ui.input.Mouse
+import util.forXY
 import world.gen.Metamap
 import world.level.CHUNK_SIZE
 
@@ -45,12 +46,10 @@ class HistogenModal : Modal(1300, 800, "- nUMeRiA -") {
 
     private fun renderMap() {
         if (isAnimating()) return
-        for (x in 0 until ((width - paddingX*2 - rightPad) / cellSize)) {
-            for (y in 0 until ((height - paddingY - paddingX) / cellSize)) {
-                val meta = Metamap.metaAt(x+mapx, y+mapy)
-                meta.mapIcons.forEach { mapIcon ->
-                    renderCell(x, y, mapIcon)
-                }
+        forXY(0,0, ((width - paddingX*2 - rightPad) / cellSize)-1, ((height - paddingY - paddingX) / cellSize)-1) { x,y ->
+            val meta = Metamap.metaAt(x+mapx, y+mapy)
+            meta.mapIcons.forEach { mapIcon ->
+                renderCell(x, y, mapIcon)
             }
         }
         if (App.history.renderLocked) return

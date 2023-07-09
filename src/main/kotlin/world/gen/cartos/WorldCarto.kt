@@ -300,21 +300,17 @@ class WorldCarto(
     }
 
     fun addTrailBlock(x0: Int, y0: Int, x1: Int, y1: Int) {
-        for (dx in x0-1..x1+1) {
-            for (dy in y0-1..y1+1) {
-                if (dx in this.x0..this.x1 && dy in this.y0..this.y1) {
-                    setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
-                }
+        forXY(x0-1,y0-1, x1+1, y1+1) { dx,dy ->
+            if (dx in this.x0..this.x1 && dy in this.y0..this.y1) {
+                setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
             }
         }
     }
 
     fun blockTrailAt(x0: Int, y0: Int) {
-        for (dx in x0-1..x0+1) {
-            for (dy in y0-1..y0+1) {
-                if (dx in x0..x1 && dy in y0..y1)
-                    setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
-            }
+        forXY(x0-1,y0-1, x0+1,y0+1) { dx,dy ->
+            if (dx in x0..x1 && dy in y0..y1)
+                setFlag(dx, dy, CellFlag.BLOCK_TRAILS)
         }
     }
 

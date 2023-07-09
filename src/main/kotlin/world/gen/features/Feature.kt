@@ -141,27 +141,23 @@ sealed class Feature : AnimalSpawnSource {
     protected fun flagsAt(x: Int, y: Int) = carto.flagsMap[x - x0][y - y0]
 
     protected fun carveBlock(x0: Int, y0: Int, x1: Int, y1: Int, terrain: Terrain.Type) {
-        for (x in x0..x1) {
-            for (y in y0..y1) {
-                setTerrain(x, y, terrain)
-            }
+        forXY(x0,y0, x1,y1) { x,y ->
+            setTerrain(x, y, terrain)
         }
     }
 
     protected fun carveFlowBlob(room: Rect,
                                 type: Terrain.Type = Terrain.Type.TERRAIN_STONEFLOOR,
                                 skipCorners: Boolean = false, skipTerrain: Terrain.Type? = null) {
-        for (x in room.x0..room.x1) {
-            for (y in room.y0..room.y1) {
-                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
-                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (!flagsAt(x,y).contains(WorldCarto.CellFlag.OCEAN) && !flagsAt(x,y).contains(WorldCarto.CellFlag.BEACH)) {
-                            if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
-                                setTerrain(x, y, type)
-                                flagsAt(x,y).apply {
-                                    add(WorldCarto.CellFlag.NO_PLANTS)
-                                    add(WorldCarto.CellFlag.NO_BUILDINGS)
-                                }
+        forXY(room) { x,y ->
+            if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                    if (!flagsAt(x,y).contains(WorldCarto.CellFlag.OCEAN) && !flagsAt(x,y).contains(WorldCarto.CellFlag.BEACH)) {
+                        if (skipTerrain == null || getTerrain(x, y) != skipTerrain) {
+                            setTerrain(x, y, type)
+                            flagsAt(x,y).apply {
+                                add(WorldCarto.CellFlag.NO_PLANTS)
+                                add(WorldCarto.CellFlag.NO_BUILDINGS)
                             }
                         }
                     }

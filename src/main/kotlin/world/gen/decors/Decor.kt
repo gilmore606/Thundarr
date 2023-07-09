@@ -9,6 +9,7 @@ import ui.panels.Console
 import util.Dice
 import util.Rect
 import util.XY
+import util.forXY
 import world.ChunkMeta
 import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
@@ -29,11 +30,9 @@ sealed class Decor {
         val clearAt = Array(width) { Array(height) { true } }
         val clears = mutableListOf<XY>()
         init {
-            for (ix in 0 until width) {
-                for (iy in 0 until height) {
-                    val cell = XY(rect.x0 + ix,rect.y0 + iy)
-                    if (!forbiddenCells.contains(cell)) clears.add(cell)
-                }
+            forXY(0,0, width-1,height-1) { ix,iy ->
+                val cell = XY(rect.x0 + ix,rect.y0 + iy)
+                if (!forbiddenCells.contains(cell)) clears.add(cell)
             }
             forbiddenCells.forEach {
                 val lx = it.x - rect.x0
@@ -50,27 +49,23 @@ sealed class Decor {
             clears.remove(loc)
         }
         fun unclearAround(loc: XY) {
-            for (ix in -1..1) {
-                for (iy in -1..1) {
-                    val lx = loc.x + ix - rect.x0
-                    val ly = loc.y + iy - rect.y0
-                    if (lx >= 0 && ly >= 0 && lx < width && ly < height) {
-                        clearAt[lx][ly] = false
-                        clears.remove(XY(lx + rect.x0, ly + rect.y0))
-                    }
+            forXY(-1,-1, 1,1) { ix,iy ->
+                val lx = loc.x + ix - rect.x0
+                val ly = loc.y + iy - rect.y0
+                if (lx >= 0 && ly >= 0 && lx < width && ly < height) {
+                    clearAt[lx][ly] = false
+                    clears.remove(XY(lx + rect.x0, ly + rect.y0))
                 }
             }
         }
         fun terrainAround(loc: XY, type: Terrain.Type, carto: Carto) {
-            for (ix in -1..1) {
-                for (iy in -1..1) {
-                    val lx = loc.x + ix - rect.x0
-                    val ly = loc.y + iy - rect.y0
-                    if (lx >= 0 && ly >= 0 && lx < width && ly < height) {
-                        clearAt[lx][ly] = false
-                        clears.remove(XY(lx + rect.x0, ly + rect.y0))
-                        carto.setTerrain(lx + rect.x0, ly + rect.y0, type)
-                    }
+            forXY(-1,-1, 1,1) { ix,iy ->
+                val lx = loc.x + ix - rect.x0
+                val ly = loc.y + iy - rect.y0
+                if (lx >= 0 && ly >= 0 && lx < width && ly < height) {
+                    clearAt[lx][ly] = false
+                    clears.remove(XY(lx + rect.x0, ly + rect.y0))
+                    carto.setTerrain(lx + rect.x0, ly + rect.y0, type)
                 }
             }
         }
@@ -168,34 +163,29 @@ sealed class Decor {
             cell = XY(cx, cy)
             doThis()
         } else {
-            for (ix in -1..1) {
-                for (iy in -1..1) {
-                    if (room.isClearAt(cx+ix, cy+iy)) {
-                        cell = XY(cx+ix, cy+iy)
-                        doThis()
-                        return
-                    }
+            var done = false
+            forXY(-1,-1, 1,1) { ix,iy ->
+                if (!done && room.isClearAt(cx+ix, cy+iy)) {
+                    cell = XY(cx+ix, cy+iy)
+                    doThis()
+                    done = true
                 }
             }
         }
     }
 
     protected fun forEachClear(doThis: (x: Int, y: Int)->Unit) {
-        for (ix in room.rect.x0..room.rect.x1) {
-            for (iy in room.rect.y0..room.rect.y1) {
-                if (room.clearAt[ix-room.rect.x0][iy-room.rect.y0]) {
-                    cell = XY(ix, iy)
-                    doThis(ix, iy)
-                }
+        forXY(room.rect) { ix,iy ->
+            if (room.clearAt[ix-room.rect.x0][iy-room.rect.y0]) {
+                cell = XY(ix, iy)
+                doThis(ix, iy)
             }
         }
     }
 
     protected fun forArea(x0: Int, y0: Int, x1: Int, y1: Int, doThis: (x: Int, y: Int)->Unit) {
-        for (ix in x0..x1) {
-            for (iy in y0..y1) {
-                doThis(ix, iy)
-            }
+        forXY(x0,y0, x1,y1) { ix,iy ->
+            doThis(ix, iy)
         }
     }
 

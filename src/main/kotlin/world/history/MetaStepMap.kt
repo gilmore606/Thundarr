@@ -1,6 +1,7 @@
 package world.history
 
 import util.DIRECTIONS
+import util.forXY
 import util.from
 import world.gen.Metamap
 
@@ -11,10 +12,8 @@ class MetaStepMap {
     val map = Array(size) { Array(size) { -1 } }
 
     fun reset() {
-        for (ix in 0 until size) {
-            for (iy in 0 until size) {
-                map[ix][iy] = -1
-            }
+        forXY(0,0, size-1,size-1) { ix,iy ->
+            map[ix][iy] = -1
         }
     }
 
@@ -27,15 +26,13 @@ class MetaStepMap {
         var dirty = true
         while (dirty) {
             dirty = false
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    if (map[x][y] == -1) dirty = true
-                    if (map[x][y] == step) {
-                        DIRECTIONS.from(x, y) { tx, ty, dir ->
-                            if (tx in 0 until size && ty in 0 until size) {
-                                if (map[tx][ty] < 0) {
-                                    map[tx][ty] = step + (Metamap.metaAt(tx,ty).biome.metaTravelCost() * 4).toInt()
-                                }
+            forXY(0,0, size-1,size-1) { x,y ->
+                if (map[x][y] == -1) dirty = true
+                if (map[x][y] == step) {
+                    DIRECTIONS.from(x, y) { tx, ty, dir ->
+                        if (tx in 0 until size && ty in 0 until size) {
+                            if (map[tx][ty] < 0) {
+                                map[tx][ty] = step + (Metamap.metaAt(tx,ty).biome.metaTravelCost() * 4).toInt()
                             }
                         }
                     }

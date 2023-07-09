@@ -208,15 +208,13 @@ class CavernCarto(
 
     private fun carveRiverChunk(room: Rect, skipCorners: Boolean, terrain: Terrain.Type,
                                 bridgeOffset: Int, bridgeVertical: Boolean, bridgeTerrain: Terrain.Type) {
-        for (x in room.x0..room.x1) {
-            for (y in room.y0..room.y1) {
-                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
-                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if ((bridgeVertical && y == bridgeOffset) || (!bridgeVertical && x == bridgeOffset)) {
-                            setTerrain(x, y, bridgeTerrain)
-                        } else {
-                            setTerrain(x, y, terrain)
-                        }
+        forXY(room) { x,y ->
+            if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                    if ((bridgeVertical && y == bridgeOffset) || (!bridgeVertical && x == bridgeOffset)) {
+                        setTerrain(x, y, bridgeTerrain)
+                    } else {
+                        setTerrain(x, y, terrain)
                     }
                 }
             }
@@ -251,10 +249,8 @@ class CavernCarto(
         evolve(5, TERRAIN_CAVEWALL, TERRAIN_CAVEFLOOR) { x,y ->
             val r1 = neighborCount(x, y, TERRAIN_CAVEWALL)
             var r2 = 0
-            for (dx in -2..2) {
-                for (dy in -2 .. 2) {
-                    if (boundsCheck(x+dx, y+dy) && getTerrain(x+dx,y+dy) == TERRAIN_CAVEWALL) r2++
-                }
+            forXY(-2,-2, 2,2) { dx, dy ->
+                if (boundsCheck(x+dx, y+dy) && getTerrain(x+dx,y+dy) == TERRAIN_CAVEWALL) r2++
             }
             (r1 >=5 || r2 <= 1)
         }
@@ -266,10 +262,8 @@ class CavernCarto(
         evolve(3 + Dice.zeroTo(1), TERRAIN_CAVEWALL, TERRAIN_CAVEFLOOR) { x,y ->
             val r1 = neighborCount(x, y, TERRAIN_CAVEWALL)
             var r2 = 0
-            for (dx in -2..2) {
-                for (dy in -2 .. 2) {
-                    if (boundsCheck(x+dx, y+dy) && getTerrain(x+dx,y+dy) == TERRAIN_CAVEWALL) r2++
-                }
+            forXY(-2,-2, 2,2) { dx, dy ->
+                if (boundsCheck(x+dx, y+dy) && getTerrain(x+dx,y+dy) == TERRAIN_CAVEWALL) r2++
             }
             (r1 >= 5 || r2 <= 2)
         }

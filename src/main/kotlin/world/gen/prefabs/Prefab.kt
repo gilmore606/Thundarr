@@ -1,6 +1,7 @@
 package world.gen.prefabs
 
 import kotlinx.serialization.Serializable
+import util.forXY
 import world.terrains.Terrain
 
 class Prefab(
@@ -12,11 +13,9 @@ class Prefab(
     val terrain = Array(width) { Array<Terrain.Type?>(height) { null } }
 
     init {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                val code = tiledFile.layers[0].data[x + y * width]
-                terrain[x][y] = Terrain.getTiled(code)
-            }
+        forXY(0,0, width-1,height-1) { x,y ->
+            val code = tiledFile.layers[0].data[x + y * width]
+            terrain[x][y] = Terrain.getTiled(code)
         }
     }
 

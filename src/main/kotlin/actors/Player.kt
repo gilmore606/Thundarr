@@ -323,6 +323,10 @@ open class Player : Actor() {
             temperature = level.temperatureAt(xy)
             feltTemperature = temperature + App.weather.feltTemperature()
             feltTemperature += App.player.status(Status.Tag.WET)?.let { (it as Wet).temperatureMod() } ?: 0
+            forXY(-3, -3, 3, 3) { ix, iy ->
+
+            }
+
             var clothing = 0
             gear.values.forEach { gear ->
                 if (gear is Clothing) {

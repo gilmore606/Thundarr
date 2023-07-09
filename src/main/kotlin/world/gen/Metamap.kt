@@ -235,15 +235,13 @@ object Metamap {
                 if (landFraction > 0f) Console.sayFromThread("Re-breaking -- insufficient " + (if (landFraction < minLand) "land" else "ocean") + "!")
                 var landC = 0
                 var totalC = 0
-                for (ix in -chunkRadius until chunkRadius) {
-                    for (iy in -chunkRadius until chunkRadius) {
-                        val chunkX = ix * CHUNK_SIZE
-                        val chunkY = iy * CHUNK_SIZE
-                        scratches[ix + chunkRadius][iy + chunkRadius].apply {
-                            x = chunkX
-                            y = chunkY
-                            height = -1
-                        }
+                forXY(-chunkRadius,-chunkRadius, chunkRadius-1, chunkRadius-1) { ix,iy ->
+                    val chunkX = ix * CHUNK_SIZE
+                    val chunkY = iy * CHUNK_SIZE
+                    scratches[ix + chunkRadius][iy + chunkRadius].apply {
+                        x = chunkX
+                        y = chunkY
+                        height = -1
                     }
                 }
                 for (i in 0 until chunkRadius * 2) {
@@ -1002,13 +1000,13 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            //startChunk = villages.random()
+            startChunk = villages.random()
             // Pick a cabin chunk
-            forEachScratch { x, y, cell ->
-                if (cell.hasFeature(Cabin::class)) {
-                    startChunk = XY(x,y)
-                }
-            }
+//            forEachScratch { x, y, cell ->
+//                if (cell.hasFeature(Cabin::class)) {
+//                    startChunk = XY(x,y)
+//                }
+//            }
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)

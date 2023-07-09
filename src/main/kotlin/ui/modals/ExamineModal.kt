@@ -7,7 +7,6 @@ import things.Thing
 import things.MeleeWeapon
 import ui.input.Keydef
 import ui.input.Mouse
-import util.plural
 import util.wrapText
 import world.Entity
 
@@ -74,14 +73,14 @@ class ExamineModal(
         }
     }
 
-    private fun drawStat(statName: String, suffix: String, value: Float, x0: Int) {
+    private fun drawStat(statName: String, suffix: String, value: Float, atx0: Int) {
         drawString(
-            statName, x0 + (80 - measure(statName, Screen.smallFont) - 8), padding + statY,
+            statName, atx0 + (80 - measure(statName, Screen.smallFont) - 8), padding + statY,
             font = Screen.smallFont, color = Screen.fontColorDull
         )
         val valuestr = String.format("%.1f", value)
-        drawString(valuestr, x0 + 80, padding + statY, font = Screen.font, color = Screen.fontColorBold)
-        drawString(suffix, x0 + 80 + measure(valuestr), padding + statY, font = Screen.font, color = Screen.fontColor)
+        drawString(valuestr, atx0 + 80, padding + statY, font = Screen.font, color = Screen.fontColorBold)
+        drawString(suffix, atx0 + 80 + measure(valuestr), padding + statY, font = Screen.font, color = Screen.fontColor)
         statY += statSpacing
     }
 

@@ -7,6 +7,7 @@ import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Mouse
+import util.forXY
 import util.log
 import world.gen.Metamap
 import world.level.CHUNK_SIZE
@@ -55,16 +56,15 @@ object RadarPanel : ShadedPanel() {
         val offx = (App.player.xy.x - Metamap.xToChunkX(cx) - CHUNK_SIZE/2).toFloat() / CHUNK_SIZE.toFloat()
         val offy = (App.player.xy.y - Metamap.yToChunkY(cy) - CHUNK_SIZE/2).toFloat() / CHUNK_SIZE.toFloat()
 
-        for (ix in 0..8) {
-            for (iy in 0 .. 8) {
-                val meta = Metamap.metaAt(cx + ix - 4, cy + iy - 4)
-                val screenX = this.x + ix * tileSize + 5 - (offx * tileSize).toInt() - tileSize
-                val screenY = this.y + iy * tileSize + 5 - (offy * tileSize).toInt() - tileSize
-                meta.mapIcons.forEach { mapIcon ->
-                    mapBatch.addPixelQuad(screenX, screenY, screenX + tileSize, screenY + tileSize,
-                        mapBatch.getTextureIndex(mapIcon))
-                }
+        forXY(0,0, 8,8) { ix,iy ->
+            val meta = Metamap.metaAt(cx + ix - 4, cy + iy - 4)
+            val screenX = this.x + ix * tileSize + 5 - (offx * tileSize).toInt() - tileSize
+            val screenY = this.y + iy * tileSize + 5 - (offy * tileSize).toInt() - tileSize
+            meta.mapIcons.forEach { mapIcon ->
+                mapBatch.addPixelQuad(screenX, screenY, screenX + tileSize, screenY + tileSize,
+                    mapBatch.getTextureIndex(mapIcon))
             }
+
         }
         val playerX = this.x + 3 * tileSize + 5
         val playerY = this.y + 3 * tileSize + 5

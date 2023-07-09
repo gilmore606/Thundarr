@@ -115,12 +115,10 @@ class Trails(
             if (step < 1) done = true
             else {
                 val poss = mutableListOf<XY>()
-                for (dx in -1..1) {
-                    for (dy in -1..1) {
-                        val next = walkMap.distanceAt(cursor.x + dx, cursor.y + dy)
-                        if (next == step - 1) {
-                            poss.add(XY(cursor.x + dx, cursor.y + dy))
-                        }
+                forXY(-1,-1, 1,1) { dx, dy ->
+                    val next = walkMap.distanceAt(cursor.x + dx, cursor.y + dy)
+                    if (next == step - 1) {
+                        poss.add(XY(cursor.x + dx, cursor.y + dy))
                     }
                 }
                 if (poss.isEmpty()) done = true else {

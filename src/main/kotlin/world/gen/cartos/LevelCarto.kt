@@ -64,13 +64,11 @@ class LevelCarto(
                 nextRegion++
             }
         }
-        for (x in x0+1 until x1) {
-            for (y in y0+1 until y1) {
-                if (isRock(x, y)) {
-                    if (neighborCount(x, y, floorTerrain) == 0) {
-                        growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
-                        nextRegion++
-                    }
+        forXY(x0+1,y0+1, x1-1,y1-1) { x,y ->
+            if (isRock(x, y)) {
+                if (neighborCount(x, y, floorTerrain) == 0) {
+                    growMaze(x, y, Dice.float(0.1f, 0.6f), nextRegion)
+                    nextRegion++
                 }
             }
         }

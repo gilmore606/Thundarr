@@ -389,4 +389,15 @@ fun drawLine(start: XY, end: XY, setCell: (x: Int, y: Int)->Unit) {
     }
 }
 
+fun forXY(x0: Int, y0: Int, x1: Int, y1: Int, doThis: (Int,Int)->Unit) {
+    for (ix in x0..x1) {
+        for (iy in y0..y1) {
+            doThis(ix, iy)
+        }
+    }
+}
+
+fun forXY(rect: Rect, doThis: (Int,Int)->Unit) = forXY(rect.x0, rect.y0, rect.x1, rect.y1, doThis)
+fun forXY(xy0: XY, xy1: XY, doThis: (Int,Int)->Unit) = forXY(xy0.x, xy0.y, xy1.x, xy1.y, doThis)
+
 fun Float.scaledTo(min: Float, max: Float) = min + this * (max - min)

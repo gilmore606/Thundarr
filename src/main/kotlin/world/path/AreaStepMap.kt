@@ -4,6 +4,7 @@ import actors.Actor
 import kotlinx.serialization.Serializable
 import util.Rect
 import util.XY
+import util.forXY
 
 @Serializable
 data class AreaStepMap(
@@ -14,10 +15,8 @@ data class AreaStepMap(
     override fun getClone(): StepMap = this.copy()
 
     override fun printTarget() {
-        for (ix in target.x0..target.x1) {
-            for (iy in target.y0..target.y1) {
-                writeTargetCell(ix, iy)
-            }
+        forXY(target) { ix,iy ->
+            writeTargetCell(ix, iy)
         }
     }
 

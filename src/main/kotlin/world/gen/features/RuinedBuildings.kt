@@ -58,27 +58,25 @@ class RuinedBuildings(
     }
 
     private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
-        for (ix in x until x+width) {
-            for (iy in y until y+height) {
-                if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE
-                    && carto.flagsMap[ix][iy].contains(WorldCarto.CellFlag.NO_BUILDINGS)) return
-            }
+        var blocked = false
+        forXY(x,y, x+width-1,y+height-1) { ix,iy ->
+            if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE
+                && carto.flagsMap[ix][iy].contains(WorldCarto.CellFlag.NO_BUILDINGS)) blocked = true
         }
+        if (blocked) return
         carto.addTrailBlock(x0+x, y0+y, x0+x+width-1, y0+y+height-1)
-        for (ix in x until x + width) {
-            for (iy in y until y + height) {
-                if (boundsCheck(ix + x0, iy + y0)) {
-                    if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
-                        val terrain = if (isIntact || Dice.chance(0.9f)) Terrain.Type.TERRAIN_BRICKWALL else null
-                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
-                    } else {
-                        val terrain =
-                            if (!isIntact && Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
-                                null else Terrain.Type.TERRAIN_STONEFLOOR
-                        setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
-                    }
-                    if (isIntact) chunk.setRoofed(ix + x0, iy + y0, Chunk.Roofed.INDOOR)
+        forXY(x,y, x+width-1,y+height-1) { ix,iy ->
+            if (boundsCheck(ix + x0, iy + y0)) {
+                if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
+                    val terrain = if (isIntact || Dice.chance(0.9f)) Terrain.Type.TERRAIN_BRICKWALL else null
+                    setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
+                } else {
+                    val terrain =
+                        if (!isIntact && Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
+                            null else Terrain.Type.TERRAIN_STONEFLOOR
+                    setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
                 }
+                if (isIntact) chunk.setRoofed(ix + x0, iy + y0, Chunk.Roofed.INDOOR)
             }
         }
         val doorDir = CARDINALS.random()

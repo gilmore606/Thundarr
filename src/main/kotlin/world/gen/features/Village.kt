@@ -331,10 +331,8 @@ class Village(
             val edgeTerrain = if (isAbandoned) Terrain.Type.TERRAIN_UNDERGROWTH else
                 if (Dice.flip()) Terrain.Type.TERRAIN_STONEFLOOR else Terrain.Type.TERRAIN_GRASS
             if (Dice.chance(0.7f)) {
-                for (ix in -1 .. 1) {
-                    for (iy in -1 .. 1) {
-                        setTerrain(x+ix, y+iy, edgeTerrain)
-                    }
+                forXY(-1,-1, 1,1) { ix,iy ->
+                    setTerrain(x+ix, y+iy, edgeTerrain)
                 }
             }
         }

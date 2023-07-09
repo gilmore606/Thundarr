@@ -8,6 +8,7 @@ import render.tilesets.Glyph
 import render.tilesets.MapTileSet
 import ui.input.Keydef
 import ui.input.Mouse
+import util.forXY
 import world.gen.Metamap
 import world.gen.habitats.Blank
 import java.lang.Integer.max
@@ -131,28 +132,26 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         if (isAnimating()) return
         val x0 = x + paddingX
         val y0 = y + paddingY
-        for (x in 0 until (1120 / cellSize)) {
-            for (y in 0 until (800 / cellSize)) {
-                val meta = Metamap.metaAt(x+mapx, y+mapy)
-                if (meta.mapped || revealAll) {
-                    val ox = x * cellSize
-                    val oy = y * cellSize
-                    val px0 = x0 + ox
-                    val py0 = y0 + oy
-                    val px1 = px0 + cellSize
-                    val py1 = py0 + cellSize
-                    meta.mapIcons.forEach { mapIcon ->
-                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(mapIcon))
-                    }
-                    if (x + mapx == playerX && y + mapy == playerY) {
-                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_PLAYER))
-                    }
-                    if (showHabitats && meta.habitat != Blank) {
-                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(meta.habitat.mapGlyph))
-                    }
-                    if (showThreat) {
-                        batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_COLOR_0), alpha = (meta.threatLevel * 0.06f))
-                    }
+        forXY(0,0, (1120/cellSize)-1, (800/cellSize)-1) { x,y ->
+            val meta = Metamap.metaAt(x+mapx, y+mapy)
+            if (meta.mapped || revealAll) {
+                val ox = x * cellSize
+                val oy = y * cellSize
+                val px0 = x0 + ox
+                val py0 = y0 + oy
+                val px1 = px0 + cellSize
+                val py1 = py0 + cellSize
+                meta.mapIcons.forEach { mapIcon ->
+                    batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(mapIcon))
+                }
+                if (x + mapx == playerX && y + mapy == playerY) {
+                    batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_PLAYER))
+                }
+                if (showHabitats && meta.habitat != Blank) {
+                    batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(meta.habitat.mapGlyph))
+                }
+                if (showThreat) {
+                    batch.addPixelQuad(px0, py0, px1, py1, batch.getTextureIndex(Glyph.MAP_COLOR_0), alpha = (meta.threatLevel * 0.06f))
                 }
             }
         }
@@ -163,15 +162,13 @@ class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
         if (!showThreat) return
         val x0 = x + paddingX
         val y0 = y + paddingY
-        for (x in 0 until (1120 / cellSize)) {
-            for (y in 0 until (800 / cellSize)) {
-                val meta = Metamap.metaAt(x + mapx, y + mapy)
-                val ox = x * cellSize
-                val oy = y * cellSize
-                val px0 = x0 + ox + cellSize / 3
-                val py0 = y0 + oy + cellSize / 3
-                drawStringAbsolute(meta.threatLevel.toString(), px0, py0, Screen.fontColor, Screen.smallFont)
-            }
+        forXY(0,0, (1120/cellSize)-1, (800/cellSize)-1) { x,y ->
+            val meta = Metamap.metaAt(x + mapx, y + mapy)
+            val ox = x * cellSize
+            val oy = y * cellSize
+            val px0 = x0 + ox + cellSize / 3
+            val py0 = y0 + oy + cellSize / 3
+            drawStringAbsolute(meta.threatLevel.toString(), px0, py0, Screen.fontColor, Screen.smallFont)
         }
     }
 

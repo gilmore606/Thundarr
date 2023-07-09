@@ -166,18 +166,16 @@ class Rivers(
 
     private fun carveRiverChunk(room: Rect, skipCorners: Boolean,
                                 bridgeX: Int, bridgeY: Int, wideBridge: Boolean) {
-        for (x in room.x0..room.x1) {
-            for (y in room.y0..room.y1) {
-                if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
-                    if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
-                        if (x != bridgeX && y != bridgeY && (!wideBridge || (x != bridgeX + 1 && y != bridgeY + 1))) {
-                            carto.blockTrailAt(x,y)
-                        } else {
-                            flagsAt(x,y).add(WorldCarto.CellFlag.BRIDGE_SLOT)
-                        }
-                        setTerrain(x, y, Terrain.Type.GENERIC_WATER)
-                        flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
+        forXY(room) { x,y ->
+            if (x >= x0 && y >= y0 && x <= x1 && y <= y1) {
+                if (!skipCorners || !((x == x0 || x == x1) && (y == y0 || y == y1))) {
+                    if (x != bridgeX && y != bridgeY && (!wideBridge || (x != bridgeX + 1 && y != bridgeY + 1))) {
+                        carto.blockTrailAt(x,y)
+                    } else {
+                        flagsAt(x,y).add(WorldCarto.CellFlag.BRIDGE_SLOT)
                     }
+                    setTerrain(x, y, Terrain.Type.GENERIC_WATER)
+                    flagsAt(x,y).add(WorldCarto.CellFlag.RIVER)
                 }
             }
         }

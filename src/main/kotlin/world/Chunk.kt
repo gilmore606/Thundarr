@@ -488,11 +488,9 @@ class Chunk(
 
     // Force all cells to re-sum light on next frame.
     fun dirtyEntireLightAndGlyphCaches() {
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                lightCacheDirty[x][y] = true
-                glyphCache[x][y] = null
-            }
+        forXY(0,0, width-1,height-1) { x,y ->
+            lightCacheDirty[x][y] = true
+            glyphCache[x][y] = null
         }
     }
 
@@ -528,11 +526,9 @@ class Chunk(
             lightCache[x][y].b = min(1f, (lightCache[x][y].b + glowColor.b))
         } ?: run {
             var nearGlow: LightColor? = null
-            for (ix in -1..1) {
-                for (iy in -1 .. 1) {
-                    Terrain.get(getTerrain(x + ix + this.x, y + iy + this.y)).glowColor()?.also { glowColor ->
-                        nearGlow = glowColor
-                    }
+            forXY(-1,-1, 1,1) { ix,iy ->
+                Terrain.get(getTerrain(x + ix + this.x, y + iy + this.y)).glowColor()?.also { glowColor ->
+                    nearGlow = glowColor
                 }
             }
             nearGlow?.also {
