@@ -4,6 +4,7 @@ import actors.actions.Get
 import actors.actions.Say
 import actors.actions.events.Event
 import actors.jobs.Job
+import actors.jobs.VendorJob
 import actors.states.Fleeing
 import actors.states.IdleVillager
 import actors.stats.Brains
@@ -267,7 +268,9 @@ class Villager(
 
     override fun updateConversationGlyph() {
         super.updateConversationGlyph()
-        if (conversationGlyph == null && targetJob.hasConversationFor(this)) {
+        if (targetJob.contains(this) && targetJob is VendorJob && fulltimeJob == targetJob) {
+            conversationGlyph = Glyph.TRADE_ICON
+        } else if (conversationGlyph == null && targetJob.hasConversationFor(this)) {
             conversationGlyph = Glyph.CONVERSATION_ICON
         }
     }

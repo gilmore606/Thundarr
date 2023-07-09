@@ -99,10 +99,15 @@ class StorageShed : Decor() {
 
 @Serializable
 class BlacksmithShop : Decor() {
+    var caseKey: Thing.Key? = null
+
     override fun description() = "A blacksmith's shop."
     override fun abandonedDescription() = "An abandoned blacksmith's shop."
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
+        againstWall {
+            caseKey = spawn(StorageCabinet())?.getKey()
+        }
         forArea(x0+1, y0+1, x1-1, y1-1) { x,y ->
             setTerrain(x, y, Terrain.Type.TERRAIN_DIRT, roofed = true)
         }
@@ -111,7 +116,9 @@ class BlacksmithShop : Decor() {
             againstWall { spawn(Table()) }
         }
     }
-    override fun job() = ForgeJob(room.rect)
+    override fun job() = caseKey?.let { caseKey ->
+        ForgeJob(room.rect, caseKey)
+    } ?: super.job()
 }
 
 @Serializable
@@ -208,11 +215,14 @@ class Barn : Decor() {
 
 @Serializable
 class Tavern(val name: String) : Decor() {
+    var caseKey: Thing.Key? = null
+
     override fun description() = "A roadside inn: \"$name\"."
     override fun abandonedDescription() = "An abandoned inn."
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
         againstWall { spawn(Candlestick())}
+        againstWall { caseKey = spawn(StorageCabinet())?.getKey() }
 
         repeat (Dice.range(5, 8)) {
             awayFromWall {
@@ -221,7 +231,9 @@ class Tavern(val name: String) : Decor() {
             }
         }
     }
-    override fun job() = TavernJob(name, room.rect)
+    override fun job() = caseKey?.let { caseKey ->
+        TavernJob(name, room.rect, caseKey)
+    } ?: super.job()
 }
 
 @Serializable

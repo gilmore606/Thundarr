@@ -72,6 +72,7 @@ sealed class Thing() : Entity {
         THING_ENERGYDRINK("energy drink", "energy drinks", { EnergyDrink() }),
 
         THING_FILINGCABINET("filing cabinet", "filing cabinets", { FilingCabinet() }),
+        THING_STORAGECABINET("storage cabinet", "storage cabinets", { StorageCabinet() }),
         THING_BOOKSHELF("bookshelf", "bookshelves", { Bookshelf() }),
         THING_WARDROBE("wardrobe", "wardrobes", { Wardrobe() }),
         THING_FRIDGE("fridge", "fridges", { Fridge() }),

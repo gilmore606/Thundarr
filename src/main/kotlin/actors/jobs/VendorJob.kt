@@ -1,8 +1,13 @@
 package actors.jobs
 
+import actors.NPC
 import actors.Villager
 import kotlinx.serialization.Serializable
+import render.Screen
+import things.Container
+import things.Thing
 import ui.modals.ConverseModal
+import ui.modals.ThingsModal
 import util.Rect
 
 
@@ -11,6 +16,7 @@ sealed class VendorJob(
     val shopName: String,
     val vendorTitle: String,
     val shopRect: Rect,
+    val caseKey: Thing.Key,
     val patronsOK: Boolean = false
 ) : Job(
     shopName, vendorTitle, shopRect, needsOwner = true, childOK = false, extraWorkersOK = patronsOK,
@@ -20,13 +26,31 @@ sealed class VendorJob(
     open fun patronComments() = setOf<String>()
 
     override fun comments(speaker: Villager) = if (speaker.fulltimeJob == this) ownerComments() else patronComments()
+
+    open fun ownerConverseHelloMsg() = "I run this shop; if you want to trade, talk to me."
+    open fun tradeQuestionMsg() = "Let's trade."
+
+    override fun converseHelloOwner() = ConverseModal.Scene(
+        "hello", ownerConverseHelloMsg(), listOf(ConverseModal.Option(
+            "trade", tradeQuestionMsg()
+        ) { vendor -> beginTrade(vendor) })
+    )
+
+    private fun beginTrade(vendor: NPC) {
+        caseKey.getThing(vendor.level ?: App.level)?.also { case ->
+            Screen.addModal(ThingsModal(
+                App.player, case as Container, vendor
+            ))
+        }
+    }
 }
 
 @Serializable
 class ForgeJob(
     val forgeRect: Rect,
+    val forgeCaseKey: Thing.Key,
 ) : VendorJob(
-    "forge", "blacksmith", forgeRect
+    "forge", "blacksmith", forgeRect, forgeCaseKey
 ) {
     override fun ownerComments() = setOf(
         "It's hot, sweaty work, but it's honest.",
@@ -43,17 +67,17 @@ class ForgeJob(
         "%n's Forge",
     ).random()
 
-    override fun converseHelloOwner() = ConverseModal.Scene(
-        "hello", "I'm the blacksmith -- I make tools and weapons."
-    )
+    override fun ownerConverseHelloMsg() = "I'm the blacksmith; I make tools and weapons.  Interested in trading?"
+    override fun tradeQuestionMsg() = "Let's see those tools and weapons."
 }
 
 @Serializable
 class TavernJob(
     val tavernName: String,
-    val tavernRect: Rect
+    val tavernRect: Rect,
+    val tavernCaseKey: Thing.Key,
 ) : VendorJob(
-    tavernName, "innkeeper", tavernRect, patronsOK = true
+    tavernName, "innkeeper", tavernRect, tavernCaseKey, patronsOK = true
 ) {
     override fun signText() = tavernName
     override fun ownerComments() = setOf(

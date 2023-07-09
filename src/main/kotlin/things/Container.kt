@@ -110,6 +110,24 @@ class FilingCabinet : Container() {
 }
 
 @Serializable
+class StorageCabinet : Container() {
+    override val tag = Tag.THING_STORAGECABINET
+    override fun name() = "storage cabinet"
+    override fun description() = "A metal cabinet with large, lockable drawers."
+    override fun glyph() = Glyph.FILING_CABINET
+    override fun hue() = -0.9f
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+    override fun randomTreasureCount() = Dice.zeroTo(2)
+    override fun randomTreasure() = when (Dice.zeroTo(3)) {
+        0 -> BoysLife()
+        1 -> Lighter()
+        2 -> HardHat()
+        else -> Paperback()
+    }
+}
+
+@Serializable
 class Bookshelf : Container() {
     override val tag = Tag.THING_BOOKSHELF
     override fun name() = "bookshelf"
