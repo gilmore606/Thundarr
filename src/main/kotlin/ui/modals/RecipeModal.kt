@@ -184,7 +184,7 @@ class RecipeModal(
             }
         }
 
-        drawString("You have " + if (productCount < 0) "no" else productCount.toString() + " " + (if (productCount > 1) productName.plural() else productName) + ".",
+        drawString("You have " + if (productCount < 1) "no" else productCount.toString() + " " + (if (productCount == 1) productName else productName.plural()) + ".",
             padding, height - 100, Screen.fontColorDull, Screen.smallFont)
 
         drawString("Back", padding + 55, height - 50, if (selection == 0) Screen.fontColorBold else Screen.fontColorDull, Screen.font)

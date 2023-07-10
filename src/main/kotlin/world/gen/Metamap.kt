@@ -27,7 +27,7 @@ import kotlin.random.Random
 
 object Metamap {
 
-    private const val fakeDelaysInWorldgenText = false
+    private const val fakeDelaysInWorldgenText = true
     private const val fakeDelayMillis = 150L
     private const val progressBarSegments = 15
     private const val SKIP_HISTORY = true

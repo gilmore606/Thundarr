@@ -45,7 +45,7 @@ class WorkbenchModal(
         zoomWhenOpen = 1.4f
 
         updateRecipes()
-        changeSelection(0, 0)
+        changeSelection(0, if (goodRecipes.isNotEmpty()) 0 else 1)
     }
 
     private fun changeSelection(newSelection: Int, newColumn: Int? = null) {
@@ -111,7 +111,14 @@ class WorkbenchModal(
         when (key) {
             Keydef.MOVE_N -> selectPrevious()
             Keydef.MOVE_S -> selectNext()
-            Keydef.MOVE_W, Keydef.MOVE_E -> switchColumns()
+            Keydef.MOVE_W -> {
+                val othercol = if (selectionColumn == 0) badRecipes else goodRecipes
+                if (othercol.isNotEmpty()) switchColumns()
+                else dismiss()
+            }
+            Keydef.MOVE_E -> {
+                switchColumns()
+            }
             Keydef.INTERACT -> doSelect()
             else -> { }
         }

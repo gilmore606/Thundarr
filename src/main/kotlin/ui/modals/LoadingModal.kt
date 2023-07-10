@@ -8,8 +8,11 @@ import world.gen.Metamap
 import world.persist.ChunkLoader
 import java.lang.Float.min
 
-class LoadingModal(text: String, val withProgress: Boolean = false) :
-    SplashModal(text, forceHeight = if (withProgress) 120 else 60) {
+class LoadingModal(
+    text: String,
+    val withProgress: Boolean = false,
+    val forceUp: Boolean = false
+) : SplashModal(text, forceHeight = if (withProgress) 100 else 60) {
 
     companion object {
         val boxBatch = QuadBatch(UITileSet())
@@ -60,13 +63,13 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
             if (!withProgress) return
             val padding = 30
             boxBatch.addHealthBar(
-                x + padding, y + 80, x + width - (padding), y + 100,
+                x + padding, y + 65, x + width - (padding), y + 85,
                 (progress * 100f).toInt(), 101, allGreen = true
             )
         }
     }
 
-    private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking || App.forceLoadingModalUp
+    private fun isLoading() = forceUp || ChunkLoader.isWorking() || Metamap.isWorking
 
     override fun dispose() {
         textBatch.dispose()

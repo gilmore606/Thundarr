@@ -32,7 +32,7 @@ object Console : Panel() {
     private val colorDull = Color(0.7f, 0.7f, 0.4f, 0.7f)
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
     private val floatColor = Color(0.9f, 0.9f, 0.7f, 0f)
-    private val floatHeightAbovePlayer = 60
+    private val floatHeightAbovePlayer = 70
     private var floatText = ""
     private var floatAge = 0f
     private var floatWidth = 0
