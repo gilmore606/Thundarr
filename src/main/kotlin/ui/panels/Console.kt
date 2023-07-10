@@ -41,7 +41,7 @@ object Console : Panel() {
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
     private const val burstMax = 1.3f
-    private const val dimDelayMs = 1200L
+    private const val dimDelayMs = 1500L
     private const val dimLevel = 0.5f
     private var burst = 1f
     private var burstFloor = 1f
@@ -113,7 +113,10 @@ object Console : Panel() {
         burst = min(if (App.attractMode) burstMax * 0.5f else burstMax, burst + if (App.attractMode) burstOnSay * 0.5f else burstOnSay)
         burstFloor = 1f
         lastLineMs = System.currentTimeMillis()
-        if (text == lines.last()) return
+        if (text == lines.last()) {
+            resetFloat(text)
+            return
+        }
         log.info("  \"$text\"")
         addLine(text)
     }
@@ -242,7 +245,7 @@ object Console : Panel() {
     }
 
     override fun drawBackground() {
-        if ((mouseInside || inputActive || modalUp) && !App.attractMode) {
+        if ((mouseInside || inputActive) && !App.attractMode) {
             Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
                 Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
                 Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.6f)
@@ -342,14 +345,20 @@ object Console : Panel() {
             amount = 1
             itemName = words.drop(1).joinToString(" ")
         }
-        Thing.Tag.values().firstOrNull { it.singularName.contains(itemName, ignoreCase = true) }?.also { tag ->
-            repeat (amount) {
-                val thing = tag.spawn.invoke()
-                thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
-            }
-            say("Spawned ${amount} ${tag}.")
+        Thing.Tag.values().firstOrNull { it.singularName == itemName }?.also { tag ->
+            spawnThings(amount, tag)
+        } ?: Thing.Tag.values().firstOrNull { it.singularName.contains(itemName, ignoreCase = true) }?.also { tag ->
+            spawnThings(amount, tag)
         } ?: run {
             say("I don't know about anything called '${words[1]}'.")
+        }
+    }
+
+    private fun spawnThings(amount: Int, tag: Thing.Tag) {
+        repeat (amount) {
+            val thing = tag.spawn.invoke()
+            thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
+            say("Spawned ${amount} ${tag}.")
         }
     }
 }

@@ -57,7 +57,7 @@ class Log() : FuelBlock() {
     override fun name() = "log"
     override fun description() = "Big, heavy, wood.  Better than bad.  Good."
     override fun glyph() = Glyph.LOG
-    override var fuel = 120f
+    override var fuel = 160f
 }
 
 @Serializable

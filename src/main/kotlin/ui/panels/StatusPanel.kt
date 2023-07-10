@@ -26,7 +26,12 @@ object StatusPanel : ShadedPanel() {
         refillCache()
     }
 
-    fun refillCache() {
+    override fun advanceTime(delta: Float) {
+        super.advanceTime(delta)
+        refillCache()
+    }
+
+    private fun refillCache() {
         var cursor = padding
         var cursorY = 100 + padding
         statuses = App.player.statuses

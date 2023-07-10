@@ -246,6 +246,7 @@ enum class Glyph(val tall: Boolean = false) {
     CANDLESTICK_ON,
     LAMPPOST_OFF,
     LAMPPOST_ON,
+    STICK,
 
     BLOODSTAIN,
     SCORCHMARK,

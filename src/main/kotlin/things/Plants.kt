@@ -1,7 +1,10 @@
 package things
 
+import actors.Actor
+import actors.stats.skills.Survive
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.panels.Console
 import util.Dice
 import util.hasOneWhere
 
@@ -53,6 +56,23 @@ sealed class Plant : Scenery(), Temporal {
 
 @Serializable
 sealed class Bush : Plant() {
+    override fun uses() = mapOf(
+        UseTag.TRANSFORM to Use("find a stick", 3f,
+            canDo = { actor,x,y,targ -> isNextTo(actor) },
+            toDo = { actor,level,x,y ->
+                scavengeStick(actor)
+            })
+    )
+
+    private fun scavengeStick(actor: Actor) {
+        if (Survive.resolve(actor, 0f) >= 0) {
+            Console.sayAct("You tear a sturdy stick out of the bush.", "%Dn rips up a bush.", actor)
+            Stick().moveTo(actor)
+        } else {
+            Console.sayAct("You rip up the bush, but fail to find a decent stick.", "%Dn rips up a bush.", actor)
+        }
+        this.moveTo(null)
+    }
 }
 
 @Serializable

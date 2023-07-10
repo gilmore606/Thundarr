@@ -462,7 +462,6 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             Stat.get(tag).touch(this)
         }
         if (status.proneGlyph()) updateRotateGlyph()
-        if (this is Player) StatusPanel.refillCache()
     }
 
     fun removeStatus(statusTag: Status.Tag): Boolean {
@@ -514,7 +513,6 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         status.statEffects().forEach { (tag, _) ->
             Stat.get(tag).touch(this)
         }
-        if (this is Player) StatusPanel.refillCache()
     }
 
     open fun witnessEvent(culprit: Actor?, event: Event, location: XY) { }
