@@ -26,14 +26,20 @@ class WorkbenchModal(
     private val wrappedDesc = wrapText((bench as Thing).examineDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
 
     private val allRecipes = bench.getRecipes()
-    private var goodRecipes = listOf<Recipe>()
-    private var badRecipes = listOf<Recipe>()
+    private val goodRecipes = mutableListOf<Recipe>()
+    private val badRecipes = mutableListOf<IncompleteRecipe>()
 
     private var selection = -1
     private var selectionColumn = 0
     private val maxSelection = mutableListOf(-1, -1)
     private val colx0 = listOf(padding, col2x)
     private val colWidth = 260
+
+    class IncompleteRecipe(
+        val recipe: Recipe,
+        val missing: Int,
+        val found: Int
+    )
 
     init {
         zoomWhenOpen = 1.4f
@@ -68,13 +74,35 @@ class WorkbenchModal(
     }
 
     private fun doSelect() {
+        if (selection < 0) return
         Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
-        val recipe = if (selectionColumn == 0) goodRecipes[selection] else badRecipes[selection]
+        val recipe = if (selectionColumn == 0) goodRecipes[selection] else badRecipes[selection].recipe
         Screen.addModal(RecipeModal(this, recipe))
     }
 
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
+        mouseToOption(screenX, screenY)?.also {
+            changeSelection(it.first, it.second)
+        } ?: run {
+            changeSelection(-1)
+        }
+    }
+
+    private fun mouseToOption(screenX: Int, screenY: Int): Pair<Int,Int>? {
+        val lx = screenX - x
+        val ly = screenY - y
+        if (ly in headerPad..headerPad + spacing * max(goodRecipes.size, badRecipes.size)) {
+            if (lx in padding..width-padding) {
+                val s1 = (ly - headerPad) / spacing
+                val s2 = if (lx in padding - 5..col2x - 10) 0 else 1
+                if (s2 == 0 && s1 < goodRecipes.size || s2 == 1 && s1 < badRecipes.size) return Pair(s1, s2)
+            }
+        }
+        return null
+    }
+
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        dismiss()
+        doSelect()
         return true
     }
 
@@ -96,12 +124,12 @@ class WorkbenchModal(
 
         drawString("Can ${bench.craftVerb()}:", padding, headerPad - 30, Screen.fontColorDull, Screen.smallFont)
         goodRecipes.forEachIndexed { i, recipe ->
-            drawRecipeLine(i, recipe, padding + 30, true, recipe.describeDifficulty())
+            drawRecipeLine(i, recipe, padding + 30, true)
         }
 
         drawString("Need ${bench.ingredientWord()}s for:", col2x, headerPad - 30, Screen.fontColorDull, Screen.smallFont)
         badRecipes.forEachIndexed { i, recipe ->
-            drawRecipeLine(i, recipe, col2x + 30, false, recipe.describeDifficulty())
+            drawRecipeLine(i, recipe.recipe, col2x + 30, false, "(need ${recipe.missing})")
         }
     }
 
@@ -127,7 +155,7 @@ class WorkbenchModal(
             drawRecipeGlyph(i, recipe, padding)
         }
         badRecipes.forEachIndexed { i, recipe ->
-            drawRecipeGlyph(i, recipe, col2x)
+            drawRecipeGlyph(i, recipe.recipe, col2x)
         }
     }
 
@@ -156,8 +184,27 @@ class WorkbenchModal(
     }
 
     private fun updateRecipes() {
-        goodRecipes = allRecipes.filter { hasIngredientsFor(it) }
-        badRecipes = allRecipes.filter { !goodRecipes.contains(it) }
+        goodRecipes.clear()
+        badRecipes.clear()
+        allRecipes.forEach { recipe ->
+            val pool = mutableListOf<Thing>().apply { addAll(App.player.contents()) }
+            var missing = 0
+            var found = 0
+            recipe.ingredients().forEach { ingTag ->
+                pool.firstOrNull { it.tag == ingTag }?.also { thing ->
+                    pool.remove(thing)
+                    found++
+                } ?: run {
+                    missing++
+                }
+            }
+            if (missing == 0) {
+                goodRecipes.add(recipe)
+            } else if (found > 0) {
+                badRecipes.add(IncompleteRecipe(recipe, missing, found))
+            }
+        }
+        badRecipes.sortBy { it.missing }
         maxSelection[0] = goodRecipes.size - 1
         maxSelection[1] = badRecipes.size - 1
         selection = min(selection, maxSelection[selectionColumn])
@@ -169,18 +216,5 @@ class WorkbenchModal(
         val maxItems = max(maxSelection[0], maxSelection[1])
         height = max(minHeight, headerPad + spacing * maxItems + padding + 30)
         onResize(Screen.width, Screen.height)
-    }
-
-    private fun hasIngredientsFor(recipe: Recipe): Boolean {
-        var possible = true
-        val pool = mutableListOf<Thing>().apply { addAll(App.player.contents()) }
-        recipe.ingredients().forEach { ingTag ->
-            pool.firstOrNull { it.tag == ingTag }?.also {
-                pool.remove(it)
-            } ?: run {
-                possible = false
-            }
-        }
-        return possible
     }
 }

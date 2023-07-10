@@ -14,6 +14,7 @@ import world.terrains.Terrain
 @Serializable
 sealed class MeleeWeapon : Gear() {
     override val slot = Slot.MELEE
+    override fun value() = 4
     override fun equipSelfMsg() = "You ready your %d for action."
     override fun unequipSelfMsg() = "You return your %d to its sheath."
     override fun equipOtherMsg() = "%Dn takes out %id."

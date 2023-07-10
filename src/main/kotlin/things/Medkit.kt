@@ -74,6 +74,7 @@ class Bandages : Medkit() {
     override fun name() = "bandage"
     override fun description() = "A roll of thick cloth suitable for binding wounds."
     override fun weight() = 0.2f
+    override fun value() = 1
     override fun flammability() = 1f
     private var bandages = 5
     override fun treatmentsLeft() = bandages
@@ -87,6 +88,7 @@ class FirstAidKit : Medkit() {
     override fun name() = "first-aid kit"
     override fun description() = "A box of bandages and topical antibiotics for effective wound care."
     override fun weight() = 0.7f
+    override fun value() = 12
     override fun flammability() = 0.7f
     private var bandages = 8
     override fun treatmentsLeft() = bandages

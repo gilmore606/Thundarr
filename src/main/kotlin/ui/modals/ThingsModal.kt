@@ -1,10 +1,15 @@
 package ui.modals
 
+import actors.NPC
 import actors.actions.Drop
 import actors.actions.Get
 import actors.actions.Use
 import actors.statuses.Status
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import render.Screen
+import render.batches.QuadBatch
 import render.tilesets.Glyph
 import things.Container
 import things.Thing
@@ -21,7 +26,7 @@ import java.lang.Math.min
 class ThingsModal(
     private val thingHolder: ThingHolder,
     private val withContainer: Container? = null,
-    private val withVendor: ThingHolder? = null,
+    private val withVendor: NPC? = null,
     private val parentModal: ThingsModal? = null,
     private val sidecarTitle: String? = null,
 ) : SelectionModal(400, 500, default = 0, title = sidecarTitle ?: "bACkPACk",
@@ -33,6 +38,9 @@ class ThingsModal(
         private const val tabSize = 24
         private const val footerPad = 30
     }
+
+    val portrait = withVendor?.portraitGlyph() ?: Glyph.PORTRAIT_OOKLA
+    val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
 
     var cursorLocalX = 0
     var cursorLocalY = 0
@@ -56,12 +64,13 @@ class ThingsModal(
     }
 
     enum class ParamType(
-        val calculate: (List<Thing>)->String
+        val calculate: (List<Thing>)->String,
+        val color: Color? = null
     ) {
         NONE({ things -> "" }),
         WEIGHT({ things -> String.format("%.1f", things.sumOf { (it.weight() * 10).toInt() } * 0.1f) + "lb" }),
-        SELLPRICE({ things -> "$" + things.sumOf { 5L }.toString() }),
-        BUYPRICE({ things -> "$" + things.sumOf { 5L }.toString() }),
+        SELLPRICE({ things -> "$" + things.sumOf { it.value() }.toString() }, Screen.fontColorGreen),
+        BUYPRICE({ things -> "$" + things.sumOf { it.value() }.toString() }, Screen.fontColorGreen),
     }
 
     enum class Context { BACKPACK, TO_CONTAINER, FROM_CONTAINER, TO_VENDOR, FROM_VENDOR }
@@ -77,8 +86,8 @@ class ThingsModal(
         MAIN_BACKPACK(false, false, ParamType.WEIGHT, true, Context.BACKPACK, "You have %t."),
         MAIN_CONTAINER(false, true, ParamType.WEIGHT, true, Context.TO_CONTAINER, "You have %t."),
         SIDE_CONTAINER(true, true, ParamType.WEIGHT, false, Context.FROM_CONTAINER, "It holds %t."),
-        MAIN_VENDOR(false, true, ParamType.SELLPRICE, true, Context.TO_VENDOR, "You have %t to sell."),
-        SIDE_VENDOR(true, true, ParamType.BUYPRICE, true, Context.FROM_VENDOR, "There's %t for sale."),
+        MAIN_VENDOR(false, true, ParamType.SELLPRICE, false, Context.TO_VENDOR, "You have %t to sell."),
+        SIDE_VENDOR(true, true, ParamType.BUYPRICE, false, Context.FROM_VENDOR, "There's %t for sale."),
     }
 
     class Group(
@@ -126,13 +135,35 @@ class ThingsModal(
             this.isSidecar = true
         } else if (mode.hasSidecar) {
             withContainer?.also { container ->
-                sidecar = ThingsModal(container, parentModal = this, sidecarTitle = container.name())
+                sidecar = ThingsModal(container, withVendor = withVendor, parentModal = this,
+                    sidecarTitle = withVendor?.name() ?: container.name())
                 moveToSidecar()
             }
         }
     }
 
     override fun myXmargin() = parentModal?.let { (it.width + xMargin + 20) } ?: xMargin
+
+    override fun drawEverything() {
+        super.drawEverything()
+        if (mode == Mode.MAIN_VENDOR) {
+            portraitBatch.clear()
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            sidecar?.also { sidecar ->
+                (sidecar as ThingsModal).drawPortrait(portraitBatch)
+            }
+            portraitBatch.draw()
+        }
+    }
+
+    fun drawPortrait(batch: QuadBatch) {
+        val shadePad = 5
+        batch.addPixelQuad(x + padding - shadePad, y + padding - shadePad, x + padding + 48 + shadePad, y + padding + 48 + shadePad,
+            batch.getTextureIndex(Glyph.PORTRAIT_SHADE))
+        batch.addPixelQuad(x + padding, y + padding, x + padding + 48, y + padding + 48,
+            batch.getTextureIndex(portrait))
+    }
 
     override fun drawModalText() {
         super.drawModalText()
@@ -145,16 +176,18 @@ class ThingsModal(
         for (i in scrollOffset..scrollOffset+maxSelection) {
             if (i <= grouped.lastIndex) {
                 val group = grouped[i]
-                drawOptionText(group.name, i - scrollOffset, 30,
+                drawOptionText(group.name, i - scrollOffset, 30, tagColorOverride = mode.listParam.color,
                     addTag = group.things.first().listTag(), addCol = group.paramText, colX = 270)
             }
         }
 
-        if (mode.listParam == ParamType.WEIGHT && mode.showTotal) {
-            drawString("capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
-            drawString(weightMaxText, padding + 75, height - 30, Screen.fontColor, Screen.smallFont)
-            drawString("total ", padding + 241, height - 30, Screen.fontColorDull, Screen.smallFont)
-            drawString(weightTotalText, padding + 297, height - 30, Screen.fontColor, Screen.smallFont)
+        if (mode.showTotal) {
+            if (mode.listParam == ParamType.WEIGHT) {
+                drawString("capacity ", padding, height - 30, Screen.fontColorDull, Screen.smallFont)
+                drawString(weightMaxText, padding + 75, height - 30, Screen.fontColor, Screen.smallFont)
+                drawString("total ", padding + 241, height - 30, Screen.fontColorDull, Screen.smallFont)
+                drawString(weightTotalText, padding + 297, height - 30, Screen.fontColor, Screen.smallFont)
+            }
         }
     }
 
@@ -332,7 +365,8 @@ class ThingsModal(
                     }
                 }
                 Context.TO_VENDOR -> {
-
+                    addOption("sell ${thing.name()}")
+                        {  }
                 }
                 Context.FROM_CONTAINER -> {
                     if (!App.player.hasStatus(Status.Tag.BURDENED)) {
@@ -348,7 +382,8 @@ class ThingsModal(
                     }
                 }
                 Context.FROM_VENDOR -> {
-
+                    addOption("buy ${thing.name()}")
+                        {  }
                 }
             }
             addOption("examine " + thing.name()) {
@@ -484,7 +519,9 @@ class ThingsModal(
 
     private fun updateGrouped() {
         var weightTotal = 0f
-        val things = tab.category?.let { thingHolder.contents().filter { it.category() == tab.category }} ?: thingHolder.contents()
+        val things = (tab.category?.let { thingHolder.contents().filter { it.category() == tab.category }} ?: thingHolder.contents()).filter {
+            shouldShow(it)
+        }
         grouped = ArrayList<Group>().apply {
             things.forEach { thing ->
                 weightTotal += thing.weight()
@@ -511,6 +548,17 @@ class ThingsModal(
         weightMaxText = String.format("%.1f", App.player.carryingCapacity()) + "lb"
 
         adjustHeight()
+    }
+
+    private fun shouldShow(thing: Thing): Boolean {
+        when (mode) {
+            Mode.MAIN_VENDOR -> {
+                return thing.value() > 0
+            }
+            else -> {
+                return true
+            }
+        }
     }
 
     fun adjustHeight(fromPartner: Boolean = false) {

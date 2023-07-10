@@ -14,6 +14,7 @@ sealed class Clothing : Gear() {
     override fun equipOtherMsg() = "%Dn puts on %id."
     override fun unequipOtherMsg() = "%Dn takes off %p %d."
     override fun weight() = 1f
+    override fun value() = 1
 
     open fun armor() = 0f
     open fun wornTemperature() = 5

@@ -16,7 +16,7 @@ import util.wrapText
 class RecipeModal(
     val workbenchModal: WorkbenchModal,
     val recipe: Recipe
-) : Modal(400, 220 + recipe.ingredients().size * 27 + 44 + 90, recipe.name(), position = Position.LEFT) {
+) : Modal(400, 230 + recipe.ingredients().size * 27 + 44 + 90, recipe.name(), position = Position.LEFT) {
 
     class Ingredient(
         val name: String,
@@ -35,7 +35,7 @@ class RecipeModal(
     private val padding = 22
     private val ingpad = 56
     private val spacing = 27
-    private val headerPad = 220
+    private val headerPad = 240
     private val buttonX0 = listOf(62, 264)
     private val buttonX1 = listOf(130, 330)
 
@@ -93,10 +93,6 @@ class RecipeModal(
         if (!makeOK) selection = 0
     }
 
-    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        dismiss()
-        return true
-    }
 
     override fun onKeyDown(key: Keydef) {
         super.onKeyDown(key)
@@ -107,14 +103,36 @@ class RecipeModal(
         }
     }
 
+    override fun onMouseMovedTo(screenX: Int, screenY: Int) {
+        changeSelection(mouseToOption(screenX, screenY) ?: -1)
+    }
+
+    private fun mouseToOption(screenX: Int, screenY: Int): Int? {
+        val lx = screenX - x
+        val ly = screenY - y
+        if (ly in height-65..height-padding) {
+            if (lx in buttonX0[0]-5..buttonX1[0]+5) return 0
+            if (lx in buttonX0[1]-5..buttonX1[1]+5 && makeOK) return 1
+        }
+        return null
+    }
+
+    override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        doSelect()
+        return true
+    }
+
     private fun selectPrevious() {
         if (!makeOK) return
-        selection = if (selection == 1) 0 else 1
-        Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
+        changeSelection(if (selection == 1) 0 else 1)
     }
     private fun selectNext() {
         if (!makeOK) return
-        selection = if (selection == 1) 0 else 1
+        changeSelection(if (selection == 1) 0 else 1)
+    }
+
+    private fun changeSelection(newSelection: Int) {
+        selection = newSelection
         Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
     }
 
@@ -148,7 +166,9 @@ class RecipeModal(
     override fun drawText() {
         super.drawText()
         if (isAnimating()) return
-        drawWrappedText(wrappedDesc, padding, padding + 60, 24, Screen.font)
+        drawCenterText(recipe.skill().name + " " + recipe.describeDifficulty(), padding, padding + 36, width - (padding*2), Screen.fontColorDull, Screen.smallFont)
+
+        drawWrappedText(wrappedDesc, padding, padding + 70, 24, Screen.font)
 
         drawString("To ${bench.craftVerb()} ${recipe.name().aOrAn()}, you need:", padding, headerPad - 40, Screen.fontColorDull, Screen.smallFont)
 
@@ -185,8 +205,12 @@ class RecipeModal(
             }
         }
 
-        boxBatch.addPixelQuad(x + buttonX0[selection], y + height - 60, x + buttonX1[selection], y + height - 25,
-            boxBatch.getTextureIndex(Glyph.BOX_SHADOW))
+        if (selection > -1) {
+            boxBatch.addPixelQuad(
+                x + buttonX0[selection], y + height - 60, x + buttonX1[selection], y + height - 25,
+                boxBatch.getTextureIndex(Glyph.BOX_SHADOW)
+            )
+        }
     }
 
     override fun drawEntities() {

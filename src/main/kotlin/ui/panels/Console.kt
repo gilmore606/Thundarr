@@ -45,7 +45,8 @@ object Console : Panel() {
     private const val dimLevel = 0.5f
     private var burst = 1f
     private var burstFloor = 1f
-    private var mouseInside = false
+    var mouseInside = false
+    private var modalUp = false
 
     var inputActive = false
     var inputCommand = ""
@@ -193,7 +194,9 @@ object Console : Panel() {
         if (burstFloor == 1f && Screen.timeMs - dimDelayMs > lastLineMs) {
             burstFloor = dimLevel
         }
-        if (!(mouseInside || inputActive)) burst = max(burstFloor, burst - burstDecay * delta)
+        modalUp = Screen.topModal != null
+        if (modalUp) burst = burstMax
+        if (!(mouseInside || inputActive || modalUp)) burst = max(burstFloor, burst - burstDecay * delta)
 
         color.apply {
             r = min(1f, Screen.fontColor.r * burst)
@@ -239,10 +242,10 @@ object Console : Panel() {
     }
 
     override fun drawBackground() {
-        if ((mouseInside || inputActive) && !App.attractMode) {
+        if ((mouseInside || inputActive || modalUp) && !App.attractMode) {
             Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
                 Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
-                Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.5f)
+                Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.6f)
         }
     }
 

@@ -20,7 +20,12 @@ object EnvPanel : ShadedPanel() {
         y = yMargin
     }
 
+    override fun drawBackground() {
+        if (Console.mouseInside || Console.inputActive) return
+        super.drawBackground()
+    }
     override fun drawText() {
+        if (Console.mouseInside || Console.inputActive) return
         val threat = App.player.threatLevel()
         val threatDesc = if (threat < 0) "relaxed"
             else if (threat == 0 || threat == 1) "cautious"

@@ -14,6 +14,7 @@ sealed class Book : Portable() {
 
     override fun glyph() = Glyph.BOOK_GRAY
     override fun weight() = 0.1f
+    override fun value() = 2
     override fun flammability() = 0.8f
     override fun toolbarName() = "read " + this.name()
     override fun toolbarUseTag() = UseTag.USE

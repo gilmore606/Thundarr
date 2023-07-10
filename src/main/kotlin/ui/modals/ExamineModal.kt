@@ -13,7 +13,7 @@ import world.Entity
 class ExamineModal(
     val entity: Entity,
     position: Position = Position.LEFT
-) : Modal(400, 400, entity.name(), position) {
+) : Modal(400, 440, entity.name(), position) {
 
     private val padding = 22
     private val statSpacing = 24
