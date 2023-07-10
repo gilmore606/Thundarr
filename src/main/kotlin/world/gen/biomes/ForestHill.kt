@@ -20,8 +20,8 @@ object ForestHill : Biome(
     override fun trailChance() = 0.2f
     override fun cabinChance() = 0.1f
     override fun cavesChance() = 0.4f
-    override fun outcroppingChance() = 0.01f
-    override fun pondChance() = 0.05f
+    override fun outcroppingChance() = 0.1f
+    override fun pondChance() = 0.1f
     override fun plantDensity() = 0.7f
     override fun riverBankAltTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_ROCKS
     override fun villageWallType() = if (Dice.flip()) Terrain.Type.TERRAIN_BRICKWALL else Terrain.Type.TERRAIN_WOODWALL

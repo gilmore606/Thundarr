@@ -16,7 +16,7 @@ object Scrub : Biome(
     override fun riverBankAltTerrain(x: Int, y: Int) = if (Dice.chance(0.1f)) Terrain.Type.TERRAIN_ROCKS else Terrain.Type.TERRAIN_GRASS
     override fun plantDensity() = 0.25f
     override fun cabinChance() = 0.005f
-    override fun outcroppingChance() = 0.15f
+    override fun outcroppingChance() = 0.25f
     override fun pondChance() = 0.001f
     override fun xpValue() = 1
     override fun villageFloorType() = if (Dice.flip()) Terrain.Type.TERRAIN_DIRT else Terrain.Type.TERRAIN_WOODFLOOR

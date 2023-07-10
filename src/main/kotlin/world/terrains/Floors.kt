@@ -159,19 +159,6 @@ object Trail : Floor(Type.TERRAIN_TRAIL, Glyph.TRAIL, false, -1f) {
     override fun sleepComfort() = -0.2f
 }
 
-object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, true, 1f) {
-    override fun name() = "rocky ground"
-    override fun moveSpeed(actor: Actor) = 1.4f
-    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
-    override fun fertilityBonus() = -0.4f
-}
-
-object CaveRocks : Floor(Type.TERRAIN_CAVE_ROCKS, Glyph.CAVE_ROCKS, false, 1f) {
-    override fun name() = "rocky ground"
-    override fun moveSpeed(actor: Actor) = 1.4f
-    override fun stepSound(actor: Actor) = Speaker.SFX.STEPHARD
-}
-
 object Grass : Floor(Type.TERRAIN_GRASS, Glyph.GRASS, true) {
     override fun name() = "grass"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_DIRT, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS, Type.TERRAIN_HARDPAN)

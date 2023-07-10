@@ -554,6 +554,11 @@ sealed class Level {
                     }
                 }
             }
+            Terrain.get(getTerrain(x,y)).uses().forEach { (useTag, terrainUse) ->
+                menu.addOption(terrainUse.command) {
+                    App.player.queue(UseTerrain(useTag, XY(x,y)))
+                }
+            }
         }
     }
 

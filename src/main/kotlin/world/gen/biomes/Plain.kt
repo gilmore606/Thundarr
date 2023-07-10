@@ -15,7 +15,7 @@ object Plain : Biome(
     override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("ruinMicro",x,y) > 0.9f) Terrain.Type.TERRAIN_SWAMP else super.riverBankTerrain(x, y)
     override fun plantDensity() = 0.5f
     override fun cabinChance() = 0.001f
-    override fun outcroppingChance() = 0.05f
+    override fun outcroppingChance() = 0.08f
     override fun pondChance() = 0.04f
     override fun xpValue() = 0
 

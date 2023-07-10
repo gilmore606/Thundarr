@@ -7,6 +7,7 @@ import render.Screen
 import render.sparks.Scoot
 import render.sparks.Spark
 import render.tilesets.Glyph
+import things.Thing
 import util.LightColor
 import util.XY
 import world.Entity
@@ -140,6 +141,7 @@ sealed class Terrain(
     open fun glowColor(): LightColor? = null
     open fun trailsOverwrite() = true
     open fun sleepComfort() = -0.5f
+    open fun uses(): Map<Thing.UseTag, Thing.Use> = mapOf()
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
     open fun onStep(actor: Actor, x: Int, y: Int, data: TerrainData?) { }

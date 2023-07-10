@@ -302,26 +302,6 @@ sealed class Portable : Thing() {
 }
 
 @Serializable
-class Brick : Portable() {
-    override val tag = Tag.THING_BRICK
-    override fun name() = "brick"
-    override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
-    override fun glyph() = Glyph.BRICK
-    override fun weight() = 0.4f
-    override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
-}
-
-@Serializable
-class Rock : Portable() {
-    override val tag = Tag.THING_ROCK
-    override fun name() = "rock"
-    override fun description() = "A chunk of rock.  You could throw it at someone."
-    override fun glyph() = Glyph.ROCK
-    override fun weight() = 0.3f
-    override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
-}
-
-@Serializable
 class Hide : Portable() {
     override val tag = Tag.THING_HIDE
     override fun name() = "hide"
