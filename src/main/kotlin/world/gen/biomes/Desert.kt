@@ -1,0 +1,44 @@
+package world.gen.biomes
+
+import audio.Speaker
+import kotlinx.serialization.Serializable
+import render.tilesets.Glyph
+import util.Dice
+import world.gen.NoisePatches
+import world.gen.habitats.Habitat
+import world.terrains.Terrain
+
+@Serializable
+object Desert : Biome(
+    Glyph.MAP_DESERT,
+    Terrain.Type.TERRAIN_SAND
+) {
+    override fun defaultTitle(habitat: Habitat) = "desert"
+    override fun canHaveRain() = false
+    override fun cavesChance() = 0.8f
+    override fun cabinChance() = 0.01f
+    override fun ambientSoundDay() = Speaker.Ambience.DESERT
+    override fun ambientSoundNight() = Speaker.Ambience.DESERT
+    override fun riverBankTerrain(x: Int, y: Int) = if (NoisePatches.get("plantsBasic", x, y) > 0.1)
+        Terrain.Type.TERRAIN_GRASS else Terrain.Type.TERRAIN_HARDPAN
+    override fun bareTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_HARDPAN
+    override fun trailSideTerrain(x: Int, y: Int) = Terrain.Type.TERRAIN_ROCKS
+    override fun plantDensity() = 0.1f
+    override fun villageWallType() = if (Dice.flip()) Terrain.Type.TERRAIN_BRICKWALL else Terrain.Type.TERRAIN_CAVEWALL
+    override fun villageFloorType() = if (Dice.chance(0.2f)) Terrain.Type.TERRAIN_HARDPAN else Terrain.Type.TERRAIN_STONEFLOOR
+    override fun metaTravelCost() = 0.7f
+    override fun edgeDistanceThreatFactor() = 1f
+    override fun xpValue() = 3
+    override fun temperatureBase() = 12
+    override fun temperatureAmplitude() = 1.3f
+
+    override fun terrainAt(x: Int, y: Int): Terrain.Type {
+        val fert = fertilityAt(x, y)
+        val v = NoisePatches.get("desertRocks",x,y).toFloat()
+        val variance = NoisePatches.get("metaVariance", x, y).toFloat()
+        if (v > 0.45f) return Terrain.Type.TERRAIN_CAVEWALL
+        else if (v > 0.35f && Dice.chance((v - 0.35f) * 10f)) return Terrain.Type.TERRAIN_ROCKS
+        else if (fert > 0.5f + (variance * 0.006f)) return Terrain.Type.TERRAIN_HARDPAN
+        return super.terrainAt(x,y)
+    }
+}

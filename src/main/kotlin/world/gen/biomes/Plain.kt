@@ -16,7 +16,7 @@ object Plain : Biome(
     override fun plantDensity() = 0.5f
     override fun cabinChance() = 0.001f
     override fun outcroppingChance() = 0.05f
-    override fun pondChance() = 0.03f
+    override fun pondChance() = 0.04f
     override fun xpValue() = 0
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
