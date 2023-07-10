@@ -257,6 +257,7 @@ sealed class Level {
     fun unlinkTemporal(temporal: Temporal) = KtxAsync.launch { director.unlinkTemporal(temporal) }
 
     abstract fun isReady(): Boolean
+    open fun loadingProgress() = 0f
 
     protected open fun onSetPov() { }
 
@@ -533,10 +534,13 @@ sealed class Level {
                     }
                 }
             }
+            if (!isHere && !isWalkableAt(App.player, x, y)) addUsesFromTerrain(menu, x, y)
         }
         if (isHere) {
+            addUsesFromTerrain(menu, x, y)
             forXY(-1,-1, 1,1) { ix,iy ->
                 if (ix != 0 || iy != 0) {
+                    if (!isWalkableAt(App.player, x+ix,y+iy)) addUsesFromTerrain(menu, x+ix, y+iy)
                     thingsAt(x+ix, y+iy).groupByTag().forEach { nearGroup ->
                         val near = nearGroup.first()
                         near.uses().forEach { (tag, nearUse) ->
@@ -554,10 +558,13 @@ sealed class Level {
                     }
                 }
             }
-            Terrain.get(getTerrain(x,y)).uses().forEach { (useTag, terrainUse) ->
-                menu.addOption(terrainUse.command) {
-                    App.player.queue(UseTerrain(useTag, XY(x,y)))
-                }
+        }
+    }
+
+    private fun addUsesFromTerrain(menu: ContextMenu, tx: Int, ty: Int) {
+        Terrain.get(getTerrain(tx,ty)).uses().forEach { (useTag, terrainUse) ->
+            menu.addOption(terrainUse.command) {
+                App.player.queue(UseTerrain(useTag, XY(tx,ty)))
             }
         }
     }

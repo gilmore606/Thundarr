@@ -45,6 +45,8 @@ class WorldLevel() : Level() {
         return loadedChunks.size >= chunksWide * chunksWide
     }
 
+    override fun loadingProgress() = (loadedChunks.size.toFloat() / (chunksWide*chunksWide).toFloat())
+
     override fun getNewPlayerEntranceFrom(): XY? {
         // Brand new start.
         var entrance = Metamap.suggestedPlayerStart

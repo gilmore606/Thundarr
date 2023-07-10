@@ -13,11 +13,15 @@ import util.groupByTag
 import util.hasOneWhere
 import util.turnsToRoughTime
 import world.Entity
+import world.level.Level
 import world.stains.Fire
 
 interface Workbench {
     fun name(): String
     fun isNextTo(actor: Actor): Boolean
+    fun examineDescription(): String
+    fun glyph(): Glyph
+    fun hue(): Float
 
     fun getPossibleRecipes(crafter: Actor) {
         val recipes = mutableListOf<Recipe>()

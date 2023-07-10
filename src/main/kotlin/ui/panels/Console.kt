@@ -54,12 +54,15 @@ object Console : Panel() {
     private val pronounSubs = mutableMapOf<String,(Entity?,Entity?,Entity?)->String>().apply {
         set("n") { s,d,i -> s?.name() ?: "???" } // subject
         set("d") { s,d,i -> d?.name() ?: "???" } // direct object
+        set("t") { s,d,i -> d?.name() ?: "???" } // direct object
         set("i") { s,d,i -> i?.name() ?: "???" } // indirect object
         set("in") { s,d,i -> s?.iname() ?: "???" } // a creature
         set("id") { s,d,i -> d?.iname() ?: "???" }
+        set("it") { s,d,i -> d?.iname() ?: "???" }
         set("ii") { s,d,i -> i?.iname() ?: "???" }
         set("dn") { s,d,i -> s?.dname() ?: "???" } // the creature
         set("dd") { s,d,i -> d?.dname() ?: "???" }
+        set("dt") { s,d,i -> d?.dname() ?: "???" }
         set("di") { s,d,i -> i?.dname() ?: "???" }
         set("s") { s,d,i -> s?.gender()?.ps ?: "???" } // he
         set("o") { s,d,i -> s?.gender()?.po ?: "???" } // him
@@ -75,12 +78,15 @@ object Console : Panel() {
         set("ir") { s,d,i -> i?.gender()?.pr ?: "???" }
         set("N") { s,d,i -> s?.name()?.capitalize() ?: "???" } // subject
         set("D") { s,d,i -> d?.name()?.capitalize() ?: "???" } // direct object
+        set("T") { s,d,i -> d?.name()?.capitalize() ?: "???" } // direct object
         set("I") { s,d,i -> i?.name()?.capitalize() ?: "???" } // indirect object
         set("In") { s,d,i -> s?.iname()?.capitalize() ?: "???" } // a creature
         set("Id") { s,d,i -> d?.iname()?.capitalize() ?: "???" }
+        set("It") { s,d,i -> d?.iname()?.capitalize() ?: "???" }
         set("Ii") { s,d,i -> i?.iname()?.capitalize() ?: "???" }
         set("Dn") { s,d,i -> s?.dname()?.capitalize() ?: "???" } // the creature
         set("Dd") { s,d,i -> d?.dname()?.capitalize() ?: "???" }
+        set("Dt") { s,d,i -> d?.dname()?.capitalize() ?: "???" }
         set("Di") { s,d,i -> i?.dname()?.capitalize() ?: "???" }
         set("S") { s,d,i -> s?.gender()?.ps?.capitalize() ?: "???" } // he
         set("O") { s,d,i -> s?.gender()?.po?.capitalize() ?: "???" } // him

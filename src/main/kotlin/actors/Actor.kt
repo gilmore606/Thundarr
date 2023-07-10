@@ -32,6 +32,7 @@ import world.stains.Stain
 import world.terrains.Terrain
 import java.lang.Float.max
 import java.lang.Float.min
+import java.lang.Math.abs
 
 @Serializable
 sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
@@ -638,6 +639,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
                 (distance / 3f) - 5
         return (sneak.toInt() - perceiver.currentSenses) > 0
     }
+
+    fun isNextTo(actor: Actor) = abs(actor.xy.x - xy.x) <= 1 && abs(actor.xy.y - xy.y) <= 1
 
     fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {
         val entities = mutableSetOf<Entity>()

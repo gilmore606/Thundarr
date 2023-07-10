@@ -24,6 +24,8 @@ sealed class MeleeWeapon : Gear() {
         add(Tag.THING_TABLE)
     }
 
+    open fun canChopTrees() = false
+
     open fun hitSelfMsg() = "You hit %dd with your %i!"
     open fun hitOtherMsg() = "%Dn hits %dd with %p %i!"
     open fun missSelfMsg() = "You miss."
@@ -113,6 +115,22 @@ class Rock : MeleeWeapon() {
 }
 
 @Serializable
+class StoneAxe : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+    }
+    override val tag = Tag.THING_STONE_AXE
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.AXE
+    override fun hue() = 0.2f
+    override fun name() = "stone axe"
+    override fun description() = "A chipped stone and branch fashioned into a crude axe."
+    override fun speed() = 1.4f
+    override fun damage() = 3f
+    override fun canChopTrees() = true
+}
+
+@Serializable
 class Axe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
@@ -124,6 +142,7 @@ class Axe : MeleeWeapon() {
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
     override fun speed() = 1.4f
     override fun damage() = 5f
+    override fun canChopTrees() = true
 }
 
 @Serializable

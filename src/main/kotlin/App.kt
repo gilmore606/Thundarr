@@ -280,6 +280,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
         }
     }
 
+    var forceLoadingModalUp = false
+
     fun finishCreateWorld(actualLevel: Level, startType: StartType, startDungeon: StarterDungeon? = null) {
         KtxAsync.launch {
             level = actualLevel
@@ -289,17 +291,20 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player.onSpawn()
             player.tempInvisible = true
 
+            forceLoadingModalUp = true
             val loadingModal = LoadingModal(
-                "Loading initial world..."
+                "Loading initial world...", withProgress = true
             )
             Screen.addModal(loadingModal)
 
             var playerStart: XY? = null
             while (playerStart == null || !level.isReady()) {
                 log.debug("Waiting for new level entrance...")
+                loadingModal.setProgress(level.loadingProgress())
                 delay(200)
                 playerStart = level.getNewPlayerEntranceFrom()
             }
+            forceLoadingModalUp = false
             loadingModal.abort()
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)

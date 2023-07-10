@@ -33,6 +33,7 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
     }
 
     fun addProgress(more: Float) { progress = min(1f, progress + more) }
+    fun setProgress(total: Float) { progress = total }
 
     fun abort() {
         dismissed = true
@@ -65,7 +66,7 @@ class LoadingModal(text: String, val withProgress: Boolean = false) :
         }
     }
 
-    private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking
+    private fun isLoading() = ChunkLoader.isWorking() || Metamap.isWorking || App.forceLoadingModalUp
 
     override fun dispose() {
         textBatch.dispose()

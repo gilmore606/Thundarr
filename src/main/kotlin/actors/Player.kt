@@ -12,12 +12,17 @@ import actors.statuses.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.GlyphRise
 import render.sparks.Smoke
 import render.tilesets.Glyph
 import things.*
+import things.recipes.ImprovRecipe
+import things.recipes.Recipe
+import ui.modals.ThingsModal
+import ui.modals.WorkbenchModal
 import ui.panels.Console
 import ui.panels.TimeButtons
 import util.*
@@ -34,7 +39,7 @@ import java.lang.Math.abs
 import java.lang.Math.max
 
 @Serializable
-open class Player : Actor() {
+open class Player : Actor(), Workbench {
 
     companion object {
         private const val caloriesMax = 2000f
@@ -458,4 +463,12 @@ open class Player : Actor() {
         hpMax += 5
         hp  = hpMax
     }
+
+    @Transient var craftingWith: Thing? = null
+    fun improvCraftWith(ingredient: Thing) {
+        craftingWith = ingredient
+        Screen.addModal(WorkbenchModal(this))
+    }
+
+    override fun benchCanMake(recipe: Recipe) = recipe is ImprovRecipe
 }

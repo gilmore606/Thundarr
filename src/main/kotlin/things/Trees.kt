@@ -19,7 +19,7 @@ sealed class Tree : Plant() {
     open fun chopProductAmount() = Dice.oneTo(3)
     override fun uses() = mapOf(
         UseTag.DESTROY to Use("chop down " + name(), 3.0f,
-            canDo = { actor,x,y,targ -> actor.meleeWeapon() is Axe && isNextTo(actor) },
+            canDo = { actor,x,y,targ -> actor.meleeWeapon().canChopTrees() && isNextTo(actor) },
             toDo = { actor, level, x, y ->
                 val logVictim = level.actorAt(x,y)
                 repeat(chopProductAmount()) {

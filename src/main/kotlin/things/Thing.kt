@@ -96,6 +96,7 @@ sealed class Thing() : Entity {
         THING_FIRSTAIDKIT("first aid kit", "first aid kits", { FirstAidKit() }),
         THING_FIST("fists", "fists", { Fist() }),
         THING_TEETH("teeth", "teeth", { Teeth() }),
+        THING_STONE_AXE("stone axe", "stone axes", { StoneAxe() }),
         THING_AXE("axe", "axes", { Axe() }),
         THING_PICKAXE("pickaxe", "pickaxes", { Pickaxe() }),
         THING_THORNBUSH("thornbush", "thornbushes", { ThornBush() }),

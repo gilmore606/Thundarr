@@ -14,6 +14,7 @@ import render.tilesets.Glyph
 import things.Container
 import things.Thing
 import things.ThingHolder
+import things.recipes.Recipe
 import ui.input.Keydef
 import ui.input.Mouse
 import ui.panels.Toolbar
@@ -332,6 +333,10 @@ class ThingsModal(
                     } else {
                         addOption("drop ${thing.listName()}")
                             { App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey())) }
+                    }
+                    if (Recipe.recipesFor(thing.tag, improvOnly = true).isNotEmpty()) {
+                        addOption("craft with ${thing.name()}")
+                            { App.player.improvCraftWith(thing) }
                     }
                     if (thing.tag != App.player.thrownTag) {
                         addOption("ready ${thing.name().plural()} for throwing")

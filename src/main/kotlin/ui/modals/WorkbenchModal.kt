@@ -23,7 +23,7 @@ class WorkbenchModal(
     private val spacing = 27
     private val col2x = 300
     private val headerPad = 210
-    private val wrappedDesc = wrapText((bench as Thing).examineDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
+    private val wrappedDesc = wrapText(bench.examineDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
 
     private val allRecipes = bench.getRecipes()
     private val goodRecipes = mutableListOf<Recipe>()
@@ -146,9 +146,8 @@ class WorkbenchModal(
         val x0 = x + width - padding - 64
         val y0 = y + padding
         val batch = myThingBatch()
-        bench as Thing
         batch?.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
-            batch.getTextureIndex(bench.glyph(), bench.level(), bench.xy().x, bench.xy().y),
+            batch.getTextureIndex(bench.glyph()),
             hue = bench.hue())
 
         goodRecipes.forEachIndexed { i, recipe ->
