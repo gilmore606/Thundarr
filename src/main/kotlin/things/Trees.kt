@@ -2,6 +2,7 @@ package things
 
 import actors.Actor
 import actors.stats.skills.Dodge
+import actors.stats.skills.Survive
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
@@ -139,4 +140,22 @@ class DeadTree : Tree() {
     override fun glyph() = Glyph.DEAD_TREE
     override fun name() = "dead tree"
     override fun description() = "The dessicated skeleton of a once-mighty tree."
+    override fun uses() = mapOf(
+        UseTag.TRANSFORM to Use("pull a log from ${name()}", 3f,
+            canDo = { actor,x,y,targ -> isNextTo(actor) },
+            toDo = { actor,level,x,y ->
+                scavengeLog(actor)
+            })
+    )
+    private fun scavengeLog(actor: Actor) {
+        if (Survive.resolve(actor, 0f) >= 0) {
+            Console.sayAct("You find a log and break it off of the dead tree trunk.", "%Dn pulls a log from %it.", actor, this)
+            Log().moveTo(actor)
+        } else {
+            Console.sayAct("You fail to find a usable log from the dead tree.", "%Dn pokes at %it.", actor, this)
+        }
+        if (Dice.chance(0.3f)) {
+            this.moveTo(null)
+        }
+    }
 }

@@ -73,9 +73,15 @@ fun plantSpawns() = listOf<PlantSpawn>(
     ),
     PlantSpawn({ DeadTree() },
         setOf(Mountain, Forest, ForestHill, Hill, Scrub, Swamp, Suburb),
-        setOf(TemperateA, TemperateB, AlpineA, AlpineB),
-        0.3f, 0.6f, 1f
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        0.3f, 0.5f, 0.8f
     ),
+    PlantSpawn({ DeadTree() },
+        setOf(Plain, Ruins),
+        setOf(TemperateA, TemperateB, AlpineA, AlpineB, TropicalA, TropicalB),
+        0.05f, 0.1f, 1f
+    ),
+
 
     // Bushes
     PlantSpawn({ ThornBush() },
