@@ -4,6 +4,10 @@ import actors.Actor
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Brick
+import things.Rebar
+import things.Stick
+import util.Dice
 import util.LightColor
 import world.Chunk
 import world.level.Level
@@ -172,6 +176,12 @@ object Undergrowth : Floor(Type.TERRAIN_UNDERGROWTH, Glyph.UNDERGROWTH, true, 2f
     override fun moveSpeed(actor: Actor) = 1.7f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPGRASS
     override fun fertilityBonus() = 0.4f
+
+    override fun scavengeCommand() = "find a stick"
+    override fun scavengeDifficulty() = -2f
+    override fun scavengeProduct() = Stick()
+    override fun scavengeMsg() = "You root around in the undergrowth and find a sturdy stick."
+    override fun scavengeFailMsg() = "You root around a while, but find only thorns and leaves."
 }
 
 object Swamp : Floor(Type.TERRAIN_SWAMP, Glyph.SWAMP, true, 2f) {
@@ -219,6 +229,12 @@ object Rubble : Floor(Type.TERRAIN_RUBBLE, Glyph.RUBBLE, false, 2f) {
     override fun name() = "rubble"
     override fun moveSpeed(actor: Actor) = 1.8f
     override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+
+    override fun scavengeCommand() = "search rubble"
+    override fun scavengeDifficulty() = -1f
+    override fun scavengeProduct() = if (Dice.flip()) Rebar() else Brick()
+    override fun scavengeMsg() = "You poke in the rubble and uncover %it."
+    override fun scavengeFailMsg() = "You fail to find anything useful in the rubble."
 }
 
 sealed class Highway : Floor(Type.GENERIC_HIGHWAY, Glyph.HIGHWAY_H, false, -2f) {

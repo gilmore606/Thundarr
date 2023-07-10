@@ -1,6 +1,8 @@
 package world.terrains
 
 import actors.Actor
+import actors.Player
+import actors.stats.skills.Survive
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.Screen
@@ -8,6 +10,7 @@ import render.sparks.Scoot
 import render.sparks.Spark
 import render.tilesets.Glyph
 import things.Thing
+import ui.panels.Console
 import util.LightColor
 import util.XY
 import world.Entity
@@ -141,7 +144,31 @@ sealed class Terrain(
     open fun glowColor(): LightColor? = null
     open fun trailsOverwrite() = true
     open fun sleepComfort() = -0.5f
-    open fun uses(): Map<Thing.UseTag, Thing.Use> = mapOf()
+
+    open fun scavengeCommand(): String? = null
+    open fun scavengeDifficulty(): Float = 0f
+    open fun scavengeMsg() = "You poke around and find %it."
+    open fun scavengeFailMsg() = "You root around a while, but fail to find anything useful."
+    open fun scavengeProduct(): Thing? = null
+    open fun uses(): Map<Thing.UseTag, Thing.Use> = scavengeCommand()?.let { command ->
+        mapOf(
+            Thing.UseTag.TRANSFORM to Thing.Use(command, 4f,
+                canDo = { actor,x,y,targ -> true },
+                toDo = { actor,level,x,y -> doScavenge(actor) }
+            )
+        )
+    } ?: mapOf()
+
+    open fun doScavenge(actor: Actor) {
+        if (Survive.resolve(actor, scavengeDifficulty()) >= 0) {
+            scavengeProduct()?.also { loot ->
+                if (actor is Player) Console.sayAct(scavengeMsg(), "", actor, loot)
+                loot.moveTo(actor)
+            }
+        } else {
+            if (actor is Player) Console.sayAct(scavengeFailMsg(), "", actor)
+        }
+    }
 
     open fun onBump(actor: Actor, x: Int, y: Int, data: TerrainData?) { }
     open fun onStep(actor: Actor, x: Int, y: Int, data: TerrainData?) { }

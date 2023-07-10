@@ -80,6 +80,19 @@ class Stick : MeleeWeapon(), Fuel {
 }
 
 @Serializable
+class Rebar : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.STICK, 0.0f, -0.1f, false)
+    }
+    override val tag = Tag.THING_REBAR
+    override fun glyphTransform() = glyphTransform
+    override fun glyph() = Glyph.STICK
+    override fun hue() = -0.3f
+    override fun name() = "rebar"
+    override fun description() = "A rusted length of metal bar, pulled from ancient ruins."
+}
+
+@Serializable
 class Brick : MeleeWeapon() {
     override val tag = Tag.THING_BRICK
     override fun name() = "brick"

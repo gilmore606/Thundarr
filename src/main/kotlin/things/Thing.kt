@@ -143,6 +143,7 @@ sealed class Thing() : Entity {
         THING_CANDLESTICK("candlestick", "candlesticks", { Candlestick() }),
         THING_LAMPPOST("lamppost", "lampposts", { Lamppost() }),
         THING_STICK("stick", "sticks", { Stick() }),
+        THING_REBAR("rebar", "rebars", { Rebar() }),
     }
 
     abstract val tag: Tag
