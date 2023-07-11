@@ -523,19 +523,6 @@ sealed class Level {
                 }
             }
         }
-        if (isAdjacentOrHere) {
-            App.player.contents.groupByTag().forEach { group ->
-                val held = group.first()
-                held.uses().forEach { (tag, heldUse) ->
-                    if (heldUse.canDo(App.player, x, y, true)) {
-                        menu.addOption(heldUse.command) {
-                            App.player.queue(Use(tag, held.getKey(), heldUse.duration))
-                        }
-                    }
-                }
-            }
-            if (!isHere && !isWalkableAt(App.player, x, y)) addUsesFromTerrain(menu, x, y)
-        }
         if (isHere) {
             addUsesFromTerrain(menu, x, y)
             forXY(-1,-1, 1,1) { ix,iy ->
@@ -554,6 +541,19 @@ sealed class Level {
                             menu.addOption(near.smashVerbName() + " " + near.name()) {
                                 App.player.queue(Smash(near.getKey(), near.smashVerbName()))
                             }
+                        }
+                    }
+                }
+            }
+        }
+        if (isAdjacentOrHere) {
+            if (!isHere && !isWalkableAt(App.player, x, y)) addUsesFromTerrain(menu, x, y)
+            App.player.contents.groupByTag().forEach { group ->
+                val held = group.first()
+                held.uses().forEach { (tag, heldUse) ->
+                    if (heldUse.canDo(App.player, x, y, true)) {
+                        menu.addOption(heldUse.command) {
+                            App.player.queue(Use(tag, held.getKey(), heldUse.duration))
                         }
                     }
                 }

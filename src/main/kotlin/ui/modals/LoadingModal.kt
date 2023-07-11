@@ -72,12 +72,13 @@ class LoadingModal(
         if (withMoon) {
             var a = progress * 2f
             if (a > 1f) a += ((a - 1f) * -2f)
+            val moony = y / 2 - 64
             boxBatch.addPixelQuad(
-                (Screen.width / 2) - 128, 200, Screen.width / 2, 328,
+                (Screen.width / 2) - 128, moony, Screen.width / 2, moony + 128,
                 boxBatch.getTextureIndex(Glyph.MOON_BANNER_L), alpha = a
             )
             boxBatch.addPixelQuad(
-                (Screen.width / 2), 200, (Screen.width / 2) + 129, 328,
+                (Screen.width / 2), moony, (Screen.width / 2) + 129, moony + 128,
                 boxBatch.getTextureIndex(Glyph.MOON_BANNER_R), alpha = a
             )
         }

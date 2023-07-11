@@ -272,17 +272,17 @@ fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.s
             val wordWidth = GlyphLayout(font, word).width.toInt()
             if (nextLine == "" || wordWidth <= linePixelsLeft) {
                 nextLine += word + " "
-                if (hitReturn) {
-                    wrapped.add(nextLine)
-                    nextLine = ""
-                    linePixelsLeft = linePixelsMax
-                }
                 linePixelsLeft -= wordWidth + spaceWidth
             } else {
                 wrapped.add(nextLine)
                 nextLine = word + " "
                 linePixelsLeft = linePixelsMax - wordWidth - spaceWidth
             }
+        }
+        if (hitReturn) {
+            wrapped.add(nextLine)
+            nextLine = ""
+            linePixelsLeft = linePixelsMax
         }
     }
     if (nextLine != "") wrapped.add(nextLine)

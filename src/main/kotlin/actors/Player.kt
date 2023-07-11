@@ -90,6 +90,7 @@ open class Player : Actor(), Workbench {
     var thrownTag: Thing.Tag? = null
     var tempInvisible: Boolean = false
     override fun glyph() = if (tempInvisible) Glyph.BLANK else Glyph.PLAYER
+    override fun shadowWidth() = if (tempInvisible) 0f else super.shadowWidth()
     override fun name() = "Thundarr"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A stalwart blond barbarian.  His good looks are somewhat marred by a permanent scowl."
@@ -202,6 +203,7 @@ open class Player : Actor(), Workbench {
 
     override fun onMove() {
         super.onMove()
+        updateTemperature()
         if (level is WorldLevel) Metamap.markChunkVisitedAt(xy.x, xy.y)
     }
 

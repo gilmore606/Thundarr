@@ -4,6 +4,8 @@ import actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Boulder
+import things.WreckedCar
 import util.*
 import world.Chunk
 import world.gen.AnimalSpawn
@@ -118,11 +120,28 @@ class Rivers(
             }
             adds.forEach { flagsAt(it.x, it.y).add(WorldCarto.CellFlag.RIVERBANK) }
         }
+
+        val rockDensity = Dice.float(0.2f, 0.8f)
         forEachBiome { x,y,biome ->
             if (flagsAt(x,y).contains(WorldCarto.CellFlag.RIVERBANK)) {
-                setTerrain(x,y,biome.riverBankTerrain(x,y))
+                val waters = neighborCount(x,y,Terrain.Type.GENERIC_WATER)
+                val riverMetaRocks = NoisePatches.get("mountainShapes", x / 39, y / 58) * 0.35f + 0.65f
+                val riverRocks = NoisePatches.get("mountainShapes", x, y)
+                if ((riverRocks > riverMetaRocks) && Dice.chance(waters * 0.3f + rockDensity)) {
+                    setTerrain(x, y, Terrain.Type.TEMP4)
+                    if (Dice.chance(0.005f)) spawnThing(x, y, if (Dice.chance(0.04f)) WreckedCar() else Boulder())
+                } else {
+                    setTerrain(x, y, biome.riverBankTerrain(x, y))
+                }
             }
         }
+        if (Dice.flip()) {
+            fringeTerrain(
+                Terrain.Type.TEMP4, Terrain.Type.TERRAIN_ROCKS, 1f - rockDensity,
+                exclude = if (Dice.flip()) Terrain.Type.GENERIC_WATER else null
+            )
+        }
+        swapTerrain(Terrain.Type.TEMP4, Terrain.Type.TERRAIN_ROCKS)
     }
 
     private fun drawRiver(start: RiverExit, end: RiverExit) {

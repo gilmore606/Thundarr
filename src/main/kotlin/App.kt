@@ -14,6 +14,7 @@ import ktx.async.KTX
 import ktx.async.KtxAsync
 import render.Screen
 import render.sparks.Smoke
+import render.tilesets.Glyph
 import things.*
 import ui.modals.*
 import ui.panels.*
@@ -334,16 +335,17 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Screen.addModal(
                     BigSplashModal(
                         "Survive!",
-                        "\"Hurry Thundarr -- into the portal!  There's no time!\"\n \nAt Princess Ariel's urging, I dove " +
-                                "into the swirling magic, transporting me out of $wizardFullName's dungeons." +
-                                "  With luck, I will meet her and my friend Ookla again soon.  But now I must make my way alone in Numeria.",
+                        "\"Hurry Thundarr -- into the \nportal!  There's no time!\"\n \nAt Princess Ariel's urging, \nI dove " +
+                                "into the swirling \nmagic, transporting me out of $wizardFullName's dungeons.\n  \n" +
+                                "With luck, I will meet her and my friend Ookla again soon.  But now I must make my way alone in Numeria.",
                         "Onward!",
                         true,
-                        true
+                        true,
+                        portrait = Glyph.PORTRAIT_ARIEL
                     )
                 )
                 MagicPortal().spawnAt(level, App.player.xy.x + 1, App.player.xy.y)
-                delay(1000)
+                delay(1400)
                 weather.flashLightning(LightColor(1f, 0.7f, 1f))
                 player.tempInvisible = false
                 player.animation = Bump(WEST)
