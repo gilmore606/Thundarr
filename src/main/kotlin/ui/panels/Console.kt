@@ -320,12 +320,20 @@ object Console : Panel() {
                 say("  SPAWN <npc> - Spawn NPC in front of you")
                 say("  TIME <hours> - Advance time n hours")
                 say("  WEATHER <value> - Change weather to 0.0 - 1.0 (or 0 if no value)")
+                say("  XP <amount> - Earn xp")
             }
             "hp" -> { debugHp(words) }
             "weather" -> { debugWeather(words) }
             "get" -> { debugGet(words) }
+            "xp" -> { debugXP(words) }
             else -> say("I don't understand that.")
         }
+    }
+
+    private fun debugXP(words: List<String>) {
+        val xp = if (words.size > 1) words[1].toInt() else 500
+        App.player.gainXP(xp)
+        say("earned $xp free XP.")
     }
 
     private fun debugHp(words: List<String>) {

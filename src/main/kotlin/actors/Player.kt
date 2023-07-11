@@ -21,7 +21,6 @@ import render.tilesets.Glyph
 import things.*
 import things.recipes.ImprovRecipe
 import things.recipes.Recipe
-import ui.modals.ThingsModal
 import ui.modals.WorkbenchModal
 import ui.panels.Console
 import ui.panels.TimeButtons
@@ -34,9 +33,6 @@ import world.level.EnclosedLevel
 import world.level.WorldLevel
 import world.stains.Fire
 import world.terrains.Terrain
-import java.lang.Float.min
-import java.lang.Math.abs
-import java.lang.Math.max
 
 @Serializable
 open class Player : Actor(), Workbench {
@@ -54,7 +50,7 @@ open class Player : Actor(), Workbench {
         val levels = listOf(
             Lvl(0, "Runaway"),
             Lvl(200, "Beggar"),
-            Lvl(500,"Lost"),
+            Lvl(550,"Lost"),
             Lvl(1000,"Mendicant"),
             Lvl(2000,"Wanderer"),
             Lvl(4000,"Seeker"),
@@ -440,13 +436,15 @@ open class Player : Actor(), Workbench {
     }
 
     fun gainXP(added: Int) {
-        val effLevel = xpLevel + levelUpsAvailable
-        if (effLevel >= levels.size - 1) return
         xp += added
-        if (xp >= levels[effLevel].xp) {
+        while (xpEarnedForLevel() >= xpNeededForLevel()) {
             earnLevelUp()
         }
     }
+
+    fun potentialLevel() = xpLevel + levelUpsAvailable
+    fun xpNeededForLevel() = if (potentialLevel() <= 1) levels[1].xp else levels[potentialLevel()].xp - levels[potentialLevel() - 1].xp
+    fun xpEarnedForLevel() = if (potentialLevel() <= 1) xp else (xp - levels[potentialLevel() - 1].xp)
 
     private fun earnLevelUp() {
         levelUpsAvailable++
@@ -458,7 +456,7 @@ open class Player : Actor(), Workbench {
         if (levelUpsAvailable < 1) return
         levelUpsAvailable--
         xpLevel++
-        Console.say("You feel your potential realized.  You are Thundarr the ${levels[xpLevel].name.capitalize()}.")
+        Console.say("You feel your potential realized.  You are Thundarr the ${levels[xpLevel-1].name.capitalize()}.")
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
 
         Heart.improve(this, fullLevel = true)

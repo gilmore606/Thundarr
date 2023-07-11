@@ -4,21 +4,26 @@ import actors.Actor
 import actors.Player
 import actors.stats.*
 import audio.Speaker
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import render.Screen
-import ui.input.Keyboard
+import render.batches.QuadBatch
+import render.tilesets.Glyph
 import ui.input.Keydef
 import ui.input.Mouse
-import util.*
+import util.log
 import java.lang.Integer.max
+import java.lang.Integer.min
 
-class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
+class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
 
-    val header = 110
-    val padding = 18
+    val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
+
+    val header = 160
+    val padding = 24
     val statSpacing = 32
     val skillSpacing = 24
+    val minHeight = 400
 
     val stats = allStats
     val statBonuses = stats.map { it.statBonuses(actor) }
@@ -31,23 +36,60 @@ class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
         if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
     }
 
+    val xpNeed = if (actor is Player) actor.xpNeededForLevel() else 0
+    val xpHave = if (actor is Player) actor.xpEarnedForLevel() else 0
+
+    val xpString = if (actor is Player) {
+        if (actor.levelUpsAvailable > 0) "level up!" else
+        "${xpNeed - xpHave}xp to lvl ${actor.xpLevel + 1}"
+    } else ""
+
+    val xpOffset = measure(xpString, Screen.smallFont)
+
     var selection = -1
     val maxSelection = stats.size + skills.size - 1
 
     init {
         sidecar = SkillSidecar(this)
         adjustHeight()
+        log.info("xp needed $xpNeed have $xpHave")
     }
 
     private fun adjustHeight() {
-        this.height = header + padding * 2 + max(5, skills.size) * skillSpacing + 10
+        this.height = max(minHeight, header + padding * 2 + max(5, skills.size) * skillSpacing + 10)
         onResize(Screen.width, Screen.height)
+    }
+
+    override fun drawEverything() {
+        super.drawEverything()
+        portraitBatch.clear()
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        if (!isAnimating()) drawPortrait()
+        portraitBatch.draw()
+    }
+
+    private fun drawPortrait() {
+        val shadePad = 8
+        val portraitSize = 64
+        val px0 = x + width - portraitSize - padding
+        val px1 = px0 + portraitSize
+        val py0 = y + padding
+        val py1 = py0 + portraitSize
+        portraitBatch.addPixelQuad(px0 - shadePad, py0 - shadePad, px1 + shadePad, py1 + shadePad,
+            portraitBatch.getTextureIndex(Glyph.PORTRAIT_SHADE))
+        portraitBatch.addPixelQuad(px0, py0, px1, py1, portraitBatch.getTextureIndex(Glyph.PORTRAIT_THUNDARR))
     }
 
     override fun drawModalText() {
         super.drawModalText()
 
-        drawSubTitle("the ${Player.levels[App.player.xpLevel-1].name}")
+        drawSubTitle("the  ${Player.levels[App.player.xpLevel-1].name}")
+
+        drawString("lvl ${actor.xpLevel}", padding, header - 45, Screen.fontColorDull, Screen.smallFont)
+        if (actor is Player && actor.xpLevel < Player.levels.lastIndex) {
+            drawRightText(xpString, width - padding, header - 45, Screen.fontColorDull, Screen.smallFont)
+        }
 
         stats.forEachIndexed { n, stat ->
             val total = stat.get(actor)
@@ -75,7 +117,19 @@ class SkillsModal(val actor: Actor) : Modal(370, 520, "- ${actor.name()} -") {
 
     override fun drawBackground() {
         super.drawBackground()
-        if (!isAnimating() && selection >= 0) {
+        if (isAnimating()) return
+
+        if (actor is Player && actor.xpLevel < Player.levels.lastIndex) {
+            val barx0 = x + padding + 55
+            val bary0 = y + header - 47
+            val barx1 = x + width - padding - xpOffset - 16
+            val bary1 = y + header - 31
+            boxBatch.addHealthBar(barx0, bary0, barx1, bary1,
+                if (actor.levelUpsAvailable > 0) xpNeed else xpHave, xpNeed,
+                allBlue = true, hideFull = false, withBorder = true)
+        }
+
+        if (selection >= 0) {
             if (selection < stats.size) {
                 drawSelectionBox(padding, header + statSpacing * selection + 2, 140, 18)
             } else {

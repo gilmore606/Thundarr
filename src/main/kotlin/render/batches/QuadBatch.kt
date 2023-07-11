@@ -12,6 +12,7 @@ import render.tilesets.TileSet
 import render.tilesets.Glyph
 import util.*
 import world.level.Level
+import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.math.abs
 import kotlin.math.sign
@@ -122,23 +123,32 @@ class QuadBatch(
     }
 
     fun addHealthBar(x0: Int, y0: Int, x1: Int, y1: Int, // absolute screen pixel XY
-                     hp: Int, hpMax: Int, allGreen: Boolean = false) {
-        val amount = (hp.toFloat() / hpMax.toFloat())
-        if (amount >= 1f) return
+                     hp: Int, hpMax: Int,
+                     allGreen: Boolean = false, allBlue: Boolean = false, hideFull: Boolean = true, withBorder: Boolean = false) {
+        val amount = max(0f, min(1f, (hp.toFloat() / hpMax.toFloat())))
+        if (amount == 1f && hideFull) return
+        val border = 2
         val xMid = x0 + ((x1 - x0) * amount).toInt()
         val glx0 = (x0 / Screen.width.toDouble()) * 2f - 1f
+        val bglx0 = ((x0 - border) / Screen.width.toDouble()) * 2f - 1f
         val gly0 = (y0 / Screen.height.toDouble()) * 2f - 1f
+        val bgly0 = ((y0 - border) / Screen.height.toDouble()) * 2f - 1f
         val glx1 = (x1 / Screen.width.toDouble()) * 2f - 1f
+        val bglx1 = ((x1 + border) / Screen.width.toDouble()) * 2f - 1f
         val gly1 = (y1 / Screen.height.toDouble()) * 2f - 1f
+        val bgly1 = ((y1 + border) / Screen.height.toDouble()) * 2f - 1f
         val glxMid = (xMid / Screen.width.toDouble()) * 2f - 1f
         val textureIndex = getTextureIndex(Glyph.COLOR_BARS)
 
         val texOffset = when {
             allGreen -> 0.25f
+            allBlue -> 0.5f
             amount < 0.35 -> 0f
             amount < 0.65 -> 0.125f
             else -> 0.25f
         }
+
+        if (withBorder) addQuad(bglx0, bgly0, bglx1, bgly1, textureIndex = textureIndex, ity0 = 0.625f, ity1 = 0.75f)
         addQuad(glx0, gly0, glxMid, gly1, textureIndex = textureIndex, ity0 = texOffset + 0.001f, ity1 = texOffset + 0.124f)
         addQuad(glxMid, gly0, glx1, gly1, textureIndex = textureIndex, ity0 = 0.376f, ity1 = 0.499f)
     }
