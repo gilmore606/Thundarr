@@ -17,3 +17,12 @@ object StoneAxeRecipe : ImprovRecipe() {
     override fun glyph() = Glyph.AXE
     override fun difficulty() = -1f
 }
+
+object StoneAxeRecipe2 : ImprovRecipe() {
+    override fun name() = "stone axe"
+    override fun description() = "A rock chipped sharp and tied to a length of rebar makes a somewhat usable axe."
+    override fun ingredients() = listOf(Thing.Tag.THING_REBAR, Thing.Tag.THING_ROCK)
+    override fun product() = StoneAxe()
+    override fun glyph() = Glyph.AXE
+    override fun difficulty() = -1f
+}

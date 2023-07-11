@@ -18,7 +18,8 @@ abstract class Recipe {
             StoneAxeRecipe,
         )
         val improv = listOf(
-            StoneAxeRecipe
+            StoneAxeRecipe,
+            StoneAxeRecipe2,
         )
 
         fun recipesFor(ingredient: Thing.Tag, improvOnly: Boolean = false): Set<Recipe> = mutableSetOf<Recipe>().apply {

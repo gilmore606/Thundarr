@@ -13,7 +13,7 @@ import java.lang.Math.min
 
 class WorkbenchModal(
     val bench: Workbench
-) : Modal(600, 500, title = bench.name(), position = Position.LEFT) {
+) : Modal(600, 500, title = bench.workbenchTitle(), position = Position.LEFT) {
 
     companion object {
         private const val minHeight = 300
@@ -23,7 +23,7 @@ class WorkbenchModal(
     private val spacing = 27
     private val col2x = 300
     private val headerPad = 210
-    private val wrappedDesc = wrapText(bench.examineDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
+    private val wrappedDesc = wrapText(bench.workbenchDescription() + "\n \nWhat will you ${bench.craftVerb()}?", width - 64, padding, Screen.font)
 
     private val allRecipes = bench.getRecipes()
     private val goodRecipes = mutableListOf<Recipe>()
@@ -154,7 +154,7 @@ class WorkbenchModal(
         val y0 = y + padding
         val batch = myThingBatch()
         batch?.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
-            batch.getTextureIndex(bench.glyph()),
+            batch.getTextureIndex(bench.workbenchGlyph()),
             hue = bench.hue())
 
         goodRecipes.forEachIndexed { i, recipe ->

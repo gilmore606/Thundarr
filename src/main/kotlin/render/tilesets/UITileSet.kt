@@ -44,4 +44,6 @@ fun UITileSet() =
         setTile(Glyph.ARROW_UP, SimpleTile(this, 1, 6))
         setTile(Glyph.ARROW_DOWN, SimpleTile(this, 2, 6))
         setTile(Glyph.CHECK_MARK, SimpleTile(this, 3, 6))
+        setTile(Glyph.MOON_BANNER_L, SimpleTile(this, 4, 6))
+        setTile(Glyph.MOON_BANNER_R, SimpleTile(this, 5, 6))
     }

@@ -20,8 +20,11 @@ interface Workbench {
     fun name(): String
     fun isNextTo(actor: Actor): Boolean
     fun examineDescription(): String
+    fun workbenchDescription() = examineDescription()
     fun glyph(): Glyph
+    fun workbenchGlyph() = glyph()
     fun hue(): Float
+    fun workbenchTitle() = name()
 
     fun getPossibleRecipes(crafter: Actor) {
         val recipes = mutableListOf<Recipe>()

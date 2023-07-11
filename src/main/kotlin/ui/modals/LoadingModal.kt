@@ -2,6 +2,7 @@ package ui.modals
 
 import render.Screen
 import render.batches.QuadBatch
+import render.tilesets.Glyph
 import render.tilesets.UITileSet
 import util.log
 import world.gen.Metamap
@@ -11,7 +12,8 @@ import java.lang.Float.min
 class LoadingModal(
     text: String,
     val withProgress: Boolean = false,
-    val forceUp: Boolean = false
+    val forceUp: Boolean = false,
+    val withMoon: Boolean = false,
 ) : SplashModal(text, forceHeight = if (withProgress) 100 else 60) {
 
     companion object {
@@ -65,6 +67,18 @@ class LoadingModal(
             boxBatch.addHealthBar(
                 x + padding, y + 65, x + width - (padding), y + 85,
                 (progress * 100f).toInt(), 101, allGreen = true
+            )
+        }
+        if (withMoon) {
+            var a = progress * 2f
+            if (a > 1f) a += ((a - 1f) * -2f)
+            boxBatch.addPixelQuad(
+                (Screen.width / 2) - 128, 200, Screen.width / 2, 328,
+                boxBatch.getTextureIndex(Glyph.MOON_BANNER_L), alpha = a
+            )
+            boxBatch.addPixelQuad(
+                (Screen.width / 2), 200, (Screen.width / 2) + 129, 328,
+                boxBatch.getTextureIndex(Glyph.MOON_BANNER_R), alpha = a
             )
         }
     }

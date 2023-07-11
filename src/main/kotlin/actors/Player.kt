@@ -469,6 +469,8 @@ open class Player : Actor(), Workbench {
         craftingWith = ingredient
         Screen.addModal(WorkbenchModal(this))
     }
-
+    override fun workbenchDescription() = craftingWith?.description() ?: ""
+    override fun workbenchGlyph() = craftingWith?.glyph() ?: Glyph.BLANK
+    override fun workbenchTitle() = craftingWith?.let { "craft with " + it.name() } ?: "craft"
     override fun benchCanMake(recipe: Recipe) = recipe is ImprovRecipe
 }

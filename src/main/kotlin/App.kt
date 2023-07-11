@@ -290,7 +290,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             player.tempInvisible = true
 
             val loadingModal = LoadingModal(
-                "Loading initial world...", withProgress = true, forceUp = true
+                "Loading initial world...", withProgress = true, forceUp = true, withMoon = true
             )
             Screen.addModal(loadingModal)
 
