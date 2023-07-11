@@ -3,6 +3,7 @@ package ui.modals
 import actors.Actor
 import actors.Player
 import actors.stats.*
+import actors.stats.skills.Skill
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
@@ -19,44 +20,59 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
 
     val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
 
-    val header = 160
+    val header = 180
     val padding = 24
     val statSpacing = 32
     val skillSpacing = 24
     val minHeight = 400
+    val skillX = 275
 
     val stats = allStats
-    val statBonuses = stats.map { it.statBonuses(actor) }
-    val statBonusStrings = statBonuses.map {
-        if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
-    }
-    val skills = actor.knownSkills().sortedBy { it.name }
-    val skillBonuses = skills.map { it.statBonuses(actor) }
-    val skillBonusStrings = skillBonuses.map {
-        if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
-    }
+    lateinit var statBonuses: List<Float>
+    lateinit var statBonusStrings: List<String>
+    lateinit var skills: List<Skill>
+    lateinit var skillBonuses: List<Float>
+    lateinit var skillBonusStrings: List<String>
 
-    val xpNeed = if (actor is Player) actor.xpNeededForLevel() else 0
-    val xpHave = if (actor is Player) actor.xpEarnedForLevel() else 0
+    var xpNeed: Int = 0
+    var xpHave: Int = 0
 
-    val xpString = if (actor is Player) {
-        if (actor.levelUpsAvailable > 0) "level up!" else
-        "${xpNeed - xpHave}xp to lvl ${actor.xpLevel + 1}"
-    } else ""
+    var xpString = ""
 
-    val xpOffset = measure(xpString, Screen.smallFont)
+    var xpOffset = 0
 
     var selection = -1
-    val maxSelection = stats.size + skills.size - 1
+    var maxSelection = 0
 
     init {
+        regenerate()
         sidecar = SkillSidecar(this)
+    }
+
+    private fun regenerate() {
+        statBonuses = stats.map { it.statBonuses(actor) }
+        statBonusStrings = statBonuses.map {
+            if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
+        }
+        skills = Skill.all().sortedBy { it.name }
+        skillBonuses = skills.map { it.statBonuses(actor) }
+        skillBonusStrings = skillBonuses.map {
+            if (it != 0f) (if (it >= 0f) "+" else "") + it.toInt().toString() else ""
+        }
+        xpNeed = if (actor is Player) actor.xpNeededForLevel() else 0
+        xpHave = if (actor is Player) actor.xpEarnedForLevel() else 0
+        xpString = if (actor is Player) {
+            if (actor.levelUpsAvailable > 0) "level up!" else
+                "${xpNeed - xpHave}xp to lvl ${actor.xpLevel + 1}"
+        } else ""
+        xpOffset = measure(xpString, Screen.smallFont)
+        maxSelection = stats.size + skills.size - 1
+
         adjustHeight()
-        log.info("xp needed $xpNeed have $xpHave")
     }
 
     private fun adjustHeight() {
-        this.height = max(minHeight, header + padding * 2 + max(5, skills.size) * skillSpacing + 10)
+        this.height = max(minHeight, header + padding + max(5, skills.size) * skillSpacing)
         onResize(Screen.width, Screen.height)
     }
 
@@ -86,9 +102,15 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
 
         drawSubTitle("the  ${Player.levels[App.player.xpLevel-1].name}")
 
-        drawString("lvl ${actor.xpLevel}", padding, header - 45, Screen.fontColorDull, Screen.smallFont)
-        if (actor is Player && actor.xpLevel < Player.levels.lastIndex) {
-            drawRightText(xpString, width - padding, header - 45, Screen.fontColorDull, Screen.smallFont)
+        drawString("lvl ${actor.xpLevel}", padding, header - 65, Screen.fontColorDull, Screen.smallFont)
+        if (actor is Player) {
+            if (actor.xpLevel < Player.levels.lastIndex) {
+                drawRightText(xpString, width - padding, header - 65, Screen.fontColorDull, Screen.smallFont)
+            }
+            if (actor.skillPoints > 0) {
+                drawRightText("${actor.skillPoints} point${if (actor.skillPoints > 1) "s" else ""} to spend!",
+                    width - padding, header - 32, Screen.fontColorGreen, Screen.smallFont)
+            }
         }
 
         stats.forEachIndexed { n, stat ->
@@ -107,10 +129,11 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
             val bonusString = skillBonusStrings[n]
             val base = skill.getBase(actor).toInt()
             val baseString = if (base < 1) "" else base.toString()
-            drawRightText(skill.name, 280, header + skillSpacing * n, if (base < 1) Screen.fontColorDull else Screen.fontColor)
-            drawString(baseString, 290, header + skillSpacing * n + 1, Screen.fontColorDull, Screen.smallFont)
-            drawString((total - bonus).toInt().toString(), 310, header + skillSpacing * n, Screen.fontColorBold)
-            drawString(bonusString, 332, header + skillSpacing * n,
+            drawRightText(skill.name, skillX, header + skillSpacing * n, if (base < 1) Screen.fontColorDull else Screen.fontColorBold)
+            drawString(baseString, skillX+15, header + skillSpacing * n + 1, Screen.fontColorDull, Screen.smallFont)
+            drawString((total - bonus).toInt().toString(), skillX+35, header + skillSpacing * n,
+                if (base < 1) Screen.fontColorDull else Screen.fontColorBold)
+            drawString(bonusString, skillX+38, header + skillSpacing * n,
                 if (bonusString.startsWith('+')) Screen.fontColorGreen else Screen.fontColorRed, Screen.font)
         }
     }
@@ -121,9 +144,9 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
 
         if (actor is Player && actor.xpLevel < Player.levels.lastIndex) {
             val barx0 = x + padding + 55
-            val bary0 = y + header - 47
+            val bary0 = y + header - 67
             val barx1 = x + width - padding - xpOffset - 16
-            val bary1 = y + header - 31
+            val bary1 = y + header - 51
             boxBatch.addHealthBar(barx0, bary0, barx1, bary1,
                 if (actor.levelUpsAvailable > 0) xpNeed else xpHave, xpNeed,
                 allBlue = true, hideFull = false, withBorder = true)
@@ -175,20 +198,45 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        dismiss()
+        if (isOutside(screenX, screenY)) dismiss() else doSelect()
         return true
+    }
+
+    private fun doSelect() {
+        if (selection < 0) return
+        if (actor !is Player) return
+        if (actor.skillPoints < 1) return
+        val skilli = selection - stats.size
+        if (skilli in skills.indices) {
+            val base = skills[skilli].getBase(actor).toInt()
+            val newbase = if (base < 0) 1 else base+1
+            Screen.addModal(ContextMenu(
+                x + skillX + 60, (skilli * skillSpacing) + y + header
+            ).apply {
+                addOption("improve " + skills[skilli].name + " to $newbase base")
+                    { improveSkill(skills[skilli]) }
+            })
+        }
+    }
+
+    private fun improveSkill(skill: Skill) {
+        (actor as Player).skillPoints--
+        skill.improve(actor, fullLevel = true)
+        regenerate()
     }
 
     override fun onKeyDown(key: Keydef) {
         when (key) {
             Keydef.MOVE_N -> selectPrevious()
             Keydef.MOVE_S -> selectNext()
+            Keydef.INTERACT -> doSelect()
             Keydef.MOVE_W, Keydef.MOVE_E -> switchSide()
             Keydef.CANCEL, Keydef.OPEN_SKILLS -> dismiss()
             Keydef.OPEN_INV -> replaceWith(ThingsModal(App.player))
             Keydef.OPEN_GEAR -> replaceWith(GearModal(App.player))
             Keydef.OPEN_JOURNAL -> replaceWith(JournalModal())
             Keydef.OPEN_MAP -> replaceWith(MapModal())
+            else -> { }
         }
     }
 

@@ -8,6 +8,10 @@ abstract class Skill(tag: Stat.Tag, name: String,
                     val dependsOn: Set<Stat>
                      ) : Stat(tag, name) {
 
+    companion object {
+        fun all() = Stat.Tag.values().map { get(it) }.filterIsInstance<Skill>()
+    }
+
     init {
         dependsOn.forEach { it.addDependent(this) }
     }

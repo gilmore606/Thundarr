@@ -18,7 +18,10 @@ abstract class Stat(
     private val ipPerImprove = 5f
 
     enum class Tag { STR, SPD, BRN, HRT, SEN,
-                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC, SNEAK }
+                     DIG, FIGHT, DODGE, THROW, BUILD, SURVIVE, MEDIC, SNEAK,
+                    AXES, BOWS, CLUBS, GUNS, SPEARS, SWORDS,
+                    SCIENCE, CRAFT,
+    }
 
     companion object {
         fun get(tag: Tag) = when (tag) {
@@ -35,6 +38,14 @@ abstract class Stat(
             Tag.SURVIVE -> Survive
             Tag.MEDIC -> Medic
             Tag.SNEAK -> Sneak
+            Tag.AXES -> Axes
+            Tag.BOWS -> Bows
+            Tag.CLUBS -> Clubs
+            Tag.GUNS -> Guns
+            Tag.SPEARS -> Spears
+            Tag.SWORDS -> Swords
+            Tag.SCIENCE -> Science
+            Tag.CRAFT -> Craft
         }
     }
 
@@ -137,6 +148,7 @@ abstract class Stat(
             }
         }
         actor.stats[tag] = value
+        updateCached(actor)
     }
 
     fun bonus(actor: Actor): Float = (10f - get(actor)) * 0.5f

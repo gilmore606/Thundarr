@@ -181,6 +181,8 @@ abstract class Modal(
         return false
     }
 
+    protected fun isOutside(tx: Int, ty: Int) = tx !in x..x+width-1 || ty !in y..y+height-1
+
     open fun onMouseScrolled(amount: Float) { }
 
     fun mouseUp(screenX: Int, screenY: Int, button: Mouse.Button) {

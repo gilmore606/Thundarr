@@ -86,6 +86,7 @@ class ContextMenu(
     }
 
     override fun doSelect() {
+        if (selection < 0) return
         super.doSelect()
         dismissSuccess()
         Screen.clearCursor()

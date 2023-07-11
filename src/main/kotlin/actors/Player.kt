@@ -103,6 +103,7 @@ open class Player : Actor(), Workbench {
 
     var xp = 0
     var levelUpsAvailable = 0
+    var skillPoints = 0
     var lastChunkThreatLevel = 0
 
     var temperature = 70
@@ -456,12 +457,13 @@ open class Player : Actor(), Workbench {
         if (levelUpsAvailable < 1) return
         levelUpsAvailable--
         xpLevel++
-        Console.say("You feel your potential realized.  You are Thundarr the ${levels[xpLevel-1].name.capitalize()}.")
+        skillPoints += 2
+        Console.say("You feel your potential realized.  You are Thundarr the ${levels[xpLevel-1].name}.")
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
 
         Heart.improve(this, fullLevel = true)
         hpMax += 5
-        hp  = hpMax
+        hp = hpMax
     }
 
     @Transient var craftingWith: Thing? = null
