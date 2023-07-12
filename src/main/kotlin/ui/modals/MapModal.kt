@@ -14,7 +14,7 @@ import world.gen.habitats.Blank
 import java.lang.Integer.max
 import java.lang.Integer.min
 
-class MapModal : Modal(1200, 900, "- yOUr tRAvELs -") {
+class MapModal : Modal(Screen.width - RIGHT_PANEL_WIDTH - 150, Screen.height - 150, "- yOUr tRAvELs -") {
 
     private val paddingX = 30
     private val paddingY = 70

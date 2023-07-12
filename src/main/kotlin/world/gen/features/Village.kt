@@ -207,7 +207,7 @@ class Village(
     }
 
     private fun layoutVillageVert(): MutableList<HutSpec> {
-        val hutCount = this.size + 2
+        val hutCount = this.size + 1
         val huts = mutableListOf<HutSpec>()
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
@@ -252,7 +252,7 @@ class Village(
     }
 
     private fun layoutVillageHoriz(): MutableList<HutSpec> {
-        val hutCount = this.size + 2
+        val hutCount = this.size + 1
         val huts = mutableListOf<HutSpec>()
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
@@ -297,7 +297,7 @@ class Village(
     }
 
     private fun layoutVillageBag(): MutableList<HutSpec> {
-        val hutCount = this.size + 2
+        val hutCount = this.size + 1
         val huts = mutableListOf<HutSpec>()
         var built = 0
         var width = Dice.range(7, 11)
@@ -318,7 +318,7 @@ class Village(
                 }
                 tries++
             }
-            if (placed || Dice.chance(0.2f)) {
+            if ((width > 6 && height > 6) && ((placed && Dice.chance(0.5f)) || Dice.chance(0.2f))) {
                 if (Dice.chance(0.6f)) width -= 1
                 if (Dice.chance(0.6f)) height -= 1
             }

@@ -799,7 +799,7 @@ object Metamap {
                                 val village = Village(
                                     Madlib.villageName(),
                                     villageAbandoned = Dice.chance(villageAbandonedChance),
-                                    size = Dice.range(5, 18)
+                                    size = Dice.range(6, 18)
                                 )
                                 placedOne = true
                                 actuallyPlaced++
