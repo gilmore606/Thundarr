@@ -207,38 +207,39 @@ class Village(
     }
 
     private fun layoutVillageVert(): MutableList<HutSpec> {
+        val hutCount = this.size + 2
         val huts = mutableListOf<HutSpec>()
         val xMid = 32 + Dice.range(-4, 4)
         val xMidLeft = xMid - Dice.oneTo(3)
         val xMidRight = xMid + Dice.oneTo(3)
         var cursorY= 32
-        while (cursorY > 14 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorY > 12 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(xMidLeft - width, cursorY - height, xMidLeft - 1, cursorY - 1), EAST))
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorY < 51 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(xMidLeft - width, cursorY, xMidLeft - 1, cursorY + height - 1), EAST))
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
         }
         cursorY = 32
-        while (cursorY > 14 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorY > 12 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(xMidRight + 1, cursorY - height, xMidRight + width, cursorY - 1), WEST))
             cursorY -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorY = 0
         }
         cursorY = 32
-        while (cursorY < 49 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorY < 51 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(xMidRight + 1, cursorY, xMidRight + width, cursorY + height - 1), WEST))
             cursorY += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorY = 64
@@ -251,38 +252,39 @@ class Village(
     }
 
     private fun layoutVillageHoriz(): MutableList<HutSpec> {
+        val hutCount = this.size + 2
         val huts = mutableListOf<HutSpec>()
         val yMid = 32 + Dice.range(-4, 4)
         val yMidTop = yMid - Dice.oneTo(3)
         val yMidBottom = yMid + Dice.oneTo(3)
         var cursorX = 32
-        while (cursorX > 14 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorX > 12 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(cursorX - width, yMidTop - height, cursorX - 1, yMidTop - 1), SOUTH))
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorX < 51 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(cursorX, yMidTop - height, cursorX + width - 1, yMidTop - 1), SOUTH))
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
         }
         cursorX = 32
-        while (cursorX > 14 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorX > 12 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(cursorX - width, yMidBottom, cursorX - 1, yMidBottom + height - 1), NORTH))
             cursorX -= (height + Dice.oneTo(2))
             if (Dice.chance(0.1f)) cursorX = 0
         }
         cursorX = 32
-        while (cursorX < 49 && huts.size < size) {
-            val width = Dice.range(9, 13)
-            val height = Dice.range(9, 13)
+        while (cursorX < 51 && huts.size < hutCount) {
+            val width = Dice.range(7, 12)
+            val height = Dice.range(7, 12)
             huts.add(HutSpec(Rect(cursorX, yMidBottom, cursorX + width - 1, yMidBottom + height - 1), NORTH))
             cursorX += height + Dice.oneTo(2)
             if (Dice.chance(0.1f)) cursorX = 64
@@ -295,11 +297,11 @@ class Village(
     }
 
     private fun layoutVillageBag(): MutableList<HutSpec> {
-        val hutCount = this.size + 1
+        val hutCount = this.size + 2
         val huts = mutableListOf<HutSpec>()
         var built = 0
-        var width = Dice.range(9, 13)
-        var height = Dice.range(9, 13)
+        var width = Dice.range(7, 11)
+        var height = Dice.range(7, 11)
         while (built < hutCount) {
             var tries = 0
             var placed = false
