@@ -262,7 +262,7 @@ open class Player : Actor(), Workbench {
         level?.thingsAt(xy.x, xy.y)?.forEach {
             if (!inBed) {
                 comfort += it.sleepComfort()
-                inBed = it is Bed
+                inBed = it is GenericBed
             }
         }
         if (!inBed) {
@@ -359,7 +359,7 @@ open class Player : Actor(), Workbench {
                 }
             }
             if (hasStatus(Status.Tag.ASLEEP)) {
-                level.thingsAt(xy.x, xy.y).firstOrNull { it is Bed }?.also {
+                level.thingsAt(xy.x, xy.y).firstOrNull { it is GenericBed }?.also {
                     if (temperature > 68) {
                         feltTemperature -= 5
                     } else if (temperature < 50) {

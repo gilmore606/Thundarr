@@ -297,11 +297,11 @@ class Village(
     }
 
     private fun layoutVillageBag(): MutableList<HutSpec> {
-        val hutCount = this.size + 1
+        val hutCount = this.size + 2
         val huts = mutableListOf<HutSpec>()
         var built = 0
-        var width = Dice.range(7, 11)
-        var height = Dice.range(7, 11)
+        var width = min(11, 7 + this.size)
+        var height = min(11, 7 + this.size)
         while (built < hutCount) {
             var tries = 0
             var placed = false
@@ -318,11 +318,14 @@ class Village(
                 }
                 tries++
             }
-            if ((width > 6 && height > 6) && ((placed && Dice.chance(0.5f)) || Dice.chance(0.2f))) {
-                if (Dice.chance(0.6f)) width -= 1
-                if (Dice.chance(0.6f)) height -= 1
+            if (width > 6 && height > 6) {
+                if ((placed && Dice.chance(0.4f)) || Dice.chance(0.1f)) {
+                    if (Dice.chance(0.6f)) width -= 1
+                    if (Dice.chance(0.6f)) height -= 1
+                }
+            } else {
+                built = hutCount
             }
-            if (width <= 6 || height <= 6) built = hutCount
         }
         return huts
     }

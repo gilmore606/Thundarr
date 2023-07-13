@@ -326,8 +326,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                         "Escape!",
                         "For years I labored in chains for the evil wizard $wizardFullName.  Today it ends!  ${Madlib.escapeReason()}, I've slipped my magical bonds and can roam $wizardName's tower freely.  I must find a way out of here, and make my way to the wider world of Numeria in freedom.",
                         "Lords of Light, protect me.",
-                        true,
-                        true
+                        zoomIn = 1.3f,
+                        isJournal = true
                     )
                 )
                 player.tempInvisible = false
@@ -339,8 +339,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                                 "into the swirling \nmagic, transporting me out of $wizardFullName's dungeons.\n  \n" +
                                 "With luck, I will meet her and my friend Ookla again soon.  But now I must make my way alone in Numeria.",
                         "Onward!",
-                        true,
-                        true,
+                        zoomIn = 1.3f,
+                        isJournal = true,
                         portrait = Glyph.PORTRAIT_ARIEL
                     )
                 )
@@ -452,7 +452,13 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
     fun openSettings() { Screen.addModal(SettingsModal()) }
     fun openControls() { Screen.addModal(ControlsModal()) }
-    fun openCredits() { Screen.addModal(CreditsModal()) }
+    fun openCredits() { Screen.addModal(BigSplashModal(
+        "ThUNdARR  the  BARBARIAN",
+        "a dlfsystems production\n\ncode and assets by gilmore606",
+        "Demon dogs!",
+        splashPosition = Modal.Position.CENTER_LOW,
+        zoomIn = 0.3f, isJournal = false, portrait = Glyph.PORTRAIT_GILMORE,
+    )) }
     fun openInventory(withContainer: Container? = null) { Screen.addModal(ThingsModal(player, withContainer)) }
     fun openGear() { Screen.addModal(GearModal(player)) }
     fun openSkills() { Screen.addModal(SkillsModal(player)) }

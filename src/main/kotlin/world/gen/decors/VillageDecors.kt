@@ -25,7 +25,7 @@ class Hut : Decor() {
     override fun doFurnish() {
         val bedCount = max(1, min(3, (room.rect.area() / 12)))
         repeat (bedCount) {
-            againstWall { spawn(Bedroll()) { bedXY ->
+            againstWall { spawn(if (Dice.chance(0.9f)) Bed() else Bedroll()) { bedXY ->
                 bedLocations.add(bedXY)
             } }
         }
@@ -251,7 +251,7 @@ class Barracks(val vertical: Boolean) : Decor() {
     override fun description() = "A dormitory barracks."
     override fun doFurnish() {
         repeat (8) { awayFromWall {
-            spawn(Bedroll()) { bedXY ->
+            spawn(Bed()) { bedXY ->
                 bedLocations.add(bedXY)
             }
         }}

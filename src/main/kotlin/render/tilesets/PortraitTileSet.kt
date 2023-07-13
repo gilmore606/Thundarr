@@ -10,6 +10,7 @@ fun PortraitTileSet() =
         setTile(Glyph.PORTRAIT_THUNDARR, SimpleTile(this, 9, 0))
         setTile(Glyph.PORTRAIT_ARIEL, SimpleTile(this, 9, 1))
         setTile(Glyph.PORTRAIT_OOKLA, SimpleTile(this, 9, 2))
+        setTile(Glyph.PORTRAIT_GILMORE, SimpleTile(this, 9, 3))
 
         setTile(Glyph.PORTRAIT_PALE_M_1, SimpleTile(this, 0, 0))
         setTile(Glyph.PORTRAIT_PALE_M_2, SimpleTile(this, 0, 1))

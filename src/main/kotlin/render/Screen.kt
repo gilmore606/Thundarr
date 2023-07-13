@@ -264,7 +264,7 @@ object Screen : KtxScreen {
             tx, ty,
             actorBatch.getTextureIndex(glyph, App.level, tx, ty), vis, light,
             offsetX = if (vis == 1f) actor.animOffsetX() else 0f,
-            offsetY = if (vis == 1f) actor.animOffsetY() else 0f,
+            offsetY = if (vis == 1f) actor.animOffsetY() + (if (actor.rotateGlyph) -0.2f else 0f) else 0f,
             hue = actor.hue(),
             mirror = if (vis == 1f) actor.mirrorGlyph else false,
             rotate = if (vis == 1f) actor.rotateGlyph else false,

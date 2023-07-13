@@ -249,6 +249,7 @@ enum class Glyph(val tall: Boolean = false) {
     LAMPPOST_OFF,
     LAMPPOST_ON,
     STICK,
+    BED,
 
     BLOODSTAIN,
     SCORCHMARK,
@@ -333,6 +334,7 @@ enum class Glyph(val tall: Boolean = false) {
     PORTRAIT_THUNDARR,
     PORTRAIT_ARIEL,
     PORTRAIT_OOKLA,
+    PORTRAIT_GILMORE,
     PORTRAIT_PALE_M_1,
     PORTRAIT_PALE_M_2,
     PORTRAIT_PALE_M_3,

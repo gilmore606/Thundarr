@@ -4,6 +4,8 @@ import actors.Actor
 import actors.NPC
 import actors.Player
 import actors.states.Hibernated
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import things.Temporal
 import util.XY
 import util.distanceBetween
@@ -36,16 +38,16 @@ class Director(val level: Level) {
     }
 
     private fun addActor(new: Actor) {
-        actorsLocked = true
-        actors.add(new)
-        sortActors()
-        actorsLocked = false
+        KtxAsync.launch {
+            actors.add(new)
+            sortActors()
+        }
     }
     private fun removeActor(old: Actor) {
-        actorsLocked = true
-        actors.remove(old)
-        sortActors()
-        actorsLocked = false
+        KtxAsync.launch {
+            actors.remove(old)
+            sortActors()
+        }
     }
     private fun sortActors() {
         actors.sortBy { it.xy.y }

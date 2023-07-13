@@ -132,7 +132,9 @@ class MapModal : Modal(Screen.width - RIGHT_PANEL_WIDTH - 150, Screen.height - 1
         if (isAnimating()) return
         val x0 = x + paddingX
         val y0 = y + paddingY
-        forXY(0,0, (1120/cellSize)-1, (800/cellSize)-1) { x,y ->
+        val mapW = width - paddingX * 2
+        val mapH = height - paddingY * 2
+        forXY(0,0, (mapW/cellSize)-1, (mapH/cellSize)-1) { x,y ->
             val meta = Metamap.metaAt(x+mapx, y+mapy)
             if (meta.mapped || revealAll) {
                 val ox = x * cellSize
