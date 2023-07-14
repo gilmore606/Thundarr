@@ -46,7 +46,6 @@ class Hut : Decor() {
 class Schoolhouse : Decor() {
     override fun description() = "A country schoolhouse lined with small desks."
     override fun abandonedDescription() = "An abandoned country schoolhouse, the small desks covered in dust and cobwebs."
-    override fun fitsInRoom(room: Room) = room.width >= 5 && room.height >= 5
 
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}

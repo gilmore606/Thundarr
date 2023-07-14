@@ -83,10 +83,7 @@ sealed class Decor {
 
     private var cell = XY(0,0)
 
-    open fun fitsInRoom(room: Room): Boolean = true
-
     fun furnish(room: Room, carto: Carto, isAbandoned: Boolean = false) {
-        if (!fitsInRoom(room)) return
         this.isAbandoned = isAbandoned
         this.carto = carto
         this.room = room
