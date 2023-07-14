@@ -114,7 +114,7 @@ class Caves : Feature() {
 
     override fun animalSpawns() = listOf(
         AnimalSpawn(
-            { NPC.Tag.NPC_GRIZZLER },
+            { NPC.Tag.GRIZZLER },
             setOf(Mountain, Hill, ForestHill, Desert),
             setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
             0f, 1000f, 1, 1, 1f

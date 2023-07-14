@@ -44,7 +44,7 @@ sealed class Thing() : Entity {
         val spawn: ()->Thing,
     ) {
 
-        NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.NPC_TUSKLET) }),
+        NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.TUSKLET) }),
         BEDROLL("bedroll", "bedrolls", { Bedroll() }),
         PAPERBACK("paperback", "paperbacks", { Paperback() }),
         BOYSLIFE("Boys Life magazine", "Boys Life magazines", { BoysLife() }),

@@ -4,7 +4,6 @@ import actors.actions.Action
 import actors.actions.events.Event
 import actors.states.*
 import actors.stats.Speed
-import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -20,38 +19,38 @@ import world.level.Level
 sealed class NPC : Actor() {
 
     enum class Tag {
-        NPC_AUROX,
-        NPC_MUSKOX,
-        NPC_CYCLOX,
-        NPC_TUSKER,
-        NPC_TUSKLET,
-        NPC_VOLTELOPE,
-        NPC_VOLTELOPE_FAWN,
-        NPC_SALAMAN,
-        NPC_TORTLE,
-        NPC_PIDGEY,
-        NPC_PIDGEY_BRUTE,
-        NPC_GRIZZLER,
-        NPC_HERMIT,
-        NPC_GATOR,
+        AUROX,
+        MUSKOX,
+        CYCLOX,
+        TUSKER,
+        TUSKLET,
+        VOLTELOPE,
+        VOLTELOPE_FAWN,
+        SALAMAN,
+        TORTLE,
+        PIDGEY,
+        PIDGEY_BRUTE,
+        GRIZZLER,
+        HERMIT,
+        GATOR,
     }
 
     companion object {
         fun create(tag: Tag): NPC = when (tag) {
-            Tag.NPC_AUROX -> Aurox()
-            Tag.NPC_MUSKOX -> MuskOx()
-            Tag.NPC_CYCLOX -> Cyclox()
-            Tag.NPC_TUSKER -> Tusker()
-            Tag.NPC_TUSKLET -> Tusklet()
-            Tag.NPC_VOLTELOPE -> Voltelope()
-            Tag.NPC_VOLTELOPE_FAWN -> VoltelopeFawn()
-            Tag.NPC_SALAMAN -> Salaman()
-            Tag.NPC_TORTLE -> Tortle()
-            Tag.NPC_PIDGEY -> Pidgey()
-            Tag.NPC_PIDGEY_BRUTE -> PidgeyBrute()
-            Tag.NPC_GRIZZLER -> Grizzler()
-            Tag.NPC_HERMIT -> Hermit()
-            Tag.NPC_GATOR -> Gator()
+            Tag.AUROX -> Aurox()
+            Tag.MUSKOX -> MuskOx()
+            Tag.CYCLOX -> Cyclox()
+            Tag.TUSKER -> Tusker()
+            Tag.TUSKLET -> Tusklet()
+            Tag.VOLTELOPE -> Voltelope()
+            Tag.VOLTELOPE_FAWN -> VoltelopeFawn()
+            Tag.SALAMAN -> Salaman()
+            Tag.TORTLE -> Tortle()
+            Tag.PIDGEY -> Pidgey()
+            Tag.PIDGEY_BRUTE -> PidgeyBrute()
+            Tag.GRIZZLER -> Grizzler()
+            Tag.HERMIT -> Hermit()
+            Tag.GATOR -> Gator()
         }
     }
 

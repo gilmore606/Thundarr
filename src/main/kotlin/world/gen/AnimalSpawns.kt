@@ -19,45 +19,45 @@ class AnimalSpawn(
 fun animalSpawns() = listOf<AnimalSpawn>(
 
     AnimalSpawn(
-        { NPC.Tag.NPC_AUROX },
+        { NPC.Tag.AUROX },
         setOf(Plain, Scrub),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 2, 4, 0.3f
     ),
     AnimalSpawn(
-        { if (Dice.chance(0.5f)) NPC.Tag.NPC_TUSKER else NPC.Tag.NPC_TUSKLET },
+        { if (Dice.chance(0.5f)) NPC.Tag.TUSKER else NPC.Tag.TUSKLET },
         setOf(Scrub, Hill, ForestHill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 2, 6, 0.4f
     ),
     AnimalSpawn(
-        { NPC.Tag.NPC_CYCLOX },
+        { NPC.Tag.CYCLOX },
         setOf(Scrub, Desert),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 1, 2, 0.1f
     ),
     AnimalSpawn(
-        { if (Dice.chance(0.5f)) NPC.Tag.NPC_VOLTELOPE else NPC.Tag.NPC_VOLTELOPE_FAWN },
+        { if (Dice.chance(0.5f)) NPC.Tag.VOLTELOPE else NPC.Tag.VOLTELOPE_FAWN },
         setOf(Plain, Scrub),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 2, 5, 0.3f
     ),
 
     AnimalSpawn(
-        { NPC.Tag.NPC_SALAMAN },
+        { NPC.Tag.SALAMAN },
         setOf(Swamp),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 1, 2, 0.4f
     ),
     AnimalSpawn(
-        { NPC.Tag.NPC_TORTLE },
+        { NPC.Tag.TORTLE },
         setOf(Swamp, Hill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 1, 2, 0.2f
     ),
 
     AnimalSpawn(
-        { if (Dice.chance(0.7f)) NPC.Tag.NPC_PIDGEY else NPC.Tag.NPC_PIDGEY_BRUTE },
+        { if (Dice.chance(0.7f)) NPC.Tag.PIDGEY else NPC.Tag.PIDGEY_BRUTE },
         setOf(Forest, ForestHill),
         setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
         0f, 1000f, 2, 3, 0.3f

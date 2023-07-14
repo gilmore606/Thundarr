@@ -94,7 +94,7 @@ class Lake(
 
     override fun animalSpawns() = listOf(
         AnimalSpawn(
-            { NPC.Tag.NPC_GATOR },
+            { NPC.Tag.GATOR },
             setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
             setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
             0f, 1000f, 1, 3, 0.5f
