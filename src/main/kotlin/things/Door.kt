@@ -95,13 +95,13 @@ sealed class Door : Thing(), Smashable {
 
 @Serializable
 class ModernDoor() : Door() {
-    override val tag = Tag.THING_MODERNDOOR
+    override val tag = Tag.METAL_DOOR
     override fun description() = "A dull metal sliding door, pitted with corrosion."
 }
 
 @Serializable
 class WoodDoor() : Door() {
-    override val tag = Tag.THING_WOODDOOR
+    override val tag = Tag.WOOD_DOOR
     override fun description() = "A heavy oak door bound with brass."
     override fun openGlyph() = Glyph.WOOD_DOOR_OPEN
     override fun closedGlyph() = Glyph.WOOD_DOOR_CLOSED

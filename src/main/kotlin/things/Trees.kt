@@ -54,14 +54,14 @@ sealed class Tree : Plant() {
 
 @Serializable
 class OakTree : Tree() {
-    override val tag = Tag.THING_OAKTREE
+    override val tag = Tag.OAKTREE
     override fun glyph() = Glyph.OAK_TREE
     override fun name() = "oak tree"
 }
 
 @Serializable
 class TeakTree : Tree() {
-    override val tag = Tag.THING_TEAKTREE
+    override val tag = Tag.TEAKTREE
     override fun glyph() = Glyph.OAK_TREE
     override fun hue() = 0.3f
     override fun name() = "teak tree"
@@ -69,51 +69,51 @@ class TeakTree : Tree() {
 
 @Serializable
 class MapleTree : Tree() {
-    override val tag = Tag.THING_MAPLETREE
+    override val tag = Tag.MAPLETREE
     override fun glyph() = Glyph.MAPLE_TREE
     override fun name() = "maple tree"
 }
 
 @Serializable
 class BirchTree : Tree() {
-    override val tag = Tag.THING_BIRCHTREE
+    override val tag = Tag.BIRCHTREE
     override fun glyph() = Glyph.BIRCH_TREE
     override fun name() = "birch tree"
 }
 
 @Serializable
 class AppleTree : Tree() {
-    override val tag = Tag.THING_APPLETREE
+    override val tag = Tag.APPLETREE
     override fun glyph() = Glyph.FRUIT_TREE
     override fun name() = "apple tree"
     override fun bearsFruit() = true
     override fun spawnFruitChance() = 0.7f
     override fun fruit() = Apple()
-    override fun fruitTag() = Tag.THING_APPLE
+    override fun fruitTag() = Tag.APPLE
 }
 
 @Serializable
 class PearTree: Tree() {
-    override val tag = Tag.THING_PEARTREE
+    override val tag = Tag.PEARTREE
     override fun glyph() = Glyph.FRUIT_TREE
     override fun hue() = 0.7f
     override fun name() = "pear tree"
     override fun bearsFruit() = true
     override fun spawnFruitChance() = 0.4f
     override fun fruit() = Pear()
-    override fun fruitTag() = Tag.THING_PEAR
+    override fun fruitTag() = Tag.PEAR
 }
 
 @Serializable
 class PineTree : Tree() {
-    override val tag = Tag.THING_PINETREE
+    override val tag = Tag.PINETREE
     override fun glyph() = Glyph.PINE_TREE
     override fun name() = "pine tree"
 }
 
 @Serializable
 class SpruceTree : Tree() {
-    override val tag = Tag.THING_SPRUCETREE
+    override val tag = Tag.SPRUCETREE
     override fun glyph() = Glyph.PINE_TREE
     override fun hue() = 0.8f
     override fun name() = "spruce tree"
@@ -121,14 +121,14 @@ class SpruceTree : Tree() {
 
 @Serializable
 class PalmTree : Tree() {
-    override val tag = Tag.THING_PALMTREE
+    override val tag = Tag.PALMTREE
     override fun glyph() = Glyph.PALM_TREE
     override fun name() = "palm tree"
 }
 
 @Serializable
 class CoconutTree : Tree() {
-    override val tag = Tag.THING_COCONUTTREE
+    override val tag = Tag.COCONUTTREE
     override fun glyph() = Glyph.PALM_TREE
     override fun hue() = 0.3f
     override fun name() = "coconut tree"
@@ -136,7 +136,7 @@ class CoconutTree : Tree() {
 
 @Serializable
 class DeadTree : Tree() {
-    override val tag = Tag.THING_DEADTREE
+    override val tag = Tag.DEADTREE
     override fun glyph() = Glyph.DEAD_TREE
     override fun name() = "dead tree"
     override fun description() = "The dessicated skeleton of a once-mighty tree."

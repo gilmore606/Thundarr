@@ -9,8 +9,6 @@ import ui.panels.Console
 import util.Dice
 import util.LightColor
 import util.hasOneWhere
-import util.log
-import world.CellContainer
 import java.lang.Float.max
 import kotlin.random.Random
 
@@ -94,7 +92,7 @@ sealed class LitThing : Portable(), LightSource {
 
 @Serializable
 class Lightbulb : LitThing() {
-    override val tag = Tag.THING_LIGHTBULB
+    override val tag = Tag.LIGHTBULB
     override fun glyph() = Glyph.LIGHTBULB
     override fun name() = "lightbulb"
     override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
@@ -104,7 +102,7 @@ class Lightbulb : LitThing() {
 
 @Serializable
 class CeilingLight : LitThing(), Smashable {
-    override val tag = Tag.THING_CEILINGLIGHT
+    override val tag = Tag.CEILING_LIGHT
     var broken = false
     override fun glyph() = Glyph.CEILING_LIGHT
     override fun name() = "ceiling light"
@@ -160,7 +158,7 @@ sealed class SwitchableLight : LitThing() {
 
 @Serializable
 class Candlestick : SwitchableLight() {
-    override val tag = Tag.THING_CANDLESTICK
+    override val tag = Tag.CANDLESTICK
     override fun glyphLit() = Glyph.CANDLESTICK_ON
     override fun glyphDark() = Glyph.CANDLESTICK_OFF
     override fun name() = "candlestick"
@@ -170,7 +168,7 @@ class Candlestick : SwitchableLight() {
 
 @Serializable
 class Lamppost : SwitchableLight() {
-    override val tag = Tag.THING_LAMPPOST
+    override val tag = Tag.LAMPPOST
     override fun glyphLit() = Glyph.LAMPPOST_ON
     override fun glyphDark() = Glyph.LAMPPOST_OFF
     override fun leaveLit() = true
@@ -185,7 +183,7 @@ class Lamppost : SwitchableLight() {
 
 @Serializable
 class Glowstone : LitThing() {
-    override val tag = Tag.THING_GLOWSTONE
+    override val tag = Tag.GLOWSTONE
     override fun glyph() = Glyph.GLOWING_CRYSTAL
     override fun name() = "glowstone"
     override fun description() = "A softly glowing quartz-like crystal formation."
@@ -202,7 +200,7 @@ class Glowstone : LitThing() {
 
 @Serializable
 class Torch : LitThing(), Temporal {
-    override val tag = Tag.THING_TORCH
+    override val tag = Tag.TORCH
     private var fuel = 2000f
     override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
     override fun name() = "torch"

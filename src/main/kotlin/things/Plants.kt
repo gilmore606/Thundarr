@@ -77,28 +77,28 @@ sealed class Bush : Plant() {
 
 @Serializable
 class ThornBush : Bush() {
-    override val tag = Tag.THING_THORNBUSH
+    override val tag = Tag.THORNBUSH
     override fun glyph() = Glyph.BUSH_2
     override fun name() = "thorn bush"
 }
 
 @Serializable
 class SageBush : Bush() {
-    override val tag = Tag.THING_SAGEBUSH
+    override val tag = Tag.SAGEBUSH
     override fun glyph() = Glyph.BUSH_1
     override fun name() = "sage bush"
 }
 
 @Serializable
 class BerryBush : Bush() {
-    override val tag = Tag.THING_BERRYBUSH
+    override val tag = Tag.BERRYBUSH
     override fun glyph() = Glyph.BUSH_1_FRUIT
     override fun name() = "berry bush"
 }
 
 @Serializable
 class HoneypodBush: Bush() {
-    override val tag = Tag.THING_HONEYPODBUSH
+    override val tag = Tag.HONEYPODBUSH
     override fun glyph() = Glyph.BUSH_2_FRUIT
     override fun name() = "honeypod bush"
 }
@@ -106,14 +106,14 @@ class HoneypodBush: Bush() {
 
 @Serializable
 class Wildflowers : Plant() {
-    override val tag = Tag.THING_WILDFLOWERS
+    override val tag = Tag.WILDFLOWERS
     override fun glyph() = Glyph.FLOWERS
     override fun name() = "flowers"
 }
 
 @Serializable
 class Poppies : Plant() {
-    override val tag = Tag.THING_POPPIES
+    override val tag = Tag.POPPIES
     override fun glyph() = Glyph.FLOWERS
     override fun hue() = 0.73f
     override fun name() = "poppy flowers"
@@ -121,14 +121,14 @@ class Poppies : Plant() {
 
 @Serializable
 class Deathflower : Plant() {
-    override val tag = Tag.THING_DEATHFLOWER
+    override val tag = Tag.DEATHFLOWER
     override fun glyph() = Glyph.HANGFLOWER
     override fun name() = "death flower"
 }
 
 @Serializable
 class Dreamflower : Plant() {
-    override val tag = Tag.THING_DREAMFLOWER
+    override val tag = Tag.DREAMFLOWER
     override fun glyph() = Glyph.HANGFLOWER
     override fun hue() = 0.4f
     override fun name() = "dream flower"
@@ -136,14 +136,14 @@ class Dreamflower : Plant() {
 
 @Serializable
 class Sunflower : Plant() {
-    override val tag = Tag.THING_SUNFLOWER
+    override val tag = Tag.SUNFLOWER
     override fun glyph() = Glyph.SUNFLOWER
     override fun name() = "sunflower"
 }
 
 @Serializable
 class Lightflower : Plant() {
-    override val tag = Tag.THING_LIGHTFLOWER
+    override val tag = Tag.LIGHTFLOWER
     override fun glyph() = Glyph.SUNFLOWER
     override fun hue() = 0.7f
     override fun name() = "lightflower"
@@ -151,21 +151,21 @@ class Lightflower : Plant() {
 
 @Serializable
 class Saguaro : Tree() {
-    override val tag = Tag.THING_SAGUARO
+    override val tag = Tag.SAGUARO
     override fun glyph() = Glyph.CACTUS_BIG
     override fun name() = "saguaro cactus"
 }
 
 @Serializable
 class Cholla : Plant() {
-    override val tag = Tag.THING_CHOLLA
+    override val tag = Tag.CHOLLA
     override fun glyph() = Glyph.CACTUS_SMALL
     override fun name() = "cholla cactus"
 }
 
 @Serializable
 class Prickpear : Plant() {
-    override val tag = Tag.THING_PRICKPEAR
+    override val tag = Tag.PRICKPEAR
     override fun glyph() = Glyph.CACTUS_SMALL
     override fun hue() = 0.3f
     override fun name() = "prickpear cactus"
@@ -173,14 +173,14 @@ class Prickpear : Plant() {
 
 @Serializable
 class BalmMoss : Plant() {
-    override val tag = Tag.THING_BALMMOSS
+    override val tag = Tag.BALMMOSS
     override fun glyph() = Glyph.HERB_PLANT_1
     override fun name() = "balm moss"
 }
 
 @Serializable
 class LaceMoss : Plant() {
-    override val tag = Tag.THING_LACEMOSS
+    override val tag = Tag.LACEMOSS
     override fun glyph() = Glyph.HERB_PLANT_1
     override fun hue() = 0.8f
     override fun name() = "lace moss"
@@ -188,7 +188,7 @@ class LaceMoss : Plant() {
 
 @Serializable
 class Foolsleaf : Plant() {
-    override val tag = Tag.THING_FOOLSLEAF
+    override val tag = Tag.FOOLSLEAF
     override fun glyph() = Glyph.SUCCULENT
     override fun name() = "foolsleaf"
 }
@@ -203,21 +203,21 @@ sealed class Mycelium : Plant() {
 
 @Serializable
 class WizardcapMycelium : Mycelium() {
-    override val tag = Tag.THING_WIZARDCAP_MYCELIUM
+    override val tag = Tag.WIZARDCAP_MYCELIUM
     override fun fruit() = WizardcapMushroom()
-    override fun fruitTag() = Tag.THING_WIZARDCAP_MUSHROOM
+    override fun fruitTag() = Tag.WIZARDCAP_MUSHROOM
 }
 
 @Serializable
 class SpeckledMycelium : Mycelium() {
-    override val tag = Tag.THING_SPECKLED_MYCELIUM
+    override val tag = Tag.SPECKLED_MYCELIUM
     override fun fruit() = SpeckledMushroom()
-    override fun fruitTag() = Tag.THING_SPECKLED_MUSHROOM
+    override fun fruitTag() = Tag.SPECKLED_MUSHROOM
 }
 
 @Serializable
 class BloodcapMycelium : Mycelium() {
-    override val tag = Tag.THING_BLOODCAP_MYCELIUM
+    override val tag = Tag.BLOODCAP_MYCELIUM
     override fun fruit() = BloodcapMushroom()
-    override fun fruitTag() = Tag.THING_BLOODCAP_MUSHROOM
+    override fun fruitTag() = Tag.BLOODCAP_MUSHROOM
 }

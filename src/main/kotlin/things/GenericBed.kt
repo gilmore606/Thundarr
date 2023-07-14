@@ -13,7 +13,7 @@ sealed class GenericBed() : Thing() {
 
 @Serializable
 class Bed : GenericBed() {
-    override val tag = Tag.THING_BED
+    override val tag = Tag.BED
     override fun glyph() = Glyph.BED
     override fun name() = "bed"
     override fun description() = "A simple twin bed with a rough woolen blanket."
@@ -21,7 +21,7 @@ class Bed : GenericBed() {
 
 @Serializable
 class Bedroll : GenericBed() {
-    override val tag = Tag.THING_BEDROLL
+    override val tag = Tag.BEDROLL
     override fun glyph() = Glyph.BEDROLL
     override fun name() = "bedroll"
     override fun description() = "A light but sturdy cotton bedroll for traveling."

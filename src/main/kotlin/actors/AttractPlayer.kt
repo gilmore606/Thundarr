@@ -58,7 +58,7 @@ class AttractPlayer : Player() {
 
                 if (Dice.chance(0.2f)) {
                     if (light.brightness() < 0.1f || (light.brightness() == 1.0f && !roofedHere)) {
-                        doWeHave(Thing.Tag.THING_SUNSWORD)?.also { return useThing(it, Thing.UseTag.SWITCH) }
+                        doWeHave(Thing.Tag.SUNSWORD)?.also { return useThing(it, Thing.UseTag.SWITCH) }
                     }
                 }
                 // Pick up stuff
@@ -78,12 +78,12 @@ class AttractPlayer : Player() {
                 // Drop junk
                 if (!roofedHere) {
                     if (Dice.chance(0.7f)) {
-                        doWeHave(Thing.Tag.THING_BRICK)?.also { brick ->
+                        doWeHave(Thing.Tag.BRICK)?.also { brick ->
                             return Drop(brick.getKey(), groundAtPlayer().getHolderKey())
                         }
                     }
                 } else {
-                    doWeHave(Thing.Tag.THING_TORCH)?.also { torch ->
+                    doWeHave(Thing.Tag.TORCH)?.also { torch ->
                         if ((torch as Torch).active) {
                             return Drop(torch.getKey(), groundAtPlayer().getHolderKey())
                         } else if (light.r < 0.7f && Dice.chance(0.2f)) {
@@ -93,7 +93,7 @@ class AttractPlayer : Player() {
                 }
 
                 // Wield weapons
-                doWeHave(Thing.Tag.THING_PICKAXE)?.also { pick ->
+                doWeHave(Thing.Tag.PICKAXE)?.also { pick ->
                     if (!(pick as Gear).equipped) {
                         return Equip(pick.getKey())
                     } else {
@@ -155,7 +155,7 @@ class AttractPlayer : Player() {
                 // Yeet apples at herders
                 if (Dice.chance(0.2f)) {
                     val seen = entitiesSeen { it is Herder }
-                    doWeHave(Thing.Tag.THING_APPLE)?.also {
+                    doWeHave(Thing.Tag.APPLE)?.also {
                         if (seen.isNotEmpty()) {
                             val target = seen.keys.random() as Herder
                             if (distanceTo(target) in 2f .. 8f) {

@@ -17,7 +17,7 @@ class Shrine : LitThing() {
 
     var lastPrayedDate = 0
 
-    override val tag = Tag.THING_SHRINE
+    override val tag = Tag.SHRINE
     override fun name() = "shrine"
     override fun description() = "A stone shrine erected to honor the Lords of Light."
     override fun glyph() = Glyph.SHRINE

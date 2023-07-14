@@ -15,7 +15,7 @@ class Table : Container(), Smashable, LightSource {
     override fun isBlocking(actor: Actor) = true
     override fun isOpaque() = false
 
-    override val tag = Tag.THING_TABLE
+    override val tag = Tag.TABLE
     override fun name() = "table"
     override fun description() = "A lacquered wooden table."
     override fun glyph() = Glyph.TABLE

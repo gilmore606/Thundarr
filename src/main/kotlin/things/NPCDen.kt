@@ -3,7 +3,6 @@ package things
 import actors.NPC
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import util.log
 
 @Serializable
 class NPCDen(
@@ -18,7 +17,7 @@ class NPCDen(
     override fun name() = "NPC DEN"
     override fun description() = "NPC DEN"
     override fun glyph() = Glyph.BLANK
-    override val tag = Tag.THING_NPCDEN
+    override val tag = Tag.NPCDEN
     override fun isOpaque() = false
     override fun isPortable() = false
 

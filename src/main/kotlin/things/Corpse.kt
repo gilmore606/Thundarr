@@ -15,7 +15,7 @@ class Corpse(
 
     override fun temporalDone() = holder == null
 
-    override val tag = Tag.THING_CORPSE
+    override val tag = Tag.CORPSE
     override fun name() = departedName?.let { "$it corpse" } ?: "corpse"
     override fun description() = "The mangled, lifeless organic remains of " + (departedName?.aOrAn() ?: "some unfortunate creature") + "."
     override fun glyph() = Glyph.CORPSE

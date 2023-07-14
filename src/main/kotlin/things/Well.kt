@@ -8,7 +8,7 @@ import ui.panels.Console
 @Serializable
 class Well : Thing() {
 
-    override val tag = Tag.THING_WELL
+    override val tag = Tag.WELL
     override fun name() = "well"
     override fun description() = "A stone well with a crossbeam and bucket.  Make a wish."
     override fun glyph() = Glyph.WELL

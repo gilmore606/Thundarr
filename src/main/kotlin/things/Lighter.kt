@@ -15,7 +15,7 @@ import world.stains.Fire
 
 @Serializable
 class Lighter : Portable() {
-    override val tag = Tag.THING_LIGHTER
+    override val tag = Tag.LIGHTER
     override fun name() = "lighter"
     override fun description() = "A brass cigarette lighter.  Handy for starting fires."
     override fun glyph() = Glyph.LIGHTER
@@ -37,7 +37,7 @@ class Lighter : Portable() {
     )
     override fun toolbarName() = "light fire nearby"
     override fun toolbarUseTag() = UseTag.USE
-    override fun spawnContainers() = mutableListOf(Tag.THING_TRUNK, Tag.THING_WRECKEDCAR, Tag.THING_BONEPILE, Tag.THING_TABLE)
+    override fun spawnContainers() = mutableListOf(Tag.TRUNK, Tag.WRECKEDCAR, Tag.BONEPILE, Tag.TABLE)
 
     private fun hasTargetAt(x: Int, y: Int): Boolean = holder?.level?.thingsAt(x, y)?.hasOneWhere { it.flammability() > 0f } ?: false
 

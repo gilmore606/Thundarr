@@ -19,8 +19,8 @@ sealed class Book : Portable() {
     override fun toolbarName() = "read " + this.name()
     override fun toolbarUseTag() = UseTag.USE
     override fun spawnContainers() = mutableListOf(
-        Tag.THING_FILINGCABINET, Tag.THING_BOOKSHELF,
-        Tag.THING_TRUNK, Tag.THING_WRECKEDCAR, Tag.THING_TABLE
+        Tag.FILING_CABINET, Tag.BOOKSHELF,
+        Tag.TRUNK, Tag.WRECKEDCAR, Tag.TABLE
     )
 
     override fun category() = Category.TOOL
@@ -58,7 +58,7 @@ sealed class Book : Portable() {
 
 @Serializable
 class Paperback : Book() {
-    override val tag = Tag.THING_PAPERBACK
+    override val tag = Tag.PAPERBACK
     override fun name() = "paperback"
     override fun description() = "A waterlogged but still readable old paperback novel."
 }
@@ -88,7 +88,7 @@ sealed class SkillBook: Book() {
 
 @Serializable
 class BoysLife: SkillBook() {
-    override val tag = Tag.THING_BOYSLIFE
+    override val tag = Tag.BOYSLIFE
     override fun name() = "Boys Life magazine"
     override fun description() = "An ancient but implausibly well preserved magazine, full of practical scouting advice for youths."
     override fun text() = "Oh boy!  An article about " + listOf(

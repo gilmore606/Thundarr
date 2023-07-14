@@ -4,7 +4,6 @@ import actors.Actor
 import actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Thing
 import ui.panels.Console
 import util.Dice
 import util.Madlib
@@ -26,7 +25,7 @@ sealed class Scenery : Thing() {
 class HighwaySign(
     val text: String
 ) : Scenery() {
-    override val tag = Tag.THING_HIGHWAYSIGN
+    override val tag = Tag.HIGHWAY_SIGN
     override fun glyph() = Glyph.HIGHWAY_SIGN
     override fun name() = "highway sign"
     override fun isOpaque() = false
@@ -38,7 +37,7 @@ class HighwaySign(
 class TrailSign(
     val text: String
 ) : Scenery() {
-    override val tag = Tag.THING_TRAILSIGN
+    override val tag = Tag.TRAIL_SIGN
     override fun glyph() = Glyph.TRAIL_SIGN
     override fun name() = "trail sign"
     override fun isOpaque() = false
@@ -48,7 +47,7 @@ class TrailSign(
 
 @Serializable
 class Boulder : Scenery() {
-    override val tag = Tag.THING_BOULDER
+    override val tag = Tag.BOULDER
     override fun glyph() = Glyph.BOULDER
     override fun name() = "boulder"
     override fun isOpaque() = false
@@ -59,7 +58,7 @@ class Boulder : Scenery() {
 class Gravestone(
     val text: String = Madlib.graveName() + " -- " + Dice.range(1994, 2007).toString() + " -- " + Madlib.epitaph()
 ) : Scenery() {
-    override val tag = Tag.THING_GRAVESTONE
+    override val tag = Tag.GRAVESTONE
     override fun glyph() = Glyph.GRAVESTONE
     override fun name() = "gravestone"
     override fun isOpaque() = false

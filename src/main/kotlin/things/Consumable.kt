@@ -44,7 +44,7 @@ sealed class Consumable : Portable() {
 
     override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
 
-    override fun spawnContainers() = mutableListOf(Tag.THING_FRIDGE, Tag.THING_TABLE)
+    override fun spawnContainers() = mutableListOf(Tag.FRIDGE, Tag.TABLE)
 
     override fun examineInfo(): String {
         return statusEffect()?.let { effect ->
@@ -105,7 +105,7 @@ sealed class Food : Consumable() {
 
 @Serializable
 class Apple : Food() {
-    override val tag = Tag.THING_APPLE
+    override val tag = Tag.APPLE
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
     override fun weight() = 0.1f
@@ -113,7 +113,7 @@ class Apple : Food() {
 
 @Serializable
 class Pear : Food() {
-    override val tag = Tag.THING_PEAR
+    override val tag = Tag.PEAR
     override fun glyph() = Glyph.FRUIT
     override fun hue() = 0.9f
     override fun name() = "pear"
@@ -122,7 +122,7 @@ class Pear : Food() {
 
 @Serializable
 class WizardcapMushroom : Food() {
-    override val tag = Tag.THING_WIZARDCAP_MUSHROOM
+    override val tag = Tag.WIZARDCAP_MUSHROOM
     override fun name() = "wizardcap mushroom"
     override fun glyph() = Glyph.MUSHROOM
     override fun weight() = 0.05f
@@ -130,7 +130,7 @@ class WizardcapMushroom : Food() {
 
 @Serializable
 class SpeckledMushroom : Food() {
-    override val tag = Tag.THING_SPECKLED_MUSHROOM
+    override val tag = Tag.SPECKLED_MUSHROOM
     override fun name() = "speckled mushroom"
     override fun glyph() = Glyph.TOADSTOOLS
     override fun weight() = 0.05f
@@ -138,7 +138,7 @@ class SpeckledMushroom : Food() {
 
 @Serializable
 class BloodcapMushroom : Food() {
-    override val tag = Tag.THING_BLOODCAP_MUSHROOM
+    override val tag = Tag.BLOODCAP_MUSHROOM
     override fun name() = "bloodcap mushroom"
     override fun glyph() = Glyph.TOADSTOOLS
     override fun hue() = 0.5f
@@ -147,7 +147,7 @@ class BloodcapMushroom : Food() {
 
 @Serializable
 class RawMeat : Rottable() {
-    override val tag = Tag.THING_RAWMEAT
+    override val tag = Tag.RAWMEAT
     override fun glyph() = Glyph.MEAT
     override fun name() = "raw meat"
     override fun description() = "A bloody chunk of raw meat.  Edible as-is, but not exactly appetizing; you're a barbarian, not a savage."
@@ -163,7 +163,7 @@ class RawMeat : Rottable() {
 
 @Serializable
 class Steak : Food() {
-    override val tag = Tag.THING_STEAK
+    override val tag = Tag.STEAK
     override fun glyph() = Glyph.MEAT
     override fun hue() = 0.5f
     override fun name() = "seared steak"
@@ -174,7 +174,7 @@ class Steak : Food() {
 
 @Serializable
 class ChickenLeg : Food() {
-    override val tag = Tag.THING_CHICKENLEG
+    override val tag = Tag.CHICKENLEG
     override fun glyph() = Glyph.CHICKEN_LEG
     override fun name() = "chicken leg"
     override fun description() = "You're not sure it actually came from a chicken, but it's cooked and smells tasty."
@@ -184,7 +184,7 @@ class ChickenLeg : Food() {
 
 @Serializable
 class Cheese : Food() {
-    override val tag = Tag.THING_CHEESE
+    override val tag = Tag.CHEESE
     override fun glyph() = Glyph.CHEESE
     override fun name() = "cheese"
     override fun description() = "A wedge of hard cheese.  It smells like Ookla."
@@ -194,7 +194,7 @@ class Cheese : Food() {
 
 @Serializable
 class Stew : Food() {
-    override val tag = Tag.THING_STEW
+    override val tag = Tag.STEW
     override fun glyph() = Glyph.STEW
     override fun name() = "stew"
     override fun description() = "A nutritious melange of meat and vegetables."
@@ -204,7 +204,7 @@ class Stew : Food() {
 
 @Serializable
 class ThrallChow : Food() {
-    override val tag = Tag.THING_THRALLCHOW
+    override val tag = Tag.THRALLCHOW
     override fun glyph() = Glyph.PACKAGE_BAG
     override fun name() = "thrall-chow"
     override fun description() = "A plastic bag of Thrall-Chow(tm).  'For minimum Thrall sustenance,' says the colorful package."
@@ -214,7 +214,7 @@ class ThrallChow : Food() {
 
 @Serializable
 class EnergyDrink : Consumable() {
-    override val tag = Tag.THING_ENERGYDRINK
+    override val tag = Tag.ENERGYDRINK
     override fun glyph() = Glyph.BOTTLE
     override fun name() = "energy drink"
     override fun consumeVerb() = "drink"

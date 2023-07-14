@@ -18,7 +18,7 @@ import world.stains.Fire
 class Campfire : Thing(), Workbench, Fuel {
     override var fuel = 100f
     override fun flammability() = 0.7f
-    override val tag = Tag.THING_CAMPFIRE
+    override val tag = Tag.CAMPFIRE
     override fun name() = "campfire"
     override fun description() = "Logs expertly stacked for controlled burning."
     override fun examineInfo() = "The stack of wood looks like it'll burn for " + (fuel / 2f).turnsToRoughTime() + "."
@@ -49,7 +49,7 @@ class Campfire : Thing(), Workbench, Fuel {
 
         uses[Thing.UseTag.SWITCH_ON] = Use("light ${name()} with survival skills", 3f,
             canDo = { actor,x,y,targ ->
-                isNextTo(actor) && !actor.hasA(Tag.THING_LIGHTER) && !isBurning()
+                isNextTo(actor) && !actor.hasA(Tag.LIGHTER) && !isBurning()
             },
             toDo = { actor,level,x,y ->
                 tryLight(actor)

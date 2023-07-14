@@ -35,7 +35,7 @@ sealed class Medkit : Portable() {
     )
 
     override fun spawnContainers() = mutableListOf(
-        Tag.THING_TRUNK, Tag.THING_BONEPILE, Tag.THING_WRECKEDCAR, Tag.THING_TABLE
+        Tag.TRUNK, Tag.BONEPILE, Tag.WRECKEDCAR, Tag.TABLE
     )
 
     private fun doTreatment(healer: Actor, target: Actor) {
@@ -69,7 +69,7 @@ sealed class Medkit : Portable() {
 
 @Serializable
 class Bandages : Medkit() {
-    override val tag = Tag.THING_BANDAGES
+    override val tag = Tag.BANDAGES
     override fun glyph() = Glyph.CLOTH_ROLL
     override fun name() = "bandage"
     override fun description() = "A roll of thick cloth suitable for binding wounds."
@@ -83,7 +83,7 @@ class Bandages : Medkit() {
 
 @Serializable
 class FirstAidKit : Medkit() {
-    override val tag = Tag.THING_FIRSTAIDKIT
+    override val tag = Tag.FIRSTAIDKIT
     override fun glyph() = Glyph.MEDPACK
     override fun name() = "first-aid kit"
     override fun description() = "A box of bandages and topical antibiotics for effective wound care."

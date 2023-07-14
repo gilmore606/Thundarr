@@ -85,7 +85,7 @@ fun ThingTileSet() =
         setTile(Glyph.CAMPFIRE, SimpleTile(this, 7, 4))
         setTile(Glyph.DOOR_CLOSED, SimpleTile(this, 7, 0))
         setTile(Glyph.DOOR_OPEN, SimpleTile(this, 7, 1))
-        setTile(Glyph.TABLE, TableTile(this, Thing.Tag.THING_TABLE).apply {
+        setTile(Glyph.TABLE, TableTile(this, Thing.Tag.TABLE).apply {
             add(TableTile.Slot.SINGLE, 7, 2)
             add(TableTile.Slot.MIDDLE, 9, 2)
             add(TableTile.Slot.LEFT, 8, 1)

@@ -8,12 +8,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
-import ui.modals.DirectionModal
-import ui.panels.Console
 import util.*
+import variants.Variant
 import world.Entity
+import world.gen.spawnsets.Spawnable
 import world.level.Level
-import world.stains.Fire
 import java.lang.Float.min
 import java.lang.RuntimeException
 
@@ -44,108 +43,115 @@ sealed class Thing() : Entity {
     enum class Tag(
         val singularName: String,
         val pluralName: String,
-        val spawn: ()->Thing
-    ) {
-        THING_NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.NPC_TUSKLET) }),
-        THING_BEDROLL("bedroll", "bedrolls", { Bedroll() }),
-        THING_PAPERBACK("paperback", "paperbacks", { Paperback() }),
-        THING_BOYSLIFE("Boys Life magazine", "Boys Life magazines", { BoysLife() }),
-        THING_HARDHAT("hardhat", "hardhats", { HardHat() }),
-        THING_HORNEDHELMET("horned helmet", "horned helmets", { HornedHelmet() }),
-        THING_RIOTHELMET("riot helmet", "riot helmets", { RiotHelmet() }),
-        THING_MOKBOOTS("mok books", "pairs of mok boots", { MokBoots() }),
-        THING_TRAVELBOOTS("travel boots", "pairs of travel boots", { TravelBoots() }),
-        THING_FURTUNIC("fur tunic", "fur tunics", { FurTunic() }),
-        THING_FURJACKET("fur jacket", "fur jackets", { FurJacket() }),
-        THING_SABRETOOTHCHARM("sabretooth charm", "sabretooth charms", { SabretoothCharm() }),
-        THING_BRICK("brick", "bricks", { Brick() }),
-        THING_ROCK("rock", "rocks", { Rock() }),
-        THING_LIGHTER("lighter", "lighters", { Lighter() }),
-        THING_APPLE("apple", "apples", { Apple() }),
-        THING_PEAR("pear", "pears", { Pear() }),
-        THING_RAWMEAT("chunk of raw meat", "chunks of raw meat", { RawMeat() }),
-        THING_STEAK("steak", "steaks", { Steak() }),
-        THING_CHICKENLEG("chicken leg", "chicken legs", { ChickenLeg() }),
-        THING_CHEESE("cheese", "cheeses", { Cheese() }),
-        THING_STEW("bowl of stew", "bowls of stew", { Stew() }),
-        THING_THRALLCHOW("thrall chow", "thrall chows", { ThrallChow() }),
-        THING_ENERGYDRINK("energy drink", "energy drinks", { EnergyDrink() }),
+        val spawn: ()->Thing,
+        val levels: Pair<Int,Int> = Pair(0,100),
+        val variants: Set<Variant<Thing>>? = null
+    ) : Spawnable<Thing> {
 
-        THING_FILINGCABINET("filing cabinet", "filing cabinets", { FilingCabinet() }),
-        THING_STORAGECABINET("storage cabinet", "storage cabinets", { StorageCabinet() }),
-        THING_BOOKSHELF("bookshelf", "bookshelves", { Bookshelf() }),
-        THING_WARDROBE("wardrobe", "wardrobes", { Wardrobe() }),
-        THING_FRIDGE("fridge", "fridges", { Fridge() }),
-        THING_TRUNK("storage trunk", "storage trunks", { Trunk() }),
-        THING_BONEPILE("bone pile", "bone piles", { Bonepile() }),
-        THING_WRECKEDCAR("wrecked car", "wrecked cars", { WreckedCar() }),
-        THING_CORPSE("corpse", "corpses", { Corpse() }),
-        THING_TABLE("table", "tables", { Table() }),
+        NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.NPC_TUSKLET) }),
+        BEDROLL("bedroll", "bedrolls", { Bedroll() }),
+        PAPERBACK("paperback", "paperbacks", { Paperback() }),
+        BOYSLIFE("Boys Life magazine", "Boys Life magazines", { BoysLife() }),
+        HARDHAT("hardhat", "hardhats", { HardHat() }),
+        HORNEDHELMET("horned helmet", "horned helmets", { HornedHelmet() }),
+        RIOTHELMET("riot helmet", "riot helmets", { RiotHelmet() }),
+        MOKBOOTS("mok books", "pairs of mok boots", { MokBoots() }),
+        TRAVELBOOTS("travel boots", "pairs of travel boots", { TravelBoots() }),
+        FURTUNIC("fur tunic", "fur tunics", { FurTunic() }),
+        FURJACKET("fur jacket", "fur jackets", { FurJacket() }),
+        SABRETOOTH_CHARM("sabretooth charm", "sabretooth charms", { SabretoothCharm() }),
+        BRICK("brick", "bricks", { Brick() }),
+        ROCK("rock", "rocks", { Rock() }),
+        LIGHTER("lighter", "lighters", { Lighter() }),
+        APPLE("apple", "apples", { Apple() }),
+        PEAR("pear", "pears", { Pear() }),
+        RAWMEAT("chunk of raw meat", "chunks of raw meat", { RawMeat() }),
+        STEAK("steak", "steaks", { Steak() }),
+        CHICKENLEG("chicken leg", "chicken legs", { ChickenLeg() }),
+        CHEESE("cheese", "cheeses", { Cheese() }),
+        STEW("bowl of stew", "bowls of stew", { Stew() }),
+        THRALLCHOW("thrall chow", "thrall chows", { ThrallChow() }),
+        ENERGYDRINK("energy drink", "energy drinks", { EnergyDrink() }),
 
-        THING_MODERNDOOR("door", "doors", { ModernDoor() }),
-        THING_WOODDOOR("door", "doors", { WoodDoor() }),
-        THING_FORGE("forge", "forges", { Forge() }),
-        THING_LOG("log", "logs", { Log() }),
-        THING_BOARD("board", "boards", { Board() }),
-        THING_LIGHTBULB("lightbulb", "lightbulbs", { Lightbulb() }),
-        THING_CEILINGLIGHT("ceiling light", "ceiling lights", { CeilingLight() }),
-        THING_GLOWSTONE("glowstone", "glowstones", { Glowstone() }),
-        THING_SUNSWORD("sunsword", "sunswords", { Sunsword() }),
-        THING_TORCH("torch", "torches", { Torch() }),
-        THING_BANDAGES("bandages", "bandages", { Bandages() }),
-        THING_FIRSTAIDKIT("first aid kit", "first aid kits", { FirstAidKit() }),
-        THING_FIST("fists", "fists", { Fist() }),
-        THING_TEETH("teeth", "teeth", { Teeth() }),
-        THING_STONE_AXE("stone axe", "stone axes", { StoneAxe() }),
-        THING_AXE("axe", "axes", { Axe() }),
-        THING_PICKAXE("pickaxe", "pickaxes", { Pickaxe() }),
-        THING_THORNBUSH("thornbush", "thornbushes", { ThornBush() }),
-        THING_SAGEBUSH("sagebush", "sagebushes", { SageBush() }),
-        THING_BERRYBUSH("berry bush", "berry bushes", { BerryBush() }),
-        THING_HONEYPODBUSH("honeypod bush", "honeypod bushes", { HoneypodBush() }),
-        THING_WILDFLOWERS("wildflowers", "wildflowers", { Wildflowers() }),
-        THING_POPPIES("poppies", "poppies", { Poppies() }),
-        THING_DEATHFLOWER("deathflower", "deathflowers", { Deathflower() }),
-        THING_DREAMFLOWER("dreamflower", "dreamflowers", { Dreamflower() }),
-        THING_SUNFLOWER("sunflower", "sunflowers", { Sunflower() }),
-        THING_LIGHTFLOWER("lightflower", "lightflowers", { Lightflower() }),
-        THING_SAGUARO("saguaro", "saguaros", { Saguaro() }),
-        THING_CHOLLA("cholla", "chollas", { Cholla() }),
-        THING_PRICKPEAR("prickpear", "prickpears", { Prickpear() }),
-        THING_BALMMOSS("balm moss", "balm mosses", { BalmMoss() }),
-        THING_LACEMOSS("lace moss", "lace mosses", { LaceMoss() }),
-        THING_WIZARDCAP_MYCELIUM("", "", { WizardcapMycelium() }),
-        THING_SPECKLED_MYCELIUM("", "",{ SpeckledMycelium() }),
-        THING_BLOODCAP_MYCELIUM("", "", { BloodcapMycelium() }),
-        THING_WIZARDCAP_MUSHROOM("wizardcap mushroom", "wizardcap mushrooms", { WizardcapMushroom() }),
-        THING_SPECKLED_MUSHROOM("speckled mushroom", "speckled mushrooms", { SpeckledMushroom() }),
-        THING_BLOODCAP_MUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
-        THING_FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),
-        THING_HIGHWAYSIGN("highway sign", "highway signs", { HighwaySign("") }),
-        THING_TRAILSIGN("trail sign", "trail signs", { TrailSign("") }),
-        THING_BOULDER("boulder", "boulders", { Boulder() }),
-        THING_SHRINE("shrine", "shrines", { Shrine() }),
-        THING_OAKTREE("oak tree", "oak trees", { OakTree() }),
-        THING_TEAKTREE("teak tree", "teak trees", { TeakTree() }),
-        THING_MAPLETREE("maple tree", "maple trees", { MapleTree() }),
-        THING_BIRCHTREE("birch tree", "birch trees", { BirchTree() }),
-        THING_APPLETREE("apple tree", "apple trees", { AppleTree() }),
-        THING_PEARTREE("pear tree", "pear trees", { PearTree() }),
-        THING_PINETREE("pine tree", "pine trees", { PineTree() }),
-        THING_SPRUCETREE("spruce tree", "spruce trees", { SpruceTree() }),
-        THING_PALMTREE("palm tree", "palm trees", { PalmTree() }),
-        THING_COCONUTTREE("coconut tree", "coconut trees", { CoconutTree() }),
-        THING_DEADTREE("dead tree", "dead trees", { DeadTree() }),
-        THING_WELL("well", "wells", { Well() }),
-        THING_CAMPFIRE("campfire", "campfires", { Campfire() }),
-        THING_GRAVESTONE("gravestone", "gravestones", { Gravestone("") }),
-        THING_HIDE("hide", "hides", { Hide() }),
-        THING_SCALYHIDE("scaly hide", "scaly hides", { ScalyHide() }),
-        THING_CANDLESTICK("candlestick", "candlesticks", { Candlestick() }),
-        THING_LAMPPOST("lamppost", "lampposts", { Lamppost() }),
-        THING_STICK("stick", "sticks", { Stick() }),
-        THING_REBAR("rebar", "rebars", { Rebar() }),
-        THING_BED("bed", "beds", { Bed() }),
+        FILING_CABINET("filing cabinet", "filing cabinets", { FilingCabinet() }),
+        STORAGE_CABINET("storage cabinet", "storage cabinets", { StorageCabinet() }),
+        BOOKSHELF("bookshelf", "bookshelves", { Bookshelf() }),
+        WARDROBE("wardrobe", "wardrobes", { Wardrobe() }),
+        FRIDGE("fridge", "fridges", { Fridge() }),
+        TRUNK("storage trunk", "storage trunks", { Trunk() }),
+        BONEPILE("bone pile", "bone piles", { Bonepile() }),
+        WRECKEDCAR("wrecked car", "wrecked cars", { WreckedCar() }),
+        CORPSE("corpse", "corpses", { Corpse() }),
+        TABLE("table", "tables", { Table() }),
+
+        METAL_DOOR("door", "doors", { ModernDoor() }),
+        WOOD_DOOR("door", "doors", { WoodDoor() }),
+        FORGE("forge", "forges", { Forge() }),
+        LOG("log", "logs", { Log() }),
+        BOARD("board", "boards", { Board() }),
+        LIGHTBULB("lightbulb", "lightbulbs", { Lightbulb() }),
+        CEILING_LIGHT("ceiling light", "ceiling lights", { CeilingLight() }),
+        GLOWSTONE("glowstone", "glowstones", { Glowstone() }),
+        SUNSWORD("sunsword", "sunswords", { Sunsword() }),
+        TORCH("torch", "torches", { Torch() }),
+        BANDAGES("bandages", "bandages", { Bandages() }),
+        FIRSTAIDKIT("first aid kit", "first aid kits", { FirstAidKit() }),
+        FIST("fists", "fists", { Fist() }),
+        TEETH("teeth", "teeth", { Teeth() }),
+        STONE_AXE("stone axe", "stone axes", { StoneAxe() }),
+        AXE("axe", "axes", { Axe() }),
+        PICKAXE("pickaxe", "pickaxes", { Pickaxe() }),
+        THORNBUSH("thornbush", "thornbushes", { ThornBush() }),
+        SAGEBUSH("sagebush", "sagebushes", { SageBush() }),
+        BERRYBUSH("berry bush", "berry bushes", { BerryBush() }),
+        HONEYPODBUSH("honeypod bush", "honeypod bushes", { HoneypodBush() }),
+        WILDFLOWERS("wildflowers", "wildflowers", { Wildflowers() }),
+        POPPIES("poppies", "poppies", { Poppies() }),
+        DEATHFLOWER("deathflower", "deathflowers", { Deathflower() }),
+        DREAMFLOWER("dreamflower", "dreamflowers", { Dreamflower() }),
+        SUNFLOWER("sunflower", "sunflowers", { Sunflower() }),
+        LIGHTFLOWER("lightflower", "lightflowers", { Lightflower() }),
+        SAGUARO("saguaro", "saguaros", { Saguaro() }),
+        CHOLLA("cholla", "chollas", { Cholla() }),
+        PRICKPEAR("prickpear", "prickpears", { Prickpear() }),
+        BALMMOSS("balm moss", "balm mosses", { BalmMoss() }),
+        LACEMOSS("lace moss", "lace mosses", { LaceMoss() }),
+        WIZARDCAP_MYCELIUM("", "", { WizardcapMycelium() }),
+        SPECKLED_MYCELIUM("", "",{ SpeckledMycelium() }),
+        BLOODCAP_MYCELIUM("", "", { BloodcapMycelium() }),
+        WIZARDCAP_MUSHROOM("wizardcap mushroom", "wizardcap mushrooms", { WizardcapMushroom() }),
+        SPECKLED_MUSHROOM("speckled mushroom", "speckled mushrooms", { SpeckledMushroom() }),
+        BLOODCAP_MUSHROOM("bloodcap mushroom", "bloodcap mushrooms", { BloodcapMushroom() }),
+        FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),
+        HIGHWAY_SIGN("highway sign", "highway signs", { HighwaySign("") }),
+        TRAIL_SIGN("trail sign", "trail signs", { TrailSign("") }),
+        BOULDER("boulder", "boulders", { Boulder() }),
+        SHRINE("shrine", "shrines", { Shrine() }),
+        OAKTREE("oak tree", "oak trees", { OakTree() }),
+        TEAKTREE("teak tree", "teak trees", { TeakTree() }),
+        MAPLETREE("maple tree", "maple trees", { MapleTree() }),
+        BIRCHTREE("birch tree", "birch trees", { BirchTree() }),
+        APPLETREE("apple tree", "apple trees", { AppleTree() }),
+        PEARTREE("pear tree", "pear trees", { PearTree() }),
+        PINETREE("pine tree", "pine trees", { PineTree() }),
+        SPRUCETREE("spruce tree", "spruce trees", { SpruceTree() }),
+        PALMTREE("palm tree", "palm trees", { PalmTree() }),
+        COCONUTTREE("coconut tree", "coconut trees", { CoconutTree() }),
+        DEADTREE("dead tree", "dead trees", { DeadTree() }),
+        WELL("well", "wells", { Well() }),
+        CAMPFIRE("campfire", "campfires", { Campfire() }),
+        GRAVESTONE("gravestone", "gravestones", { Gravestone("") }),
+        ANIMAL_HIDE("hide", "hides", { Hide() }),
+        SCALY_HIDE("scaly hide", "scaly hides", { ScalyHide() }),
+        CANDLESTICK("candlestick", "candlesticks", { Candlestick() }),
+        LAMPPOST("lamppost", "lampposts", { Lamppost() }),
+        STICK("stick", "sticks", { Stick() }),
+        REBAR("rebar", "rebars", { Rebar() }),
+        BED("bed", "beds", { Bed() })
+        ;
+
+        override fun levels() = levels
+        override fun variants(): Set<Variant<Thing>>? = variants
     }
 
     abstract val tag: Tag
@@ -306,7 +312,7 @@ sealed class Portable : Thing() {
 
 @Serializable
 class Hide : Portable() {
-    override val tag = Tag.THING_HIDE
+    override val tag = Tag.ANIMAL_HIDE
     override fun name() = "hide"
     override fun description() = "A leather animal hide.  You could make something out of it."
     override fun glyph() = Glyph.LEATHER
@@ -315,7 +321,7 @@ class Hide : Portable() {
 
 @Serializable
 class ScalyHide: Portable() {
-    override val tag = Tag.THING_SCALYHIDE
+    override val tag = Tag.SCALY_HIDE
     override fun name() = "scaly hide"
     override fun description() = "A thick animal hide covered in rigid scales.  You could make something out of it."
     override fun glyph() = Glyph.LEATHER

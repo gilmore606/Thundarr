@@ -21,7 +21,7 @@ sealed class MeleeWeapon : Gear() {
     override fun unequipOtherMsg() = "%Dn puts away %p %d."
 
     override fun spawnContainers() = super.spawnContainers().apply {
-        add(Tag.THING_TABLE)
+        add(Tag.TABLE)
     }
 
     open fun canChopTrees() = false
@@ -47,7 +47,7 @@ sealed class MeleeWeapon : Gear() {
 
 @Serializable
 class Fist : MeleeWeapon() {
-    override val tag = Tag.THING_FIST
+    override val tag = Tag.FIST
     override fun glyph() = Glyph.BLANK
     override fun name() = "fist"
     override fun description() = "Bare knuckles."
@@ -58,7 +58,7 @@ class Fist : MeleeWeapon() {
 
 @Serializable
 class Teeth : MeleeWeapon() {
-    override val tag = Tag.THING_TEETH
+    override val tag = Tag.TEETH
     override fun glyph() = Glyph.BLANK
     override fun name() = "teeth"
     override fun description() = "Sharp teeth."
@@ -72,7 +72,7 @@ class Stick : MeleeWeapon(), Fuel {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.STICK, 0.0f, -0.1f, false)
     }
-    override val tag = Tag.THING_STICK
+    override val tag = Tag.STICK
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.STICK
     override fun name() = "stick"
@@ -86,7 +86,7 @@ class Rebar : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.STICK, 0.0f, -0.1f, false)
     }
-    override val tag = Tag.THING_REBAR
+    override val tag = Tag.REBAR
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.STICK
     override fun hue() = -0.3f
@@ -96,7 +96,7 @@ class Rebar : MeleeWeapon() {
 
 @Serializable
 class Brick : MeleeWeapon() {
-    override val tag = Tag.THING_BRICK
+    override val tag = Tag.BRICK
     override fun name() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun glyph() = Glyph.BRICK
@@ -106,7 +106,7 @@ class Brick : MeleeWeapon() {
 
 @Serializable
 class Rock : MeleeWeapon() {
-    override val tag = Tag.THING_ROCK
+    override val tag = Tag.ROCK
     override fun name() = "rock"
     override fun description() = "A chunk of rock.  You could throw it at someone."
     override fun glyph() = Glyph.ROCK
@@ -119,7 +119,7 @@ class StoneAxe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
     }
-    override val tag = Tag.THING_STONE_AXE
+    override val tag = Tag.STONE_AXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 0.2f
@@ -135,7 +135,7 @@ class Axe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
     }
-    override val tag = Tag.THING_AXE
+    override val tag = Tag.AXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
@@ -150,7 +150,7 @@ class Pickaxe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
     }
-    override val tag = Tag.THING_PICKAXE
+    override val tag = Tag.PICKAXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 5.2f
@@ -172,7 +172,7 @@ class Sunsword : MeleeWeapon(), LightSource {
         val glyphTransform = GlyphTransform(Glyph.SUNSWORD_LIT, 0.0f, -0.1f, false)
         val lightColor = LightColor(0.1f, 0.3f, 0.3f)
     }
-    override val tag = Tag.THING_SUNSWORD
+    override val tag = Tag.SUNSWORD
     override fun glyph() = if (equipped) Glyph.SUNSWORD_LIT else Glyph.SUNSWORD
     override fun glyphTransform() = glyphTransform
     override fun name() = "sunsword"
