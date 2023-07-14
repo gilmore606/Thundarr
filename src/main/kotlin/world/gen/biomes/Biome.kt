@@ -13,6 +13,7 @@ import world.gen.AnimalSpawnSource
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
+import world.gen.spawnsets.PlantSet
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
@@ -25,7 +26,6 @@ sealed class Biome(
 ) : AnimalSpawnSource {
     open fun defaultTitle(habitat: Habitat) = "the wilderness"
     open fun trailChance() = 0.1f
-    open fun plantDensity() = 1.0f
     open fun cabinChance() = 0.0f
     open fun cavesChance() = 0.0f
     open fun outcroppingChance() = 0.0f
@@ -35,6 +35,8 @@ sealed class Biome(
     open fun canHaveRain() = true
     open fun temperatureBase() = 0
     open fun temperatureAmplitude() = 1f
+
+    open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
     open fun riverBankTerrain(x: Int, y: Int): Terrain.Type = if (NoisePatches.get("plantsBasic",x,y) > 0.4f) riverBankAltTerrain(x,y) else baseTerrain
     open fun riverBankAltTerrain(x: Int, y: Int): Terrain.Type = TERRAIN_UNDERGROWTH
     open fun bareTerrain(x: Int, y: Int): Terrain.Type = Terrain.Type.TERRAIN_DIRT
@@ -42,8 +44,10 @@ sealed class Biome(
     open fun villageWallType() = Terrain.Type.TERRAIN_WOODWALL
     open fun villageFloorType() = Terrain.Type.TERRAIN_WOODFLOOR
 
-    open fun terrainAt(x: Int, y: Int): Terrain.Type = baseTerrain
+    open fun plantDensity() = 1.0f
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
+    open fun plantSet(habitat: Habitat): PlantSet? = null
+
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun postProcess(carto: WorldCarto) { }
     open fun placeExtraThings(carto: WorldCarto) { }

@@ -39,8 +39,6 @@ abstract class Carto(
 
     protected val json = Json { ignoreUnknownKeys = true }
 
-    protected val plantSpawns = plantSpawns()
-
     open val wallTerrain = Terrain.Type.TERRAIN_BRICKWALL
     open val floorTerrain = Terrain.Type.TERRAIN_STONEFLOOR
 
@@ -590,25 +588,13 @@ abstract class Carto(
         }
     }
 
-    fun getPlant(biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float,
-                           fromSpawns: List<PlantSpawn> = plantSpawns
+    fun getPlant(
+        biome: Biome, habitat: Habitat, fertility: Float, globalPlantDensity: Float
     ): Thing? {
-        val plantChance = biome.plantDensity() * globalPlantDensity * java.lang.Float.max(0.2f, fertility)
+        val plantChance = biome.plantDensity() * globalPlantDensity * java.lang.Float.max(0.1f, fertility)
         if (Dice.chance(plantChance)) {
-            val plants = fromSpawns.filter {
-                it.biomes.contains(biome) && it.habitats.contains(habitat) &&
-                        fertility >= it.minFertility && fertility <= it.maxFertility
-            }
-            if (plants.isNotEmpty()) {
-                val totalFreq = plants.map { it.frequency }.reduce { t, f -> t + f }
-                val spawnFreq = Dice.float(0f, totalFreq)
-                var acc = 0f
-                plants.forEach {
-                    acc += it.frequency
-                    if (acc >= spawnFreq) {
-                        return it.spawn()
-                    }
-                }
+            biome.plantSet(habitat)?.getPlant(fertility, habitat)?.also { result ->
+                return result.spawnThing()
             }
         }
         return null

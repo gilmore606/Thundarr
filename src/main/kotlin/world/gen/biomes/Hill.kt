@@ -4,8 +4,10 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
-import world.gen.habitats.Habitat
 import world.terrains.Terrain
+import things.Thing.Tag.*
+import world.gen.habitats.*
+import world.gen.spawnsets.PlantSet
 
 @Serializable
 object Hill : Biome(
@@ -41,5 +43,56 @@ object Hill : Biome(
         super.carveExtraTerrain(carto)
         carto.fringeTerrain(Terrain.Type.TERRAIN_CAVEWALL, Terrain.Type.TERRAIN_ROCKS, 0.7f, Terrain.Type.GENERIC_WATER)
         repeat (2) { carto.varianceFuzzTerrain(Terrain.Type.TERRAIN_ROCKS, Terrain.Type.TERRAIN_CAVEWALL) }
+    }
+
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> HillPlantsAlpine.set
+        is TemperateA, TemperateB -> HillPlantsTemperate.set
+        is TropicalA, TropicalB -> HillPlantsTropical.set
+        else -> null
+    }
+}
+
+object HillPlantsAlpine {
+    val set = PlantSet().apply {
+        add(0.1f, SPRUCETREE, 0.75f)
+        add(0.1f, PINETREE, 0.8f)
+        add(0.1f, DEADTREE, 0.6f)
+        add(1f, THORNBUSH)
+        add(0.4f, WILDFLOWERS, 0.5f)
+        add(0.1f, DANDYLIONS, 0.5f)
+        add(0.4f, BOULDER, 0f, 0.5f)
+        add(0.1f, ROCK, 0f, 0.5f)
+        add(0.05f, WIZARDCAP_MYCELIUM)
+    }
+}
+
+object HillPlantsTemperate {
+    val set = PlantSet().apply {
+        add(0.1f, BIRCHTREE, 0.75f)
+        add(0.1f, DEADTREE, 0.6f)
+        add(1f, THORNBUSH)
+        add(0.5f, BERRYBUSH, 0.3f)
+        add(0.4f, WILDFLOWERS, 0.5f)
+        add(0.1f, DANDYLIONS, 0.5f)
+        add(0.4f, BOULDER, 0f, 0.5f)
+        add(0.1f, ROCK, 0f, 0.5f)
+        add(0.02f, WIZARDCAP_MYCELIUM)
+    }
+}
+
+object HillPlantsTropical {
+    val set = PlantSet().apply {
+        add(0.1f, PALMTREE, 0.75f)
+        add(0.1f, DEADTREE, 0.6f)
+        add(1f, THORNBUSH)
+        add(0.5f, BERRYBUSH, 0.3f)
+        add(0.5f, HONEYPODBUSH, 0.4f)
+        add(0.4f, POPPIES, 0.5f)
+        add(0.4f, BOULDER, 0f, 0.5f)
+        add(0.1f, ROCK, 0f, 0.5f)
+        add(0.1f, PRICKPEAR, 0f, 0.5f)
+        add(0.01f, BLOODCAP_MYCELIUM)
     }
 }

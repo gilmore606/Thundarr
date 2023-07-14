@@ -3,12 +3,15 @@ package world.gen.biomes
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.Thing
 import util.Dice
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
-import world.gen.habitats.Habitat
+import world.gen.habitats.*
+import world.gen.spawnsets.PlantSet
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
+import things.Thing.Tag.*
 
 @Serializable
 object Swamp : Biome(
@@ -52,5 +55,49 @@ object Swamp : Biome(
             val y = Dice.zeroTil(CHUNK_SIZE -13)
             digLake(carto, x, y, x + Dice.range(7, 12), y + Dice.range(7, 12))
         }
+    }
+
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> SwampPlantsAlpine.set
+        is TemperateA, TemperateB -> SwampPlantsTemperate.set
+        is TropicalA, TropicalB -> SwampPlantsTropical.set
+        else -> null
+    }
+}
+
+object SwampPlantsAlpine {
+    val set = PlantSet().apply {
+        add(1f, SPRUCETREE, 0.75f)
+        add(1f, DEADTREE, 0.7f)
+        add(1f, WILDFLOWERS)
+        add(1f, BLUEBELLS)
+        add(0.3f, FOOLSLEAF)
+    }
+}
+
+object SwampPlantsTemperate {
+    val set = PlantSet().apply {
+        add(1f, MAPLETREE, 0.75f)
+        add(1f, BIRCHTREE, 0.6f)
+        add(1f, DEADTREE, 0.7f)
+        add(0.4f, APPLETREE, 0.7f, only = TropicalA)
+        add(0.4f, PEARTREE, 0.7f, only = TropicalB)
+        add(1f, BERRYBUSH, 0.3f, 0.8f)
+        add(1f, WILDFLOWERS)
+        add(1f, BLUEBELLS)
+        add(1f, LACEMOSS, 0f, 0.8f)
+        add(0.3f, FOOLSLEAF)
+    }
+}
+
+object SwampPlantsTropical {
+    val set = PlantSet().apply {
+        add(1f, PALMTREE, 0.75f)
+        add(0.5f, DEADTREE, 0.7f)
+        add(1f, BERRYBUSH, 0.3f, 0.8f)
+        add(1f, WILDFLOWERS)
+        add(1f, BLUEBELLS)
+        add(1f, LACEMOSS, 0f, 0.8f)
     }
 }

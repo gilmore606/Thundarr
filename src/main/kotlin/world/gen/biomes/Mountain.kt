@@ -5,8 +5,10 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
-import world.gen.habitats.Habitat
 import world.terrains.Terrain
+import things.Thing.Tag.*
+import world.gen.habitats.*
+import world.gen.spawnsets.PlantSet
 
 @Serializable
 object Mountain : Biome(
@@ -42,4 +44,48 @@ object Mountain : Biome(
 
     override fun riverBankTerrain(x: Int, y: Int) = if (Dice.flip()) Terrain.Type.TERRAIN_GRASS else Terrain.Type.TERRAIN_DIRT
 
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> MountainPlantsAlpine.set
+        is TemperateA, TemperateB -> MountainPlantsTemperate.set
+        is TropicalA, TropicalB -> MountainPlantsTropical.set
+        else -> null
+    }
+}
+
+object MountainPlantsAlpine {
+    val set = PlantSet().apply {
+        add(1f, DEADTREE, 0.5f)
+        add(0.1f, PINETREE, 0.7f)
+        add(1f, BOULDER, 0f, 0.8f)
+        add(0.4f, ROCK, 0f, 0.8f)
+        add(0.1f, SAGEBUSH, 0.5f)
+        add(0.05f, BALMMOSS, 0.5f)
+        add(0.1f, WIZARDCAP_MYCELIUM, 0.5f)
+    }
+}
+
+object MountainPlantsTemperate {
+    val set = PlantSet().apply {
+        add(1f, DEADTREE, 0.5f)
+        add(0.1f, PINETREE, 0.7f)
+        add(1f, BOULDER, 0f, 0.8f)
+        add(0.4f, ROCK, 0f, 0.8f)
+        add(0.3f, SAGEBUSH, 0.5f)
+        add(0.2f, BALMMOSS, 0.5f)
+        add(0.3f, WIZARDCAP_MYCELIUM, 0.5f)
+    }
+}
+
+object MountainPlantsTropical {
+    val set = PlantSet().apply {
+        add(1f, DEADTREE, 0.5f)
+        add(0.5f, PINETREE, 0.6f)
+        add(0.3f, TEAKTREE, 0.75f)
+        add(1f, BOULDER, 0f, 0.8f)
+        add(0.4f, ROCK, 0f, 0.8f)
+        add(0.3f, THORNBUSH, 0.5f)
+        add(0.1f, BALMMOSS, 0.5f)
+        add(0.3f, BLOODCAP_MYCELIUM, 0.5f)
+    }
 }

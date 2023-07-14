@@ -112,11 +112,27 @@ class Wildflowers : Plant() {
 }
 
 @Serializable
+class BlueBells : Plant() {
+    override val tag = Tag.BLUEBELLS
+    override fun glyph() = Glyph.FLOWERS
+    override fun hue() = 0.33f
+    override fun name() = "bluebell flowers"
+}
+
+@Serializable
 class Poppies : Plant() {
     override val tag = Tag.POPPIES
     override fun glyph() = Glyph.FLOWERS
-    override fun hue() = 0.73f
-    override fun name() = "poppy flowers"
+    override fun hue() = 1.8f
+    override fun name() = "poppies"
+}
+
+@Serializable
+class Dandylions : Plant() {
+    override val tag = Tag.DANDYLIONS
+    override fun glyph() = Glyph.FLOWERS
+    override fun hue() = -1.8f
+    override fun name() = "dandylions"
 }
 
 @Serializable

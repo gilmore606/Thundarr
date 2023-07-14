@@ -22,6 +22,11 @@ object Blank : Habitat(
 )
 
 @Serializable
+object Garden : Habitat(
+    Glyph.MAP_HABITAT_TEMP_A
+)
+
+@Serializable
 object Arctic : Habitat(
     Glyph.MAP_HABITAT_ARCTIC
 ) {
@@ -34,6 +39,7 @@ object Arctic : Habitat(
 object AlpineA : Habitat(
     Glyph.MAP_HABITAT_COLD_A
 ) {
+    override fun forestName() = "taiga"
     override fun forestWallType() = Terrain.Type.TERRAIN_PINE_FORESTWALL
     override fun grasslandName() = "plains"
     override fun scrubName() = "tundra"
@@ -43,6 +49,7 @@ object AlpineA : Habitat(
 object AlpineB : Habitat(
     Glyph.MAP_HABITAT_COLD_B
 ) {
+    override fun forestName() = "taiga"
     override fun forestWallType() = Terrain.Type.TERRAIN_PINE_FORESTWALL
     override fun grasslandName() = "plains"
     override fun scrubName() = "tundra"

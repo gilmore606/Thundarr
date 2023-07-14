@@ -9,7 +9,8 @@ import world.gen.biomes.Biome
 import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
-import world.gen.gardenPlantSpawns
+import world.gen.habitats.Garden
+import world.gen.spawnsets.SpawnSet
 import world.terrains.Terrain
 import java.lang.Math.max
 import java.lang.Math.min
@@ -131,17 +132,22 @@ class Garden(
     override fun doFurnish() {
         val inVertRows = Dice.flip()
         val gardenDensity = fertility * 2f
-        val gardenPlantSpawns = gardenPlantSpawns()
-        for (tx in x0 until x1) {
-            for (ty in y0 until y1) {
-                if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isAbandoned) {
-                    setTerrain(tx, ty, rowType)
-                    carto.getPlant(biome, habitat, 1f,
-                        gardenDensity, gardenPlantSpawns)?.also { plant ->
-                        spawnAt(tx, ty, plant)
+        val types = mutableListOf<SpawnSet.Result<Thing.Tag,Thing>>()
+        repeat (Dice.oneTo(3)) {
+            biome.plantSet(Garden)?.getPlant(gardenDensity, habitat)?.also {
+                types.add(it)
+            }
+        }
+        if (types.isNotEmpty()) {
+            for (tx in x0 until x1) {
+                for (ty in y0 until y1) {
+                    if ((inVertRows && (tx % 2 == 0)) || (!inVertRows && (ty % 2 == 0)) || isAbandoned) {
+                        setTerrain(tx, ty, rowType)
+                        spawnAt(tx, ty, types.random().spawnThing())
                     }
+                    if (!isAbandoned && carto is WorldCarto)
+                            (carto as WorldCarto).setFlag(tx, ty, WorldCarto.CellFlag.NO_PLANTS)
                 }
-                if (!isAbandoned && carto is WorldCarto) (carto as WorldCarto).setFlag(tx, ty, WorldCarto.CellFlag.NO_PLANTS)
             }
         }
     }

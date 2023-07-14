@@ -14,7 +14,6 @@ import world.gen.AnimalSpawnSource
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.gen.gardenPlantSpawns
 import world.level.Level
 import world.quests.Quest
 import world.terrains.Terrain
@@ -172,7 +171,6 @@ sealed class Feature : AnimalSpawnSource {
                            buildByOutsideDoor: ((x: Int, y: Int)->Unit)? = null,
                            ): Decor.Room {
         carto.addTrailBlock(x0 + x, y0 + y, x0 + x + width - 1, y0 + y + height - 1)
-        val villagePlantSpawns = gardenPlantSpawns()
         val wallType = forceWall ?: meta.biome.villageWallType()
         val floorType = forceFloor ?:  meta.biome.villageFloorType()
         val dirtType =  meta.biome.bareTerrain(x0,y0)
@@ -256,7 +254,7 @@ sealed class Feature : AnimalSpawnSource {
         val plantDensity = fertility * 2f
         forEachTerrain(Terrain.Type.TEMP3) { x, y ->
             carto.getPlant(meta.biome, meta.habitat, 0.5f,
-                plantDensity, villagePlantSpawns
+                plantDensity
             )?.also { plant ->
                 spawnThing(x, y, plant)
             }

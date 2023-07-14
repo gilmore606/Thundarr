@@ -6,8 +6,10 @@ import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
-import world.gen.habitats.Habitat
+import world.gen.habitats.*
 import world.terrains.Terrain
+import things.Thing.Tag.*
+import world.gen.spawnsets.PlantSet
 
 @Serializable
 object ForestHill : Biome(
@@ -32,7 +34,7 @@ object ForestHill : Biome(
     override fun temperatureAmplitude() = 0.7f
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
-            (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 3f).toFloat()
+            (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 5f).toFloat()
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         if (NoisePatches.get("extraForest", x, y) > 0.2f) {
@@ -58,5 +60,61 @@ object ForestHill : Biome(
         )
         carto.varianceFuzzTerrain(Terrain.Type.TERRAIN_ROCKS, Terrain.Type.TERRAIN_CAVEWALL)
         carto.varianceFuzzTerrain(Terrain.Type.TERRAIN_UNDERGROWTH, Terrain.Type.TERRAIN_TEMPERATE_FORESTWALL)
+    }
+
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> ForestHillPlantsAlpine.set
+        is TemperateA, TemperateB -> ForestHillPlantsTemperate.set
+        is TropicalA, TropicalB -> ForestHillPlantsTropical.set
+        else -> null
+    }
+}
+
+object ForestHillPlantsAlpine {
+    val set = PlantSet().apply {
+        add(1f, PINETREE, 0.5f)
+        add(0.2f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.3f, BERRYBUSH, 0.5f)
+        add(0.1f, BOULDER)
+        add(0.1f, BALMMOSS, 0.2f, 0.6f)
+        add(0.2f, BOULDER, 0f, 0.5f)
+        add(0.2f, SPECKLED_MYCELIUM)
+    }
+}
+
+object ForestHillPlantsTemperate {
+    val set = PlantSet().apply {
+        add(2f, OAKTREE, 0.6f)
+        add(1f, MAPLETREE, 0.6f)
+        add(0.1f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.5f, BERRYBUSH)
+        add(0.2f, HONEYPODBUSH)
+        add(1f, WILDFLOWERS)
+        add(0.6f, BLUEBELLS)
+        add(0.1f, BALMMOSS, 0.2f, 0.6f)
+        add(0.2f, LACEMOSS, 0.3f, 0.6f)
+        add(0.1f, BOULDER, 0f, 0.5f)
+        add(0.1f, SPECKLED_MYCELIUM)
+        add(0.02f, BLOODCAP_MYCELIUM)
+    }
+}
+
+object ForestHillPlantsTropical {
+    val set = PlantSet().apply {
+        add(2f, PALMTREE, 0.6f)
+        add(0.1f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.7f, BERRYBUSH)
+        add(0.4f, HONEYPODBUSH)
+        add(1f, WILDFLOWERS)
+        add(0.6f, BLUEBELLS)
+        add(0.4f, POPPIES)
+        add(0.2f, LACEMOSS, 0.3f, 0.6f)
+        add(0.1f, BOULDER, 0f, 0.5f)
+        add(0.1f, SPECKLED_MYCELIUM)
+        add(0.1f, BLOODCAP_MYCELIUM)
     }
 }

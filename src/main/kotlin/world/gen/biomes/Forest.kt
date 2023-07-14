@@ -6,8 +6,10 @@ import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
-import world.gen.habitats.Habitat
+import world.gen.habitats.*
+import world.gen.spawnsets.PlantSet
 import world.terrains.Terrain
+import things.Thing.Tag.*
 
 @Serializable
 object Forest : Biome(
@@ -43,4 +45,57 @@ object Forest : Biome(
         return super.terrainAt(x, y)
     }
 
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> ForestPlantsAlpine.set
+        is TemperateA, TemperateB -> ForestPlantsTemperate.set
+        is TropicalA, TropicalB -> ForestPlantsTropical.set
+        else -> null
+    }
+}
+
+object ForestPlantsAlpine {
+    val set = PlantSet().apply {
+        add(1f, PINETREE, 0.5f)
+        add(1f, SPRUCETREE, 0.6f)
+        add(0.5f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.3f, BERRYBUSH, 0.5f)
+        add(0.1f, BOULDER)
+        add(0.1f, BLUEBELLS)
+        add(0.1f, BALMMOSS, 0.2f, 0.6f)
+    }
+}
+
+object ForestPlantsTemperate {
+    val set = PlantSet().apply {
+        add(2f, OAKTREE, 0.7f)
+        add(1f, MAPLETREE, 0.7f)
+        add(1f, BIRCHTREE, 0.75f)
+        add(0.5f, APPLETREE, 0.6f, only = TemperateA)
+        add(0.5f, PEARTREE, 0.6f, only = TemperateB)
+        add(0.1f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.5f, BERRYBUSH)
+        add(0.2f, HONEYPODBUSH)
+        add(1f, WILDFLOWERS)
+        add(0.5f, BLUEBELLS)
+        add(0.1f, BALMMOSS, 0.2f, 0.6f)
+        add(0.2f, LACEMOSS, 0.3f, 0.6f)
+    }
+}
+
+object ForestPlantsTropical {
+    val set = PlantSet().apply {
+        add(2f, COCONUTTREE, 0.75f)
+        add(1.5f, PALMTREE, 0.75f)
+        add(0.1f, DEADTREE, 0.4f)
+        add(1f, THORNBUSH)
+        add(0.7f, BERRYBUSH)
+        add(0.4f, HONEYPODBUSH)
+        add(1f, WILDFLOWERS)
+        add(0.6f, BLUEBELLS)
+        add(0.4f, POPPIES)
+        add(0.2f, LACEMOSS, 0.3f, 0.6f)
+    }
 }

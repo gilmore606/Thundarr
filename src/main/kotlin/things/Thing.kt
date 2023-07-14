@@ -9,9 +9,7 @@ import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
 import util.*
-import variants.Variant
 import world.Entity
-import world.gen.spawnsets.Spawnable
 import world.level.Level
 import java.lang.Float.min
 import java.lang.RuntimeException
@@ -44,9 +42,7 @@ sealed class Thing() : Entity {
         val singularName: String,
         val pluralName: String,
         val spawn: ()->Thing,
-        val levels: Pair<Int,Int> = Pair(0,100),
-        val variants: Set<Variant<Thing>>? = null
-    ) : Spawnable<Thing> {
+    ) {
 
         NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.NPC_TUSKLET) }),
         BEDROLL("bedroll", "bedrolls", { Bedroll() }),
@@ -107,6 +103,8 @@ sealed class Thing() : Entity {
         HONEYPODBUSH("honeypod bush", "honeypod bushes", { HoneypodBush() }),
         WILDFLOWERS("wildflowers", "wildflowers", { Wildflowers() }),
         POPPIES("poppies", "poppies", { Poppies() }),
+        BLUEBELLS("bluebell flower", "bluebell flowers", { BlueBells() }),
+        DANDYLIONS("dandylion", "dandylions", { Dandylions() }),
         DEATHFLOWER("deathflower", "deathflowers", { Deathflower() }),
         DREAMFLOWER("dreamflower", "dreamflowers", { Dreamflower() }),
         SUNFLOWER("sunflower", "sunflowers", { Sunflower() }),
@@ -149,9 +147,6 @@ sealed class Thing() : Entity {
         REBAR("rebar", "rebars", { Rebar() }),
         BED("bed", "beds", { Bed() })
         ;
-
-        override fun levels() = levels
-        override fun variants(): Set<Variant<Thing>>? = variants
     }
 
     abstract val tag: Tag

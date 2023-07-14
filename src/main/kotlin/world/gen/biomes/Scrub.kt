@@ -4,8 +4,10 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.Dice
 import world.gen.NoisePatches
-import world.gen.habitats.Habitat
 import world.terrains.Terrain
+import things.Thing.Tag.*
+import world.gen.habitats.*
+import world.gen.spawnsets.PlantSet
 
 @Serializable
 object Scrub : Biome(
@@ -31,5 +33,52 @@ object Scrub : Biome(
             return Terrain.Type.TERRAIN_DIRT
         }
         return super.terrainAt(x, y)
+    }
+
+    override fun plantSet(habitat: Habitat) = when (habitat) {
+        is Garden -> GardenPlants.set
+        is AlpineA, AlpineB -> ScrubPlantsAlpine.set
+        is TemperateA, TemperateB -> ScrubPlantsTemperate.set
+        is TropicalA, TropicalB -> ScrubPlantsTropical.set
+        else -> null
+    }
+}
+
+object ScrubPlantsAlpine {
+    val set = PlantSet().apply {
+        add(0.05f, DEADTREE, 0.5f)
+        add(1f, THORNBUSH)
+        add(1f, SAGEBUSH)
+        add(0.2f, WILDFLOWERS)
+        add(0.2f, DANDYLIONS)
+        add(0.04f, BOULDER, 0f, 0.4f)
+    }
+}
+
+object ScrubPlantsTemperate {
+    val set = PlantSet().apply {
+        add(0.05f, DEADTREE, 0.5f)
+        add(1f, THORNBUSH)
+        add(1f, SAGEBUSH)
+        add(0.8f, CHOLLA, 0f, 0.6f)
+        add(0.2f, HONEYPODBUSH)
+        add(0.3f, WILDFLOWERS)
+        add(0.1f, DANDYLIONS, 0.5f)
+        add(0.02f, BOULDER, 0f, 0.4f)
+        add(0.01f, DREAMFLOWER, 0.2f, only = TemperateA)
+        add(0.04f, LIGHTFLOWER, 0.3f, 0.7f, only = TemperateB)
+    }
+}
+
+object ScrubPlantsTropical {
+    val set = PlantSet().apply {
+        add(0.05f, DEADTREE, 0.5f)
+        add(1f, THORNBUSH)
+        add(1f, SAGEBUSH)
+        add(0.8f, CHOLLA, 0f, 0.6f)
+        add(0.2f, HONEYPODBUSH)
+        add(0.8f, WILDFLOWERS)
+        add(1f, POPPIES)
+        add(0.04f, LIGHTFLOWER, 0.3f, 0.7f, only = TropicalB)
     }
 }

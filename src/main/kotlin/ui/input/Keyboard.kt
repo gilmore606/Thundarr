@@ -1,9 +1,6 @@
 package ui.input
 
 import App
-import actors.Herder
-import actors.Jerif
-import actors.MagicPortal
 import actors.actions.Wait
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys.*
@@ -237,7 +234,7 @@ object Keyboard : KtxInputAdapter {
                     K -> { App.player.debugMove(SOUTH) }
                     L -> { App.player.debugMove(EAST) }
 
-                    F8 -> { MagicPortal().spawnAt(App.player.level!!, App.player.xy.x + 1, App.player.xy.y) }
+                    F8 -> { (if (Dice.flip()) BlueBells() else Poppies()).moveTo(App.player.level!!, App.player.xy.x + 1, App.player.xy.y) }
                     F9 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }
                     F10 -> { Sunsword().moveTo(groundAtPlayer()) }
                     F11 -> {
