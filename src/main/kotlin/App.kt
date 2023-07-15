@@ -185,7 +185,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     }
 
     private fun restoreState() {
-        Screen.addModal(LoadingModal("Returning to Numeria..."))
+        val loadingModal = LoadingModal(
+            "Returning to Numeria...", withProgress = true, forceUp = true, withMoon = true
+        )
+        Screen.addModal(loadingModal)
 
         pendingJob = KtxAsync.launch {
             Screen.brightnessTarget = 0f
@@ -194,7 +197,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             val state = save.getWorldState()
             Metamap.loadWorld()
             while (Metamap.isWorking) {
-                delay(250L)
+                loadingModal.setProgress(Metamap.loadingProgress * 0.5f)
+                delay(200)
             }
 
             level = LevelKeeper.getLevel(state.levelId)
@@ -211,10 +215,12 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
             while (!level.isReady()) {
                 log.info("Waiting for level...")
-                delay(250)
+                loadingModal.setProgress(0.5f + level.loadingProgress() * 0.5f)
+                delay(200)
             }
             movePlayerIntoLevel(player.xy.x, player.xy.y)
             log.info("Restored state with player at ${player.xy.x} ${player.xy.y}.")
+            loadingModal.abort()
             delay(300)
             Screen.brightnessTarget = 1f
             addGamePanels()

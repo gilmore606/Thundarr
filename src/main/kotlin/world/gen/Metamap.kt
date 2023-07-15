@@ -177,12 +177,16 @@ object Metamap {
         }
     }
 
+    var loadingProgress = 0f
+
     fun loadWorld() {
         isWorking = true
+        loadingProgress = 0f
         coroutineScope.launch {
-            Console.sayFromThread("Loading world map...")
             metaCache.clear()
+            var n = 0
             for (x in 0 until chunkRadius *2) {
+                n++
                 val col = ArrayList<ChunkMeta>(chunkRadius*2)
                 repeat (chunkRadius*2) { col.add(outOfBoundsMeta) }
                 App.save.getWorldMetaColumn(xToChunkX(x)).forEach {
@@ -190,9 +194,8 @@ object Metamap {
                     if (i >= 0 && i < chunkRadius*2) col[i] = it
                 }
                 metaCache.add(col)
+                loadingProgress = 1f / (chunkRadius * 2) * n
             }
-
-            Console.sayFromThread("Load completed!")
             isWorking = false
         }
     }
