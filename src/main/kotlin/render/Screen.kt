@@ -57,9 +57,9 @@ object Screen : KtxScreen {
             field = value
             updateSurfaceParams()
         }
-    private var zoomTarget = 0.75
-    private val zoomLevels = listOf(0.25, 0.5, 0.6, 0.75, 0.85, 1.0, 1.3, 1.6, 2.0)
-    var zoomIndex = 3.0
+    private var zoomTarget = 0.73
+    private val zoomLevels = listOf(0.5, 0.62, 0.73, 0.83, 1.0, 1.15, 1.3)
+    var zoomIndex = 2.0
 
     var width = 0
     var height = 0
@@ -179,7 +179,7 @@ object Screen : KtxScreen {
 
     var scrollLatch = false
     var scrollDragging = false
-    private val dragPixels = XY(0, 0)
+    val dragPixels = XY(0, 0)
     private val lastDrag = XY(0, 0)
 
     var drawTime: Int = 0
@@ -547,7 +547,7 @@ object Screen : KtxScreen {
             topModal!!.onMouseScrolled(amount)
             return
         }
-        zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble() * 0.7))
+        zoomIndex = max(0.0, min(zoomLevels.lastIndex.toDouble(), zoomIndex - amount.toDouble()))
         updateZoomTarget()
     }
 

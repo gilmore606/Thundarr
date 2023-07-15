@@ -107,7 +107,13 @@ sealed class Level {
                     val roofed = isRoofedAt(x, y)
                     val walkable = isWalkableAt(App.player, x, y)
                     if (vis > 0f) {
-                        val light = if (App.DEBUG_VISIBLE) Screen.fullLight else if (vis == 1f) chunk.lightAt(x, y) else if (Screen.showSeenAreas) Screen.halfLight else Screen.fullDark
+                        val light = when {
+                            App.DEBUG_VISIBLE -> Screen.fullLight
+                            vis == 1f -> chunk.lightAt(x, y)
+                            Screen.showSeenAreas && (Screen.dragPixels.x != 0 || Screen.dragPixels.y != 0) -> Screen.fullLight
+                            Screen.showSeenAreas -> Screen.halfLight
+                            else -> Screen.fullDark
+                        }
                         doTile(
                             x, y, vis, glyph, light
                         )
@@ -472,6 +478,13 @@ sealed class Level {
         val isAdjacentOrHere = abs(x - App.player.xy.x) < 2 && abs(y - App.player.xy.y) < 2
         val isHere = App.player.xy.x == x && App.player.xy.y == y
 
+        if (isWalkableAt(App.player, x, y) && !isAdjacentOrHere) {
+            menu.addOption("walk here") {
+                App.player.queue(WalkTo(x, y))
+            }
+        }
+        if (visibilityAt(x, y) < 1f) return
+
         val groups = thingsAt(x,y).groupByTag()
         groups.forEach { group ->
             if (isHere && group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
@@ -493,18 +506,15 @@ sealed class Level {
                     }
                 }
             }
-            if (isAdjacentOrHere && group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
-                menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
-                    App.player.queue(Smash(group[0].getKey(), (group[0] as Smashable).smashVerbName()))
+            if (isAdjacentOrHere) {
+                if (group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
+                    menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
+                        App.player.queue(Smash(group[0].getKey(), (group[0] as Smashable).smashVerbName()))
+                    }
                 }
             }
-            if (!group[0].isPortable() || isHere) {
-                menu.addOption("examine " + group[0].name()) { Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW)) }
-            }
-        }
-        if (isWalkableAt(App.player, x, y) && !isAdjacentOrHere) {
-            menu.addOption("walk here") {
-                App.player.queue(WalkTo(x, y))
+            menu.addOption("examine " + group[0].name()) {
+                Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW))
             }
         }
         var actorAt: Actor? = null
