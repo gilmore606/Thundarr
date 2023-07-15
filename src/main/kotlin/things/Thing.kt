@@ -145,7 +145,9 @@ sealed class Thing() : Entity {
         LAMPPOST("lamppost", "lampposts", { Lamppost() }),
         STICK("stick", "sticks", { Stick() }),
         REBAR("rebar", "rebars", { Rebar() }),
-        BED("bed", "beds", { Bed() })
+        BED("bed", "beds", { Bed() }),
+        FLASHLIGHT("flashlight", "flashlights", { Flashlight() }),
+        LANTERN("lantern", "lanterns", { Lantern() }),
         ;
     }
 

@@ -129,7 +129,7 @@ class CeilingLight : LitThing(), Smashable {
 }
 
 @Serializable
-sealed class SwitchableLight : LitThing() {
+sealed class SwitchablePlacedLight : LitThing() {
     override fun isPortable() = false
     override fun isAlwaysVisible() = true
     override fun glyph() = if (active) glyphLit() else glyphDark()
@@ -157,7 +157,7 @@ sealed class SwitchableLight : LitThing() {
 }
 
 @Serializable
-class Candlestick : SwitchableLight() {
+class Candlestick : SwitchablePlacedLight() {
     override val tag = Tag.CANDLESTICK
     override fun glyphLit() = Glyph.CANDLESTICK_ON
     override fun glyphDark() = Glyph.CANDLESTICK_OFF
@@ -167,7 +167,7 @@ class Candlestick : SwitchableLight() {
 }
 
 @Serializable
-class Lamppost : SwitchableLight() {
+class Lamppost : SwitchablePlacedLight() {
     override val tag = Tag.LAMPPOST
     override fun glyphLit() = Glyph.LAMPPOST_ON
     override fun glyphDark() = Glyph.LAMPPOST_OFF
@@ -196,6 +196,53 @@ class Glowstone : LitThing() {
         lightColor.b = b
         return this
     }
+}
+
+@Serializable
+sealed class SwitchablePortableLight : LitThing() {
+    override fun isPortable() = true
+    override fun glyph() = if (active) glyphLit() else glyphDark()
+    abstract fun glyphLit(): Glyph
+    abstract fun glyphDark(): Glyph
+
+    override fun toolbarName() = "turn ${name()} " + if (active) "off" else "on"
+    override fun toolbarUseTag() = UseTag.SWITCH
+
+    override fun uses() = mapOf(
+        UseTag.SWITCH to Use(toolbarName(), 0.25f,
+            canDo =  { actor,x,y,targ -> isHeldBy(actor) || isNextTo(actor) },
+            toDo = { actor,level,x,y ->
+                if (active) {
+                    Console.sayAct("You turn off your %d.", "%Dn turns off %dd.", actor, this)
+                    active = false
+                    level.removeLightSource(this)
+                } else {
+                    active = true
+                    level.addLightSource(x, y, this)
+                    Console.sayAct("You turn on your %d.", "%Dn turns on %id.", actor, this)
+                }
+            }),
+    )
+}
+
+@Serializable
+class Flashlight : SwitchablePortableLight() {
+    override val tag = Tag.FLASHLIGHT
+    override fun glyphLit() = Glyph.FLASHLIGHT
+    override fun glyphDark() = Glyph.FLASHLIGHT
+    override fun name() = "flashlight"
+    override fun description() = "A metal tube with a bulb on one end.  You can't imagine how it works."
+    override val lightColor = LightColor(0.4f, 0.5f, 0.5f)
+}
+
+@Serializable
+class Lantern : SwitchablePortableLight() {
+    override val tag = Tag.LANTERN
+    override fun glyphLit() = Glyph.LANTERN
+    override fun glyphDark() = Glyph.LANTERN
+    override fun name() = "lantern"
+    override fun description() = "A brass lantern."
+    override val lightColor = LightColor(0.5f, 0.4f, 0.4f)
 }
 
 @Serializable

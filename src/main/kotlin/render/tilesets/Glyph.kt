@@ -250,6 +250,7 @@ enum class Glyph(val tall: Boolean = false) {
     LAMPPOST_ON,
     STICK,
     BED,
+    LANTERN,
 
     BLOODSTAIN,
     SCORCHMARK,

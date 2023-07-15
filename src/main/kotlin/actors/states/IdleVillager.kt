@@ -8,7 +8,7 @@ import actors.actions.events.Event
 import actors.actions.events.Knock
 import kotlinx.serialization.Serializable
 import things.Door
-import things.SwitchableLight
+import things.SwitchablePlacedLight
 import things.Thing
 import util.*
 
@@ -84,8 +84,8 @@ class IdleVillager(
                 }
             }
 
-            entitiesSeen { it is SwitchableLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
-                if ((light as SwitchableLight).active && previousTargetJob.contains(light) && (targetJob != previousTargetJob) &&
+            entitiesSeen { it is SwitchablePlacedLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
+                if ((light as SwitchablePlacedLight).active && previousTargetJob.contains(light) && (targetJob != previousTargetJob) &&
                     previousTargetJob.contains(npc) && previousTargetJob.villagerCount(level()) <= 1) {
                     // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
                     pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
