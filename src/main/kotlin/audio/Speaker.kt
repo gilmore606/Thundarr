@@ -164,7 +164,7 @@ object Speaker {
         SFX.values().forEach { sfx ->
             sfxFiles[sfx] = mutableListOf<Sound>().apply {
                 sfx.files.forEach { add(
-                    audio.newSound(Gdx.files.internal("sounds/${it}"))
+                    audio.newSound(Gdx.files.internal("res/sounds/${it}"))
                 )}
             }
         }
@@ -214,7 +214,7 @@ object Speaker {
     fun requestSong(request: Song) {
         musicDecks.forEach { it.requestFadeout() }
 
-        musicDecks.add(Deck(audio.newMusic(Gdx.files.internal("sounds/music/${request.file}"))))
+        musicDecks.add(Deck(audio.newMusic(Gdx.files.internal("res/sounds/music/${request.file}"))))
     }
 
     fun clearMusic() {
@@ -223,7 +223,7 @@ object Speaker {
 
     fun requestAmbience(request: Ambience) {
         if (request !in ambiDecks.keys) {
-            ambiDecks[request] = Deck(audio.newMusic(Gdx.files.internal("sounds/${request.file}")), false)
+            ambiDecks[request] = Deck(audio.newMusic(Gdx.files.internal("res/sounds/${request.file}")), false)
         } else {
             ambiDecks[request]?.abortDone()
         }

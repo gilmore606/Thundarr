@@ -66,7 +66,7 @@ class NoisePatch(
 object NoisePatches {
     val json = Json { ignoreUnknownKeys = true }
     val patches: MutableMap<String, NoisePatch> = json.decodeFromString(
-        Gdx.files.internal("noisepatches.json").readString()
+        Gdx.files.internal("res/noise/noisepatches.json").readString()
     )
 
     fun get(patch: String, x: Int, y: Int) = patches[patch]?.value(x,y) ?: throw RuntimeException("Non-existent noise patch $patch !")

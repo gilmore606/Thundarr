@@ -1,10 +1,8 @@
 package world.gen.cartos
 
-import actors.Actor
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import things.LitThing
 import kotlin.random.Random
 import things.Thing
 import util.*
@@ -280,7 +278,7 @@ abstract class Carto(
 
     protected fun getPrefab(): Prefab {
         val tiledFile = json.decodeFromString<TiledFile>(
-            Gdx.files.internal("prefabs/building1.json").readString()
+            Gdx.files.internal("res/prefabs/building1.json").readString()
         )
         val prefab = Prefab(tiledFile)
         return prefab

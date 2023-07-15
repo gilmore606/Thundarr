@@ -14,22 +14,22 @@ object SpriteSheets {
         val filter: Texture.TextureFilter = Texture.TextureFilter.Nearest
     ) {
         ActorSprites(
-            "sheets/tiles_mob.png", 11, 11, Screen.textureFilter
+            "res/sheets/tiles_mob.png", 11, 11, Screen.textureFilter
         ),
         TerrainSprites(
-            "sheets/tiles_terrain.png", 12, 14, Screen.textureFilter
+            "res/sheets/tiles_terrain.png", 12, 14, Screen.textureFilter
         ),
         ThingSprites(
-            "sheets/tiles_thing.png", 13, 11, Screen.textureFilter
+            "res/sheets/tiles_thing.png", 13, 11, Screen.textureFilter
         ),
         UISprites(
-            "sheets/tiles_ui.png", 6, 7, Texture.TextureFilter.Nearest
+            "res/sheets/tiles_ui.png", 6, 7, Texture.TextureFilter.Nearest
         ),
         MapSprites(
-            "sheets/tiles_map.png", 10, 8, Screen.textureFilter
+            "res/sheets/tiles_map.png", 10, 8, Screen.textureFilter
         ),
         PortraitSprites(
-            "sheets/tiles_portrait.png", 10, 10, Texture.TextureFilter.Nearest
+            "res/sheets/tiles_portrait.png", 10, 10, Texture.TextureFilter.Nearest
         )
     }
 

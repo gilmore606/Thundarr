@@ -110,31 +110,31 @@ object Screen : KtxScreen {
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val fontColorRed = Color(1f, 0.1f, 0.1f, 1f)
     val fontColorGreen = Color(0.1f, 1f, 0.1f, 1f)
-    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/amstrad.ttf"))
+    val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("res/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize
-            borderWidth = 2.3f
-            spaceX = -1
+            borderWidth = 1.8f
+            spaceX = 0
             kerning = true
             genMipMaps = true
             minFilter = TextureFilter.MipMapLinearLinear
             magFilter = TextureFilter.MipMapLinearLinear
             color = Color(1f, 1f, 0.8f, 0.9f)
-            borderColor = Color(0f, 0f, 0f, 0.5f)
+            borderColor = Color(0f, 0f, 0f, 1f)
         })
-    val smallFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/amstrad.ttf"))
+    val smallFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("res/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSizeSmall
-            borderWidth = 2f
-            spaceX = -1
+            borderWidth = 0.7f
+            spaceX = 0
             kerning = true
             genMipMaps = true
             minFilter = TextureFilter.MipMapLinearLinear
             magFilter = TextureFilter.MipMapLinearLinear
             color = Color(1f, 1f, 0.8f, 0.9f)
-            borderColor = Color(0f, 0f, 0f, 0.5f)
+            borderColor = Color(0f, 0f, 0f, 1f)
         })
-    val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/worldOfWater.ttf"))
+    val titleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("res/font/worldOfWater.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = titleFontSize
             borderWidth = 3f
@@ -146,7 +146,7 @@ object Screen : KtxScreen {
             color = Color(1f, 0.9f, 0.2f, 1f)
             borderColor = Color(0f, 0f, 0f, 0.8f)
         })
-    val subTitleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("font/worldOfWater.ttf"))
+    val subTitleFont: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("res/font/worldOfWater.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = subTitleFontSize
             borderWidth = 2f

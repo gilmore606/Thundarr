@@ -22,7 +22,7 @@ class RainBatch : RenderBatch() {
 
     val startTime = System.currentTimeMillis()
 
-    private val rainMask = Texture(Gdx.files.internal("mask_rainfall.png"), true).apply {
+    private val rainMask = Texture(Gdx.files.internal("res/masks/mask_rainfall.png"), true).apply {
         setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.Repeat)
         log.info("Loaded weather texture mask_rainfall.png ($width x $height)")
