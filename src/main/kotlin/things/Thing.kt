@@ -148,6 +148,9 @@ sealed class Thing() : Entity {
         BED("bed", "beds", { Bed() }),
         FLASHLIGHT("flashlight", "flashlights", { Flashlight() }),
         LANTERN("lantern", "lanterns", { Lantern() }),
+        HAMMER("hammer", "hammers", { Hammer() }),
+        KNIFE("knife", "knives", { Knife() }),
+        GLADIUS("gladius", "gladii", { Gladius() }),
         ;
     }
 

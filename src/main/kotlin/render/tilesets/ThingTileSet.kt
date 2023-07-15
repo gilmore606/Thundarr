@@ -158,4 +158,9 @@ fun ThingTileSet() =
         setTile(Glyph.STICK, SimpleTile(this, 7, 3))
         setTile(Glyph.BED, SimpleTile(this, 11, 6))
         setTile(Glyph.LANTERN, SimpleTile(this, 8, 10))
+        setTile(Glyph.HAMMER, SimpleTile(this, 9, 9))
+        setTile(Glyph.KNIFE_WORN, SimpleTile(this, 11, 7))
+        setTile(Glyph.KNIFE, SimpleTile(this, 12, 7))
+        setTile(Glyph.SWORD_WORN, SimpleTile(this, 11, 8))
+        setTile(Glyph.SWORD, SimpleTile(this, 12, 8))
     }

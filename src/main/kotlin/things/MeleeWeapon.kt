@@ -115,9 +115,44 @@ class Rock : MeleeWeapon() {
 }
 
 @Serializable
+class Hammer : MeleeWeapon() {
+    override val tag = Tag.HAMMER
+    override fun name() = "hammer"
+    override fun description() = "A simple ball-peen hammer."
+    override fun glyph() = Glyph.HAMMER
+    override fun weight() = 0.6f
+}
+
+@Serializable
+class Knife : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.KNIFE_WORN)
+    }
+    override val tag = Tag.KNIFE
+    override fun name() = "knife"
+    override fun description() = "A single-edged survival knife."
+    override fun glyph() = Glyph.KNIFE
+    override fun weight() = 0.2f
+    override fun glyphTransform() = glyphTransform
+}
+
+@Serializable
+class Gladius : MeleeWeapon() {
+    companion object {
+        val glyphTransform = GlyphTransform(Glyph.SWORD_WORN)
+    }
+    override val tag = Tag.GLADIUS
+    override fun name() = "gladius"
+    override fun description() = "A double edged iron short sword."
+    override fun glyph() = Glyph.SWORD
+    override fun weight() = 0.5f
+    override fun glyphTransform() = glyphTransform
+}
+
+@Serializable
 class StoneAxe : MeleeWeapon() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+        val glyphTransform = GlyphTransform(Glyph.AXE)
     }
     override val tag = Tag.STONE_AXE
     override fun glyphTransform() = glyphTransform
@@ -133,7 +168,7 @@ class StoneAxe : MeleeWeapon() {
 @Serializable
 class Axe : MeleeWeapon() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+        val glyphTransform = GlyphTransform(Glyph.AXE)
     }
     override val tag = Tag.AXE
     override fun glyphTransform() = glyphTransform
@@ -148,7 +183,7 @@ class Axe : MeleeWeapon() {
 @Serializable
 class Pickaxe : MeleeWeapon() {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.AXE, 0.0f, -0.1f, false)
+        val glyphTransform = GlyphTransform(Glyph.AXE)
     }
     override val tag = Tag.PICKAXE
     override fun glyphTransform() = glyphTransform
@@ -169,7 +204,7 @@ class Pickaxe : MeleeWeapon() {
 @Serializable
 class Sunsword : MeleeWeapon(), LightSource {
     companion object {
-        val glyphTransform = GlyphTransform(Glyph.SUNSWORD_LIT, 0.0f, -0.1f, false)
+        val glyphTransform = GlyphTransform(Glyph.SUNSWORD_LIT)
         val lightColor = LightColor(0.1f, 0.3f, 0.3f)
     }
     override val tag = Tag.SUNSWORD

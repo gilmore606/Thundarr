@@ -251,7 +251,11 @@ enum class Glyph(val tall: Boolean = false) {
     STICK,
     BED,
     LANTERN,
-
+    HAMMER,
+    KNIFE,
+    KNIFE_WORN,
+    SWORD,
+    SWORD_WORN,
     BLOODSTAIN,
     SCORCHMARK,
 

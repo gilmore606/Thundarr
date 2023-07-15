@@ -26,7 +26,7 @@ class GearModal(
     var childDeployed = false
 
     init {
-        zoomWhenOpen = 1.6f
+        zoomWhenOpen = 1.8f
         selectionBoxHeight = 18
         spacing = 32
         headerPad = 80
