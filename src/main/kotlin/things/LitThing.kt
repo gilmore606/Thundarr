@@ -91,16 +91,6 @@ sealed class LitThing : Portable(), LightSource {
 }
 
 @Serializable
-class Lightbulb : LitThing() {
-    override val tag = Tag.LIGHTBULB
-    override fun glyph() = Glyph.LIGHTBULB
-    override fun name() = "lightbulb"
-    override fun description() = "A light bulb with no obvious power source.  Why is this even here?"
-    override val lightColor = LightColor(0.7f, 0.6f, 0.3f)
-    override fun onCreate() { active = true }
-}
-
-@Serializable
 class CeilingLight : LitThing(), Smashable {
     override val tag = Tag.CEILING_LIGHT
     var broken = false

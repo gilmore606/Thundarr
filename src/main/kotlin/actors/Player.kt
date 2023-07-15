@@ -33,6 +33,8 @@ import world.level.EnclosedLevel
 import world.level.WorldLevel
 import world.stains.Fire
 import world.terrains.Terrain
+import java.lang.Float.max
+import java.lang.Float.min
 
 @Serializable
 open class Player : Actor(), Workbench {
@@ -315,20 +317,27 @@ open class Player : Actor(), Workbench {
     }
 
     fun addWetness(amount: Float, max: Float = 1f) {
-        val wetStatus = status(Status.Tag.WET) as Wet?
-        val current = wetStatus?.let { (it as Wet).wetness } ?: 0f
-        if (current <= 0f) {
-            addStatus(Wet().apply { wetness = amount })
-        } else {
-            wetStatus?.addWetness(amount)
+        if (!Dice.chance(weatherProtection())) {
+            val wetStatus = status(Status.Tag.WET) as Wet?
+            val current = wetStatus?.let { (it as Wet).wetness } ?: 0f
+            if (current <= 0f) {
+                addStatus(Wet().apply { wetness = amount })
+            } else {
+                wetStatus?.addWetness(amount)
+            }
         }
     }
+
+    private fun coldProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.coldProtection() * it.slot.coldProtection })
+    private fun heatProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.heatProtection() * it.slot.heatProtection })
+    private fun weatherProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.weatherProtection() * it.slot.weatherProtection })
 
     private fun updateTemperature() {
         level?.also { level ->
             temperature = level.temperatureAt(xy)
-            feltTemperature = temperature + App.weather.feltTemperature()
-            feltTemperature += App.player.status(Status.Tag.WET)?.let { (it as Wet).temperatureMod() } ?: 0
+            var weatherProtection = weatherProtection()
+            var heatProtection = heatProtection()
+            var coldProtection = coldProtection()
 
             var fireheat = 0
             forXY(xy.x-3,xy.y-3, xy.x+3,xy.y+3) { ix, iy ->
@@ -337,43 +346,38 @@ open class Player : Actor(), Workbench {
                     fireheat += (fire as Fire).temperatureAtDistance(distance)
                 }
             }
-            feltTemperature += fireheat
+            temperature += fireheat
 
-            var clothing = 0
-            gear.values.forEach { gear ->
-                if (gear is Clothing) {
-                    clothing += gear.wornTemperature()
-                }
-            }
-            if (clothing > 0) {
-                if (temperature > 68) {
-                    feltTemperature += clothing / 2
-                } else {
-                    feltTemperature += clothing
-                }
-            } else if (clothing < 0) {
-                if (temperature < 50) {
-                    feltTemperature += clothing
-                } else {
-                    feltTemperature += clothing / 2
-                }
-            }
+            feltTemperature = temperature
+
             if (hasStatus(Status.Tag.ASLEEP)) {
                 level.thingsAt(xy.x, xy.y).firstOrNull { it is GenericBed }?.also {
-                    if (temperature > 68) {
-                        feltTemperature -= 5
-                    } else if (temperature < 50) {
-                        feltTemperature += 15
-                    }
+                    weatherProtection = max(weatherProtection, 0.8f)
+                    coldProtection = max(coldProtection, 0.7f)
                 } ?: run {
-                    if (temperature < 50) {
-                        feltTemperature -= 5
+                    if (temperature < 55) {
+                        feltTemperature -= 8
                     }
                 }
                 if (!level.isRoofedAt(xy.x, xy.y)) {
                     feltTemperature += if (temperature < 50) -8 else 0
                 }
             }
+
+            if (feltTemperature > 75) {
+                var excess = (feltTemperature - 75).toFloat()
+                excess *= (1f - heatProtection + coldProtection * 0.5f)
+                feltTemperature = 75 + excess.toInt()
+            } else if (feltTemperature < 55) {
+                var excess = (feltTemperature - 55).toFloat()
+                excess *= (1f - coldProtection)
+                feltTemperature = 55 + excess.toInt()
+            }
+
+            val weatherTemperature = (App.weather.weatherTemperature() * (1f - weatherProtection)).toInt()
+            feltTemperature += weatherTemperature
+            feltTemperature += App.player.status(Status.Tag.WET)?.let { (it as Wet).temperatureMod() } ?: 0
+
 
             if (feltTemperature > Heatstroke.threshold) {
                 removeStatus(Status.Tag.HOT)

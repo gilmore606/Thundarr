@@ -235,6 +235,12 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
     return str
 }
 
+fun <T>List<T>.sumOf(selector: (T)->Float): Float {
+    var sum = 0f
+    forEach { sum += selector.invoke(it) }
+    return sum
+}
+
 fun <T>MutableSet<Pair<T,Float>>.addIfHeavier(item: T, weight: Float) {
     removeIf { it.first == item && it.second < weight }
     add(Pair(item, weight))

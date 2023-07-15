@@ -13,7 +13,7 @@ import java.lang.Integer.min
 
 class GearModal(
     private val thingHolder: ThingHolder
-) : SelectionModal(300, 350, "- gEAr -", default = 0), ContextMenu.ParentModal {
+) : SelectionModal(300, 385, "- gEAr -", default = 0), ContextMenu.ParentModal {
 
     class SlotMenu(
         val name: String,

@@ -11,15 +11,26 @@ import util.toEnglishList
 sealed class Gear : Portable(), StatEffector {
 
     enum class Slot(val duration: Float, val title: String, val where: String,
-                    val verb: String, val unverb: String, val drawOrder: Int) {
-        MELEE(0.5f, "melee", "as melee", "wield", "put away", 0),
-        RANGED(0.5f, "ranged", "as ranged", "ready", "unready", 1),
-        HEAD(0.6f, "head", "on head", "wear", "remove", 2),
-        NECK(1.0f, "neck", "around neck", "wear", "remove", 3),
-        HANDS(1.5f, "hands", "on hands", "wear", "remove", 4),
-        TORSO(1.5f, "torso", "on torso", "wear", "remove", 5),
-        LEGS(2.0f, "legs", "on legs", "wear", "remove", 7),
-        FEET(2.0f, "feet", "on feet", "wear", "remove", 6)
+                    val verb: String, val unverb: String, val equippedTag: String,
+                    val drawOrder: Int, val coldProtection: Float, val heatProtection: Float, val weatherProtection: Float) {
+        MELEE(0.5f, "melee", "as melee", "wield", "put away", "ready",
+            1, 0f, 0f, 0f),
+        RANGED(0.5f, "ranged", "as ranged", "ready", "unready", "ready",
+            2, 0f, 0f, 0f),
+        HEAD(0.6f, "head", "on head", "wear", "remove", "worn",
+            3, 0.3f, 0.3f, 0.4f),
+        NECK(1.0f, "neck", "around neck", "wear", "remove", "worn",
+            4, 0.3f, 0f, 0f),
+        HANDS(1.5f, "hands", "on hands", "wear", "remove", "worn",
+            5, 0.3f, 0f, 0f),
+        TORSO(1.5f, "torso", "on torso", "wear", "remove", "worn",
+            6, 0.3f, 0.2f, 0.5f),
+        CLOAK(1.0f, "cloak", "around body", "wear", "remove", "worn",
+            0, 0.5f, 0.6f, 0.8f),
+        LEGS(2.0f, "legs", "on legs", "wear", "remove", "worn",
+            7, 0.3f, 0f, 0.3f),
+        FEET(2.0f, "feet", "on feet", "wear", "remove", "worn",
+            8, 0.3f, 0f, 0.3f),
     }
 
     class GlyphTransform(
@@ -30,7 +41,7 @@ sealed class Gear : Portable(), StatEffector {
     )
 
     companion object {
-        val slots = listOf(Slot.MELEE, Slot.RANGED, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.LEGS, Slot.FEET)
+        val slots = listOf(Slot.MELEE, Slot.RANGED, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.CLOAK, Slot.LEGS, Slot.FEET)
         val glyphTransform = GlyphTransform(Glyph.BLANK, 0.0f, 0.0f, false)
     }
 
@@ -48,7 +59,7 @@ sealed class Gear : Portable(), StatEffector {
     override fun spawnContainers() = mutableListOf(
         Tag.WARDROBE, Tag.WRECKEDCAR, Tag.BONEPILE
     )
-    override fun listTag() = if (equipped) "(equipped)" else ""
+    override fun listTag() = if (equipped) "(${slot.equippedTag})" else ""
 
     override fun onDropping(actor: Actor, dest: ThingHolder) {
         this.equipped = false

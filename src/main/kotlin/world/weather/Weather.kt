@@ -1,7 +1,5 @@
 package world.weather
 
-import actors.statuses.Status
-import actors.statuses.Wet
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import ui.panels.Console
@@ -40,9 +38,8 @@ class Weather {
     fun clouds() = cloudIntensity
     fun rain() = rainIntensity
 
-    fun temperature() = (-4f * windSpeed + -5f * rainIntensity + -5f * cloudIntensity).toInt()
-
-    fun feltTemperature() = (-6f * windSpeed + -6f * rainIntensity).toInt()
+    fun temperature() = (-3f * windSpeed + -4f * rainIntensity + -7f * cloudIntensity).toInt()
+    fun weatherTemperature() = (-6f * windSpeed) + (-5f * rainIntensity)
 
     fun shouldRaindrop(): Boolean {
         framesBeforeRaindrop--
@@ -179,6 +176,7 @@ class Weather {
     }
 
     private fun updatePlayerWetness() {
+        if (Dice.chance(0.6f)) return
         if (rainIntensity > 0.1f) {
             if (App.player.level?.isRoofedAt(App.player.xy.x, App.player.xy.y) == false) {
                 App.player.addWetness(rainIntensity * 0.2f, min(1f, rainIntensity * 2f))
