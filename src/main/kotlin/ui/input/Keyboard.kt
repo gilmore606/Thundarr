@@ -177,7 +177,10 @@ object Keyboard : KtxInputAdapter {
         }
 
         when (keycode) {
-            ENTER -> { lastKey = -1 ; if (ALT) Screen.toggleFullscreen() }
+            ENTER -> { lastKey = -1 ; if (ALT) {
+                Screen.toggleFullscreen()
+                return
+            } }
         }
 
         val key = keycodeToKeydef(keycode)

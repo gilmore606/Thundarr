@@ -342,14 +342,16 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                         zoomIn = 1.3f,
                         isJournal = true,
                         portrait = Glyph.PORTRAIT_ARIEL
-                    )
+                    ) {
+                        weather.flashLightning(LightColor(1f, 0.7f, 1f))
+                        player.tempInvisible = false
+                        player.animation = Bump(WEST)
+                        level.addSpark(Smoke().at(player.xy.x, player.xy.y))
+                    }
                 )
+                delay(800)
+                weather.flashLightning(LightColor(1f, 0.4f, 0.8f))
                 MagicPortal().spawnAt(level, App.player.xy.x + 1, App.player.xy.y)
-                delay(1400)
-                weather.flashLightning(LightColor(1f, 0.7f, 1f))
-                player.tempInvisible = false
-                player.animation = Bump(WEST)
-                level.addSpark(Smoke().at(player.xy.x, player.xy.y))
             }
         }
     }

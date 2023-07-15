@@ -131,7 +131,7 @@ class Poppies : Plant() {
 class Dandylions : Plant() {
     override val tag = Tag.DANDYLIONS
     override fun glyph() = Glyph.FLOWERS
-    override fun hue() = -1.8f
+    override fun hue() = -3.0f
     override fun name() = "dandylions"
 }
 

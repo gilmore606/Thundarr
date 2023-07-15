@@ -22,6 +22,7 @@ class BigSplashModal(
     private val isJournal: Boolean = false,
     private val portrait: Glyph? = null,
     splashPosition: Modal.Position = Modal.Position.LEFT,
+    private val afterDismiss: (()->Unit)? = null
 ) : Modal(400, 100, title, position = splashPosition){
 
     val portraitBatch = QuadBatch(Screen.portraitTileSet, maxQuads = 100)
@@ -35,7 +36,7 @@ class BigSplashModal(
     private val wrappedText = wrapText(text, width, padding, Screen.font)
     private val buttonWidth = measure(buttonLabel)
 
-    private var isHovered = false
+    private var isHovered = true
 
     init {
         zoomWhenOpen = zoomIn
@@ -107,5 +108,6 @@ class BigSplashModal(
         }
         dismissible = true
         dismiss()
+        afterDismiss?.invoke()
     }
 }

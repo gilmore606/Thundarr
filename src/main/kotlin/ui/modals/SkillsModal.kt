@@ -133,7 +133,7 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
             drawString(baseString, skillX+15, header + skillSpacing * n + 1, Screen.fontColorDull, Screen.smallFont)
             drawString((total - bonus).toInt().toString(), skillX+35, header + skillSpacing * n,
                 if (base < 1) Screen.fontColorDull else Screen.fontColorBold)
-            drawString(bonusString, skillX+38, header + skillSpacing * n,
+            drawString(bonusString, skillX+55, header + skillSpacing * n,
                 if (bonusString.startsWith('+')) Screen.fontColorGreen else Screen.fontColorRed, Screen.font)
         }
     }

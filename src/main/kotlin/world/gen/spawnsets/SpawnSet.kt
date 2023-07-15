@@ -5,7 +5,7 @@ import util.Dice
 import variants.Variant
 import world.Entity
 
-abstract class SpawnSet<S: Any, O: Entity, T>() {
+abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
 
     sealed class Entry<S,O,T> (
         val freq: Float,
@@ -32,7 +32,7 @@ abstract class SpawnSet<S: Any, O: Entity, T>() {
         }
     }
 
-    class SubsetEntry<S: Any, O: Entity, T>(
+    class SubsetEntry<S: Any, O: Entity, T: Any>(
         freq: Float,
         val subset: SpawnSet<S,O,T>,
         limit: Pair<Int,Int> = Pair(0,100)
