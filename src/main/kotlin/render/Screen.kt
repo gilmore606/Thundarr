@@ -743,17 +743,23 @@ object Screen : KtxScreen {
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
     fun tileYtoGly(row: Double) = ((row - (cameraPovY) - 0.5) * tileStride)
-    private fun screenXtoTileX(screenX: Int) = ((((((screenX.toFloat() - dragPixels.x) / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + cameraPovX).toInt()
-    private fun screenYtoTileY(screenY: Int) = ((((screenY.toFloat() - dragPixels.y) / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + cameraPovY).toInt()
     private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()
     private fun tileYtoScreenY(tileY: Int) = ((height / 2.0) + (tileY - pov.y - 0.5) * 0.5 * tileStride * height.toDouble()).toInt()
+    private fun screenXtoTileX(screenX: Int): Int {
+        val ix = (((((screenX.toFloat() - dragPixels.x) / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + cameraPovX
+        return ix.toInt() + (if (ix < 0.0) -1 else 0)
+    }
+    private fun screenYtoTileY(screenY: Int): Int {
+        val iy = (((screenY.toFloat() - dragPixels.y) / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + cameraPovY
+        return iy.toInt() + (if (iy < 0.0) -1 else 0)
+    }
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()
         tileStride = 1.0 / (height.coerceAtLeast(400).toDouble() * 0.01) * zoom
         renderTilesWide = kotlin.math.min(MAX_RENDER_WIDTH, ((width.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
         renderTilesHigh = kotlin.math.min(MAX_RENDER_HEIGHT, ((height.toDouble() * tileStride / zoom / zoom) / 2 + 1).toInt())
-        log.debug("new surface params aspect $aspectRatio stride $tileStride, $renderTilesWide by $renderTilesHigh tiles")
+        log.debug("SCREEN RESIZE: new surface params aspect $aspectRatio stride $tileStride, $renderTilesWide by $renderTilesHigh tiles")
     }
 
     fun advanceTime(turns: Float) {
