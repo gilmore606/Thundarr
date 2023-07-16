@@ -98,8 +98,8 @@ sealed class Level {
         delta: Float
     ) {
         var minOutdoorDist = 100
-        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x)
-        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y)
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x).toInt()
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y).toInt()
         for (x in povX - Screen.renderTilesWide / 2 until povX + Screen.renderTilesWide / 2) {
             for (y in povY - Screen.renderTilesHigh / 2 until povY + Screen.renderTilesHigh / 2) {
                 chunkAt(x, y)?.also { chunk ->
@@ -149,8 +149,8 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit, delta: Float
     ) {
-        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x)
-        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y)
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x).toInt()
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y).toInt()
         for (x in povX - Screen.renderTilesWide/2 until povX + Screen.renderTilesWide/2) {
             for (y in povY - Screen.renderTilesHigh/2 until povY + Screen.renderTilesHigh/2) {
                 val thingsAt = thingsAt(x,y)
@@ -526,7 +526,7 @@ sealed class Level {
             if (actor !is Player) {
                 actorAt = actor
                 menu.addOption("examine " + actor.name()) {
-                    Screen.addModal(ExamineModal(actor))
+                    Screen.addModal(ExamineModal(actor, Modal.Position.CENTER_LOW))
                 }
             }
         }
