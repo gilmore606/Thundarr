@@ -34,6 +34,9 @@ class Aurox : NPC() {
 
     override fun onDeath(corpse: Container?) {
         corpse?.also { RawMeat().moveTo(it) }
+        if (Dice.chance(0.5f)) {
+            corpse?.also { Hide().moveTo(it) }
+        }
     }
 }
 
@@ -60,7 +63,7 @@ class MuskOx : NPC() {
 
     override fun onDeath(corpse: Container?) {
         corpse?.also { RawMeat().moveTo(it) }
-        if (Dice.chance(0.5f)) {
+        if (Dice.chance(0.8f)) {
             corpse?.also { Hide().moveTo(it) }
         }
     }

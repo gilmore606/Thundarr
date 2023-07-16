@@ -152,6 +152,7 @@ sealed class Thing() : Entity {
         STONE_AXE("stone axe", "stone axes", { StoneAxe() }),
         AXE("axe", "axes", { Axe() }),
         PICKAXE("pickaxe", "pickaxes", { Pickaxe() }),
+        PITCHFORK("pitchfork", "pitchforks", { Pitchfork() }),
         HAMMER("hammer", "hammers", { Hammer() }),
         KNIFE("knife", "knives", { Knife() }),
         GLADIUS("gladius", "gladii", { Gladius() }),

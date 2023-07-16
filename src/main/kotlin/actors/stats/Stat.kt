@@ -43,7 +43,7 @@ abstract class Stat(
             Tag.CLUBS -> Clubs
             Tag.GUNS -> Guns
             Tag.SPEARS -> Spears
-            Tag.SWORDS -> Swords
+            Tag.SWORDS -> Blades
             Tag.SCIENCE -> Science
             Tag.CRAFT -> Craft
         }

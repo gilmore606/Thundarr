@@ -98,8 +98,10 @@ sealed class Level {
         delta: Float
     ) {
         var minOutdoorDist = 100
-        for (x in pov.x - Screen.renderTilesWide / 2 until pov.x + Screen.renderTilesWide / 2) {
-            for (y in pov.y - Screen.renderTilesHigh / 2 until pov.y + Screen.renderTilesHigh / 2) {
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x)
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y)
+        for (x in povX - Screen.renderTilesWide / 2 until povX + Screen.renderTilesWide / 2) {
+            for (y in povY - Screen.renderTilesHigh / 2 until povY + Screen.renderTilesHigh / 2) {
                 chunkAt(x, y)?.also { chunk ->
                     val vis = if (App.DEBUG_VISIBLE) 1f else chunk.visibilityAt(x, y)
                     val terrain = Terrain.get(chunk.getTerrain(x, y))
@@ -147,8 +149,10 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit, delta: Float
     ) {
-        for (x in pov.x - Screen.renderTilesWide/2 until pov.x + Screen.renderTilesWide/2) {
-            for (y in pov.y - Screen.renderTilesHigh/2 until pov.y + Screen.renderTilesHigh/2) {
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x)
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y)
+        for (x in povX - Screen.renderTilesWide/2 until povX + Screen.renderTilesWide/2) {
+            for (y in povY - Screen.renderTilesHigh/2 until povY + Screen.renderTilesHigh/2) {
                 val thingsAt = thingsAt(x,y)
                 val vis =  if (App.DEBUG_VISIBLE) 1f else visibilityAt(x, y)
                 if (thingsAt.isNotEmpty() && vis > 0f) {

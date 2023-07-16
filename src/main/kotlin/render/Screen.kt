@@ -202,9 +202,11 @@ object Screen : KtxScreen {
         )
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
-        lightCache[lx][ly].r = light.r
-        lightCache[lx][ly].g = light.g
-        lightCache[lx][ly].b = light.b
+        if (lx in 0..lightCache.lastIndex && ly in 0..lightCache[0].lastIndex) {
+            lightCache[lx][ly].r = light.r
+            lightCache[lx][ly].g = light.g
+            lightCache[lx][ly].b = light.b
+        }
     }
 
     private val renderQuad: (Double, Double, Double, Double, Float, Float, Float, Float, Float, Glyph, LightColor, Boolean)->Unit =
@@ -229,13 +231,14 @@ object Screen : KtxScreen {
     private val renderThing: (Int, Int, Thing, Float)->Unit = { tx, ty, thing, vis ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
+        val cachedLight = if (lx in 0..lightCache.lastIndex && ly in 0..lightCache[0].lastIndex) lightCache[lx][ly] else fullLight
         thingBatch.addTileQuad(
             tx, ty, thingBatch.getTextureIndex(thing.glyph(), App.level, tx, ty),
-            vis, lightCache[lx][ly], hue = thing.hue())
+            vis, cachedLight, hue = thing.hue())
         if (vis == 1f) {
             thing.drawExtraGlyphs { glyph, hue, offX, offY ->
                 thingBatch.addTileQuad(tx, ty, thingBatch.getTextureIndex(glyph, App.level, tx, ty),
-                    vis, lightCache[lx][ly], hue = hue, offsetX = offX, offsetY = offY)
+                    vis, cachedLight, hue = hue, offsetX = offX, offsetY = offY)
             }
         }
     }
@@ -247,7 +250,7 @@ object Screen : KtxScreen {
     private val renderActor: (Int, Int, Actor, Float)->Unit = { tx, ty, actor, vis ->
         val lx = tx - pov.x + renderTilesWide
         val ly = ty - pov.y + renderTilesHigh
-        val light = if (lx < lightCache.size && ly < lightCache[0].size && lx >= 0 && ly >= 0) lightCache[lx][ly] else fullDark
+        val light = if(lx in 0..lightCache.lastIndex && ly in 0..lightCache[0].lastIndex) lightCache[lx][ly] else fullDark
 
         val shadow = if (Terrain.get(actor.level?.getTerrain(actor.xy.x, actor.xy.y) ?: Terrain.Type.BLANK) is Water)
             Glyph.MOB_WATER_SHADOW else Glyph.MOB_SHADOW
@@ -741,6 +744,8 @@ object Screen : KtxScreen {
 
     }
 
+    fun grayOutLevel() = if (dragPixels.x != 0 || dragPixels.y != 0) 0.5f else 0.8f
+
     fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
     fun tileYtoGly(row: Double) = ((row - (cameraPovY) - 0.5) * tileStride)
     private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()
@@ -753,6 +758,8 @@ object Screen : KtxScreen {
         val iy = (((screenY.toFloat() - dragPixels.y) / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + cameraPovY
         return iy.toInt() + (if (iy < 0.0) -1 else 0)
     }
+    fun pxToTiles(p: Int): Int = ((p.toFloat() / width.toFloat() * 2f) * aspectRatio / tileStride).toInt()
+    fun pyToTiles(p: Int): Int = ((p.toFloat() / height.toFloat() * 2f) / tileStride).toInt()
 
     private fun updateSurfaceParams() {
         aspectRatio = width.toDouble() / height.toDouble()

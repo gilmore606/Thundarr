@@ -88,7 +88,7 @@ class QuadBatch(
         val lightR = min(visibility, light.r + App.level.weather.lightning.r) * Screen.brightness
         val lightG = min(visibility, light.g + App.level.weather.lightning.g) * Screen.brightness
         val lightB = min(visibility, light.b + App.level.weather.lightning.b) * Screen.brightness
-        val grayOut = grayBlend ?: if (visibility < 1f) 1f else App.level.weather.lightning.r * 0.6f
+        val grayOut = grayBlend ?: if (visibility < 1f) Screen.grayOutLevel() else App.level.weather.lightning.r * 0.6f
         val itx0 = if (mirror) 0.98f else 0f
         val itx1 = if (mirror) 0.02f else 1f
         addQuad(x0, y0, x1, y1, itx0, 0f, itx1, if (isTall) 2f else 1f, textureIndex, lightR, lightG, lightB, alpha, grayOut, hue, rotate, waves)
