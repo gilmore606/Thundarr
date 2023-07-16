@@ -21,6 +21,7 @@ import render.tilesets.Glyph
 import things.*
 import things.recipes.ImprovRecipe
 import things.recipes.Recipe
+import ui.modals.BigSplashModal
 import ui.modals.WorkbenchModal
 import ui.panels.Console
 import ui.panels.TimeButtons
@@ -133,9 +134,17 @@ open class Player : Actor(), Workbench {
     override fun die() {
         super.die()
         KtxAsync.launch {
-            Screen.brightnessTarget = 0f
             delay(1000L)
-            App.wipeStateAndReturnToMenu()
+            Screen.addModal(BigSplashModal(
+                "You hAVe diED",
+                "Thundarr's journey is \nat an end.",
+                "...",
+                zoomIn = 1.5f,
+                portrait = Glyph.PORTRAIT_THUNDARR
+            ) {
+                Screen.brightnessTarget = 0f
+                App.wipeStateAndReturnToMenu()
+            })
         }
     }
 
