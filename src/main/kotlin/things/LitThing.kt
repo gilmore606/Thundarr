@@ -8,7 +8,6 @@ import render.tilesets.Glyph
 import ui.panels.Console
 import util.Dice
 import util.LightColor
-import util.hasOneWhere
 import java.lang.Float.max
 import kotlin.random.Random
 
@@ -236,20 +235,25 @@ class Lantern : SwitchablePortableLight() {
 }
 
 @Serializable
-class Torch : LitThing(), Temporal {
-    override val tag = Tag.TORCH
-    private var fuel = 2000f
-    override fun glyph() = if (active) Glyph.TORCH_LIT else Glyph.TORCH
+sealed class GenericTorch : LitThing(), Temporal {
+    private var torchFuel = 0f
+    open fun torchFuelMax() = 300f
+
+    open fun glyphLit() = Glyph.TORCH_LIT
+    abstract fun glyphUnlit(): Glyph
+    override fun glyph() = if (active) glyphLit() else glyphUnlit()
     override fun name() = "torch"
     override fun description() = "A branch dipped in pitch tar."
     override fun extinguishMsg() = "%Dn sputters and dies."
     override fun extinguishSelfMsg() = "Your %d sputters and dies."
     override fun extinguishOtherMsg() = "%Dn's %d sputters and dies."
-    override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
 
     private val smokeChance = 1.1f
 
-    override fun onCreate() { active = false }
+    override fun onCreate() {
+        active = false
+        torchFuel = torchFuelMax()
+    }
 
     override fun light() = if (active) lightColor else null
     override fun canLightFires() = active
@@ -275,13 +279,13 @@ class Torch : LitThing(), Temporal {
     }
 
     override fun advanceTime(delta: Float) {
-        if (fuel >= 0f) {
-            fuel -= delta
-            if (fuel < 200f) {
+        if (torchFuel >= 0f) {
+            torchFuel -= delta
+            if (torchFuel < 200f) {
                 lightColor.r = max(0.15f, lightColor.r - delta * 0.0015f)
                 lightColor.g = max(0f, lightColor.g - delta * 0.0035f)
                 lightColor.b = max(0f, lightColor.b - delta * 0.0025f)
-                if (fuel < 0f) {
+                if (torchFuel < 0f) {
                     becomeDark()
                     moveTo(null)
                 } else {
@@ -290,4 +294,24 @@ class Torch : LitThing(), Temporal {
             }
         }
     }
+}
+
+@Serializable
+class Torch : GenericTorch() {
+    override val tag = Tag.TORCH
+    override fun glyphUnlit() = Glyph.TORCH
+    override fun torchFuelMax() = 2500f
+    override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
+}
+
+@Serializable
+class Stick : GenericTorch(), Fuel {
+    override val tag = Tag.STICK
+    override fun glyphUnlit() = Glyph.STICK
+    override fun name() = "stick"
+    override fun description() = "A long wooden stick.  You could burn it, or make something out of it."
+    override var fuel = 40f
+    override fun torchFuelMax() = 900f
+    override val lightColor = LightColor(0.4f, 0.2f, 0.1f)
+    override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
 }

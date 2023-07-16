@@ -34,7 +34,7 @@ interface Entity {
     fun inamec() = if (hasProperName()) name() else name().aOrAn().capitalize()
     fun description(): String
     fun examineDescription(): String = description()
-    fun examineInfo(): String = "You don't know anything interesting about " + iname() + "."
+    fun examineInfo(): String = ""
     fun gender(): Gender = Gender.NEUTER
 
     fun level(): Level?

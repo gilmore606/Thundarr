@@ -63,21 +63,6 @@ class Teeth : MeleeWeapon() {
 }
 
 @Serializable
-class Stick : MeleeWeapon(), Fuel {
-    companion object {
-        val glyphTransform = GlyphTransform(Glyph.STICK, 0.0f, -0.1f, false)
-    }
-    override val tag = Tag.STICK
-    override fun glyphTransform() = glyphTransform
-    override fun glyph() = Glyph.STICK
-    override fun name() = "stick"
-    override fun description() = "A sturdy wood branch.  You could hit people with it, or make something out of it."
-    override fun skill() = Clubs
-    override var fuel = 40f
-    override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
-}
-
-@Serializable
 class Rebar : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.STICK, 0.0f, -0.1f, false)
