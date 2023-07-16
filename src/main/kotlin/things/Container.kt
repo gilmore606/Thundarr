@@ -75,18 +75,18 @@ sealed class Container : Portable(), ThingHolder {
         }
     }
 
-    override fun uses(): Map<UseTag, Use> {
+    override fun uses(): MutableMap<UseTag, Use> {
         if (isOpenable()) {
-            return mapOf(
-                UseTag.OPEN to Use(openVerb() + " " + name(), 1.5f,
+            return super.uses().apply {
+                this[UseTag.OPEN] = Use(openVerb() + " " + name(), 1.5f,
                     canDo = { actor, x, y, targ -> !targ && isHeldBy(actor) || isNextTo(actor) },
                     toDo = { actor, level, x, y ->
                         if (actor is Player) {
                             App.openInventory(withContainer = this@Container)
                         }
                     })
-            )
-        } else return mapOf()
+            }
+        } else return super.uses()
     }
 
 }

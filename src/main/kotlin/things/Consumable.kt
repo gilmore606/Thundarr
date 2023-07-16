@@ -21,7 +21,7 @@ sealed class Consumable : Portable() {
 
     override fun category() = Category.CONSUMABLE
 
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.CONSUME to Use(consumeVerb() + " " + name(), consumeDuration(),
             canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) && this.consumableBy(actor) },
             toDo = { actor, level, x, y ->
@@ -43,8 +43,6 @@ sealed class Consumable : Portable() {
     open fun statusEffect(): Status? = null
 
     override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
-
-    override fun spawnContainers() = mutableListOf(Tag.FRIDGE, Tag.TABLE)
 
     override fun examineInfo(): String {
         return statusEffect()?.let { effect ->

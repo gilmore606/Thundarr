@@ -18,14 +18,10 @@ sealed class Book : Portable() {
     override fun flammability() = 0.8f
     override fun toolbarName() = "read " + this.name()
     override fun toolbarUseTag() = UseTag.USE
-    override fun spawnContainers() = mutableListOf(
-        Tag.FILING_CABINET, Tag.BOOKSHELF,
-        Tag.TRUNK, Tag.WRECKEDCAR, Tag.TABLE
-    )
 
     override fun category() = Category.TOOL
 
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.USE to Use("read " + this.name(), 5f,
             canDo = { actor,x,y,targ -> !targ && isHeldBy(actor) },
             toDo = { actor, level, x, y ->

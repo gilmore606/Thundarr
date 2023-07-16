@@ -279,7 +279,7 @@ sealed class Level {
 
     fun thingsAt(x: Int, y: Int): MutableList<Thing> = chunkAt(x,y)?.thingsAt(x,y) ?: noThing
 
-    fun stainsAt(x: Int, y: Int) = chunkAt(x,y)?.stainsAt(x,y)
+    fun stainsAt(x: Int, y: Int) = chunkAt(x,y)?.stainsAt(x,y) ?: mutableListOf()
 
     fun exitAt(x: Int, y: Int) = chunkAt(x,y)?.exitAt(x,y)
 

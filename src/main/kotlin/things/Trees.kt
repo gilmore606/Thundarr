@@ -17,11 +17,12 @@ sealed class Tree : Plant() {
     override fun moveSpeedPast(actor: Actor): Float? = 1.4f
     open fun chopProduct(): Thing? = Log()
     open fun chopProductAmount() = Dice.oneTo(3)
-    override fun uses() = mapOf(
-        UseTag.DESTROY to Use("chop down " + name(), 3.0f,
-            canDo = { actor,x,y,targ -> actor.meleeWeapon().canChopTrees() && isNextTo(actor) },
+
+    override fun uses() = super.uses().apply {
+        this[UseTag.DESTROY] = Use("chop down " + name(), 3.0f,
+            canDo = { actor, x, y, targ -> actor.meleeWeapon().canChopTrees() && isNextTo(actor) },
             toDo = { actor, level, x, y ->
-                val logVictim = level.actorAt(x,y)
+                val logVictim = level.actorAt(x, y)
                 repeat(chopProductAmount()) {
                     chopProduct()?.also { log ->
                         logVictim?.also { victim ->
@@ -38,7 +39,7 @@ sealed class Tree : Plant() {
                 Speaker.world(Speaker.SFX.TREEFALL, source = actor.xy)
                 Console.sayAct("%Dd comes crashing down!", "%Dn chops down %id.", actor, this@Tree)
             })
-    )
+    }
 
     override fun flammability() = 0.4f
     override fun onBurn(delta: Float): Float {
@@ -140,13 +141,13 @@ class DeadTree : Tree() {
     override fun glyph() = Glyph.DEAD_TREE
     override fun name() = "dead tree"
     override fun description() = "The dessicated skeleton of a once-mighty tree."
-    override fun uses() = mapOf(
-        UseTag.TRANSFORM to Use("pull a log from ${name()}", 3f,
-            canDo = { actor,x,y,targ -> isNextTo(actor) },
-            toDo = { actor,level,x,y ->
+    override fun uses() = super.uses().apply {
+        this[UseTag.TRANSFORM] = Use("pull a log from ${name()}", 3f,
+            canDo = { actor, x, y, targ -> isNextTo(actor) },
+            toDo = { actor, level, x, y ->
                 scavengeLog(actor)
             })
-    )
+    }
     private fun scavengeLog(actor: Actor) {
         if (Survive.resolve(actor, 0f) >= 0) {
             Console.sayAct("You find a log and break it off of the dead tree trunk.", "%Dn pulls a log from %it.", actor, this)

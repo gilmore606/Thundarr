@@ -16,7 +16,7 @@ class Well : Thing() {
     override fun isOpaque() = false
     override fun isBlocking(actor: Actor) = true
 
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.CONSUME to Use("drink from " + name(), 2.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) },
             toDo = { actor,level,x,y -> doDrink(actor) }

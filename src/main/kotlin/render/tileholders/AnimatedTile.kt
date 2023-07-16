@@ -24,7 +24,7 @@ open class AnimatedTile(
             val frame = abs((Screen.timeMs + (level.getRandom(x,y) / 200)).toInt() / frameMs ) % frames.size
             return indexFromCoords(frames[frame].first, frames[frame].second)
         }
-        return 0
+        return indexFromCoords(frames[0].first, frames[0].second)
     }
 
 }

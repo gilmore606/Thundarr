@@ -2,15 +2,20 @@ package things
 
 import actors.Actor
 import actors.NPC
+import actors.Player
 import actors.actions.Action
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
+import ui.modals.DirectionModal
+import ui.panels.Console
 import util.*
+import world.CellContainer
 import world.Entity
 import world.level.Level
+import world.stains.Fire
 import java.lang.Float.min
 import java.lang.RuntimeException
 
@@ -161,11 +166,21 @@ sealed class Thing() : Entity {
     }
 
     abstract val tag: Tag
+
     open fun isOpaque(): Boolean = false
     open fun isBlocking(actor: Actor): Boolean = false
     open fun isPortable(): Boolean = true
     open fun isIntangible() = false
     open fun isAlwaysVisible() = false
+    open fun canLightFires() = false
+    open fun canBeLitOnFire() = flammability() > 0 && holder is CellContainer
+    open fun receiveLightOnFire(actor: Actor) {
+        level()?.also { level ->
+            level.addStain(Fire(), xy().x, xy().y)
+            Console.sayAct("You start a fire.", "%Dn lights a fire.", actor)
+        }
+    }
+
     open fun announceOnWalk() = !isIntangible()
     open fun sleepComfort() = -0.1f
     open fun value() = 0
@@ -175,12 +190,13 @@ sealed class Thing() : Entity {
     enum class Category {
         GEAR, TOOL, CONSUMABLE, MISC
     }
-
     open fun category(): Category = Category.MISC
 
     enum class UseTag {
         E0, E1, E2, E3, E4, E5, E6, E7, E8, E9,
-        USE, USE_ON, SWITCH, SWITCH_ON, SWITCH_OFF, CONSUME, OPEN, CLOSE, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
+        USE, USE_ON, USE_BE_LIT, USE_BE_LIT_FROM, SWITCH, SWITCH_ON, SWITCH_OFF,
+        CONSUME, OPEN, CLOSE, EQUIP, UNEQUIP, DESTROY, TRANSFORM,
+        ;
     }
 
     class Use(
@@ -218,9 +234,26 @@ sealed class Thing() : Entity {
     open fun onCreate() { }
     open fun onSpawn() { }
 
-    open fun uses(): Map<UseTag, Use> = mapOf()
-    open fun canSpawnIn(containerType: Thing.Tag) = spawnContainers().hasOneWhere { it == containerType }
-    open fun spawnContainers() = mutableListOf<Thing.Tag>()
+    open fun uses(): MutableMap<UseTag, Use> = mutableMapOf<UseTag, Use>().apply {
+        this[UseTag.USE_BE_LIT] = Use("light ${this@Thing.name()} on fire", 0.5f,
+            canDo = { actor, x, y, targ ->
+                canBeLitOnFire() && (isHeldBy(actor) || isAtFeet(actor) || isNextTo(actor)) &&
+                        actor.contents().hasOneWhere { it.canLightFires() }
+            },
+            toDo = { actor, level, x, y ->
+                Console.sayAct("You light your %d.", "%DN lights %p %d.", actor, this@Thing)
+                receiveLightOnFire(actor)
+            })
+        this[UseTag.USE_BE_LIT_FROM] = Use("light ${this@Thing.name()} from nearby fire", 0.5f,
+            canDo = { actor, x, y, targ ->
+                canBeLitOnFire() && isHeldBy(actor) && actor.isNextToFire() &&
+                        !actor.contents().hasOneWhere { it.canLightFires() }
+            },
+            toDo = { actor, level, x, y ->
+                Console.sayAct("You light your %d from the fire.", "%DN lights %p %d from the fire.", actor, this@Thing)
+                receiveLightOnFire(actor)
+            })
+    }
 
     protected fun isHeldBy(actor: Actor) = actor.contents.contains(this)
     protected fun isAtFeet(actor: Actor) = holder?.let { it.xy() == actor.xy() } ?: false

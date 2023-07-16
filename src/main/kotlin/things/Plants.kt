@@ -56,7 +56,7 @@ sealed class Plant : Scenery(), Temporal {
 
 @Serializable
 sealed class Bush : Plant() {
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.TRANSFORM to Use("pull a stick from ${name()}", 3f,
             canDo = { actor,x,y,targ -> isNextTo(actor) },
             toDo = { actor,level,x,y ->

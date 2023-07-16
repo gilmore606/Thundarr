@@ -24,10 +24,10 @@ class Shrine : LitThing() {
     override fun isPortable() = false
     override fun isOpaque() = false
     override fun isBlocking(actor: Actor) = true
-    override fun ambientSound() = Speaker.PointAmbience(Speaker.Ambience.SHRINECHORD, 24f, 1f)
+    override fun ambientSound() = Speaker.PointAmbience(Speaker.Ambience.SHRINECHORD, 24f, 0.5f)
     override val lightColor = LightColor(0.1f, 0.1f, 0.4f)
 
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.USE to Use("pray to " + name(), 2.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) },
             toDo = { actor,level,x,y -> doPray(actor) }

@@ -22,21 +22,17 @@ sealed class Medkit : Portable() {
 
     override fun category() = Category.TOOL
 
-    override fun uses() = mapOf(
-        UseTag.USE to Use("self-treat with " + name(), 3f,
-            canDo = { actor,x,y,targ ->
+    override fun uses() = super.uses().apply {
+        this[UseTag.USE] = Use("self-treat with " + name(), 3f,
+            canDo = { actor, x, y, targ ->
                 !targ && isHeldBy(actor) && actor.hp < actor.hpMax && !actor.hasStatus(Status.Tag.BANDAGED)
-                    },
+            },
             toDo = { actor, level, x, y ->
                 doTreatment(actor, actor)
             }
-        ),
+        )
         // TODO: USE_ON to treat other, but how to select/target?
-    )
-
-    override fun spawnContainers() = mutableListOf(
-        Tag.TRUNK, Tag.BONEPILE, Tag.WRECKEDCAR, Tag.TABLE
-    )
+    }
 
     private fun doTreatment(healer: Actor, target: Actor) {
         if (healer == target) Console.sayAct(useSelfMsg(), useOtherMsg(), healer, target, this)

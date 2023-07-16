@@ -33,6 +33,7 @@ class Campfire : Thing(), Workbench, Fuel {
     override fun benchCanMake(recipe: Recipe) = recipe is FoodRecipe
 
     fun isBurning(): Boolean = level()?.stainsAt(xy().x, xy().y)?.hasOneWhere { it is Fire } ?: false
+    override fun canBeLitOnFire() = !isBurning()
 
     fun feedWith(log: Fuel, actor: Actor) {
         val bonus = Survive.bonus(actor) + Survive.resolve(actor, 0f) * 0.25f
@@ -41,7 +42,7 @@ class Campfire : Thing(), Workbench, Fuel {
         log.moveTo(null)
     }
 
-    override fun uses(): Map<UseTag, Use> {
+    override fun uses(): MutableMap<UseTag, Use> {
         val uses = mutableMapOf<UseTag, Use>()
         super.uses().forEach { (k,v) ->
             uses[k] = v
@@ -49,10 +50,10 @@ class Campfire : Thing(), Workbench, Fuel {
 
         uses[Thing.UseTag.SWITCH_ON] = Use("light ${name()} with survival skills", 3f,
             canDo = { actor,x,y,targ ->
-                isNextTo(actor) && !actor.hasA(Tag.LIGHTER) && !isBurning()
+                isNextTo(actor) && !isBurning() && !actor.contents().hasOneWhere { it.canLightFires() }
             },
             toDo = { actor,level,x,y ->
-                tryLight(actor)
+                trySurvivalLight(actor)
             })
         uses[Thing.UseTag.USE] = craftUse()
 
@@ -73,7 +74,7 @@ class Campfire : Thing(), Workbench, Fuel {
         return uses
     }
 
-    private fun tryLight(actor: Actor) {
+    private fun trySurvivalLight(actor: Actor) {
         if (Survive.resolve(actor, 0f) > 0) {
             Console.sayAct("You rub two sticks together skillfully until the tinder catches and fire blossoms.",
                 "%DN bends down and lights %dt.", actor, this)

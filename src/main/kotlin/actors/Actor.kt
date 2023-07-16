@@ -28,6 +28,7 @@ import world.journal.JournalEntry
 import world.path.Pather
 import world.path.StepMap
 import world.stains.Blood
+import world.stains.Fire
 import world.stains.Stain
 import world.terrains.Terrain
 import java.lang.Float.max
@@ -641,6 +642,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun isNextTo(actor: Actor) = abs(actor.xy.x - xy.x) <= 1 && abs(actor.xy.y - xy.y) <= 1
+
+    fun isNextToFire(): Boolean {
+        var found = false
+        level?.also { level ->
+            forXY(xy.x-1,xy.y-1,xy.x+1,xy.y+1) { dx,dy ->
+                if (level.stainsAt(dx,dy).hasOneWhere { it is Fire }) found = true
+            }
+        }
+        return found
+    }
 
     fun entitiesNextToUs(matching: ((Entity)->Boolean) = { _ -> true }): Set<Entity> {
         val entities = mutableSetOf<Entity>()

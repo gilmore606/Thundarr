@@ -127,23 +127,23 @@ sealed class SwitchablePlacedLight : LitThing() {
     abstract fun glyphDark(): Glyph
     open fun leaveLit() = false
 
-    override fun uses() = mapOf(
-        UseTag.SWITCH_ON to Use("light " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> !active && isNextTo(actor) },
-            toDo = { actor,level,x,y ->
+    override fun uses() = super.uses().apply {
+        this[UseTag.SWITCH_ON] = Use("light " + name(), 0.5f,
+            canDo = { actor, x, y, targ -> !active && isNextTo(actor) },
+            toDo = { actor, level, x, y ->
                 active = true
-                level.addLightSource(x, y, this)
-                Console.sayAct("You light %dd.", "%Dn lights %dd.", actor, this)
-            }),
-        UseTag.SWITCH_OFF to Use("extinguish " + name(), 0.5f,
-            canDo = { actor,x,y,targ -> active && isNextTo(actor) && !leaveLit() },
-            toDo = { actor,level,x,y ->
-                Console.sayAct("You snuff out %dd.", "%Dn snuffs out %dd.", actor, this)
+                level.addLightSource(x, y, this@SwitchablePlacedLight)
+                Console.sayAct("You light %dd.", "%Dn lights %dd.", actor, this@SwitchablePlacedLight)
+            })
+        this[UseTag.SWITCH_OFF] = Use("extinguish " + name(), 0.5f,
+            canDo = { actor, x, y, targ -> active && isNextTo(actor) && !leaveLit() },
+            toDo = { actor, level, x, y ->
+                Console.sayAct("You snuff out %dd.", "%Dn snuffs out %dd.", actor, this@SwitchablePlacedLight)
                 active = false
-                level.removeLightSource(this)
+                level.removeLightSource(this@SwitchablePlacedLight)
             }
         )
-    )
+    }
 }
 
 @Serializable
@@ -198,21 +198,21 @@ sealed class SwitchablePortableLight : LitThing() {
     override fun toolbarName() = "turn ${name()} " + if (active) "off" else "on"
     override fun toolbarUseTag() = UseTag.SWITCH
 
-    override fun uses() = mapOf(
-        UseTag.SWITCH to Use(toolbarName(), 0.25f,
-            canDo =  { actor,x,y,targ -> isHeldBy(actor) || isNextTo(actor) },
-            toDo = { actor,level,x,y ->
+    override fun uses() = super.uses().apply {
+        this[UseTag.SWITCH] = Use(toolbarName(), 0.25f,
+            canDo = { actor, x, y, targ -> isHeldBy(actor) || isNextTo(actor) },
+            toDo = { actor, level, x, y ->
                 if (active) {
-                    Console.sayAct("You turn off your %d.", "%Dn turns off %dd.", actor, this)
+                    Console.sayAct("You turn off your %d.", "%Dn turns off %dd.", actor, this@SwitchablePortableLight)
                     active = false
-                    level.removeLightSource(this)
+                    level.removeLightSource(this@SwitchablePortableLight)
                 } else {
                     active = true
-                    level.addLightSource(x, y, this)
-                    Console.sayAct("You turn on your %d.", "%Dn turns on %id.", actor, this)
+                    level.addLightSource(x, y, this@SwitchablePortableLight)
+                    Console.sayAct("You turn on your %d.", "%Dn turns on %id.", actor, this@SwitchablePortableLight)
                 }
-            }),
-    )
+            })
+    }
 }
 
 @Serializable
@@ -252,6 +252,8 @@ class Torch : LitThing(), Temporal {
     override fun onCreate() { active = false }
 
     override fun light() = if (active) lightColor else null
+    override fun canLightFires() = active
+    override fun canBeLitOnFire() = !active
 
     private var flicker = 1f
     override fun flicker() = flicker
@@ -264,15 +266,13 @@ class Torch : LitThing(), Temporal {
         }
     }
 
-    override fun uses() = mapOf(
-        UseTag.SWITCH to Use("light " + name(), 0.5f,
-                canDo = { actor,x,y,targ -> !targ && !active && (isHeldBy(actor) || isNextTo(actor)) &&
-                        actor.contents.hasOneWhere { it is Lighter }},
-                toDo = { actor, level, x, y ->
-                    active = true
-                    level.addLightSource(x, y, (if (holder == actor) actor else this@Torch) as LightSource)
-                    level.linkTemporal(this@Torch)
-                }))
+    override fun receiveLightOnFire(actor: Actor) {
+        level()?.also { level ->
+            active = true
+            level.addLightSource(xy().x, xy().y, (if (holder == actor) actor else this) as LightSource)
+            level.linkTemporal(this)
+        }
+    }
 
     override fun advanceTime(delta: Float) {
         if (fuel >= 0f) {

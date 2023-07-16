@@ -36,7 +36,7 @@ sealed class Door : Thing(), Smashable {
     override fun name() = "door"
     override fun description() = "A wooden door braced with metal."
 
-    override fun uses() = mapOf(
+    override fun uses() = mutableMapOf(
         UseTag.OPEN to Use("open " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
             toDo = { actor,level,x,y ->

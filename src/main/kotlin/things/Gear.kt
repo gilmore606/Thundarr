@@ -56,9 +56,6 @@ sealed class Gear : Portable(), StatEffector {
 
     open fun glyphTransform() = glyphTransform
 
-    override fun spawnContainers() = mutableListOf(
-        Tag.WARDROBE, Tag.WRECKEDCAR, Tag.BONEPILE
-    )
     override fun listTag() = if (equipped) "(${slot.equippedTag})" else ""
 
     override fun onDropping(actor: Actor, dest: ThingHolder) {
@@ -89,14 +86,14 @@ sealed class Gear : Portable(), StatEffector {
     override fun toolbarName() = (if (equipped) slot.unverb else slot.verb) + " " + this.name()
     override fun toolbarUseTag() = if (equipped) UseTag.UNEQUIP else UseTag.EQUIP
 
-    override fun uses() = mapOf(
-        UseTag.EQUIP to Use(slot.verb + " " + name(), slot.duration,
-            canDo = { actor,x,y,targ -> !targ && !this.equipped && isHeldBy(actor) },
-            toDo = { actor,level,x,y -> actor.equipGear(this) }),
-        UseTag.UNEQUIP to Use(slot.unverb + " " + name(), slot.duration,
-            canDo = { actor,x,y,targ -> !targ && this.equipped && isHeldBy(actor) },
-            toDo = { actor,level,x,y -> actor.unequipGear(this) })
-    )
+    override fun uses() = super.uses().apply {
+        this[UseTag.EQUIP] = Use(slot.verb + " " + name(), slot.duration,
+            canDo = { actor, x, y, targ -> !targ && !this@Gear.equipped && isHeldBy(actor) },
+            toDo = { actor, level, x, y -> actor.equipGear(this@Gear) })
+        this[UseTag.UNEQUIP] = Use(slot.unverb + " " + name(), slot.duration,
+            canDo = { actor, x, y, targ -> !targ && this@Gear.equipped && isHeldBy(actor) },
+            toDo = { actor, level, x, y -> actor.unequipGear(this@Gear) })
+    }
 
     override fun statEffects() = defaultStatEffects
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
