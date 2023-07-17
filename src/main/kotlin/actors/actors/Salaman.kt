@@ -21,7 +21,7 @@ class Salaman : NPC() {
         Speed.set(this, 10f)
         Brains.set(this, 7f)
     }
-    override fun armorTotal() = 1.5f
+    override fun skinArmor() = 1.5f
 
     override fun idleState() = IdleHerd(
         0.3f, 8, true,

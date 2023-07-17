@@ -1,5 +1,6 @@
 package things
 
+import actors.actors.Actor
 import actors.stats.Brains
 import actors.stats.Stat
 import actors.stats.skills.Build
@@ -7,6 +8,8 @@ import actors.stats.skills.Fight
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Damage.*
+import java.lang.Float.max
+import java.lang.Float.min
 
 @Serializable
 sealed class Clothing : Gear() {
@@ -45,12 +48,16 @@ sealed class Clothing : Gear() {
 
     open fun material(): Material = Material.CLOTH
     open fun armor() = 0f
+    open fun deflect() = 0f
 
     open fun coldProtection() = 0f
     open fun heatProtection() = 0f
     open fun weatherProtection() = 0f
 
     fun armorVs(type: Damage) = material().modify(type, armor())
+
+    fun reduceDamage(target: Actor, type: Damage, rawDamage: Float): Float =
+        max(0f, rawDamage - armorVs(type))
 }
 
 @Serializable

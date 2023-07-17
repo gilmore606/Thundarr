@@ -56,14 +56,12 @@ class Throw(
         }
     }
 
+    // TODO: update this for new combat system
     private fun resolveHit(thing: Thing, actor: Actor, level: Level, hitX: Int, hitY: Int, roll: Float) {
         Speaker.world(thing.thrownHitSound(), source = XY(hitX,hitY))
         level.addSpark(Smoke().at(hitX, hitY))
         level.actorAt(hitX, hitY)?.also { target ->
             var result = roll
-            if (target.canSee(actor)) {
-                result = target.tryDodge(actor, thing, roll)
-            }
             if (result >= 0) {
                 Console.sayAct("%Di hits %dd!", "%Dn throws %ii at %dd, hitting %do!", actor, target, thing)
                 val damage = thing.thrownDamage(actor, result)

@@ -23,7 +23,7 @@ class Aurox : NPC() {
         Speed.set(this, 8f)
         Brains.set(this, 5f)
     }
-    override fun armorTotal() = 2.5f
+    override fun skinArmor() = 2.5f
 
     override fun idleState() = IdleHerd(
         0.4f, 10, true,

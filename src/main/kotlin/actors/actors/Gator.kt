@@ -26,7 +26,7 @@ class Gator : NPC() {
         Speed.set(this, 11f)
         Brains.set(this, 4f)
     }
-    override fun armorTotal() = 2.0f
+    override fun skinArmor() = 2.0f
     override fun idleState() = IdleWander(0.35f)
     override fun canWalkOn(terrain: Terrain) = walkableTerrains.contains(terrain)
     override fun canSwimShallow() = true

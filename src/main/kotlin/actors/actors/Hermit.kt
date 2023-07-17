@@ -19,7 +19,7 @@ class Hermit : NPC() {
         Brains.set(this, 12f)
     }
 
-    override fun armorTotal() = 0f
+    override fun skinArmor() = 0f
     override fun idleState() = IdleDen(
         0.5f, 16, false,
         22.0f, 5.0f

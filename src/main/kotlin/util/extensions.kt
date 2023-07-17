@@ -235,7 +235,7 @@ fun List<String>.toEnglishList(articles: Boolean = true): String {
     return str
 }
 
-fun <T>List<T>.sumOf(selector: (T)->Float): Float {
+fun <T>Collection<T>.sumOf(selector: (T)->Float): Float {
     var sum = 0f
     forEach { sum += selector.invoke(it) }
     return sum

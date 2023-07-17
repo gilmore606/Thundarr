@@ -4,6 +4,7 @@ import actors.actions.*
 import actors.actions.events.Event
 import actors.animations.Animation
 import actors.animations.Step
+import actors.bodyparts.*
 import actors.stats.Senses
 import actors.stats.Speed
 import actors.stats.Stat
@@ -69,15 +70,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     val queuedActions: MutableList<Action> = mutableListOf()
 
-    @Transient var currentSenses: Float = 0f
-    @Transient var currentSneak: Float = 0f
-
-    @Transient var seen = mutableMapOf<Entity, Float>()
-    @Transient var seenUpdatedAt = 0.0
-    @Transient var seenPrevious = mutableMapOf<Entity, Float>()
 
     var hp: Float = 20f
     var hpMax: Float = 20f
+
+    val bodyparts: Set<Bodypart> = initialBodyparts()
+    open fun initialBodyparts() = Bodypart.humanoid()
+
+    open fun skinArmor() = 0f
+    open fun skinArmorMaterial() = Clothing.Material.HIDE
+    open fun skinDeflect() = 0f
 
     @Transient
     override var level: Level? = null
@@ -96,6 +98,13 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
                 }
             }
         }
+
+    @Transient var currentSenses: Float = 0f
+    @Transient var currentSneak: Float = 0f
+
+    @Transient var seen = mutableMapOf<Entity, Float>()
+    @Transient var seenUpdatedAt = 0.0
+    @Transient var seenPrevious = mutableMapOf<Entity, Float>()
 
     open fun isSentient() = true
     open fun isHuman() = false
@@ -363,40 +372,31 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
     }
 
-    // Take damage and react to attacker if any.  Return damage that actually got through.
-    fun receiveDamage(raw: Float, attacker: Actor? = null, internal: Boolean = false): Float {
-        val armor = armorTotal()
-        val amount = if (internal) raw else raw - armor
-        if (amount > 0f) {
-            if (!internal) {
-                if (Dice.chance(bleedChance() * amount * 0.35f)) {
-                    bloodstain()?.also { stain ->
-                        level?.addStain(stain, xy.x, xy.y)
-                        if (Dice.chance(0.2f * amount)) {
-                            bloodstain()?.also {
-                                level?.addStain(
-                                    it,
-                                    xy.x - 1 + Dice.zeroTo(2),
-                                    xy.y - 1 + Dice.zeroTo(2)
-                                )
-                            }
+    fun receiveDamage(amount: Float, attacker: Actor? = null, internal: Boolean = false) {
+        if (!internal) {
+            if (Dice.chance(bleedChance() * amount * 0.35f)) {
+                bloodstain()?.also { stain ->
+                    level?.addStain(stain, xy.x, xy.y)
+                    if (Dice.chance(0.2f * amount)) {
+                        bloodstain()?.also {
+                            level?.addStain(
+                                it,
+                                xy.x - 1 + Dice.zeroTo(2),
+                                xy.y - 1 + Dice.zeroTo(2)
+                            )
                         }
                     }
                 }
-                repeat(amount.toInt()) {
-                    gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
-                }
             }
-            hp = max(0f, hp - amount)
-            if (Dice.chance(amount * 0.1f)) {
-                addStatus(Stunned())
+            repeat(amount.toInt()) {
+                gore()?.also { level?.addSpark(it.at(xy.x, xy.y)) }
             }
         }
+        hp = max(0f, hp - amount)
         if (hp < 1) {
             die()
             attacker?.also { onKilledBy(it) }
-        } else attacker?.also { receiveAggression(it) }
-        return amount
+        }
     }
 
     fun healDamage(heal: Float, healer: Actor? = null) {
@@ -520,28 +520,27 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     ///// combat info
 
-    fun tryDodge(attacker: Actor, weapon: Thing, bonus: Float): Float {
-        // skip this if we're under certain statuses
-        val roll = Dodge.resolve(this, 0f - bonus)
-        var result = 0f
-        if (roll > 0f) {
-            if (roll > 3f) Console.sayAct("You dodge unpredictably.", "%Dn dodges unpredictably.", this)
-            result = 0f - (roll * 0.5f)
-        } else if (roll < -6f) {
-            Console.sayAct("You stumble, exposing yourself.", "%Dn stumbles, creating an opening.", this)
-            result = 4f
-        }
-        return result
+    fun canActivelyDefend(attacker: Actor? = null): Boolean {
+        statuses.forEach { if (it.preventActiveDefense()) return false }
+        attacker?.also { if (!canSee(it)) return false }
+        return true
     }
 
     open fun meleeWeapon(): MeleeWeapon = equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: fist
 
-    open fun armorTotal(): Float {
-        var total = 0f
-        gear.values.forEach { if (it is Clothing) total += it.armor() }
-        return total
+    open fun randomBodypart(): Bodypart {
+        val range = bodyparts.sumOf { it.size }
+        val roll = Dice.float(0f, range)
+        var acc = 0f
+        bodyparts.forEach {
+            acc += it.size
+            if (roll <= acc) return it
+        }
+        return bodyparts.random()
     }
 
+    open fun skinReduceDamage(target: Actor, type: Damage, rawDamage: Float): Float =
+        max(0f, rawDamage - skinArmorMaterial().modify(type, skinArmor()))
 
     ///// action generators
 

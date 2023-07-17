@@ -20,7 +20,7 @@ class Grizzler : NPC() {
         Speed.set(this, 11f)
         Brains.set(this, 7f)
     }
-    override fun armorTotal() = 2f
+    override fun skinArmor() = 2f
 
     override fun idleState() = IdleDen(
         0.4f, 12, true,

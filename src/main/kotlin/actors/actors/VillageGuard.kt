@@ -34,7 +34,7 @@ class VillageGuard(
         Brains.set(this, 10f)
         Senses.set(this, 12f)
     }
-    override fun armorTotal() = 2.0f
+    override fun skinArmor() = 2.0f
     override fun idleState() = IdlePatrol(
         0.7f,
         bounds,

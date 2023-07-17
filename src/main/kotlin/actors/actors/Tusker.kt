@@ -21,7 +21,7 @@ sealed class GenericTusker : NPC() {
         Speed.set(this, 9f)
         Brains.set(this, 5f)
     }
-    override fun armorTotal() = 1.0f
+    override fun skinArmor() = 1.0f
 
     override fun idleState() = IdleHerd(
         0.5f, 6, true,
@@ -52,7 +52,7 @@ class Tusklet : GenericTusker() {
         Speed.set(this, 9f)
         Brains.set(this, 4f)
     }
-    override fun armorTotal() = 0f
+    override fun skinArmor() = 0f
     override fun onDeath(corpse: Container?) {
         corpse?.also {
             if (Dice.chance(0.4f)) {

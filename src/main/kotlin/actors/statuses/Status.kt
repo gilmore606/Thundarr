@@ -55,6 +55,7 @@ sealed class Status : StatEffector {
     protected val defaultStatEffects = mapOf<Stat.Tag, Float>()
 
     open fun preventVision() = false
+    open fun preventActiveDefense() = false
     open fun comfort() = 0f
     open fun calorieBurnMod() = 1f // 1f = unchanged
 
@@ -286,6 +287,7 @@ class Asleep() : Status() {
         Speed.tag to -10f
     )
     override fun preventVision() = true
+    override fun preventActiveDefense() = true
     override fun preventedAction(action: Action, actor: Actor): Boolean {
         if (action !is Sleep) {
             if (actor is Player) Console.say("You can't do anything in your sleep.")
@@ -406,6 +408,7 @@ class Stunned() : TimeStatus() {
     )
     override fun duration() = 1f
     override fun maxDuration() = 2f
+    override fun preventActiveDefense() = true
     override fun preventedAction(action: Action, actor: Actor): Boolean {
         if (action is Move || action is WalkTo || action is Attack || action is Throw) {
             if (actor is Player) Console.say("You're too stunned to " + action.name() + "!")

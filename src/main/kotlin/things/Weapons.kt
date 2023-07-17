@@ -1,30 +1,67 @@
 package things
 
 import actors.actors.Actor
+import actors.bodyparts.Bodypart
 import actors.stats.Heart
 import actors.stats.Stat
 import actors.stats.skills.*
+import actors.statuses.Status
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import util.Dice
 import util.LightColor
 import world.terrains.Terrain
 
 @Serializable
-enum class Damage {
-    CRUSH,
-    CUT,
-    PIERCE,
-    BURN,
-    SHOCK,
-    CORRODE,
+enum class Damage(
+    val displayName: String,
+) {
+    CRUSH("crush"),
+
+    CUT("cut"),
+
+    PIERCE("pierce"),
+
+    BURN("burn"),
+
+    SHOCK("shock") {
+        override fun addDamage(target: Actor, bodypart: Bodypart, amount: Float): Float {
+            if (target.hasStatus(Status.Tag.WET)) {
+                return amount * 1.5f
+            }
+            return amount
+        }
+    },
+
+    CORRODE("corrode"),
+
+    ;
+    open fun addDamage(target: Actor, bodypart: Bodypart, amount: Float): Float = amount
 }
+
 
 @Serializable
 sealed class Weapon : Gear() {
     abstract fun damageType(): Damage
     abstract fun damage(): Float
     open fun accuracy(): Float = 0f
+    open fun critThreshold(): Float = 5f
+    open fun critMultiplier(): Float = 0.5f
+
+    open fun hitSound() = Speaker.SFX.HIT
+    open fun bounceSound() = Speaker.SFX.HIT
+    open fun missSound() = Speaker.SFX.MISS
+
+    open fun rollDamage(roll: Float): Float {
+        var damage = Dice.float(damage() * 0.5f, damage())
+        if (roll >= critThreshold() * 2) {
+            damage *= (1f + critMultiplier() * 2f)
+        } else if (roll >= critThreshold()) {
+            damage *= (1f + critMultiplier())
+        }
+        return damage
+    }
 }
 
 @Serializable
@@ -38,14 +75,10 @@ sealed class MeleeWeapon : Weapon() {
 
     open fun canChopTrees() = false
 
-    open fun hitSelfMsg() = "You hit %dd with your %i!"
-    open fun hitOtherMsg() = "%Dn hits %dd with %p %i!"
+    open fun hitSelfMsg() = "You hit %dd's %part with your %i!"
+    open fun hitOtherMsg() = "%Dn hits %dd's %part with %p %i!"
     open fun missSelfMsg() = "You miss."
     open fun missOtherMsg() = "%Dn misses %dd."
-
-    open fun hitSound() = Speaker.SFX.HIT
-    open fun bounceSound() = Speaker.SFX.HIT
-    open fun missSound() = Speaker.SFX.MISS
 
     override fun thrownDamage(thrower: Actor, roll: Float) = damage() * 0.5f
 
@@ -60,8 +93,8 @@ class Fist : MeleeWeapon() {
     override fun glyph() = Glyph.BLANK
     override fun name() = "fist"
     override fun description() = "Bare knuckles."
-    override fun hitSelfMsg() = "You punch %dd!"
-    override fun hitOtherMsg() = "%Dn punches %dd!"
+    override fun hitSelfMsg() = "You punch %dd in the %part!"
+    override fun hitOtherMsg() = "%Dn punches %dd in the %part!"
     override fun damageType() = Damage.CRUSH
     override fun damage() = 1f
 }
@@ -72,8 +105,8 @@ class Teeth : MeleeWeapon() {
     override fun glyph() = Glyph.BLANK
     override fun name() = "teeth"
     override fun description() = "Sharp teeth."
-    override fun hitSelfMsg() = "You bite %dd!"
-    override fun hitOtherMsg() = "%Dn bites %dd!"
+    override fun hitSelfMsg() = "You bite %dd's %part!"
+    override fun hitOtherMsg() = "%Dn bites %dd's %part!"
     override fun damageType() = Damage.CUT
     override fun damage() = 1.5f
 }

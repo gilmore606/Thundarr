@@ -18,7 +18,7 @@ class Tortle : NPC() {
         Speed.set(this, 6f)
         Brains.set(this, 8f)
     }
-    override fun armorTotal() = 3.5f
+    override fun skinArmor() = 3.5f
 
     override fun idleState() = IdleHerd(
         0.3f, 8, true,

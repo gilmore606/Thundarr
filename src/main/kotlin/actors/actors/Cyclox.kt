@@ -20,7 +20,7 @@ class Cyclox : NPC() {
         Speed.set(this, 9f)
         Brains.set(this, 7f)
     }
-    override fun armorTotal() = 3f
+    override fun skinArmor() = 3f
 
     override fun idleState() = IdleWander(0.5f)
 
