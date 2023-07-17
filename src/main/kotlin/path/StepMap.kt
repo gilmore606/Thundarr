@@ -153,12 +153,6 @@ sealed class StepMap {
         }
     }
 
-    private suspend fun waitForActorLock(level: Level) {
-        while (level.director.actorsLocked) {
-            log.info("...stepMap waiting for actors lock...")
-            delay(0L)
-        }
-    }
     private suspend fun waitForCellLock(level: Level, x: Int, y: Int) {
         while (level.hasCellContainerAt(x, y)?.locked == true) {
             log.info("...stepMap waiting for cell lock...")

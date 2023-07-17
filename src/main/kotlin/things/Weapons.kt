@@ -11,7 +11,24 @@ import util.LightColor
 import world.terrains.Terrain
 
 @Serializable
-sealed class MeleeWeapon : Gear() {
+enum class Damage {
+    CRUSH,
+    CUT,
+    PIERCE,
+    BURN,
+    SHOCK,
+    CORRODE,
+}
+
+@Serializable
+sealed class Weapon : Gear() {
+    abstract fun damageType(): Damage
+    abstract fun damage(): Float
+    open fun accuracy(): Float = 0f
+}
+
+@Serializable
+sealed class MeleeWeapon : Weapon() {
     override val slot = Slot.MELEE
     override fun value() = 4
     override fun equipSelfMsg() = "You ready your %d for action."
@@ -34,10 +51,7 @@ sealed class MeleeWeapon : Gear() {
 
     open fun canDig(terrainType: Terrain.Type): Boolean = false
     open fun speed(): Float = 1f
-    open fun skill(): Stat = Fight
-    open fun accuracy(): Float = 0f
-    open fun damage(): Float = 2f
-
+    open fun skill(): Skill = Fight
 }
 
 @Serializable
@@ -48,6 +62,7 @@ class Fist : MeleeWeapon() {
     override fun description() = "Bare knuckles."
     override fun hitSelfMsg() = "You punch %dd!"
     override fun hitOtherMsg() = "%Dn punches %dd!"
+    override fun damageType() = Damage.CRUSH
     override fun damage() = 1f
 }
 
@@ -59,6 +74,7 @@ class Teeth : MeleeWeapon() {
     override fun description() = "Sharp teeth."
     override fun hitSelfMsg() = "You bite %dd!"
     override fun hitOtherMsg() = "%Dn bites %dd!"
+    override fun damageType() = Damage.CUT
     override fun damage() = 1.5f
 }
 
@@ -74,6 +90,9 @@ class Rebar : MeleeWeapon() {
     override fun name() = "rebar"
     override fun description() = "A rusted length of metal bar, pulled from ancient ruins."
     override fun skill() = Clubs
+    override fun weight() = 1f
+    override fun damageType() = Damage.CRUSH
+    override fun damage() = 3f
 }
 
 @Serializable
@@ -84,6 +103,8 @@ class Brick : MeleeWeapon() {
     override fun skill() = Clubs
     override fun glyph() = Glyph.BRICK
     override fun weight() = 0.4f
+    override fun damageType() = Damage.CRUSH
+    override fun damage() = 2f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
 }
 
@@ -95,6 +116,8 @@ class Rock : MeleeWeapon() {
     override fun skill() = Clubs
     override fun glyph() = Glyph.ROCK
     override fun weight() = 0.3f
+    override fun damageType() = Damage.CRUSH
+    override fun damage() = 1.5f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
 }
 
@@ -106,6 +129,8 @@ class Hammer : MeleeWeapon() {
     override fun skill() = Clubs
     override fun glyph() = Glyph.HAMMER
     override fun weight() = 0.6f
+    override fun damageType() = Damage.CRUSH
+    override fun damage() = 3f
 }
 
 @Serializable
@@ -116,10 +141,12 @@ class Knife : MeleeWeapon() {
     override val tag = Tag.KNIFE
     override fun name() = "knife"
     override fun description() = "A single-edged survival knife."
+    override fun glyphTransform() = glyphTransform
     override fun skill() = Blades
     override fun glyph() = Glyph.KNIFE
     override fun weight() = 0.2f
-    override fun glyphTransform() = glyphTransform
+    override fun damageType() = Damage.CUT
+    override fun damage() = 2f
 }
 
 @Serializable
@@ -130,10 +157,12 @@ class Gladius : MeleeWeapon() {
     override val tag = Tag.GLADIUS
     override fun name() = "gladius"
     override fun description() = "A double edged iron short sword."
+    override fun glyphTransform() = glyphTransform
     override fun skill() = Blades
     override fun glyph() = Glyph.SWORD
     override fun weight() = 0.5f
-    override fun glyphTransform() = glyphTransform
+    override fun damageType() = Damage.CUT
+    override fun damage() = 3f
 }
 
 @Serializable
@@ -147,10 +176,11 @@ class StoneAxe : MeleeWeapon() {
     override fun hue() = 0.2f
     override fun name() = "stone axe"
     override fun description() = "A chipped stone and branch fashioned into a crude axe."
+    override fun canChopTrees() = true
     override fun skill() = Axes
     override fun speed() = 1.4f
+    override fun damageType() = Damage.CUT
     override fun damage() = 3f
-    override fun canChopTrees() = true
 }
 
 @Serializable
@@ -163,10 +193,11 @@ class Axe : MeleeWeapon() {
     override fun glyph() = Glyph.AXE
     override fun name() = "axe"
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
+    override fun canChopTrees() = true
     override fun skill() = Axes
     override fun speed() = 1.4f
+    override fun damageType() = Damage.CUT
     override fun damage() = 5f
-    override fun canChopTrees() = true
 }
 
 @Serializable
@@ -187,6 +218,7 @@ class Pickaxe : MeleeWeapon() {
     }
     override fun speed() = 1.3f
     override fun accuracy() = -2f
+    override fun damageType() = Damage.PIERCE
     override fun damage() = 4f
 }
 
@@ -203,6 +235,7 @@ class Pitchfork : MeleeWeapon() {
     override fun skill() = Spears
     override fun speed() = 1.3f
     override fun accuracy() = -1f
+    override fun damageType() = Damage.PIERCE
     override fun damage() = 3f
 }
 
@@ -222,6 +255,9 @@ class Sunsword : MeleeWeapon(), LightSource {
         this[Heart.tag] = 1f
     }
     override fun light() = if (equipped) lightColor else null
+    override fun damageType() = Damage.SHOCK
+    override fun damage() = 8f
+
     override fun onEquip(actor: Actor) {
         actor.level?.addLightSource(actor.xy.x, actor.xy.y, actor)
     }

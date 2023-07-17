@@ -125,13 +125,6 @@ object Pather {
         })
     }
 
-    private suspend fun waitForActorLock(level: Level) {
-        while (level.director.actorsLocked) {
-            log.info("...Pather waiting for actors lock...")
-            delay(0L)
-        }
-    }
-
     fun saveActorMaps(subscriber: Actor) {
         subscriber.savedStepMaps.clear()
         KtxAsync.launch {

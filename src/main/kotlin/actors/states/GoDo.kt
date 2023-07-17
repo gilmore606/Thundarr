@@ -26,7 +26,7 @@ class GoDo(
     ).random() else null
 
     override fun onEnter(npc: NPC) {
-        log.info("$npc GoDo subscribing pather for $targetXY (from ${npc.xy})")
+        //log.info("$npc GoDo subscribing pather for $targetXY (from ${npc.xy})")
         Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
     }
 
