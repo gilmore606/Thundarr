@@ -1,13 +1,10 @@
 package actors.states
 
-import actors.Actor
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
-import actors.actions.Say
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import util.log
-import world.path.Pather
+import path.Pather
 
 @Serializable
 class Fleeing(

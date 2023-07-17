@@ -1,7 +1,7 @@
 package actors.stats
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import actors.stats.skills.*
 import audio.Speaker
 import kotlinx.serialization.Serializable

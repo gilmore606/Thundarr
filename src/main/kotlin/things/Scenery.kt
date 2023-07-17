@@ -1,7 +1,7 @@
 package things
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import ui.panels.Console

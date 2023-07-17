@@ -1,7 +1,7 @@
 package actors.actions
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import kotlinx.serialization.Serializable
 import ui.panels.Console
 import ui.panels.TimeButtons

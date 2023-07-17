@@ -1,7 +1,7 @@
 package world.terrains
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import audio.Speaker
 import render.sparks.Splash
 import render.tilesets.Glyph

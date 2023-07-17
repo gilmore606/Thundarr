@@ -1,6 +1,6 @@
-import actors.AttractPlayer
-import actors.MagicPortal
-import actors.Player
+import actors.actors.AttractPlayer
+import actors.actors.MagicPortal
+import actors.actors.Player
 import actors.animations.Bump
 import actors.factions.Factions
 import audio.Speaker

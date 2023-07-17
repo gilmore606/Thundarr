@@ -1,6 +1,6 @@
 package world.terrains
 
-import actors.Actor
+import actors.actors.Actor
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph

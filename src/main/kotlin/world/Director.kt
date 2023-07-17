@@ -1,8 +1,8 @@
 package world
 
-import actors.Actor
-import actors.NPC
-import actors.Player
+import actors.actors.Actor
+import actors.actors.NPC
+import actors.actors.Player
 import actors.states.Hibernated
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
@@ -11,7 +11,7 @@ import util.XY
 import util.distanceBetween
 import util.filterOut
 import world.level.Level
-import world.path.Pather
+import path.Pather
 import world.persist.LevelKeeper
 
 // A delegate class for Level to manage actors in time and space.

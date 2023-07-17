@@ -1,12 +1,11 @@
 package actors.states
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Sleep
 import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import util.Dice
-import world.path.Pather
 
 
 @Serializable

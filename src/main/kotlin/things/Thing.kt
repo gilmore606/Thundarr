@@ -1,15 +1,13 @@
 package things
 
-import actors.Actor
-import actors.NPC
-import actors.Player
+import actors.actors.Actor
+import actors.actors.NPC
 import actors.actions.Action
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
 import render.tilesets.Glyph
-import ui.modals.DirectionModal
 import ui.panels.Console
 import util.*
 import world.CellContainer
@@ -202,8 +200,8 @@ sealed class Thing() : Entity {
     class Use(
         val command: String,
         val duration: Float,
-        val canDo: ((Actor, Int, Int, Boolean)->Boolean) = { _,_,_,_ -> false },
-        val toDo: ((Actor, Level, Int, Int)->Unit) = { _,_,_,_ -> }
+        val canDo: ((Actor, Int, Int, Boolean)->Boolean) = { _, _, _, _ -> false },
+        val toDo: ((Actor, Level, Int, Int)->Unit) = { _, _, _, _ -> }
     ) {
         companion object {
             fun enumeratedTag(n: Int) = when (n) {

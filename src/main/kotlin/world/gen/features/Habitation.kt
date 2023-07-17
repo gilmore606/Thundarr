@@ -1,7 +1,7 @@
 package world.gen.features
 
-import actors.Citizen
-import actors.Villager
+import actors.actors.Citizen
+import actors.actors.Villager
 import actors.factions.HabitationFaction
 import actors.jobs.Job
 import kotlinx.serialization.Serializable

@@ -1,12 +1,12 @@
 package world.gen
 
-import actors.*
+import actors.actors.NPC
 import util.Dice
 import world.gen.biomes.*
 import world.gen.habitats.*
 
 class AnimalSpawn(
-    val tag: ()->NPC.Tag,
+    val tag: ()-> NPC.Tag,
     val biomes: Set<Biome>,
     val habitats: Set<Habitat>,
     val minThreat: Float,

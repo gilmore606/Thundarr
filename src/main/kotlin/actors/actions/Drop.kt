@@ -1,6 +1,6 @@
 package actors.actions
 
-import actors.Actor
+import actors.actors.Actor
 import kotlinx.serialization.Serializable
 import things.Container
 import things.Thing

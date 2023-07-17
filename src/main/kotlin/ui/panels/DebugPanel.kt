@@ -5,7 +5,7 @@ import render.Screen
 import ui.input.Keyboard
 import world.gen.Metamap
 import world.persist.LevelKeeper
-import world.path.Pather
+import path.Pather
 import world.terrains.Terrain
 
 object DebugPanel : ShadedPanel() {

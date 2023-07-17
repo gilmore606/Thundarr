@@ -1,7 +1,7 @@
 package actors.jobs
 
-import actors.NPC
-import actors.Villager
+import actors.actors.NPC
+import actors.actors.Villager
 import kotlinx.serialization.Serializable
 import render.Screen
 import things.Container

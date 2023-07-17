@@ -1,12 +1,10 @@
 package actors.actions
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
 import kotlinx.serialization.Serializable
 import things.Thing
 import things.Workbench
 import things.recipes.Recipe
-import ui.panels.Console
 import world.level.Level
 
 @Serializable

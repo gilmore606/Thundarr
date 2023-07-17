@@ -1,10 +1,7 @@
 package actors.actions
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
 import kotlinx.serialization.Serializable
-import ui.panels.Console
-import util.Dice
 import world.level.Level
 
 @Serializable

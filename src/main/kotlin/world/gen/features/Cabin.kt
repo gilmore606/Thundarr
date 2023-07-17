@@ -1,6 +1,6 @@
 package world.gen.features
 
-import actors.Villager
+import actors.actors.Villager
 import kotlinx.serialization.Serializable
 import util.Dice
 import util.Rect

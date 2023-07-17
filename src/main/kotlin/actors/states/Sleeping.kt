@@ -1,8 +1,8 @@
 package actors.states
 
-import actors.Actor
-import actors.NPC
-import actors.Villager
+import actors.actors.Actor
+import actors.actors.NPC
+import actors.actors.Villager
 import actors.actions.*
 import actors.actions.events.Event
 import actors.statuses.Status

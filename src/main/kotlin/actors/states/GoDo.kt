@@ -1,15 +1,14 @@
 package actors.states
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Say
 import actors.actions.Wait
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import util.Dice
 import util.XY
 import util.log
-import world.path.Pather
+import path.Pather
 
 @Serializable
 class GoDo(

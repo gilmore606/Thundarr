@@ -1,11 +1,8 @@
 package actors.actions
 
-import actors.Actor
-import actors.NPC
-import audio.Speaker
+import actors.actors.Actor
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
-import render.sparks.Speak
-import ui.panels.Console
 import world.level.Level
 
 @Serializable

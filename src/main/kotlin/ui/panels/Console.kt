@@ -1,6 +1,6 @@
 package ui.panels
 
-import actors.Player
+import actors.actors.Player
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import kotlinx.coroutines.launch
@@ -8,7 +8,6 @@ import ktx.async.KtxAsync
 import render.Screen
 import render.tilesets.Glyph
 import things.Thing
-import ui.input.Keydef
 import util.XY
 import util.log
 import world.Entity

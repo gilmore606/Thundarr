@@ -1,6 +1,6 @@
 package ui.modals
 
-import actors.Actor
+import actors.actors.Actor
 import render.Screen
 import things.Clothing
 import things.Thing

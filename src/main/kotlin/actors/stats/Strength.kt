@@ -1,6 +1,6 @@
 package actors.stats
 
-import actors.Actor
+import actors.actors.Actor
 
 
 object Strength : Stat(Tag.STR, "strength") {

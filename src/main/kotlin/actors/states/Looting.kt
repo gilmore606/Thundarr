@@ -1,6 +1,6 @@
 package actors.states
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Get
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import util.XY
 import util.hasOneWhere
 import util.log
 import world.level.Level
-import world.path.Pather
+import path.Pather
 
 // Trying to get a known seen item.
 @Serializable

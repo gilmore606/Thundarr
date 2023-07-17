@@ -10,7 +10,7 @@ import world.gen.biomes.Cavern
 import world.gen.features.Rivers
 import world.gen.habitats.TemperateA
 import world.level.EnclosedLevel
-import world.path.DistanceMap
+import path.DistanceMap
 import world.terrains.Terrain
 import world.terrains.Terrain.Type.*
 import world.terrains.Water

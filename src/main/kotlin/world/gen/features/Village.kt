@@ -1,11 +1,10 @@
 package world.gen.features
 
-import actors.Actor
-import actors.VillageGuard
-import actors.Villager
+import actors.actors.Actor
+import actors.actors.VillageGuard
+import actors.actors.Villager
 import actors.jobs.Job
 import actors.jobs.WellJob
-import actors.jobs.WorkJob
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.tilesets.Glyph
@@ -17,7 +16,7 @@ import world.gen.biomes.Glacier
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
-import world.path.DistanceMap
+import path.DistanceMap
 import world.quests.FetchQuest
 import world.terrains.Terrain
 import kotlin.math.max

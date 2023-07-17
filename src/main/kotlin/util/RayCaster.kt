@@ -1,6 +1,6 @@
 package util
 
-import actors.Actor
+import actors.actors.Actor
 import world.Entity
 import world.level.Level
 import java.lang.RuntimeException

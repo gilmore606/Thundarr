@@ -1,6 +1,6 @@
 package world
 
-import actors.Actor
+import actors.actors.Actor
 import audio.Speaker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

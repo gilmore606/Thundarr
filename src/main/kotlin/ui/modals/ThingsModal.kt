@@ -1,6 +1,6 @@
 package ui.modals
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Drop
 import actors.actions.Get
 import actors.actions.Use
@@ -19,7 +19,6 @@ import ui.input.Keydef
 import ui.input.Mouse
 import ui.panels.Toolbar
 import util.groundAtPlayer
-import util.log
 import util.plural
 import java.lang.Math.max
 import java.lang.Math.min

@@ -1,6 +1,6 @@
 package ui.modals
 
-import actors.NPC
+import actors.actors.NPC
 
 class TradeModal(
     private val trader: NPC,

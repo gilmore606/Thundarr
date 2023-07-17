@@ -1,9 +1,9 @@
 package world.gen.cartos
 
-import actors.Peeper
-import actors.Ratman
-import actors.Ratthing
-import actors.Thrall
+import actors.actors.Peeper
+import actors.actors.Ratman
+import actors.actors.Ratthing
+import actors.actors.Thrall
 import things.CeilingLight
 import things.FilingCabinet
 import things.Fridge

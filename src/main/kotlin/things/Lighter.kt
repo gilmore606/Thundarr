@@ -1,17 +1,7 @@
 package things
 
-import actors.Actor
 import kotlinx.serialization.Serializable
-import render.Screen
 import render.tilesets.Glyph
-import ui.modals.DirectionModal
-import ui.panels.Console
-import util.DIRECTIONS
-import util.NO_DIRECTION
-import util.XY
-import util.hasOneWhere
-import world.level.Level
-import world.stains.Fire
 
 @Serializable
 class Lighter : Portable() {

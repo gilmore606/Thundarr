@@ -1,6 +1,6 @@
 package world.gen.biomes
 
-import actors.NPC
+import actors.actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph

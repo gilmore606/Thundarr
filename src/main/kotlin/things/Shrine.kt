@@ -1,8 +1,8 @@
 package things
 
-import actors.Actor
-import actors.NPC
-import actors.Player
+import actors.actors.Actor
+import actors.actors.NPC
+import actors.actors.Player
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph

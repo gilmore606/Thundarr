@@ -1,7 +1,7 @@
 package actors.states
 
-import actors.Actor
-import actors.NPC
+import actors.actors.Actor
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Wait
 import actors.actions.events.Event

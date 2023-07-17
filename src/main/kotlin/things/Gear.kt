@@ -1,6 +1,6 @@
 package things
 
-import actors.Actor
+import actors.actors.Actor
 import actors.stats.Stat
 import actors.statuses.StatEffector
 import kotlinx.serialization.Serializable

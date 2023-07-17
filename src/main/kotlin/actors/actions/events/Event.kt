@@ -1,6 +1,6 @@
 package actors.actions.events
 
-import actors.Actor
+import actors.actors.Actor
 import util.XY
 import world.level.Level
 

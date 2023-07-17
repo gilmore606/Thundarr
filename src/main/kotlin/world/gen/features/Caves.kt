@@ -1,6 +1,6 @@
 package world.gen.features
 
-import actors.NPC
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Glowstone

@@ -1,11 +1,9 @@
 package actors.actions
 
-import actors.Actor
-import actors.NPC
+import actors.actors.Actor
+import actors.actors.NPC
 import actors.actions.events.Event
-import audio.Speaker
 import kotlinx.serialization.Serializable
-import render.sparks.Speak
 import util.log
 import world.level.Level
 

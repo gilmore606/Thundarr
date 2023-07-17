@@ -1,7 +1,6 @@
 package actors.states
 
-import actors.NPC
-import actors.VillageGuard
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait

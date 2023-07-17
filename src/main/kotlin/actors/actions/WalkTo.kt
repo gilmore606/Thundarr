@@ -1,11 +1,11 @@
 package actors.actions
 
-import actors.Actor
+import actors.actors.Actor
 import kotlinx.serialization.Serializable
 import util.XY
 import util.log
 import world.level.Level
-import world.path.Pather
+import path.Pather
 
 @Serializable
 class WalkTo(

@@ -1,8 +1,8 @@
 package actors.statuses
 
-import actors.Actor
-import actors.NPC
-import actors.Player
+import actors.actors.Actor
+import actors.actors.NPC
+import actors.actors.Player
 import actors.actions.*
 import actors.actions.WalkTo
 import actors.stats.Brains

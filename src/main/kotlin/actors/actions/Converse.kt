@@ -1,7 +1,7 @@
 package actors.actions
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import actors.animations.Hop
 import audio.Speaker
 import kotlinx.serialization.Serializable

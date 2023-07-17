@@ -1,6 +1,6 @@
 package world.lore
 
-import actors.NPC
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import ui.modals.ConverseModal
 

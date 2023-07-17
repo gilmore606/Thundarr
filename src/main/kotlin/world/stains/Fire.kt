@@ -1,6 +1,5 @@
 package world.stains
 
-import actors.Actor
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.LightSource

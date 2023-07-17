@@ -1,15 +1,11 @@
 package actors.states
 
 import App
-import actors.Actor
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
-import audio.Speaker
 import kotlinx.serialization.Serializable
-import render.sparks.Speak
-import ui.panels.Console
 import util.*
 
 @Serializable

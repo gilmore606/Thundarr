@@ -1,6 +1,6 @@
 package things
 
-import actors.Actor
+import actors.actors.Actor
 import actors.actions.Action
 import actors.actions.Use
 import actors.actions.events.Knock

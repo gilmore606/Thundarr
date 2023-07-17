@@ -1,12 +1,9 @@
 package actors.factions
 
-import actors.Actor
-import actors.NPC
+import actors.actors.Actor
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import util.UUID
-import util.XY
-import util.hasOneWhere
-import util.log
 import world.quests.Quest
 
 @Serializable

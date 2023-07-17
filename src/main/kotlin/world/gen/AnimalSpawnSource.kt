@@ -1,6 +1,6 @@
 package world.gen
 
-import actors.NPC
+import actors.actors.NPC
 import util.XY
 import world.Chunk
 

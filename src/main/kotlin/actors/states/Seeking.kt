@@ -1,13 +1,13 @@
 package actors.states
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Say
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
 import util.distanceBetween
-import world.path.Pather
+import path.Pather
 
 @Serializable
 class Seeking(

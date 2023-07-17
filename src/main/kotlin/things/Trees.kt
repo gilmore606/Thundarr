@@ -1,6 +1,6 @@
 package things
 
-import actors.Actor
+import actors.actors.Actor
 import actors.stats.skills.Dodge
 import actors.stats.skills.Survive
 import audio.Speaker

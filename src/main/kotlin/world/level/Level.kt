@@ -1,7 +1,7 @@
 package world.level
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import actors.actions.*
 import actors.actions.WalkTo
 import actors.statuses.Status
@@ -23,7 +23,7 @@ import util.*
 import world.Chunk
 import world.Director
 import world.gen.decors.Decor
-import world.path.Pather
+import path.Pather
 import world.stains.Fire
 import world.stains.Stain
 import world.terrains.Terrain

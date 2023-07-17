@@ -1,7 +1,7 @@
 package ui.modals
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import actors.stats.*
 import actors.stats.skills.Skill
 import audio.Speaker
@@ -12,9 +12,7 @@ import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Keydef
 import ui.input.Mouse
-import util.log
 import java.lang.Integer.max
-import java.lang.Integer.min
 
 class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
 

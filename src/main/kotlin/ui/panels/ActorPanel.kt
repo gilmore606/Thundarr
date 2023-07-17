@@ -1,6 +1,6 @@
 package ui.panels
 
-import actors.Actor
+import actors.actors.Actor
 import render.Screen
 import render.tilesets.Glyph
 import util.manhattanDistance

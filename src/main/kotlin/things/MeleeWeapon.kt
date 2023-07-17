@@ -1,6 +1,6 @@
 package things
 
-import actors.Actor
+import actors.actors.Actor
 import actors.stats.Heart
 import actors.stats.Stat
 import actors.stats.skills.*

@@ -1,6 +1,6 @@
 package world.lore
 
-import actors.NPC
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import ui.modals.ConverseModal
 import util.XY
@@ -9,7 +9,6 @@ import util.forXY
 import util.toEnglishList
 import world.gen.Metamap
 import world.gen.features.Feature
-import java.lang.Math.abs
 
 @Serializable
 class DirectionsLore(

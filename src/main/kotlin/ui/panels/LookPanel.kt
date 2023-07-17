@@ -1,6 +1,6 @@
 package ui.panels
 
-import actors.Player
+import actors.actors.Player
 import render.Screen
 import ui.modals.ThingsModal
 import util.XY

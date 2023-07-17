@@ -11,7 +11,7 @@ import world.gen.biomes.Ocean
 import world.gen.biomes.Ruins
 import world.gen.biomes.Suburb
 import world.gen.cartos.WorldCarto
-import world.path.DistanceMap
+import path.DistanceMap
 import world.terrains.Terrain
 
 @Serializable

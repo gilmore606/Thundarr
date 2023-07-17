@@ -1,12 +1,9 @@
 package world.terrains
 
-import actors.Actor
-import actors.stats.skills.Survive
+import actors.actors.Actor
 import audio.Speaker
 import render.tilesets.Glyph
 import things.Rock
-import things.Thing
-import ui.panels.Console
 
 object Rocks : Floor(Type.TERRAIN_ROCKS, Glyph.ROCKS, true, 1f) {
     override fun name() = "rocky ground"

@@ -1,6 +1,6 @@
 package things
 
-import actors.Actor
+import actors.actors.Actor
 import actors.stats.skills.Survive
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph

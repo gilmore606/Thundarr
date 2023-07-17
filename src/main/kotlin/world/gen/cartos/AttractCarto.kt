@@ -1,9 +1,9 @@
 package world.gen.cartos
 
-import actors.Herder
-import actors.MuskOx
-import actors.Aurox
-import actors.Wolfman
+import actors.actors.Herder
+import actors.actors.MuskOx
+import actors.actors.Aurox
+import actors.actors.Wolfman
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import things.*

@@ -1,9 +1,6 @@
 package world.gen.cartos
 
 import App
-import actors.NPC
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
 import things.NPCDen
 import util.*
 import world.*

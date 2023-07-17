@@ -1,6 +1,6 @@
 package ui.modals
 
-import actors.NPC
+import actors.actors.NPC
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
@@ -13,7 +13,6 @@ import render.tilesets.Glyph
 import ui.input.Keydef
 import ui.input.Mouse
 import util.Stack
-import util.log
 import util.wrapText
 import java.lang.Math.max
 

@@ -1,6 +1,6 @@
 package actors.actions
 
-import actors.Actor
+import actors.actors.Actor
 import actors.actions.events.Event
 import actors.animations.Whack
 import audio.Speaker

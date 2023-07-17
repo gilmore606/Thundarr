@@ -1,11 +1,8 @@
 package world.quests
 
-import actors.Citizen
-import actors.NPC
-import actors.Villager
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import actors.actors.Citizen
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
-import render.Screen
 import ui.modals.ConverseModal
 import util.UUID
 import world.Chunk

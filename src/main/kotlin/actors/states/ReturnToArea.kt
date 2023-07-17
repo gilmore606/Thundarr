@@ -1,11 +1,10 @@
 package actors.states
 
-import actors.NPC
+import actors.actors.NPC
 import actors.actions.Action
-import actors.actions.Say
 import kotlinx.serialization.Serializable
 import util.Rect
-import world.path.Pather
+import path.Pather
 
 @Serializable
 class ReturnToArea(

@@ -1,6 +1,6 @@
 package world.persist
 
-import actors.Player
+import actors.actors.Player
 import actors.factions.Factions
 import kotlinx.serialization.Serializable
 import things.Thing

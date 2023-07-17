@@ -1,7 +1,7 @@
 package things
 
-import actors.Actor
-import actors.Player
+import actors.actors.Actor
+import actors.actors.Player
 import actors.statuses.Sick
 import actors.statuses.Status
 import actors.statuses.Wired

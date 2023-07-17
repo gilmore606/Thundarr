@@ -1,6 +1,6 @@
 package actors.actions
 
-import actors.Actor
+import actors.actors.Actor
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import world.level.Level

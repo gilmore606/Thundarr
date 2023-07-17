@@ -1,7 +1,7 @@
 package render
 
 import App
-import actors.Actor
+import actors.actors.Actor
 import audio.Speaker
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
