@@ -15,7 +15,8 @@ object LeftButtons : Panel() {
     class Button(
         val glyph: Glyph,
         val tip: String,
-        val onPress: ()->Unit
+        val onPress: ()->Unit,
+        val notificationGlyph: (()->Glyph?)? = null,
     ) {
         var size = 36.0
         var targetSize = 36.0
@@ -41,24 +42,32 @@ object LeftButtons : Panel() {
     var mouseInside = false
 
     private val buttons = listOf(
-        Button(Glyph.BUTTON_SYSTEM, "system") {
+
+        Button(Glyph.BUTTON_SYSTEM, "system", {
             App.openSystemMenu()
-        },
-        Button(Glyph.BUTTON_INVENTORY, "backpack") {
+        }),
+
+        Button(Glyph.BUTTON_INVENTORY, "backpack", {
             App.openInventory()
-        },
-        Button(Glyph.BUTTON_GEAR, "gear") {
+        }),
+
+        Button(Glyph.BUTTON_GEAR, "gear", {
             App.openGear()
-        },
-        Button(Glyph.BUTTON_SKILLS, "skills") {
+        }),
+
+        Button(Glyph.BUTTON_SKILLS, "skills", {
             App.openSkills()
-        },
-        Button(Glyph.BUTTON_MAP, "world map") {
+        }, {
+            if (App.player.skillPoints > 0) Glyph.PLUS_ICON_BLUE else null
+        }),
+
+        Button(Glyph.BUTTON_MAP, "world map", {
             App.openMap()
-        },
-        Button(Glyph.BUTTON_JOURNAL, "journal") {
+        }),
+
+        Button(Glyph.BUTTON_JOURNAL, "journal", {
             App.openJournal()
-        }
+        })
     )
 
     fun isShown() = (this.contraction < 1)
@@ -108,12 +117,17 @@ object LeftButtons : Panel() {
         val cx = 0 - contraction
         var cy = 0
         buttons.forEachIndexed { n, button ->
-            Screen.uiBatch.addPixelQuad(
-                    cx + this.x - (button.size.toInt()) / 2 + 16,
-                    cy + this.y - (button.size.toInt()) / 2 + 24,
-                    cx + this.x + button.size.toInt() / 2 + 16,
-                    cy + this.y + button.size.toInt() / 2 + 24,
-                Screen.uiBatch.getTextureIndex(button.glyph))
+            val x0 = cx + this.x - (button.size.toInt()) / 2 + 16
+            val y0 = cy + this.y - (button.size.toInt()) / 2 + 24
+            val x1 = cx + this.x + button.size.toInt() / 2 + 16
+            val y1 = cy + this.y + button.size.toInt() / 2 + 24
+
+            Screen.uiBatch.addPixelQuad(x0, y0, x1, y1, Screen.uiBatch.getTextureIndex(button.glyph))
+
+            button.notificationGlyph?.invoke()?.also { notif ->
+                Screen.uiBatch.addPixelQuad(x0, y0, x1, y1, Screen.uiBatch.getTextureIndex(notif))
+            }
+
             cy += spacing
         }
     }

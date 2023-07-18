@@ -1,5 +1,6 @@
 package ui.modals
 
+import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.UITileSet
 
@@ -24,10 +25,13 @@ class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
         maxSelection = options.size - 1
         spacing = 30
         padding = 36
+        headerPad += 36
         height = spacing * options.size + headerPad + padding / 2
     }
 
     override fun drawModalText() {
+        if (isAnimating()) return
+        drawCenterText("the bARbARiAn", 0, 54, width, Screen.fontColor, Screen.subTitleFont)
         options.keys.forEachIndexed { n, optionText ->
             drawOptionText(optionText, n)
         }

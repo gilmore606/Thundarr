@@ -110,6 +110,7 @@ object Screen : KtxScreen {
     val fontColorBold = Color(1f, 1f, 1f, 1f)
     val fontColorRed = Color(1f, 0.1f, 0.1f, 1f)
     val fontColorGreen = Color(0.1f, 1f, 0.1f, 1f)
+    val fontColorBlue = Color(0f, 0.7f, 1f, 1f)
     val font: BitmapFont = FreeTypeFontGenerator(Gdx.files.internal("res/font/amstrad.ttf"))
         .generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().apply {
             size = fontSize

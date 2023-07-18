@@ -107,7 +107,7 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
             }
             if (actor.skillPoints > 0) {
                 drawRightText("${actor.skillPoints} point${if (actor.skillPoints > 1) "s" else ""} to spend!",
-                    width - padding, header - 32, Screen.fontColorGreen, Screen.smallFont)
+                    width - padding, header - 32, Screen.fontColorBlue, Screen.smallFont)
             }
         }
 
