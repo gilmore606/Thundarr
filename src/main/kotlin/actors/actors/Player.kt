@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
+import path.Pather
 import render.Screen
 import render.sparks.GlyphRise
 import render.sparks.Smoke
@@ -31,6 +32,7 @@ import world.gen.Metamap
 import world.journal.GameTime
 import world.journal.Journal
 import world.level.EnclosedLevel
+import world.level.Level
 import world.level.WorldLevel
 import world.stains.Fire
 import world.terrains.Terrain
@@ -117,10 +119,6 @@ open class Player : Actor(), Workbench {
     val autoPickUpTypes = mutableListOf<Thing.Tag>()
     val ignoredAutoPickupTypes = mutableListOf<Thing.Tag>()
 
-    init {
-        //Pather.subscribe(this, this, 60f)
-    }
-
     open fun onSpawn() {
         Strength.set(this, 10f + Dice.zeroTo(4).toFloat())
         Brains.set(this, 8f + Dice.zeroTo(4).toFloat())
@@ -133,6 +131,7 @@ open class Player : Actor(), Workbench {
 
     override fun die() {
         super.die()
+        Pather.unsubscribeAll(this)
         KtxAsync.launch {
             delay(1000L)
             Screen.addModal(BigSplashModal(
@@ -209,8 +208,8 @@ open class Player : Actor(), Workbench {
 
     fun getThrown(): Thing? = thrownTag?.let { tag -> contents.firstOrNull { it.tag == tag } }
 
-    override fun onMove() {
-        super.onMove()
+    override fun onMove(oldLevel: Level?) {
+        super.onMove(oldLevel)
         updateTemperature()
         if (level is WorldLevel) Metamap.markChunkVisitedAt(xy.x, xy.y)
     }

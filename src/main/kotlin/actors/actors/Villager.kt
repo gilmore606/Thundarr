@@ -19,6 +19,7 @@ import util.*
 import world.Entity
 import world.gen.features.Habitation
 import path.Pather
+import world.level.Level
 import world.quests.Quest
 
 @Serializable
@@ -206,7 +207,7 @@ class Villager(
         }
     }
 
-    override fun onMove() {
+    override fun onMove(oldLevel: Level?) {
         // Record ownedThings to detect robbery
         if (ownedThings.isEmpty()) {
             if (homeJob.contains(this)) {
@@ -222,7 +223,7 @@ class Villager(
                 }
             }
         }
-        super.onMove()
+        super.onMove(oldLevel)
     }
 
     override fun witnessEvent(culprit: Actor?, event: Event, location: XY) {

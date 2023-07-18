@@ -138,7 +138,8 @@ object Toolbar : Panel() {
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         val lx = screenX - this.x
         val ly = screenY - this.y
-        if (ly < this.height + slop && lx >= 0 && lx < this.width && !Screen.scrollDragging) {
+        if ((!mouseInside && ly < 1 && lx >= 0 && lx < this.width && !Screen.scrollDragging) ||
+            (mouseInside && ly < this.height + slop && lx >= 0 && lx < this.width && !Screen.scrollDragging)) {
             mouseInside = true
             if (!shouldShow()) return
             var newHover = -1
@@ -162,9 +163,7 @@ object Toolbar : Panel() {
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         mouseMovedTo(screenX, screenY)
-        val lx = screenX - this.x
-        val ly = screenY - this.y
-        if (ly < this.height + wakeSlop && lx >=0 && lx < this.width) {
+        if (mouseInside) {
             if (button == Mouse.Button.LEFT) {
                 if (hovered >= 0) {
                     doSelect(hovered)

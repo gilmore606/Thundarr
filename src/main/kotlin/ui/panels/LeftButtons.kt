@@ -121,7 +121,8 @@ object LeftButtons : Panel() {
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         val lx = screenX - this.x
         val ly = screenY - this.y
-        if (lx < this.width + 50 && ly >= 0 && ly < this.height && !Screen.scrollDragging) {
+        if ((!mouseInside && lx < 5 && ly >= 0 && ly < this.height && !Screen.scrollDragging) ||
+            (mouseInside && lx < this.width + 50 && ly >= 0 && ly < this.height && !Screen.scrollDragging)) {
             mouseInside = true
             if (!shouldShow()) return
             var newHover = -1
@@ -144,9 +145,7 @@ object LeftButtons : Panel() {
 
     override fun mouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
         mouseMovedTo(screenX, screenY)
-        val lx = screenX - this.x
-        val ly = screenY - this.y
-        if (lx < this.width + wakeSlop && ly >= 0 && ly < this.height) {
+        if (mouseInside) {
             if (button == Mouse.Button.LEFT) {
                 if (hovered >= 0) {
                     mouseInside = false

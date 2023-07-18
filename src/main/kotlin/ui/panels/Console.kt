@@ -32,6 +32,7 @@ object Console : Panel() {
     private val color = Color(0.9f, 0.9f, 0.7f, 0.9f)
     private val floatColor = Color(0.9f, 0.9f, 0.7f, 0f)
     private val floatHeightAbovePlayer = 70
+    private val activationX = RIGHT_PANEL_WIDTH
     private var floatText = ""
     private var floatAge = 0f
     private var floatWidth = 0
@@ -204,8 +205,7 @@ object Console : Panel() {
             burstFloor = dimLevel
         }
         modalUp = Screen.topModal != null
-        if (modalUp) burst = burstMax
-        if (!(mouseInside || inputActive || modalUp)) burst = max(burstFloor, burst - burstDecay * delta)
+        if (!(mouseInside || inputActive)) burst = max(burstFloor, burst - burstDecay * delta)
 
         color.apply {
             r = min(1f, Screen.fontColor.r * burst)
@@ -224,7 +224,7 @@ object Console : Panel() {
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         super.mouseMovedTo(screenX, screenY)
-        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing && screenX < this.width - RIGHT_PANEL_WIDTH - 100) {
+        if (!modalUp && (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing && screenX < this.x + activationX)) {
             if (!mouseInside) {
                 mouseInside = true
                 this.burst = 1.2f

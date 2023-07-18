@@ -46,7 +46,7 @@ object Pather {
                 maps = newMaps
                 skipTilLog++
                 if (skipTilLog > 10) {
-                    if (updates > 0) log.info("PATHER: updated $updates stepMaps last run")
+                    if (updates > 0) log.info("PATHER: updated $updates stepMaps last run ($maps)")
                     skipTilLog = 0
                 }
                 delay(1L)
@@ -120,9 +120,7 @@ object Pather {
     }
 
     fun unsubscribeAll(subscriber: Actor) {
-        jobs.add(coroutineScope.launch {
-            maps.forEach { if (it.walkerID == subscriber.id) it.expire() }
-        })
+        maps.safeForEach { if (it.walkerID == subscriber.id) it.expire() }
     }
 
     fun saveActorMaps(subscriber: Actor) {

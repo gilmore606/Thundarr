@@ -173,7 +173,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         onMove()
     }
 
-    open fun onMove() {
+    open fun onMove(oldLevel: Level? = null) {
         level?.thingsAt(xy.x, xy.y)?.forEach { thing ->
             if (wantsToPickUp(thing)) queue(Get(thing.getKey()))
         }
@@ -208,7 +208,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     // Queue an action to be executed next.
     fun queue(action: Action) {
-        if (action.canQueueFor(this)) queuedActions.add(action)
+        if (action.canQueueFor(this)) {
+            action.onQueue(this)
+            queuedActions.add(action)
+        }
     }
 
     fun cancelAction() {

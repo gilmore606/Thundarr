@@ -15,6 +15,7 @@ import render.tilesets.Glyph
 import things.*
 import ui.panels.Console
 import util.*
+import world.level.Level
 import world.terrains.Terrain
 import world.terrains.Wall
 import kotlin.random.Random
@@ -222,8 +223,8 @@ class AttractPlayer : Player() {
         return null
     }
 
-    override fun onMove() {
-        super.onMove()
+    override fun onMove(oldLevel: Level?) {
+        super.onMove(oldLevel)
         val roofed = level?.isRoofedAt(xy.x, xy.y) ?: false
         if (wasOutdoor && roofed) {
             lastOutdoor.x = xy.x
