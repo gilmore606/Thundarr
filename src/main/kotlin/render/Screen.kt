@@ -174,7 +174,7 @@ object Screen : KtxScreen {
     var cameraSpeed = 4.0
     var scrollLatch = false
     var scrollDragging = false
-    val dragPixels = XY(0, 0)
+    val dragPixels = XYd(0.0, 0.0)
     private val lastDrag = XY(0, 0)
     private val dragInertia = XY(0, 0)
     private val dragInertiaLast = XY(0, 0)
@@ -406,6 +406,7 @@ object Screen : KtxScreen {
     private fun animateCamera(delta: Float) {
         sinBob = sin(((timeMs % 1000L).toFloat() * 0.001f) * 6.283f)
 
+        // Animate zoom to zoomtarget
         if (brightness < brightnessTarget) {
             brightness = kotlin.math.min(brightnessTarget, brightness + delta * 0.6f)
         } else if (brightness > brightnessTarget) {
@@ -413,24 +414,31 @@ object Screen : KtxScreen {
         }
         val ztarget = currentZoomTarget()
         val zdiff = min(3.0, max(0.04, abs(zoom - ztarget)))
+        var newZoom = zoom
         if (zoom < ztarget) {
-            zoom = min(ztarget, zoom + zdiff * delta * ZOOM_SPEED)
+            newZoom = min(ztarget, zoom + zdiff * delta * ZOOM_SPEED)
         } else if (zoom > ztarget) {
-            zoom = max(ztarget, zoom - zdiff * delta * ZOOM_SPEED)
+            newZoom = max(ztarget, zoom - zdiff * delta * ZOOM_SPEED)
         }
+        if (scrollLatch && zoom != newZoom) {
+            dragPixels.x = (dragPixels.x / zoom) * newZoom
+            dragPixels.y = (dragPixels.y / zoom) * newZoom
+        }
+        zoom = newZoom
 
+        // Animate scroll latch release of dragPixels
         if (scrollLatch) {
             if (scrollDragging) {
                 dragInertiaDelta = delta
                 dragInertia.x = ((dragPixels.x - dragInertiaLast.x) * dragStartWeight).toInt()
                 dragInertia.y = ((dragPixels.y - dragInertiaLast.y) * dragStartWeight).toInt()
-                dragInertiaLast.x = dragPixels.x
-                dragInertiaLast.y = dragPixels.y
+                dragInertiaLast.x = dragPixels.x.toInt()
+                dragInertiaLast.y = dragPixels.y.toInt()
             } else {
                 dragPixels.x += ((dragInertia.x / dragInertiaDelta) * delta).toInt()
                 dragPixels.y += ((dragInertia.y / dragInertiaDelta) * delta).toInt()
-                val txdist = pxToTiles(dragPixels.x).toDouble()
-                val tydist = pyToTiles(dragPixels.y).toDouble()
+                val txdist = pxToTiles(dragPixels.x.toInt()).toDouble()
+                val tydist = pyToTiles(dragPixels.y.toInt()).toDouble()
                 cameraPov = XYd(txdist, tydist) + pov
                 dragInertia.x = (dragInertia.x.toFloat() * dragBraking).toInt()
                 dragInertia.y = (dragInertia.y.toFloat() * dragBraking).toInt()
@@ -438,15 +446,16 @@ object Screen : KtxScreen {
             return
         }
 
+        // Animate camera to camera target
         val target = cameraTargetOffset + pov
         val diff = target - cameraPov
         val currentSpeed = cameraVec.magnitude()
-        val desiredSpeed = diff.magnitude() * cameraSpeed
+        val diffMagnitude = diff.magnitude()
+        val desiredSpeed = min(diffMagnitude * cameraAccel, diffMagnitude * cameraSpeed)
         val accel = max(-cameraAccel, min(cameraAccel, (desiredSpeed - currentSpeed)))
         val nextSpeed = currentSpeed + accel
         cameraVec = diff.toUnitVec() * nextSpeed
 
-        // Move the camera
         cameraPov += cameraVec * delta.toDouble()
     }
 
@@ -513,13 +522,13 @@ object Screen : KtxScreen {
                 dragPixels.y += lastDrag.y - screenY
                 lastDrag.x = screenX
                 lastDrag.y = screenY
-                val txdist = pxToTiles(dragPixels.x).toDouble()
-                val tydist = pyToTiles(dragPixels.y).toDouble()
+                val txdist = pxToTiles(dragPixels.x.toInt()).toDouble()
+                val tydist = pyToTiles(dragPixels.y.toInt()).toDouble()
                 cameraPov.x = pov.x + txdist
                 cameraPov.y = pov.y + tydist
             } else {
-                val col = screenXtoTileX(screenX + dragPixels.x)
-                val row = screenYtoTileY(screenY + dragPixels.y)
+                val col = screenXtoTileX(screenX + dragPixels.x.toInt())
+                val row = screenYtoTileY(screenY + dragPixels.y.toInt())
                 if (col != cursorPosition?.x || row != cursorPosition?.y) {
                     if (!buttonBarsShown() && App.level.isSeenAt(col, row)) {
                         if (App.player.queuedActions.isEmpty()) {
@@ -578,8 +587,8 @@ object Screen : KtxScreen {
                     return true
                 }
                 Mouse.Button.RIGHT -> {
-                    val x = screenXtoTileX(screenX + dragPixels.x)
-                    val y = screenYtoTileY(screenY + dragPixels.y)
+                    val x = screenXtoTileX(screenX + dragPixels.x.toInt())
+                    val y = screenYtoTileY(screenY + dragPixels.y.toInt())
                     setCursorPosition(x,y)
                     rightClickCursorTile()
                     return true
@@ -616,16 +625,16 @@ object Screen : KtxScreen {
     fun releaseScrollLatch() {
         scrollLatch = false
         scrollDragging = false
-        dragPixels.x = 0
-        dragPixels.y = 0
+        dragPixels.x = 0.0
+        dragPixels.y = 0.0
     }
 
     fun rightClickCursorTile() {
         if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
         val offset = (8.0 * zoom).toInt()
         val menu = ContextMenu(
-            tileXtoScreenX(cursorPosition!!.x) - dragPixels.x - offset,
-            tileYtoScreenY(cursorPosition!!.y) - dragPixels.y - offset
+            tileXtoScreenX(cursorPosition!!.x) - dragPixels.x.toInt() - offset,
+            tileYtoScreenY(cursorPosition!!.y) - dragPixels.y.toInt() - offset
         ).apply {
             App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
         }
@@ -743,7 +752,7 @@ object Screen : KtxScreen {
 
     }
 
-    fun grayOutLevel() = if (dragPixels.x != 0 || dragPixels.y != 0) 0.5f else 0.8f
+    fun grayOutLevel() = if (dragPixels.x != 0.0 || dragPixels.y != 0.0) 0.5f else 0.8f
 
     fun tileXtoGlx(col: Double) = ((col - (cameraPov.x) - 0.5) * tileStride) / aspectRatio
     fun tileYtoGly(row: Double) = ((row - (cameraPov.y) - 0.5) * tileStride)

@@ -98,8 +98,8 @@ sealed class Level {
         delta: Float
     ) {
         var minOutdoorDist = 100
-        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x).toInt()
-        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y).toInt()
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x.toInt()).toInt()
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y.toInt()).toInt()
         for (x in povX - Screen.renderTilesWide / 2 until povX + Screen.renderTilesWide / 2) {
             for (y in povY - Screen.renderTilesHigh / 2 until povY + Screen.renderTilesHigh / 2) {
                 chunkAt(x, y)?.also { chunk ->
@@ -112,7 +112,7 @@ sealed class Level {
                         val light = when {
                             App.DEBUG_VISIBLE -> Screen.fullLight
                             vis == 1f -> chunk.lightAt(x, y)
-                            Screen.showSeenAreas && (Screen.dragPixels.x != 0 || Screen.dragPixels.y != 0) -> Screen.fullLight
+                            Screen.showSeenAreas && (Screen.dragPixels.x != 0.0 || Screen.dragPixels.y != 0.0) -> Screen.fullLight
                             Screen.showSeenAreas -> Screen.halfLight
                             else -> Screen.fullDark
                         }
@@ -149,8 +149,8 @@ sealed class Level {
     fun forEachThingToRender(
         doThis: (x: Int, y: Int, thing: Thing, vis: Float) -> Unit, delta: Float
     ) {
-        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x).toInt()
-        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y).toInt()
+        val povX = pov.x + Screen.pxToTiles(Screen.dragPixels.x.toInt()).toInt()
+        val povY = pov.y + Screen.pxToTiles(Screen.dragPixels.y.toInt()).toInt()
         for (x in povX - Screen.renderTilesWide/2 until povX + Screen.renderTilesWide/2) {
             for (y in povY - Screen.renderTilesHigh/2 until povY + Screen.renderTilesHigh/2) {
                 val thingsAt = thingsAt(x,y)

@@ -19,6 +19,9 @@ data class XY(var x: Int, var y: Int) {
     operator fun times(b: Int): XY {
         return XY(x * b, y * b)
     }
+    operator fun times(b: Double): XY {
+        return XY((x * b).toInt(), (y * b).toInt())
+    }
     override fun equals(other: Any?): Boolean {
         return (other is XY) && (x == other.x && y == other.y)
     }
