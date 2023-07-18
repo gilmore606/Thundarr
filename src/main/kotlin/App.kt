@@ -259,6 +259,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
     private fun createNewWorld(startType: StartType) {
         pendingJob = KtxAsync.launch {
 
+            Console.lowerFloater = true
             LevelKeeper.hibernateAll()
 
             var rejected = true
@@ -312,6 +313,7 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
             delay(500)
             movePlayerIntoLevel(playerStart.x, playerStart.y)
             Console.clear()
+            Console.lowerFloater = false
             Console.say(
                 when (startType) {
                     StartType.SURVIVE -> "You gather your wits and resolve to survive."

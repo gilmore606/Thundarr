@@ -37,6 +37,7 @@ object Console : Panel() {
     private var floatAge = 0f
     private var floatWidth = 0
     private var floatFadeTime = 2f
+    var lowerFloater = false
 
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
@@ -247,7 +248,7 @@ object Console : Panel() {
             floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
             drawStringAbsolute(floatText,
                 Screen.width / 2 - floatWidth / 2,
-                Screen.height / 2 - floatHeightAbovePlayer + if (Metamap.isWorking) 150 else 0,
+                Screen.height / 2 - floatHeightAbovePlayer + if (lowerFloater) 150 else 0,
                 floatColor, Screen.smallFont)
         }
     }
