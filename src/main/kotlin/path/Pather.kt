@@ -28,7 +28,6 @@ object Pather {
     private fun relaunchWorker() {
         worker?.cancel()
         worker = KtxAsync.launch {
-            var skipTilLog = 0
             while (!App.isExiting) {
                 val newMaps = mutableListOf<StepMap>()
                 var updates = 0
@@ -44,11 +43,7 @@ object Pather {
                     }
                 }
                 maps = newMaps
-                skipTilLog++
-                if (skipTilLog > 10) {
-                    if (updates > 0) log.info("PATHER: updated $updates stepMaps last run ($maps)")
-                    skipTilLog = 0
-                }
+                if (updates > 0) log.info("PATHER: updated $updates maps (${maps.size} alive)")
                 delay(1L)
             }
         }

@@ -17,8 +17,10 @@ class WalkTo(
     val y: Int
 ) : Action(1f) {
     override fun name() = "move"
+    override fun toString() = "WalkTo($x,$y)"
 
     private var done = false
+    private var fails = 0
     private val dest = XY(x,y)
 
     override fun shouldContinueFor(actor: Actor): Boolean = !done && (actor.xy.x != x || actor.xy.y != y)
@@ -36,7 +38,13 @@ class WalkTo(
                     log.info("walkTo failed at unwalkable step $it")
                     done = true
                 }
-            } ?: run { done = true }
+            } ?: run {
+                fails++
+                log.info("  ($this for $actor failed $fails)")
+                if (fails > 10) {
+                    done = true
+                }
+            }
         }
         if (done) {
             Pather.unsubscribe(actor, dest)
