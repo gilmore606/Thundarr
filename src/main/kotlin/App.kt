@@ -34,6 +34,8 @@ import kotlin.system.exitProcess
 
 object App : KtxGame<com.badlogic.gdx.Screen>() {
 
+    private val defaultWindowSize = XY(1400, 1000)
+
     lateinit var player: Player
     lateinit var level: Level
     lateinit var save: SaveSlot
@@ -171,7 +173,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 zoomIndex = Screen.zoomIndex,
                 windowSize = Screen.savedWindowSize(),
                 fullscreen = Screen.fullscreen,
-                cameraSlack = Screen.cameraSlack,
+                cameraSpeed = Screen.cameraSpeed,
+                cameraAccel = Screen.cameraAccel,
                 cameraMenuShift = Screen.cameraMenuShift,
                 worldZoom = Screen.worldZoom,
                 uiHue = Screen.uiHue,
@@ -242,7 +245,8 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
 
                 Screen.restoreZoomIndex(state.zoomIndex)
                 Screen.worldZoom = state.worldZoom
-                Screen.cameraSlack = state.cameraSlack
+                Screen.cameraSpeed = state.cameraSpeed
+                Screen.cameraAccel = state.cameraAccel
                 Screen.cameraMenuShift = state.cameraMenuShift
                 Screen.uiHue = state.uiHue
 
@@ -252,6 +256,10 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Speaker.volumeUI = state.volumeUI
 
                 Keyboard.loadBinds(state.binds)
+            } ?: run {
+                // Set missing prefs to reasonable defaults
+                Screen.resize(defaultWindowSize.x, defaultWindowSize.y)
+                Gdx.graphics.setWindowedMode(defaultWindowSize.x, defaultWindowSize.y)
             }
         }
     }

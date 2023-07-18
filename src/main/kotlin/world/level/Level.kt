@@ -487,7 +487,7 @@ sealed class Level {
                 App.player.queue(WalkTo(x, y))
             }
         }
-        if (visibilityAt(x, y) < 1f) return
+        if (visibilityAt(x, y) < 1f && !App.DEBUG_VISIBLE) return
 
         val groups = thingsAt(x,y).groupByTag()
         groups.forEach { group ->

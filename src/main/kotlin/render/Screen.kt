@@ -34,8 +34,6 @@ import world.terrains.Water
 import java.lang.Double.max
 import java.lang.Double.min
 import kotlin.math.abs
-import kotlin.math.absoluteValue
-import kotlin.math.sign
 
 object Screen : KtxScreen {
     const val GLSL_VERSION = "120"
@@ -43,12 +41,10 @@ object Screen : KtxScreen {
     var brightnessTarget = 1f
     val textureFilter = TextureFilter.MipMapLinearLinear
     var worldZoom = 1.3
-    var cameraSlack = 0.3
     var cameraMenuShift = 0.8
     var uiHue = 0.0
     var showSeenAreas = true
     var showRadar = true
-    private const val CAMERA_MAX_JERK = 0.7
     private const val ZOOM_SPEED = 4.0
     private const val MAX_RENDER_WIDTH = 150
     private const val MAX_RENDER_HEIGHT = 150
@@ -171,13 +167,11 @@ object Screen : KtxScreen {
         get() = App.level.pov
     private val lastPov = XY(0,0)
 
-    var cameraPovX = 0.0
-    var cameraPovY = 0.0
-    var cameraOffsetX = 0.0
-    var cameraOffsetY = 0.0
-    private var cameraLastMoveX = 0.0
-    private var cameraLastMoveY = 0.0
-
+    var cameraTargetOffset = XYd(0.0, 0.0)  // add to pov to get intended camera target pos
+    var cameraPov = XYd(0.0, 0.0)  // actual camera pos
+    var cameraVec = XYd(0.0, 0.0)  // current camera movement vector
+    var cameraAccel = 2.0  // max vector change per sec
+    var cameraSpeed = 4.0
     var scrollLatch = false
     var scrollDragging = false
     val dragPixels = XY(0, 0)
@@ -378,8 +372,7 @@ object Screen : KtxScreen {
         topModal = topModalFound
         underModal = underModalFound
         if (topModal == null) {
-            this@Screen.cameraOffsetX = 0.0
-            this@Screen.cameraOffsetY = 0.0
+            this@Screen.cameraTargetOffset = XYd(0.0, 0.0)
         }
 
         drawEverything(delta)
@@ -419,11 +412,11 @@ object Screen : KtxScreen {
             brightness = kotlin.math.max(brightnessTarget, brightness - delta * 1.6f)
         }
         val ztarget = currentZoomTarget()
-        val diff = min(3.0, max(0.04, abs(zoom - ztarget)))
+        val zdiff = min(3.0, max(0.04, abs(zoom - ztarget)))
         if (zoom < ztarget) {
-            zoom = min(ztarget, zoom + diff * delta * ZOOM_SPEED)
+            zoom = min(ztarget, zoom + zdiff * delta * ZOOM_SPEED)
         } else if (zoom > ztarget) {
-            zoom = max(ztarget, zoom - diff * delta * ZOOM_SPEED)
+            zoom = max(ztarget, zoom - zdiff * delta * ZOOM_SPEED)
         }
 
         if (scrollLatch) {
@@ -438,50 +431,31 @@ object Screen : KtxScreen {
                 dragPixels.y += ((dragInertia.y / dragInertiaDelta) * delta).toInt()
                 val txdist = pxToTiles(dragPixels.x).toDouble()
                 val tydist = pyToTiles(dragPixels.y).toDouble()
-                cameraPovX = pov.x + txdist
-                cameraPovY = pov.y + tydist
+                cameraPov = XYd(txdist, tydist) + pov
                 dragInertia.x = (dragInertia.x.toFloat() * dragBraking).toInt()
                 dragInertia.y = (dragInertia.y.toFloat() * dragBraking).toInt()
             }
             return
         }
 
-        val slack = if (App.attractMode) cameraSlack * 3.5 else cameraSlack
-        val maxJerk = if (App.attractMode) CAMERA_MAX_JERK * 0.5 else CAMERA_MAX_JERK
-        val targetX = pov.x + cameraOffsetX
-        val targetY = pov.y + cameraOffsetY
-        val xdist = (targetX - cameraPovX)
-        val ydist = (targetY - cameraPovY)
-        var xinc = max(0.5, min(1000.0, (xdist.absoluteValue / slack))) * xdist.sign
-        var yinc = max(0.5, min(1000.0, (ydist.absoluteValue / slack))) * ydist.sign
-        var xchange = cameraLastMoveX - xinc
-        var ychange = cameraLastMoveY - yinc
-        xchange = if (xchange >= 0.0) min(xchange, maxJerk) else max(xchange, -maxJerk)
-        ychange = if (ychange >= 0.0) min(ychange, maxJerk) else max(ychange, -maxJerk)
-        xinc = cameraLastMoveX - xchange
-        yinc = cameraLastMoveY - ychange
-        cameraLastMoveX = xinc
-        cameraLastMoveY = yinc
+        val target = cameraTargetOffset + pov
+        val diff = target - cameraPov
+        val currentSpeed = cameraVec.magnitude()
+        val desiredSpeed = diff.magnitude() * cameraSpeed
+        val accel = max(-cameraAccel, min(cameraAccel, (desiredSpeed - currentSpeed)))
+        val nextSpeed = currentSpeed + accel
+        cameraVec = diff.toUnitVec() * nextSpeed
 
-        if (cameraPovX < targetX) {
-            cameraPovX = min(targetX, cameraPovX + xinc * delta)
-        } else if (cameraPovX > targetX) {
-            cameraPovX = max(targetX,  cameraPovX + xinc * delta)
-        }
-        if (cameraPovY < targetY) {
-            cameraPovY = min(targetY, cameraPovY + yinc * delta)
-        } else if (cameraPovY > targetY) {
-            cameraPovY = max(targetY, cameraPovY + yinc * delta)
-        }
+        // Move the camera
+        cameraPov += cameraVec * delta.toDouble()
     }
 
     fun recenterCamera() {
         lastPov.x = pov.x
         lastPov.y = pov.y
-        cameraPovX = pov.x.toDouble()
-        cameraPovY = pov.y.toDouble()
-        cameraLastMoveX = 0.0
-        cameraLastMoveY = 0.0
+        cameraPov.x = pov.x.toDouble()
+        cameraPov.y = pov.y.toDouble()
+        cameraVec = XYd(0.0,0.0)
         log.info("Screen.recenterCamera()")
     }
 
@@ -541,8 +515,8 @@ object Screen : KtxScreen {
                 lastDrag.y = screenY
                 val txdist = pxToTiles(dragPixels.x).toDouble()
                 val tydist = pyToTiles(dragPixels.y).toDouble()
-                cameraPovX = pov.x + txdist
-                cameraPovY = pov.y + tydist
+                cameraPov.x = pov.x + txdist
+                cameraPov.y = pov.y + tydist
             } else {
                 val col = screenXtoTileX(screenX + dragPixels.x)
                 val row = screenYtoTileY(screenY + dragPixels.y)
@@ -683,10 +657,10 @@ object Screen : KtxScreen {
         val tileWidth = ((modal.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride
         val tileHeight = ((modal.height.toDouble() / (height)) * 2.0) / tileStride
         when (modal.position) {
-            Modal.Position.LEFT -> { this.cameraOffsetX = 0.0 - (tileWidth / 2.0 * cameraMenuShift) }
-            Modal.Position.RIGHT -> { this.cameraOffsetX = 0.0 + (tileWidth / 2.0 * cameraMenuShift) }
-            Modal.Position.TOP -> { this.cameraOffsetY = 0.0 - (tileHeight / 2.0 * cameraMenuShift) }
-            Modal.Position.BOTTOM -> { this.cameraOffsetY = 0.0 + (tileHeight / 2.0 * cameraMenuShift) }
+            Modal.Position.LEFT -> { this.cameraTargetOffset.x = 0.0 - (tileWidth / 2.0 * cameraMenuShift) }
+            Modal.Position.RIGHT -> { this.cameraTargetOffset.x = 0.0 + (tileWidth / 2.0 * cameraMenuShift) }
+            Modal.Position.TOP -> { this.cameraTargetOffset.y = 0.0 - (tileHeight / 2.0 * cameraMenuShift) }
+            Modal.Position.BOTTOM -> { this.cameraTargetOffset.y = 0.0 + (tileHeight / 2.0 * cameraMenuShift) }
             else -> { }
         }
         topModal = modal
@@ -771,16 +745,16 @@ object Screen : KtxScreen {
 
     fun grayOutLevel() = if (dragPixels.x != 0 || dragPixels.y != 0) 0.5f else 0.8f
 
-    fun tileXtoGlx(col: Double) = ((col - (cameraPovX) - 0.5) * tileStride) / aspectRatio
-    fun tileYtoGly(row: Double) = ((row - (cameraPovY) - 0.5) * tileStride)
+    fun tileXtoGlx(col: Double) = ((col - (cameraPov.x) - 0.5) * tileStride) / aspectRatio
+    fun tileYtoGly(row: Double) = ((row - (cameraPov.y) - 0.5) * tileStride)
     private fun tileXtoScreenX(tileX: Int) = ((width / 2.0) + (tileX - pov.x + 0.5) / aspectRatio * 0.5 * tileStride * width.toDouble()).toInt()
     private fun tileYtoScreenY(tileY: Int) = ((height / 2.0) + (tileY - pov.y - 0.5) * 0.5 * tileStride * height.toDouble()).toInt()
     private fun screenXtoTileX(screenX: Int): Int {
-        val ix = (((((screenX.toFloat() - dragPixels.x) / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + cameraPovX
+        val ix = (((((screenX.toFloat() - dragPixels.x) / width) * 2.0 - 1.0) * aspectRatio) + tileStride * 0.5) / tileStride + cameraPov.x
         return ix.toInt() + (if (ix < 0.0) -1 else 0)
     }
     private fun screenYtoTileY(screenY: Int): Int {
-        val iy = (((screenY.toFloat() - dragPixels.y) / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + cameraPovY
+        val iy = (((screenY.toFloat() - dragPixels.y) / height) * 2.0 - 1.0 + tileStride * 0.5) / tileStride + cameraPov.y
         return iy.toInt() + (if (iy < 0.0) -1 else 0)
     }
     fun pxToTiles(p: Int): Float = ((p.toFloat() / width.toFloat() * 2f) * aspectRatio / tileStride).toFloat()

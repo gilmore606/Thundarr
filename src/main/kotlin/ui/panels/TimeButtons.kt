@@ -128,7 +128,7 @@ object TimeButtons : Panel() {
         val lx = screenX - this.x
         val ly = screenY - this.y
         if ((!mouseInside && ly < 1 && lx >= 0 && lx < this.width && !Screen.scrollDragging) ||
-            (mouseInside && ly < this.height + slop && lx >= 0 && lx < this.width && !Screen.scrollDragging)) {
+            ((mouseInside || state != State.PAUSE) && ly < this.height + slop && lx >= 0 && lx < this.width && !Screen.scrollDragging)) {
             mouseInside = true
             if (!shouldShow()) return
             var newHover = -1

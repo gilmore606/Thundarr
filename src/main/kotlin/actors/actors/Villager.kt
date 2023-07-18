@@ -300,4 +300,10 @@ class Villager(
         "No time to chat, I've got places to be."
     )
 
+    override fun examineInfo(): String {
+        if (!App.DEBUG_VISIBLE) return super.examineInfo() else {
+            val action = if (queuedActions.isNotEmpty()) queuedActions[0] else null
+            return "targetJob=${targetJob}\ndoing=$action"
+        }
+    }
 }

@@ -3,14 +3,13 @@ package ui.modals
 import audio.Speaker
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import render.Screen
-import render.batches.QuadBatch
 import render.tilesets.Glyph
 import ui.input.Keydef
 import ui.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
 
-class SettingsModal : Modal(300, 580, "- settings -") {
+class SettingsModal : Modal(300, 440, "- settings -") {
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -29,17 +28,19 @@ class SettingsModal : Modal(300, 580, "- settings -") {
         var dragging = false
 
         fun drawText(modal: SettingsModal) {
-            modal.drawString(title, modal.padding, modal.contentY + y, color = if (dragging) Screen.fontColorBold else Screen.fontColor)
+            modal.drawString(title, modal.padding, modal.contentY + y, color = if (dragging) Screen.fontColorBold else Screen.fontColor,
+                font = Screen.smallFont)
         }
         fun drawBackground(modal: SettingsModal) {
-            modal.drawQuad(modal.padding, modal.contentY + y + 40, modal.width - modal.padding * 2, 4, Glyph.BOX_BORDER)
-            val thumbx = ((modal.width - modal.padding * 2).toFloat() * value).toInt()
-            modal.drawQuad(thumbx, modal.contentY + y + 26, 32, 32, Glyph.BUTTON_SYSTEM)
+            modal.drawQuad(modal.padding, modal.contentY + y + 30, modal.width - modal.padding * 2, 4, Glyph.BOX_BORDER)
+            val thumbx = ((modal.width - modal.padding * 2).toFloat() * value).toInt() + 8
+            modal.drawQuad(thumbx, modal.contentY + y + 16, 32, 32, Glyph.BUTTON_SYSTEM)
         }
         fun mouseClicked(modal: SettingsModal, modalX: Int, modalY: Int) {
-            val thumbx = ((modal.width - modal.padding * 2).toFloat() * value).toInt()
+            val thumbx = ((modal.width - modal.padding * 2).toFloat() * value).toInt() + 8
             if (modalX >= thumbx && modalX <= thumbx + 32) {
                 dragging = true
+                Speaker.ui(Speaker.SFX.UIMOVE)
             }
         }
         fun mouseMovedTo(modal: SettingsModal, modalX: Int, modalY: Int) {
@@ -49,7 +50,12 @@ class SettingsModal : Modal(300, 580, "- settings -") {
                 onValueSet(outValue)
             }
         }
-        fun mouseUp(modal: SettingsModal) { dragging = false }
+        fun mouseUp(modal: SettingsModal) {
+            if (dragging) {
+                dragging = false
+                Speaker.ui(Speaker.SFX.UISELECT)
+            }
+        }
     }
 
     class Multipick(
@@ -62,10 +68,10 @@ class SettingsModal : Modal(300, 580, "- settings -") {
         val widths = options.map { option -> GlyphLayout(Screen.font, option).width.toInt() + 20 }
 
         fun drawText(modal: SettingsModal) {
-            modal.drawString(title, modal.padding, modal.contentY + y)
+            modal.drawString(title, modal.padding, modal.contentY + y, font = Screen.smallFont)
             var xused = 0
             options.forEachIndexed { n, option ->
-                modal.drawString(option, modal.padding + xused + 10, modal.contentY + y + 30,
+                modal.drawString(option, modal.padding + xused + 10, modal.contentY + y + 24,
                     color = if (n == selected) Screen.fontColorBold else Screen.fontColorDull)
                 xused += widths[n]
             }
@@ -86,25 +92,25 @@ class SettingsModal : Modal(300, 580, "- settings -") {
     }
 
     object Video : Section("video") {
-        val sliderCameraSpring = Slider("Camera follow slack", 0, Screen.cameraSlack, 0.04, 0.7) {
-            Screen.cameraSlack = it }
-        val sliderWorldZoom = Slider("Overworld auto zoom-out", 85, Screen.worldZoom, 1.0, 1.4) {
+        val sliderCameraSpeed = Slider("Camera speed", 0, Screen.cameraSpeed, 0.5, 10.0) {
+            Screen.cameraSpeed = it }
+        val sliderCameraAccel = Slider("Camera accel", 60, Screen.cameraAccel, 0.5, 4.0) {
+            Screen.cameraAccel = it }
+        val sliderWorldZoom = Slider("Overworld auto zoom-out", 120, Screen.worldZoom, 1.0, 1.4) {
             Screen.worldZoom = it }
-        val sliderMenuShift = Slider("Camera shift on menu open", 170, Screen.cameraMenuShift, 0.01, 0.9) {
+        val sliderMenuShift = Slider("Camera shift on menu open", 180, Screen.cameraMenuShift, 0.01, 0.9) {
             Screen.cameraMenuShift = it}
-        val sliderUIColor = Slider("UI hue adjust", 255, Screen.uiHue, 0.0, 6.283) {
+        val sliderUIColor = Slider("UI hue adjust", 240, Screen.uiHue, 0.0, 6.283) {
             Screen.uiHue = it }
-        val sliders = listOf(sliderCameraSpring, sliderWorldZoom, sliderMenuShift, sliderUIColor)
+        val sliders = listOf(sliderCameraSpeed, sliderCameraAccel, sliderWorldZoom, sliderMenuShift, sliderUIColor)
 
-        val menuPos = Multipick("Dialog window position", 355, listOf("Left", "Center", "Top"))
+
         override fun drawText(modal: SettingsModal) {
             sliders.forEach { it.drawText(modal) }
-            menuPos.drawText(modal)
         }
 
         override fun drawBackground(modal: SettingsModal) {
             sliders.forEach { it.drawBackground(modal) }
-            menuPos.drawBackground(modal)
         }
         override fun mouseClicked(modal: SettingsModal, modalX: Int, modalY: Int) {
             sliders.forEachIndexed { n, slider ->
@@ -129,13 +135,13 @@ class SettingsModal : Modal(300, 580, "- settings -") {
         val sliderMaster = Slider("Master volume", 0, Speaker.volumeMaster, 0.0, 1.0) {
             Speaker.volumeMaster = it
         }
-        val sliderWorld = Slider("World volume", 85, Speaker.volumeWorld, 0.0, 1.0) {
+        val sliderWorld = Slider("World volume", 80, Speaker.volumeWorld, 0.0, 1.0) {
             Speaker.volumeWorld = it
         }
-        val sliderMusic = Slider("Music volume", 170, Speaker.volumeMusic, 0.0, 1.0) {
+        val sliderMusic = Slider("Music volume", 160, Speaker.volumeMusic, 0.0, 1.0) {
             Speaker.volumeMusic = it
         }
-        val sliderUI = Slider("UI volume", 255, Speaker.volumeUI, 0.0, 1.0) {
+        val sliderUI = Slider("UI volume", 240, Speaker.volumeUI, 0.0, 1.0) {
             Speaker.volumeUI = it
         }
         val sliders = listOf(sliderMaster, sliderWorld, sliderMusic, sliderUI)
@@ -189,7 +195,7 @@ class SettingsModal : Modal(300, 580, "- settings -") {
             return true
         }
         hoveredSection?.also { hovered ->
-            if (hovered != selectedSection) Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
+            if (hovered != selectedSection) Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
             selectedSection = hovered
         } ?: run {
             sections[selectedSection].mouseClicked(this, screenX - this.x, screenY - this.y)
@@ -209,7 +215,7 @@ class SettingsModal : Modal(300, 580, "- settings -") {
                 newSection = min(sections.lastIndex, (localX / spacePerSectionTitle))
             }
         }
-        if (newSection != hoveredSection) Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
+        if (newSection != hoveredSection) Speaker.ui(Speaker.SFX.UIMOVE, screenX = x)
         hoveredSection = newSection
         if (localY >= contentY) {
             sections[selectedSection].mouseMovedTo(this, localX, localY)

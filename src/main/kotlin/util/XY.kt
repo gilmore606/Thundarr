@@ -88,6 +88,33 @@ data class XYf(var x: Float, var y: Float) {
     }
 }
 
+data class XYd(var x: Double, var y: Double) {
+    override fun toString() = "$x,$y"
+
+    operator fun plus(b: XYd): XYd {
+        return XYd(x + b.x, y + b.y)
+    }
+    operator fun plus(b: XY): XYd {
+        return XYd(x + b.x, y + b.y)
+    }
+    operator fun minus(b: XYd): XYd {
+        return XYd(x - b.x, y - b.y)
+    }
+    operator fun times(b: Double): XYd {
+        return XYd(x * b, y * b)
+    }
+    override fun equals(other: Any?): Boolean {
+        return (other is XYd) && (x == other.x && y == other.y)
+    }
+
+    fun magnitude() = sqrt(x.pow(2) + y.pow(2))
+    fun toUnitVec(): XYd {
+        val mag = magnitude()
+        if (mag < 1.0) return this
+        return XYd(x / mag, y / mag)
+    }
+}
+
 fun dirToEdge(dir: XY, offset: Int = 0): XY = when (dir) {
     NORTH -> XY(CHUNK_SIZE / 2 + offset, 0)
     SOUTH -> XY(CHUNK_SIZE / 2 + offset, CHUNK_SIZE - 1)
