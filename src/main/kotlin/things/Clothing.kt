@@ -8,8 +8,9 @@ import actors.stats.skills.Fight
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Damage.*
+import ui.modals.ExamineModal.StatLine
+import world.Entity
 import java.lang.Float.max
-import java.lang.Float.min
 
 @Serializable
 sealed class Clothing : Gear() {
@@ -37,6 +38,7 @@ sealed class Clothing : Gear() {
             BURN -> vsBURN * amount
             SHOCK -> vsSHOCK * amount
             CORRODE -> vsCORRODE * amount
+            else -> amount
         }
     }
 
@@ -58,6 +60,37 @@ sealed class Clothing : Gear() {
 
     fun reduceDamage(target: Actor, type: Damage, rawDamage: Float): Float =
         max(0f, rawDamage - armorVs(type))
+
+    override fun examineStats(compareTo: Entity?) = mutableListOf<StatLine>().apply {
+        add(StatLine(isSpacer = true))
+        add(StatLine(
+            "deflect", deflect(), showPlus = true,
+            compare = compareTo?.let { (it as Clothing).deflect() }
+        ))
+        add(StatLine(
+            "made of", valueString = material().displayName
+        ))
+        add(StatLine(isSpacer = true))
+        Damage.values().forEach { damage ->
+            add(StatLine(
+                "vs ${damage.displayName}", armorVs(damage),
+                compare = compareTo?.let { (it as Clothing).armorVs(damage) }
+            ))
+        }
+        add(StatLine(isSpacer = true))
+        add(StatLine(
+            "insulation", coldProtection(),
+            compare = compareTo?.let { (it as Clothing).coldProtection() }
+        ))
+        add(StatLine(
+            "cooling", heatProtection(),
+            compare = compareTo?.let { (it as Clothing).heatProtection() }
+        ))
+        add(StatLine(
+            "weather", weatherProtection(),
+            compare = compareTo?.let { (it as Clothing).weatherProtection() }
+        ))
+    }
 }
 
 @Serializable

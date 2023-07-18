@@ -337,9 +337,9 @@ open class Player : Actor(), Workbench {
         }
     }
 
-    private fun coldProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.coldProtection() * it.slot.coldProtection })
-    private fun heatProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.heatProtection() * it.slot.heatProtection })
-    private fun weatherProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.weatherProtection() * it.slot.weatherProtection })
+    fun coldProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.coldProtection() * it.slot.coldProtection })
+    fun heatProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.heatProtection() * it.slot.heatProtection })
+    fun weatherProtection() = min(1f, gear.values.filterIsInstance<Clothing>().sumOf { it.weatherProtection() * it.slot.weatherProtection })
 
     private fun updateTemperature() {
         level?.also { level ->

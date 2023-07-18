@@ -2,18 +2,19 @@ package ui.modals
 
 import actors.actions.Equip
 import actors.actions.Unequip
-import com.badlogic.gdx.Input
 import render.Screen
 import things.Gear
 import things.ThingHolder
 import ui.input.Keydef
-import util.log
-import java.lang.Integer.max
-import java.lang.Integer.min
 
 class GearModal(
     private val thingHolder: ThingHolder
-) : SelectionModal(300, 385, "- gEAr -", default = 0), ContextMenu.ParentModal {
+) : SelectionModal(320, 580, "- gEAr -", default = 0), ContextMenu.ParentModal {
+
+    companion object {
+        const val statSpacing = 24
+        const val statX = 140
+    }
 
     class SlotMenu(
         val name: String,
@@ -25,12 +26,17 @@ class GearModal(
     var slots = ArrayList<SlotMenu>()
     var childDeployed = false
 
+    var toHit = 0f
+    var insulation = 0f
+    var cooling = 0f
+    var weather = 0f
+
     init {
         zoomWhenOpen = 1.8f
         selectionBoxHeight = 18
         spacing = 32
-        headerPad = 80
-        fillSlots()
+        headerPad = 90
+        regenerate()
 
         sidecar = CompareSidecar(this)
         (sidecar as CompareSidecar).showList(slots[selection].slot)
@@ -44,6 +50,22 @@ class GearModal(
             drawString(label, padding + 90 - measure(label), headerPad + spacing * n - 2,
                 Screen.fontColorDull, Screen.smallFont)
         }
+
+        val statY = headerPad + spacing * slots.size + 30
+        drawRightText("toHit:", statX, statY, Screen.fontColorDull, Screen.smallFont)
+        drawRightText("insulation:", statX, statY + statSpacing + 12, Screen.fontColorDull, Screen.smallFont)
+        drawRightText("cooling:", statX, statY + statSpacing * 2 + 12, Screen.fontColorDull, Screen.smallFont)
+        drawRightText("weather:", statX, statY + statSpacing * 3 + 12, Screen.fontColorDull, Screen.smallFont)
+
+        drawString(formatValue(toHit, showPlus = true), statX + 10, statY, Screen.fontColorBold, Screen.font)
+        drawString(formatValue(insulation), statX + 10, statY + statSpacing + 12, Screen.fontColorBold, Screen.font)
+        drawString(formatValue(cooling), statX + 10, statY + statSpacing * 2 + 12, Screen.fontColorBold, Screen.font)
+        drawString(formatValue(weather), statX + 10, statY + statSpacing * 3 + 12, Screen.fontColorBold, Screen.font)
+    }
+
+    private fun formatValue(value: Float, showPlus: Boolean = false): String {
+        if (value == 0f) return "-"
+        return (if (showPlus && value > 0f) "+" else "") + String.format("%.1f", value)
     }
 
     override fun drawBackground() {
@@ -107,21 +129,23 @@ class GearModal(
 
     override fun childSucceeded() {
         childDeployed = false
+        regenerate()
         changeSelection(selection)
     }
 
     override fun childCancelled() {
         childDeployed = false
+        regenerate()
         changeSelection(selection)
     }
 
     override fun advanceTime(turns: Float) {
         super.advanceTime(turns)
-        fillSlots()
+        regenerate()
         changeSelection(selection)
     }
 
-    private fun fillSlots() {
+    private fun regenerate() {
         slots.clear()
         for (gearslot in Gear.slots) {
             slots.add(SlotMenu(
@@ -131,6 +155,11 @@ class GearModal(
             ))
         }
         maxSelection = slots.size - 1
+
+        toHit = App.player.meleeWeapon().accuracy() - App.player.armorEncumbrance()
+        insulation = App.player.coldProtection()
+        cooling = App.player.heatProtection()
+        weather = App.player.weatherProtection()
     }
 
     override fun onKeyDown(key: Keydef) {

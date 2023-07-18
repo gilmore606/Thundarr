@@ -9,8 +9,10 @@ import actors.statuses.Status
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import ui.modals.ExamineModal.StatLine
 import util.Dice
 import util.LightColor
+import world.Entity
 import world.terrains.Terrain
 
 @Serializable
@@ -45,6 +47,7 @@ enum class Damage(
 sealed class Weapon : Gear() {
     abstract fun damageType(): Damage
     abstract fun damage(): Float
+    open fun speed(): Float = 1f
     open fun accuracy(): Float = 0f
     open fun critThreshold(): Float = 5f
     open fun critMultiplier(): Float = 0.5f
@@ -61,6 +64,35 @@ sealed class Weapon : Gear() {
             damage *= (1f + critMultiplier())
         }
         return damage
+    }
+
+    override fun examineStats(compareTo: Entity?) = mutableListOf<StatLine>().apply {
+        add(StatLine(isSpacer = true))
+        add(StatLine(
+            "speed", speed(), lowerBetter = true,
+            compare = compareTo?.let { (it as Weapon).speed() }
+        ))
+        add(StatLine(
+            "accuracy", accuracy(), showPlus = true,
+            compare = compareTo?.let { (it as Weapon).accuracy() }
+        ))
+        add(StatLine(isSpacer = true))
+        add(StatLine(
+            "type", valueString = damageType().displayName
+        ))
+        add(StatLine(
+            "damage", damage(),
+            compare = compareTo?.let { (it as Weapon).damage() }
+        ))
+        add(StatLine(isSpacer = true))
+        add(StatLine(
+            "crit thresh", critThreshold(), lowerBetter = true,
+            compare = compareTo?.let { (it as Weapon).critThreshold() }
+        ))
+        add(StatLine(
+            "crit bonus", critMultiplier(),
+            compare = compareTo?.let { (it as Weapon).critMultiplier() }
+        ))
     }
 }
 
@@ -83,7 +115,6 @@ sealed class MeleeWeapon : Weapon() {
     override fun thrownDamage(thrower: Actor, roll: Float) = damage() * 0.5f
 
     open fun canDig(terrainType: Terrain.Type): Boolean = false
-    open fun speed(): Float = 1f
     open fun skill(): Skill = Fight
 }
 

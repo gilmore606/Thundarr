@@ -40,10 +40,11 @@ object Console : Panel() {
     private const val burstOnSay = 0.5f
     private const val burstDecay = 0.2f
     private const val burstMax = 1.3f
-    private const val dimDelayMs = 1500L
-    private const val dimLevel = 0.5f
-    private var burst = 1f
-    private var burstFloor = 1f
+    private const val dimDelayMs = 1800L
+    private const val dimLevel = 0.6f
+    private var burst = dimLevel
+    private var burstFloor = dimLevel
+
     var mouseInside = false
     private var modalUp = false
 
@@ -115,7 +116,7 @@ object Console : Panel() {
     fun say(text: String) {
         if (text == "") return
         if (App.attractMode) return
-        burst = min(if (App.attractMode) burstMax * 0.5f else burstMax, burst + if (App.attractMode) burstOnSay * 0.5f else burstOnSay)
+        burst = min(burstMax, burst + if (App.attractMode) burstOnSay * 0.5f else burstOnSay)
         burstFloor = 1f
         lastLineMs = System.currentTimeMillis()
         if (text == lines.last()) {
@@ -223,9 +224,11 @@ object Console : Panel() {
 
     override fun mouseMovedTo(screenX: Int, screenY: Int) {
         super.mouseMovedTo(screenX, screenY)
-        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing && screenX < this.width - RIGHT_PANEL_WIDTH) {
-            mouseInside = true
-            this.burst = 1.2f
+        if (screenY > this.y + (maxLines - maxLinesShown) * lineSpacing && screenX < this.width - RIGHT_PANEL_WIDTH - 100) {
+            if (!mouseInside) {
+                mouseInside = true
+                this.burst = 1.2f
+            }
         } else mouseInside = false
     }
 

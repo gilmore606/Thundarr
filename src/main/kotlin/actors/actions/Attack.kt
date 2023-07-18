@@ -43,7 +43,9 @@ class Attack(
 
             val difficulty = (actor.xpLevel - target.xpLevel) / 2 +
                     (mySkill - hisSkill) / 2 +
-                    weapon.accuracy() +
+                    weapon.accuracy() -
+                    actor.armorEncumbrance() +
+                    target.armorEncumbrance() +
                     (targetBodypart?.toHit ?: 0)
 
             val roll = (weapon.skill().resolve(actor, difficulty) + Fight.resolve(actor, difficulty)) / 2

@@ -526,6 +526,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return true
     }
 
+    fun armorEncumbrance(): Float {
+        val kgPerStr = 0.5f
+        val encPerKg = 0.5f
+        val weight = gear.values.sumOf { it?.weight() ?: 0f }
+        val excess = weight - (Strength.get(this) * kgPerStr)
+        return if (excess <= 0f) 0f else excess * encPerKg
+    }
+
     open fun meleeWeapon(): MeleeWeapon = equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: fist
 
     open fun randomBodypart(): Bodypart {

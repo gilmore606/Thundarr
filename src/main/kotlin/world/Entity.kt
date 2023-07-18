@@ -2,6 +2,7 @@ package world
 
 import render.batches.QuadBatch
 import render.tilesets.Glyph
+import ui.modals.ExamineModal
 import util.Rect
 import util.XY
 import util.aOrAn
@@ -35,6 +36,7 @@ interface Entity {
     fun description(): String
     fun examineDescription(): String = description()
     fun examineInfo(): String = ""
+    fun examineStats(compareTo: Entity? = null): List<ExamineModal.StatLine> = listOf()
     fun gender(): Gender = Gender.NEUTER
 
     fun level(): Level?
