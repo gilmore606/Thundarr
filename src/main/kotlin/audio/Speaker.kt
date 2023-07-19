@@ -18,8 +18,13 @@ object Speaker {
 
     var volumeMaster = 1.0
     var volumeWorld = 1.0
-    var volumeMusic = 1.0
-    var volumeUI = 1.0
+    var volumeMusic = 0.6
+    var volumeUI = 0.6
+
+    val gainMaster = 1.0
+    val gainWorld = 1.0
+    val gainMusic = 1.0
+    val gainUI = 0.5
 
     @Serializable
     enum class Song(
@@ -99,7 +104,6 @@ object Speaker {
     )
 
 
-    private val maxVolumeUI = 0.7
     private val audio = Gdx.audio
 
     class Deck(
@@ -137,7 +141,7 @@ object Speaker {
             if (fader <= 0.0 && doneAtZero) done = true
             song.volume = (fader * localMaster()).toFloat()
         }
-        fun localMaster() = (if (isMusic) volumeMusic else volumeWorld) * volumeMaster
+        fun localMaster() = (if (isMusic) volumeMusic * gainMusic else volumeWorld * gainWorld) * volumeMaster * gainMaster
         fun dispose() { song.dispose() }
         fun abortDone() { done = false ; doneAtZero = false }
     }
@@ -171,7 +175,7 @@ object Speaker {
     }
 
     fun ui(sfx: SFX, vol: Float = 1f, pitch: Float = 1f, screenX: Int = screenCenterX) {
-        val volume = (vol * volumeMaster * volumeUI * maxVolumeUI * sfx.gain).toFloat()
+        val volume = (vol * volumeMaster * gainMaster * volumeUI * gainUI * sfx.gain).toFloat()
         val pan = (screenX.toFloat() / screenWidth.toFloat())
         playSFX(sfx, volume, pitch, pan)
     }
@@ -179,7 +183,7 @@ object Speaker {
     fun world(sfx: SFX?, vol: Float = 1f, pitch: Float = 1f, source: XY? = null, delayMs: Long = 0L) {
         if (sfx == null) return
         val distance = source?.let { distanceBetween(it.x, it.y, App.player.xy.x, App.player.xy.y) } ?: 0f
-        val volume = (vol * volumeMaster * volumeWorld * sfx.gain * (1f - (distance / 20f))).toFloat()
+        val volume = (vol * volumeMaster * gainMaster * volumeWorld * gainWorld * sfx.gain * (1f - (distance / 20f))).toFloat()
         if (volume > 0f) {
             if (TimeButtons.state != TimeButtons.State.FFWD) {
                 if (delayMs > 0L) {
