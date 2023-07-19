@@ -39,8 +39,8 @@ class GoDo(
             npc.popState()
             return targetAction ?: Wait(0.5f)
         } else if (failedSteps > 4) {
+            log.info("$npc $this gave up ($failedSteps failed steps)")
             npc.popState()
-            log.info("$this gave up GoDo for $targetAction")
             return Say("Aww, forget it.")
         } else {
             npc.stepToward(targetXY)?.also { failedSteps = 0; return it } ?: run { failedSteps++ }

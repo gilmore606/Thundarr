@@ -43,7 +43,10 @@ object Pather {
                     }
                 }
                 maps = newMaps
-                if (updates > 0) log.info("PATHER: updated $updates maps (${maps.size} alive)")
+                if (updates > 0) {
+                    log.info("PATHER: updated $updates maps (${maps.size} alive)")
+                    //log.info("PATHER: $maps")
+                }
                 delay(1L)
             }
         }

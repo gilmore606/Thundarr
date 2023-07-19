@@ -11,7 +11,7 @@ data class AreaStepMap(
     val target: Rect,
 ) : StepMap() {
 
-    override fun toString() = "AreaStepMap(from $walker to $target)"
+    override fun toString() = (if (expired) "EXPIRED" else "") + "AreaStepMap(from $walker to $target)"
     override fun getClone(): StepMap = this.copy()
 
     override fun printTarget() {

@@ -54,8 +54,8 @@ object Screen : KtxScreen {
             updateSurfaceParams()
         }
     private var zoomTarget = 0.73
-    private val zoomLevels = listOf(0.5, 0.62, 0.73, 0.83, 1.0, 1.15, 1.3)
-    var zoomIndex = 2.0
+    private val zoomLevels = listOf(0.38, 0.5, 0.62, 0.73, 0.83, 1.0, 1.15, 1.3)
+    var zoomIndex = 3.0
 
     var width = 0
     var height = 0
@@ -179,8 +179,8 @@ object Screen : KtxScreen {
     private val dragInertia = XY(0, 0)
     private val dragInertiaLast = XY(0, 0)
     private var dragInertiaDelta = 0f
-    private val dragBraking = 0.98f
-    private val dragStartWeight = 0.7f
+    private val dragBraking = 0.95f
+    private val dragStartWeight = 0.6f
 
     var drawTime: Int = 0
     private val lastDrawTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
