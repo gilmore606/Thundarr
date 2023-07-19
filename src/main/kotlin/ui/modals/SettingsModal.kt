@@ -9,7 +9,7 @@ import ui.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
 
-class SettingsModal : Modal(300, 440, "- settings -") {
+class SettingsModal : Modal(300, 420, "- settings -") {
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -92,17 +92,15 @@ class SettingsModal : Modal(300, 440, "- settings -") {
     }
 
     object Video : Section("video") {
-        val sliderCameraSpeed = Slider("Camera speed", 0, Screen.cameraSpeed, 1.5, 5.0) {
+        val sliderCameraSpeed = Slider("Camera speed", 0, Screen.cameraSpeed, 0.4, 8.0) {
             Screen.cameraSpeed = it }
-        val sliderCameraAccel = Slider("Camera accel", 60, Screen.cameraAccel, 1.0, 10.0) {
-            Screen.cameraAccel = it }
-        val sliderWorldZoom = Slider("Overworld auto zoom-out", 120, Screen.worldZoom, 1.0, 1.4) {
+        val sliderWorldZoom = Slider("Overworld auto zoom-out", 70, Screen.worldZoom, 1.0, 1.4) {
             Screen.worldZoom = it }
-        val sliderMenuShift = Slider("Camera shift on menu open", 180, Screen.cameraMenuShift, 0.01, 0.9) {
+        val sliderMenuShift = Slider("Camera shift on menu open", 140, Screen.cameraMenuShift, 0.01, 0.9) {
             Screen.cameraMenuShift = it}
-        val sliderUIColor = Slider("UI hue adjust", 240, Screen.uiHue, 0.0, 6.283) {
+        val sliderUIColor = Slider("UI hue adjust", 210, Screen.uiHue, 0.0, 6.283) {
             Screen.uiHue = it }
-        val sliders = listOf(sliderCameraSpeed, sliderCameraAccel, sliderWorldZoom, sliderMenuShift, sliderUIColor)
+        val sliders = listOf(sliderCameraSpeed, sliderWorldZoom, sliderMenuShift, sliderUIColor)
 
 
         override fun drawText(modal: SettingsModal) {
@@ -135,13 +133,13 @@ class SettingsModal : Modal(300, 440, "- settings -") {
         val sliderMaster = Slider("Master volume", 0, Speaker.volumeMaster, 0.0, 1.0) {
             Speaker.volumeMaster = it
         }
-        val sliderWorld = Slider("World volume", 80, Speaker.volumeWorld, 0.0, 1.0) {
+        val sliderWorld = Slider("World volume", 70, Speaker.volumeWorld, 0.0, 1.0) {
             Speaker.volumeWorld = it
         }
-        val sliderMusic = Slider("Music volume", 160, Speaker.volumeMusic, 0.0, 1.0) {
+        val sliderMusic = Slider("Music volume", 140, Speaker.volumeMusic, 0.0, 1.0) {
             Speaker.volumeMusic = it
         }
-        val sliderUI = Slider("UI volume", 240, Speaker.volumeUI, 0.0, 1.0) {
+        val sliderUI = Slider("UI volume", 210, Speaker.volumeUI, 0.0, 1.0) {
             Speaker.volumeUI = it
         }
         val sliders = listOf(sliderMaster, sliderWorld, sliderMusic, sliderUI)

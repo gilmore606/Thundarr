@@ -170,8 +170,7 @@ object Screen : KtxScreen {
     var cameraTargetOffset = XYd(0.0, 0.0)  // add to pov to get intended camera target pos
     var cameraPov = XYd(0.0, 0.0)  // actual camera pos
     var cameraVec = XYd(0.0, 0.0)  // current camera movement vector
-    var cameraAccel = 5.0  // max vector change per sec
-    var cameraSpeed = 2.5
+    var cameraSpeed = 4.0
     var scrollLatch = false
     var scrollDragging = false
     val dragPixels = XYd(0.0, 0.0)
@@ -320,7 +319,7 @@ object Screen : KtxScreen {
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         if (width == 0 || height == 0) return  // Windows does this on a hide/show, ignore it
-
+        if (width == this.width && height == this.height) return
         this.width = width
         this.height = height
         log.info("Screen resized to $width by $height")
@@ -444,24 +443,19 @@ object Screen : KtxScreen {
         // Animate camera to camera target
         val target = cameraTargetOffset + pov
 
-//        val diff = target - cameraPov
-//        val currentSpeed = cameraVec.magnitude()
-//        val diffMagnitude = diff.magnitude()
-//        val desiredSpeed = min(diffMagnitude * cameraAccel, diffMagnitude * cameraSpeed)
-//        val accel = max(-cameraAccel, min(cameraAccel, (desiredSpeed - currentSpeed)))
-//        val nextSpeed = currentSpeed + accel
-//        cameraVec = diff.toUnitVec() * nextSpeed
+        cameraVec.x = (target.x - cameraPov.x) * cameraSpeed
+        cameraVec.y = (target.y - cameraPov.y) * cameraSpeed
 
-        val diffX = target.x - cameraPov.x
-        val diffY = target.y - cameraPov.y
-        val desiredSpeedX = diffX * cameraSpeed
-        val desiredSpeedY = diffY * cameraSpeed
-        val acc = cameraAccel * 0.1f
-        val accelX = max(-acc, min(acc, desiredSpeedX - cameraVec.x))
-        val accelY = max(-acc, min(acc, desiredSpeedY - cameraVec.y))
-        cameraVec.add(accelX, accelY)
-
-        cameraPov += cameraVec * delta.toDouble()
+        if (cameraVec.x < 0) {
+            cameraPov.x = max(target.x, cameraPov.x + cameraVec.x * delta.toDouble())
+        } else {
+            cameraPov.x = min(target.x, cameraPov.x + cameraVec.x * delta.toDouble())
+        }
+        if (cameraVec.y < 0) {
+            cameraPov.y = max(target.y, cameraPov.y + cameraVec.y * delta.toDouble())
+        } else {
+            cameraPov.y = min(target.y, cameraPov.y + cameraVec.y * delta.toDouble())
+        }
     }
 
     fun recenterCamera() {

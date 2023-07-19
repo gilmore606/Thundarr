@@ -11,7 +11,6 @@ data class PrefsState(
     val fullscreen: Boolean,
     val worldZoom: Double,
     val cameraSpeed: Double,
-    val cameraAccel: Double,
     val cameraMenuShift: Double,
     val uiHue: Double,
     val volumeMaster: Double,

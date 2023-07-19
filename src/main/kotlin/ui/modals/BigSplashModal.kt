@@ -4,6 +4,8 @@ import App
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import render.Screen
 import render.batches.QuadBatch
 import render.tilesets.Glyph
@@ -108,6 +110,8 @@ class BigSplashModal(
         }
         dismissible = true
         dismiss()
-        afterDismiss?.invoke()
+        KtxAsync.launch {
+            afterDismiss?.invoke()
+        }
     }
 }

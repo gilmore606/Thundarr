@@ -174,7 +174,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 windowSize = Screen.savedWindowSize(),
                 fullscreen = Screen.fullscreen,
                 cameraSpeed = Screen.cameraSpeed,
-                cameraAccel = Screen.cameraAccel,
                 cameraMenuShift = Screen.cameraMenuShift,
                 worldZoom = Screen.worldZoom,
                 uiHue = Screen.uiHue,
@@ -246,7 +245,6 @@ object App : KtxGame<com.badlogic.gdx.Screen>() {
                 Screen.restoreZoomIndex(state.zoomIndex)
                 Screen.worldZoom = state.worldZoom
                 Screen.cameraSpeed = state.cameraSpeed
-                Screen.cameraAccel = state.cameraAccel
                 Screen.cameraMenuShift = state.cameraMenuShift
                 Screen.uiHue = state.uiHue
 
