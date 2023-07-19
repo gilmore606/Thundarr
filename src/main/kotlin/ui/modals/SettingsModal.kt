@@ -92,9 +92,9 @@ class SettingsModal : Modal(300, 440, "- settings -") {
     }
 
     object Video : Section("video") {
-        val sliderCameraSpeed = Slider("Camera speed", 0, Screen.cameraSpeed, 0.5, 10.0) {
+        val sliderCameraSpeed = Slider("Camera speed", 0, Screen.cameraSpeed, 1.5, 5.0) {
             Screen.cameraSpeed = it }
-        val sliderCameraAccel = Slider("Camera accel", 60, Screen.cameraAccel, 0.5, 4.0) {
+        val sliderCameraAccel = Slider("Camera accel", 60, Screen.cameraAccel, 1.0, 10.0) {
             Screen.cameraAccel = it }
         val sliderWorldZoom = Slider("Overworld auto zoom-out", 120, Screen.worldZoom, 1.0, 1.4) {
             Screen.worldZoom = it }

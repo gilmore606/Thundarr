@@ -9,7 +9,6 @@ import actors.stats.Senses
 import actors.stats.Speed
 import actors.stats.Stat
 import actors.stats.Strength
-import actors.stats.skills.Dodge
 import actors.stats.skills.Skill
 import actors.stats.skills.Sneak
 import actors.statuses.*
@@ -160,8 +159,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val oldY = this.xy.y
         val oldLevel = this.level
         this.level = level
-        this.xy.x = x
-        this.xy.y = y
+        this.xy.setTo(x, y)
         Pather.onActorMove(this)
         oldLevel?.onActorMovedFrom(this, oldX, oldY)
         if (oldLevel != level) oldLevel?.director?.detachActor(this)

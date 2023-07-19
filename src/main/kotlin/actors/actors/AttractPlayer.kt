@@ -227,8 +227,7 @@ class AttractPlayer : Player() {
         super.onMove(oldLevel)
         val roofed = level?.isRoofedAt(xy.x, xy.y) ?: false
         if (wasOutdoor && roofed) {
-            lastOutdoor.x = xy.x
-            lastOutdoor.y = xy.y
+            lastOutdoor.setTo(xy)
             wasOutdoor = false
             Console.say("Here I go!")
         } else if (!wasOutdoor && !roofed) {

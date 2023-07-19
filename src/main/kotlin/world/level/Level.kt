@@ -182,14 +182,12 @@ sealed class Level {
             if (chunkAt(x,y) != null) {
                 if (vis == 1f) {
                     actor.onRender(delta)
-                    actor.lastSeenLocation.x = x
-                    actor.lastSeenLocation.y = y
+                    actor.lastSeenLocation.setTo(x, y)
                     doThis(x, y, actor, vis)
                 } else {
                     val lastSeenVis = visibilityAt(actor.lastSeenLocation.x, actor.lastSeenLocation.y)
                     if (lastSeenVis == 1f) {
-                        actor.lastSeenLocation.x = -9999
-                        actor.lastSeenLocation.y = -9999
+                        actor.lastSeenLocation.setTo(-9999, -9999)
                     } else if (lastSeenVis > 0f) {
                         doThis(actor.lastSeenLocation.x, actor.lastSeenLocation.y, actor, lastSeenVis)
                     }
@@ -213,8 +211,7 @@ sealed class Level {
 
     // Move the POV.
     open fun setPov(x: Int, y: Int) {
-        pov.x = x
-        pov.y = y
+        pov.setTo(x, y)
         onSetPov()
         shadowDirty = true
         if (this == App.level) Screen.povMoved()

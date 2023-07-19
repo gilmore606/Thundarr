@@ -9,7 +9,6 @@ import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import util.*
 import world.Entity
-import world.level.Level
 import java.lang.RuntimeException
 
 object Pather {
@@ -61,11 +60,10 @@ object Pather {
     fun buildPath(from: XY, to: Entity) = maps.firstOrNull { false }.let { map ->
         mutableListOf<XY>().apply {
             val feet = XY(from.x, from.y)
-            while (feet.x != to.xy().x || feet.y != to.xy().y) {
+            while (feet != to.xy()) {
                 nextStep(feet, to)?.also {
                     add(it)
-                    feet.x = it.x
-                    feet.y = it.y
+                    feet.setTo(it)
                 } ?: run { return this }
             }
             return this

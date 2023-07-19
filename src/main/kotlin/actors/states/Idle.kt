@@ -49,18 +49,14 @@ sealed class Idle : State() {
                 val dest = xy + dir
                 if (level.isWalkableFrom(npc, xy, dir) && isOK(dest)) {
                     if (placeMemory["lastWander"] != dest && placeMemory["lastWander2"] != dest) {
-                        placeMemory["lastWander2"]!!.x = placeMemory["lastWander"]!!.x
-                        placeMemory["lastWander2"]!!.y = placeMemory["lastWander"]!!.y
-                        placeMemory["lastWander"]!!.x = dest.x
-                        placeMemory["lastWander"]!!.y = dest.y
+                        placeMemory["lastWander2"]!!.setTo(placeMemory["lastWander"]!!)
+                        placeMemory["lastWander"]!!.setTo(dest)
                         return Move(dir)
                     }
                 }
             }
-            placeMemory["lastWander"]!!.x = 0
-            placeMemory["lastWander"]!!.y = 0
-            placeMemory["lastWander2"]!!.x = 0
-            placeMemory["lastWander2"]!!.y = 0
+            placeMemory["lastWander"]!!.setTo(0,0)
+            placeMemory["lastWander2"]!!.setTo(0,0)
         }}
         return Wait(1f)
     }

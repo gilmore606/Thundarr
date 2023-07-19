@@ -94,7 +94,7 @@ object ActorPanel : ShadedPanel() {
         var i = actors.indexOf(actor)
         var c = 0
         if (i < 0) return null
-        while (!actors[i].willAggro(App.player) && !App.player.willAggro(actors[i])) {
+        while (!actors[i].willAggro(App.player) || !App.player.willAggro(actors[i])) {
             i += dir
             c++
             if (i < 0) i = actors.lastIndex else if (i > actors.lastIndex) i = 0

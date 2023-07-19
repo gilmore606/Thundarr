@@ -20,9 +20,6 @@ object Keyboard : KtxInputAdapter {
 
     var binds = mutableMapOf<Int, Keydef>()
 
-    var debugFloat = 0f
-    val debugFloatStep = 0.05f
-
     var lastKey = -1
     var lastKeyTime = System.currentTimeMillis()
 
@@ -205,8 +202,8 @@ object Keyboard : KtxInputAdapter {
                 CURSOR_PREV -> { CURSOR_MODE = true ; Screen.cursorNextTarget(-1) }
                 CURSOR_NEXT -> { CURSOR_MODE = true ; Screen.cursorNextTarget(1) }
 
-                ZOOM_IN -> { Screen.mouseScrolled(-1.43f) }
-                ZOOM_OUT -> { Screen.mouseScrolled(1.43f) }
+                ZOOM_IN -> { Screen.mouseScrolled(-1f) }
+                ZOOM_OUT -> { Screen.mouseScrolled(1f) }
 
                 SEEN_TOGGLE -> { Screen.showSeenAreas = !Screen.showSeenAreas }
                 RADAR_TOGGLE -> { Screen.showRadar = !Screen.showRadar }
@@ -217,7 +214,7 @@ object Keyboard : KtxInputAdapter {
                 OPEN_MAP -> { App.openMap() }
                 OPEN_JOURNAL -> { App.openJournal() }
 
-                CANCEL -> { App.openSystemMenu() }
+                CANCEL -> { Screen.cursorPosition?.also { Screen.clearCursor() } ?: run { App.openSystemMenu() } }
                 TOOLBAR_SHOW -> { Toolbar.onKey(-1)}
                 SHORTCUT1 -> { Toolbar.onKey(1) }
                 SHORTCUT2 -> { Toolbar.onKey(2) }
@@ -267,8 +264,10 @@ object Keyboard : KtxInputAdapter {
         NUMPAD_4 -> MOVE_W
         NUMPAD_7 -> MOVE_NW
         NUMPAD_5 -> INTERACT
-        NUMPAD_ENTER -> INTERACT
+        NUMPAD_ENTER -> CANCEL
         NUMPAD_DIVIDE -> CURSOR_TOGGLE
+        NUMPAD_ADD -> ZOOM_IN
+        NUMPAD_SUBTRACT -> ZOOM_OUT
         ENTER -> INTERACT
         else -> null
     }

@@ -23,6 +23,7 @@ class SystemMenu : SelectionModal(270, 200, "- ThUNdARR -", Position.LEFT) {
 
     init {
         maxSelection = options.size - 1
+        selection = 0
         spacing = 30
         padding = 36
         headerPad += 36

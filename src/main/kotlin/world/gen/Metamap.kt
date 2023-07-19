@@ -1162,8 +1162,7 @@ object Metamap {
                 count++
                 if (cell.height > 0) {
                     done = false
-                    cursor.x = cell.riverParentX
-                    cursor.y = cell.riverParentY
+                    cursor.setTo(cell.riverParentX, cell.riverParentY)
                 }
             }
         }
@@ -1252,8 +1251,7 @@ object Metamap {
                 scratches[cursor.x][cursor.y].removeFeature(Lake::class)
                 scratches[cursor.x][cursor.y].addLavaExit(myExit)
                 scratches[next.x][next.y].addLavaExit(childExit)
-                cursor.x = next.x
-                cursor.y = next.y
+                cursor.setTo(next)
                 width -= Dice.float(1f, 2.5f)
                 if (width <= 1f) done = true
                 if (Dice.chance(branchChance * (width / 5f))) {
@@ -1451,8 +1449,7 @@ object Metamap {
                         runSideRoad(XY(cursor.x, cursor.y), sideRoadDir, highwayNumber)
                         stepsSinceSideRoad = 0
                     }
-                    cursor.x += moveDir.x
-                    cursor.y += moveDir.y
+                    cursor.add(moveDir)
                     if (moveDir != lastDir) {
                         turnsMade++
                         lastDir = moveDir
@@ -1485,8 +1482,7 @@ object Metamap {
                 val sign = if (Dice.chance(randomHighwaySignChance)) highwayId else null
                 connectRoadExits(cursor, next, sourceSign = sign)
                 roadCells.add(XY(cursor.x, cursor.y))
-                cursor.x = next.x
-                cursor.y = next.y
+                cursor.setTo(next)
             }
         }
     }

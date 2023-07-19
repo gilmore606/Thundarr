@@ -280,11 +280,9 @@ class CavernCarto(
             steps--
             setTerrain(cursor.x, cursor.y, TERRAIN_CAVEFLOOR)
             val dir = CARDINALS.random()
-            cursor.x += dir.x
-            cursor.y += dir.y
+            cursor.add(dir)
             if (!innerBoundsCheck(cursor.x, cursor.y)) {
-                cursor.x = x0 + (x1 - x0) / 2
-                cursor.y = y0 + (y1 - y0) / 2
+                cursor.setTo(x0 + (x1 - x0) / 2, y0 + (y1 - y0) / 2)
             }
         }
         repeat (fuzz) { fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.1f,0.5f)) }
@@ -298,8 +296,7 @@ class CavernCarto(
             val next = XY(Dice.range(x0+2,x1-2),Dice.range(y0+2,y1-2))
             drawLine(cursor, next) { x,y -> setTerrain(x,y,TERRAIN_CAVEFLOOR) }
             if (!stayCentered) {
-                cursor.x = next.x
-                cursor.y = next.y
+                cursor.setTo(next)
             }
         }
         repeat (Dice.range(2,5)) { fuzzTerrain(TERRAIN_CAVEFLOOR, Dice.float(0.1f, 0.4f)) }

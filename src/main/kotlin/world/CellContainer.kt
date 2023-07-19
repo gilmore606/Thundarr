@@ -27,8 +27,7 @@ class CellContainer : ThingHolder {
 
     fun reconnect(level: Level, x: Int, y: Int) {
         locked = true
-        xy.x = x
-        xy.y = y
+        xy.setTo(x, y)
         this.level = level
         contents.safeForEach { thing ->
             thing.onRestore(this)

@@ -9,7 +9,7 @@ import ui.input.Mouse
 import ui.panels.Console
 import util.log
 
-class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
+class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -17,7 +17,7 @@ class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
     var selectionX = -1
     var selectionY = -1
 
-    val header = 80
+    val header = 115
     val padding = 24
     val columnWidth = 255
     val lineSpacing = 24
@@ -142,6 +142,7 @@ class ControlsModal : Modal(550, 485, "- cONtRoLS -") {
 
     override fun drawModalText() {
         super.drawModalText()
+        drawString("(numpad is hardwired to move/interact/zoom)", padding, header - 26, Screen.fontColorDull, Screen.smallFont)
         for (ix in 0..1) {
             var iy = 0
             for (item in items[ix]) {

@@ -89,14 +89,12 @@ class ContextMenu(
         if (selection < 0) return
         super.doSelect()
         dismissSuccess()
-        Screen.clearCursor()
         options[selection].onPick.invoke()
     }
 
     override fun onKeyDown(key: Keydef) {
         if (key == Keydef.OPEN_INV) dismissSuccess()
         else if (key == Keydef.MOVE_W) {
-            Screen.clearCursor()
             dismiss()
         } else {
             super.onKeyDown(key)
@@ -105,7 +103,6 @@ class ContextMenu(
 
     override fun onDismiss() {
         super.onDismiss()
-        Screen.clearCursor()
         if (!succeeded) {
             parentModal?.childCancelled()
         } else {

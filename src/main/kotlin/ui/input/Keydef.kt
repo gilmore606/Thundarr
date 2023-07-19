@@ -41,7 +41,7 @@ enum class Keydef(
     ZOOM_IN("Zoom in", EQUALS, true, KeydefSection.AWARE),
     ZOOM_OUT("Zoom out", MINUS, true, KeydefSection.AWARE),
     SEEN_TOGGLE("Toggle seen areas", V, true, KeydefSection.AWARE),
-    RADAR_TOGGLE("Toggle minimap", M, true, KeydefSection.AWARE),
+    RADAR_TOGGLE("Toggle minimap", N, true, KeydefSection.AWARE),
 
     OPEN_INV("Open inventory", TAB, true, KeydefSection.UI),
     OPEN_GEAR("Open gear", BACKSLASH, true, KeydefSection.UI),

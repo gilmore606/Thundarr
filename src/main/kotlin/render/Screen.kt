@@ -170,8 +170,8 @@ object Screen : KtxScreen {
     var cameraTargetOffset = XYd(0.0, 0.0)  // add to pov to get intended camera target pos
     var cameraPov = XYd(0.0, 0.0)  // actual camera pos
     var cameraVec = XYd(0.0, 0.0)  // current camera movement vector
-    var cameraAccel = 2.0  // max vector change per sec
-    var cameraSpeed = 4.0
+    var cameraAccel = 5.0  // max vector change per sec
+    var cameraSpeed = 2.5
     var scrollLatch = false
     var scrollDragging = false
     val dragPixels = XYd(0.0, 0.0)
@@ -421,8 +421,7 @@ object Screen : KtxScreen {
             newZoom = max(ztarget, zoom - zdiff * delta * ZOOM_SPEED)
         }
         if (scrollLatch && zoom != newZoom) {
-            dragPixels.x = (dragPixels.x / zoom) * newZoom
-            dragPixels.y = (dragPixels.y / zoom) * newZoom
+            dragPixels.setTo((dragPixels / zoom) * newZoom)
         }
         zoom = newZoom
 
@@ -430,40 +429,44 @@ object Screen : KtxScreen {
         if (scrollLatch) {
             if (scrollDragging) {
                 dragInertiaDelta = delta
-                dragInertia.x = ((dragPixels.x - dragInertiaLast.x) * dragStartWeight).toInt()
-                dragInertia.y = ((dragPixels.y - dragInertiaLast.y) * dragStartWeight).toInt()
-                dragInertiaLast.x = dragPixels.x.toInt()
-                dragInertiaLast.y = dragPixels.y.toInt()
+                dragInertia.moveToInt((dragPixels - dragInertiaLast) * dragStartWeight)
+                dragInertiaLast.moveToInt(dragPixels)
             } else {
-                dragPixels.x += ((dragInertia.x / dragInertiaDelta) * delta).toInt()
-                dragPixels.y += ((dragInertia.y / dragInertiaDelta) * delta).toInt()
+                dragPixels.add((dragInertia / dragInertiaDelta) * delta)
                 val txdist = pxToTiles(dragPixels.x.toInt()).toDouble()
                 val tydist = pyToTiles(dragPixels.y.toInt()).toDouble()
                 cameraPov = XYd(txdist, tydist) + pov
-                dragInertia.x = (dragInertia.x.toFloat() * dragBraking).toInt()
-                dragInertia.y = (dragInertia.y.toFloat() * dragBraking).toInt()
+                dragInertia.scaleBy(dragBraking)
             }
             return
         }
 
         // Animate camera to camera target
         val target = cameraTargetOffset + pov
-        val diff = target - cameraPov
-        val currentSpeed = cameraVec.magnitude()
-        val diffMagnitude = diff.magnitude()
-        val desiredSpeed = min(diffMagnitude * cameraAccel, diffMagnitude * cameraSpeed)
-        val accel = max(-cameraAccel, min(cameraAccel, (desiredSpeed - currentSpeed)))
-        val nextSpeed = currentSpeed + accel
-        cameraVec = diff.toUnitVec() * nextSpeed
+
+//        val diff = target - cameraPov
+//        val currentSpeed = cameraVec.magnitude()
+//        val diffMagnitude = diff.magnitude()
+//        val desiredSpeed = min(diffMagnitude * cameraAccel, diffMagnitude * cameraSpeed)
+//        val accel = max(-cameraAccel, min(cameraAccel, (desiredSpeed - currentSpeed)))
+//        val nextSpeed = currentSpeed + accel
+//        cameraVec = diff.toUnitVec() * nextSpeed
+
+        val diffX = target.x - cameraPov.x
+        val diffY = target.y - cameraPov.y
+        val desiredSpeedX = diffX * cameraSpeed
+        val desiredSpeedY = diffY * cameraSpeed
+        val acc = cameraAccel * 0.1f
+        val accelX = max(-acc, min(acc, desiredSpeedX - cameraVec.x))
+        val accelY = max(-acc, min(acc, desiredSpeedY - cameraVec.y))
+        cameraVec.add(accelX, accelY)
 
         cameraPov += cameraVec * delta.toDouble()
     }
 
     fun recenterCamera() {
-        lastPov.x = pov.x
-        lastPov.y = pov.y
-        cameraPov.x = pov.x.toDouble()
-        cameraPov.y = pov.y.toDouble()
+        lastPov.setTo(pov)
+        cameraPov.setTo(pov)
         cameraVec = XYd(0.0,0.0)
         log.info("Screen.recenterCamera()")
     }
@@ -483,20 +486,18 @@ object Screen : KtxScreen {
 
     fun setCursorPosition(x: Int, y: Int) {
         if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
-        cursorPosition?.also { it.x = x ; it.y = y }
+        cursorPosition?.setTo(x, y)
     }
 
     fun cursorNextTarget(dir: Int) {
         cursorPosition?.also { cursor ->
             App.level.actorAt(cursor.x, cursor.y)?.also { actor ->
                 ActorPanel.targetAfter(actor, dir)?.also { nextActor ->
-                    cursor.x = nextActor.xy.x
-                    cursor.y = nextActor.xy.y
+                    cursor.setTo(nextActor)
                 } ?: run { clearCursor() }
             } ?: run {
                 ActorPanel.firstActor()?.also { actor ->
-                    cursor.x = actor.xy.x
-                    cursor.y = actor.xy.y
+                    cursor.setTo(actor)
                 } ?: run { clearCursor() }
             }
         } ?: run {
@@ -518,14 +519,11 @@ object Screen : KtxScreen {
                 it.mouseMovedTo(screenX, screenY)
             }
             if (scrollDragging) {
-                dragPixels.x += lastDrag.x - screenX
-                dragPixels.y += lastDrag.y - screenY
-                lastDrag.x = screenX
-                lastDrag.y = screenY
+                dragPixels.add(lastDrag - XY(screenX, screenY))
+                lastDrag.setTo(screenX, screenY)
                 val txdist = pxToTiles(dragPixels.x.toInt()).toDouble()
                 val tydist = pyToTiles(dragPixels.y.toInt()).toDouble()
-                cameraPov.x = pov.x + txdist
-                cameraPov.y = pov.y + tydist
+                cameraPov.setTo(pov + XYd(txdist, tydist))
             } else {
                 val col = screenXtoTileX(screenX + dragPixels.x.toInt())
                 val row = screenYtoTileY(screenY + dragPixels.y.toInt())
@@ -580,8 +578,7 @@ object Screen : KtxScreen {
             }
             when (button) {
                 Mouse.Button.LEFT -> {
-                    lastDrag.x = screenX
-                    lastDrag.y = screenY
+                    lastDrag.setTo(screenX, screenY)
                     scrollDragging = true
                     scrollLatch = true
                     return true
@@ -625,8 +622,7 @@ object Screen : KtxScreen {
     fun releaseScrollLatch() {
         scrollLatch = false
         scrollDragging = false
-        dragPixels.x = 0.0
-        dragPixels.y = 0.0
+        dragPixels.setTo(0.0, 0.0)
     }
 
     fun rightClickCursorTile() {

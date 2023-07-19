@@ -201,8 +201,7 @@ class WorldLevel() : Level() {
             return
         }
         log.info("Entered chunk $chunkX $chunkY")
-        lastPovChunkXY.x = chunkX
-        lastPovChunkXY.y = chunkY
+        lastPovChunkXY.setTo(chunkX, chunkY)
         originChunkX = chunkX - (CHUNK_SIZE * CHUNKS_AHEAD)
         originChunkY = chunkY - (CHUNK_SIZE * CHUNKS_AHEAD)
 
