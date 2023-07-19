@@ -1,8 +1,6 @@
 # Thundarr
 Thundarr the Roguelike.
 
-![vid1](https://i.imgur.com/xdFahWI.mp4)
-
 ![title](https://github.com/gilmore606/Thundarr/assets/3459354/a7e15e43-35b8-4e5e-8659-0b0cd7ff5fb6)
 
 ![controls](https://github.com/gilmore606/Thundarr/assets/3459354/4f785d53-3a24-4712-b07f-2716d682c110)
