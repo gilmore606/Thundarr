@@ -23,6 +23,7 @@ object Scrub : Biome(
     override fun xpValue() = 1
     override fun villageFloorType() = if (Dice.flip()) Terrain.Type.TERRAIN_DIRT else Terrain.Type.TERRAIN_WOODFLOOR
     override fun temperatureAmplitude() = 1.15f
+    override fun weatherBias() = -0.1f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

@@ -141,7 +141,7 @@ class WorldLevel() : Level() {
             ambienceChunkXY.x = chunkX
             ambienceChunkXY.y = chunkY
             chunkAt(pov.x, pov.y)?.also { chunk ->
-                crossChunks(chunk)
+                if (chunk != ambienceChunk) crossChunks(chunk)
             } ?: run {
                 ambienceChunk = null
             }
@@ -149,7 +149,9 @@ class WorldLevel() : Level() {
     }
 
     private fun crossChunks(newChunk: Chunk) {
+        log.info("crossing to new chunk $newChunk")
         transitionAmbienceToChunk(newChunk)
+        App.weather.update()
 
         val threat = App.player.threatLevel()
         if (threat > 0 && App.player.lastChunkThreatLevel <= 0) {

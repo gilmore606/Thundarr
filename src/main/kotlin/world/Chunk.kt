@@ -37,6 +37,8 @@ import kotlin.random.Random
 class Chunk(
     val width: Int, val height: Int
 ) {
+    override fun toString() = "Chunk($x,$y)"
+
     @Serializable
     enum class ExitType { WORLD, LEVEL }
 

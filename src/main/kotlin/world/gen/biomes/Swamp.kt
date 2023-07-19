@@ -34,6 +34,7 @@ object Swamp : Biome(
     override fun xpValue() = 4
     override fun temperatureBase() = 5
     override fun temperatureAmplitude() = 0.9f
+    override fun weatherBias() = 0.2f
 
     override fun fertilityAt(x: Int, y: Int) = NoisePatches.get("swampForest", x, y).toFloat()
 

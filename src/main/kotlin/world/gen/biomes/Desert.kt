@@ -20,7 +20,8 @@ object Desert : Biome(
     Terrain.Type.TERRAIN_SAND
 ) {
     override fun defaultTitle(habitat: Habitat) = "desert"
-    override fun canHaveRain() = false
+    override fun maxWeatherRank() = 2
+    override fun weatherBias() = -0.3f
     override fun cavesChance() = 0.8f
     override fun cabinChance() = 0.01f
     override fun ambientSoundDay() = Speaker.Ambience.DESERT

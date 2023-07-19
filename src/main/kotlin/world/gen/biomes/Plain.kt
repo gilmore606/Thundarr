@@ -23,6 +23,7 @@ object Plain : Biome(
     override fun outcroppingChance() = 0.08f
     override fun pondChance() = 0.04f
     override fun xpValue() = 0
+    override fun weatherBias() = -0.05f
 
     override fun terrainAt(x: Int, y: Int): Terrain.Type {
         val fert = fertilityAt(x, y)

@@ -19,8 +19,7 @@ sealed class StepMap {
     var range: Int = 1
     var width = 2
     var height = 2
-    var offsetX = 0
-    var offsetY = 0 // offset to level coords
+    var offset = XY(0,0) // offset to level coords
 
     // We need this because the child data classes' copy method can't see the non-data sealed parent class
     // Like most terrible things I've done, this is for serialization
@@ -29,8 +28,7 @@ sealed class StepMap {
         it.range = range
         it.width = width
         it.height = height
-        it.offsetX = offsetX
-        it.offsetY = offsetY
+        it.offset.setTo(offset)
     }
 
     @Transient var walker: Actor? = null
@@ -76,8 +74,8 @@ sealed class StepMap {
     open fun onActorMove(actor: Actor) {
         if (actor.id == walkerID) {
             dirty = true
-            offsetX = actor.xy.x - width / 2
-            offsetY = actor.xy.y - height / 2
+            offset.x = actor.xy.x - width / 2
+            offset.y = actor.xy.y - height / 2
         }
     }
 
@@ -92,8 +90,8 @@ sealed class StepMap {
 
     protected fun getNextStep(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
-        val lx = fromX - offsetX
-        val ly = fromY - offsetY
+        val lx = fromX - offset.x
+        val ly = fromY - offset.y
         var passNeighborStep: XY? = null
         if (lx in 0 until width && ly in 0 until height) {
             val nextstep = map[lx][ly] - 1
@@ -118,8 +116,8 @@ sealed class StepMap {
 
     protected fun getNextStepAway(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
-        val lx = fromX - offsetX
-        val ly = fromY - offsetY
+        val lx = fromX - offset.x
+        val ly = fromY - offset.y
         if (lx in 0 until width && ly in 0 until height) {
             val nextstep = map[lx][ly] + 1
             val steps = mutableSetOf<XY>()
@@ -161,8 +159,8 @@ sealed class StepMap {
     }
 
     inline fun writeTargetCell(x: Int, y: Int) {
-        val ix = x - offsetX
-        val iy = y - offsetY
+        val ix = x - offset.x
+        val iy = y - offset.y
         if ((ix in 0 until width) && (iy in 0 until height)) {
             scratch[ix][iy] = 0
         }
@@ -190,7 +188,7 @@ sealed class StepMap {
                                     if (scratch[tx][ty] < 0) {
                                         //waitForActorLock(level) don't need this since actors don't block walkable
                                         waitForCellLock(level, tx, ty)
-                                        if (level.isPathableBy(walker!!, x + offsetX + dir.x, y + offsetY + dir.y)) {
+                                        if (level.isPathableBy(walker!!, x + offset.x + dir.x, y + offset.y + dir.y)) {
                                             scratch[tx][ty] = step + 1
                                             notDone = true
                                         }

@@ -158,7 +158,7 @@ open class Player : Actor(), Workbench {
     fun tryMove(dir: XY) {
         level?.also { level ->
             if (level.isWalkableFrom(this, xy, dir)) {
-                if (level.stainsAt(xy.x + dir.x, xy.y + dir.y)?.hasOneWhere { it is Fire } == true && !dangerMode) {
+                if (level.stainsAt(xy.x + dir.x, xy.y + dir.y).hasOneWhere { it is Fire } && !dangerMode) {
                     Console.say("You reconsider your dangerous idea of running into a burning fire.")
                     return
                 }

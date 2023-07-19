@@ -32,7 +32,8 @@ sealed class Biome(
     open fun pondChance() = 0.0f
     open fun ambientSoundDay(): Speaker.Ambience = Speaker.Ambience.OUTDOORDAY
     open fun ambientSoundNight(): Speaker.Ambience = Speaker.Ambience.OUTDOORNIGHT
-    open fun canHaveRain() = true
+    open fun maxWeatherRank(): Int? = null
+    open fun weatherBias(): Float = 0f
     open fun temperatureBase() = 0
     open fun temperatureAmplitude() = 1f
 
@@ -162,5 +163,5 @@ object Tundra: Biome(
     TERRAIN_DIRT
 ) {
     override fun defaultTitle(habitat: Habitat) = "tundra"
-    override fun canHaveRain() = false
+    override fun maxWeatherRank() = 2
 }

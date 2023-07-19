@@ -7,44 +7,77 @@ import util.Dice
 import util.LightColor
 import util.isEveryFrame
 import world.Chunk
+import world.gen.Metamap
 import world.level.Level
-import java.lang.Float.max
-import java.lang.Float.min
+import world.level.WorldLevel
+import java.lang.Math.max
+import java.lang.Math.min
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Serializable
 class Weather {
 
-    val overallRaininess = 0.3f   // 0.4f
+    enum class Type(
+        val rank: Int,
+        val displayName: String,
+        val cloudVisual: Float,
+        val rainVisual: Float,
+        val temperatureMod: Float,
+        val upMsg: String,
+        val downMsg: String,
+        val doubleUpMsg: String,
+        val doubleDownMsg: String,
+    ) {
+        CLEAR(0, "clear", 0f, 0f, 0f,
+            "", "The clouds dissipate, leaving clear sky.",
+            "", "The cloud cover breaks up and vanishes, leaving clear sky."),
+        CLOUDY(1, "cloudy", 0.5f, 0f, -3f,
+            "Light clouds gather in the sky.", "The cloud cover breaks up.",
+            "", "The rain suddenly stops, and the clouds break up."),
+        OVERCAST(2, "overcast", 1f, 0f, -6f,
+            "The clouds spread to blanket the sky.", "The rain stops.",
+            "Clouds roll quickly across the sky, blocking the sun.", "The storm abruptly stops."),
+        RAINY(3, "rainy", 1f, 0.4f, -8f,
+            "It begins to rain.", "The rain lets up some.",
+            "It begins to rain.", "The storm's fury suddenly calms."),
+        STORMY(4, "stormy", 1f, 0.7f, -8f,
+            "The rainfall grows to a downpour.", "The intense storm lessens its fury.",
+            "The clouds burst with a sudden downpour.", ""),
+        MONSOON(5, "monsoon", 1f, 1f, -10f,
+            "The storm intensifies!", "",
+            "The clouds burst into an intense monsoon!", "")
+        ;
+        override fun toString() = displayName
+    }
+
+    var type: Type = Type.CLEAR
+    var cloudIntensity: Float = 0f
+    var rainIntensity: Float = 0f
 
     var envString: String = "clear"
 
-    var weatherIntensity = 0f
     var windX = 0f
     var windY = 0f
-    var cloudIntensity = 0f
-    var rainIntensity = 0f
     val lightning = LightColor(0f, 0f, 0f)
 
     var windSpeed = 0f
     var windDirection = 0.2f
     private val maxWindSpeed = 2f
 
-    private var weatherIntensityTarget = 0f
     private var framesBeforeRaindrop = 0
     private var lastWeatherHour = 0
 
     fun clouds() = cloudIntensity
     fun rain() = rainIntensity
 
-    fun temperature() = (-3f * windSpeed + -4f * rainIntensity + -7f * cloudIntensity).toInt()
-    fun weatherTemperature() = (-6f * windSpeed) + (-5f * rainIntensity)
+    fun temperature() = (-3f * windSpeed + type.temperatureMod).toInt()
+    fun weatherTemperature() = (-6f * windSpeed) + (-5f * type.rainVisual)
 
     fun shouldRaindrop(): Boolean {
         framesBeforeRaindrop--
-        if (framesBeforeRaindrop < 0 && rainIntensity > 0.2f) {
-            val rainInterval = (1800 - rainIntensity * 1600).toInt()
+        if (framesBeforeRaindrop < 0 && type.rainVisual > 0f) {
+            val rainInterval = (1800 - type.rainVisual * 1600).toInt()
             framesBeforeRaindrop = rainInterval + Dice.oneTo(rainInterval)
             return true
         }
@@ -52,22 +85,24 @@ class Weather {
     }
 
     fun onRender(delta: Float) {
-        weatherIntensity = if (weatherIntensity < weatherIntensityTarget) {
-            min(weatherIntensityTarget, weatherIntensity + 0.1f * delta)
+        cloudIntensity = if (cloudIntensity < type.cloudVisual) {
+            java.lang.Float.min(type.cloudVisual, cloudIntensity + 0.1f * delta)
         } else {
-            max(weatherIntensityTarget, weatherIntensity - 0.1f * delta)
-        }
-        App.DEBUG_PERLIN?.also {
-            weatherIntensity = 0f
-            rainIntensity = 0f
+            java.lang.Float.max(type.cloudVisual, cloudIntensity - 0.1f * delta)
         }
 
-        var bolt = max(0f, lightning.r - 3.8f * delta)
+        rainIntensity = if (rainIntensity < type.rainVisual) {
+            java.lang.Float.min(type.rainVisual, rainIntensity + 0.1f * delta)
+        } else {
+            java.lang.Float.max(type.rainVisual, rainIntensity - 0.1f * delta)
+        }
 
-        val boltChance = (rainIntensity - 0.4f) * 0.4f
+        var bolt = java.lang.Float.max(0f, lightning.r - 3.8f * delta)
+
+        val boltChance = (type.rainVisual - 0.4f) * 0.4f
         if (isEveryFrame(5)) {
             if (Dice.chance(delta * boltChance * 5f)) {
-                bolt = 0.4f + Dice.float(0f, rainIntensity)
+                bolt = 0.4f + Dice.float(0f, type.rainVisual)
                 Speaker.world(if (bolt > 0.8f) Speaker.SFX.THUNDER_NEAR else Speaker.SFX.THUNDER_DISTANT,
                     delayMs = java.lang.Long.max(0L, 20L + (600f - Dice.float(0f, bolt / 0.0015f)).toLong()) )
             }
@@ -91,21 +126,16 @@ class Weather {
     }
 
     fun updateTime(hour: Int, minute: Int, level: Level) {
+        updatePlayerWetness()
         if (hour != lastWeatherHour) {
             lastWeatherHour = hour
-            updateWeather(hour, minute, level)
+            update()
         }
-        val cloudLight = min(1f, (level.ambientLight.brightness() - 0.5f) * 2f)
-        cloudIntensity = max(0f, min(1f, weatherIntensity * 2.0f) * cloudLight)
-        rainIntensity = max(0f, (weatherIntensity - 0.5f) * 2f)
-        updateEnvString()
-        updatePlayerWetness()
     }
 
-    private fun updateWeather(hour: Int, minute: Int, level: Level) {
-        if (Dice.chance(0.3f)) return
+    fun update() {
         var m = ""
-        if (Dice.chance(0.5f)) {
+        if (Dice.chance(0.3f)) {
             // Wind speed change
             if (Dice.chance(0.7f - windSpeed * 0.5f)) {
                 windSpeed += Dice.float(0.05f, 0.2f)
@@ -116,7 +146,7 @@ class Weather {
             }
         }
         windSpeed = min(windSpeed, maxWindSpeed)
-        if (windSpeed < 0.2f && Dice.chance(0.5f)) {
+        if (windSpeed < 0.2f && Dice.chance(0.3f)) {
             m += "The wind shifts.  "
             windDirection = (windDirection + Dice.float(0.2f, 0.8f)) % 1f
         }
@@ -125,54 +155,64 @@ class Weather {
         windX = (cos(windRads) * windSpeed).toFloat()
         windY = (sin(windRads) * windSpeed).toFloat()
 
-        if (Dice.chance(overallRaininess + weatherIntensity * 0.3f)) {
-            // Rain more
-            weatherIntensityTarget = min(1f, weatherIntensityTarget + 0.3f)
-            if (!level.isRoofedAt(App.player.xy.x, App.player.xy.y)) {
-                if (weatherIntensity < 0.45f && weatherIntensityTarget > 0.45f) {
-                    m += "It begins to rain."
-                } else if (weatherIntensity >= 0.5f) {
-                    m += "The rain falls harder."
-                } else if (hour in 7..18) {
-                    m += "Clouds gather in the sky."
-                }
+        // Pick a new weather
+        if (App.player.level !is WorldLevel) return
+
+        val biome = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).biome
+        val maxRank = biome.maxWeatherRank() ?: Type.values().maxOf { it.rank }
+        if (type.rank > maxRank) {
+            changeWeather(getWeatherForRank(maxRank), m)
+        } else if (type.rank == maxRank) {
+            if (Dice.chance(0.5f)) {
+                changeWeather(getWeatherForRank(maxRank - 1), m)
+            }
+        } else if (type.rank == 0) {
+            if (Dice.chance(0.5f)) {
+                changeWeather(getWeatherForRank(1), m)
             }
         } else {
-            // Rain less
-            weatherIntensityTarget = java.lang.Float.max(0f, weatherIntensityTarget - 0.3f)
-            if (!level.isRoofedAt(App.player.xy.x, App.player.xy.y)) {
-                if (weatherIntensity > 0.45f && weatherIntensityTarget < 0.45f) {
-                    m += "It stops raining."
-                } else if (weatherIntensity > 0.45f) {
-                    m += "The rain lets up a bit."
-                } else if (hour in 7..18) {
-                    if (weatherIntensity > 0.3f) {
-                        m += "The sun breaks through the clouds."
-                    } else {
-                        m += "The sun shines brightly."
-                    }
-                }
+            val roll = Dice.float(-1f, 2f) + biome.weatherBias()
+            var shift = when {
+                roll < 0f -> -1
+                roll in 0f..1f -> 0
+                else -> 1
             }
+            if (Dice.chance(0.1f)) shift *= 2
+            val newRank = min(maxRank, max(0, type.rank + shift))
+            changeWeather(getWeatherForRank(newRank), m)
         }
-        if (m.isNotEmpty() && App.player.level == level &&
-            level.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
-            Console.say(m)
+
     }
 
-    private fun updateEnvString() {
-        envString = when {
-            rainIntensity > 0.7f -> "stormy"
-            rainIntensity > 0.3f -> "rainy"
-            rainIntensity > 0.05f -> "drizzling"
-            cloudIntensity > 0.65f -> "overcast"
-            cloudIntensity > 0.3f -> "cloudy"
-            else -> "clear"
-        } + when {
-            windSpeed > (maxWindSpeed * 0.8f) -> ", blustery"
-            windSpeed > (maxWindSpeed * 0.6f) -> ", windy"
-            windSpeed > (maxWindSpeed * 0.2f) -> ", breezy"
-            else -> ", calm"
+    private fun getWeatherForRank(rank: Int) = Type.values().filter { it.rank == rank }.random()
+
+    private fun changeWeather(newType: Type, partialMessage: String? = null) {
+        if (newType == type) return
+
+        val oldType = type
+        type = newType
+        val jump = type.rank - oldType.rank
+        val tm = when {
+            jump < -1 -> type.doubleDownMsg
+            jump == -1 -> type.downMsg
+            jump == 1 -> type.upMsg
+            jump > 1 -> type.doubleUpMsg
+            else -> ""
         }
+
+        val m = (partialMessage ?: "") + tm
+        if (m.isNotEmpty() &&
+            App.player.level?.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
+            Console.say(m)
+
+        envString = type.displayName + ", " + windWord()
+    }
+
+    private fun windWord() = when {
+        windSpeed > (maxWindSpeed * 0.8f) -> "blustery"
+        windSpeed > (maxWindSpeed * 0.5f) -> "windy"
+        windSpeed > (maxWindSpeed * 0.2f) -> "breezy"
+        else -> "calm"
     }
 
     private fun updatePlayerWetness() {
@@ -184,9 +224,7 @@ class Weather {
         }
     }
 
-    fun forceWeather(intensity: Float) {
-        weatherIntensity = intensity
-        weatherIntensityTarget = intensity
-        updateTime(App.gameTime.hour, App.gameTime.minute, App.level)
+    fun forceWeather(newType: Type) {
+        changeWeather(newType)
     }
 }

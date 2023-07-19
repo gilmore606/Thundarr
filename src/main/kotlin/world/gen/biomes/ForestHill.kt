@@ -32,6 +32,7 @@ object ForestHill : Biome(
     override fun edgeDistanceThreatFactor() = 2f
     override fun xpValue() = 4
     override fun temperatureAmplitude() = 0.7f
+    override fun maxWeatherRank() = 4
 
     override fun fertilityAt(x: Int, y: Int) = super.fertilityAt(x, y) -
             (NoisePatches.get("mountainShapes", x, y) * 0.7f + NoisePatches.get("extraForest", x, y) * 5f).toFloat()

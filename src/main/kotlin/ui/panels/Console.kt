@@ -13,6 +13,7 @@ import util.log
 import world.Entity
 import world.gen.Metamap
 import world.level.Level
+import world.weather.Weather
 import java.lang.Float.max
 import java.lang.Float.min
 
@@ -346,9 +347,14 @@ object Console : Panel() {
     }
 
     private fun debugWeather(words: List<String>) {
-        val newWeather = if (words.size > 1) words[1].toFloat() else 0f
-        App.weather.forceWeather(newWeather)
-        say("Weather forced to $newWeather.")
+        val newWeather = if (words.size > 1) words[1] else "clear"
+        Weather.Type.values().firstOrNull { it.displayName.startsWith(newWeather) }?.also { weather ->
+            App.weather.forceWeather(weather)
+            say("Weather forced to $weather.")
+        } ?: run {
+            say("No such weather.  Weather types: ")
+            say("  " + Weather.Type.values().joinToString(" "))
+        }
     }
 
     private fun debugGet(words: List<String>) {
