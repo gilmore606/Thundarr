@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.21'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'org.beryx.runtime' version '1.13.0'
 }
 
 group = 'me.danbu'
@@ -11,16 +12,20 @@ version = '1.0-SNAPSHOT'
 allprojects {
     repositories {
         mavenCentral()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url 'https://jitpack.io' }
     }
-
-    apply plugin: 'application'
+    apply plugin: 'org.beryx.runtime'
 }
 
 application {
     mainClass = "DesktopLauncher"
     applicationName = 'thundarr'
+}
+
+runtime {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    modules = ['java.naming', 'java.xml']
+    javaHome = 'C:/Users/danbu/.jdks/openjdk-20.0.1'
 }
 
 dependencies {
