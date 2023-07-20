@@ -213,6 +213,8 @@ enum class Glyph(val tall: Boolean = false) {
     FRIDGE,
     GRAY_TUNIC,
     GRAY_TUNIC_WORN,
+    RED_PANTS,
+    RED_PANTS_WORN,
     STOVE,
     SLINGSHOT,
     ROCK,

@@ -214,7 +214,7 @@ object Keyboard : KtxInputAdapter {
                 OPEN_MAP -> { App.openMap() }
                 OPEN_JOURNAL -> { App.openJournal() }
 
-                CANCEL -> { Screen.cursorPosition?.also { Screen.clearCursor() } ?: run { App.openSystemMenu() } }
+                CANCEL -> { App.openSystemMenu() }
                 TOOLBAR_SHOW -> { Toolbar.onKey(-1)}
                 SHORTCUT1 -> { Toolbar.onKey(1) }
                 SHORTCUT2 -> { Toolbar.onKey(2) }

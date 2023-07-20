@@ -63,7 +63,7 @@ object Speaker {
         ROCKHIT(listOf("hits/rockhit.ogg"), 0.3f),
         EXPLODE(listOf("hits/explode.ogg"), 0.1f),
         TREEFALL(listOf("misc/treefall.ogg"), 0.1f, 0.8f),
-        DOOR_CLOSE(listOf("misc/doorclose.ogg"), 0.2f),
+        DOOR_CLOSE(listOf("misc/doorclose.ogg"), 0.2f, 0.6f),
         DOOR_OPEN(listOf("misc/dooropen.ogg"), 0.2f),
         PRAYER(listOf("misc/prayer.ogg"), 0f),
 
