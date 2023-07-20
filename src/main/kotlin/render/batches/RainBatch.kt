@@ -83,7 +83,7 @@ class RainBatch : RenderBatch() {
         shader.setUniformi("u_SnowMask", 1)
         shader.setUniformf("u_Time", (Screen.timeMs - startTime).toFloat())
         shader.setUniformf("u_RainSpeed", 0.005f)
-        shader.setUniformf("u_SnowSpeed", 0.002f)
+        shader.setUniformf("u_SnowSpeed", 0.0015f - Screen.sinBob * 0.000001f)
         Gdx.gl.glActiveTexture(GL_TEXTURE0)
     }
 

@@ -8,6 +8,7 @@ import util.LightColor
 import util.isEveryFrame
 import world.Chunk
 import world.gen.Metamap
+import world.journal.GameTime
 import world.level.Level
 import world.level.WorldLevel
 import java.lang.Math.max
@@ -27,35 +28,69 @@ class Weather {
         val temperatureMod: Float,
         val minTemp: Int,
         val maxTemp: Int,
-        val upMsg: String,
-        val downMsg: String,
-        val doubleUpMsg: String,
-        val doubleDownMsg: String,
+        val messages: Map<String, String>
     ) {
         CLEAR(0, "clear", 0f, 0f, 0f, 0f, -1000, 1000,
-            "", "The clouds dissipate, leaving clear sky.",
-            "", "The cloud cover breaks up and vanishes, leaving clear sky."),
+            mapOf(
+                "cloudy" to "The clouds dissipate, leaving clear sky.",
+                "overcast" to "The cloud cover breaks up and vanishes, leaving clear sky."
+            )),
         CLOUDY(1, "cloudy", 0.7f, 0f, 0f, -3f,-1000, 1000,
-            "Light clouds gather in the sky.", "The cloud cover breaks up.",
-            "", "The %rain suddenly stops, and the clouds break up."),
+            mapOf(
+                "clear" to "Light clouds gather in the sky.",
+                "overcast" to "The cloud cover breaks up.",
+                "rainy" to "The rain abruptly stops, and the cloud cover breaks."
+            )),
         OVERCAST(2, "overcast", 1f, 0f, 0f, -6f,-1000, 1000,
-            "The clouds spread to blanket the sky.", "The %rain stops.",
-            "Clouds roll quickly across the sky, blocking the sun.", "The storm abruptly stops."),
+            mapOf(
+                "clear" to "Clouds roll quickly across the sky, blocking the sun.",
+                "cloudy" to "The clouds spread to blanket the sky.",
+                "rainy" to "It stops raining.",
+                "snowy" to "It stops snowing.",
+                "stormy" to "The rainstorm peters out and stops.",
+                "snowstorm" to "The snowstorm peters out and stops."
+            )),
         RAINY(3, "rainy", 1f, 0.4f, 0f, -8f,25, 1000,
-            "It begins to rain.", "The %rain lets up some.",
-            "It begins to rain.", "The storm's fury suddenly calms."),
+            mapOf(
+                "cloudy" to "The cloud cover spreads, and rain begins to fall.",
+                "overcast" to "It starts raining.",
+                "snowy" to "The snow turns to a cold rain.",
+                "stormy" to "The storm lets up a bit.",
+                "snowstorm" to "The storm lets up, and the snow turns to cold rain.",
+                "monsoon" to "The storm's fury suddenly calms."
+            )),
         SNOWY(3, "snowy", 0.5f, 0f, 0.5f, 0f, -1000, 35,
-            "It starts snowing.", "It stops snowing.",
-            "It starts snowing.", "It stops snowing."),
+            mapOf(
+                "cloudy" to "The cloud cover spreads, and snow begins to fall.",
+                "overcast" to "It starts snowing.",
+                "rainy" to "The rain turns to sleet, then snow.",
+                "stormy" to "The storm lets up a bit, and the snow turns to cold rain.",
+                "snowstorm" to "The storm lets up a bit.",
+                "monsoon" to "The storm's fury suddenly calms, and the snow turns to cold rain."
+            )),
         STORMY(4, "stormy", 1f, 0.7f, 0f, -8f,25, 1000,
-            "The rainfall grows to a downpour.", "The intense storm lessens its fury.",
-            "The clouds burst with a sudden downpour.", ""),
+            mapOf(
+                "overcast" to "The clouds burst with a sudden rainstorm.",
+                "rainy" to "The rain intensifies.",
+                "snowy" to "The snow turns to a cold rainstorm.",
+                "snowstorm" to "The snowstorm lessens, and turns to a freezing rainstorm.",
+                "monsoon" to "The intense storm lessens its fury."
+            )),
         SNOWSTORM(4, "snowstorm", 1f, 0f, 1f, -5f, -1000, 30,
-            "The snow falls harder.", "The blizzard lessens its fury.",
-            "A heavy snowfall begins.", ""),
+            mapOf(
+                "overcast" to "A blustering snowstorm begins.",
+                "rainy" to "The rain freezes and turns to a brutal snowstorm.",
+                "snowy" to "The snowfall intensifies to a storm.",
+                "stormy" to "The rainstorm freezes into a heavy snowfall.",
+                "monsoon" to "The rain lets up a bit, and turns to a storm of wet snow."
+            )),
         MONSOON(5, "monsoon", 1f, 1f, 0f, -10f,35, 1000,
-            "The storm intensifies!", "",
-            "The clouds burst into an intense monsoon!", "")
+            mapOf(
+                "rainy" to "The clouds burst in an intense thunderstorm.",
+                "snowy" to "The snow turns to rain, and the clouds burst in an intense thunderstorm.",
+                "stormy" to "The storm intensifies.",
+                "snowstorm" to "The snow turns to an intense rainstorm."
+            ))
         ;
         override fun toString() = displayName
     }
@@ -66,6 +101,8 @@ class Weather {
     var cloudIntensity: Float = 0f
     var rainIntensity: Float = 0f
     var snowIntensity: Float = 0f
+
+    var lastChangeTime: Double = 0.0
 
     var envString: String = "clear"
 
@@ -91,7 +128,7 @@ class Weather {
     fun shouldRaindrop(): Boolean {
         framesBeforeRaindrop--
         if (framesBeforeRaindrop < 0 && type.rainVisual > 0f) {
-            val rainInterval = (1800 - type.rainVisual * 1600).toInt()
+            val rainInterval = (1800 - type.rainVisual * 1200).toInt()
             framesBeforeRaindrop = rainInterval + Dice.oneTo(rainInterval)
             return true
         }
@@ -154,6 +191,9 @@ class Weather {
     }
 
     fun update() {
+        if (App.gameTime.time < lastChangeTime + 12) return
+        lastChangeTime = App.gameTime.time
+
         var m = ""
         if (Dice.chance(0.3f)) {
             // Wind speed change
@@ -198,7 +238,7 @@ class Weather {
                 roll in 0f..1f -> 0
                 else -> 1
             }
-            if (Dice.chance(0.1f)) shift *= 2
+            if (Dice.chance(0.06f)) shift *= 2
             val newRank = min(maxRank, max(0, type.rank + shift))
             changeWeather(getWeatherForRank(newRank, temperature), m)
         }
@@ -214,16 +254,9 @@ class Weather {
 
         val oldType = type
         type = newType
-        val jump = type.rank - oldType.rank
-        val tm = when {
-            jump < -1 -> type.doubleDownMsg
-            jump == -1 -> type.downMsg
-            jump == 1 -> type.upMsg
-            jump > 1 -> type.doubleUpMsg
-            else -> ""
-        }
+        val tm = type.messages[oldType.displayName] ?: ""
 
-        val m = ((partialMessage ?: "") + tm).replace("%rain", if (oldType.snowVisual > 0f) "snow" else "rain")
+        val m = ((partialMessage ?: "") + tm)
         if (m.isNotEmpty() &&
             App.player.level?.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
             Console.say(m)
