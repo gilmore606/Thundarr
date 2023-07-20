@@ -27,7 +27,6 @@ class FurTunic : GenericShirt() {
     override fun weatherProtection() = 0.2f
 }
 
-
 @Serializable
 class LeatherVest : GenericShirt() {
     companion object {

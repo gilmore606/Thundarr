@@ -25,35 +25,42 @@ class Weather {
         val rainVisual: Float,
         val snowVisual: Float,
         val temperatureMod: Float,
+        val minTemp: Int,
+        val maxTemp: Int,
         val upMsg: String,
         val downMsg: String,
         val doubleUpMsg: String,
         val doubleDownMsg: String,
     ) {
-        CLEAR(0, "clear", 0f, 0f, 0f, 0f,
+        CLEAR(0, "clear", 0f, 0f, 0f, 0f, -1000, 1000,
             "", "The clouds dissipate, leaving clear sky.",
             "", "The cloud cover breaks up and vanishes, leaving clear sky."),
-        CLOUDY(1, "cloudy", 0.7f, 0f, 0f, -3f,
+        CLOUDY(1, "cloudy", 0.7f, 0f, 0f, -3f,-1000, 1000,
             "Light clouds gather in the sky.", "The cloud cover breaks up.",
-            "", "The rain suddenly stops, and the clouds break up."),
-        OVERCAST(2, "overcast", 1f, 0f, 0f, -6f,
-            "The clouds spread to blanket the sky.", "The rain stops.",
+            "", "The %rain suddenly stops, and the clouds break up."),
+        OVERCAST(2, "overcast", 1f, 0f, 0f, -6f,-1000, 1000,
+            "The clouds spread to blanket the sky.", "The %rain stops.",
             "Clouds roll quickly across the sky, blocking the sun.", "The storm abruptly stops."),
-        RAINY(3, "rainy", 1f, 0.4f, 0f, -8f,
-            "It begins to rain.", "The rain lets up some.",
+        RAINY(3, "rainy", 1f, 0.4f, 0f, -8f,25, 1000,
+            "It begins to rain.", "The %rain lets up some.",
             "It begins to rain.", "The storm's fury suddenly calms."),
-//        SNOWY(3, "snowy", 0.5f, 0f, 1f, 0f,
-//            "It starts snowing.", "It stops snowing.",
-//            "It starts snowing.", "It stops snowing."),
-        STORMY(4, "stormy", 1f, 0.7f, 0f, -8f,
+        SNOWY(3, "snowy", 0.5f, 0f, 0.5f, 0f, -1000, 35,
+            "It starts snowing.", "It stops snowing.",
+            "It starts snowing.", "It stops snowing."),
+        STORMY(4, "stormy", 1f, 0.7f, 0f, -8f,25, 1000,
             "The rainfall grows to a downpour.", "The intense storm lessens its fury.",
             "The clouds burst with a sudden downpour.", ""),
-        MONSOON(5, "monsoon", 1f, 1f, 0f, -10f,
+        SNOWSTORM(4, "snowstorm", 1f, 0f, 1f, -5f, -1000, 30,
+            "The snow falls harder.", "The blizzard lessens its fury.",
+            "A heavy snowfall begins.", ""),
+        MONSOON(5, "monsoon", 1f, 1f, 0f, -10f,35, 1000,
             "The storm intensifies!", "",
             "The clouds burst into an intense monsoon!", "")
         ;
         override fun toString() = displayName
     }
+
+    var currentWeatherBias = -0.1f
 
     var type: Type = Type.CLEAR
     var cloudIntensity: Float = 0f
@@ -171,20 +178,21 @@ class Weather {
         // Pick a new weather
         if (App.player.level !is WorldLevel) return
 
+        val temperature = App.player.level?.temperatureAt(App.player.xy) ?: 65
         val biome = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y).biome
         val maxRank = biome.maxWeatherRank() ?: Type.values().maxOf { it.rank }
         if (type.rank > maxRank) {
-            changeWeather(getWeatherForRank(maxRank), m)
+            changeWeather(getWeatherForRank(maxRank, temperature), m)
         } else if (type.rank == maxRank) {
             if (Dice.chance(0.5f)) {
-                changeWeather(getWeatherForRank(maxRank - 1), m)
+                changeWeather(getWeatherForRank(maxRank - 1, temperature), m)
             }
         } else if (type.rank == 0) {
             if (Dice.chance(0.5f)) {
-                changeWeather(getWeatherForRank(1), m)
+                changeWeather(getWeatherForRank(1, temperature), m)
             }
         } else {
-            val roll = Dice.float(-1f, 2f) + biome.weatherBias()
+            val roll = Dice.float(-1f, 2f) + biome.weatherBias() + currentWeatherBias
             var shift = when {
                 roll < 0f -> -1
                 roll in 0f..1f -> 0
@@ -192,12 +200,14 @@ class Weather {
             }
             if (Dice.chance(0.1f)) shift *= 2
             val newRank = min(maxRank, max(0, type.rank + shift))
-            changeWeather(getWeatherForRank(newRank), m)
+            changeWeather(getWeatherForRank(newRank, temperature), m)
         }
 
     }
 
-    private fun getWeatherForRank(rank: Int) = Type.values().filter { it.rank == rank }.random()
+    private fun getWeatherForRank(rank: Int, temperature: Int) = Type.values().filter {
+        it.rank == rank && temperature >= it.minTemp && temperature <= it.maxTemp
+    }.random()
 
     private fun changeWeather(newType: Type, partialMessage: String? = null) {
         if (newType == type) return
@@ -213,7 +223,7 @@ class Weather {
             else -> ""
         }
 
-        val m = (partialMessage ?: "") + tm
+        val m = ((partialMessage ?: "") + tm).replace("%rain", if (oldType.snowVisual > 0f) "snow" else "rain")
         if (m.isNotEmpty() &&
             App.player.level?.roofedAt(App.player.xy.x, App.player.xy.y) != Chunk.Roofed.INDOOR)
             Console.say(m)

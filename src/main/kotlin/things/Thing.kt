@@ -136,6 +136,7 @@ sealed class Thing() : Entity {
 
         TARP("tarp", "tarps", { TarpCloak() }),
         ANIMAL_HIDE("hide", "hides", { Hide() }),
+        FUR_HIDE("furry hide", "furry hides", { FurHide() }),
         SCALY_HIDE("scaly hide", "scaly hides", { ScalyHide() }),
         HARDHAT("hardhat", "hardhats", { HardHat() }),
         WOOLHAT("wool hat", "wool hats", { WoolHat() }),

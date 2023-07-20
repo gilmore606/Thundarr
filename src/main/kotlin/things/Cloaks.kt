@@ -29,6 +29,17 @@ class Hide : GenericCloak() {
 }
 
 @Serializable
+class FurHide : GenericCloak() {
+    override val tag = Tag.FUR_HIDE
+    override fun name() = "furry hide"
+    override fun description() = "A leather animal hide covered in thick fur.  You could make something out of it, or wear it as a cloak."
+    override fun hue() = 2.6f
+    override fun weight() = 1.2f
+    override fun material() = Material.FUR
+    override fun armor() = 1f
+}
+
+@Serializable
 class ScalyHide: GenericCloak() {
     override val tag = Tag.SCALY_HIDE
     override fun name() = "scaly hide"
