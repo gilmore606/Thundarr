@@ -5,10 +5,9 @@ import actors.actions.events.Event
 import actors.animations.Animation
 import actors.animations.Step
 import actors.bodyparts.*
-import actors.stats.Senses
-import actors.stats.Speed
-import actors.stats.Stat
-import actors.stats.Strength
+import actors.stats.*
+import actors.stats.skills.Dodge
+import actors.stats.skills.Fight
 import actors.stats.skills.Skill
 import actors.stats.skills.Sneak
 import actors.statuses.*
@@ -152,6 +151,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
         Pather.restoreActorMaps(this)
         isUnloading = false
+    }
+
+    fun initStats(strength: Int, speed: Int, brains: Int, senses: Int, heart: Int, fight: Int = 0, dodge: Int = 0) {
+        Strength.set(this, strength)
+        Speed.set(this, speed)
+        Brains.set(this, brains)
+        Senses.set(this, senses)
+        Heart.set(this, heart)
+        Fight.set(this, fight)
+        Dodge.set(this, dodge)
     }
 
     fun moveTo(level: Level?, x: Int, y: Int) {
@@ -535,7 +544,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return if (excess <= 0f) 0f else excess * encPerKg
     }
 
-    open fun meleeWeapon(): MeleeWeapon = equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: fist
+    open fun meleeWeapon(): MeleeWeapon = equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: unarmedWeapon()
+    open fun unarmedWeapon(): MeleeWeapon = fist
 
     open fun randomBodypart(): Bodypart {
         val range = bodyparts.sumOf { it.size }

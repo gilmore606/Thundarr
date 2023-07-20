@@ -19,11 +19,9 @@ class Aurox : NPC() {
     override fun name() = "aurox"
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
     override fun onSpawn() {
-        Strength.set(this, 14f)
-        Speed.set(this, 8f)
-        Brains.set(this, 5f)
+        initStats(14, 8, 5, 9, 8, 0, 0)
     }
-    override fun skinArmor() = 2.5f
+    override fun skinArmor() = 1.5f
 
     override fun idleState() = IdleHerd(
         0.4f, 10, true,
@@ -47,12 +45,10 @@ class MuskOx : NPC() {
     override fun shadowXOffset() = 0.2f
     override fun name() = "muskox"
     override fun description() = "Predictably, it smells awful."
-    override fun isHuman() = false
     override fun onSpawn() {
-        Strength.set(this, 15f)
-        Speed.set(this, 10f)
-        Brains.set(this, 6f)
+        initStats(15, 9, 5, 10, 9, 1, 0)
     }
+    override fun skinArmor() = 3f
 
     override fun idleState() = IdleHerd(
         0.4f, 15, true,

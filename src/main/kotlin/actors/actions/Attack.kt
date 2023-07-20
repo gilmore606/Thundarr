@@ -14,6 +14,7 @@ import things.Weapon
 import ui.panels.Console
 import util.Dice
 import util.XY
+import util.log
 import world.level.Level
 
 @Serializable
@@ -49,6 +50,7 @@ class Attack(
                     (targetBodypart?.toHit ?: 0)
 
             val roll = (weapon.skill().resolve(actor, difficulty) + Fight.resolve(actor, difficulty)) / 2
+            log.info("COMBAT: $actor rolled attack $roll at diff $difficulty")
 
             if (roll < 0) {
 

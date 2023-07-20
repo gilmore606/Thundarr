@@ -68,6 +68,7 @@ abstract class Stat(
 
     // Set the base value for actor.  Probably only use this in initial NPC spawn.
     fun set(actor: Actor, base: Float) { actor.stats[tag] = Value(base) }
+    fun set(actor: Actor, base: Int) { set(actor, base.toFloat()) }
 
     // Get the current value for actor.
     // If the final cached value is null, refresh the cache.
