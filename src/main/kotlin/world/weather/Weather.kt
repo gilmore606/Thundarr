@@ -23,28 +23,32 @@ class Weather {
         val displayName: String,
         val cloudVisual: Float,
         val rainVisual: Float,
+        val snowVisual: Float,
         val temperatureMod: Float,
         val upMsg: String,
         val downMsg: String,
         val doubleUpMsg: String,
         val doubleDownMsg: String,
     ) {
-        CLEAR(0, "clear", 0f, 0f, 0f,
+        CLEAR(0, "clear", 0f, 0f, 0f, 0f,
             "", "The clouds dissipate, leaving clear sky.",
             "", "The cloud cover breaks up and vanishes, leaving clear sky."),
-        CLOUDY(1, "cloudy", 0.5f, 0f, -3f,
+        CLOUDY(1, "cloudy", 0.7f, 0f, 0f, -3f,
             "Light clouds gather in the sky.", "The cloud cover breaks up.",
             "", "The rain suddenly stops, and the clouds break up."),
-        OVERCAST(2, "overcast", 1f, 0f, -6f,
+        OVERCAST(2, "overcast", 1f, 0f, 0f, -6f,
             "The clouds spread to blanket the sky.", "The rain stops.",
             "Clouds roll quickly across the sky, blocking the sun.", "The storm abruptly stops."),
-        RAINY(3, "rainy", 1f, 0.4f, -8f,
+        RAINY(3, "rainy", 1f, 0.4f, 0f, -8f,
             "It begins to rain.", "The rain lets up some.",
             "It begins to rain.", "The storm's fury suddenly calms."),
-        STORMY(4, "stormy", 1f, 0.7f, -8f,
+//        SNOWY(3, "snowy", 0.5f, 0f, 1f, 0f,
+//            "It starts snowing.", "It stops snowing.",
+//            "It starts snowing.", "It stops snowing."),
+        STORMY(4, "stormy", 1f, 0.7f, 0f, -8f,
             "The rainfall grows to a downpour.", "The intense storm lessens its fury.",
             "The clouds burst with a sudden downpour.", ""),
-        MONSOON(5, "monsoon", 1f, 1f, -10f,
+        MONSOON(5, "monsoon", 1f, 1f, 0f, -10f,
             "The storm intensifies!", "",
             "The clouds burst into an intense monsoon!", "")
         ;
@@ -54,6 +58,7 @@ class Weather {
     var type: Type = Type.CLEAR
     var cloudIntensity: Float = 0f
     var rainIntensity: Float = 0f
+    var snowIntensity: Float = 0f
 
     var envString: String = "clear"
 
@@ -64,12 +69,14 @@ class Weather {
     var windSpeed = 0f
     var windDirection = 0.2f
     private val maxWindSpeed = 2f
+    private val fadeSpeed = 0.4f
 
     private var framesBeforeRaindrop = 0
     private var lastWeatherHour = 0
 
     fun clouds() = cloudIntensity
     fun rain() = rainIntensity
+    fun snow() = snowIntensity
 
     fun temperature() = (-3f * windSpeed + type.temperatureMod).toInt()
     fun weatherTemperature() = (-6f * windSpeed) + (-5f * type.rainVisual)
@@ -86,15 +93,21 @@ class Weather {
 
     fun onRender(delta: Float) {
         cloudIntensity = if (cloudIntensity < type.cloudVisual) {
-            java.lang.Float.min(type.cloudVisual, cloudIntensity + 0.1f * delta)
+            java.lang.Float.min(type.cloudVisual, cloudIntensity + fadeSpeed * delta)
         } else {
-            java.lang.Float.max(type.cloudVisual, cloudIntensity - 0.1f * delta)
+            java.lang.Float.max(type.cloudVisual, cloudIntensity - fadeSpeed * delta)
         }
 
         rainIntensity = if (rainIntensity < type.rainVisual) {
-            java.lang.Float.min(type.rainVisual, rainIntensity + 0.1f * delta)
+            java.lang.Float.min(type.rainVisual, rainIntensity + fadeSpeed * delta)
         } else {
-            java.lang.Float.max(type.rainVisual, rainIntensity - 0.1f * delta)
+            java.lang.Float.max(type.rainVisual, rainIntensity - fadeSpeed * delta)
+        }
+
+        snowIntensity = if (snowIntensity < type.snowVisual) {
+            java.lang.Float.min(type.snowVisual, snowIntensity + fadeSpeed * delta)
+        } else {
+            java.lang.Float.max(type.snowVisual, snowIntensity - fadeSpeed * delta)
         }
 
         var bolt = java.lang.Float.max(0f, lightning.r - 3.8f * delta)

@@ -8,10 +8,10 @@ class Raindrop : Spark() {
 
     init {
         scale = 0.6f
-        alpha = (App.player.level?.weather?.rainIntensity ?: 0f) * 0.6f + 0.8f
+        alpha = (App.player.level?.weather?.rainIntensity ?: 0f) * 0.7f + 0.9f
     }
 
-    private val fadeSpeed = 2.0f
+    private val fadeSpeed = 1.4f
 
     override fun isLit() = true
     override fun duration() = 0.2f

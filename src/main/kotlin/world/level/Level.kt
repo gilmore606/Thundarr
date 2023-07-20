@@ -94,7 +94,7 @@ sealed class Level {
                  vis: Float, glyph: Glyph, light: LightColor, rotate: Boolean)->Unit,
         doStain: (x: Int, y: Int, stain: Stain, light: LightColor) -> Unit,
         doFire: (x: Int, y: Int, offset: Float, offX: Float, offY: Float, size: Float) -> Unit,
-        doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, fadeUp: Boolean) -> Unit,
+        doWeather: (x: Int, y: Int, cloudAlpha: Float, rainAlpha: Float, snowAlpha: Float, fadeUp: Boolean) -> Unit,
         delta: Float
     ) {
         var minOutdoorDist = 100
@@ -122,10 +122,10 @@ sealed class Level {
                         terrain.renderExtraQuads(this, x, y, vis, glyph, light, doQuad)
                         if (vis == 1f) {
                             if ((!roofed && (!isOpaqueAt(x, y) || walkable))) {
-                                doWeather(x, y, weather.clouds(), weather.rain(), false)
+                                doWeather(x, y, weather.clouds(), weather.rain(), weather.snow(), false)
                                 if (weather.shouldRaindrop()) addSpark(Raindrop().at(x, y))
                             } else if (!isRoofedAt(x, y+1) && (!isOpaqueAt(x,y+1) || isWalkableAt(App.player, x,y+1))) {
-                                doWeather(x, y, weather.clouds(), weather.rain(), true)
+                                doWeather(x, y, weather.clouds(), weather.rain(), weather.snow(), true)
                             }
                             chunk.stainsAt(x, y)?.forEach { stain ->
                                 if (stain is Fire) {

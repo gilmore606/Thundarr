@@ -214,9 +214,9 @@ object Screen : KtxScreen {
             terrainBatch.addPartialQuad(x0, y0, x1, y1, textureIndex, vis, light, tx0, ty0, tx1, ty1, 1f, rotate = rotate)
     }
 
-    private val renderWeather: (Int, Int, Float, Float, Boolean)->Unit = { tx, ty, cloudAlpha, rainAlpha, fadeUp ->
+    private val renderWeather: (Int, Int, Float, Float, Float, Boolean)->Unit = { tx, ty, cloudAlpha, rainAlpha, snowAlpha, fadeUp ->
         cloudBatch.addTileQuad(tx, ty, cloudAlpha, fadeUp)
-        rainBatch.addTileQuad(tx, ty, rainAlpha, fadeUp)
+        rainBatch.addTileQuad(tx, ty, rainAlpha, snowAlpha, fadeUp)
     }
 
     private val renderStain: (Int, Int, Stain, LightColor)->Unit = { tx, ty, stain, light ->
