@@ -247,7 +247,7 @@ class Weather {
 
     private fun getWeatherForRank(rank: Int, temperature: Int) = Type.values().filter {
         it.rank == rank && temperature >= it.minTemp && temperature <= it.maxTemp
-    }.random()
+    }.randomOrNull() ?: Type.CLEAR
 
     private fun changeWeather(newType: Type, partialMessage: String? = null) {
         if (newType == type) return
