@@ -20,14 +20,6 @@ class Seeking(
 
     override fun toString() = "Seeking (target $targetID)"
 
-    override fun onEnter(npc: NPC) {
-        Pather.subscribe(npc, lastLocation, npc.visualRange().toInt())
-    }
-
-    override fun onLeave(npc: NPC) {
-        Pather.unsubscribe(npc, lastLocation)
-    }
-
     override fun considerState(npc: NPC) {
         npc.apply {
             origin?.also { origin ->

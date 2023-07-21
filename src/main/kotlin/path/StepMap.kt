@@ -15,11 +15,17 @@ import world.level.Level
 @Serializable
 sealed class StepMap {
 
+    companion object {
+        const val expireAge = 8.0
+    }
+
     var walkerID: String = ""
     var range: Int = 1
     var width = 2
     var height = 2
     var offset = XY(0,0) // offset to level coords
+
+    var lastConsultTime: Double = App.gameTime.time
 
     // We need this because the child data classes' copy method can't see the non-data sealed parent class
     // Like most terrible things I've done, this is for serialization
@@ -29,6 +35,7 @@ sealed class StepMap {
         it.width = width
         it.height = height
         it.offset.setTo(offset)
+        it.lastConsultTime = lastConsultTime
     }
 
     @Transient var walker: Actor? = null
@@ -55,6 +62,7 @@ sealed class StepMap {
         this.height = range * 2
         scratch = Array(width) { IntArray(height) { -1 } }
         map = Array(width) { IntArray(height) { -1 } }
+        lastConsultTime = App.gameTime.time
         onActorMove(walker)
     }
 
@@ -91,6 +99,7 @@ sealed class StepMap {
 
     protected fun getNextStep(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
+        lastConsultTime = App.gameTime.time
         val lx = fromX - offset.x
         val ly = fromY - offset.y
         var passNeighborStep: XY? = null
@@ -117,6 +126,7 @@ sealed class StepMap {
 
     protected fun getNextStepAway(walker: Actor, fromX: Int, fromY: Int): XY? {
         if (expired) return null
+        lastConsultTime = App.gameTime.time
         val lx = fromX - offset.x
         val ly = fromY - offset.y
         if (lx in 0 until width && ly in 0 until height) {
@@ -167,11 +177,19 @@ sealed class StepMap {
         }
     }
 
+    suspend fun updateAge() {
+        if (App.gameTime.time - lastConsultTime > expireAge) {
+            //log.info("expiring $this (not consulted in $expireAge turns)")
+            expire()
+        }
+    }
+
     suspend fun update() {
         if (walker == null) {
             walker = App.level.director.getActor(walkerID)
         }
         if (!dirty) return
+        if (expired) return
         walker?.level?.also { level ->
             clearScratch()
             printTarget()

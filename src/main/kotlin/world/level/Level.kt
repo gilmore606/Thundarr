@@ -299,8 +299,6 @@ sealed class Level {
 
     fun getGlyph(x: Int, y: Int): Glyph = chunkAt(x,y)?.getGlyph(x,y) ?: Glyph.BLANK
 
-    fun getPathToPOV(from: XY): List<XY> = Pather.buildPath(from, App.player)
-
     fun isSeenAt(x: Int, y: Int) = chunkAt(x,y)?.isSeenAt(x,y) ?: false
 
     fun isRoofedAt(x: Int, y: Int) = chunkAt(x,y)?.isRoofedAt(x,y) ?: false

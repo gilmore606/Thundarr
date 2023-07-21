@@ -13,14 +13,6 @@ class ReturnToArea(
 
     override fun toString() = "ReturnToArea ($area)"
 
-    override fun onEnter(npc: NPC) {
-        Pather.subscribe(npc, area, 40)
-    }
-
-    override fun onLeave(npc: NPC) {
-        Pather.unsubscribe(npc, area)
-    }
-
     override fun considerState(npc: NPC) {
         if (area.contains(npc.xy)) {
             npc.popState()

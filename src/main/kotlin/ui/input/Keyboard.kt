@@ -108,7 +108,6 @@ object Keyboard : KtxInputAdapter {
         } else if (keycode == CONTROL_LEFT || keycode == CONTROL_RIGHT) {
             CTRL = true
             modKeyDown = keycode
-            Screen.updateCursorLine()
         } else if (keycode != SHIFT_RIGHT && keycode != SHIFT_LEFT) {
             lastKey = keycode
             modKeyDown = 0
@@ -126,7 +125,6 @@ object Keyboard : KtxInputAdapter {
         } else if (keycode == CONTROL_LEFT || keycode == CONTROL_RIGHT) {
             CTRL = false
             isMod = true
-            Screen.clearCursorLine()
         } else if (keycode == SHIFT_LEFT || keycode == SHIFT_RIGHT) {
             lastShiftUp = System.currentTimeMillis()
         }

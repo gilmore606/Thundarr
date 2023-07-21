@@ -25,10 +25,6 @@ class WalkTo(
 
     override fun shouldContinueFor(actor: Actor): Boolean = !done && (actor.xy.x != x || actor.xy.y != y)
 
-    override fun onQueue(actor: Actor) {
-        Pather.subscribe(actor, dest, min(60, manhattanDistance(dest, actor.xy).toInt()))
-    }
-
     override fun execute(actor: Actor, level: Level) {
         if (actor.xy == dest) done = true else {
             Pather.nextStep(actor, dest)?.also {
@@ -41,13 +37,10 @@ class WalkTo(
             } ?: run {
                 fails++
                 log.info("  ($this for $actor failed $fails)")
-                if (fails > 10) {
+                if (fails > 5) {
                     done = true
                 }
             }
-        }
-        if (done) {
-            Pather.unsubscribe(actor, dest)
         }
     }
 

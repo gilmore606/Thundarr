@@ -21,8 +21,6 @@ class IdleDen(
 
     // TODO: Change this to just pass the den in constructor
     override fun pickAction(npc: NPC): Action {
-        npc.den?.also { Pather.subscribe(npc, it.xy(), wanderRadius) }
-
         if (shouldSleep(sleepHour, wakeHour)) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
                 if (npc.den != null) {

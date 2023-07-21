@@ -177,12 +177,8 @@ class Villager(
 
     fun setTarget(newTarget: Job) {
         if (newTarget != targetJob) {
-            Pather.unsubscribe(this, targetJob.rect)
             previousTargetJob = targetJob
             targetJob = newTarget
-        }
-        if (!targetJob.contains(this)) {
-            Pather.subscribe(this, targetJob.rect, 64)
         }
     }
 

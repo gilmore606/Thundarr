@@ -25,14 +25,6 @@ class GoDo(
         "Hang on a minute.",
     ).random() else null
 
-    override fun onEnter(npc: NPC) {
-        Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
-    }
-
-    override fun onLeave(npc: NPC) {
-        Pather.unsubscribe(npc, targetXY)
-    }
-
     override fun pickAction(npc: NPC): Action {
         if (npc.xy() == targetXY) {
             npc.popState()

@@ -161,7 +161,6 @@ object Screen : KtxScreen {
     var underModal: Modal? = null
 
     var cursorPosition: XY? = null
-    private var cursorLine: MutableList<XY> = mutableListOf()
 
     private val pov
         get() = App.level.pov
@@ -467,7 +466,6 @@ object Screen : KtxScreen {
 
     fun clearCursor() {
         cursorPosition = null
-        cursorLine.clear()
         Keyboard.CURSOR_MODE = false
     }
 
@@ -526,7 +524,6 @@ object Screen : KtxScreen {
                         if (App.player.queuedActions.isEmpty()) {
                             val newCursor = XY(col, row)
                             cursorPosition = newCursor
-                            if (Keyboard.CTRL) updateCursorLine()
                             return
                         }
                     }
@@ -537,13 +534,6 @@ object Screen : KtxScreen {
     }
 
     private fun buttonBarsShown() = LeftButtons.isShown() || TimeButtons.isShown() || Toolbar.isShown()
-
-    fun updateCursorLine() {
-        cursorPosition?.also { cursor -> cursorLine = App.level.getPathToPOV(cursor).toMutableList() }
-    }
-    fun clearCursorLine() {
-        cursorLine.clear()
-    }
 
     fun mouseScrolled(amount: Float) {
         if (topModal != null) {
@@ -697,10 +687,6 @@ object Screen : KtxScreen {
             cursorPosition?.also { cursorPosition ->
                 addTileQuad(cursorPosition.x, cursorPosition.y,
                     getTextureIndex(Glyph.CURSOR), 1f, fullLight)
-                cursorLine.forEach { xy ->
-                    addTileQuad(xy.x, xy.y,
-                        getTextureIndex(Glyph.CURSOR), 1f, fullLight)
-                }
             }
         }
 

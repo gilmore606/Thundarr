@@ -19,14 +19,6 @@ class Looting(
 ) : State() {
     override fun toString() = "Looting($targetXY,$thingTag)"
 
-    override fun onEnter(npc: NPC) {
-        Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
-    }
-
-    override fun onLeave(npc: NPC) {
-        Pather.unsubscribe(npc, npc)
-    }
-
     override fun considerState(npc: NPC) {
         npc.apply {
             if (!stillThere(level)) {

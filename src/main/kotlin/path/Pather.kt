@@ -37,7 +37,14 @@ object Pather {
                         if (map.needsUpdated()) {
                             updates++
                             map.updating = true
-                            coroutineScope.launch { map.update() }
+                            coroutineScope.launch {
+                                map.updateAge()
+                                map.update()
+                            }
+                        } else {
+                            coroutineScope.launch {
+                                map.updateAge()
+                            }
                         }
                     } else {
                         map.dispose()
@@ -47,6 +54,9 @@ object Pather {
                 if (updates > 0) {
                     //log.info("PATHER: updated $updates maps (${maps.size} alive)")
                     //log.info("PATHER: $maps")
+                    if (updates > 10) {
+                        log.info("PATHER: updated $updates maps (${maps.size} alive)")
+                    }
                 }
                 lastUpdated = updates
                 delay(1L)
@@ -54,68 +64,36 @@ object Pather {
         }
     }
 
-    fun nextStep(from: XY, to: Entity): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
-    fun nextStep(from: Actor, to: XY): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
-    fun nextStep(from: Actor, to: Rect): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
-    fun nextStep(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) }
-    fun nextStepAwayFrom(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStepAwayFrom(from, to) }
+    fun nextStep(from: Actor, to: XY): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
+    fun nextStep(from: Actor, to: Rect): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
+    fun nextStep(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
+    fun nextStepAwayFrom(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStepAwayFrom(from, to) } ?: newRequest(from, to)
 
-    fun buildPath(from: XY, to: Entity) = maps.firstOrNull { false }.let { map ->
-        mutableListOf<XY>().apply {
-            val feet = XY(from.x, from.y)
-            while (feet != to.xy()) {
-                nextStep(feet, to)?.also {
-                    add(it)
-                    feet.setTo(it)
-                } ?: run { return this }
-            }
-            return this
+    private fun newRequest(from: Actor, to: XY): XY? {
+        if (maps.hasOneWhere { it is PointStepMap && it.walkerID == from.id && it.target == to}) return null
+        val map = PointStepMap(to).apply {
+            initialize(from, 32)
         }
+        maps.add(map)
+        return null
     }
 
-    fun subscribe(walker: Actor, target: XY, range: Int) {
-        if (!maps.hasOneWhere { it is PointStepMap && it.target == target && it.walkerID == walker.id }) {
-            val map = PointStepMap(target).apply {
-                initialize(walker, range)
-            }
-            maps.add(map)
+    private fun newRequest(from: Actor, to: Rect): XY? {
+        if (maps.hasOneWhere { it is AreaStepMap && it.walkerID == from.id && it.target == to }) return null
+        val map = AreaStepMap(to).apply {
+            initialize(from, 64)
         }
+        maps.add(map)
+        return null
     }
 
-    fun subscribe(walker: Actor, target: Rect, range: Int) {
-        if (!maps.hasOneWhere { it is AreaStepMap && it.target == target && it.walkerID == walker.id }) {
-            val map = AreaStepMap(target).apply {
-                initialize(walker, range)
-            }
-            maps.add(map)
+    private fun newRequest(from: Actor, to: Actor): XY? {
+        if (maps.hasOneWhere { it is ActorStepMap && it.walkerID == from.id && it.targetID == to.id }) return null
+        val map = ActorStepMap(to.id).apply {
+            initialize(from, 48)
         }
-    }
-
-    fun subscribe(walker: Actor, target: Actor, range: Int) {
-        if (!maps.hasOneWhere { it is ActorStepMap && it.targetID == target.id && it.walkerID == walker.id }) {
-            val map = ActorStepMap(target.id).apply {
-                initialize(walker, range)
-            }
-            maps.add(map)
-        }
-    }
-
-    fun unsubscribe(walker: Actor, target: XY) {
-        maps.firstOrNull { it is PointStepMap && it.target == target && it.walkerID == walker.id }?.also {
-            it.expire()
-        }
-    }
-
-    fun unsubscribe(walker: Actor, target: Actor) {
-        maps.firstOrNull { it is ActorStepMap && it.targetID == target.id && it.walkerID == walker.id }?.also {
-            it.expire()
-        }
-    }
-
-    fun unsubscribe(walker: Actor, target: Rect) {
-        maps.firstOrNull { it is AreaStepMap && it.target == target && it.walkerID == walker.id }?.also {
-            it.expire()
-        }
+        maps.add(map)
+        return null
     }
 
     fun unsubscribeAll(subscriber: Actor) {

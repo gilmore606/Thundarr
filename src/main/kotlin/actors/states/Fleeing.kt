@@ -15,18 +15,6 @@ class Fleeing(
 
     override fun commentLine() = "I've got to get out of here!"
 
-    override fun onEnter(npc: NPC) {
-        App.level.director.getActor(targetID)?.also { target ->
-            Pather.subscribe(npc, target, npc.visualRange().toInt())
-        }
-    }
-
-    override fun onLeave(npc: NPC) {
-        App.level.director.getActor(targetID)?.also { target ->
-            Pather.unsubscribe(npc, target)
-        }
-    }
-
     override fun considerState(npc: NPC) {
         npc.apply {
             if (!canSee(getActor(targetID))) {

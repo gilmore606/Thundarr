@@ -131,7 +131,6 @@ open class Player : Actor(), Workbench {
 
     override fun die() {
         super.die()
-        Pather.unsubscribeAll(this)
         KtxAsync.launch {
             delay(1000L)
             Screen.addModal(BigSplashModal(
