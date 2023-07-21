@@ -150,6 +150,8 @@ object Console : Panel() {
         if (level == App.level || reach == Reach.WORLD) {
             if (reach != Reach.VISUAL || level?.visibilityAt(x, y) == 1f) {
                 say(text)
+            } else {
+                log.info("   \"$text\"")
             }
         }
     }

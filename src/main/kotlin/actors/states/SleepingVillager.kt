@@ -7,13 +7,16 @@ import actors.actions.*
 import actors.actions.events.Event
 import actors.statuses.Status
 import kotlinx.serialization.Serializable
+import things.GenericTorch
 import things.SwitchablePlacedLight
+import things.SwitchablePortableLight
 import things.Thing
 import util.DayTime
 import util.XY
+import util.hasOneWhere
 
 @Serializable
-class Sleeping(
+class SleepingVillager(
     val wakeTime: DayTime
 ) : State() {
     val sleptTime = App.gameTime.dayTime()
@@ -27,14 +30,19 @@ class Sleeping(
     override fun considerState(npc: NPC) {
         if (npc is Villager) {
             if (!npc.hasStatus(Status.Tag.ASLEEP)) {
-                npc.entitiesSeen { it is SwitchablePlacedLight && !it.leaveLit() && it.active && npc.targetJob.contains(it) }.keys.firstOrNull()?.also { light ->
-                    var awakeRoomies = false
-                    npc.targetJob.villagers(npc.level).forEach { villager ->
-                        if (villager.state !is Sleeping) awakeRoomies = true
-                    }
-                    if (!awakeRoomies) {
+                if (npc.targetJob != npc.homeJob) {
+                    npc.setTarget(npc.homeJob)
+                    npc.popState()
+                    return
+                }
+                val awakeRoomies = npc.targetJob.villagers(npc.level).hasOneWhere { it.state !is SleepingVillager }
+                if (!awakeRoomies) {
+                    npc.entitiesSeen { it is SwitchablePlacedLight && !it.leaveLit() && it.active && npc.targetJob.contains(it) }.keys.firstOrNull()?.also { light ->
                         npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, (light as Thing).getKey())))
                         return
+                    }
+                    npc.entitiesSeen { it is GenericTorch && it.active && npc.targetJob.contains(it) }.keys.firstOrNull()?.also { light ->
+                        npc.pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, (light as Thing).getKey())))
                     }
                 }
                 if (npc.xy() != npc.bedLocation) {

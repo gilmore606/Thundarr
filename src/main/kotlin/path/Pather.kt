@@ -19,6 +19,7 @@ object Pather {
     private val coroutineScope = CoroutineScope(coroutineContext)
     private var worker: Job? = null
     private var jobs = mutableSetOf<Job>()
+    var lastUpdated: Int = 0
 
     init {
         relaunchWorker()
@@ -35,6 +36,7 @@ object Pather {
                         newMaps.add(map)
                         if (map.needsUpdated()) {
                             updates++
+                            map.updating = true
                             coroutineScope.launch { map.update() }
                         }
                     } else {
@@ -43,9 +45,10 @@ object Pather {
                 }
                 maps = newMaps
                 if (updates > 0) {
-                    log.info("PATHER: updated $updates maps (${maps.size} alive)")
+                    //log.info("PATHER: updated $updates maps (${maps.size} alive)")
                     //log.info("PATHER: $maps")
                 }
+                lastUpdated = updates
                 delay(1L)
             }
         }

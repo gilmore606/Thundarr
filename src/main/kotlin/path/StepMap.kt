@@ -34,6 +34,7 @@ sealed class StepMap {
     @Transient var walker: Actor? = null
     @Transient var dirty = true  // Do we need an update?
     @Transient protected var expired = false  // Can we be disposed of?
+    @Transient var updating = false
 
     @Transient var scratch = Array(width) { IntArray(height) { -1 } }
     @Transient var map = Array(width) { IntArray(height) { -1 } }
@@ -41,7 +42,7 @@ sealed class StepMap {
     abstract fun getClone(): StepMap
 
     fun isActive() = !expired
-    fun needsUpdated() = !expired && dirty
+    fun needsUpdated() = !expired && dirty && !updating
     fun expire() {
         expired = true
     }
@@ -202,6 +203,7 @@ sealed class StepMap {
             }
             promoteScratch()
             dirty = false
+            KtxAsync.launch { updating = false }
         }
     }
 }

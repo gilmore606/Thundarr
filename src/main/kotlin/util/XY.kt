@@ -73,6 +73,8 @@ data class XY(var x: Int, var y: Int) {
     }
     fun distanceTo(b: XY) = distanceTo(b.x, b.y)
 
+    fun isAdjacentTo(b: XY): Boolean = (b.x in x-1..x+1 && b.y in y-1..y+1) && (b != this)
+
     override fun hashCode(): Int {
         var result = x
         result = 31 * result + y
