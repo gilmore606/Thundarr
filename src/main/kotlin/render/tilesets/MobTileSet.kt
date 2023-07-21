@@ -68,4 +68,6 @@ fun ActorTileSet() =
         setTile(Glyph.DOG, SimpleTile(this, 1, 6))
         setTile(Glyph.JERIF, SimpleTile(this, 2, 6))
         setTile(Glyph.MAGIC_PORTAL, SimpleTile(this, 3, 6))
+        setTile(Glyph.BEETLE, SimpleTile(this, 0, 6))
+        setTile(Glyph.FROG, SimpleTile(this, 0, 7))
     }

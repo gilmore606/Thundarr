@@ -139,6 +139,8 @@ enum class Glyph(val tall: Boolean = false) {
     DOG,
     JERIF(tall = true),
     MAGIC_PORTAL(tall = true),
+    FROG,
+    BEETLE,
 
     OAK_TREE,
     MAPLE_TREE,

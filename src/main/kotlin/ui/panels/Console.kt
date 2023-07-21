@@ -1,5 +1,8 @@
 package ui.panels
 
+import actors.actors.Beetle
+import actors.actors.Frog
+import actors.actors.Peeper
 import actors.actors.Player
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
@@ -332,6 +335,7 @@ object Console : Panel() {
             "weather" -> { debugWeather(words) }
             "get" -> { debugGet(words) }
             "xp" -> { debugXP(words) }
+            "spawn" -> { debugSpawn(words) }
             else -> say("I don't understand that.")
         }
     }
@@ -361,7 +365,7 @@ object Console : Panel() {
 
     private fun debugGet(words: List<String>) {
         if (words.size <= 1) {
-            say("Usage: GET <item name>")
+            say("Usage: GET <item name> or GET <number> <item name>")
             return
         }
         var amount = words[1].toIntOrNull() ?: 0
@@ -377,6 +381,20 @@ object Console : Panel() {
         } ?: run {
             say("I don't know about anything called '${words[1]}'.")
         }
+    }
+
+    private fun debugSpawn(words: List<String>) {
+        if (words.size <= 1) {
+            say("Usage: SPAWN <npc name>")
+            return
+        }
+        val npcName = words.drop(1).joinToString(" ")
+        val npc = when (npcName) {
+            "beetle" -> Beetle()
+            "frog" -> Frog()
+            else -> Peeper()
+        }
+        npc.spawnAt(App.player.level!!, App.player.xy.x + 1, App.player.xy.y)
     }
 
     private fun spawnThings(amount: Int, tag: Thing.Tag) {
