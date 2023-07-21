@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import util.*
-import world.Entity
 import java.lang.RuntimeException
 
 object Pather {
@@ -67,7 +66,7 @@ object Pather {
     fun nextStep(from: Actor, to: XY): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
     fun nextStep(from: Actor, to: Rect): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
     fun nextStep(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStep(from, to) } ?: newRequest(from, to)
-    fun nextStepAwayFrom(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStepAwayFrom(from, to) } ?: newRequest(from, to)
+    fun nextStepAwayFrom(from: Actor, to: Actor): XY? = maps.firstNotNullOfOrNull { it.nextStepAwayFrom(from, to) } ?: newRequest(from, to, true)
 
     private fun newRequest(from: Actor, to: XY): XY? {
         if (maps.hasOneWhere { it is PointStepMap && it.walkerID == from.id && it.target == to}) return null
@@ -75,7 +74,7 @@ object Pather {
             initialize(from, 32)
         }
         maps.add(map)
-        return null
+        return fakeFirstStep(from, to)
     }
 
     private fun newRequest(from: Actor, to: Rect): XY? {
@@ -84,15 +83,28 @@ object Pather {
             initialize(from, 64)
         }
         maps.add(map)
-        return null
+        return fakeFirstStep(from, to.center())
     }
 
-    private fun newRequest(from: Actor, to: Actor): XY? {
+    private fun newRequest(from: Actor, to: Actor, isAway: Boolean = false): XY? {
         if (maps.hasOneWhere { it is ActorStepMap && it.walkerID == from.id && it.targetID == to.id }) return null
         val map = ActorStepMap(to.id).apply {
             initialize(from, 48)
         }
         maps.add(map)
+        return fakeFirstStep(from, to.xy, isAway)
+    }
+
+    private fun fakeFirstStep(from: Actor, to: XY, isAway: Boolean = false): XY? {
+        from.level?.also { level ->
+            DIRECTIONS.between(from.xy, to)?.also { toDir ->
+                val dir = if (isAway) toDir.flipped() else toDir
+                if (level.isWalkableFrom(from, from.xy, dir)) return dir
+                else dir.dirPlusDiagonals().forEach { altDir ->
+                    if (level.isWalkableFrom(from, from.xy, altDir)) return altDir
+                }
+            }
+        }
         return null
     }
 

@@ -10,8 +10,7 @@ import world.journal.GameTime
 import world.level.CHUNK_SIZE
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.lang.Math.abs
-import java.lang.Math.max
+import java.lang.Math.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import java.util.UUID
@@ -318,6 +317,13 @@ fun List<XY>.from(x: Int, y: Int, doThis: (dx: Int, dy: Int, dir: XY)->Unit) {
     this.forEach { dir ->
         doThis(x+dir.x, y+dir.y, dir)
     }
+}
+
+fun List<XY>.between(from: XY, target: XY): XY? {
+    val xd = min(1, max(-1, target.x - from.x))
+    val yd = min(1, max(-1, target.y - from.y))
+    forEach { if (it.x == xd && it.y == yd) return it }
+    return null
 }
 
 fun List<XY>.nextNearestTo(origin: XY, exclude: List<XY>): XY {

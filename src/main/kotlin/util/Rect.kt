@@ -26,6 +26,11 @@ data class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
         return true
     }
 
+    fun center(): XY = XY(
+        x0 + (x1 - x0) / 2,
+        y0 + (y1 - y0) / 2
+    )
+
     fun width() = (x1 - x0) + 1
     fun height() = (y1 - y0) + 1
     fun area() = width() * height()
