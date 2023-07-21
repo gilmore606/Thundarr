@@ -4,6 +4,7 @@ import actors.jobs.HomeJob
 import actors.jobs.Job
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import things.Table
 import things.Thing
 import ui.panels.Console
 import util.Dice
@@ -181,6 +182,13 @@ sealed class Decor {
         }
     }
 
+    protected fun hasTable(): Table? =
+        mutableSetOf<Thing>().apply {
+            forXY(room.rect) { ix,iy ->
+                addAll(carto.chunk.thingsAt(ix, iy).filter { it is Table })
+            }
+        }.randomOrNull() as Table?
+
     protected fun forArea(x0: Int, y0: Int, x1: Int, y1: Int, doThis: (x: Int, y: Int)->Unit) {
         forXY(x0,y0, x1,y1) { ix,iy ->
             doThis(ix, iy)
@@ -197,4 +205,5 @@ sealed class Decor {
     protected fun boundsCheck(x: Int, y: Int) = (x in x0..x1 && y in y0..y1)
 
     protected fun flagsAt(x: Int, y: Int) = if (carto is WorldCarto) (carto as WorldCarto).flagsMap[x - x0][y - y0] else null
+
 }

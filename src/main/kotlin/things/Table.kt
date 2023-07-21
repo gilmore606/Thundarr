@@ -48,20 +48,23 @@ class Table : Container(), Smashable, LightSource {
         }
     }
 
+    private val lightColor = LightColor(0f,0f,0f)
+
     override fun light(): LightColor? {
-        var light: LightColor? = null
+        var hasLight = false
+        lightColor.setTo(0f,0f,0f)
         contents.forEach { thing ->
             if (thing is LightSource) {
                 val thingLight = thing.light()
                 if (thingLight != null) {
-                    if (light == null) light = LightColor(0f,0f,0f)
-                    light!!.r += thingLight.r
-                    light!!.g += thingLight.g
-                    light!!.b += thingLight.b
+                    hasLight = true
+                    lightColor.r += thingLight.r
+                    lightColor.g += thingLight.g
+                    lightColor.b += thingLight.b
                 }
             }
         }
-        return light
+        return if (hasLight) lightColor else null
     }
 
     override fun onAdd(thing: Thing) {

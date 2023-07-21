@@ -262,6 +262,8 @@ enum class Glyph(val tall: Boolean = false) {
     CLOAK_WORN,
     BLOODSTAIN,
     SCORCHMARK,
+    CANDLE_ON,
+    CANDLE_OFF,
 
     MAP_FOREST,
     MAP_PLAIN,

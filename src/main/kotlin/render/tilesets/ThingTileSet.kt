@@ -167,4 +167,6 @@ fun ThingTileSet() =
         setTile(Glyph.CLOAK, SimpleTile(this, 12, 9))
         setTile(Glyph.RED_PANTS_WORN, SimpleTile(this, 11, 10))
         setTile(Glyph.RED_PANTS, SimpleTile(this, 12, 10))
+        setTile(Glyph.CANDLE_OFF, SimpleTile(this, 12, 1))
+        setTile(Glyph.CANDLE_ON, SimpleTile(this, 12, 2))
     }

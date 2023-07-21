@@ -26,7 +26,6 @@ class GoDo(
     ).random() else null
 
     override fun onEnter(npc: NPC) {
-        //log.info("$npc GoDo subscribing pather for $targetXY (from ${npc.xy})")
         Pather.subscribe(npc, targetXY, npc.visualRange().toInt())
     }
 
@@ -38,12 +37,18 @@ class GoDo(
         if (npc.xy() == targetXY) {
             npc.popState()
             return targetAction ?: Wait(0.5f)
+        } else if ((npc.level?.isWalkableAt(npc, targetXY.x, targetXY.y) == false) && npc.xy().isAdjacentTo(targetXY)) {
+            npc.popState()
+            return targetAction ?: Wait(0.5f)
         } else if (failedSteps > 4) {
             log.info("$npc $this gave up ($failedSteps failed steps)")
             npc.popState()
             return Say("Aww, forget it.")
         } else {
-            npc.stepToward(targetXY)?.also { failedSteps = 0; return it } ?: run { failedSteps++ }
+            npc.stepToward(targetXY)?.also {
+                failedSteps = 0
+                return it
+            } ?: run { failedSteps++ }
         }
         return super.pickAction(npc)
     }

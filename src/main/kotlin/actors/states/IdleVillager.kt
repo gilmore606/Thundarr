@@ -7,9 +7,7 @@ import actors.actions.*
 import actors.actions.events.Event
 import actors.actions.events.Knock
 import kotlinx.serialization.Serializable
-import things.Door
-import things.SwitchablePlacedLight
-import things.Thing
+import things.*
 import util.*
 
 @Serializable
@@ -21,6 +19,8 @@ class IdleVillager(
 ) : Idle() {
     val wanderChance = 0.4f
     val commentChance = 0.03f
+
+    var failedSteps = 0
 
     override fun toString() = "IdleVillager"
 
@@ -54,7 +54,15 @@ class IdleVillager(
                 }
             } else {
                 // Go where we should be!
-                stepToward(targetJob.rect)?.also { return it } ?: run {
+                stepToward(targetJob.rect)?.also {
+                    failedSteps = 0
+                    return it
+                } ?: run {
+                    failedSteps++
+                    if (failedSteps > 4) {
+                        say("Damn!  Can't get to $targetJob")
+                        failedSteps = 0
+                    }
                     return wander(npc) { true }
                 }
             }
@@ -69,7 +77,7 @@ class IdleVillager(
     override fun considerState(npc: NPC) {
         if (npc is Villager) { npc.apply {
             if (App.gameTime.isBefore(wakeTime) || App.gameTime.isAfter(sleepTime)) {
-                pushState(Sleeping(wakeTime))
+                pushState(SleepingVillager(wakeTime))
                 return
             } else if (App.gameTime.isAfter(restTime)) {
                 if (targetJob != homeJob) {
@@ -84,13 +92,14 @@ class IdleVillager(
                 }
             }
 
-            entitiesSeen { it is SwitchablePlacedLight && !it.leaveLit() }.keys.firstOrNull()?.also { light ->
-                if ((light as SwitchablePlacedLight).active && previousTargetJob.contains(light) && (targetJob != previousTargetJob) &&
+            entitiesSeen { (it is SwitchablePlacedLight && !it.leaveLit()) || it is GenericTorch }.keys.firstOrNull()?.also { light ->
+                if ((light as LitThing).active && previousTargetJob.contains(light) && (targetJob != previousTargetJob) &&
                     previousTargetJob.contains(npc) && previousTargetJob.villagerCount(level()) <= 1) {
                     // Is it lit, and we're leaving, and we're here, and nobody else is here?  Extinguish it
                     pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_OFF, light.getKey())))
                 } else if (!light.active && targetJob.contains(npc) && targetJob.contains(light)) {
                     // Is it out, and we're staying here?  Light it
+                    say("Where's that candle...")
                     pushState(GoDo(light.xy(), Use(Thing.UseTag.SWITCH_ON, light.getKey())))
                 }
             }

@@ -128,6 +128,7 @@ sealed class Thing() : Entity {
         LOG("log", "logs", { Log() }),
         BOARD("board", "boards", { Board() }),
         TORCH("torch", "torches", { Torch() }),
+        CANDLE("candle", "candles", { Candle() }),
         BANDAGES("bandages", "bandages", { Bandages() }),
         FIRSTAIDKIT("first aid kit", "first aid kits", { FirstAidKit() }),
         FOOLSLEAF("foolsleaf", "foolsleaves", { Foolsleaf() }),

@@ -1,6 +1,7 @@
 package util
 
 import actors.actors.Actor
+import things.Table
 import world.Entity
 import world.level.Level
 import java.lang.RuntimeException
@@ -282,10 +283,16 @@ class RayCaster {
                                 }
                                 level.thingsAt(castX, castY).forEach {
                                     resultSet[it] = distance
+                                    if (it is Table) it.also { table ->
+                                        table.contents().forEach { onTable -> resultSet[onTable] = distance }
+                                    }
                                 }
                             } else {
                                 level.thingsAt(castX, castY).forEach {
                                     if (it.isAlwaysVisible()) resultSet[it] = distance
+                                    if (it is Table) it.also { table ->
+                                        table.contents().forEach { onTable -> if (onTable.isAlwaysVisible()) resultSet[onTable] = distance }
+                                    }
                                 }
                             }
                             if (visible && level.isOpaqueAt(castX, castY)) {

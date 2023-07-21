@@ -24,7 +24,7 @@ class Gladius : MeleeWeapon() {
     override fun glyph() = Glyph.SWORD
     override fun weight() = 0.5f
     override fun damageType() = Damage.CUT
-    override fun damage() = 3f
+    override fun damage() = 5f
 }
 
 @Serializable
@@ -44,7 +44,7 @@ class Sunsword : MeleeWeapon(), LightSource {
     }
     override fun light() = if (equipped) lightColor else null
     override fun damageType() = Damage.SHOCK
-    override fun damage() = 8f
+    override fun damage() = 12f
 
     override fun onEquip(actor: Actor) {
         actor.level?.addLightSource(actor.xy.x, actor.xy.y, actor)

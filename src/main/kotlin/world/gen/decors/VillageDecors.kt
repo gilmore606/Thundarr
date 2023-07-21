@@ -30,7 +30,6 @@ class Hut : Decor() {
                 bedLocations.add(bedXY)
             } }
         }
-        againstWall { spawn(Candlestick())}
         chance(0.5f + bedCount * 0.1f) { againstWall { spawn(Trunk()) } }
         chance(0.2f + bedCount * 0.2f) { awayFromWall { spawn(Table()) } }
         chance(bedCount * 0.1f) { awayFromWall { spawn(Table()) } }
@@ -38,6 +37,9 @@ class Hut : Decor() {
             chance(0.6f) { againstWall { spawn(
                 if (Dice.chance(0.7f)) FilingCabinet() else Bookshelf()
             )}}
+        }
+        hasTable()?.also { Candle().moveTo(it) } ?: run {
+            againstWall { spawn(Candlestick()) }
         }
     }
     override fun job() = HomeJob(room.rect)
@@ -226,12 +228,11 @@ class Tavern(val name: String) : Decor() {
     override fun abandonedDescription() = "An abandoned inn."
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
-        againstWall { spawn(Candlestick())}
         againstWall { caseKey = spawn(StorageCabinet())?.getKey() }
 
         repeat (Dice.range(5, 8)) {
             awayFromWall {
-                spawn(Table())
+                spawn(Table().also { if (Dice.chance(0.3f)) Candle().moveTo(it) })
                 clearAround()
             }
         }

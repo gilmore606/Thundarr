@@ -8,6 +8,7 @@ import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import util.Dice
+import util.log
 import world.level.Level
 
 @Serializable

@@ -1,6 +1,7 @@
 package things
 
 import actors.actors.Actor
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import render.Screen
 import render.sparks.Smoke
@@ -215,40 +216,20 @@ sealed class SwitchablePortableLight : LitThing() {
 }
 
 @Serializable
-class Flashlight : SwitchablePortableLight() {
-    override val tag = Tag.FLASHLIGHT
-    override fun glyphLit() = Glyph.FLASHLIGHT
-    override fun glyphDark() = Glyph.FLASHLIGHT
-    override fun name() = "flashlight"
-    override fun description() = "A metal tube with a bulb on one end.  You can't imagine how it works."
-    override val lightColor = LightColor(0.4f, 0.5f, 0.5f)
-}
-
-@Serializable
-class Lantern : SwitchablePortableLight() {
-    override val tag = Tag.LANTERN
-    override fun glyphLit() = Glyph.LANTERN
-    override fun glyphDark() = Glyph.LANTERN
-    override fun name() = "lantern"
-    override fun description() = "A brass lantern."
-    override val lightColor = LightColor(0.5f, 0.4f, 0.4f)
-}
-
-@Serializable
 sealed class GenericTorch : LitThing(), Temporal {
     private var torchFuel = 0f
     open fun torchFuelMax() = 300f
 
     open fun glyphLit() = Glyph.TORCH_LIT
-    abstract fun glyphUnlit(): Glyph
-    override fun glyph() = if (active) glyphLit() else glyphUnlit()
+    abstract fun glyphDark(): Glyph
+    override fun glyph() = if (active) glyphLit() else glyphDark()
+    override fun isAlwaysVisible() = true
     override fun name() = "torch"
     override fun description() = "A branch dipped in pitch tar."
     override fun extinguishMsg() = "%Dn sputters and dies."
     override fun extinguishSelfMsg() = "Your %d sputters and dies."
     override fun extinguishOtherMsg() = "%Dn's %d sputters and dies."
-
-    private val smokeChance = 1.1f
+    open fun smokeChance() = 1.1f
 
     override fun onCreate() {
         active = false
@@ -264,10 +245,30 @@ sealed class GenericTorch : LitThing(), Temporal {
     override fun onRender(delta: Float) {
         if (active && Screen.timeMs % 5 == 1L) {
             flicker = Random.nextFloat() * 0.12f + 0.88f
-            if (Dice.chance(delta * smokeChance * 5f)) {
+            if (Dice.chance(delta * smokeChance() * 5f)) {
                 xy().also { xy -> level()?.addSpark(Smoke().at(xy.x, xy.y)) }
             }
         }
+    }
+
+    override fun uses() = super.uses().apply {
+        this[UseTag.SWITCH_ON] = Use(name(), 0.5f,
+            canDo = { actor, x, y, targ -> actor is NPC },
+            toDo = { actor, level, x, y -> npcLight(actor) }
+        )
+        this[UseTag.SWITCH_OFF] = Use(name(), 0.5f,
+            canDo = { actor,x,y,targ -> actor is NPC },
+            toDo = { actor,level,x,y -> npcExtinguish(actor) }
+        )
+    }
+
+    private fun npcLight(actor: Actor) {
+        torchFuel = torchFuelMax()
+        receiveLightOnFire(actor)
+    }
+    private fun npcExtinguish(actor: Actor) {
+        active = false
+        becomeDark()
     }
 
     override fun receiveLightOnFire(actor: Actor) {
@@ -294,24 +295,4 @@ sealed class GenericTorch : LitThing(), Temporal {
             }
         }
     }
-}
-
-@Serializable
-class Torch : GenericTorch() {
-    override val tag = Tag.TORCH
-    override fun glyphUnlit() = Glyph.TORCH
-    override fun torchFuelMax() = 2500f
-    override val lightColor = LightColor(0.6f, 0.5f, 0.2f)
-}
-
-@Serializable
-class Stick : GenericTorch(), Fuel {
-    override val tag = Tag.STICK
-    override fun glyphUnlit() = Glyph.STICK
-    override fun name() = "stick"
-    override fun description() = "A long wooden stick.  You could burn it, or make something out of it."
-    override var fuel = 40f
-    override fun torchFuelMax() = 900f
-    override val lightColor = LightColor(0.4f, 0.2f, 0.1f)
-    override fun onBurn(delta: Float): Float { return super<Fuel>.onBurn(delta) }
 }

@@ -19,7 +19,7 @@ class Brick : MeleeWeapon() {
     override fun glyph() = Glyph.BRICK
     override fun weight() = 0.4f
     override fun damageType() = Damage.CRUSH
-    override fun damage() = 2f
+    override fun damage() = 3f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
 }
 
@@ -32,7 +32,7 @@ class Rock : MeleeWeapon() {
     override fun glyph() = Glyph.ROCK
     override fun weight() = 0.3f
     override fun damageType() = Damage.CRUSH
-    override fun damage() = 1.5f
+    override fun damage() = 2f
     override fun thrownDamage(thrower: Actor, roll: Float) = super.thrownDamage(thrower, roll) + 1.5f
 }
 
@@ -50,7 +50,7 @@ class Rebar : MeleeWeapon() {
     override fun skill() = Clubs
     override fun weight() = 1f
     override fun damageType() = Damage.CRUSH
-    override fun damage() = 3f
+    override fun damage() = 4f
 }
 
 @Serializable
@@ -62,7 +62,7 @@ class Hammer : MeleeWeapon() {
     override fun glyph() = Glyph.HAMMER
     override fun weight() = 0.6f
     override fun damageType() = Damage.CRUSH
-    override fun damage() = 3f
+    override fun damage() = 5f
 }
 
 @Serializable
@@ -78,7 +78,7 @@ class Knife : MeleeWeapon() {
     override fun glyph() = Glyph.KNIFE
     override fun weight() = 0.2f
     override fun damageType() = Damage.CUT
-    override fun damage() = 2f
+    override fun damage() = 3f
 }
 
 @Serializable
@@ -152,5 +152,5 @@ class Pitchfork : MeleeWeapon() {
     override fun speed() = 1.3f
     override fun accuracy() = -1f
     override fun damageType() = Damage.PIERCE
-    override fun damage() = 3f
+    override fun damage() = 4f
 }
