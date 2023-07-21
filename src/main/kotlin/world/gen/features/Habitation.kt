@@ -4,8 +4,10 @@ import actors.actors.Citizen
 import actors.actors.Villager
 import actors.factions.HabitationFaction
 import actors.jobs.Job
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import ktx.async.KtxAsync
 import util.*
 import world.ChunkScratch
 import world.gen.cartos.WorldCarto
@@ -224,14 +226,16 @@ sealed class Habitation(
             if (lores.isNotEmpty()) {
                 val newLore = lores.random()
                 lores.remove(newLore)
-                var tries = 20
-                while (tries > 0) {
-                    tries--
-                    citizens.randomOrNull()?.also { citizenID ->
-                        App.level.director.getActor(citizenID)?.also { citizen ->
-                            if ((citizen as Citizen).couldHaveLore()) {
-                                citizen.lore.add(newLore)
-                                tries = 0
+                KtxAsync.launch {
+                    var tries = 20
+                    while (tries > 0) {
+                        tries--
+                        citizens.randomOrNull()?.also { citizenID ->
+                            App.level.director.getActor(citizenID)?.also { citizen ->
+                                if ((citizen as Citizen).couldHaveLore()) {
+                                    citizen.lore.add(newLore)
+                                    tries = 0
+                                }
                             }
                         }
                     }

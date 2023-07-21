@@ -190,38 +190,37 @@ sealed class StepMap {
         }
         if (!dirty) return
         if (expired) return
-        walker?.level?.also { level ->
-            clearScratch()
-            printTarget()
-            var step = 0
-            var notDone = true
-            while (notDone) {
-                notDone = false
-                for (x in 0 until width) {
-                    for (y in 0 until height) {
-                        if (scratch[x][y] == step) {
-                            DIRECTIONS.forEach { dir ->
-                                val tx = x + dir.x
-                                val ty = y + dir.y
-                                if (tx in 0 until width && ty in 0 until height) {
-                                    if (scratch[tx][ty] < 0) {
-                                        //waitForActorLock(level) don't need this since actors don't block walkable
-                                        waitForCellLock(level, tx, ty)
-                                        if (level.isPathableBy(walker!!, x + offset.x + dir.x, y + offset.y + dir.y)) {
-                                            scratch[tx][ty] = step + 1
-                                            notDone = true
-                                        }
+        val level = walker?.level ?: run { return }
+        clearScratch()
+        printTarget()
+        var step = 0
+        var notDone = true
+        while (notDone) {
+            notDone = false
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    if (scratch[x][y] == step) {
+                        DIRECTIONS.forEach { dir ->
+                            val tx = x + dir.x
+                            val ty = y + dir.y
+                            if (tx in 0 until width && ty in 0 until height) {
+                                if (scratch[tx][ty] < 0) {
+                                    //waitForActorLock(level) don't need this since actors don't block walkable
+                                    waitForCellLock(level, tx, ty)
+                                    if (level.isPathableBy(walker!!, x + offset.x + dir.x, y + offset.y + dir.y)) {
+                                        scratch[tx][ty] = step + 1
+                                        notDone = true
                                     }
                                 }
                             }
                         }
                     }
                 }
-                step++
             }
-            promoteScratch()
-            dirty = false
-            KtxAsync.launch { updating = false }
+            step++
         }
+        promoteScratch()
+        dirty = false
+        KtxAsync.launch { updating = false }
     }
 }
