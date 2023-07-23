@@ -189,6 +189,9 @@ enum class Glyph(val tall: Boolean = false) {
     WATER_SPIRIT,
     BRICK_MAN,
     WILLOWISP,
+    BRAINBOT,
+    COMBOT,
+    TANKBOT,
 
     OAK_TREE,
     MAPLE_TREE,
