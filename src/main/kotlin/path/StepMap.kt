@@ -205,7 +205,6 @@ sealed class StepMap {
                             val ty = y + dir.y
                             if (tx in 0 until width && ty in 0 until height) {
                                 if (scratch[tx][ty] < 0) {
-                                    //waitForActorLock(level) don't need this since actors don't block walkable
                                     waitForCellLock(level, tx, ty)
                                     if (level.isPathableBy(walker!!, x + offset.x + dir.x, y + offset.y + dir.y)) {
                                         scratch[tx][ty] = step + 1

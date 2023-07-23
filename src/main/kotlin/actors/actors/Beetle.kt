@@ -8,7 +8,7 @@ import util.XY
 
 class Beetle : NPC() {
 
-    override fun glyph() = Glyph.BEETLE
+    override fun glyph() = Glyph.PINCER_BEETLE
     override fun shadowWidth() = 1.5f
     override fun shadowXOffset() = 0.2f
     override fun stepAnimation(dir: XY) = Slide(dir)
