@@ -10,17 +10,14 @@ fun ActorTileSet() =
         setTile(Glyph.MOB_WATER_SHADOW, SimpleTile(this, 3, 0))
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
+        setTile(Glyph.ARIEL, SimpleTile(this, 0, 0))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))
-        setTile(Glyph.HORSE, AnimatedTile(this).apply {
-            frameMs = 300
-            add(0, 2)
-            add(1, 2)
-        })
-        setTile(Glyph.CATTLE, AnimatedTile(this).apply {
-            frameMs = 450
-            add(2, 2)
-            add(3, 2)
-        })
+        setTile(Glyph.CATTLE, SimpleTile(this, 2, 3))
+        setTile(Glyph.CACTOID, SimpleTile(this, 0, 2))
+        setTile(Glyph.HYENAMAN, SimpleTile(this, 1, 2))
+        setTile(Glyph.GIANT_ANT, SimpleTile(this, 2, 2))
+        setTile(Glyph.DROID_1, SimpleTile(this, 1, 0))
+        setTile(Glyph.DROID_2, SimpleTile(this, 2, 0))
         setTile(Glyph.WOLFMAN, SimpleTile(this, 0, 3))
         setTile(Glyph.SNAKEMAN, SimpleTile(this, 1, 3))
         setTile(Glyph.KARROK, SimpleTile(this, 2, 3))
