@@ -76,6 +76,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     var hp: Float = 20f
     var hpMax: Float = 20f
+    fun healthiness() = (hp / hpMax)
 
     val bodyparts: Set<Bodypart> = initialBodyparts()
     open fun initialBodyparts() = Bodypart.humanoid()
@@ -168,6 +169,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         Dodge.set(this, dodge)
     }
 
+    fun moveTo(level: Level?, xy: XY) = moveTo(level, xy.x, xy.y)
     fun moveTo(level: Level?, x: Int, y: Int) {
         val oldX = this.xy.x
         val oldY = this.xy.y

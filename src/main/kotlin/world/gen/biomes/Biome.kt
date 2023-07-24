@@ -103,7 +103,6 @@ sealed class Biome(
             addOutcropping(carto)
         }
         if (Dice.chance(pondChance())) {
-            log.info("digging random pond!")
             addPond(carto)
         }
     }

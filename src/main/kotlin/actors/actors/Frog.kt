@@ -27,5 +27,5 @@ class Frog : NPC() {
 
     override fun visualRange() = 8f
     override fun idleState() = IdleWander(0.4f)
-    override fun initialAbilities() = setOf(Leap())
+    override fun initialAbilities() = setOf(Leap(4))
 }
