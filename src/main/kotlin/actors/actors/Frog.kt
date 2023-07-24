@@ -1,11 +1,14 @@
 package actors.actors
 
+import actors.abilities.Leap
 import actors.animations.Jump
 import actors.states.IdleWander
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
 import util.XY
 
+@Serializable
 class Frog : NPC() {
 
     override fun glyph() = Glyph.FROG
@@ -24,4 +27,5 @@ class Frog : NPC() {
 
     override fun visualRange() = 8f
     override fun idleState() = IdleWander(0.4f)
+    override fun initialAbilities() = setOf(Leap())
 }

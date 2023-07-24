@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.abilities.Ability
 import actors.actions.*
 import actors.actions.events.Event
 import actors.animations.Animation
@@ -65,6 +66,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (isMonster()) add(App.factions.monsters)
     }
     val factions = initialFactions()
+
+    open fun initialAbilities(): Set<Ability> = setOf()
+    val abilities = initialAbilities()
+    fun getAbility(id: String) = abilities.firstOrNull { it.id == id }
 
     val queuedActions: MutableList<Action> = mutableListOf()
 

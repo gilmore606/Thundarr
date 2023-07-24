@@ -4,6 +4,7 @@ import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Attack
 import actors.actions.Say
+import actors.actions.UseAbility
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.XY
@@ -52,6 +53,13 @@ class Attacking(
     override fun pickAction(npc: NPC): Action {
         npc.apply {
             getActor(targetID)?.also { target ->
+
+                npc.abilities.forEach { ability ->
+                    if (ability.canQueue(npc, target) && ability.shouldQueue(npc, target)) {
+                        return UseAbility(ability.id, targetID, ability.durationFor(npc))
+                    }
+                }
+
                 if (entitiesNextToUs().contains(target)) {
                     return Attack(target.id, target.xy - xy)
                 } else if (canSee(target)) {
@@ -64,7 +72,7 @@ class Attacking(
                         stepToward(lastLocation!!)?.also { return it }
                     }
                 }
-            }
+            } ?: run { giveUp(npc) }
         }
         return super.pickAction(npc)
     }

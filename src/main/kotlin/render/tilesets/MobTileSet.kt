@@ -12,7 +12,7 @@ fun ActorTileSet() =
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
         setTile(Glyph.ARIEL, SimpleTile(this, 0, 0))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))
-        setTile(Glyph.CATTLE, SimpleTile(this, 2, 3))
+        setTile(Glyph.CATTLE, SimpleTile(this, 3, 2))
         setTile(Glyph.CACTOID, SimpleTile(this, 0, 2))
         setTile(Glyph.HYENAMAN, SimpleTile(this, 1, 2))
         setTile(Glyph.GIANT_ANT, SimpleTile(this, 2, 2))
