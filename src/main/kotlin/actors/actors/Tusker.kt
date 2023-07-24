@@ -8,20 +8,20 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
 import things.RawMeat
+import things.Thing
 import util.Dice
 
 @Serializable
 sealed class GenericTusker : NPC() {
     override fun glyph() = Glyph.PIG
-    override fun shadowWidth() = 1.7f
+    override fun shadowWidth() = 1.6f
     override fun shadowXOffset() = 0.2f
     override fun description() = "A large, stout porcine animal covered in wiry bristles, with a protruding snout."
     override fun onSpawn() {
-        Strength.set(this, 10f)
-        Speed.set(this, 9f)
-        Brains.set(this, 5f)
+        initStats(10, 9, 5, 8, 8, 1, 1)
     }
     override fun skinArmor() = 1.0f
+    open fun meatChance() = 1f
 
     override fun idleState() = IdleHerd(
         0.5f, 6, true,
@@ -29,12 +29,8 @@ sealed class GenericTusker : NPC() {
         7.0f,
     )
 
-    override fun onDeath(corpse: Container?) {
-        corpse?.also {
-            if (Dice.chance(0.7f)) {
-                RawMeat().moveTo(it)
-            }
-        }
+    override fun corpseMeats() = mutableSetOf<Thing>().apply {
+        if (Dice.chance(meatChance())) add(RawMeat())
     }
 }
 
@@ -48,16 +44,10 @@ class Tusklet : GenericTusker() {
     override fun name() = "tusklet"
     override fun description() = "A juvenile pig creature covered in wiry bristles."
     override fun onSpawn() {
+        super.onSpawn()
         Strength.set(this, 8f)
-        Speed.set(this, 9f)
-        Brains.set(this, 4f)
+        Speed.set(this, 7f)
     }
     override fun skinArmor() = 0f
-    override fun onDeath(corpse: Container?) {
-        corpse?.also {
-            if (Dice.chance(0.4f)) {
-                RawMeat().moveTo(it)
-            }
-        }
-    }
+    override fun meatChance() = 0.5f
 }

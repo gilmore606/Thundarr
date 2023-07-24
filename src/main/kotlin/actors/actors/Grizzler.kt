@@ -6,9 +6,7 @@ import actors.stats.Speed
 import actors.stats.Strength
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Container
-import things.Hide
-import things.RawMeat
+import things.*
 
 @Serializable
 class Grizzler : NPC() {
@@ -16,10 +14,10 @@ class Grizzler : NPC() {
     override fun name() = "grizzler"
     override fun description() = "A large furry brown predator with glittering yellow eyes and large claws."
     override fun onSpawn() {
-        Strength.set(this, 18f)
-        Speed.set(this, 11f)
-        Brains.set(this, 7f)
+        initStats(17, 12, 7, 12, 12, 3, 1)
     }
+
+    override fun skinArmorMaterial() = Clothing.Material.FUR
     override fun skinArmor() = 2f
 
     override fun idleState() = IdleDen(
@@ -28,10 +26,8 @@ class Grizzler : NPC() {
         5.0f
     )
 
-    override fun onDeath(corpse: Container?) {
-        corpse?.also {
-            RawMeat().moveTo(it)
-            Hide().moveTo(it)
-        }
+    override fun corpseMeats() = mutableSetOf<Thing>().apply {
+        add(RawMeat())
+        add(FurHide())
     }
 }

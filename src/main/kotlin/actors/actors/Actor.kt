@@ -443,6 +443,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
         corpse()?.also { corpse ->
             corpse.moveTo(level, xy.x, xy.y)
+            corpseMeats().forEach { it.moveTo(corpse) }
             onDeath(corpse)
             contents.safeForEach { it.moveTo(corpse) }
         } ?: run {
@@ -451,6 +452,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
     }
 
+    open fun corpseMeats(): Set<Thing> = setOf()
     open fun onDeath(corpse: Container?) { }
 
     open fun ingestCalories(cal: Int) { }

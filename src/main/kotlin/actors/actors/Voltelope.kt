@@ -4,10 +4,12 @@ import actors.states.IdleHerd
 import actors.stats.Brains
 import actors.stats.Speed
 import actors.stats.Strength
+import actors.stats.skills.Dodge
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
 import things.RawMeat
+import things.Thing
 import util.Dice
 
 @Serializable
@@ -16,9 +18,7 @@ sealed class GenericVoltelope : NPC() {
     override fun name() = "voltelope"
     override fun shadowWidth() = 1.7f
     override fun onSpawn() {
-        Strength.set(this, 7f)
-        Speed.set(this, 13f)
-        Brains.set(this, 7f)
+        initStats(8, 14, 6, 13, 8, 1, 2)
     }
 
     override fun idleState() = IdleHerd(
@@ -28,12 +28,8 @@ sealed class GenericVoltelope : NPC() {
     )
 
     open fun meatChance() = 1.0f
-    override fun onDeath(corpse: Container?) {
-        corpse?.also {
-            if (Dice.chance(meatChance())) {
-                RawMeat().moveTo(it)
-            }
-        }
+    override fun corpseMeats() = mutableSetOf<Thing>().apply {
+        if (Dice.chance(meatChance())) add(RawMeat())
     }
 }
 
@@ -47,9 +43,10 @@ class Voltelope : GenericVoltelope() {
 class VoltelopeFawn : GenericVoltelope() {
     override fun name() = "voltelope fawn"
     override fun description() = "A small juvenile ruminant beast with two small yellow horns."
-    override fun meatChance() = 0.6f
+    override fun meatChance() = 0.5f
     override fun onSpawn() {
-        Strength.set(this, 5f)
-        Speed.set(this, 11f)
+        super.onSpawn()
+        Dodge.set(this, 1)
+        Speed.set(this, 12f)
     }
 }
