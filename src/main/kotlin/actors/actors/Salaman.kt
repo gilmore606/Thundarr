@@ -17,6 +17,7 @@ class Salaman : NPC() {
     override fun name() = "salaman"
     override fun description() = "A man-sized red salamander.  A curiously human face bobs at the end of its long neck."
     override fun canSwimShallow() = true
+    override fun hpMax() = 14f
     override fun onSpawn() {
         initStats(10, 10, 7, 9, 9, 1, 0)
     }

@@ -17,8 +17,6 @@ class Thrall(
     override fun description() = "A pitiful human, enslaved by magic bonds to $wizardName.  ${gender().pp.capitalize()} eyes beg you for rescue."
     override fun isHuman() = true
     override fun onSpawn() {
-        hpMax = 10f
-        hp = 10f
         Strength.set(this, 7f)
         Speed.set(this, 9f)
         Brains.set(this, 10f)

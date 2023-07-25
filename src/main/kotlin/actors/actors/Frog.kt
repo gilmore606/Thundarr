@@ -17,8 +17,8 @@ class Frog : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "frog"
     override fun description() = "A big slimy frog."
+    override fun hpMax() = 6f
     override fun onSpawn() {
-        hpMax = 6f
         initStats(9, 9, 4, 8, 6, 1, 0)
     }
     override fun canSwimShallow() = true

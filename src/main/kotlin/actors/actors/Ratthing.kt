@@ -22,10 +22,9 @@ class Ratthing : NPC() {
         is Attacking -> "%Dn scurries toward you, baring its teeth!"
         else -> super.enterStateMsg(newState)
     }
+    override fun hpMax() = 10f
     override fun onSpawn() {
         initStats(8, 8, 3, 9, 5, 1, 1)
-        hpMax = 10f
-        hp = 10f
     }
     override fun unarmedWeapon() = teeth
     override fun corpse() = null

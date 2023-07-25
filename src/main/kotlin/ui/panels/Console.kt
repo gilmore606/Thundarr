@@ -347,9 +347,9 @@ object Console : Panel() {
     }
 
     private fun debugHp(words: List<String>) {
-        val newhp = if (words.size > 1) words[1].toInt().toFloat() else App.player.hpMax
+        val newhp = if (words.size > 1) words[1].toInt().toFloat() else App.player.hpMax()
         App.player.hp = newhp
-        say("hp set to $newhp / ${App.player.hpMax}.")
+        say("hp set to $newhp / ${App.player.hpMax()}.")
     }
 
     private fun debugWeather(words: List<String>) {

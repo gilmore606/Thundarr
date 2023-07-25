@@ -73,7 +73,7 @@ object ActorPanel : ShadedPanel() {
                 }
                 Screen.uiBatch.addHealthBar(
                     x0 + 38, y0 + 20,
-                    x0 + width - padding * 2 - 38, y0 + 32, actor.hp.toInt(), actor.hpMax.toInt()
+                    x0 + width - padding * 2 - 38, y0 + 32, actor.hp.toInt(), actor.hpMax().toInt()
                 )
             }
         }

@@ -37,6 +37,7 @@ sealed class GenericVoltelope : NPC() {
 class Voltelope : GenericVoltelope() {
     override fun name() = "voltelope"
     override fun description() = "A large ruminant beast with two branching yellow horns."
+    override fun hpMax() = 8f
     override fun skinArmor() = 1f
     override fun unarmedDamage() = 3f
 }
@@ -46,6 +47,7 @@ class VoltelopeFawn : GenericVoltelope() {
     override fun name() = "voltelope fawn"
     override fun description() = "A small juvenile ruminant beast with two small yellow horns."
     override fun meatChance() = 0.5f
+    override fun hpMax() = 6f
     override fun onSpawn() {
         super.onSpawn()
         Dodge.set(this, 1)

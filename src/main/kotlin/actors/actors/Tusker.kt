@@ -38,6 +38,7 @@ sealed class GenericTusker : NPC() {
 @Serializable
 class Tusker : GenericTusker() {
     override fun name() = "tusker"
+    override fun hpMax() = 22f
     override fun unarmedDamage() = 5f
 }
 
@@ -45,6 +46,7 @@ class Tusker : GenericTusker() {
 class Tusklet : GenericTusker() {
     override fun name() = "tusklet"
     override fun description() = "A juvenile pig creature covered in wiry bristles."
+    override fun hpMax() = 14f
     override fun onSpawn() {
         super.onSpawn()
         Strength.set(this, 8f)

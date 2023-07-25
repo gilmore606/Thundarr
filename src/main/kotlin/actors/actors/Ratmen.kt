@@ -51,10 +51,9 @@ class Ratlord(
     override fun glyph() = Glyph.RATLORD
     override fun name() = "rat-lord"
     override fun description() = "A man-sized hunched gray rodent wearing bronze armor.  It has an air of arrogant authority."
+    override fun hpMax() = 24f
     override fun onSpawn() {
         initStats(11, 10, 9, 11, 8, 3, 1)
-        hpMax = 25f
-        hp = 25f
     }
     override fun unarmedDamage() = 6f
     override fun skinArmorMaterial() = Clothing.Material.METAL
@@ -68,10 +67,9 @@ class Ratman(
     override fun glyph() = Glyph.RATMAN
     override fun name() = "rat-man"
     override fun description() = "A man-sized hunched gray rodent. Its eyes glitter with hatred."
+    override fun hpMax() = 16f
     override fun onSpawn() {
         initStats(10, 9, 7, 11, 6, 2, 1)
-        hpMax = 15f
-        hp = 15f
     }
     override fun unarmedDamage() = 4f
     override fun skinArmorMaterial() = Clothing.Material.HIDE

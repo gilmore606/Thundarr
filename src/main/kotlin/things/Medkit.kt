@@ -25,7 +25,7 @@ sealed class Medkit : Portable() {
     override fun uses() = super.uses().apply {
         this[UseTag.USE] = Use("self-treat with " + name(), 3f,
             canDo = { actor, x, y, targ ->
-                !targ && isHeldBy(actor) && actor.hp < actor.hpMax && !actor.hasStatus(Status.Tag.BANDAGED)
+                !targ && isHeldBy(actor) && actor.hp < actor.hpMax() && !actor.hasStatus(Status.Tag.BANDAGED)
             },
             toDo = { actor, level, x, y ->
                 doTreatment(actor, actor)
@@ -37,7 +37,7 @@ sealed class Medkit : Portable() {
     private fun doTreatment(healer: Actor, target: Actor) {
         if (healer == target) Console.sayAct(useSelfMsg(), useOtherMsg(), healer, target, this)
         else Console.sayAct(useSelfOtherMsg(), if (target is Player) useOtherSelfMsg() else useOtherOtherMsg(), healer, target, this)
-        val result = Medic.resolve(healer, 2f - (target.hpMax - target.hp) * 0.3f)
+        val result = Medic.resolve(healer, 2f - (target.hpMax() - target.hp) * 0.3f)
         if (result < 0f) {
             if (healer is Player) Console.say("You don't think you did much good.")
         } else {

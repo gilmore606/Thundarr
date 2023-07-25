@@ -248,7 +248,7 @@ class AttractPlayer : Player() {
     }
 
     private fun fakeRespawn() {
-        hp = hpMax
+        hp = hpMax()
     }
 
 }

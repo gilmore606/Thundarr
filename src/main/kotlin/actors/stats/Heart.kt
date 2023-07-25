@@ -1,6 +1,7 @@
 package actors.stats
 
 import actors.actors.Actor
+import actors.actors.Player
 
 
 object Heart : Stat(Tag.HRT, "heart") {
@@ -12,6 +13,8 @@ object Heart : Stat(Tag.HRT, "heart") {
     fun getHpMax(actor: Actor, total: Float = get(actor)) = (total * 2f)
 
     override fun onUpdate(actor: Actor, newTotal: Float) {
-        actor.hpMax = getHpMax(actor, newTotal)
+        if (actor is Player) {
+            actor.currentHpMax = getHpMax(actor, newTotal)
+        }
     }
 }

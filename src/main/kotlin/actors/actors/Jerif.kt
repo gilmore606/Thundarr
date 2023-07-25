@@ -11,6 +11,7 @@ class Jerif : NPC() {
     override fun shadowWidth() = 1.7f
     override fun description() = "A tall long-necked equine ruminant."
 
+    override fun hpMax() = 18f
     override fun unarmedWeapon() = hooves
     override fun unarmedDamage() = 4f
     override fun skinArmor() = 0f

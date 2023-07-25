@@ -17,6 +17,7 @@ class Wolfman : NPC() {
     override fun name() = "wolfman"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A snarling wolf, on two legs...no, a man with...Demon dogs!!"
+    override fun hpMax() = 30f
     override fun onSpawn() {
         initStats(12, 12, 6, 13, 10, 4, 2)
     }

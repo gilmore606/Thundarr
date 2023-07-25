@@ -48,9 +48,9 @@ class Shrine : LitThing() {
             }
             lastPrayedDate = App.gameTime.date
             Speaker.world(Speaker.SFX.PRAYER, source = xy())
-            if (actor.hp < actor.hpMax) {
+            if (actor.hp < actor.hpMax()) {
                 Console.say("You feel a warm glow spread out from your heart, through your body, healing every wound as it flows.")
-                actor.healDamage(actor.hpMax - actor.hp)
+                actor.healDamage(actor.hpMax() - actor.hp)
             }
         }
     }

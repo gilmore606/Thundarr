@@ -24,6 +24,7 @@ class Pidgey : GenericPidgey() {
     override fun name() = "pidgey"
     override fun glyph() = Glyph.PIDGEY
     override fun description() = "A birdlike human figure, covered in feathers, with a bulbous head and beady black eyes."
+    override fun hpMax() = 10f
     override fun onSpawn() {
         Strength.set(this, 6f)
         Speed.set(this, 13f)
@@ -37,6 +38,7 @@ class PidgeyBrute : GenericPidgey() {
     override fun name() = "pidgey brute"
     override fun glyph() = Glyph.PIDGEY_BRUTE
     override fun description() = "A burly birdlike human figure, covered in feathers, with a bulbous head and menacing black eyes."
+    override fun hpMax() = 13f
     override fun onSpawn() {
         Strength.set(this, 11f)
         Speed.set(this, 12f)

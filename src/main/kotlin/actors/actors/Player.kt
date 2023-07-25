@@ -106,6 +106,7 @@ open class Player : Actor(), Workbench {
     override fun defaultAction(): Action? = null
     override fun canSwimShallow() = true
 
+    var currentHpMax = 20f
     var xp = 0
     var levelUpsAvailable = 0
     var skillPoints = 0
@@ -127,7 +128,10 @@ open class Player : Actor(), Workbench {
         Fight.set(this, 1f)
         Throw.set(this, 1f)
         Survive.set(this, 1f)
+        hp = hpMax()
     }
+
+    override fun hpMax() = currentHpMax
 
     override fun die() {
         super.die()
@@ -287,10 +291,10 @@ open class Player : Actor(), Workbench {
             log.info("sleep comfort: $comfort")
         }
 
-        if (hp < hpMax && comfort > -0.5f) {
+        if (hp < hpMax() && comfort > -0.5f) {
             val healChance = (0.5f + (comfort * 0.5f)) * healSpeed
             if (Dice.chance(healChance)) {
-                healDamage((hpMax / 20f), null)
+                healDamage((hpMax() / 20f), null)
             }
         }
     }
@@ -473,8 +477,8 @@ open class Player : Actor(), Workbench {
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_BLUE).at(xy.x, xy.y))
 
         Heart.improve(this, fullLevel = true)
-        hpMax += 5
-        hp = hpMax
+        currentHpMax += 5
+        hp = hpMax()
     }
 
     @Transient var craftingWith: Thing? = null

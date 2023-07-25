@@ -72,6 +72,7 @@ sealed class NPC : Actor() {
     @Transient var den: NPCDen? = null
 
     fun spawnAt(level: Level, x: Int, y: Int): NPC {
+        hp = hpMax()
         onSpawn()
         moveTo(level, x, y)
         return this

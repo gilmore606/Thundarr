@@ -80,9 +80,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     val queuedActions: MutableList<Action> = mutableListOf()
 
 
-    var hp: Float = 20f
-    var hpMax: Float = 20f
-    fun healthiness() = (hp / hpMax)
+    var hp: Float = 1f
+    open fun hpMax(): Float = 20f
+    fun healthiness() = (hp / hpMax())
 
     val bodyparts: Set<Bodypart> = initialBodyparts()
     open fun initialBodyparts() = Bodypart.humanoid()
@@ -391,7 +391,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun gainHealth(amount: Float) {
-        hp = min(hpMax, (hp + amount))
+        hp = min(hpMax(), (hp + amount))
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
     }
 
@@ -423,7 +423,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun healDamage(heal: Float, healer: Actor? = null) {
-        hp = min(hpMax, hp + heal)
+        hp = min(hpMax(), hp + heal)
         healer?.also { receiveAssistance(it) }
     }
 
@@ -511,7 +511,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     open fun onSleep(delta: Float) {
-        if (hp < hpMax) {
+        if (hp < hpMax()) {
             if (Dice.chance(0.3f)) {
                 var healmax = 3
                 val heal = Dice.range(0, Math.max(1, healmax))

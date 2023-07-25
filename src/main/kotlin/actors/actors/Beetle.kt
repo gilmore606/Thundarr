@@ -14,8 +14,8 @@ class Beetle : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "pincer beetle"
     override fun description() = "A huge shiny purple beetle, with large pinching jaws."
+    override fun hpMax() = 6f
     override fun onSpawn() {
-        hpMax = 6f
         initStats(9, 9, 3, 8, 6, 1, 0)
     }
 
