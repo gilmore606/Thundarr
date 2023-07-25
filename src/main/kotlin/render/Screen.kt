@@ -442,8 +442,15 @@ object Screen : KtxScreen {
         // Animate camera to camera target
         val target = cameraTargetOffset + pov
 
-        cameraVec.x = (target.x - cameraPov.x) * cameraSpeed
-        cameraVec.y = (target.y - cameraPov.y) * cameraSpeed
+        val prevSpeed = cameraVec.magnitude()
+        val desiredVec = (target - cameraPov) * cameraSpeed
+        val desiredSpeed = desiredVec.magnitude()
+        val accelMax = (cameraSpeed + desiredSpeed * 0.2f) * delta
+        if (desiredVec.magnitude() <= prevSpeed + accelMax) {
+            cameraVec = desiredVec
+        } else {
+            cameraVec = desiredVec.toUnitVec() * (prevSpeed + accelMax)
+        }
 
         if (cameraVec.x < 0) {
             cameraPov.x = max(target.x, cameraPov.x + cameraVec.x * delta.toDouble())
