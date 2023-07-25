@@ -17,6 +17,7 @@ class Brick : MeleeWeapon() {
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun skill() = Clubs
     override fun glyph() = Glyph.BRICK
+    override fun glyphTransform() = Rock.transform
     override fun weight() = 0.4f
     override fun damageType() = Damage.CRUSH
     override fun damage() = 3f
@@ -25,11 +26,15 @@ class Brick : MeleeWeapon() {
 
 @Serializable
 class Rock : MeleeWeapon() {
+    companion object {
+        val transform = GlyphTransform(Glyph.ROCK_WORN, 0f, 0f, false)
+    }
     override val tag = Tag.ROCK
     override fun name() = "rock"
     override fun description() = "A chunk of rock.  You could throw it at someone."
     override fun skill() = Clubs
     override fun glyph() = Glyph.ROCK
+    override fun glyphTransform() = transform
     override fun weight() = 0.3f
     override fun damageType() = Damage.CRUSH
     override fun damage() = 2f

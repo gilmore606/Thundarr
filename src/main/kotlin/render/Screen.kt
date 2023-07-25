@@ -275,9 +275,9 @@ object Screen : KtxScreen {
             val trans = gear.glyphTransform()
             gearBatch.addTileQuad(
                 tx, ty,
-                gearBatch.getTextureIndex(trans.glyph, App.level, tx, ty), vis, light,
-                offsetX = actor.animOffsetX() + trans.x, offsetY = actor.animOffsetY() + trans.y,
-                hue = gear.hue(), rotate = trans.rotate && actor.rotateGlyph, mirror = actor.mirrorGlyph
+                gearBatch.getTextureIndex(trans?.glyph ?: gear.glyph(), App.level, tx, ty), vis, light,
+                offsetX = actor.animOffsetX() + (trans?.x ?: 0f), offsetY = actor.animOffsetY() + (trans?.y ?: 0f),
+                hue = gear.hue(), rotate = (trans?.rotate ?: false) && actor.rotateGlyph, mirror = actor.mirrorGlyph
             )
         }
         if (vis == 1f) {

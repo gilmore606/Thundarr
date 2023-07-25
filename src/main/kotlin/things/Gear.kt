@@ -42,7 +42,6 @@ sealed class Gear : Portable(), StatEffector {
 
     companion object {
         val slots = listOf(Slot.MELEE, Slot.RANGED, Slot.HEAD, Slot.NECK, Slot.HANDS, Slot.TORSO, Slot.CLOAK, Slot.LEGS, Slot.FEET)
-        val glyphTransform = GlyphTransform(Glyph.BLANK, 0.0f, 0.0f, false)
     }
 
     var equipped = false
@@ -54,7 +53,7 @@ sealed class Gear : Portable(), StatEffector {
     open fun unequipSelfMsg() = "You take off your %d."
     open fun unequipOtherMsg() = "%Dn takes off %p %d."
 
-    open fun glyphTransform() = glyphTransform
+    open fun glyphTransform(): GlyphTransform? = null
 
     override fun listTag() = if (equipped) "(${slot.equippedTag})" else ""
 
