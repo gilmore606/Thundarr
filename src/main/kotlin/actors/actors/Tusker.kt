@@ -20,6 +20,7 @@ sealed class GenericTusker : NPC() {
     override fun onSpawn() {
         initStats(10, 9, 5, 8, 8, 1, 1)
     }
+    override fun unarmedWeapons() = setOf(hooves, teeth)
     override fun skinArmor() = 1.0f
     open fun meatChance() = 1f
 
@@ -37,6 +38,7 @@ sealed class GenericTusker : NPC() {
 @Serializable
 class Tusker : GenericTusker() {
     override fun name() = "tusker"
+    override fun unarmedDamage() = 5f
 }
 
 @Serializable
@@ -48,6 +50,7 @@ class Tusklet : GenericTusker() {
         Strength.set(this, 8f)
         Speed.set(this, 7f)
     }
+    override fun unarmedDamage() = 3.5f
     override fun skinArmor() = 0f
     override fun meatChance() = 0.5f
 }

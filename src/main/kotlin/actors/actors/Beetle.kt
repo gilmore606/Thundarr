@@ -19,6 +19,8 @@ class Beetle : NPC() {
         initStats(9, 9, 3, 8, 6, 1, 0)
     }
 
+    override fun unarmedWeapon() = mandibles
+    override fun unarmedDamage() = 4f
     override fun skinArmorMaterial() = Clothing.Material.SHELL
     override fun skinArmor() = 1f
 

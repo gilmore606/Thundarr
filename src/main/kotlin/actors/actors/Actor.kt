@@ -39,6 +39,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     companion object {
         val fist: MeleeWeapon = Fist()
+        val teeth: MeleeWeapon = Teeth()
+        val claws: MeleeWeapon = Claws()
+        val mandibles: MeleeWeapon = Mandibles()
+        val horns: MeleeWeapon = Horns()
+        val hooves: MeleeWeapon = Hooves()
+        val beak: MeleeWeapon = Beak()
         val caster = RayCaster()
     }
 
@@ -553,8 +559,11 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         return if (excess <= 0f) 0f else excess * encPerKg
     }
 
-    open fun meleeWeapon(): MeleeWeapon = equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: unarmedWeapon()
+    open fun meleeWeapon(): MeleeWeapon =
+        equippedOn(Gear.Slot.MELEE)?.let { it as MeleeWeapon } ?: unarmedWeapons()?.random() ?: unarmedWeapon()
     open fun unarmedWeapon(): MeleeWeapon = fist
+    open fun unarmedWeapons(): Set<MeleeWeapon>? = null
+    open fun unarmedDamage(): Float = 2f
 
     open fun randomBodypart(): Bodypart {
         val range = bodyparts.sumOf { it.size }

@@ -47,6 +47,7 @@ enum class Damage(
 sealed class Weapon : Gear() {
     abstract fun damageType(): Damage
     abstract fun damage(): Float
+    open fun getDamage(wielder: Actor, roll: Float): Float = damage()
     open fun speed(): Float = 1f
     open fun accuracy(): Float = 0f
     open fun critThreshold(): Float = 5f
@@ -56,8 +57,9 @@ sealed class Weapon : Gear() {
     open fun bounceSound() = Speaker.SFX.HIT
     open fun missSound() = Speaker.SFX.MISS
 
-    open fun rollDamage(roll: Float): Float {
-        var damage = Dice.float(damage() * 0.5f, damage())
+    open fun rollDamage(wielder: Actor, roll: Float): Float {
+        val base = getDamage(wielder, roll)
+        var damage = Dice.float(base * 0.5f, base)
         if (roll >= critThreshold() * 2) {
             damage *= (1f + critMultiplier() * 2f)
         } else if (roll >= critThreshold()) {
@@ -116,4 +118,10 @@ sealed class MeleeWeapon : Weapon() {
 
     open fun canDig(terrainType: Terrain.Type): Boolean = false
     open fun skill(): Skill = Fight
+}
+
+@Serializable
+sealed class UnarmedWeapon : MeleeWeapon() {
+    override fun damage() = 0f
+    override fun getDamage(wielder: Actor, roll: Float): Float = wielder.unarmedDamage()
 }

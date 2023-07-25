@@ -10,6 +10,7 @@ import render.tilesets.Glyph
 @Serializable
 sealed class GenericPidgey : NPC() {
     override fun shadowWidth() = 1.3f
+    override fun unarmedWeapon() = beak
     override fun skinArmor() = 0.0f
     override fun idleState() = IdleHerd(
         0.6f, 12, false,
@@ -28,6 +29,7 @@ class Pidgey : GenericPidgey() {
         Speed.set(this, 13f)
         Brains.set(this, 6f)
     }
+    override fun unarmedDamage() = 3f
 }
 
 @Serializable
@@ -40,4 +42,5 @@ class PidgeyBrute : GenericPidgey() {
         Speed.set(this, 12f)
         Brains.set(this, 5f)
     }
+    override fun unarmedDamage() = 5f
 }

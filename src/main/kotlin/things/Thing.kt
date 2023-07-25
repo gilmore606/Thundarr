@@ -159,6 +159,11 @@ sealed class Thing() : Entity {
 
         FIST("fists", "fists", { Fist() }),
         TEETH("teeth", "teeth", { Teeth() }),
+        CLAWS("claws", "claws", { Claws() }),
+        MANDIBLES("mandibles", "mandibles", { Mandibles() }),
+        HORNS("horns", "horns", { Horns() }),
+        HOOVES("hooves", "hooves", { Hooves() }),
+        BEAK("beak", "beaks", { Beak() }),
         BRICK("brick", "bricks", { Brick() }),
         ROCK("rock", "rocks", { Rock() }),
         STICK("stick", "sticks", { Stick() }),

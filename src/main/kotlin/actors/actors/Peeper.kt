@@ -20,12 +20,9 @@ class Peeper : NPC() {
     override fun name() = "peeper"
     override fun description() = "A floating eyeball.  Disgusting.  You wonder who's looking through it."
     override fun onSpawn() {
+        initStats(4, 8, 6, 13, 4, 0, 1)
         hpMax = 6f
         hp = 6f
-        Strength.set(this, 4f)
-        Speed.set(this, 8f)
-        Brains.set(this, 6f)
-        Dodge.set(this, 2f)
     }
 
     override fun stepAnimation(dir: XY) = Slide(dir)

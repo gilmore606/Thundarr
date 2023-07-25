@@ -26,7 +26,7 @@ sealed class GenericVoltelope : NPC() {
         21.0f,
         6.0f,
     )
-
+    override fun unarmedWeapons() = setOf(hooves, horns)
     open fun meatChance() = 1.0f
     override fun corpseMeats() = mutableSetOf<Thing>().apply {
         if (Dice.chance(meatChance())) add(RawMeat())
@@ -37,6 +37,8 @@ sealed class GenericVoltelope : NPC() {
 class Voltelope : GenericVoltelope() {
     override fun name() = "voltelope"
     override fun description() = "A large ruminant beast with two branching yellow horns."
+    override fun skinArmor() = 1f
+    override fun unarmedDamage() = 3f
 }
 
 @Serializable
@@ -49,4 +51,5 @@ class VoltelopeFawn : GenericVoltelope() {
         Dodge.set(this, 1)
         Speed.set(this, 12f)
     }
+    override fun unarmedDamage() = 2f
 }

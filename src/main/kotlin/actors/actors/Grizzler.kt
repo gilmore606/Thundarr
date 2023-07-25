@@ -17,6 +17,8 @@ class Grizzler : NPC() {
         initStats(17, 12, 7, 12, 12, 3, 1)
     }
 
+    override fun unarmedWeapons() = setOf(teeth, claws)
+    override fun unarmedDamage() = 8f
     override fun skinArmorMaterial() = Clothing.Material.FUR
     override fun skinArmor() = 2f
 

@@ -30,6 +30,8 @@ class Gator : NPC() {
     override fun onSpawn() {
         initStats(14, 11, 4, 9, 10, 2, 1)
     }
+    override fun unarmedWeapon() = teeth
+    override fun unarmedDamage() = 6f
     override fun skinArmorMaterial() = Clothing.Material.SCALES
     override fun skinArmor() = 2.5f
     override fun idleState() = IdleWander(0.35f)

@@ -81,7 +81,7 @@ class Attack(
                 } else {
 
                     // HIT
-                    var damage = bodypart.reduceDamage(target, weapon.damageType(), weapon.rollDamage(roll))
+                    var damage = bodypart.reduceDamage(target, weapon.damageType(), weapon.rollDamage(actor, roll))
                     if (damage > 0f) {
                         damage = weapon.damageType().addDamage(target, bodypart, damage)
                     }

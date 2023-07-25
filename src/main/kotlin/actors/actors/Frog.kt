@@ -21,7 +21,10 @@ class Frog : NPC() {
         hpMax = 6f
         initStats(9, 9, 4, 8, 6, 1, 0)
     }
+    override fun canSwimShallow() = true
 
+    override fun unarmedWeapon() = horns
+    override fun unarmedDamage() = 3f
     override fun skinArmorMaterial() = Clothing.Material.HIDE
     override fun skinArmor() = 1f
 

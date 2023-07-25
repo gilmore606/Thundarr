@@ -13,6 +13,8 @@ sealed class GenericCattle : NPC() {
     override fun glyph() = Glyph.CATTLE
     override fun shadowWidth() = 1.7f
     override fun shadowXOffset() = 0.2f
+    override fun unarmedWeapons() = setOf(horns, hooves)
+    override fun unarmedDamage() = 4f
     override fun skinArmorMaterial() = Clothing.Material.HIDE
 
     override fun idleState(): Idle = IdleHerd(

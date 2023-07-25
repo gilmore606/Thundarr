@@ -15,9 +15,6 @@ import things.Teeth
 
 @Serializable
 class Ratthing : NPC() {
-    companion object {
-        val weapon = Teeth()
-    }
     override fun glyph() = Glyph.RATTHING
     override fun name() = "rat-thing"
     override fun description() = "A dog-sized shaggy gray rodent.  Its red eyes are full of hatred."
@@ -26,15 +23,11 @@ class Ratthing : NPC() {
         else -> super.enterStateMsg(newState)
     }
     override fun onSpawn() {
+        initStats(8, 8, 3, 9, 5, 1, 1)
         hpMax = 10f
         hp = 10f
-        Strength.set(this, 8f)
-        Speed.set(this, 8f)
-        Brains.set(this, 3f)
-        Dodge.set(this, 1f)
-        Fight.set(this, 1f)
     }
-    override fun meleeWeapon() = weapon
+    override fun unarmedWeapon() = teeth
     override fun corpse() = null
     override fun talkSound(actor: Actor) = Speaker.SFX.RAT
 

@@ -13,7 +13,7 @@ sealed class GenericTortle : NPC() {
     override fun glyph() = Glyph.TORTLE
     override fun shadowWidth() = 1.4f
     override fun skinArmorMaterial() = Clothing.Material.SHELL
-    override fun unarmedWeapon() = fist
+    override fun unarmedWeapon() = hooves
     override fun idleState() = IdleHerd(
         0.3f, 8, true,
         19.0f,
@@ -31,6 +31,7 @@ class YoungTortle : GenericTortle() {
         hpMax = 9f
         initStats(12, 6, 8, 9, 9, 1, 0)
     }
+    override fun unarmedDamage() = 3f
     override fun skinArmor() = 2.5f
 }
 
@@ -43,6 +44,7 @@ class Tortle : GenericTortle() {
         hpMax = 12f
         initStats(13, 6, 8, 9, 9, 2, 0)
     }
+    override fun unarmedDamage() = 4f
     override fun skinArmor() = 2.5f
 }
 
@@ -56,5 +58,6 @@ class BullTortle : GenericTortle() {
         hpMax = 18f
         initStats(15, 8, 8, 9, 9, 3, 0)
     }
+    override fun unarmedDamage() = 5f
     override fun skinArmor() = 2.5f
 }

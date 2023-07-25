@@ -7,6 +7,7 @@ import ui.panels.Console
 import util.Dice
 import util.XY
 import util.forXY
+import world.Chunk
 import world.level.Level
 
 @Serializable
@@ -34,10 +35,13 @@ class Leap(
 
     private fun pickDestination(actor: Actor): XY? {
         val poss = mutableSetOf<XY>()
+        val roofed = actor.level?.isRoofedAt(actor.xy.x, actor.xy.y) ?: Chunk.Roofed.OUTDOOR
         forXY(actor.xy.x - range, actor.xy.y - range, actor.xy.x + range, actor.xy.y + range) { dx, dy ->
             if (dx != actor.xy.x && dy != actor.xy.y) {
                 if (actor.level?.isWalkableAt(actor, dx, dy) == true) {
-                    poss.add(XY(dx, dy))
+                    if (actor.level?.isRoofedAt(dx, dy) == roofed) {
+                        poss.add(XY(dx, dy))
+                    }
                 }
             }
         }
