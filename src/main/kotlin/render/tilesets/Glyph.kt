@@ -206,6 +206,13 @@ enum class Glyph(val tall: Boolean = false) {
     RAD_MELEE,
     WITCH,
     GASBAG,
+    ROBO_BOSS,
+    GUNLUGGER,
+    GUNSLINGER,
+    SAND_BANDIT,
+    WHITE_DRAKE,
+    RED_DRAKE,
+    GREEN_DRAKE,
 
     OAK_TREE,
     MAPLE_TREE,

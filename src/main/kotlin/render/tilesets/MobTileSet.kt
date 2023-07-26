@@ -127,4 +127,11 @@ fun ActorTileSet() =
         setTile(Glyph.RAD_MELEE, SimpleTile(this, 11, 3))
         setTile(Glyph.WITCH, SimpleTile(this, 12, 4))
         setTile(Glyph.GASBAG, SimpleTile(this, 11, 4))
+        setTile(Glyph.ROBO_BOSS, SimpleTile(this, 12, 5))
+        setTile(Glyph.GUNLUGGER, SimpleTile(this, 11, 5))
+        setTile(Glyph.GUNSLINGER, SimpleTile(this, 11, 6))
+        setTile(Glyph.SAND_BANDIT, SimpleTile(this, 12, 7))
+        setTile(Glyph.WHITE_DRAKE, SimpleTile(this, 11, 7))
+        setTile(Glyph.RED_DRAKE, SimpleTile(this, 11, 8))
+        setTile(Glyph.GREEN_DRAKE, SimpleTile(this, 12, 8))
     }
