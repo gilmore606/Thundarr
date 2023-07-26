@@ -234,10 +234,12 @@ class Bonepile : Container() {
 
 @Serializable
 class WreckedCar : Container() {
+    var hue: Float = 0f
     override val tag = Tag.WRECKEDCAR
     override fun name() = "wrecked vehicle"
     override fun description() = "The hulk of a rusty metal wagon."
     override fun glyph() = Glyph.WRECKED_CAR
+    override fun hue() = hue
     override fun isPortable() = false
     override fun isBlocking(actor: Actor) = true
     override fun openVerb() = "search"
@@ -256,5 +258,10 @@ class WreckedCar : Container() {
         8 -> TravelBoots()
         9 -> Paperback()
         else -> Torch()
+    }
+
+    override fun onSpawn() {
+        super.onSpawn()
+        hue = Dice.float(-2f, 2f)
     }
 }

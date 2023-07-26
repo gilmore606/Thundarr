@@ -118,4 +118,6 @@ fun ActorTileSet() =
         setTile(Glyph.WATER_SPIRIT, SimpleTile(this, 10, 8))
         setTile(Glyph.BRICK_MAN, SimpleTile(this, 10, 9))
         setTile(Glyph.WILLOWISP, SimpleTile(this, 10, 10))
+        setTile(Glyph.ARMBOT, SimpleTile(this, 11, 0))
+        setTile(Glyph.BIG_DEAD_TREE_MAN, SimpleTile(this, 11, 1))
     }

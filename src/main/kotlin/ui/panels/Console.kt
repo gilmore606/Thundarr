@@ -399,7 +399,7 @@ object Console : Panel() {
 
     private fun spawnThings(amount: Int, tag: Thing.Tag) {
         repeat (amount) {
-            val thing = tag.spawn.invoke()
+            val thing = Thing.spawn(tag)
             thing.moveTo(App.player.level!!, App.player.xy.x, App.player.xy.y)
             say("Spawned ${amount} ${tag}.")
         }

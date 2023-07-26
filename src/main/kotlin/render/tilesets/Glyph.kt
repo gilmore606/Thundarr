@@ -197,6 +197,8 @@ enum class Glyph(val tall: Boolean = false) {
     BRAINBOT,
     COMBOT,
     TANKBOT,
+    ARMBOT,
+    BIG_DEAD_TREE_MAN,
 
     OAK_TREE,
     MAPLE_TREE,

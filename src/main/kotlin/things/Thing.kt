@@ -20,6 +20,10 @@ import java.lang.RuntimeException
 @Serializable
 sealed class Thing() : Entity {
 
+    companion object {
+        fun spawn(tag: Tag): Thing = tag.spawn().apply { onSpawn() }
+    }
+
     @Serializable
     data class Key(
         val xy: XY,
