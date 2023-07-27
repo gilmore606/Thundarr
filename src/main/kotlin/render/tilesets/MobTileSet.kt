@@ -1,6 +1,5 @@
 package render.tilesets
 
-import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
 fun ActorTileSet() =
@@ -134,4 +133,20 @@ fun ActorTileSet() =
         setTile(Glyph.WHITE_DRAKE, SimpleTile(this, 11, 7))
         setTile(Glyph.RED_DRAKE, SimpleTile(this, 11, 8))
         setTile(Glyph.GREEN_DRAKE, SimpleTile(this, 12, 8))
+        setTile(Glyph.LAMPREY, SimpleTile(this, 12, 9))
+        setTile(Glyph.FIRE_TORNADO, SimpleTile(this, 11, 9))
+        setTile(Glyph.BEE, SimpleTile(this, 12, 10))
+        setTile(Glyph.CORAL_SNAKE, SimpleTile(this, 11, 10))
+        setTile(Glyph.FLYDRAGON, SimpleTile(this, 0, 11))
+        setTile(Glyph.JELLYBULB, SimpleTile(this, 1, 11))
+        setTile(Glyph.SUPERBRUTE, SimpleTile(this, 2, 11))
+        setTile(Glyph.LOSTRICH, SimpleTile(this, 3, 11))
+        setTile(Glyph.TRASH_MONSTER, SimpleTile(this, 4, 11))
+        setTile(Glyph.MANTIS_MAN, SimpleTile(this, 5, 11))
+        setTile(Glyph.DEVIL_BULL, SimpleTile(this, 6, 11))
+        setTile(Glyph.WASTED_ONE, SimpleTile(this, 7, 11))
+        setTile(Glyph.CONSTRUCT_WITCH, SimpleTile(this, 8, 11))
+        setTile(Glyph.CONSTRUCT_STRIKER, SimpleTile(this, 9, 11))
+        setTile(Glyph.ENERGY_SPHERE, SimpleTile(this, 10, 11))
+        setTile(Glyph.PENGUIN, SimpleTile(this, 11, 11))
     }
