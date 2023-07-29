@@ -149,4 +149,6 @@ fun ActorTileSet() =
         setTile(Glyph.CONSTRUCT_STRIKER, SimpleTile(this, 9, 11))
         setTile(Glyph.ENERGY_SPHERE, SimpleTile(this, 10, 11))
         setTile(Glyph.PENGUIN, SimpleTile(this, 11, 11))
+        setTile(Glyph.GRANITE_GIANT, SimpleTile(this, 12, 11))
+        setTile(Glyph.BIG_TREE_MAN, SimpleTile(this, 13, 0))
     }
