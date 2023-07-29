@@ -111,14 +111,14 @@ sealed class StepMap {
             DIRECTIONS.from(lx, ly) { tx, ty, dir ->
                 if (tx in 0 until width && ty in 0 until height) {
                     if (map[tx][ty] == nextstep) {
-                        if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) steps.add(dir)
-                        else if (walker.level?.actorAt(fromX+dir.x, fromY+dir.y) is NPC) passNeighborStep = dir
+                        if (walker.level?.actorAt(fromX+dir.x, fromY+dir.y) is NPC) passNeighborStep = dir
+                        else if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) steps.add(dir)
                     } else if (map[tx][ty] == nextstep - 1) {
                         if (walker.level?.isWalkableFrom(walker, fromX, fromY, dir) == true) altSteps.add(dir)
                     }
                 }
             }
-            if (steps.isNotEmpty()) return steps.random()
+            if (steps.isNotEmpty()) return if (Dice.chance(0.7f)) steps.first() else steps.random()
             if (altSteps.isNotEmpty()) return altSteps.random()
         }
         return passNeighborStep
