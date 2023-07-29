@@ -32,8 +32,6 @@ object DebugPanel : ShadedPanel() {
         val lg = (l.g * 100).toInt()
         val lb = (l.b * 100).toInt()
         drawString("light $lr $lg $lb", padding, padding + 40)
-        drawString("render ${Screen.drawTime} ms", padding, padding + 60)
-        drawString("action ${Screen.actTime} ms", padding, padding + 80)
         drawString("${LevelKeeper.liveLevels.size} live levels", padding, padding + 100)
 
         val meta = Metamap.metaAtWorld(App.player.xy.x, App.player.xy.y)

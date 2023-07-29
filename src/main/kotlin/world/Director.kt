@@ -18,13 +18,16 @@ import world.persist.LevelKeeper
 
 class Director(val level: Level) {
 
-    val actors = mutableListOf<Actor>()
+    companion object {
+        const val millisPerRun = 8L
+    }
 
+    val actors = mutableListOf<Actor>()
     private val temporals = mutableListOf<Temporal>()
 
     private var playerTimePassed = 0f
-
     var actorsLocked = false
+    var actionsPending = false
 
     fun attachActor(actor: Actor) {
         if (actor is Player && actor != App.player) {
@@ -95,20 +98,23 @@ class Director(val level: Level) {
 
     // Execute actors' actions until it's the player's turn.
     fun runQueue(level: Level) {
-        while (true) {
+        actionsPending = true
+        val cutoffTime = System.currentTimeMillis() + millisPerRun
+        while (System.currentTimeMillis() < cutoffTime) {
             if (level.hasBlockingSpark()) return
             // find actor with highest juice
             var actor: Actor? = null
             var checkActor: Actor
             var unloadingActor: Actor? = null
-            for (n in 0 .. actors.lastIndex) {
+            for (n in 0..actors.lastIndex) {
                 checkActor = actors[n]
                 if (checkActor.isUnloading) {
                     unloadingActor = checkActor
                 } else if (checkActor.wantsToAct()) {
                     if ((checkActor.juice > (actor?.juice ?: 0f)) ||
                         ((checkActor is Player) && (checkActor.juice == (actor?.juice ?: 0f))) ||
-                        ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice ?: 0f)) && (checkActor.actionSpeed() < (actor?.actionSpeed() ?: 0f)))
+                        ((checkActor.juice > 0f) && (checkActor.juice == (actor?.juice
+                            ?: 0f)) && (checkActor.actionSpeed() < (actor?.actionSpeed() ?: 0f)))
                     ) {
                         actor = checkActor
                     }
@@ -117,6 +123,7 @@ class Director(val level: Level) {
             unloadingActor?.also { removeActor(it) }
             if (actor == null || !actor.hasActionJuice()) {  // no one had juice, we're done
                 triggerAdvanceTime()
+                actionsPending = false
                 return
             }
             // execute their action
@@ -131,6 +138,7 @@ class Director(val level: Level) {
                     playerTimePassed += duration
                     if (playerTimePassed >= 1f) {
                         triggerAdvanceTime()
+                        actionsPending = false
                         return  // quit to let the renderer run
                     }
                 } else {  // NPC spends juice
@@ -140,6 +148,7 @@ class Director(val level: Level) {
                 // they had juice, but no action
                 if (actor is Player) {
                     triggerAdvanceTime()
+                    actionsPending = false
                     return
                 }
                 throw RuntimeException("NPC $actor had no next action!")

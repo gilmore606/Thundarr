@@ -3,6 +3,7 @@ package util
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import render.Screen
 import things.Thing
 import world.Entity
@@ -294,7 +295,8 @@ fun wrapText(text: String, width: Int, padding: Int, font: BitmapFont = Screen.s
     return wrapped
 }
 
-val log = KotlinLogging.logger {}
+//val log = KotlinLogging.logger {}
+val log = LoggerFactory.getLogger("")
 
 val NORTH = XY(0, -1)
 val SOUTH = XY(0, 1)

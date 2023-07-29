@@ -97,10 +97,10 @@ object Screen : KtxScreen {
     val halfLight = LightColor(0.3f, 0.3f, 0.3f)
     val fullDark = LightColor(0f, 0f, 0f)
 
-    const val fontSize = 16
-    const val fontSizeSmall = 14
-    const val titleFontSize = 24
-    const val subTitleFontSize = 20
+    private const val fontSize = 16
+    private const val fontSizeSmall = 14
+    private const val titleFontSize = 24
+    private const val subTitleFontSize = 20
     val fontColor = Color(0.95f, 0.92f, 0.8f, 1f)
     val fontColorDull = Color(0.73f, 0.73f, 0.6f, 1f)
     val fontColorBold = Color(1f, 1f, 1f, 1f)
@@ -177,17 +177,12 @@ object Screen : KtxScreen {
     private val dragInertia = XY(0, 0)
     private val dragInertiaLast = XY(0, 0)
     private var dragInertiaDelta = 0f
-    private val dragBraking = 0.95f
-    private val dragStartWeight = 0.6f
+    private const val dragBraking = 0.95f
+    private const val dragStartWeight = 0.6f
 
-    var drawTime: Int = 0
-    private val lastDrawTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private var drawTimeIndex = 0
-    var actTime: Int = 0
-    private val lastActTimes = arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private var actTimeIndex = 0
+    private var lastDrawTime = 0L
     private var lastActionTime = 0L
-    private var minActionInterval = 60L
+    private const val minActionInterval = 80L
 
     var sinBob = 0f
     var timeMs = System.currentTimeMillis()
@@ -345,6 +340,11 @@ object Screen : KtxScreen {
 
     override fun render(delta: Float) {
         timeMs = System.currentTimeMillis()
+        if (timeMs - lastDrawTime > 32L) {
+            log.warn("Davey!  frame time ${timeMs - lastDrawTime}")
+        }
+        lastDrawTime = timeMs
+
         animateCamera(delta)
         Speaker.onRender(delta)
         Fire.onRender(delta)
@@ -375,18 +375,13 @@ object Screen : KtxScreen {
 
         drawEverything(delta)
 
-        val startTime = timeMs
-        if (startTime - lastActionTime > minActionInterval || Keyboard.lastKeyTime > startTime + 20L) {
+        if (
+            (timeMs - lastActionTime > minActionInterval) ||
+            (Keyboard.lastKeyTime > timeMs + 20L) ||
+            (App.level.director.actionsPending)
+        ) {
             LevelKeeper.runActorQueues()
-            lastActionTime = startTime
-            val thisActTime = timeMs - startTime
-            if (thisActTime > 0) {
-                lastActTimes[actTimeIndex] = thisActTime.toInt()
-                actTimeIndex = if (actTimeIndex == 9) 0 else actTimeIndex + 1
-                actTime = 0
-                lastActTimes.forEach { actTime += it }
-                actTime /= 10
-            }
+            lastActionTime = timeMs
         }
     }
 
@@ -468,7 +463,6 @@ object Screen : KtxScreen {
         lastPov.setTo(pov)
         cameraPov.setTo(pov)
         cameraVec = XYd(0.0,0.0)
-        log.info("Screen.recenterCamera()")
     }
 
     fun clearCursor() {
@@ -703,13 +697,6 @@ object Screen : KtxScreen {
                 panel.renderEntities()
             }
         }
-
-        // Calculate our render time before hitting the GPU
-        lastDrawTimes[drawTimeIndex] = (timeMs - startTime).toInt()
-        drawTimeIndex = if (drawTimeIndex == 9) 0 else drawTimeIndex + 1
-        drawTime = 0
-        lastDrawTimes.forEach { drawTime += it }
-        drawTime /= 10
 
         allBatches.forEach {
             it.draw()
