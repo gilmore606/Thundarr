@@ -23,6 +23,7 @@ sealed class GenericTortle : NPC() {
 
 @Serializable
 class YoungTortle : GenericTortle() {
+    override val tag = Tag.TORTLE_YOUNG
     override fun hue() = 0.9f
     override fun name() = "young tortle"
     override fun description() = "A large tortoise with a large raised head and sharp horns."
@@ -37,6 +38,7 @@ class YoungTortle : GenericTortle() {
 
 @Serializable
 class Tortle : GenericTortle() {
+    override val tag = Tag.TORTLE
     override fun name() = "tortle"
     override fun description() = "A large tortoise with a large raised head and sharp horns."
     override fun hpMax() = 14f
@@ -50,6 +52,7 @@ class Tortle : GenericTortle() {
 
 @Serializable
 class BullTortle : GenericTortle() {
+    override val tag = Tag.TORTLE_BULL
     override fun hue() = -0.8f
     override fun name() = "bull tortle"
     override fun description() = "A huge tortoise with a large raised head, sharp horns, and a gray crest."

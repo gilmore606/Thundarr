@@ -15,6 +15,7 @@ import things.Teeth
 
 @Serializable
 class Ratthing : NPC() {
+    override val tag = Tag.RATTHING
     override fun glyph() = Glyph.RATTHING
     override fun name() = "rat-thing"
     override fun description() = "A dog-sized shaggy gray rodent.  Its red eyes are full of hatred."

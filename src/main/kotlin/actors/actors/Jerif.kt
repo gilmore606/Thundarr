@@ -6,6 +6,7 @@ import render.tilesets.Glyph
 
 @Serializable
 class Jerif : NPC() {
+    override val tag = Tag.JERIF
     override fun name() = "jerif"
     override fun glyph() = Glyph.JERIF
     override fun shadowWidth() = 1.7f

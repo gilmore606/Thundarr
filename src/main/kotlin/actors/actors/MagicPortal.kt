@@ -16,6 +16,7 @@ class MagicPortal : NPC() {
         private val flipInterval = 0.06f
         private val lifespan = 3f
     }
+    override val tag = Tag.PORTAL
     override fun name() = "portal"
     override fun glyph() = Glyph.MAGIC_PORTAL
     override fun shadowWidth() = 0f

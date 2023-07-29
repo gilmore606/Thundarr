@@ -16,6 +16,7 @@ import world.stains.Goo
 @Serializable
 class Peeper : NPC() {
 
+    override val tag = Tag.PEEPER
     override fun glyph() = Glyph.FLOATING_EYE
     override fun name() = "peeper"
     override fun description() = "A floating eyeball.  Disgusting.  You wonder who's looking through it."

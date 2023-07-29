@@ -17,6 +17,7 @@ class Herder : NPC() {
 
     val lantern = LightColor(0.5f, 0.4f, 0.0f)
 
+    override val tag = Tag.HERDER
     override fun glyph() = Glyph.HERDER
     override fun name() = "herdsman"
     override fun gender() = Entity.Gender.MALE

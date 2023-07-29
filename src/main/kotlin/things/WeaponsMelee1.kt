@@ -4,6 +4,7 @@ import actors.actors.Actor
 import actors.stats.Heart
 import actors.stats.Stat
 import actors.stats.skills.Blades
+import actors.stats.skills.Spears
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import util.LightColor

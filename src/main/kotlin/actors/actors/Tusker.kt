@@ -37,6 +37,7 @@ sealed class GenericTusker : NPC() {
 
 @Serializable
 class Tusker : GenericTusker() {
+    override val tag = Tag.TUSKER
     override fun name() = "tusker"
     override fun hpMax() = 22f
     override fun unarmedDamage() = 5f
@@ -44,6 +45,7 @@ class Tusker : GenericTusker() {
 
 @Serializable
 class Tusklet : GenericTusker() {
+    override val tag = Tag.TUSKLET
     override fun name() = "tusklet"
     override fun description() = "A juvenile pig creature covered in wiry bristles."
     override fun hpMax() = 14f

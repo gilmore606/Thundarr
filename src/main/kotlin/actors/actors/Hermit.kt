@@ -9,6 +9,7 @@ import render.tilesets.Glyph
 
 @Serializable
 class Hermit : NPC() {
+    override val tag = Tag.HERMIT
     override fun glyph() = Glyph.PEASANT_WHITE_DARK
     override fun name() = "hermit"
     override fun description() = "A wizened old human in tattered rags."

@@ -48,6 +48,7 @@ sealed class GenericRatman(
 class Ratlord(
     val ratlordWizardName: String
 ) : GenericRatman(ratlordWizardName) {
+    override val tag = Tag.RATLORD
     override fun glyph() = Glyph.RATLORD
     override fun name() = "rat-lord"
     override fun description() = "A man-sized hunched gray rodent wearing bronze armor.  It has an air of arrogant authority."
@@ -64,6 +65,8 @@ class Ratlord(
 class Ratman(
     val ratmanWizardName: String
 ) : GenericRatman(ratmanWizardName) {
+
+    override val tag = Tag.RATMAN
     override fun glyph() = Glyph.RATMAN
     override fun name() = "rat-man"
     override fun description() = "A man-sized hunched gray rodent. Its eyes glitter with hatred."

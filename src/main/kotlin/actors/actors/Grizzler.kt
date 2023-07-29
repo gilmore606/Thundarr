@@ -10,6 +10,7 @@ import things.*
 
 @Serializable
 class Grizzler : NPC() {
+    override val tag = Tag.GRIZZLER
     override fun glyph() = Glyph.DEMONDOG
     override fun name() = "grizzler"
     override fun description() = "A large furry brown predator with glittering yellow eyes and large claws."

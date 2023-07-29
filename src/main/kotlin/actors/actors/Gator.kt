@@ -23,6 +23,7 @@ class Gator : NPC() {
         val walkableTerrains = listOf(Swamp, ShallowWater, DeepWater)
     }
 
+    override val tag = Tag.GATOR
     override fun name() = "gator"
     override fun glyph() = Glyph.GATOR
     override fun description() = "A long dark green lizard with a huge toothy snout."

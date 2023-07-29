@@ -6,8 +6,9 @@ import render.tilesets.Glyph
 import things.Clothing
 import util.XY
 
-class Beetle : NPC() {
+class PincerBeetle : NPC() {
 
+    override val tag = Tag.PINCER_BEETLE
     override fun glyph() = Glyph.PINCER_BEETLE
     override fun shadowWidth() = 1.5f
     override fun shadowXOffset() = 0.2f

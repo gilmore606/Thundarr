@@ -167,6 +167,7 @@ class Villager(
     val ownedThings = mutableListOf<String>()
 
     override fun toString() = name()
+    override val tag = Tag.VILLAGER
 
     var portraitGlyph: Glyph = Glyph.BLANK
     var customGlyph: Glyph = Glyph.BLANK

@@ -27,6 +27,7 @@ sealed class GenericCattle : NPC() {
 
 @Serializable
 class Aurox : GenericCattle() {
+    override val tag = Tag.AUROX
     override fun name() = "aurox"
     override fun description() = "A big lazy ruminant covered in short wiry bluish fur."
     override fun onSpawn() {
@@ -42,6 +43,7 @@ class Aurox : GenericCattle() {
 
 @Serializable
 class MuskOx : GenericCattle() {
+    override val tag = Tag.MUSKOX
     override fun hue() = 4.3f
     override fun name() = "muskox"
     override fun description() = "Predictably, it smells awful."
@@ -58,6 +60,7 @@ class MuskOx : GenericCattle() {
 
 @Serializable
 class Cyclox : GenericCattle() {
+    override val tag = Tag.CYCLOX
     override fun glyph() = Glyph.CYCLOX
     override fun name() = "cyclox"
     override fun description() = "A large spheroid ruminant with wrinkly gray skin, and one giant eye."

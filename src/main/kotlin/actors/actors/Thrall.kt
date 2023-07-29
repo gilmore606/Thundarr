@@ -12,6 +12,7 @@ import render.tilesets.Glyph
 class Thrall(
     val wizardName: String
 ) : NPC() {
+    override val tag = Tag.THRALL
     override fun glyph() = Glyph.THRALL
     override fun name() = "thrall"
     override fun description() = "A pitiful human, enslaved by magic bonds to $wizardName.  ${gender().pp.capitalize()} eyes beg you for rescue."

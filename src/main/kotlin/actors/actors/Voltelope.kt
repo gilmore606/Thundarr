@@ -35,6 +35,7 @@ sealed class GenericVoltelope : NPC() {
 
 @Serializable
 class Voltelope : GenericVoltelope() {
+    override val tag = Tag.VOLTELOPE
     override fun name() = "voltelope"
     override fun description() = "A large ruminant beast with two branching yellow horns."
     override fun hpMax() = 8f
@@ -44,6 +45,7 @@ class Voltelope : GenericVoltelope() {
 
 @Serializable
 class VoltelopeFawn : GenericVoltelope() {
+    override val tag = Tag.VOLTELOPE_FAWN
     override fun name() = "voltelope fawn"
     override fun description() = "A small juvenile ruminant beast with two small yellow horns."
     override fun meatChance() = 0.5f

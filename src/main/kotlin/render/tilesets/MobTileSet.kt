@@ -1,5 +1,6 @@
 package render.tilesets
 
+import render.tileholders.AnimatedTile
 import render.tileholders.SimpleTile
 
 fun ActorTileSet() =
@@ -38,6 +39,11 @@ fun ActorTileSet() =
         setTile(Glyph.TORTLE, SimpleTile(this, 5, 0))
         setTile(Glyph.PIDGEY, SimpleTile(this, 6, 2))
         setTile(Glyph.PIDGEY_BRUTE, SimpleTile(this, 6, 0))
+        setTile(Glyph.BLUE_BIRD, AnimatedTile(this).apply {
+            frameMs = 381
+            add(5, 5)
+            add(6, 5)
+        })
         setTile(Glyph.GOAT, SimpleTile(this, 2, 5))
         setTile(Glyph.MANAPE, SimpleTile(this, 3, 5))
         setTile(Glyph.GATOR, SimpleTile(this, 6, 4))
@@ -66,7 +72,7 @@ fun ActorTileSet() =
         setTile(Glyph.MAGIC_PORTAL, SimpleTile(this, 3, 6))
         setTile(Glyph.PINCER_BEETLE, SimpleTile(this, 0, 6))
         setTile(Glyph.FROG, SimpleTile(this, 0, 7))
-        setTile(Glyph.SPIDER, SimpleTile(this, 1, 7))
+        setTile(Glyph.SPOTTED_BEETLE, SimpleTile(this, 1, 7))
         setTile(Glyph.GECKOID, SimpleTile(this, 4, 6))
         setTile(Glyph.CRAB, SimpleTile(this, 4, 7))
         setTile(Glyph.EYEHOP, SimpleTile(this, 5, 6))
@@ -151,4 +157,5 @@ fun ActorTileSet() =
         setTile(Glyph.PENGUIN, SimpleTile(this, 11, 11))
         setTile(Glyph.GRANITE_GIANT, SimpleTile(this, 12, 11))
         setTile(Glyph.BIG_TREE_MAN, SimpleTile(this, 13, 0))
+        setTile(Glyph.SCORPIYAK, SimpleTile(this, 13, 2))
     }

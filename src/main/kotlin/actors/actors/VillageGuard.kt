@@ -17,13 +17,14 @@ import world.gen.features.Habitation
 class VillageGuard(
     val bounds: Rect,
     val villageName: String,
-    val flavor: Habitation.Flavor,
+    val flavor: Habitation.Flavor = Habitation.Flavor.HUMAN,
 ) : Citizen() {
 
     val maxChaseRange = 60
     val boundsCenter = XY(bounds.x0 + (bounds.x1 - bounds.x0) / 2, bounds.y0 + (bounds.y1 - bounds.y0) / 2)
 
     override fun toString() = name() + "(" + id + ")"
+    override val tag = Tag.VILLAGE_GUARD
     override fun name() = "guard"
     override fun glyph() = Glyph.SHIELD_GUARD
     override fun description() = "A village guard."

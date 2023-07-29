@@ -168,6 +168,7 @@ sealed class Thing() : Entity {
         HORNS("horns", "horns", { Horns() }),
         HOOVES("hooves", "hooves", { Hooves() }),
         BEAK("beak", "beaks", { Beak() }),
+        BRANCHES("branches", "branches", { Branches() }),
         BRICK("brick", "bricks", { Brick() }),
         ROCK("rock", "rocks", { Rock() }),
         STICK("stick", "sticks", { Stick() }),
@@ -179,6 +180,7 @@ sealed class Thing() : Entity {
         HAMMER("hammer", "hammers", { Hammer() }),
         KNIFE("knife", "knives", { Knife() }),
         GLADIUS("gladius", "gladii", { Gladius() }),
+        WOODSPEAR("wood spear", "wood spears", { UnarmedSpear() }),
         SUNSWORD("sunsword", "sunswords", { Sunsword() }),
         ;
     }

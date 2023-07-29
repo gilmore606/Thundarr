@@ -18,40 +18,59 @@ import world.level.Level
 @Serializable
 sealed class NPC : Actor() {
 
-    enum class Tag {
-        AUROX,
-        MUSKOX,
-        CYCLOX,
-        TUSKER,
-        TUSKLET,
-        VOLTELOPE,
-        VOLTELOPE_FAWN,
-        SALAMAN,
-        TORTLE,
-        PIDGEY,
-        PIDGEY_BRUTE,
-        GRIZZLER,
-        HERMIT,
-        GATOR,
+    enum class Tag(val spawn: ()->NPC) {
+        AUROX({ Aurox() }),
+        BOAR({ Boar() }),
+        CACTOID({ Cactoid() }),
+        CHARMAN({ Charman() }),
+        CYCLOX({ Cyclox() }),
+        FROG({ Frog() }),
+        GATOR({ Gator() }),
+        GECKOID({ Geckoid() }),
+        GLOCUST({ Glocust() }),
+        GRIZZLER({ Grizzler() }),
+        GRUB({ Grub() }),
+        HERDER({ Herder() }),
+        HERMIT({ Hermit() }),
+        HYENAMAN({ Hyenaman() }),
+        JERIF({ Jerif() }),
+        KILLDAISY({ Killdaisy() }),
+        LAMPREY({ Lamprey() }),
+        LOSTRICH({ Lostrich() }),
+        MOLEGULL({ Molegull() }),
+        MUSKOX({ MuskOx() }),
+        PEEPER({ Peeper() }),
+        PENGO({ Pengo() }),
+        PIDGEY({ Pidgey() }),
+        PIDGEY_BRUTE({ PidgeyBrute() }),
+        PINCER_BEETLE({ PincerBeetle() }),
+        PORTAL({ MagicPortal() }),
+        RAM({ Ram() }),
+        RATLORD({ Ratlord("") }),
+        RATMAN({ Ratman("") }),
+        RATTHING({ Ratthing() }),
+        SALAMAN({ Salaman() }),
+        SCORPION({ Scorpion() }),
+        STICKLEBOAR({ Stickleboar() }),
+        THRALL({ Thrall("") }),
+        TICK({ Tick() }),
+        TORTLE({ Tortle() }),
+        TORTLE_YOUNG({ YoungTortle() }),
+        TORTLE_BULL({ BullTortle() }),
+        TUSKER({ Tusker() }),
+        TUSKLET({ Tusklet() }),
+        VILLAGE_GUARD({ Tick() }), // no free spawn!
+        VILLAGER({ Tick() }), // no free spawn!
+        VOLTELOPE({ Voltelope() }),
+        VOLTELOPE_FAWN({ VoltelopeFawn() }),
+        WOLFMAN({ Wolfman() }),
+        WOOD_SPIDER({ WoodSpider() }),
     }
 
+    abstract val tag: Tag
+
     companion object {
-        fun create(tag: Tag): NPC = when (tag) {
-            Tag.AUROX -> Aurox()
-            Tag.MUSKOX -> MuskOx()
-            Tag.CYCLOX -> Cyclox()
-            Tag.TUSKER -> Tusker()
-            Tag.TUSKLET -> Tusklet()
-            Tag.VOLTELOPE -> Voltelope()
-            Tag.VOLTELOPE_FAWN -> VoltelopeFawn()
-            Tag.SALAMAN -> Salaman()
-            Tag.TORTLE -> Tortle()
-            Tag.PIDGEY -> Pidgey()
-            Tag.PIDGEY_BRUTE -> PidgeyBrute()
-            Tag.GRIZZLER -> Grizzler()
-            Tag.HERMIT -> Hermit()
-            Tag.GATOR -> Gator()
-        }
+        fun create(tag: Tag): NPC = tag.spawn()
     }
 
     @Transient val unhibernateRadius = 65f
@@ -99,8 +118,8 @@ sealed class NPC : Actor() {
     }
 
     open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
-
     override fun willAggro(target: Actor) = isHostileTo(target)
+    open fun aggroRange() = visualRange()
 
     override fun visualRange() = 8f + Speed.get(this)
     override fun canSee() = super.canSee() && state.canSee()
@@ -242,7 +261,7 @@ sealed class NPC : Actor() {
         state.receiveAggression(this, attacker)
     }
 
-    fun opinionOf(actor: Actor): Opinion {
+    open fun opinionOf(actor: Actor): Opinion {
         if (opinions.containsKey(actor.id)) return opinions[actor.id]!!.opinion else {
             var loved = false
             factions.forEach { id ->

@@ -45,6 +45,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val horns: MeleeWeapon = Horns()
         val hooves: MeleeWeapon = Hooves()
         val beak: MeleeWeapon = Beak()
+        val branches: MeleeWeapon = Branches()
+        val spear: MeleeWeapon = UnarmedSpear()
         val caster = RayCaster()
     }
 

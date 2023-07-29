@@ -31,6 +31,7 @@ sealed class Clothing : Gear() {
         SHELL("shell", 0.5f, 1.5f, 1.5f, 1.5f, 2f, 1.5f),
         PLASTIC("plastic", 0.7f, 1f, 0.5f, 0.7f, 1.3f, 0.4f),
         METAL("metal", 1f, 1.4f, 1f, 1f, 0.2f, 1.5f),
+        WOOD("wood", 1f, 0.5f, 0.7f, 0f, 1f, 0.5f),
         ;
         fun modify(type: Damage, amount: Float) = when (type) {
             CRUSH -> vsCRUSH * amount

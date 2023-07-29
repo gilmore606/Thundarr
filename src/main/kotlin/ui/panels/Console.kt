@@ -1,9 +1,6 @@
 package ui.panels
 
-import actors.actors.Beetle
-import actors.actors.Frog
-import actors.actors.Peeper
-import actors.actors.Player
+import actors.actors.*
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import kotlinx.coroutines.launch
@@ -14,7 +11,6 @@ import things.Thing
 import util.XY
 import util.log
 import world.Entity
-import world.gen.Metamap
 import world.level.Level
 import world.weather.Weather
 import java.lang.Float.max
@@ -389,12 +385,8 @@ object Console : Panel() {
             return
         }
         val npcName = words.drop(1).joinToString(" ")
-        val npc = when (npcName) {
-            "beetle" -> Beetle()
-            "frog" -> Frog()
-            else -> Peeper()
-        }
-        npc.spawnAt(App.player.level!!, App.player.xy.x + 1, App.player.xy.y)
+        val npc = NPC.Tag.values().firstOrNull { it.name.toLowerCase().startsWith(npcName) }
+        npc?.spawn?.invoke()?.spawnAt(App.player.level!!, App.player.xy.x + 1, App.player.xy.y)
     }
 
     private fun spawnThings(amount: Int, tag: Thing.Tag) {

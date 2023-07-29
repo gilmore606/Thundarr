@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 import render.Screen
 import render.tilesets.Glyph
 import util.XY
+import util.distanceBetween
 
 // A State represents a goal the NPC is trying to achieve.
 @Serializable
@@ -35,7 +36,9 @@ sealed class State {
     // Consider my situation and possibly change to a new state.
     open fun considerState(npc: NPC) {
         npc.apply {
-            entitiesSeen { it is Actor && opinionOf(it) == NPC.Opinion.HATE }.keys.toList().firstOrNull()
+            entitiesSeen {
+                it is Actor && opinionOf(it) == NPC.Opinion.HATE && distanceBetween(it.xy, xy) <= aggroRange()
+            }.keys.toList().firstOrNull()
                 ?.also { enemy ->
                     hostileResponseState(enemy as Actor)?.also { hostileState ->
                         pushState(hostileState)

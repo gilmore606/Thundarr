@@ -12,6 +12,7 @@ import things.ScalyHide
 
 @Serializable
 class Salaman : NPC() {
+    override val tag = Tag.SALAMAN
     override fun glyph() = Glyph.TAILMANDER
     override fun shadowWidth() = 1.4f
     override fun name() = "salaman"

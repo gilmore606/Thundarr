@@ -21,6 +21,7 @@ sealed class GenericPidgey : NPC() {
 
 @Serializable
 class Pidgey : GenericPidgey() {
+    override val tag = Tag.PIDGEY
     override fun name() = "pidgey"
     override fun glyph() = Glyph.PIDGEY
     override fun description() = "A birdlike human figure, covered in feathers, with a bulbous head and beady black eyes."
@@ -35,6 +36,7 @@ class Pidgey : GenericPidgey() {
 
 @Serializable
 class PidgeyBrute : GenericPidgey() {
+    override val tag = Tag.PIDGEY_BRUTE
     override fun name() = "pidgey brute"
     override fun glyph() = Glyph.PIDGEY_BRUTE
     override fun description() = "A burly birdlike human figure, covered in feathers, with a bulbous head and menacing black eyes."

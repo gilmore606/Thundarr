@@ -123,5 +123,6 @@ sealed class MeleeWeapon : Weapon() {
 @Serializable
 sealed class UnarmedWeapon : MeleeWeapon() {
     override fun damage() = 0f
+    override fun glyph() = Glyph.BLANK
     override fun getDamage(wielder: Actor, roll: Float): Float = wielder.unarmedDamage()
 }

@@ -97,6 +97,7 @@ open class Player : Actor(), Workbench {
     override fun description() = "A stalwart blond barbarian.  His good looks are somewhat marred by a permanent scowl."
     override fun dname() = name()
     override fun iname() = name()
+    override fun isHuman() = true
 
     override fun initialFactions() = mutableSetOf(App.factions.humans)
 

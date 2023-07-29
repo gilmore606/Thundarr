@@ -1,5 +1,6 @@
 package things
 
+import actors.stats.skills.Spears
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 
@@ -7,7 +8,6 @@ import render.tilesets.Glyph
 @Serializable
 class Fist : UnarmedWeapon() {
     override val tag = Tag.FIST
-    override fun glyph() = Glyph.BLANK
     override fun name() = "fist"
     override fun description() = "Bare knuckles."
     override fun hitSelfMsg() = "You punch %dd in the %part!"
@@ -18,7 +18,6 @@ class Fist : UnarmedWeapon() {
 @Serializable
 class Teeth : UnarmedWeapon() {
     override val tag = Tag.TEETH
-    override fun glyph() = Glyph.BLANK
     override fun name() = "teeth"
     override fun description() = "Sharp teeth."
     override fun hitSelfMsg() = "You bite %dd's %part!"
@@ -29,7 +28,6 @@ class Teeth : UnarmedWeapon() {
 @Serializable
 class Claws : UnarmedWeapon() {
     override val tag = Tag.CLAWS
-    override fun glyph() = Glyph.BLANK
     override fun name() = "claws"
     override fun description() = "Sharp claws."
     override fun hitSelfMsg() = "You tear at %dd's %part with your claws!"
@@ -40,7 +38,6 @@ class Claws : UnarmedWeapon() {
 @Serializable
 class Mandibles : UnarmedWeapon() {
     override val tag = Tag.MANDIBLES
-    override fun glyph() = Glyph.BLANK
     override fun name() = "mandibles"
     override fun description() = "Sharp mandibles."
     override fun hitSelfMsg() = "You bite %dd's %part with your mandibles!"
@@ -51,7 +48,6 @@ class Mandibles : UnarmedWeapon() {
 @Serializable
 class Horns : UnarmedWeapon() {
     override val tag = Tag.HORNS
-    override fun glyph() = Glyph.BLANK
     override fun name() = "horns"
     override fun description() = "Sharp horns."
     override fun hitSelfMsg() = "You ram your horns into %dd's %part!"
@@ -62,7 +58,6 @@ class Horns : UnarmedWeapon() {
 @Serializable
 class Hooves : UnarmedWeapon() {
     override val tag = Tag.HOOVES
-    override fun glyph() = Glyph.BLANK
     override fun name() = "horns"
     override fun description() = "Crushing hooves."
     override fun hitSelfMsg() = "You trample %dd's %part!"
@@ -73,10 +68,29 @@ class Hooves : UnarmedWeapon() {
 @Serializable
 class Beak : UnarmedWeapon() {
     override val tag = Tag.BEAK
-    override fun glyph() = Glyph.BLANK
     override fun name() = "beak"
     override fun description() = "Sharp beak."
     override fun hitSelfMsg() = "You peck at %dd's %part!"
     override fun hitOtherMsg() = "%Dn pecks at %dd's %part!"
+    override fun damageType() = Damage.PIERCE
+}
+
+@Serializable
+class Branches : UnarmedWeapon() {
+    override val tag = Tag.BRANCHES
+    override fun name() = "branches"
+    override fun description() = "Woody branches."
+    override fun hitSelfMsg() = "You flail your branches at %dd's %part!"
+    override fun hitOtherMsg() = "%Dn flails %p branches at %dd's %part!"
+    override fun damageType() = Damage.CRUSH
+}
+
+@Serializable
+class UnarmedSpear : UnarmedWeapon() {
+    override val tag = Tag.WOODSPEAR
+    override fun name() = "wood spear"
+    override fun description() = "A wooden pike, its tip hardened in fire."
+    override fun hitSelfMsg() = "You stab %dd's %part!"
+    override fun hitOtherMsg() = "%Dn stabs %p spear into %dd's %part!"
     override fun damageType() = Damage.PIERCE
 }

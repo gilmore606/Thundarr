@@ -146,7 +146,7 @@ enum class Glyph(val tall: Boolean = false) {
     MAGIC_PORTAL(tall = true),
     FROG,
     PINCER_BEETLE,
-    SPIDER,
+    SPOTTED_BEETLE,
     GECKOID,
     CRAB,
     EYEHOP,
@@ -231,6 +231,8 @@ enum class Glyph(val tall: Boolean = false) {
     ENERGY_SPHERE,
     PENGUIN,
     GRANITE_GIANT,
+    SCORPIYAK,
+    BLUE_BIRD,
 
     OAK_TREE,
     MAPLE_TREE,
