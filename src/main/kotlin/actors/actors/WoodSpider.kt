@@ -2,7 +2,10 @@ package actors.actors
 
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
+import render.sparks.GooGore
 import render.tilesets.Glyph
+import things.BugCorpse
+import world.stains.Goo
 
 @Serializable
 class WoodSpider : NPC() {
@@ -12,6 +15,9 @@ class WoodSpider : NPC() {
     override fun shadowXOffset() = 0.2f
     override fun name() = "wood spider"
     override fun description() = "A huge brown bristle-bodied spider."
+    override fun bloodstain() = Goo()
+    override fun gore() = GooGore()
+    override fun corpse() = BugCorpse()
     override fun hpMax() = 8f
     override fun onSpawn() {
         initStats(9, 9, 3, 8, 6, 1, 0)

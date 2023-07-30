@@ -6,7 +6,7 @@ import util.aOrAn
 import util.iterateAndEmpty
 
 @Serializable
-class Corpse(
+sealed class GenericCorpse(
     val departedName: String? = null
 ) : Container(), Temporal {
 
@@ -15,7 +15,6 @@ class Corpse(
 
     override fun temporalDone() = holder == null
 
-    override val tag = Tag.CORPSE
     override fun name() = departedName?.let { "$it corpse" } ?: "corpse"
     override fun description() = "The mangled, lifeless organic remains of " + (departedName?.aOrAn() ?: "some unfortunate creature") + "."
     override fun glyph() = Glyph.CORPSE
@@ -43,4 +42,20 @@ class Corpse(
     }
 
     private fun onRot() { }
+}
+
+@Serializable
+class Corpse(
+    val corpseName: String? = null
+) : GenericCorpse(corpseName) {
+    override val tag = Tag.CORPSE
+    override fun glyph() = Glyph.CORPSE
+}
+
+@Serializable
+class BugCorpse(
+    val corpseName: String? = null
+) : GenericCorpse(corpseName) {
+    override val tag = Tag.BUG_CORPSE
+    override fun glyph() = Glyph.GOO_CORPSE
 }

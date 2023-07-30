@@ -457,13 +457,14 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             gore()?.also { level.addSpark(it.at(xy.x, xy.y)) }
         }
         corpse()?.also { corpse ->
-            corpse.moveTo(level, xy.x, xy.y)
+            corpse.moveTo(level, xy)
             corpseMeats().forEach { it.moveTo(corpse) }
             onDeath(corpse)
             contents.safeForEach { it.moveTo(corpse) }
         } ?: run {
             onDeath(null)
-            contents.safeForEach { it.moveTo(xy.x, xy.y) }
+            corpseMeats().forEach { it.moveTo(level, xy) }
+            contents.safeForEach { it.moveTo(level, xy) }
         }
     }
 

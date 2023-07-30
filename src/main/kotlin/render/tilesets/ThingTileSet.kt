@@ -62,6 +62,7 @@ fun ThingTileSet() =
         })
         setTile(Glyph.SCORCHMARK, SimpleTile(this, 7, 5))
         setTile(Glyph.CORPSE, SimpleTile(this, 3, 5))
+        setTile(Glyph.GOO_CORPSE, SimpleTile(this, 12, 3))
         setTile(Glyph.MEAT, SimpleTile(this, 4, 5))
         setTile(Glyph.FILING_CABINET, SimpleTile(this, 5, 5))
         setTile(Glyph.HARD_HAT, SimpleTile(this, 6, 0))

@@ -3,9 +3,12 @@ package actors.actors
 import actors.animations.Slide
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
+import render.sparks.GooGore
 import render.tilesets.Glyph
+import things.BugCorpse
 import things.Clothing
 import util.XY
+import world.stains.Goo
 
 @Serializable
 class PincerBeetle : NPC() {
@@ -17,6 +20,9 @@ class PincerBeetle : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "pincer beetle"
     override fun description() = "A huge shiny purple beetle, with large pinching jaws."
+    override fun bloodstain() = Goo()
+    override fun gore() = GooGore()
+    override fun corpse() = BugCorpse()
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 3, 8, 6, 1, 0)

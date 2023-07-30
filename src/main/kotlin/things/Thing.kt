@@ -107,6 +107,7 @@ sealed class Thing() : Entity {
         BONEPILE("bone pile", "bone piles", { Bonepile() }),
         WRECKEDCAR("wrecked car", "wrecked cars", { WreckedCar() }),
         CORPSE("corpse", "corpses", { Corpse() }),
+        BUG_CORPSE("dead bug", "dead bugs", { BugCorpse() }),
         TABLE("table", "tables", { Table() }),
 
         METAL_DOOR("door", "doors", { ModernDoor() }),
@@ -333,6 +334,7 @@ sealed class Thing() : Entity {
     }
     fun moveTo(xy:  XY) = moveTo(xy.x, xy.y)
     fun moveTo(x: Int, y: Int) = moveTo(level()?.cellContainerAt(x, y) ?: throw RuntimeException("moved $this to local coords but it wasn't in a level!"))
+    fun moveTo(level: Level, xy: XY) = moveTo(level, xy.x, xy.y)
     fun moveTo(level: Level, x: Int, y: Int) = moveTo(level.cellContainerAt(x, y))
 
     open fun onDropping(actor: Actor, dest: ThingHolder) { }

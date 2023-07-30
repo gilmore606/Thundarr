@@ -5,9 +5,11 @@ import actors.animations.Jump
 import actors.animations.Slide
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
+import render.sparks.GooGore
 import render.tilesets.Glyph
 import things.Clothing
 import util.XY
+import world.stains.Goo
 
 @Serializable
 class Grub : NPC() {
@@ -19,6 +21,8 @@ class Grub : NPC() {
     override fun name() = "grub"
     override fun description() = "A huge yellowish insect grub."
     override fun corpse() = null
+    override fun bloodstain() = Goo()
+    override fun gore() = GooGore()
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

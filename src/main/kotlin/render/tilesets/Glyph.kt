@@ -255,6 +255,7 @@ enum class Glyph(val tall: Boolean = false) {
     SMOKE_PUFF,
     DUST_PUFF,
     CORPSE,
+    GOO_CORPSE,
     MEAT,
     FILING_CABINET,
     HARD_HAT,
