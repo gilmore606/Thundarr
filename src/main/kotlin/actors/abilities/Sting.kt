@@ -13,6 +13,6 @@ class Sting(
     override fun shouldQueue(actor: Actor, target: Actor) = actor.isNextTo(target) && Dice.chance(chance)
 
     override fun execute(actor: Actor, level: Level, target: Actor) {
-        TODO("Not yet implemented")
+
     }
 }

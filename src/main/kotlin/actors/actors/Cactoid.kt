@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.abilities.Leap
+import actors.abilities.Projectile
 import actors.animations.Jump
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
@@ -18,6 +19,7 @@ class Cactoid : NPC() {
     override fun shadowWidth() = 1.2f
     override fun name() = "cactoid"
     override fun description() = "A humanoid-shaped cactus creature with a single blood-red eye."
+    override fun makeAbilities() = setOf(Projectile())
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
     override fun corpse() = null

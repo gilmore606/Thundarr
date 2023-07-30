@@ -12,6 +12,6 @@ class Regenerate(
     override fun shouldQueue(actor: Actor, target: Actor) = false
 
     override fun execute(actor: Actor, level: Level, target: Actor) {
-        TODO("Not yet implemented")
+
     }
 }

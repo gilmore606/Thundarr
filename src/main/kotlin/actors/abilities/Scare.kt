@@ -15,6 +15,6 @@ class Scare(
     override fun shouldQueue(actor: Actor, target: Actor) = (distanceBetween(actor.xy, target.xy) <= range) && Dice.chance(chance)
 
     override fun execute(actor: Actor, level: Level, target: Actor) {
-        TODO("Not yet implemented")
+
     }
 }

@@ -12,6 +12,6 @@ class Bloodsuck : Ability() {
     }
 
     override fun execute(actor: Actor, level: Level, target: Actor) {
-        TODO("Not yet implemented")
+
     }
 }
