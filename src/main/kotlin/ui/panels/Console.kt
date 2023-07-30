@@ -135,7 +135,7 @@ object Console : Panel() {
         if (lines.size > maxLines) {
             lines.removeFirst()
         }
-        resetFloat(line)
+        if (!mouseInside) resetFloat(line)
     }
 
     fun sayFromThread(text: String) {

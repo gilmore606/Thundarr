@@ -369,8 +369,18 @@ object Screen : KtxScreen {
         }
         topModal = topModalFound
         underModal = underModalFound
-        if (topModal == null) {
-            this@Screen.cameraTargetOffset = XYd(0.0, 0.0)
+        val tileWidth = topModal?.let { ((it.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride } ?: 0.0
+        val tileHeight = topModal?.let { ((it.height.toDouble() / (height)) * 2.0) / tileStride } ?: 0.0
+        this.cameraTargetOffset.x = when {
+            Console.mouseInside -> 0.0 - (5.0 * cameraMenuShift)
+            topModal?.position == Modal.Position.LEFT -> 0.0 - (tileWidth / 2.0 * cameraMenuShift)
+            topModal?.position == Modal.Position.RIGHT -> 0.0 + (tileWidth / 2.0 * cameraMenuShift)
+            else -> 0.0
+        }
+        this.cameraTargetOffset.y = when {
+            topModal?.position == Modal.Position.TOP -> 0.0 - (tileHeight / 2.0 * cameraMenuShift)
+            topModal?.position == Modal.Position.BOTTOM -> 0.0 + (tileHeight / 2.0 * cameraMenuShift)
+            else -> 0.0
         }
 
         drawEverything(delta)
@@ -644,15 +654,6 @@ object Screen : KtxScreen {
         addPanel(modal)
         modal.onAdd()
         modal.openSound()?.also { Speaker.ui(it, screenX = modal.x) }
-        val tileWidth = ((modal.width.toDouble() / (width + Panel.RIGHT_PANEL_WIDTH - 16)) * 2.0) * aspectRatio / tileStride
-        val tileHeight = ((modal.height.toDouble() / (height)) * 2.0) / tileStride
-        when (modal.position) {
-            Modal.Position.LEFT -> { this.cameraTargetOffset.x = 0.0 - (tileWidth / 2.0 * cameraMenuShift) }
-            Modal.Position.RIGHT -> { this.cameraTargetOffset.x = 0.0 + (tileWidth / 2.0 * cameraMenuShift) }
-            Modal.Position.TOP -> { this.cameraTargetOffset.y = 0.0 - (tileHeight / 2.0 * cameraMenuShift) }
-            Modal.Position.BOTTOM -> { this.cameraTargetOffset.y = 0.0 + (tileHeight / 2.0 * cameraMenuShift) }
-            else -> { }
-        }
         topModal = modal
     }
 
