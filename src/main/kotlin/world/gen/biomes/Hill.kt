@@ -9,6 +9,9 @@ import things.Thing.Tag.*
 import world.gen.habitats.*
 import world.gen.spawnsets.PlantSet
 
+import actors.actors.NPC.Tag.*
+import world.gen.spawnsets.AnimalSet
+
 @Serializable
 object Hill : Biome(
     Glyph.MAP_HILL,
@@ -52,6 +55,8 @@ object Hill : Biome(
         is TropicalA, TropicalB -> HillPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = HillAnimals.set
 }
 
 object HillPlantsAlpine {
@@ -94,5 +99,15 @@ object HillPlantsTropical {
         add(0.1f, ROCK, 0f, 0.5f)
         add(0.1f, PRICKPEAR, 0f, 0.5f)
         add(0.01f, BLOODCAP_MYCELIUM)
+    }
+}
+
+object HillAnimals {
+    val set = AnimalSet().apply {
+        add(1f, LOSTRICH)
+        add(1f, GECKOID)
+        add(1f, CHARMAN)
+        add(0.2f, MUSKOX)
+        add(0.1f, KILLDAISY)
     }
 }

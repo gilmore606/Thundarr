@@ -14,6 +14,7 @@ class Grizzler : NPC() {
     override fun glyph() = Glyph.DEMONDOG
     override fun name() = "grizzler"
     override fun description() = "A large furry brown predator with glittering yellow eyes and large claws."
+    override fun spawnsInDen() = true
     override fun hpMax() = 30f
     override fun onSpawn() {
         initStats(17, 12, 7, 12, 12, 3, 1)
@@ -29,6 +30,11 @@ class Grizzler : NPC() {
         22.0f,
         5.0f
     )
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
+    override fun aggroRange() = 6f
 
     override fun corpseMeats() = mutableSetOf<Thing>().apply {
         add(RawMeat())

@@ -1,5 +1,6 @@
 package world.gen.biomes
 
+import actors.actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -12,6 +13,8 @@ import world.gen.spawnsets.PlantSet
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 import things.Thing.Tag.*
+import world.gen.spawnsets.AnimalSet
+import actors.actors.NPC.Tag.*
 
 @Serializable
 object Swamp : Biome(
@@ -65,6 +68,8 @@ object Swamp : Biome(
         is TropicalA, TropicalB -> SwampPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = SwampAnimals.set
 }
 
 object SwampPlantsAlpine {
@@ -100,5 +105,15 @@ object SwampPlantsTropical {
         add(1f, WILDFLOWERS)
         add(1f, BLUEBELLS)
         add(1f, LACEMOSS, 0f, 0.8f)
+    }
+}
+
+object SwampAnimals {
+    val set = AnimalSet().apply {
+        add(1f, TORTLE)
+        add(0.5f, TORTLE_BULL)
+        add(1f, TORTLE_YOUNG)
+        add(2f, FROG)
+        add(1f, LAMPREY)
     }
 }

@@ -7,6 +7,7 @@ import world.gen.NoisePatches
 import world.gen.habitats.Habitat
 import world.terrains.Terrain
 
+import actors.actors.NPC.Tag.*
 @Serializable
 object Suburb: Biome(
     Glyph.MAP_SUBURB,

@@ -17,6 +17,7 @@ class Molegull : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "molegull"
     override fun description() = "An angry bird covered in fine blue fur."
+    override fun corpse() = null
     override fun hpMax() = 4f
     override fun onSpawn() {
         initStats(11, 9, 4, 10, 6, 1, 1)

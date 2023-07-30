@@ -37,6 +37,10 @@ class Gator : NPC() {
     override fun skinArmorMaterial() = Clothing.Material.SCALES
     override fun skinArmor() = 2.5f
     override fun idleState() = IdleWander(0.35f)
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
     override fun canWalkOn(terrain: Terrain) = walkableTerrains.contains(terrain)
     override fun canSwimShallow() = true
     override fun canSwimDeep() = true

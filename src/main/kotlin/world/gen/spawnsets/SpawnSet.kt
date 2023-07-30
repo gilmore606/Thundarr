@@ -1,5 +1,6 @@
 package world.gen.spawnsets
 
+import actors.actors.NPC
 import things.Thing
 import util.Dice
 import variants.Variant
@@ -45,6 +46,7 @@ abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
         val variant: Variant<O>? = null
     ) {
         fun spawnThing() = (item as Thing.Tag).spawn()
+        fun spawnNPC() = (item as NPC.Tag).spawn()
     }
 
     val set: MutableSet<Entry<S,O,T>> = mutableSetOf()

@@ -16,6 +16,7 @@ import world.gen.habitats.Habitat
 import world.level.CHUNK_SIZE
 import world.terrains.*
 
+import actors.actors.NPC.Tag.*
 @Serializable
 object Ruins : Biome(
     Glyph.MAP_RUINS,

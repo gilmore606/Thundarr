@@ -8,11 +8,11 @@ import things.Boulder
 import things.WreckedCar
 import util.*
 import world.Chunk
-import world.gen.AnimalSpawn
 import world.gen.NoisePatches
 import world.gen.biomes.*
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.*
+import world.gen.spawnsets.AnimalSet
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
 
@@ -25,6 +25,13 @@ class Rivers(
 
     private val harborChance = 0.8f
     private val lonelyBridgeChance = 0.05f
+
+    companion object {
+        val animalSpawns = AnimalSet().apply {
+            add(1f, NPC.Tag.GATOR)
+            add(1f, NPC.Tag.GECKOID)
+        }
+    }
 
     @Serializable
     class RiverExit(
@@ -232,15 +239,7 @@ class Rivers(
         }
     }
 
-    override fun animalSpawns() = listOf(
-        AnimalSpawn(
-            { NPC.Tag.GATOR },
-            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
-            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            0f, 1000f, 1, 3, (exits.total { it.width.toFloat() } / exits.size) * 0.1f
-        )
-    )
-
+    override fun animalSet(habitat: Habitat) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
         findSpawnPointForNPCType(chunk, animalType, Rect(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1))
 }

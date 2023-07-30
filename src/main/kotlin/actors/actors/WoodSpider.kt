@@ -22,4 +22,8 @@ class WoodSpider : NPC() {
 
     override fun visualRange() = 8f
     override fun idleState() = IdleWander(0.4f)
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
 }

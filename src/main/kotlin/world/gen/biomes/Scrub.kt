@@ -9,6 +9,9 @@ import things.Thing.Tag.*
 import world.gen.habitats.*
 import world.gen.spawnsets.PlantSet
 
+import actors.actors.NPC.Tag.*
+import world.gen.spawnsets.AnimalSet
+
 @Serializable
 object Scrub : Biome(
     Glyph.MAP_SCRUB,
@@ -43,6 +46,8 @@ object Scrub : Biome(
         is TropicalA, TropicalB -> ScrubPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = ScrubAnimals.set
 }
 
 object ScrubPlantsAlpine {
@@ -81,5 +86,15 @@ object ScrubPlantsTropical {
         add(0.8f, WILDFLOWERS)
         add(1f, POPPIES)
         add(0.04f, LIGHTFLOWER, 0.3f, 0.7f, only = TropicalB)
+    }
+}
+
+object ScrubAnimals {
+    val set = AnimalSet().apply {
+        add(0.6f, VOLTELOPE)
+        add(0.6f, VOLTELOPE_FAWN)
+        add(1f, STICKLEBOAR)
+        add(1f, HYENAMAN)
+        add(1f, GLOCUST)
     }
 }

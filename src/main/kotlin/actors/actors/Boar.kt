@@ -25,4 +25,9 @@ class Boar : NPC() {
     override fun visualRange() = 8f
     override fun canSeeInDark() = true
     override fun idleState() = IdleWander(0.4f)
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
+    override fun aggroRange() = 3f
 }

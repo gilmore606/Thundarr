@@ -1,5 +1,6 @@
 package world.gen.cartos
 
+import actors.actors.NPC
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -594,6 +595,15 @@ abstract class Carto(
             biome.plantSet(habitat)?.getPlant(fertility, habitat)?.also { result ->
                 return result.spawnThing()
             }
+        }
+        return null
+    }
+
+    fun getAnimal(
+        biome: Biome, habitat: Habitat, xpLevel: Int
+    ): NPC? {
+        biome.animalSet(habitat)?.getAnimal(xpLevel, habitat)?.also { result ->
+            return result.spawnNPC()
         }
         return null
     }

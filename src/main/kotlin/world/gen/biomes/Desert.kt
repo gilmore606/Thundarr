@@ -14,6 +14,9 @@ import world.gen.habitats.AlpineA
 import world.gen.habitats.AlpineB
 import world.gen.habitats.Garden
 
+import actors.actors.NPC.Tag.*
+import world.gen.spawnsets.AnimalSet
+
 @Serializable
 object Desert : Biome(
     Glyph.MAP_DESERT,
@@ -54,6 +57,8 @@ object Desert : Biome(
         is AlpineA, AlpineB -> DesertPlantsAlpine.set
         else -> DesertPlants.set
     }
+
+    override fun animalSet(habitat: Habitat) = DesertAnimals.set
 }
 
 object DesertPlantsAlpine {
@@ -77,5 +82,15 @@ object DesertPlants {
         add(1f, PRICKPEAR, 0.5f)
         add(0.7f, BOULDER, 0f, 0.6f)
         add(0.7f, ROCK, 0f, 0.5f)
+    }
+}
+
+object DesertAnimals {
+    val set = AnimalSet().apply {
+        add(1f, GRUB)
+        add(1f, CACTOID)
+        add(1f, SCORPION)
+        add(0.3f, GLOCUST)
+        add(0.3f, HYENAMAN)
     }
 }

@@ -13,6 +13,7 @@ import world.gen.AnimalSpawnSource
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
+import world.gen.spawnsets.AnimalSet
 import world.gen.spawnsets.PlantSet
 import world.level.CHUNK_SIZE
 import world.terrains.Terrain
@@ -48,6 +49,7 @@ sealed class Biome(
     open fun plantDensity() = 1.0f
     open fun fertilityAt(x: Int, y: Int) = NoisePatches.get("plantsBasic", x, y).toFloat()
     open fun plantSet(habitat: Habitat): PlantSet? = null
+    open fun animalSet(habitat: Habitat): AnimalSet? = null
 
     open fun postBlendProcess(carto: WorldCarto, dir: Rect) { }
     open fun postProcess(carto: WorldCarto) { }

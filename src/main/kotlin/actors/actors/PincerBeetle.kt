@@ -2,10 +2,12 @@ package actors.actors
 
 import actors.animations.Slide
 import actors.states.IdleWander
+import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
 import util.XY
 
+@Serializable
 class PincerBeetle : NPC() {
 
     override val tag = Tag.PINCER_BEETLE
@@ -27,4 +29,8 @@ class PincerBeetle : NPC() {
 
     override fun visualRange() = 8f
     override fun idleState() = IdleWander(0.4f)
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
 }

@@ -1,5 +1,6 @@
 package world.gen.biomes
 
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import world.gen.NoisePatches
@@ -8,6 +9,8 @@ import world.gen.spawnsets.PlantSet
 import world.terrains.Terrain
 import things.Thing.Tag.*
 import world.gen.habitats.*
+import world.gen.spawnsets.AnimalSet
+import actors.actors.NPC.Tag.*
 
 @Serializable
 object Plain : Biome(
@@ -43,6 +46,8 @@ object Plain : Biome(
         is TropicalA, TropicalB -> PlainPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = PlainAnimals.set
 }
 
 object PlainPlantsAlpine {
@@ -104,5 +109,15 @@ object PlainPlantsTropical {
         add(0.03f, DEATHFLOWER, 0.2f, only = TropicalB)
         add(0.01f, DREAMFLOWER, 0.2f, only = TropicalA)
         add(0.03f, DREAMFLOWER, 0.2f, only = TropicalB)
+    }
+}
+
+object PlainAnimals {
+    val set = AnimalSet().apply {
+        add(1f, AUROX)
+        add(1f, MUSKOX)
+        add(1f, KILLDAISY)
+        add(0.3f, VOLTELOPE)
+        add(0.3f, GECKOID)
     }
 }

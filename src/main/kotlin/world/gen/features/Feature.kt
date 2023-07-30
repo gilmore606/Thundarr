@@ -9,11 +9,12 @@ import things.WoodDoor
 import util.*
 import world.Chunk
 import world.ChunkMeta
-import world.gen.AnimalSpawn
 import world.gen.AnimalSpawnSource
 import world.gen.biomes.Biome
 import world.gen.cartos.WorldCarto
 import world.gen.decors.*
+import world.gen.habitats.Habitat
+import world.gen.spawnsets.AnimalSet
 import world.level.Level
 import world.quests.Quest
 import world.terrains.Terrain
@@ -27,7 +28,6 @@ sealed class Feature : AnimalSpawnSource {
     enum class Stage { TERRAIN, BUILD }
 
     open fun preventBiomeAnimalSpawns() = false
-    open fun animalSpawns(): List<AnimalSpawn> = listOf()
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = null
 
     open fun canBeQuestDestination() = false
@@ -40,6 +40,9 @@ sealed class Feature : AnimalSpawnSource {
     open fun xpValue() = 1
 
     open fun temperatureMod() = 0
+
+    open fun animalSet(habitat: Habitat): AnimalSet? = null
+    open fun animalSpawnCount() = Dice.oneTo(3)
 
     var worldX = 0
     var worldY = 0

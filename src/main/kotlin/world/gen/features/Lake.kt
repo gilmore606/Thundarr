@@ -8,9 +8,9 @@ import util.Rect
 import util.XY
 import world.Chunk
 import world.ChunkScratch
-import world.gen.AnimalSpawn
 import world.gen.biomes.*
 import world.gen.habitats.*
+import world.gen.spawnsets.AnimalSet
 import world.level.CHUNK_SIZE
 import world.quests.FetchQuest
 import world.terrains.Terrain
@@ -35,6 +35,10 @@ class Lake(
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome !in listOf(Ocean, Glacier, Desert)
+
+        val animalSpawns = AnimalSet().apply {
+            add(1f, NPC.Tag.GATOR)
+        }
     }
 
 
@@ -92,15 +96,7 @@ class Lake(
         printGrid(growBlob(width, height), x, y, Terrain.Type.TEMP1)
     }
 
-    override fun animalSpawns() = listOf(
-        AnimalSpawn(
-            { NPC.Tag.GATOR },
-            setOf(Mountain, Hill, ForestHill, Desert, Forest, Plain, Swamp),
-            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            0f, 1000f, 1, 3, 0.5f
-        )
-    )
-
+    override fun animalSet(habitat: Habitat) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
         findSpawnPointForNPCType(chunk, animalType, bounds)
 }

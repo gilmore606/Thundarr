@@ -11,6 +11,9 @@ import world.gen.spawnsets.PlantSet
 import world.terrains.Terrain
 import things.Thing.Tag.*
 
+import actors.actors.NPC.Tag.*
+import world.gen.spawnsets.AnimalSet
+
 @Serializable
 object Forest : Biome(
     Glyph.MAP_FOREST,
@@ -54,6 +57,8 @@ object Forest : Biome(
         is TropicalA, TropicalB -> ForestPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = ForestAnimals.set
 }
 
 object ForestPlantsAlpine {
@@ -99,5 +104,14 @@ object ForestPlantsTropical {
         add(0.6f, BLUEBELLS)
         add(0.4f, POPPIES)
         add(0.2f, LACEMOSS, 0.3f, 0.6f)
+    }
+}
+
+object ForestAnimals {
+    val set = AnimalSet().apply {
+        add(1f, BOAR)
+        add(1f, WOOD_SPIDER)
+        add(0.2f, KILLDAISY)
+        add(1f, PINCER_BEETLE)
     }
 }

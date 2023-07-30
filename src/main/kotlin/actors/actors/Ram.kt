@@ -29,4 +29,9 @@ class Ram : NPC() {
 
     override fun visualRange() = 9f
     override fun idleState() = IdleWander(0.6f)
+    override fun opinionOf(actor: Actor) = when {
+        actor.isSentient() -> Opinion.HATE
+        else -> super.opinionOf(actor)
+    }
+    override fun aggroRange() = 3f
 }

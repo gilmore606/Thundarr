@@ -14,6 +14,7 @@ class Killdaisy : NPC() {
     override fun glyph() = Glyph.KILLDAISY
     override fun name() = "killdaisy"
     override fun description() = "A large floppy white flower blossom, brought to hideous life by unknown sorcery."
+    override fun corpse() = null
     override fun canSwimShallow() = true
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun hpMax() = 6f

@@ -8,10 +8,10 @@ import util.*
 import world.Chunk
 import world.ChunkScratch
 import world.NaturalCavern
-import world.gen.AnimalSpawn
 import world.gen.Metamap
 import world.gen.biomes.*
 import world.gen.habitats.*
+import world.gen.spawnsets.AnimalSet
 import world.quests.FetchQuest
 import world.terrains.Terrain
 
@@ -26,6 +26,10 @@ class Caves : Feature() {
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
                 && meta.biome in listOf(Mountain, Hill, ForestHill, Desert)
+
+        val animalSpawns = AnimalSet().apply {
+            add(1f, NPC.Tag.GRIZZLER)
+        }
     }
 
     private val cavePortalChance = 0.15f
@@ -112,14 +116,7 @@ class Caves : Feature() {
     override fun mapPOITitle() = if (hasCavern) "cavern" else null
     override fun mapPOIDescription() = if (hasCavern) "An underground cave system." else null
 
-    override fun animalSpawns() = listOf(
-        AnimalSpawn(
-            { NPC.Tag.GRIZZLER },
-            setOf(Mountain, Hill, ForestHill, Desert),
-            setOf(TemperateA, TemperateB, TropicalA, TropicalB, AlpineA, AlpineB),
-            0f, 1000f, 1, 1, 1f
-        )
-    )
-
+    override fun animalSpawnCount() = 1
+    override fun animalSet(habitat: Habitat) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = cavePoints.randomOrNull()
 }

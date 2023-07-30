@@ -18,6 +18,7 @@ class Grub : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "grub"
     override fun description() = "A huge yellowish insect grub."
+    override fun corpse() = null
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

@@ -10,6 +10,9 @@ import things.Thing.Tag.*
 import world.gen.habitats.*
 import world.gen.spawnsets.PlantSet
 
+import actors.actors.NPC.Tag.*
+import world.gen.spawnsets.AnimalSet
+
 @Serializable
 object Mountain : Biome(
     Glyph.MAP_MOUNTAIN,
@@ -51,6 +54,8 @@ object Mountain : Biome(
         is TropicalA, TropicalB -> MountainPlantsTropical.set
         else -> null
     }
+
+    override fun animalSet(habitat: Habitat) = MountainAnimals.set
 }
 
 object MountainPlantsAlpine {
@@ -87,5 +92,14 @@ object MountainPlantsTropical {
         add(0.3f, THORNBUSH, 0.5f)
         add(0.1f, BALMMOSS, 0.5f)
         add(0.3f, BLOODCAP_MYCELIUM, 0.5f)
+    }
+}
+
+object MountainAnimals {
+    val set = AnimalSet().apply {
+        add(1f, RAM)
+        add(1f, MOLEGULL)
+        add(1f, TICK)
+        add(0.3f, GECKOID)
     }
 }

@@ -4,13 +4,12 @@ import App
 import things.NPCDen
 import util.*
 import world.*
-import world.gen.AnimalSpawn
 import world.gen.AnimalSpawnSource
 import world.gen.Metamap
-import world.gen.animalSpawns
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
 import world.gen.features.Feature
+import world.gen.spawnsets.AnimalSet
 import world.level.CHUNK_SIZE
 import world.level.Level
 import world.terrains.Terrain
@@ -129,37 +128,41 @@ class WorldCarto(
     }
 
     private fun spawnAnimals() {
-        var groupsSpawned = 0
+        var spawned = 0
         // Spawn for chunk features
         var spawnForBiomes = true
         meta.features().forEach { feature ->
-            groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, feature.animalSpawns(), feature)
+            feature.animalSet(meta.habitat)?.also { featureAnimals ->
+                spawned = spawnAnimalsFrom(spawned, featureAnimals, feature, feature.animalSpawnCount())
+            }
             spawnForBiomes = spawnForBiomes && !feature.preventBiomeAnimalSpawns()
         }
         // Spawn for general biome/habitat
         if (spawnForBiomes) {
-            groupsSpawned = spawnAnimalsFromGroups(groupsSpawned, animalSpawns())
+            meta.biome.animalSet(meta.habitat)?.also { biomeAnimals ->
+                spawned = spawnAnimalsFrom(spawned, biomeAnimals, meta.biome)
+            }
         }
     }
 
-    private fun spawnAnimalsFromGroups(groupsSpawned: Int, groupsPool: List<AnimalSpawn>, source: AnimalSpawnSource? = null): Int {
-        val maxGroups = 2
-        var spawned = groupsSpawned
-        val pool = groupsPool.filter {
-            it.biomes.contains(meta.biome) &&
-                it.habitats.contains(meta.habitat) &&
-                meta.threatLevel >= it.minThreat && meta.threatLevel <= it.maxThreat
-        }.shuffled()
-        pool.forEach { group ->
-            if (spawned < maxGroups && Dice.chance(group.frequency)) {
-                repeat(Dice.range(group.min, group.max)) {
-                    val animalType = group.tag.invoke()
-                    (source ?: meta.biome).animalSpawnPoint(chunk, animalType)?.also { location ->
-                        spawnThing(location.x, location.y, NPCDen(animalType))
+    private fun spawnAnimalsFrom(spawnedSoFar: Int, pool: AnimalSet, source: AnimalSpawnSource, limit: Int = Int.MAX_VALUE): Int {
+        val maxAnimalSpawns = Dice.range(2, 6)
+        var spawned = spawnedSoFar
+        var spawnedThisTime = 0
+        var tries = 0
+        while (spawned < maxAnimalSpawns && spawnedThisTime < limit && tries < 20) {
+            pool.getAnimal(meta.threatLevel, meta.habitat)?.spawnNPC()?.also { animal ->
+                source.animalSpawnPoint(chunk, animal.tag)?.also { location ->
+                    if (animal.spawnsInDen()) {
+                        spawnThing(location.x, location.y, NPCDen(animal.tag))
+                    } else {
+                        animal.spawnAt(level, location.x, location.y)
                     }
+                    spawned++
+                    spawnedThisTime++
                 }
-                spawned++
             }
+            tries++
         }
         return spawned
     }
