@@ -76,8 +76,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
     val factions = initialFactions()
 
-    open fun initialAbilities(): Set<Ability> = setOf()
-    val abilities = initialAbilities()
+    open fun makeAbilities(): Set<Ability> = setOf()
+    val abilities = makeAbilities()
     fun getAbility(id: String) = abilities.firstOrNull { it.id == id }
 
     val queuedActions: MutableList<Action> = mutableListOf()
@@ -451,6 +451,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         }
         this.animation = null
         Pather.unsubscribeAll(this)
+        abilities.forEach { it.onDie(this) }
         moveTo(null, 0, 0)
     }
 
@@ -478,6 +479,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun advanceTime(delta: Float) {
         statuses.safeForEach { it.advanceTime(this, delta) }
         statuses.filterAnd({ it.done }) { onRemoveStatus(it) }
+
+        abilities.forEach { it.advanceTime(this, delta) }
     }
 
     fun addStatus(status: Status) {

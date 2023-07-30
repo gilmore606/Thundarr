@@ -29,4 +29,6 @@ sealed class Ability {
 
     abstract fun execute(actor: Actor, level: Level, target: Actor)
 
+    open fun advanceTime(actor: Actor, delta: Float) { }
+    open fun onDie(actor: Actor) { }
 }

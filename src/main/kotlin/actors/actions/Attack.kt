@@ -38,9 +38,7 @@ class Attack(
             val canActivelyDefend = target.canActivelyDefend(actor)
 
             val mySkill = Fight.get(actor) + weapon.skill().get(actor)
-            val hisSkill = if (canActivelyDefend) {
-                                Fight.get(target) + targetWeapon.skill().get(target)
-                            } else 0f
+            val hisSkill = if (canActivelyDefend) Fight.get(target) else 0f
 
             val difficulty = (actor.xpLevel - target.xpLevel) / 2 +
                     (mySkill - hisSkill) / 2 +

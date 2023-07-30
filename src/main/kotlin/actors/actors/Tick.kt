@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.abilities.Bloodsuck
 import actors.animations.Jump
 import actors.bodyparts.Bodypart
 import actors.states.IdleWander
@@ -17,6 +18,7 @@ class Tick : NPC() {
     override fun name() = "tick"
     override fun description() = "A large bloated insect with tiny red eyes and many legs."
     override fun makeBody() = Bodypart.blob()
+    override fun makeAbilities() = setOf(Bloodsuck())
     override fun corpse() = null
     override fun xpValue() = 15
     override fun hpMax() = 5f

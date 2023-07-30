@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.abilities.Regenerate
 import actors.bodyparts.Bodypart
 import actors.states.IdleHerd
 import actors.stats.Brains
@@ -9,6 +10,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
 import things.Container
+import things.RawMeat
 import things.ScalyHide
 
 @Serializable
@@ -19,6 +21,8 @@ class Salaman : NPC() {
     override fun name() = "salaman"
     override fun description() = "A man-sized red salamander.  A curiously human face bobs at the end of its long neck."
     override fun makeBody() = Bodypart.quadruped()
+    override fun makeAbilities() = setOf(Regenerate())
+    override fun corpseMeats() = setOf(RawMeat(), ScalyHide())
     override fun canSwimShallow() = true
     override fun xpValue() = 40
     override fun hpMax() = 14f
@@ -35,6 +39,4 @@ class Salaman : NPC() {
         21.0f,
         7.0f
     )
-
-    override fun corpseMeats() = setOf(ScalyHide())
 }

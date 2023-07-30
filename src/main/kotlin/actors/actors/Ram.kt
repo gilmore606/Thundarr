@@ -1,11 +1,14 @@
 package actors.actors
 
+import actors.abilities.Rushdown
 import actors.animations.Jump
 import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
+import things.FurHide
+import things.RawMeat
 import util.XY
 
 @Serializable
@@ -19,6 +22,8 @@ class Ram : NPC() {
     override fun name() = "ram"
     override fun description() = "A stout goaty creature with blue wool and curled horns."
     override fun makeBody() = Bodypart.quadruped()
+    override fun makeAbilities() = setOf(Rushdown())
+    override fun corpseMeats() = setOf(RawMeat(), FurHide())
     override fun xpValue() = 25
     override fun hpMax() = 8f
     override fun onSpawn() {

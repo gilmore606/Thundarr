@@ -9,6 +9,7 @@ import actors.stats.skills.Dodge
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Container
+import things.Hide
 import things.RawMeat
 import things.Thing
 import util.Dice
@@ -40,6 +41,7 @@ class Voltelope : GenericVoltelope() {
     override val tag = Tag.VOLTELOPE
     override fun name() = "voltelope"
     override fun description() = "A large ruminant beast with two branching yellow horns."
+    override fun corpseMeats() = super.corpseMeats().apply { add(Hide()) }
     override fun xpValue() = 20
     override fun hpMax() = 8f
     override fun skinArmor() = 1f

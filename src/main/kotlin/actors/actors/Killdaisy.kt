@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.abilities.Deathburst
 import actors.animations.Jump
 import actors.bodyparts.Bodypart
 import actors.bodyparts.Petals
@@ -10,6 +11,7 @@ import render.sparks.GooGore
 import render.tilesets.Glyph
 import things.Clothing
 import things.Log
+import things.Stick
 import util.XY
 import world.stains.Goo
 
@@ -20,7 +22,9 @@ class Killdaisy : NPC() {
     override fun name() = "killdaisy"
     override fun description() = "A large floppy white flower blossom, brought to hideous life by unknown sorcery."
     override fun makeBody() = setOf(Trunk(), Petals())
+    override fun makeAbilities() = setOf(Deathburst())
     override fun corpse() = null
+    override fun corpseMeats() = setOf(Stick())
     override fun canSwimShallow() = true
     override fun bloodstain() = null
     override fun gore() = GooGore()

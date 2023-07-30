@@ -31,7 +31,7 @@ class Glocust : NPC() {
     override fun onSpawn() {
         initStats(9, 9, 3, 8, 6, 1, 0)
     }
-    override fun initialAbilities() = setOf(Leap(3))
+    override fun makeAbilities() = setOf(Leap(3))
     override fun unarmedWeapon() = mandibles
     override fun unarmedDamage() = 4f
     override fun skinArmorMaterial() = Clothing.Material.SHELL

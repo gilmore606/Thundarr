@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.abilities.Bloodsuck
 import actors.animations.Slide
 import actors.bodyparts.Bodypart
 import actors.states.IdleWander
@@ -18,6 +19,7 @@ class Lamprey : NPC() {
     override fun name() = "lamprey"
     override fun description() = "A writhing flesh tube with a gaping toothy mouth hole.  Ugh."
     override fun makeBody() = Bodypart.serpent()
+    override fun makeAbilities() = setOf(Bloodsuck())
     override fun xpValue() = 20
     override fun hpMax() = 6f
     override fun onSpawn() {

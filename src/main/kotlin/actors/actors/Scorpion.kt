@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.abilities.Leap
+import actors.abilities.Sting
 import actors.animations.Jump
 import actors.bodyparts.*
 import actors.states.IdleWander
@@ -23,6 +24,7 @@ class Scorpion : NPC() {
     override fun name() = "scorpion"
     override fun description() = "A dog-sized purple scorpion."
     override fun makeBody() = setOf(Head(), Torso(), Stinger(), Legs())
+    override fun makeAbilities() = setOf(Sting())
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
     override fun corpse() = BugCorpse()

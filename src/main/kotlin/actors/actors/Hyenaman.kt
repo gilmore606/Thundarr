@@ -1,9 +1,11 @@
 package actors.actors
 
+import actors.abilities.Steal
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
+import things.Hide
 
 @Serializable
 class Hyenaman : NPC() {
@@ -11,6 +13,8 @@ class Hyenaman : NPC() {
     override fun glyph() = Glyph.HYENAMAN
     override fun name() = "hyenaman"
     override fun description() = "A yellow-furred canine-faced humanoid with beady red eyes, clad in raw hides."
+    override fun corpseMeats() = setOf(Hide())
+    override fun makeAbilities() = setOf(Steal())
     override fun isSentient() = true
     override fun xpValue() = 25
     override fun hpMax() = 9f

@@ -6,6 +6,7 @@ import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Clothing
+import things.RawMeat
 import util.XY
 
 @Serializable
@@ -18,6 +19,7 @@ class Lostrich : NPC() {
     override fun name() = "lostrich"
     override fun description() = "A tall flightless bird.  Both its heads stare at you from serpentine necks."
     override fun makeBody() = setOf(Head(2), Body(), Legs())
+    override fun corpseMeats() = setOf(RawMeat())
     override fun xpValue() = 25
     override fun hpMax() = 8f
     override fun onSpawn() {
