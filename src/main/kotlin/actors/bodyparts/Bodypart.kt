@@ -13,7 +13,8 @@ sealed class Bodypart(
     val name: String,
     val size: Float,
     val toHit: Int,
-    val gearSlot: Gear.Slot? = null
+    val gearSlot: Gear.Slot? = null,
+    val stunOnCrush: Boolean = false,
 ) {
 
     companion object {
@@ -54,7 +55,8 @@ sealed class Bodypart(
 class Head(
     val count: Int = 1
 ) : Bodypart(
-    if (count < 2) "head" else "heads", 0.2f, -3, Gear.Slot.HEAD
+    if (count < 2) "head" else "heads", 0.2f, -3, Gear.Slot.HEAD,
+    stunOnCrush = true
 )
 
 @Serializable
@@ -106,7 +108,8 @@ class Wings : Bodypart(
 
 @Serializable
 class Eyeball : Bodypart(
-    "eyeball", 1f, 0, Gear.Slot.HEAD
+    "eyeball", 1f, 0, Gear.Slot.HEAD,
+    stunOnCrush = true
 )
 
 @Serializable

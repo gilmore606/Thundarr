@@ -5,7 +5,9 @@ import actors.bodyparts.Bodypart
 import actors.stats.Heart
 import actors.stats.Stat
 import actors.stats.skills.*
+import actors.statuses.Bleeding
 import actors.statuses.Status
+import actors.statuses.Stunned
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -18,28 +20,58 @@ import world.terrains.Terrain
 @Serializable
 enum class Damage(
     val displayName: String,
+    val bleedChance: Float,
 ) {
-    CRUSH("crush"),
+    CRUSH("crush", 0.1f) {
+        override fun onDamage(target: Actor, bodypart: Bodypart?, amount: Float) {
+            if (bodypart?.stunOnCrush == true) {
+                val chance = (amount / target.hpMax()) * 1.5f
+                if (Dice.chance(chance)) target.addStatus(Stunned())
+            }
+        }
+    },
 
-    CUT("cut"),
+    CUT("cut", 0.5f) {
+        override fun onDamage(target: Actor, bodypart: Bodypart?, amount: Float) {
+            checkBleed(target, bodypart, amount)
+        }
+    },
 
-    PIERCE("pierce"),
+    PIERCE("pierce", 0.3f) {
+        override fun onDamage(target: Actor, bodypart: Bodypart?, amount: Float) {
+            checkBleed(target, bodypart, amount)
+        }
+    },
 
-    BURN("burn"),
+    BURN("burn", 0f),
 
-    SHOCK("shock") {
+    SHOCK("shock", 0f) {
         override fun addDamage(target: Actor, bodypart: Bodypart, amount: Float): Float {
             if (target.hasStatus(Status.Tag.WET)) {
                 return amount * 1.5f
             }
             return amount
         }
+        override fun onDamage(target: Actor, bodypart: Bodypart?, amount: Float) {
+            val shockChance = (amount / target.hpMax())
+            if (Dice.chance(shockChance)) target.addStatus(Stunned())
+        }
     },
 
-    CORRODE("corrode"),
+    CORRODE("corrode", 0f),
 
     ;
+
+    fun checkBleed(target: Actor, bodypart: Bodypart?, amount: Float) {
+        val chance = (amount / target.hpMax())
+        if (Dice.chance(chance)) {
+            val perTick = (target.hpMax() / 20f) * Dice.float(0.5f, 1.5f)
+            target.addStatus(Bleeding(perTick))
+        }
+    }
+
     open fun addDamage(target: Actor, bodypart: Bodypart, amount: Float): Float = amount
+    open fun onDamage(target: Actor, bodypart: Bodypart?, amount: Float) { }
 }
 
 

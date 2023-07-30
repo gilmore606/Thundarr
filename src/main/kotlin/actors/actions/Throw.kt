@@ -9,6 +9,8 @@ import kotlinx.serialization.Serializable
 import render.sparks.Projectile
 import render.sparks.ProjectileShadow
 import render.sparks.Smoke
+import things.Damage
+import things.MeleeWeapon
 import things.Smashable
 import things.Thing
 import ui.panels.Console
@@ -65,7 +67,7 @@ class Throw(
             if (result >= 0) {
                 Console.sayAct("%Di hits %dd!", "%Dn throws %ii at %dd, hitting %do!", actor, target, thing)
                 val damage = thing.thrownDamage(actor, result)
-                target.receiveDamage(damage, actor)
+                target.receiveDamage(damage, if (thing is MeleeWeapon) thing.damageType() else Damage.CRUSH, target.randomBodypart(), actor)
                 thing.onThrownOn(target)
                 return
             } else {

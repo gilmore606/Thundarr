@@ -399,9 +399,9 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
     }
 
-    fun receiveDamage(amount: Float, attacker: Actor? = null, internal: Boolean = false) {
+    fun receiveDamage(amount: Float, type: Damage? = null, bodypart: Bodypart? = null, attacker: Actor? = null, internal: Boolean = false) {
         if (!internal) {
-            if (Dice.chance(bleedChance() * amount * 0.35f)) {
+            if (Dice.chance(bleedChance() * amount * (type?.bleedChance ?: 0.3f))) {
                 bloodstain()?.also { stain ->
                     level?.addStain(stain, xy.x, xy.y)
                     if (Dice.chance(0.2f * amount)) {
@@ -423,6 +423,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         if (hp < 1) {
             die()
             attacker?.also { onKilledBy(it) }
+        } else {
+            type?.onDamage(this, bodypart, amount)
         }
     }
 

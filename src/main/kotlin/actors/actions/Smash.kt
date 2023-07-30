@@ -9,6 +9,7 @@ import actors.statuses.Stunned
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.sparks.Smoke
+import things.Damage
 import things.Smashable
 import things.Thing
 import ui.panels.Console
@@ -46,7 +47,7 @@ class Smash(
                             actor.addStatus(Dazed())
                         }
                         if (Dice.chance(0.3f)) {
-                            actor.receiveDamage(Dice.float(1f, 3f))
+                            actor.receiveDamage(Dice.float(1f, 3f), Damage.CRUSH, actor.randomBodypart())
                         }
                         target.onSmashFail()
                     }

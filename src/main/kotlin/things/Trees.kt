@@ -28,7 +28,7 @@ sealed class Tree : Plant() {
                         logVictim?.also { victim ->
                             if (Dodge.resolve(victim, 0f) < 0f) {
                                 Console.sayAct("Ow!  The falling branches hit you!", "The falling timber collides with %dn!", victim)
-                                victim.receiveDamage(Dice.float(1f, 5f))
+                                victim.receiveDamage(Dice.float(1f, 5f), Damage.CRUSH, victim.randomBodypart())
                             }
                         }
                         log.moveTo(level, x, y)

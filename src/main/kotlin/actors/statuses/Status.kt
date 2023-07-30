@@ -42,7 +42,7 @@ sealed class Status : StatEffector {
         BURDENED, ENCUMBERED,
         WET, COLD, FREEZING, HOT, HEATSTROKE,
         SATIATED, HUNGRY, STARVING,
-        WIRED, DAZED, STUNNED, ASLEEP, BANDAGED, SICK
+        WIRED, DAZED, BLEEDING, STUNNED, ASLEEP, BANDAGED, SICK
     }
 
     abstract fun description(): String
@@ -231,7 +231,7 @@ class Heatstroke(): Status() {
     override fun advanceTime(actor: Actor, delta: Float) {
         if (Dice.chance(0.04f * delta)) {
             Console.say("You're dying of heatstroke!")
-            actor.receiveDamage(1f, internal = true)
+            actor.receiveDamage(1f,  internal = true)
         }
     }
 }
@@ -390,6 +390,25 @@ class Sick(): TimeStatus() {
             return true
         }
         return false
+    }
+}
+
+@Serializable
+class Bleeding(
+    val hpPerTick: Float
+) : TimeStatus() {
+    override val tag = Tag.BLEEDING
+    override fun name() = "bleeding"
+    override fun description() = "You're losing blood fast!"
+    override fun onAddMsg() = "You're bleeding out!"
+    override fun onAddOtherMsg() = "%Dn's wounds gush blood."
+    override fun panelTag() = "bleed"
+    override fun panelTagColor() = tagColors[TagColor.FATAL]!!
+    override fun duration() = 1f
+    override fun maxDuration() = 10f
+    override fun advanceTime(actor: Actor, delta: Float) {
+        super.advanceTime(actor, delta)
+        actor.receiveDamage(hpPerTick * delta, internal = true)
     }
 }
 

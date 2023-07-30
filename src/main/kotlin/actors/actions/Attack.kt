@@ -97,7 +97,7 @@ class Attack(
                         // DAMAGE INFLICTED
                         level.addSpark(Pow().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
                         Speaker.world(weapon.hitSound(), source = actor.xy)
-                        target.receiveDamage(damage, actor)
+                        target.receiveDamage(damage, weapon.damageType(), bodypart, actor)
                         if (target.isAlive()) {
                             Console.sayAct(partSub(weapon.hitSelfMsg(), bodypart), partSub(weapon.hitOtherMsg(), bodypart), actor, target, weapon)
                         } else {
