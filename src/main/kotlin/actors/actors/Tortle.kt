@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleHerd
 import actors.stats.Brains
 import actors.stats.Speed
@@ -12,6 +13,7 @@ import things.Clothing
 sealed class GenericTortle : NPC() {
     override fun glyph() = Glyph.TORTLE
     override fun shadowWidth() = 1.4f
+    override fun makeBody() = Bodypart.quadruped()
     override fun skinArmorMaterial() = Clothing.Material.SHELL
     override fun unarmedWeapon() = hooves
     override fun idleState() = IdleHerd(
@@ -27,6 +29,7 @@ class YoungTortle : GenericTortle() {
     override fun hue() = 0.9f
     override fun name() = "young tortle"
     override fun description() = "A large tortoise with a large raised head and sharp horns."
+    override fun xpValue() = 20
     override fun hpMax() = 10f
     override fun onSpawn() {
         xpLevel = 1
@@ -41,6 +44,7 @@ class Tortle : GenericTortle() {
     override val tag = Tag.TORTLE
     override fun name() = "tortle"
     override fun description() = "A large tortoise with a large raised head and sharp horns."
+    override fun xpValue() = 35
     override fun hpMax() = 14f
     override fun onSpawn() {
         xpLevel = 2
@@ -56,6 +60,7 @@ class BullTortle : GenericTortle() {
     override fun hue() = -0.8f
     override fun name() = "bull tortle"
     override fun description() = "A huge tortoise with a large raised head, sharp horns, and a gray crest."
+    override fun xpValue() = 70
     override fun hpMax() = 18f
     override fun onSpawn() {
         xpLevel = 3

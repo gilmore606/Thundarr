@@ -2,6 +2,7 @@ package actors.actors
 
 import actors.abilities.Leap
 import actors.animations.Jump
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.sparks.GooGore
@@ -21,9 +22,11 @@ class Glocust : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "glocust"
     override fun description() = "A large leaping insect, which emits a phosphorescent glow."
+    override fun makeBody() = Bodypart.quadruped()
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
     override fun corpse() = BugCorpse()
+    override fun xpValue() = 20
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 3, 8, 6, 1, 0)

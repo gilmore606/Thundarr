@@ -99,8 +99,12 @@ class Attack(
                         // DAMAGE INFLICTED
                         level.addSpark(Pow().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
                         Speaker.world(weapon.hitSound(), source = actor.xy)
-                        Console.sayAct(partSub(weapon.hitSelfMsg(), bodypart), partSub(weapon.hitOtherMsg(), bodypart), actor, target, weapon)
                         target.receiveDamage(damage, actor)
+                        if (target.isAlive()) {
+                            Console.sayAct(partSub(weapon.hitSelfMsg(), bodypart), partSub(weapon.hitOtherMsg(), bodypart), actor, target, weapon)
+                        } else {
+                            Console.sayAct("You kill %dd!", "%Dn kills dd!", actor, target)
+                        }
                     }
                 }
             }

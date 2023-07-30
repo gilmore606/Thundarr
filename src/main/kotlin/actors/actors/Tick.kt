@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.animations.Jump
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -15,7 +16,9 @@ class Tick : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "tick"
     override fun description() = "A large bloated insect with tiny red eyes and many legs."
+    override fun makeBody() = Bodypart.blob()
     override fun corpse() = null
+    override fun xpValue() = 15
     override fun hpMax() = 5f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

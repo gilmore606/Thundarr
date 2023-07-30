@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.animations.Jump
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -17,6 +18,8 @@ class Ram : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "ram"
     override fun description() = "A stout goaty creature with blue wool and curled horns."
+    override fun makeBody() = Bodypart.quadruped()
+    override fun xpValue() = 25
     override fun hpMax() = 8f
     override fun onSpawn() {
         initStats(11, 9, 4, 10, 6, 1, 0)

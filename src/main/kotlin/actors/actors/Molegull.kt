@@ -2,6 +2,7 @@ package actors.actors
 
 import actors.animations.Jump
 import actors.animations.Slide
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -17,7 +18,9 @@ class Molegull : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "molegull"
     override fun description() = "An angry bird covered in fine blue fur."
+    override fun makeBody() = Bodypart.bird()
     override fun corpse() = null
+    override fun xpValue() = 20
     override fun hpMax() = 4f
     override fun onSpawn() {
         initStats(11, 9, 4, 10, 6, 1, 1)

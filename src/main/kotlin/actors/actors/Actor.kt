@@ -26,6 +26,7 @@ import world.level.Level
 import world.journal.JournalEntry
 import path.Pather
 import path.StepMap
+import things.Branches
 import world.stains.Blood
 import world.stains.Fire
 import world.stains.Stain
@@ -85,9 +86,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     var hp: Float = 1f
     open fun hpMax(): Float = 20f
     fun healthiness() = (hp / hpMax())
+    fun isAlive() = (hp > 0f)
 
-    val bodyparts: Set<Bodypart> = initialBodyparts()
-    open fun initialBodyparts() = Bodypart.humanoid()
+    val bodyparts: Set<Bodypart> = makeBody()
+    open fun makeBody() = Bodypart.humanoid()
 
     open fun skinArmor() = 0f
     open fun skinArmorMaterial() = Clothing.Material.HIDE

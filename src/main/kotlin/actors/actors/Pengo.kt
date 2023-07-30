@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.animations.Jump
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -12,6 +13,7 @@ class Pengo : NPC() {
     override fun glyph() = Glyph.PENGUIN
     override fun name() = "pengo"
     override fun description() = "A squat, fat flightless bird.  It's very well dressed."
+    override fun makeBody() = Bodypart.bird()
     override fun hpMax() = 8f
     override fun onSpawn() {
         initStats(11, 9, 4, 10, 6, 1, 0)

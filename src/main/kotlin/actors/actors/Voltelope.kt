@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleHerd
 import actors.stats.Brains
 import actors.stats.Speed
@@ -17,6 +18,7 @@ sealed class GenericVoltelope : NPC() {
     override fun glyph() = Glyph.VOLTELOPE
     override fun name() = "voltelope"
     override fun shadowWidth() = 1.7f
+    override fun makeBody() = Bodypart.quadruped()
     override fun onSpawn() {
         initStats(8, 14, 6, 13, 8, 1, 2)
     }
@@ -38,6 +40,7 @@ class Voltelope : GenericVoltelope() {
     override val tag = Tag.VOLTELOPE
     override fun name() = "voltelope"
     override fun description() = "A large ruminant beast with two branching yellow horns."
+    override fun xpValue() = 20
     override fun hpMax() = 8f
     override fun skinArmor() = 1f
     override fun unarmedDamage() = 3f
@@ -49,6 +52,7 @@ class VoltelopeFawn : GenericVoltelope() {
     override fun name() = "voltelope fawn"
     override fun description() = "A small juvenile ruminant beast with two small yellow horns."
     override fun meatChance() = 0.5f
+    override fun xpValue() = 10
     override fun hpMax() = 6f
     override fun onSpawn() {
         super.onSpawn()

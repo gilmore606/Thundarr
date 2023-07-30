@@ -12,6 +12,7 @@ class Hyenaman : NPC() {
     override fun name() = "hyenaman"
     override fun description() = "A yellow-furred canine-faced humanoid with beady red eyes, clad in raw hides."
     override fun isSentient() = true
+    override fun xpValue() = 25
     override fun hpMax() = 9f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.animations.Slide
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -16,6 +17,8 @@ class Lamprey : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "lamprey"
     override fun description() = "A writhing flesh tube with a gaping toothy mouth hole.  Ugh."
+    override fun makeBody() = Bodypart.serpent()
+    override fun xpValue() = 20
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

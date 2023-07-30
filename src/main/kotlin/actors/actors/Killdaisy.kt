@@ -1,6 +1,9 @@
 package actors.actors
 
 import actors.animations.Jump
+import actors.bodyparts.Bodypart
+import actors.bodyparts.Petals
+import actors.bodyparts.Trunk
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.sparks.GooGore
@@ -16,11 +19,13 @@ class Killdaisy : NPC() {
     override fun glyph() = Glyph.KILLDAISY
     override fun name() = "killdaisy"
     override fun description() = "A large floppy white flower blossom, brought to hideous life by unknown sorcery."
+    override fun makeBody() = setOf(Trunk(), Petals())
     override fun corpse() = null
     override fun canSwimShallow() = true
     override fun bloodstain() = null
     override fun gore() = GooGore()
     override fun stepAnimation(dir: XY) = Jump(dir)
+    override fun xpValue() = 20
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(6, 12, 6, 13, 10, 1, 0)

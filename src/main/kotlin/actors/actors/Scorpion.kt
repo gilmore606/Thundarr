@@ -2,12 +2,14 @@ package actors.actors
 
 import actors.abilities.Leap
 import actors.animations.Jump
+import actors.bodyparts.*
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.sparks.GooGore
 import render.tilesets.Glyph
 import things.BugCorpse
 import things.Clothing
+import things.Gear
 import util.XY
 import world.stains.Goo
 
@@ -20,9 +22,11 @@ class Scorpion : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "scorpion"
     override fun description() = "A dog-sized purple scorpion."
+    override fun makeBody() = setOf(Head(), Torso(), Stinger(), Legs())
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
     override fun corpse() = BugCorpse()
+    override fun xpValue() = 30
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleHerd
 import actors.stats.Brains
 import actors.stats.Speed
@@ -10,6 +11,7 @@ import render.tilesets.Glyph
 @Serializable
 sealed class GenericPidgey : NPC() {
     override fun shadowWidth() = 1.3f
+    override fun makeBody() = Bodypart.bird()
     override fun unarmedWeapon() = beak
     override fun skinArmor() = 0.0f
     override fun idleState() = IdleHerd(

@@ -3,6 +3,7 @@ package actors.actors
 import actors.abilities.Leap
 import actors.animations.Jump
 import actors.animations.Slide
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.sparks.GooGore
@@ -20,9 +21,11 @@ class Grub : NPC() {
     override fun stepAnimation(dir: XY) = Slide(dir)
     override fun name() = "grub"
     override fun description() = "A huge yellowish insect grub."
+    override fun makeBody() = Bodypart.blob()
     override fun corpse() = null
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
+    override fun xpValue() = 15
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

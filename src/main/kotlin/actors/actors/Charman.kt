@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.sparks.GooGore
@@ -16,10 +17,12 @@ class Charman : NPC() {
     override fun glyph() = Glyph.DEAD_TREE_MAN
     override fun name() = "charman"
     override fun description() = "A charred tree, brought to hideous life by unknown sorcery."
+    override fun makeBody() = Bodypart.tree()
     override fun isSentient() = true
     override fun canSwimShallow() = true
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
+    override fun xpValue() = 80
     override fun hpMax() = 16f
     override fun onSpawn() {
         initStats(12, 12, 6, 13, 10, 4, 2)

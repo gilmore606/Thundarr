@@ -1,6 +1,7 @@
 package actors.actors
 
 import actors.animations.Jump
+import actors.bodyparts.*
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -16,6 +17,8 @@ class Lostrich : NPC() {
     override fun stepAnimation(dir: XY) = Jump(dir)
     override fun name() = "lostrich"
     override fun description() = "A tall flightless bird.  Both its heads stare at you from serpentine necks."
+    override fun makeBody() = setOf(Head(2), Body(), Legs())
+    override fun xpValue() = 25
     override fun hpMax() = 8f
     override fun onSpawn() {
         initStats(11, 9, 4, 10, 6, 1, 0)

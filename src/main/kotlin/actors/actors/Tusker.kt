@@ -39,6 +39,7 @@ sealed class GenericTusker : NPC() {
 class Tusker : GenericTusker() {
     override val tag = Tag.TUSKER
     override fun name() = "tusker"
+    override fun xpValue() = 60
     override fun hpMax() = 22f
     override fun unarmedDamage() = 5f
 }
@@ -48,6 +49,7 @@ class Tusklet : GenericTusker() {
     override val tag = Tag.TUSKLET
     override fun name() = "tusklet"
     override fun description() = "A juvenile pig creature covered in wiry bristles."
+    override fun xpValue() = 35
     override fun hpMax() = 14f
     override fun onSpawn() {
         super.onSpawn()

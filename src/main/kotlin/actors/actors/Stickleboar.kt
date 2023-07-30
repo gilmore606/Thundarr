@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleWander
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
@@ -12,8 +13,10 @@ class Stickleboar : NPC() {
     override fun shadowWidth() = 1.3f
     override fun name() = "stickleboar"
     override fun description() = "A wild boar, its back covered in stiff spines."
+    override fun makeBody() = Bodypart.quadruped()
     override fun canSwimShallow() = true
-    override fun hpMax() = 8f
+    override fun xpValue() = 45
+    override fun hpMax() = 12f
     override fun onSpawn() {
         initStats(12, 12, 6, 13, 10, 4, 2)
     }

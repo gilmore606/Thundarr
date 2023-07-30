@@ -12,9 +12,10 @@ class Geckoid : NPC() {
     override fun name() = "geckoid"
     override fun description() = "A scaly green humanoid with beady red eyes, clad in raw hides."
     override fun isSentient() = true
+    override fun xpValue() = 25
     override fun hpMax() = 9f
     override fun onSpawn() {
-        initStats(9, 9, 4, 8, 6, 1, 0)
+        initStats(9, 9, 4, 9, 6, 2, 0)
     }
 
     override fun unarmedWeapon() = spear

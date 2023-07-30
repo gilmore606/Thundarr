@@ -1,6 +1,8 @@
 package actors.actors
 
 import actors.animations.Slide
+import actors.bodyparts.Bodypart
+import actors.bodyparts.Eyeball
 import actors.states.IdleWander
 import actors.stats.Brains
 import actors.stats.Speed
@@ -20,6 +22,7 @@ class Peeper : NPC() {
     override fun glyph() = Glyph.FLOATING_EYE
     override fun name() = "peeper"
     override fun description() = "A floating eyeball.  Disgusting.  You wonder who's looking through it."
+    override fun makeBody() = setOf(Eyeball())
     override fun hpMax() = 3f
     override fun onSpawn() {
         initStats(4, 8, 6, 13, 4, 0, 1)

@@ -22,6 +22,7 @@ class Cactoid : NPC() {
     override fun gore() = GooGore()
     override fun corpse() = null
     override fun corpseMeats() = setOf(Log())
+    override fun xpValue() = 20
     override fun hpMax() = 6f
     override fun onSpawn() {
         initStats(9, 9, 4, 8, 6, 1, 0)

@@ -29,6 +29,12 @@ sealed class Bodypart(
         fun blob() = setOf(
             Body()
         )
+        fun tree() = setOf(
+            Trunk(), Branches()
+        )
+        fun bird() = setOf(
+            Head(), Wings(), Feet()
+        )
     }
 
     fun clothingOn(actor: Actor): Clothing? = gearSlot?.let { actor.gear[it]?.let { it as Clothing } }
@@ -45,31 +51,65 @@ sealed class Bodypart(
 }
 
 @Serializable
-class Head : Bodypart(
-    "head", 0.2f, -3, Gear.Slot.HEAD
+class Head(
+    val count: Int = 1
+) : Bodypart(
+    if (count < 2) "head" else "heads", 0.2f, -3, Gear.Slot.HEAD
 )
 
 @Serializable
 class Torso : Bodypart(
-    "torso", 0.4f, -1, Gear.Slot.TORSO
+    "torso", 0.5f, -1, Gear.Slot.TORSO
 )
 
 @Serializable
 class Hands : Bodypart(
-    "hands", 0.1f, -4, Gear.Slot.HANDS
+    "hands", 0.05f, -4, Gear.Slot.HANDS
 )
 
 @Serializable
-class Legs : Bodypart(
-    "legs", 0.2f, -2, Gear.Slot.LEGS
+class Legs(
+    val count: Int = 2
+) : Bodypart(
+    if (count < 2) "leg" else "legs", 0.2f, -2, Gear.Slot.LEGS
 )
 
 @Serializable
 class Feet : Bodypart(
-    "feet", 0.1f, -3, Gear.Slot.FEET
+    "feet", 0.05f, -3, Gear.Slot.FEET
 )
 
 @Serializable
 class Body : Bodypart(
     "body", 1f, 0, Gear.Slot.TORSO
+)
+
+@Serializable
+class Trunk : Bodypart(
+    "trunk", 1f, 0, Gear.Slot.TORSO
+)
+
+@Serializable
+class Branches : Bodypart(
+    "branches", 1f, -1, Gear.Slot.HANDS
+)
+
+@Serializable
+class Petals : Bodypart(
+    "petals", 1f, 0, Gear.Slot.HANDS
+)
+
+@Serializable
+class Wings : Bodypart(
+    "wings", 1f, 0, Gear.Slot.HANDS
+)
+
+@Serializable
+class Eyeball : Bodypart(
+    "eyeball", 1f, 0, Gear.Slot.HEAD
+)
+
+@Serializable
+class Stinger : Bodypart(
+    "stinger", 0.5f, -1, Gear.Slot.NECK
 )

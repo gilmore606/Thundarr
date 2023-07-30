@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.bodyparts.Bodypart
 import actors.states.IdleDen
 import actors.stats.Brains
 import actors.stats.Speed
@@ -14,7 +15,9 @@ class Grizzler : NPC() {
     override fun glyph() = Glyph.DEMONDOG
     override fun name() = "grizzler"
     override fun description() = "A large furry brown predator with glittering yellow eyes and large claws."
+    override fun makeBody() = Bodypart.quadruped()
     override fun spawnsInDen() = true
+    override fun xpValue() = 100
     override fun hpMax() = 30f
     override fun onSpawn() {
         initStats(17, 12, 7, 12, 12, 3, 1)
