@@ -1,9 +1,11 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
 import util.XY
 import util.log
 import java.lang.Integer.min
 
+@Serializable
 class Whack(
     val dir: XY
 ) : Animation(300) {

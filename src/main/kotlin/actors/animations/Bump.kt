@@ -1,7 +1,9 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
 import util.XY
 
+@Serializable
 class Bump(
     val dir: XY
 ) : Animation(200) {

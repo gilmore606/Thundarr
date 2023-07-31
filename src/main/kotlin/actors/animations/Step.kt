@@ -1,8 +1,10 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
 import ui.input.Keyboard
 import util.XY
 
+@Serializable
 class Step(
     val dir: XY
 ) : Animation(Keyboard.REPEAT_MS) {

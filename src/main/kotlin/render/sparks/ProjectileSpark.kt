@@ -3,7 +3,7 @@ package render.sparks
 import render.tilesets.Glyph
 import util.distanceBetween
 
-class Projectile(
+class ProjectileSpark(
     val glyph: Glyph,
     val destX: Int,
     val destY: Int,

@@ -1,10 +1,11 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
 import render.Screen
 import java.lang.Float.max
 import java.lang.Float.min
 
-
+@Serializable
 abstract class Animation(
     val durationMs: Long,
 ) {

@@ -6,7 +6,7 @@ import actors.animations.Hop
 import actors.stats.skills.Throw
 import audio.Speaker
 import kotlinx.serialization.Serializable
-import render.sparks.Projectile
+import render.sparks.ProjectileSpark
 import render.sparks.ProjectileShadow
 import render.sparks.Smoke
 import things.Damage
@@ -48,11 +48,11 @@ class Throw(
                 }
             }
 
-            level.addSpark(Projectile(thing.glyph(), x, y, 40f) {
+            level.addSpark(ProjectileSpark(thing.glyph(), x, y, 30f) {
                 resolveHit(thing, actor, level, hitx, hity, roll)
             }.at(actor.xy.x, actor.xy.y))
 
-            level.addSpark(ProjectileShadow(x, y, 40f).at(actor.xy.x, actor.xy.y))
+            level.addSpark(ProjectileShadow(x, y, 30f).at(actor.xy.x, actor.xy.y))
 
             broadcast(level, actor, XY(hitx, hity))
         }

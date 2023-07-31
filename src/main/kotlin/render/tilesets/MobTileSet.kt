@@ -158,4 +158,5 @@ fun ActorTileSet() =
         setTile(Glyph.GRANITE_GIANT, SimpleTile(this, 12, 11))
         setTile(Glyph.BIG_TREE_MAN, SimpleTile(this, 13, 0))
         setTile(Glyph.SCORPIYAK, SimpleTile(this, 13, 2))
+        setTile(Glyph.MAMMOTH, SimpleTile(this, 13, 3))
     }

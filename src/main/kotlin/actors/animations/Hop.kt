@@ -1,5 +1,8 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class Hop : Animation(200) {
 
     var oy = 0f

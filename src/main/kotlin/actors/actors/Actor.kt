@@ -425,6 +425,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
             attacker?.also { onKilledBy(it) }
         } else {
             type?.onDamage(this, bodypart, amount)
+            attacker?.also { receiveAggression(it) }
         }
     }
 

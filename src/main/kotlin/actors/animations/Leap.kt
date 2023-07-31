@@ -1,11 +1,16 @@
 package actors.animations
 
+import kotlinx.serialization.Serializable
 import ui.input.Keyboard
 import util.XY
 import java.lang.Float.max
 import java.lang.Float.min
 
-class Leap(source: XY, dest: XY): Animation(Keyboard.REPEAT_MS * 2) {
+@Serializable
+class Leap(
+    val source: XY,
+    val dest: XY
+): Animation(Keyboard.REPEAT_MS * 2) {
 
     val xdist = (dest.x - source.x)
     val ydist = (dest.y - source.y)
