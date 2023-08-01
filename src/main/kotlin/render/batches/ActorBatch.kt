@@ -1,7 +1,6 @@
 package render.batches
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.VertexAttributes
@@ -18,7 +17,9 @@ class ActorBatch(
     maxQuads: Int = 5000,
 ) : RenderBatch(maxQuads) {
 
-    val noAura = Color(0f, 0f, 0f, 0f)
+    companion object {
+        val noAura = LightColor(0f, 0f, 0f, 0f)
+    }
 
     private val textureEdgePad = 0.0012f
     private val quadEdgePadX = 0.0002f
@@ -71,7 +72,7 @@ class ActorBatch(
     fun addActorQuad(col: Int, row: Int, // global tile XY
                     textureIndex: Int, visibility: Float, light: LightColor,
                     offsetX: Float = 0f, offsetY: Float = 0f,
-                    scale: Double = 1.0, alpha: Float = 1f, aura: Color = noAura, hue: Float = 0f,
+                    scale: Double = 1.0, alpha: Float = 1f, aura: LightColor = noAura, hue: Float = 0f,
                     grayBlend: Float? = null, mirror: Boolean = false, rotate: Boolean = false,
                     isTall: Boolean = false) {
         val scaleOffset = (1.0 - scale) * 0.5
@@ -92,7 +93,7 @@ class ActorBatch(
     fun addPartialActorQuad(x0: Double, y0: Double, x1: Double, y1: Double,
                        textureIndex: Int, visibility: Float, light: LightColor,
                        tx0: Float, ty0: Float, tx1: Float, ty1: Float,
-                       alpha: Float = 1f, aura: Color = noAura, hue: Float = 0f, rotate: Boolean = false) {
+                       alpha: Float = 1f, aura: LightColor = noAura, hue: Float = 0f, rotate: Boolean = false) {
         val gx0 = Screen.tileXtoGlx(x0)
         val gy0 = Screen.tileYtoGly(y0)
         val gx1 = Screen.tileXtoGlx(x1)

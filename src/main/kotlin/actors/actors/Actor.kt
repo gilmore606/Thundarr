@@ -13,6 +13,7 @@ import actors.stats.skills.Skill
 import actors.stats.skills.Sneak
 import actors.statuses.*
 import audio.Speaker
+import com.badlogic.gdx.graphics.Color
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import render.Screen
@@ -26,6 +27,7 @@ import world.level.Level
 import world.journal.JournalEntry
 import path.Pather
 import path.StepMap
+import render.batches.ActorBatch
 import things.Branches
 import world.stains.Blood
 import world.stains.Fire
@@ -149,6 +151,8 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     override fun uiBatch() = Screen.uiActorBatch
     var mirrorGlyph = false
     var rotateGlyph = false
+    val auraColor = LightColor(0f, 0f, 0f, 0f)
+    open fun aura(): LightColor = auraColor
 
     open fun corpse(): Container? = Corpse(name())
     open fun bloodstain(): Stain? = Blood()
@@ -326,8 +330,16 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         } else {
             animation = null
         }
+        auraColor.a = max(0f, auraColor.a - delta)
     }
     open fun doOnRender(delta: Float) { }
+
+    fun flashAura(r: Float = 0f, g: Float = 0f, b: Float = 0f, a: Float) {
+        auraColor.r = r
+        auraColor.g = g
+        auraColor.b = b
+        auraColor.a = a
+    }
 
     fun renderShadow(doDraw: (Double,Double,Double,Double)->Unit) {
         val extra = (shadowWidth() - 1f) * 0.5f
@@ -400,6 +412,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun receiveDamage(amount: Float, type: Damage? = null, bodypart: Bodypart? = null, attacker: Actor? = null, internal: Boolean = false) {
+        flashAura(r = 1f, a = 1f)
         if (!internal) {
             if (Dice.chance(bleedChance() * amount * (type?.bleedChance ?: 0.3f))) {
                 bloodstain()?.also { stain ->
@@ -430,6 +443,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     fun healDamage(heal: Float, healer: Actor? = null) {
+        flashAura(g = 1f, a = 1f)
         hp = min(hpMax(), hp + heal)
         level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
         healer?.also { receiveAssistance(it) }
