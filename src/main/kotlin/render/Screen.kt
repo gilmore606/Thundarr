@@ -13,10 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.MathUtils.sin
 import ktx.app.KtxScreen
-import render.batches.CloudBatch
-import render.batches.FireBatch
-import render.batches.QuadBatch
-import render.batches.RainBatch
+import render.batches.*
 import render.tilesets.*
 import things.Thing
 import ui.input.Keyboard
@@ -76,7 +73,7 @@ object Screen : KtxScreen {
     val mapTileSet = MapTileSet()
     val terrainBatch = QuadBatch(terrainTileSet)
     val thingBatch = QuadBatch(thingTileSet)
-    val actorBatch = QuadBatch(actorTileSet)
+    val actorBatch = ActorBatch(actorTileSet)
     val gearBatch = QuadBatch(thingTileSet)
     val fireBatch = FireBatch()
     val uiWorldBatch = QuadBatch(uiTileSet)
@@ -249,14 +246,14 @@ object Screen : KtxScreen {
             Glyph.MOB_WATER_SHADOW else Glyph.MOB_SHADOW
         if (vis == 1f && shadow == Glyph.MOB_SHADOW) {
             actor.renderShadow { x0, y0, x1, y1 ->
-                actorBatch.addPartialQuad(
+                actorBatch.addPartialActorQuad(
                     x0, y0, x1, y1, actorBatch.getTextureIndex(shadow),
-                    1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f
+                    1f, fullLight, 0f, 0f, 1f, 1f, 1f, hue = 0f
                 )
             }
         }
         val glyph = actor.glyph()
-        actorBatch.addTileQuad(
+        actorBatch.addActorQuad(
             tx, ty,
             actorBatch.getTextureIndex(glyph, App.level, tx, ty), vis, light,
             offsetX = if (vis == 1f) actor.animOffsetX() else 0f,
@@ -278,9 +275,9 @@ object Screen : KtxScreen {
         if (vis == 1f) {
             if (shadow == Glyph.MOB_WATER_SHADOW) {
                 actor.renderShadow { x0, y0, x1, y1 ->
-                    actorBatch.addPartialQuad(
+                    actorBatch.addPartialActorQuad(
                         x0, y0, x1, y1, actorBatch.getTextureIndex(shadow),
-                        1f, fullLight, 0f, 0f, 1f, 1f, 1f, 0f
+                        1f, fullLight, 0f, 0f, 1f, 1f, 1f, hue = 0f
                     )
                 }
             }
@@ -296,8 +293,8 @@ object Screen : KtxScreen {
 
     private val renderSpark: (Int, Int, Glyph, LightColor, Float, Float, Float, Float, Float)->Unit =
         { tx, ty, glyph, light, offsetX, offsetY, scale, alpha, hue ->
-        worldBatches.firstOrNull { it.tileSet.hasGlyph(glyph) }?.also { batch ->
-            batch.addTileQuad(
+        worldBatches.firstOrNull { it is QuadBatch && it.tileSet.hasGlyph(glyph) }?.also { batch ->
+            (batch as QuadBatch).addTileQuad(
                 tx, ty,
                 batch.getTextureIndex(glyph, App.level, tx, ty), 1f, light,
                 offsetX, offsetY, scale.toDouble(), alpha, hue = hue

@@ -1,6 +1,7 @@
 package world
 
 import render.batches.QuadBatch
+import render.batches.RenderBatch
 import render.tilesets.Glyph
 import ui.modals.ExamineModal
 import util.Rect
@@ -25,7 +26,7 @@ interface Entity {
 
     fun glyph(): Glyph
     fun hue(): Float = 0f
-    fun glyphBatch(): QuadBatch
+    fun glyphBatch(): RenderBatch
     fun uiBatch(): QuadBatch
     fun name(): String
     fun hasProperName(): Boolean = false

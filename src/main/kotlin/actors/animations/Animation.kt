@@ -6,7 +6,7 @@ import java.lang.Float.max
 import java.lang.Float.min
 
 @Serializable
-abstract class Animation(
+sealed class Animation(
     val durationMs: Long,
 ) {
     var done = false
