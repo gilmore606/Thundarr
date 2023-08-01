@@ -15,13 +15,20 @@ import things.ScalyHide
 
 @Serializable
 class Salaman : NPC() {
+    companion object {
+        val regenerate = Regenerate.Spec(
+            0.5f,
+            "%Dn's body shivers, and %p wounds grow closed!"
+        )
+    }
+
     override val tag = Tag.SALAMAN
     override fun glyph() = Glyph.TAILMANDER
     override fun shadowWidth() = 1.4f
     override fun name() = "salaman"
     override fun description() = "A man-sized red salamander.  A curiously human face bobs at the end of its long neck."
     override fun makeBody() = Bodypart.quadruped()
-    override fun makeAbilities() = setOf(Regenerate())
+    override fun makeAbilities() = setOf(Regenerate(4.0, 1f, 0.5f, regenerate))
     override fun corpseMeats() = setOf(RawMeat(), ScalyHide())
     override fun canSwimShallow() = true
     override fun xpValue() = 40

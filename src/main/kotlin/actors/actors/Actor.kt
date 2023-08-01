@@ -431,6 +431,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
 
     fun healDamage(heal: Float, healer: Actor? = null) {
         hp = min(hpMax(), hp + heal)
+        level?.addSpark(GlyphRise(Glyph.PLUS_ICON_GREEN).at(xy.x, xy.y))
         healer?.also { receiveAssistance(it) }
     }
 

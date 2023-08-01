@@ -19,10 +19,11 @@ import world.level.Level
 
 @Serializable
 class Projectile(
-    val chance: Float,
+    val projectileCooldown: Double = 0.0,
+    val projectileChance: Float = 1f,
     val range: Float,
     val spec: Spec
-) : Ability() {
+) : Ability(projectileCooldown, projectileChance) {
 
     @Serializable
     class Spec(
@@ -41,7 +42,7 @@ class Projectile(
 
     override fun shouldQueue(actor: Actor, target: Actor): Boolean {
         val distance = distanceBetween(actor.xy, target.xy)
-        return Dice.chance(chance) && (distance > 1f) && (distance <= range)
+        return (distance > 1f) && (distance <= range)
     }
 
     override fun execute(actor: Actor, level: Level, target: Actor) {

@@ -19,6 +19,7 @@ data class ActorStepMap(
     }
 
     override fun printTarget() {
+        // TODO: fix concurrent mod error here (getActor crosses threads)
         App.level.director.getActor(targetID)?.also { target ->
             writeTargetCell(target.xy.x, target.xy.y)
         }

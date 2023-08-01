@@ -22,7 +22,7 @@ class Ram : NPC() {
     override fun name() = "ram"
     override fun description() = "A stout goaty creature with blue wool and curled horns."
     override fun makeBody() = Bodypart.quadruped()
-    override fun makeAbilities() = setOf(Rushdown())
+    override fun makeAbilities() = setOf(Rushdown(3.0, 0.6f))
     override fun corpseMeats() = setOf(RawMeat(), FurHide())
     override fun xpValue() = 25
     override fun hpMax() = 8f

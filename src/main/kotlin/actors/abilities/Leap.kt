@@ -12,10 +12,10 @@ import world.level.Level
 
 @Serializable
 class Leap(
+    val leapCooldown: Double = 0.0,
+    val leapChance: Float = 1f,
     val range: Int,
-) : Ability() {
-
-    override fun cooldown() = 3.0
+) : Ability(leapCooldown, leapChance) {
 
     override fun shouldQueue(actor: Actor, target: Actor): Boolean {
         // Leap away if wounded

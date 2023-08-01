@@ -5,7 +5,10 @@ import kotlinx.serialization.Serializable
 import world.level.Level
 
 @Serializable
-class Rushdown : Ability() {
+class Rushdown(
+    val rushdownCooldown: Double = 0.0,
+    val rushdownChance: Float = 1f,
+) : Ability(rushdownCooldown, rushdownChance) {
 
     override fun shouldQueue(actor: Actor, target: Actor): Boolean {
         return false

@@ -113,5 +113,6 @@ object ForestAnimals {
         add(1f, WOOD_SPIDER)
         add(0.2f, KILLDAISY)
         add(1f, PINCER_BEETLE)
+        add(0.5f, SALAMAN)
     }
 }

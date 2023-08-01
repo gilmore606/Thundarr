@@ -33,7 +33,7 @@ class Frog : NPC() {
     override fun skinArmorMaterial() = Clothing.Material.HIDE
     override fun skinArmor() = 1f
 
-    override fun makeAbilities() = setOf(Leap(4))
+    override fun makeAbilities() = setOf(Leap(2.0, 1f,4))
     override fun visualRange() = 10f
     override fun aggroRange() = 6f
     override fun idleState() = IdleWander(0.4f)

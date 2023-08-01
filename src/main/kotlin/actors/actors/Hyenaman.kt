@@ -14,7 +14,7 @@ class Hyenaman : NPC() {
     override fun name() = "hyenaman"
     override fun description() = "A yellow-furred canine-faced humanoid with beady red eyes, clad in raw hides."
     override fun corpseMeats() = setOf(Hide())
-    override fun makeAbilities() = setOf(Steal())
+    override fun makeAbilities() = setOf(Steal(5.0, 0.6f))
     override fun isSentient() = true
     override fun xpValue() = 25
     override fun hpMax() = 9f

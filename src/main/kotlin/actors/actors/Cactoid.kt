@@ -26,12 +26,13 @@ class Cactoid : NPC() {
             3f,
         )
     }
+
     override val tag = Tag.CACTOID
     override fun glyph() = Glyph.CACTOID
     override fun shadowWidth() = 1.2f
     override fun name() = "cactoid"
     override fun description() = "A humanoid-shaped cactus creature with a single blood-red eye."
-    override fun makeAbilities() = setOf(Projectile(0.6f, 4f, projectile))
+    override fun makeAbilities() = setOf(Projectile(2.0, 1f, 4f, projectile))
     override fun bloodstain() = Goo()
     override fun gore() = GooGore()
     override fun corpse() = null

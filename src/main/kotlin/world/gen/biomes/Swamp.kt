@@ -115,5 +115,6 @@ object SwampAnimals {
         add(1f, TORTLE_YOUNG)
         add(2f, FROG)
         add(1f, LAMPREY)
+        add(1f, SALAMAN)
     }
 }

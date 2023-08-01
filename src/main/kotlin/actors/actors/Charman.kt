@@ -19,7 +19,7 @@ class Charman : NPC() {
     override fun name() = "charman"
     override fun description() = "A charred tree, brought to hideous life by unknown sorcery."
     override fun makeBody() = Bodypart.tree()
-    override fun makeAbilities() = setOf(Scare())
+    override fun makeAbilities() = setOf(Scare(5.0, 0.4f))
     override fun isSentient() = true
     override fun canSwimShallow() = true
     override fun bloodstain() = Goo()
