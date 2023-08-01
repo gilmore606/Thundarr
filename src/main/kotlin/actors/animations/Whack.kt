@@ -7,12 +7,12 @@ import java.lang.Integer.min
 
 @Serializable
 class Whack(
-    val dir: XY
+    val dir: XY,
+    val reach: Float = 0.8f
 ) : Animation(300) {
 
     var ox = 0f
     var oy = 0f
-    val reach = 0.8f
 
     override fun doOnRender(delta: Float) {
         var p = progress()

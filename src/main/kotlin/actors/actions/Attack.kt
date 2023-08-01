@@ -58,10 +58,11 @@ class Attack(
                 Console.sayAct(weapon.missSelfMsg(), weapon.missOtherMsg(), actor, target, weapon)
                 Speaker.world(weapon.missSound(), source = actor.xy)
 
-            } else if (canActivelyDefend && Dodge.resolve(target, -roll - 3) > 0) {
+            } else if (canActivelyDefend && Dodge.resolve(target, -(roll * 0.5f)) > 0) {
 
                 // DODGE
                 Console.sayAct("%Dd dodges your %i attack.", "%Dd dodges %dn's %i.", actor, target, weapon)
+                target.animation = Whack((target.xy - actor.xy).rotated(), 0.5f)
 
             } else {
 
