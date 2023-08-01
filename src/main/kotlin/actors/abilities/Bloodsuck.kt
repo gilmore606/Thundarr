@@ -8,8 +8,15 @@ import world.level.Level
 class Bloodsuck(
     val bloodsuckCooldown: Double = 0.0,
     val bloodsuckChance: Float = 1f,
-) : Ability(bloodsuckCooldown, bloodsuckChance) {
+    val atHealthiness: Float = 0.95f,
 
+) : Ability(bloodsuckCooldown, bloodsuckChance) {
+    @Serializable
+    class Spec(
+        val suckFraction: Float = 0.25f,
+        val suckEfficiency: Float = 1f,
+        val suckMsg: String = "%Dn "
+    )
     override fun shouldQueue(actor: Actor, target: Actor): Boolean {
         return false
     }

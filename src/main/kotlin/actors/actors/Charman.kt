@@ -14,12 +14,19 @@ import world.stains.Goo
 
 @Serializable
 class Charman : NPC() {
+    companion object {
+        val scare = Scare.Spec(
+            "%Dn meances %dd with %p branches, terrifying %do!",
+            "%Dn waves %p branches ineffectually at %dd."
+        )
+    }
+
     override val tag = Tag.CHARMAN
     override fun glyph() = Glyph.DEAD_TREE_MAN
     override fun name() = "charman"
     override fun description() = "A charred tree, brought to hideous life by unknown sorcery."
     override fun makeBody() = Bodypart.tree()
-    override fun makeAbilities() = setOf(Scare(5.0, 0.4f))
+    override fun makeAbilities() = setOf(Scare(5.0, 0.4f, 3f, scare))
     override fun isSentient() = true
     override fun canSwimShallow() = true
     override fun bloodstain() = Goo()
@@ -27,7 +34,7 @@ class Charman : NPC() {
     override fun xpValue() = 80
     override fun hpMax() = 16f
     override fun onSpawn() {
-        initStats(12, 12, 6, 13, 10, 4, 2)
+        initStats(12, 12, 6, 13, 12, 4, 2)
     }
     override fun corpse() = null
     override fun corpseMeats() = setOf(Log())

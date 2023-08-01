@@ -9,7 +9,7 @@ import world.level.Level
 
 @Serializable
 class Move(
-    private val dir: XY
+    val dir: XY
 ) : Action(1.0f) {
     override fun name() = "move"
 

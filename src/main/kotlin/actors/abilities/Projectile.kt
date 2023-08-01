@@ -28,9 +28,9 @@ class Projectile(
     @Serializable
     class Spec(
         val glyph: Glyph,
-        val hitMsg: String = "%Dn throws something and hits %dt's %part!",
-        val missMsg: String = "%Dn throws something at %dt, but misses.",
-        val bounceMsg: String = "%Dn throws something, which bounces off %dt's %part.",
+        val hitMsg: String = "%Dn throws something and hits %dd's %part!",
+        val missMsg: String = "%Dn throws something at %dd, but misses.",
+        val bounceMsg: String = "%Dn throws something, which bounces off %dd's %part.",
         val damageType: Damage = Damage.CRUSH,
         val damage: Float = 2f,
         val castShadow: Boolean = true,

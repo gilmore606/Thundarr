@@ -48,12 +48,12 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         val beak: MeleeWeapon = Beak()
         val branches: MeleeWeapon = Branches()
         val spear: MeleeWeapon = UnarmedSpear()
+
         val caster = RayCaster()
     }
 
     val id = UUID()
     override fun getHolderKey() = ThingHolder.Key(ThingHolder.Type.ACTOR, actorKey = id)
-
     override fun toString() = "${name()} ($id)"
 
     var isUnloading = false
