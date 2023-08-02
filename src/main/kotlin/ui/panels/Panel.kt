@@ -93,18 +93,18 @@ abstract class Panel {
         Screen.subTitleFont.draw(myTextBatch(), text, ((this.x + xOffset) - (Screen.width / 2f)), 0f - ((this.y + yOffset) - (Screen.height / 2f)))
     }
 
-    fun drawBox(x: Int, y: Int, width: Int, height: Int) {
+    fun drawBox(x: Int, y: Int, width: Int, height: Int, alpha: Float = 1f) {
         myBoxBatch().addPixelQuad(x+ shadowOffset, y + (shadowOffset * 1.2).toInt(), x + width + shadowOffset, y + height + shadowOffset,
-            myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW))
+            myBoxBatch().getTextureIndex(Glyph.BOX_SHADOW), alpha = alpha)
         myBoxBatch().addPixelQuad(x - borderWidth, y - borderWidth, x + width + borderWidth, y + height + borderWidth,
-            myBoxBatch().getTextureIndex(Glyph.BOX_BORDER))
+            myBoxBatch().getTextureIndex(Glyph.BOX_BORDER), alpha = alpha)
         myBoxBatch().addPixelQuad(x, y, x + width, y + height,
-            myBoxBatch().getTextureIndex(Glyph.BOX_BG))
+            myBoxBatch().getTextureIndex(Glyph.BOX_BG), alpha = alpha)
     }
 
-    fun drawShade(x: Int, y: Int, width: Int, height: Int) {
+    fun drawShade(x: Int, y: Int, width: Int, height: Int, alpha: Float = 1f) {
         myBoxBatch().addPixelQuad(x, y, x + width, y + height,
-            myBoxBatch().getTextureIndex(Glyph.WINDOW_SHADE))
+            myBoxBatch().getTextureIndex(Glyph.WINDOW_SHADE), alpha = alpha)
     }
 
     fun drawQuad(x: Int, y: Int, width: Int, height: Int, glyph: Glyph, alpha: Float = 1f) {

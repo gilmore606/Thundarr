@@ -146,6 +146,14 @@ object WoodFloor: Floor(Type.TERRAIN_WOODFLOOR, Glyph.WOOD_FLOOR, false, -2f) {
     override fun sleepComfort() = 0f
 }
 
+object Hearth: Floor(Type.TERRAIN_HEARTH, Glyph.HEARTH, false) {
+    override fun name() = "hearth"
+    override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_WOODFLOOR, Type.TERRAIN_CAVEFLOOR)
+    override fun moveSpeed(actor: Actor) = 1.0f
+    override fun stepSound(actor: Actor) = Speaker.SFX.STEPDIRT
+    override fun trailsOverwrite() = false
+}
+
 object Dirt : Floor(Type.TERRAIN_DIRT, Glyph.DIRT, true, -1f) {
     override fun name() = "bare ground"
     override fun overlapsOn() = setOf(Type.TERRAIN_STONEFLOOR, Type.TERRAIN_PAVEMENT, Type.TERRAIN_ROCKS)

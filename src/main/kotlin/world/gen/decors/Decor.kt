@@ -110,6 +110,10 @@ sealed class Decor {
         if (Dice.chance(chance)) doThis()
     }
 
+    protected fun setTerrain(type: Terrain.Type) {
+        carto.setTerrain(cell.x, cell.y, type)
+    }
+
     protected fun spawn(thing: Thing, useXY: ((XY)->Unit)? = null): Thing? {
         if (isAbandoned && Dice.chance(0.3f)) return null
         carto.spawnThing(cell.x, cell.y, thing)

@@ -30,7 +30,7 @@ class Seeking(
             }
             getActor(targetID)?.also { target ->
                 if (canSee(target)) {
-                    say(listOf("Aha!", "Got you!", "You can't escape!").random())
+                    //say(listOf("Aha!", "Got you!", "You can't escape!").random())
                     popState()
                     return
                 }

@@ -41,6 +41,7 @@ class Hut : Decor() {
         hasTable()?.also { Candle().moveTo(it) } ?: run {
             againstWall { spawn(Candlestick()) }
         }
+        chance (0.5f) { againstWall { setTerrain(Terrain.Type.TERRAIN_HEARTH) } }
     }
     override fun job() = HomeJob(room.rect)
 }

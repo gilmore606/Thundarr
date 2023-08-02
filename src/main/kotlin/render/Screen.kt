@@ -627,7 +627,10 @@ object Screen : KtxScreen {
         ).apply {
             App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
         }
-        if (menu.options.isNotEmpty()) addModal(menu) else {
+        if (menu.options.isNotEmpty()) {
+            addModal(menu)
+            menu.changeSelection(0)
+        } else {
             clearCursor()
             Speaker.ui(Speaker.SFX.UIERROR)
         }

@@ -33,5 +33,5 @@ class Whack(
     }
     override fun offsetX() = ox
     override fun offsetY() = oy
-
+    override fun shadowOffsetX() = ox
 }

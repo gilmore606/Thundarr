@@ -253,6 +253,7 @@ sealed class NPC : Actor() {
     }
 
     override fun receiveAggression(attacker: Actor) {
+        super.receiveAggression(attacker)
         if (!isHostileTo(attacker)) {
             downgradeOpinionOf(attacker)
             factions.forEach { factionID ->

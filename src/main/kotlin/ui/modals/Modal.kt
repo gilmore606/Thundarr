@@ -74,6 +74,7 @@ abstract class Modal(
         Screen.addModal(nextModal)
     }
 
+    var bgAlpha = 1f
     var darkenUnder = true
     var darkenUnderSidecar = true
 
@@ -122,9 +123,9 @@ abstract class Modal(
         val anim = min(1f, (Screen.timeMs - launchTimeMs) / animTime)
         val xSquish = ((1f - anim) * width / 2f).toInt()
         val ySquish = ((1f - anim) * height / 2f).toInt()
-        drawBox(x - xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2)
+        drawBox(x - xSquish, y + ySquish, width - xSquish * 2, height - ySquish * 2, alpha = bgAlpha)
         if (anim == 1f) {
-            drawShade(x + 4, y + 4, width - 8, height - 8)
+            drawShade(x + 4, y + 4, width - 8, height - 8, alpha = bgAlpha)
         }
 
         sidecar?.drawBackground()

@@ -10,7 +10,7 @@ fun ActorTileSet() =
         setTile(Glyph.MOB_WATER_SHADOW, SimpleTile(this, 3, 0))
 
         setTile(Glyph.PLAYER, SimpleTile(this, 0, 1))
-        setTile(Glyph.ARIEL, SimpleTile(this, 0, 0))
+        setTile(Glyph.ARIEL, SimpleTile(this, 13, 5))
         setTile(Glyph.MOK, SimpleTile(this, 2, 1))
         setTile(Glyph.CATTLE, SimpleTile(this, 3, 2))
         setTile(Glyph.CACTOID, SimpleTile(this, 0, 2))

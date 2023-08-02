@@ -36,6 +36,7 @@ enum class Glyph(val tall: Boolean = false) {
     METAL_WALL,
     WINDOW,
     TRAIL,
+    HEARTH,
 
     WALL_DAMAGE,
     CURSOR,

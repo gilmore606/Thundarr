@@ -216,6 +216,8 @@ fun TerrainTileSet() =
             add(ChasmTile.Slot.HORIZONTAL, 1f, 5, 13)
         })
 
+        setTile(Glyph.HEARTH, SimpleTile(this, 0, 11))
+
         setTile(Glyph.WALL_DAMAGE, SimpleTile(this, 4, 3))
 
         setTile(Glyph.SHALLOW_WATER, WaterTile(this).apply {

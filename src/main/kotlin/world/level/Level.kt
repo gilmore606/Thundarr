@@ -484,43 +484,49 @@ sealed class Level {
         }
         if (visibilityAt(x, y) < 1f && !App.DEBUG_VISIBLE) return
 
-        val groups = thingsAt(x,y).groupByTag()
+        val groups = thingsAt(x,y).groupByTag().toMutableList()
+        forXY(x-1, y-1, x+1, y+1) { ix, iy ->
+            thingsAt(ix, iy).filter { it is Table }.forEach { groups.addAll((it as Table).contents().groupByTag()) }
+        }
+
         groups.forEach { group ->
-            if (isHere && group[0].isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
+            val thing = group[0]
+            if (isHere && thing.isPortable() && !App.player.hasStatus(Status.Tag.BURDENED)) {
                 if (group.size == 1) {
-                    menu.addOption("take " + group[0].listName()) { App.player.queue(Get(group[0].getKey())) }
+                    menu.addOption("take " + thing.listName(), thing.xy()) { App.player.queue(Get(thing.getKey())) }
                 } else {
-                    menu.addOption("take one " + group[0].name()) { App.player.queue(Get(group[0].getKey())) }
-                    menu.addOption("take all " + group.size.toEnglish() + " " + group[0].name().plural()) {
+                    menu.addOption("take one " +thing.name(), thing.xy()) { App.player.queue(Get(thing.getKey())) }
+                    menu.addOption("take all " + group.size.toEnglish() + " " + thing.name().plural(), thing.xy()) {
                         group.forEach { App.player.queue(Get(it.getKey())) }
                     }
                 }
             }
         }
         groups.forEach { group ->
-            group[0].uses().forEach { (tag, use) ->
+            val thing = group[0]
+            thing.uses().forEach { (tag, use) ->
                 if (use.canDo(App.player, App.player.xy.x, App.player.xy.y, false)) {
-                    menu.addOption(use.command) {
-                        App.player.queue(Use(tag, group[0].getKey(), use.duration))
+                    menu.addOption(use.command, thing.xy()) {
+                        App.player.queue(Use(tag, thing.getKey(), use.duration))
                     }
                 }
             }
             if (isAdjacentOrHere) {
-                if (group[0] is Smashable && (group[0] as Smashable).isSmashable()) {
-                    menu.addOption((group[0] as Smashable).smashVerbName() + " " + group[0].name()) {
-                        App.player.queue(Smash(group[0].getKey(), (group[0] as Smashable).smashVerbName()))
+                if (thing is Smashable && (thing as Smashable).isSmashable()) {
+                    menu.addOption((thing as Smashable).smashVerbName() + " " + thing.name(), thing.xy()) {
+                        App.player.queue(Smash(thing.getKey(), (thing as Smashable).smashVerbName()))
                     }
                 }
             }
-            menu.addOption("examine " + group[0].name()) {
-                Screen.addModal(ExamineModal(group[0], Modal.Position.CENTER_LOW))
+            menu.addOption("examine " + thing.name(), thing.xy()) {
+                Screen.addModal(ExamineModal(thing, Modal.Position.CENTER_LOW))
             }
         }
         var actorAt: Actor? = null
         actorAt(x, y)?.also { actor ->
             if (actor !is Player) {
                 actorAt = actor
-                menu.addOption("examine " + actor.name()) {
+                menu.addOption("examine " + actor.name(), actor.xy()) {
                     Screen.addModal(ExamineModal(actor, Modal.Position.CENTER_LOW))
                 }
             }
@@ -541,13 +547,13 @@ sealed class Level {
                         val near = nearGroup.first()
                         near.uses().forEach { (tag, nearUse) ->
                             if (nearUse.canDo(App.player, x+ix, y+iy, true)) {
-                                menu.addOption(nearUse.command) {
+                                menu.addOption(nearUse.command, near.xy()) {
                                     App.player.queue(Use(tag, near.getKey(), nearUse.duration))
                                 }
                             }
                         }
                         if (near is Smashable && near.isSmashable()) {
-                            menu.addOption(near.smashVerbName() + " " + near.name()) {
+                            menu.addOption(near.smashVerbName() + " " + near.name(), near.xy()) {
                                 App.player.queue(Smash(near.getKey(), near.smashVerbName()))
                             }
                         }
@@ -561,7 +567,7 @@ sealed class Level {
                 val held = group.first()
                 held.uses().forEach { (tag, heldUse) ->
                     if (heldUse.canDo(App.player, x, y, true)) {
-                        menu.addOption(heldUse.command) {
+                        menu.addOption(heldUse.command, held.xy()) {
                             App.player.queue(Use(tag, held.getKey(), heldUse.duration))
                         }
                     }
@@ -570,10 +576,17 @@ sealed class Level {
         }
     }
 
+    private fun gettableThingsAt(x: Int, y: Int): MutableList<Thing> = mutableListOf<Thing>().apply {
+        addAll(thingsAt(x, y))
+        forXY(x-1, y-1, x+1, y+1) { ix, iy ->
+            thingsAt(ix, iy).filter { it is Table }.forEach { addAll((it as Table).contents()) }
+        }
+    }
+
     private fun addUsesFromTerrain(menu: ContextMenu, tx: Int, ty: Int) {
         Terrain.get(getTerrain(tx,ty)).uses().forEach { (useTag, terrainUse) ->
-            menu.addOption(terrainUse.command) {
-                App.player.queue(UseTerrain(useTag, XY(tx,ty)))
+            menu.addOption(terrainUse.command, XY(tx, ty)) {
+                App.player.queue(UseTerrain(useTag, XY(tx, ty)))
             }
         }
     }

@@ -67,6 +67,7 @@ sealed class Terrain(
             Type.TERRAIN_CHASM -> Chasm
             Type.TERRAIN_RUBBLE -> Rubble
             Type.TERRAIN_TRAIL -> Trail
+            Type.TERRAIN_HEARTH -> Hearth
             else -> throw RuntimeException("tried to get(terrainType) for un-instantiatable type $type !")
         }
         fun getTiled(type: Int): Terrain.Type? = when (type) {
@@ -122,6 +123,7 @@ sealed class Terrain(
         TERRAIN_CHASM,
         TERRAIN_RUBBLE,
         TERRAIN_TRAIL,
+        TERRAIN_HEARTH,
     }
 
     override fun glyph() = this.glyph

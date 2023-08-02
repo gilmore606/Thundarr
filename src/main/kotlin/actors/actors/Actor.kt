@@ -449,7 +449,10 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
         healer?.also { receiveAssistance(it) }
     }
 
-    open fun receiveAggression(attacker: Actor) { }
+    open fun receiveAggression(attacker: Actor) {
+        if (hasStatus(Status.Tag.ASLEEP)) wakeFromSleep()
+    }
+
     open fun receiveAssistance(assister: Actor) { }
 
     open fun onKilledBy(killer: Actor) {

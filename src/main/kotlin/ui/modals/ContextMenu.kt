@@ -8,6 +8,7 @@ import render.tilesets.UITileSet
 import ui.input.Keyboard
 import ui.input.Keydef
 import util.WEST
+import util.XY
 
 class ContextMenu(
     screenX: Int,
@@ -25,7 +26,7 @@ class ContextMenu(
     override fun newThingBatch() = null
     override fun newActorBatch() = null
 
-    class Option(val name: String, val onPick: ()->Unit)
+    class Option(val name: String, val onPick: ()->Unit, val cursorXY: XY? = null)
 
     var parentModal: ParentModal? = null
     interface ParentModal {
@@ -51,8 +52,8 @@ class ContextMenu(
         changeSelection(0)
     }
 
-    fun addOption(text: String, handler: ()->Unit): ContextMenu {
-        options.add(Option(text, handler))
+    fun addOption(text: String, cursorXY: XY? = null, handler: ()->Unit): ContextMenu {
+        options.add(Option(text, handler, cursorXY))
         val optionWidth = GlyphLayout(Screen.font, text).width.toInt()
         if (optionWidth > maxOptionWidth) {
             maxOptionWidth = optionWidth
@@ -68,6 +69,11 @@ class ContextMenu(
     override fun changeSelection(newSelection: Int) {
         super.changeSelection(newSelection)
         onHover?.invoke(newSelection)
+        if (options.isNotEmpty() && selection in 0..maxSelection) {
+            options[selection].cursorXY?.also { cursorXY ->
+                Screen.cursorPosition = cursorXY
+            }
+        }
     }
 
     override fun drawModalText() {
@@ -89,12 +95,14 @@ class ContextMenu(
         if (selection < 0) return
         super.doSelect()
         dismissSuccess()
+        Screen.clearCursor()
         options[selection].onPick.invoke()
     }
 
     override fun onKeyDown(key: Keydef) {
         if (key == Keydef.OPEN_INV) dismissSuccess()
         else if (key == Keydef.MOVE_W) {
+            Screen.clearCursor()
             dismiss()
         } else {
             super.onKeyDown(key)
