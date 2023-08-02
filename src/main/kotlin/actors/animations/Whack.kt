@@ -8,8 +8,9 @@ import java.lang.Integer.min
 @Serializable
 class Whack(
     val dir: XY,
-    val reach: Float = 0.8f
-) : Animation(300) {
+    val reach: Float = 0.8f,
+    val whackDuration: Long = 300,
+) : Animation(whackDuration) {
 
     var ox = 0f
     var oy = 0f

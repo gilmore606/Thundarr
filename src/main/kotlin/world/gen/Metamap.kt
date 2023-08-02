@@ -1198,7 +1198,7 @@ object Metamap {
                     val myExit = Rivers.RiverExit(
                         pos = edgePos,
                         edge = edgeDir,
-                        control = edgePos + (edgeDir * -1 * Dice.range(4, 20) + (edgeDir.rotated() * Dice.range(
+                        control = edgePos + (edgeDir * -1 * Dice.range(4, 20) + (edgeDir.unitRotated() * Dice.range(
                             -12,
                             12
                         ))),
@@ -1209,7 +1209,7 @@ object Metamap {
                     val childExit = Rivers.RiverExit(
                         pos = childEdgePos,
                         edge = childEdgeDir,
-                        control = childEdgePos + (edgeDir * Dice.range(4, 20)) + (edgeDir.rotated() * Dice.range(
+                        control = childEdgePos + (edgeDir * Dice.range(4, 20)) + (edgeDir.unitRotated() * Dice.range(
                             -12,
                             12
                         )),
@@ -1255,7 +1255,7 @@ object Metamap {
                 width -= Dice.float(1f, 2.5f)
                 if (width <= 1f) done = true
                 if (Dice.chance(branchChance * (width / 5f))) {
-                    val branchDir = if (Dice.flip()) dir.rotated() else dir.rotated().flipped()
+                    val branchDir = if (Dice.flip()) dir.unitRotated() else dir.unitRotated().flipped()
                     digLavaFlow(cursor, branchDir, width * 0.7f)
                 }
             } else {
@@ -1444,7 +1444,7 @@ object Metamap {
                     if (cursor != city) newRoads.add(XY(cursor.x, cursor.y))
                     stepsSinceSideRoad++
                     if (stepsSinceSideRoad >= minStepsBetweenSideRoads && Dice.chance(sideRoadChance)) {
-                        var sideRoadDir = moveDir.rotated()
+                        var sideRoadDir = moveDir.unitRotated()
                         if (Dice.flip()) sideRoadDir = sideRoadDir.flipped()
                         runSideRoad(XY(cursor.x, cursor.y), sideRoadDir, highwayNumber)
                         stepsSinceSideRoad = 0
@@ -1475,7 +1475,7 @@ object Metamap {
             else if (scratches[next.x][next.y].biome == Mountain) {
                 if (Dice.chance(0.2f)) done = true
                 else {
-                    currentDir = currentDir.rotated()
+                    currentDir = currentDir.unitRotated()
                     if (Dice.flip()) currentDir = currentDir.flipped()
                 }
             } else {

@@ -9,7 +9,7 @@ import ui.input.Mouse
 import ui.panels.Console
 import util.log
 
-class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
+class ControlsModal : Modal(550, 580, "- cONtRoLS -") {
 
     override fun newThingBatch() = null
     override fun newActorBatch() = null
@@ -111,29 +111,37 @@ class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
     class KeyItem(
         val header: String? = null,
         val key: Keydef? = null,
-        var code: Int = -1
+        var code: Int = -1,
+        val y: Int = 0
     ) {
         fun isKey() = header == null
         fun isHeader() = header != null
     }
 
     val items = Array (2) { ArrayList<KeyItem>() }.apply {
-        addItems(this[0], KeydefSection.MOVE)
-        addItems(this[0], KeydefSection.INTERACT)
-        addItems(this[1], KeydefSection.AWARE)
-        addItems(this[1], KeydefSection.UI)
+        val yacc = addItems(0, this[0], KeydefSection.MOVE)
+        addItems(yacc, this[0], KeydefSection.INTERACT)
+        val yacc1 = addItems(0, this[1], KeydefSection.AWARE)
+        addItems(yacc1, this[1], KeydefSection.UI)
     }
 
     fun codeToName(code: Int): String? = keyNames[code]
 
-    private fun addItems(toList: ArrayList<KeyItem>, section: KeydefSection) {
-        toList.add(KeyItem(header = section.title))
+    private fun addItems(yacc: Int, toList: ArrayList<KeyItem>, section: KeydefSection): Int {
+        var iy = if (yacc > 0) yacc + (lineSpacing * 0.6f).toInt() else yacc
+        toList.add(KeyItem(header = section.title, y = iy))
+        iy += (lineSpacing * 1.3f).toInt()
         for (keyDef in Keydef.values()) {
-            if (keyDef.uiSection == section) toList.add(KeyItem(
-                key = keyDef,
-                code = Keyboard.codeForBind(keyDef)
-            ))
+            if (keyDef.uiSection == section) {
+                toList.add(KeyItem(
+                        key = keyDef,
+                        code = Keyboard.codeForBind(keyDef),
+                        y = iy
+                    ))
+                iy += lineSpacing
+            }
         }
+        return iy
     }
 
     private fun selectedItem(): KeyItem? =
@@ -142,12 +150,12 @@ class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
 
     override fun drawModalText() {
         super.drawModalText()
-        drawString("(numpad is hardwired to move/interact/zoom)", padding, header - 26, Screen.fontColorDull, Screen.smallFont)
+        drawString("(numpad is hardwired to move/interact/zoom)", padding, header - 32, Screen.fontColorDull, Screen.smallFont)
         for (ix in 0..1) {
             var iy = 0
             for (item in items[ix]) {
                 val x = padding + ix * columnWidth
-                val y = header + iy * lineSpacing
+                val y = header + item.y
                 item.header?.also { header ->
                     drawString(header, x, y + 3, Screen.fontColorDull, Screen.smallFont)
                 } ?: item.key?.also { key ->
@@ -168,8 +176,8 @@ class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
                 selectedItem()?.also { selected ->
                     if (selected.isKey())
                         drawSelectionBox(
-                            padding + selectionX * columnWidth, header + selectionY * lineSpacing + 4,
-                            columnWidth - 10, 18
+                            padding + selectionX * columnWidth, header + items[selectionX][selectionY].y + 5,
+                            columnWidth - 10, lineSpacing - 5
                         )
                 }
             } else if (selectionX >=0 && selectionY == items[selectionX].size) {
@@ -213,13 +221,15 @@ class ControlsModal : Modal(550, 520, "- cONtRoLS -") {
         val ly = screenY - y - header
         if (lx > 0 && ly > 0 && lx < (columnWidth * 2)) {
             val column = if (lx > columnWidth) 1 else 0
-            val row = ly / lineSpacing
-            if (row < items[column].size) {
-                if (items[column][row].isKey()) {
-                    selectionX = column
-                    selectionY = row
-                    return
+            selectionY = -1
+            items[column].forEachIndexed { n, item ->
+                if (ly in item.y - 1 .. item.y + lineSpacing) {
+                    selectionY= n
                 }
+            }
+            if (selectionY> -1) {
+                selectionX = column
+                return
             }
         }
         if (lx in 1 until columnWidth && ly in (height - header - 48) until height - header - 8) {

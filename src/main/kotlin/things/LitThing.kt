@@ -280,7 +280,7 @@ sealed class GenericTorch : LitThing(), Temporal {
     }
 
     override fun advanceTime(delta: Float) {
-        if (torchFuel >= 0f) {
+        if (active && torchFuel >= 0f) {
             torchFuel -= delta
             if (torchFuel < 200f) {
                 lightColor.r = max(0.15f, lightColor.r - delta * 0.0015f)

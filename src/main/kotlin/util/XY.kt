@@ -83,7 +83,17 @@ data class XY(var x: Int, var y: Int) {
 
     fun toXYf() = XYf(x.toFloat(), y.toFloat())
 
-    fun rotated() = XY(y, x)
+    fun unitRotated() = when (this) {
+        XY(-1, 0) -> XY(0, -1)
+        XY(-1, -1) -> XY(1, -1)
+        XY(0, -1) -> XY(1, 0)
+        XY(1, -1) -> XY(1, 1)
+        XY(1, 0) -> XY(0, 1)
+        XY(1, 1) -> XY(-1, 1)
+        XY(0, 1) -> XY(-1, 0)
+        XY(-1, 1) -> XY(-1, -1)
+        else -> XY(0, 0)
+    }
     fun flipped() = XY(-x, -y)
 
     fun isFarEnoughFromAll(dist: Int, all: List<XY>): Boolean {

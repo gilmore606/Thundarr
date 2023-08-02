@@ -49,6 +49,7 @@ enum class Keydef(
     OPEN_MAP("Open map", M, true, KeydefSection.UI),
     OPEN_JOURNAL("Open journal", O, true, KeydefSection.UI),
     TOOLBAR_SHOW("Show toolbar", NUM_0, true, KeydefSection.UI),
+    SCROLL_TOGGLE("Toggle scroll", DPAD_UP, true, KeydefSection.UI),
 
     CANCEL("Cancel / Menu", ESCAPE, false, KeydefSection.HIDDEN),
     SHORTCUT1("Shortcut 1", NUM_1, false, KeydefSection.HIDDEN),

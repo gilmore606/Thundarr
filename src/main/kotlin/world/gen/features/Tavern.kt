@@ -111,7 +111,7 @@ class Tavern(
         val tavernDecor = Tavern(name)
         tavernDecor.furnish(tavernHut, carto)
         val tavernJob = tavernDecor.job().apply {
-            signXY = (hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated())
+            signXY = (hut.doorXY!! + hut.doorDir!! + hut.doorDir.unitRotated())
         }
         jobs.add(tavernJob)
         val sign = HighwaySign(name)

@@ -27,7 +27,7 @@ fun UITileSet() =
         setTile(Glyph.SLEEP_ICON, SimpleTile(this, 3, 4))
         setTile(Glyph.ANGRY_THUNDARR, SimpleTile(this, 2, 3))
         setTile(Glyph.SPEECH_BUBBLE, SimpleTile(this, 3, 3))
-        setTile(Glyph.POW_ICON, SimpleTile(this, 0, 4))
+        setTile(Glyph.DEBRIS_PARTICLE, SimpleTile(this, 0, 4))
         setTile(Glyph.HOSTILE_ICON, SimpleTile(this, 1, 4))
         setTile(Glyph.HOSTILE_OTHER_ICON, SimpleTile(this, 2, 5))
         setTile(Glyph.FLEEING_ICON, SimpleTile(this, 1, 5))

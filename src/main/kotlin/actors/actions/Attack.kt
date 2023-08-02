@@ -8,11 +8,8 @@ import actors.stats.skills.Dodge
 import actors.stats.skills.Fight
 import audio.Speaker
 import kotlinx.serialization.Serializable
-import render.sparks.Pow
-import render.sparks.Smoke
-import things.Weapon
+import render.sparks.HitDebris
 import ui.panels.Console
-import util.Dice
 import util.XY
 import util.log
 import world.level.Level
@@ -49,12 +46,11 @@ class Attack(
 
             val roll = (weapon.skill().resolve(actor, difficulty) + Fight.resolve(actor, difficulty)) / 2
             log.info("COMBAT: $actor rolled attack $roll at diff $difficulty")
+            target.receiveAggression(actor)
 
             if (roll < 0) {
 
                 // MISS
-                target.receiveAggression(actor)
-                level.addSpark(Smoke().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
                 Console.sayAct(weapon.missSelfMsg(), weapon.missOtherMsg(), actor, target, weapon)
                 Speaker.world(weapon.missSound(), source = actor.xy)
 
@@ -62,7 +58,7 @@ class Attack(
 
                 // DODGE
                 Console.sayAct("%Dd dodges your %i attack.", "%Dd dodges %dn's %i.", actor, target, weapon)
-                target.animation = Whack((target.xy - actor.xy).rotated(), 0.5f)
+                target.animation = Whack((target.xy - actor.xy).unitRotated(), 0.4f, 400)
 
             } else {
 
@@ -71,6 +67,7 @@ class Attack(
                 if (roll < deflect) {
 
                     // DEFLECT
+                    sparkDebris(1, level, target.xy)
                     Console.sayAct(
                         partSub("Your %i glances harmlessly off %dd's %part.", bodypart),
                         partSub("%Dn's %i glances off %dd's %part.", bodypart),
@@ -87,6 +84,7 @@ class Attack(
                     if (damage <= 0f) {
 
                         // BOUNCE
+                        sparkDebris(1, level, target.xy)
                         Console.sayAct(
                             partSub("Your %i bounces harmlessly off %dd's %part.", bodypart),
                             partSub("%Dn's %i bounces off %dd's %part.", bodypart),
@@ -96,7 +94,7 @@ class Attack(
                     } else {
 
                         // DAMAGE INFLICTED
-                        level.addSpark(Pow().at(actor.xy.x + dir.x, actor.xy.y + dir.y))
+                        sparkDebris(5, level, target.xy)
                         Speaker.world(weapon.hitSound(), source = actor.xy)
                         target.receiveDamage(damage, weapon.damageType(), bodypart, actor)
                         if (target.isAlive()) {
@@ -109,6 +107,11 @@ class Attack(
             }
         }
 
+    }
+    private fun sparkDebris(count: Int, level: Level, at: XY) {
+        repeat (count) {
+            level.addSpark(HitDebris().at(at.x, at.y))
+        }
     }
 
     private fun partSub(m: String, part: Bodypart) = m.replace("%part", part.name)

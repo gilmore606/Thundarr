@@ -205,6 +205,7 @@ object Keyboard : KtxInputAdapter {
 
                 SEEN_TOGGLE -> { Screen.showSeenAreas = !Screen.showSeenAreas }
                 RADAR_TOGGLE -> { Screen.showRadar = !Screen.showRadar }
+                SCROLL_TOGGLE -> { Console.toggleScrollback()  }
 
                 OPEN_INV -> { App.openInventory() }
                 OPEN_GEAR -> { App.openGear() }

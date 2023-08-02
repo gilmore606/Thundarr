@@ -66,7 +66,7 @@ enum class Glyph(val tall: Boolean = false) {
     SLEEP_ICON,
     ANGRY_THUNDARR,
     SPEECH_BUBBLE,
-    POW_ICON,
+    DEBRIS_PARTICLE,
     HOSTILE_ICON,
     HOSTILE_OTHER_ICON,
     FLEEING_ICON,

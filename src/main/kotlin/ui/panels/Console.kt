@@ -19,11 +19,10 @@ import java.lang.Float.min
 
 object Console : Panel() {
 
-    private val maxLines = 40
     private val maxLinesShown = 7
     private val lineSpacing = 21
     private val padding = 12
-    val lines: MutableList<String> = mutableListOf<String>()
+    val lines: MutableList<String> = mutableListOf()
 
     private var lastLineMs = System.currentTimeMillis()
     private var scroll = 0f
@@ -48,6 +47,7 @@ object Console : Panel() {
     private var burstFloor = dimLevel
 
     var mouseInside = false
+    var forceScrollback = false
     private var modalUp = false
 
     var inputActive = false
@@ -106,8 +106,16 @@ object Console : Panel() {
 
     enum class Reach { VISUAL, AUDIBLE, LEVEL, WORLD }
 
+    private var maxLines = 2
+
     init {
+        adjustMaxLines()
         clear()
+    }
+
+    private fun adjustMaxLines() {
+        maxLines = (height - padding * 2) / lineSpacing
+        while (lines.size > maxLines) lines.removeFirst()
     }
 
     fun clear() {
@@ -135,7 +143,14 @@ object Console : Panel() {
         if (lines.size > maxLines) {
             lines.removeFirst()
         }
-        if (!mouseInside) resetFloat(line)
+        if (!isScrolledBack()) resetFloat(line)
+    }
+
+    private fun isScrolledBack() = mouseInside || inputActive || forceScrollback
+
+    fun toggleScrollback() {
+        forceScrollback = !forceScrollback
+        if (forceScrollback) this.burst = 1.2f
     }
 
     fun sayFromThread(text: String) {
@@ -195,10 +210,11 @@ object Console : Panel() {
 
     override fun onResize(width: Int, height: Int) {
         super.onResize(width, height)
-        this.height = (maxLines * lineSpacing) + padding * 2
         x = xMargin
-        y = height - this.height - yMargin - padding
         this.width = width - (xMargin * 2)
+        y = yMargin * 2 + EnvPanel.height
+        this.height = (height - y - yMargin)
+        adjustMaxLines()
     }
 
     override fun onRender(delta: Float) {
@@ -208,7 +224,7 @@ object Console : Panel() {
             burstFloor = dimLevel
         }
         modalUp = Screen.topModal != null
-        if (!(mouseInside || inputActive)) burst = max(burstFloor, burst - burstDecay * delta)
+        if (!isScrolledBack()) burst = max(burstFloor, burst - burstDecay * delta)
 
         color.apply {
             r = min(1f, Screen.fontColor.r * burst)
@@ -238,7 +254,7 @@ object Console : Panel() {
     override fun drawText() {
         var offset = scroll.toInt() + padding
         lines.forEachIndexed { n, line ->
-            if ((mouseInside || inputActive) || (n >= lines.size - maxLinesShown)) {
+            if (isScrolledBack() || (n >= lines.size - maxLinesShown)) {
                 drawString(
                     line, padding, offset,
                     if (n == lines.lastIndex) color else colorDull
@@ -246,6 +262,7 @@ object Console : Panel() {
             }
             offset += lineSpacing
         }
+
         if (!App.attractMode && floatAge <= floatFadeTime) {
             floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
             drawStringAbsolute(floatText,
@@ -256,7 +273,7 @@ object Console : Panel() {
     }
 
     override fun drawBackground() {
-        if ((mouseInside || inputActive) && !App.attractMode) {
+        if (isScrolledBack() && !App.attractMode) {
             Screen.uiBatch.addPixelQuad(xMargin, yMargin + EnvPanel.height + yMargin,
                 Screen.width - xMargin * 2 - RadarPanel.width, Screen.height - yMargin,
                 Screen.uiBatch.getTextureIndex(Glyph.CONSOLE_SHADE), alpha = 0.6f)

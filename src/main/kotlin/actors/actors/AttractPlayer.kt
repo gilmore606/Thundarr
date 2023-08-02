@@ -39,10 +39,11 @@ class AttractPlayer : Player() {
 
     override fun onSpawn() {
         Strength.set(this, 20f)
-        Fight.set(this, 4f)
-        Dodge.set(this, 1f)
+        Fight.set(this, 9f)
+        Dodge.set(this, 3f)
         actors.stats.skills.Throw.set(this, 3f)
-
+        currentHpMax = 200f
+        hp = 200f
         Sunsword().moveTo(this)
         repeat (4) { Apple().moveTo(this) }
         Pickaxe().moveTo(this)

@@ -142,7 +142,7 @@ class Village(
             shopDecors.remove(decor)
             decor.furnish(hut, carto, isAbandoned)
             val shopJob = decor.job().apply {
-                signXY = hut.doorXY!! + hut.doorDir!! + hut.doorDir.rotated()
+                signXY = hut.doorXY!! + hut.doorDir!! + hut.doorDir.unitRotated()
             }
             jobs.add(shopJob)
             if (shopJob.needsOwner) ownerJobs.add(shopJob)
