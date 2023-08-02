@@ -12,7 +12,7 @@ sealed class GenericCloak : Clothing() {
     override val slot = Slot.CLOAK
     override fun glyph() = Glyph.CLOAK
     override fun glyphTransform() = glyphTransform
-    override fun weatherProtection() = 0.8f
+    override fun weatherProtection() = 0.7f
     override fun heatProtection() = 0.4f
     override fun coldProtection() = 0.5f
 }
@@ -35,6 +35,7 @@ class FurHide : GenericCloak() {
     override fun description() = "A leather animal hide covered in thick fur.  You could make something out of it, or wear it as a cloak."
     override fun hue() = 2.6f
     override fun weight() = 1.2f
+    override fun coldProtection() = 1f
     override fun material() = Material.FUR
     override fun armor() = 1f
 }
@@ -59,4 +60,16 @@ class TarpCloak : GenericCloak() {
     override fun coldProtection() = 0.1f
     override fun material() = Material.PLASTIC
     override fun armor() = 0f
+}
+
+@Serializable
+class TravelCloak : GenericCloak() {
+    override val tag = Tag.TRAVEL_CLOAK
+    override fun name() = "travel cloak"
+    override fun description() = "A thick wool cloth cloak, warm and dry."
+    override fun weight() = 0.5f
+    override fun coldProtection() = 0.8f
+    override fun weatherProtection() = 1f
+    override fun material() = Material.CLOTH
+    override fun armor() = 1f
 }

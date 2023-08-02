@@ -30,7 +30,7 @@ class LeatherPants : GenericPants() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_PANTS_WORN)
     }
-    override val tag = Tag.LEATHERPANTS
+    override val tag = Tag.LEATHER_PANTS
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_PANTS
     override fun hue() = 0.2f
@@ -64,7 +64,7 @@ class FurPants : GenericPants() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_PANTS_WORN)
     }
-    override val tag = Tag.FURPANTS
+    override val tag = Tag.FUR_PANTS
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_PANTS
     override fun name() = "fur pants"

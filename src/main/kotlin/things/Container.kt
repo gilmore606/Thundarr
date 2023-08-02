@@ -8,10 +8,7 @@ import kotlinx.serialization.Transient
 import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import util.Dice
-import util.log
-import world.gen.spawnsets.BookLoot
-import world.gen.spawnsets.LootSet
-import world.gen.spawnsets.WeaponLoot
+import world.gen.spawnsets.*
 import world.level.Level
 
 @Serializable
@@ -157,13 +154,17 @@ class Trunk : Container() {
 }
 
 @Serializable
+class Chest : Container() {
+    override val tag = Tag.CHEST
+    override fun name() = "chest"
+    override fun description() = "A sturdy oak chest."
+    override fun glyph() = Glyph.CHEST
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+}
+
+@Serializable
 class Bonepile : Container() {
-    companion object {
-        val lootSet = LootSet().apply {
-            add(1f, WeaponLoot.set)
-            add(1f, BookLoot.set)
-        }
-    }
     override val tag = Tag.BONEPILE
     override fun name() = "bone pile"
     override fun description() = "A pile of dried old bones; from what, you can't tell."
@@ -171,7 +172,7 @@ class Bonepile : Container() {
     override fun isPortable() = false
     override fun openVerb() = "search"
     override fun isEmptyMsg() = "You find nothing useful in the bones."
-    override fun defaultLoot() = lootSet
+    override fun defaultLoot() = TravelerLoot.set
     override fun defaultLootCount() = Dice.range(0, 3)
 }
 

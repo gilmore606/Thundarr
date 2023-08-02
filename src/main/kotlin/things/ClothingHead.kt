@@ -21,7 +21,7 @@ class WoolHat : GenericHat() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.HARD_HAT, 0.0f, -0.6f)
     }
-    override val tag = Tag.WOOLHAT
+    override val tag = Tag.WOOL_HAT
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.HARD_HAT
     override fun hue() = 3.5f

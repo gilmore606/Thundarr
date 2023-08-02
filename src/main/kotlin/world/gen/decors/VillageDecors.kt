@@ -10,7 +10,7 @@ import world.gen.cartos.Carto
 import world.gen.cartos.WorldCarto
 import world.gen.habitats.Habitat
 import world.gen.habitats.Garden
-import world.gen.spawnsets.SpawnSet
+import world.gen.spawnsets.*
 import world.terrains.Terrain
 import java.lang.Math.max
 import java.lang.Math.min
@@ -30,12 +30,19 @@ class Hut : Decor() {
                 bedLocations.add(bedXY)
             } }
         }
-        chance(0.5f + bedCount * 0.1f) { againstWall { spawn(Trunk()) } }
-        chance(0.2f + bedCount * 0.2f) { awayFromWall { spawn(Table()) } }
+        chance(0.5f + bedCount * 0.1f) { againstWall { spawn(
+            Trunk().withLoot(HutLoot.set, Dice.range(1, 2), carto.threatLevel)
+        ) } }
+        chance(0.2f + bedCount * 0.2f) { awayFromWall { spawn(
+            Table().withLoot(HutLoot.set, Dice.range(0, 1), carto.threatLevel)
+        ) } }
         chance(bedCount * 0.1f) { awayFromWall { spawn(Table()) } }
         if (clearCount > 20) {
             chance(0.6f) { againstWall { spawn(
-                if (Dice.chance(0.7f)) FilingCabinet() else Bookshelf()
+                if (Dice.chance(0.7f))
+                    FilingCabinet().withLoot(HutLoot.set, Dice.range(1, 4), carto.threatLevel)
+                else
+                    Bookshelf().withLoot(BookLoot.set, Dice.range(0 ,2), carto.threatLevel)
             )}}
         }
         hasTable()?.also { Candle().moveTo(it) } ?: run {
@@ -54,7 +61,7 @@ class Schoolhouse : Decor() {
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
         repeat(Dice.oneTo(2)) { againstWall {
-            spawn(Bookshelf())
+            spawn(Bookshelf().withLoot(BookLoot.set, Dice.range(1 ,2), carto.threatLevel))
             clearAround()
         } }
         forEachClear { x,y ->
@@ -74,7 +81,12 @@ class Church : Decor() {
         atCenter { spawn(
             if (!isAbandoned || Dice.chance(0.5f)) Shrine() else Boulder()
         ) }
-        repeat(Dice.zeroTo(2)) { againstWall { spawn(Table()) }}
+        repeat(Dice.zeroTo(2)) { againstWall { spawn(
+            Table().withLoot(ShrineLoot.set, Dice.range(0, 1), carto.threatLevel)
+        ) }}
+        againstWall { spawn(
+            Chest().withLoot(ShrineLoot.set, Dice.range(2, 5), carto.threatLevel)
+        ) }
     }
     override fun job() = ChurchJob(room.rect)
 }
@@ -84,9 +96,11 @@ class StorageShed : Decor() {
     override fun description() = "A musty-smelling storage shed."
 
     override fun doFurnish() {
-        againstWall { spawn(Candlestick())}
-        repeat (Dice.range(4, 8)) {
-            awayFromWall { spawn(if (Dice.flip()) Trunk() else FilingCabinet()) }
+        againstWall { spawn(Candlestick()) }
+        repeat (Dice.range(3, 5)) {
+            awayFromWall { spawn(
+                (if (Dice.flip()) Chest() else FilingCabinet()).withLoot(HutLoot.set, Dice.range(1, 4), carto.threatLevel)
+                )}
         }
         if (Dice.flip()) repeat (Dice.range(1, 3)) {
             againstWall { spawn(Table()) }
@@ -109,7 +123,9 @@ class BlacksmithShop : Decor() {
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
         againstWall {
-            caseKey = spawn(StorageCabinet())?.getKey()
+            caseKey = spawn(
+                StorageCabinet().withLoot(SmithyWares.set, Dice.range(4, 6), carto.threatLevel)
+            )?.getKey()
         }
         forArea(x0+1, y0+1, x1-1, y1-1) { x,y ->
             setTerrain(x, y, Terrain.Type.TERRAIN_DIRT, roofed = true)
@@ -212,7 +228,10 @@ class Barn : Decor() {
     override fun description() = "A barn.  It smells of hay and manure."
     override fun abandonedDescription() = "A barn that hasn't seen use in a long time."
     override fun doFurnish() {
-        againstWall { spawn(Candlestick())}
+        againstWall { spawn(Candlestick()) }
+        againstWall { spawn(
+            Chest().withLoot(BarnLoot.set, Dice.range(2, 5), carto.threatLevel)
+        )}
     }
     override fun job() = WorkJob(
         "barn", "farmer", room.rect, false, true, setOf(
@@ -229,7 +248,9 @@ class Tavern(val name: String) : Decor() {
     override fun abandonedDescription() = "An abandoned inn."
     override fun doFurnish() {
         againstWall { spawn(Candlestick())}
-        againstWall { caseKey = spawn(StorageCabinet())?.getKey() }
+        againstWall { caseKey = spawn(
+            StorageCabinet().withLoot(TavernWares.set, Dice.range(4, 6), carto.threatLevel)
+        )?.getKey() }
 
         repeat (Dice.range(5, 8)) {
             awayFromWall {
@@ -263,6 +284,8 @@ class Barracks(val vertical: Boolean) : Decor() {
             }
         }}
         againstWall { spawn(Candlestick()) }
-        againstWall { spawn(Trunk()) }
+        againstWall { spawn(
+            Trunk().withLoot(TravelerLoot.set, Dice.range(2, 4), carto.threatLevel)
+        ) }
     }
 }

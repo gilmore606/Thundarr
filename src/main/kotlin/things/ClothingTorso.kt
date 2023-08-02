@@ -15,7 +15,7 @@ class FurTunic : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_TUNIC_WORN)
     }
-    override val tag = Tag.FURTUNIC
+    override val tag = Tag.FUR_TUNIC
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_TUNIC
     override fun name() = "fur tunic"
@@ -32,7 +32,7 @@ class LeatherVest : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_TUNIC_WORN)
     }
-    override val tag = Tag.LEATHERVEST
+    override val tag = Tag.LEATHER_VEST
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_TUNIC
     override fun hue() = 0.2f
@@ -49,7 +49,7 @@ class ScaleVest : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_TUNIC_WORN)
     }
-    override val tag = Tag.SCALEVEST
+    override val tag = Tag.SCALE_VEST
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_TUNIC
     override fun hue() = 0.7f
@@ -66,7 +66,7 @@ class LeatherJacket : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_JACKET_WORN)
     }
-    override val tag = Tag.LEATHERJACKET
+    override val tag = Tag.LEATHER_JACKET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_JACKET
     override fun hue() = 0.2f
@@ -84,7 +84,7 @@ class ScaleJacket : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_JACKET_WORN)
     }
-    override val tag = Tag.SCALEJACKET
+    override val tag = Tag.SCALE_JACKET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_JACKET
     override fun hue() = 0.7f
@@ -102,7 +102,7 @@ class FurJacket : GenericShirt() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.RED_JACKET_WORN)
     }
-    override val tag = Tag.FURJACKET
+    override val tag = Tag.FUR_JACKET
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.RED_JACKET
     override fun name() = "fur jacket"
