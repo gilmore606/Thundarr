@@ -45,8 +45,8 @@ abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
         val item: S,
         val variant: Variant<O>? = null
     ) {
-        fun spawnThing() = (item as Thing.Tag).spawn()
-        fun spawnNPC() = (item as NPC.Tag).spawn()
+        fun spawnThing() = (item as Thing.Tag).spawn().apply { onSpawn() }
+        fun spawnNPC() = (item as NPC.Tag).spawn().apply { onSpawn() }
     }
 
     val set: MutableSet<Entry<S,O,T>> = mutableSetOf()

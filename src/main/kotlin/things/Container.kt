@@ -9,6 +9,9 @@ import ktx.async.KtxAsync
 import render.tilesets.Glyph
 import util.Dice
 import util.log
+import world.gen.spawnsets.BookLoot
+import world.gen.spawnsets.LootSet
+import world.gen.spawnsets.WeaponLoot
 import world.level.Level
 
 @Serializable
@@ -60,21 +63,20 @@ sealed class Container : Portable(), ThingHolder {
     }
     open fun onRemove(thing: Thing) { }
 
-    open fun randomTreasure(): Thing? = null
-    open fun randomTreasureCount(): Int = 0
-
-    override fun onSpawn() {
-        // TODO: Find a more generic way to deal with this, that doesn't involve launching one for every thing.onSpawn().
-        // Coroutine, because otherwise constructor hasn't finished and we don't have a contents.
-        val treasures = randomTreasureCount()
-        if (treasures > 0) {
-            KtxAsync.launch {
-                repeat (treasures) {
-                    randomTreasure()?.moveTo(this@Container)
+    open fun withLoot(lootSet: LootSet, lootCount: Int, xpLevel: Int): Container {
+        KtxAsync.launch {
+            repeat(lootCount) {
+                lootSet.getLoot(xpLevel)?.spawnThing()?.also {
+                    it.moveTo(this@Container)
                 }
             }
         }
+        return this
     }
+
+    open fun withDefaultLoot(xpLevel: Int): Container = defaultLoot()?.let { withLoot(it, defaultLootCount(), xpLevel) } ?: this
+    open fun defaultLoot(): LootSet? = null
+    open fun defaultLootCount() = 0
 
     override fun uses(): MutableMap<UseTag, Use> {
         if (isOpenable()) {
@@ -100,14 +102,6 @@ class FilingCabinet : Container() {
     override fun glyph() = Glyph.FILING_CABINET
     override fun isPortable() = false
     override fun openVerb() = "open"
-
-    override fun randomTreasureCount() = Dice.zeroTo(2)
-    override fun randomTreasure() = when (Dice.zeroTo(3)) {
-        0 -> BoysLife()
-        1 -> Lighter()
-        2 -> HardHat()
-        else -> Paperback()
-    }
 }
 
 @Serializable
@@ -119,13 +113,6 @@ class StorageCabinet : Container() {
     override fun hue() = -0.9f
     override fun isPortable() = false
     override fun openVerb() = "open"
-    override fun randomTreasureCount() = Dice.zeroTo(2)
-    override fun randomTreasure() = when (Dice.zeroTo(3)) {
-        0 -> BoysLife()
-        1 -> Lighter()
-        2 -> HardHat()
-        else -> Paperback()
-    }
 }
 
 @Serializable
@@ -136,13 +123,6 @@ class Bookshelf : Container() {
     override fun glyph() = Glyph.BOOKSHELF
     override fun isPortable() = false
     override fun openVerb() = "peruse"
-
-    override fun randomTreasureCount() = Dice.zeroTo(2)
-    override fun randomTreasure() = when (Dice.zeroTo(1)) {
-        0 -> BoysLife()
-        1 -> Paperback()
-        else -> Paperback()
-    }
 }
 
 @Serializable
@@ -152,8 +132,6 @@ class Wardrobe : Container() {
     override fun description() = "A wooden wardrobe."
     override fun glyph() = Glyph.WARDROBE
     override fun isPortable() = false
-
-    override fun randomTreasureCount() = Dice.zeroTo(2)
 }
 
 @Serializable
@@ -166,19 +144,6 @@ class Fridge : Container() {
     override fun openVerb() = "open"
 
     fun isRefrigerating() = true  // TODO: invent electric power
-
-    override fun randomTreasureCount() = Dice.oneTo(3)
-    override fun randomTreasure() = when (Dice.zeroTo(13)) {
-        0,8,9,10 -> RawMeat()
-        1 -> ChickenLeg()
-        2 -> Cheese()
-        3 -> EnergyDrink()
-        4 -> Steak()
-        5 -> Apple()
-        6 -> Pear()
-        7,11 -> ThrallChow()
-        else -> Stew()
-    }
 }
 
 @Serializable
@@ -189,25 +154,16 @@ class Trunk : Container() {
     override fun glyph() = Glyph.STRONGBOX
     override fun isPortable() = false
     override fun openVerb() = "open"
-
-    override fun randomTreasureCount() = Dice.oneTo(4)
-    override fun randomTreasure() = when (Dice.zeroTo(10)) {
-        0 -> BoysLife()
-        1 -> Lighter()
-        2 -> HardHat()
-        3 -> Axe()
-        4 -> Pickaxe()
-        5 -> Bandages()
-        6 -> FirstAidKit()
-        7 -> RiotHelmet()
-        8 -> TravelBoots()
-        9 -> Paperback()
-        else -> Torch()
-    }
 }
 
 @Serializable
 class Bonepile : Container() {
+    companion object {
+        val lootSet = LootSet().apply {
+            add(1f, WeaponLoot.set)
+            add(1f, BookLoot.set)
+        }
+    }
     override val tag = Tag.BONEPILE
     override fun name() = "bone pile"
     override fun description() = "A pile of dried old bones; from what, you can't tell."
@@ -215,21 +171,8 @@ class Bonepile : Container() {
     override fun isPortable() = false
     override fun openVerb() = "search"
     override fun isEmptyMsg() = "You find nothing useful in the bones."
-
-    override fun randomTreasureCount() = Dice.zeroTo(1)
-    override fun randomTreasure() = when (Dice.zeroTo(10)) {
-        0 -> BoysLife()
-        1 -> Lighter()
-        2 -> HardHat()
-        3 -> Axe()
-        4 -> Pickaxe()
-        5 -> Bandages()
-        6 -> FirstAidKit()
-        7 -> RiotHelmet()
-        8 -> TravelBoots()
-        9 -> Paperback()
-        else -> Torch()
-    }
+    override fun defaultLoot() = lootSet
+    override fun defaultLootCount() = Dice.range(0, 3)
 }
 
 @Serializable
@@ -244,21 +187,6 @@ class WreckedCar : Container() {
     override fun isBlocking(actor: Actor) = true
     override fun openVerb() = "search"
     override fun isEmptyMsg() = "You find nothing useful in the vehicle."
-
-    override fun randomTreasureCount() = Dice.zeroTo(1)
-    override fun randomTreasure() = when (Dice.zeroTo(10)) {
-        0 -> BoysLife()
-        1 -> Lighter()
-        2 -> HardHat()
-        3 -> Axe()
-        4 -> Pickaxe()
-        5 -> Bandages()
-        6 -> FirstAidKit()
-        7 -> RiotHelmet()
-        8 -> TravelBoots()
-        9 -> Paperback()
-        else -> Torch()
-    }
 
     override fun onSpawn() {
         super.onSpawn()

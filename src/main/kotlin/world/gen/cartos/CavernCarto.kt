@@ -17,8 +17,8 @@ import world.terrains.Water
 
 class CavernCarto(
     level: EnclosedLevel,
-    val building: Building
-) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, level.chunk!!, level) {
+    val building: Building,
+) : Carto(0, 0, building.floorWidth() - 1, building.floorHeight() - 1, level.chunk!!, level, building.threatLevel) {
 
     val waterChance = 0.5f
     val pitsChance = 0.5f
@@ -87,7 +87,9 @@ class CavernCarto(
 
     private fun placeTreasure() {
         repeat (Dice.oneTo(3)) {
-            placeThing(distanceMap, if (Dice.chance(0.25f)) Trunk() else Bonepile(), distanceMap.maxDistance / 2)
+            placeThing(distanceMap,
+                if (Dice.chance(0.25f)) Trunk() else Bonepile().withDefaultLoot(threatLevel),
+                distanceMap.maxDistance / 2)
         }
     }
 

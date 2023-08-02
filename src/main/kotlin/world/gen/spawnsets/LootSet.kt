@@ -17,13 +17,6 @@ class LootSet : SpawnSet<Thing.Tag, Thing, Any>() {
 
 }
 
-object SkeletonLoot {
-    val set = LootSet().apply {
-        add(1f, WeaponLoot.set)
-        add(1f, BookLoot.set)
-    }
-}
-
 object WeaponLoot {
     val set = LootSet().apply {
         add(1f, STONE_AXE, 0, 2)

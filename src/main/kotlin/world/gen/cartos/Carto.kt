@@ -27,7 +27,8 @@ abstract class Carto(
     val x1: Int,
     val y1: Int,
     val chunk: Chunk,
-    val level: Level
+    val level: Level,
+    val threatLevel: Int,
 ) {
 
     protected var regions: Array<Array<Int?>> = Array(1+x1-x0) { Array(1+y1-y0) { null } }

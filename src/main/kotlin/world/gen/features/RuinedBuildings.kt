@@ -104,7 +104,7 @@ class RuinedBuildings(
                 val tx = Dice.range(x-2, x+2) + x0
                 val ty = Dice.range(y-2, y+2) + y0
                 if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
-                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
+                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile().withDefaultLoot(carto.threatLevel)
                     spawnThing(tx, ty, treasure)
                     placed = true
                 }

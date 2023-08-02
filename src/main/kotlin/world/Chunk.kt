@@ -157,7 +157,8 @@ class Chunk(
             log.info("Generating world chunk $x $y for starter dungeon...")
             level.needStarterDungeon = false  // only need to do this once!
         }
-        WorldCarto(x, y, x+width-1,y+height-1,this, level, withStarter).carveWorldChunk()
+        val meta = Metamap.metaAtWorld(x, y)
+        WorldCarto(x, y, x+width-1,y+height-1,this, level, meta, withStarter).carveWorldChunk()
         generating = false
     }
 

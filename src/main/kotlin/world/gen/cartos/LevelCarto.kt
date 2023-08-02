@@ -23,8 +23,8 @@ class LevelCarto(
     x1: Int,
     y1: Int,
     level: EnclosedLevel,
-    val building: Building
-) : Carto(x0, y0, x1, y1, level.chunk!!, level) {
+    val building: Building,
+) : Carto(x0, y0, x1, y1, level.chunk!!, level, building.threatLevel) {
 
     override val wallTerrain = Terrain.Type.TERRAIN_METALWALL
 

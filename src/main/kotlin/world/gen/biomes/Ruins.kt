@@ -142,7 +142,7 @@ object Ruins : Biome(
                 val tx = Dice.range(x0-1,x1+1) + carto.x0
                 val ty = Dice.range(y0-1,y1+1) + carto.y0
                 if (carto.boundsCheck(tx,ty) && carto.isWalkableAt(tx,ty)) {
-                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile()
+                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile().withDefaultLoot(carto.threatLevel)
                     carto.spawnThing(tx, ty, treasure)
                     placed = true
                 }

@@ -54,7 +54,7 @@ class MountainPeak : Decor() {
         if (Dice.chance(0.7f)) {
             repeat (Dice.oneTo(6)) {
                 awayFromWall {
-                    spawn(if (Dice.chance(0.8f)) Bonepile() else Gravestone())
+                    spawn(if (Dice.chance(0.8f)) Bonepile().withDefaultLoot(carto.threatLevel) else Gravestone())
                 }
             }
         }

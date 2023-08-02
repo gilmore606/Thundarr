@@ -16,6 +16,7 @@ sealed class Building {
     val xy = XY(0,0)
     val facing = XY(0, 0)
     val floorDimensions = XY(0, 0)
+    var threatLevel = 0
     open fun shortName() = "boring building"
     open fun floorWidth() = floorDimensions.x
     open fun floorHeight() = floorDimensions.y
@@ -29,7 +30,10 @@ sealed class Building {
     open val lightVariance = 0.2f
     open val lightAttempts = 1000
 
-
+    open fun threat(threat: Int): Building {
+        threatLevel = threat
+        return this
+    }
     open fun at(x: Int, y: Int): Building {
         xy.x = x
         xy.y = y

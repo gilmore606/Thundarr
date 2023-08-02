@@ -107,7 +107,7 @@ class Caves : Feature() {
         CARDINALS.from(doorPos.x, doorPos.y) { dx, dy, dir ->
             if (boundsCheck(dx,dy) && isWalkableAt(dx,dy)) facings.add(dir)
         }
-        carto.connectBuilding(NaturalCavern().at(doorPos.x, doorPos.y).facing(facings.random()))
+        carto.connectBuilding(NaturalCavern().threat(carto.threatLevel).at(doorPos.x, doorPos.y).facing(facings.random()))
         hasCavern = true
         Metamap.update(meta)
     }

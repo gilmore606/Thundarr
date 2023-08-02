@@ -25,8 +25,9 @@ class WorldCarto(
     y1: Int,
     chunk: Chunk,
     level: Level,
+    val meta: ChunkMeta,
     val forStarter: Boolean = false
-) : Carto(x0, y0, x1, y1, chunk, level) {
+) : Carto(x0, y0, x1, y1, chunk, level, meta.threatLevel) {
 
     val chunkBlendWidth = 6
     val chunkBlendCornerRadius = 4
@@ -41,11 +42,8 @@ class WorldCarto(
     private val fertMap = Array(CHUNK_SIZE) { Array<Float?>(CHUNK_SIZE) { null } }
 
     private var hasBlends = false
-    lateinit var meta: ChunkMeta
 
     suspend fun carveWorldChunk() {
-        meta = Metamap.metaAtWorld(x0, y0) ?: throw RuntimeException("No meta found for chunk $x0 $y0 !")
-
         if (meta.biome == Ocean) {
             carveRoom(Rect(x0,y0,x1,y1), 0, TERRAIN_DEEP_WATER)
         } else {
@@ -291,9 +289,9 @@ class WorldCarto(
         forEachCell { x, y ->
             if (getTerrain(x, y) == TERRAIN_PORTAL_DOOR) {
                 val building = if (forStarter)
-                    StarterDungeon().at(x,y).facing(facing)
+                    StarterDungeon().threat(1).at(x,y).facing(facing)
                 else
-                    BoringBuilding().at(x,y).facing(facing)
+                    BoringBuilding().threat(threatLevel + 1).at(x,y).facing(facing)
                 connectBuilding(building)
             }
         }

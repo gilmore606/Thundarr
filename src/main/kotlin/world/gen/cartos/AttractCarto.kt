@@ -21,7 +21,7 @@ class AttractCarto(
     y1: Int,
     chunk: Chunk,
     level: Level,
-) : Carto(x0, y0, x1, y1, chunk, level) {
+) : Carto(x0, y0, x1, y1, chunk, level, 1) {
 
     val scale = 0.02
     val fullness = 0.002
