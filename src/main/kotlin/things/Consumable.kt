@@ -42,6 +42,10 @@ sealed class Consumable : Portable() {
 
     open fun statusEffect(): Status? = null
 
+    open fun isMeat() = false
+    open fun isFruit() = false
+    open fun isVegetable() = false
+
     override fun description() = "Looks like you could eat it, if you were hungry enough.  Maybe you are."
 
     override fun examineInfo(): String {
@@ -107,6 +111,7 @@ class Apple : Food() {
     override fun glyph() = Glyph.FRUIT
     override fun name() = "apple"
     override fun weight() = 0.1f
+    override fun isFruit() = true
 }
 
 @Serializable
@@ -116,6 +121,7 @@ class Pear : Food() {
     override fun hue() = 0.9f
     override fun name() = "pear"
     override fun weight() = 0.1f
+    override fun isFruit() = true
 }
 
 @Serializable
@@ -151,6 +157,7 @@ class RawMeat : Rottable() {
     override fun description() = "A bloody chunk of raw meat.  Edible as-is, but not exactly appetizing; you're a barbarian, not a savage."
     override fun calories() = 600
     override fun consumeSelfMsg() = "You choke down the raw meat, imagining how delicious it would be if you cooked it first.  Oh well."
+    override fun isMeat() = true
     override fun onConsume(actor: Actor) {
         super.onConsume(actor)
         if (Dice.chance(0.3f)) {
@@ -168,6 +175,7 @@ class Steak : Food() {
     override fun description() = "A delicious flame-grilled slab of steak.  From what animal, is not important.  It smells wonderful."
     override fun calories() = 1200
     override fun consumeSelfMsg() = "You feast on the steak, congratulating yourself for your domestic prowess."
+    override fun isMeat() = true
 }
 
 @Serializable
@@ -178,6 +186,7 @@ class ChickenLeg : Food() {
     override fun description() = "You're not sure it actually came from a chicken, but it's cooked and smells tasty."
     override fun calories() = 1000
     override fun consumeSelfMsg() = "You hungrily strip the meat from the bird leg."
+    override fun isMeat() = true
 }
 
 @Serializable

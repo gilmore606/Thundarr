@@ -21,8 +21,8 @@ interface Workbench {
         Recipe.all.forEach { recipe ->
             var possible = true
             val pool = mutableListOf<Thing>().apply { addAll(crafter.contents()) }
-            recipe.ingredients().forEach { ingTag ->
-                pool.firstOrNull { it.tag == ingTag }?.also {
+            recipe.ingredients().forEach { ingredient ->
+                pool.firstOrNull { ingredient.matches(it) }?.also {
                     pool.remove(it)
                 } ?: run {
                     possible = false

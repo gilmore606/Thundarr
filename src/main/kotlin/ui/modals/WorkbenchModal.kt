@@ -196,8 +196,8 @@ class WorkbenchModal(
             val pool = mutableListOf<Thing>().apply { addAll(App.player.contents()) }
             var missing = 0
             var found = 0
-            recipe.ingredients().forEach { ingTag ->
-                pool.firstOrNull { it.tag == ingTag }?.also { thing ->
+            recipe.ingredients().forEach { ingredient ->
+                pool.firstOrNull { ingredient.matches(it) }?.also { thing ->
                     pool.remove(thing)
                     found++
                 } ?: run {

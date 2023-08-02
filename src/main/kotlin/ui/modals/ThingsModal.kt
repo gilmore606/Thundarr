@@ -333,7 +333,7 @@ class ThingsModal(
                         addOption("drop ${thing.listName()}")
                             { App.player.queue(Drop(thing.getKey(), groundAtPlayer().getHolderKey())) }
                     }
-                    if (Recipe.recipesFor(thing.tag, improvOnly = true).isNotEmpty()) {
+                    if (Recipe.recipesFor(thing, improvOnly = true).isNotEmpty()) {
                         addOption("craft with ${thing.name()}")
                             { App.player.improvCraftWith(thing) }
                     }

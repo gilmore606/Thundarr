@@ -18,16 +18,15 @@ class RecipeModal(
     val recipe: Recipe
 ) : Modal(400, 230 + recipe.ingredients().size * 27 + 44 + 90, recipe.name(), position = Position.LEFT) {
 
-    class Ingredient(
+    class LineItem(
+        val ingredient: Recipe.Ingredient,
         val name: String,
-        val tag: Thing.Tag,
-        var amount: Int,
         val glyph: Glyph,
         val hue: Float,
         val things: MutableList<Thing> = mutableListOf(),
-        var total: Int = 0
+        var available: Int = 0
     ) {
-        fun filled() = things.size >= amount
+        fun filled() = things.size >= ingredient.amount
     }
 
     private val bench = workbenchModal.bench
@@ -41,7 +40,7 @@ class RecipeModal(
 
     private val wrappedDesc = wrapText(recipe.description(), width - 64, padding, Screen.font)
 
-    private val ingredients: MutableList<Ingredient> = mutableListOf()
+    private val lineItems: MutableList<LineItem> = mutableListOf()
     private var productCount = 0
     private val productTag: Thing.Tag
     private val productName: String
@@ -57,15 +56,8 @@ class RecipeModal(
         }
         zoomWhenOpen = 1.4f
 
-        recipe.ingredients().forEach { ing ->
-            ingredients.firstOrNull { it.tag == ing }?.also {
-                it.amount++
-            } ?: run {
-                val goat = ing.spawn()
-                ingredients.add(Ingredient(
-                    goat.name(), ing, 1, goat.glyph(), goat.hue()
-                ))
-            }
+        recipe.ingredients().forEach { ingredient ->
+            lineItems.add(LineItem(ingredient, ingredient.description(), ingredient.glyph(), ingredient.hue()))
         }
         updateIngredients()
     }
@@ -78,16 +70,16 @@ class RecipeModal(
     private fun updateIngredients() {
         val pool = mutableListOf<Thing>().apply { addAll(App.player.contents()) }
         makeOK = true
-        ingredients.forEach { ing ->
-            ing.total = App.player.contents().count { it.tag == ing.tag }
-            ing.things.clear()
-            repeat (ing.amount) {
-                pool.firstOrNull { it.tag == ing.tag }?.also { cand ->
-                    ing.things.add(cand)
+        lineItems.forEach { lineItem ->
+            lineItem.available = App.player.contents().count { lineItem.ingredient.matches(it) }
+            lineItem.things.clear()
+            repeat (lineItem.ingredient.amount) {
+                pool.firstOrNull { lineItem.ingredient.matches(it) }?.also { cand ->
+                    lineItem.things.add(cand)
                     pool.remove(cand)
                 }
             }
-            makeOK = makeOK && ing.things.size >= ing.amount
+            makeOK = makeOK && lineItem.filled()
         }
         productCount = App.player.contents().count { it.tag == productTag }
         if (!makeOK) selection = 0
@@ -153,7 +145,7 @@ class RecipeModal(
     private fun doMake() {
         Console.say(recipe.makeSuccessMsg())
 
-        ingredients.forEach {
+        lineItems.forEach {
             it.things.forEach {
                 it.moveTo(null)
             }
@@ -172,19 +164,16 @@ class RecipeModal(
 
         drawString("To ${bench.craftVerb()} ${recipe.name().aOrAn()}, you need:", padding, headerPad - 40, Screen.fontColorDull, Screen.smallFont)
 
-        ingredients.forEachIndexed { i, ing ->
-            drawString(ing.name, ingpad + 30, headerPad + i * spacing,
-                if (ing.filled()) Screen.fontColorBold else Screen.fontColorDull, Screen.font)
-            if (ing.amount > 1) {
-                drawString("x${ing.amount}", ingpad + 30 + measure(ing.name) + 8, headerPad + i * spacing + 1, Screen.fontColorDull, Screen.smallFont)
-            }
-            if (ing.total > 0) {
-                drawString(ing.total.toString(), width - ingpad + 8, headerPad + i * spacing + 1,
-                    if (ing.filled()) Screen.fontColor else Screen.fontColorDull, Screen.smallFont)
+        lineItems.forEachIndexed { i, lineItem ->
+            drawString(lineItem.name, ingpad + 30, headerPad + i * spacing,
+                if (lineItem.filled()) Screen.fontColorBold else Screen.fontColorDull, Screen.font)
+            if (lineItem.available > 0) {
+                drawString(lineItem.available.toString(), width - ingpad + 8, headerPad + i * spacing + 1,
+                    if (lineItem.filled()) Screen.fontColor else Screen.fontColorDull, Screen.smallFont)
             }
         }
 
-        drawString("You have " + if (productCount < 1) "no" else productCount.toString() + " " + (if (productCount == 1) productName else productName.plural()) + ".",
+        drawString("You have " + (if (productCount < 1) "no" else productCount.toString()) + " " + (if (productCount == 1) productName else productName.plural()) + ".",
             padding, height - 100, Screen.fontColorDull, Screen.smallFont)
 
         drawString("Back", padding + 55, height - 50, if (selection == 0) Screen.fontColorBold else Screen.fontColorDull, Screen.font)
@@ -197,7 +186,7 @@ class RecipeModal(
         super.drawBackground()
         if (isAnimating()) return
 
-        ingredients.forEachIndexed { i, ing ->
+        lineItems.forEachIndexed { i, ing ->
             if (ing.filled()) {
                 val ix0 = x + width - ingpad - 26
                 val iy0 = y + headerPad + i * spacing - 6
@@ -221,7 +210,7 @@ class RecipeModal(
         batch?.addPixelQuad(x0, y0, x0 + 64, y0 + 64,
             batch.getTextureIndex(recipe.glyph()))
 
-        ingredients.forEachIndexed { i, ing ->
+        lineItems.forEachIndexed { i, ing ->
             val ix0 = x + ingpad
             val iy0 = y + headerPad + i * spacing - 12
             myThingBatch()?.also { batch ->

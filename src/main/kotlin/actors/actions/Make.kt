@@ -10,8 +10,8 @@ import world.level.Level
 @Serializable
 class Make(
     private val benchKey: Thing.Key,
-    private val recipe: Recipe
-) : Action(recipe.makeDuration()) {
+    private val recipe: Recipe.Tag
+) : Action(recipe.get.makeDuration()) {
     override fun name() = "make something"
 
     override fun execute(actor: Actor, level: Level) {
