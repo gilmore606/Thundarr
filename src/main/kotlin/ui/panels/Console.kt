@@ -8,6 +8,7 @@ import ktx.async.KtxAsync
 import render.Screen
 import render.tilesets.Glyph
 import things.Thing
+import ui.modals.Modal
 import util.XY
 import util.log
 import world.Entity
@@ -265,10 +266,13 @@ object Console : Panel() {
 
         if (!App.attractMode && floatAge <= floatFadeTime) {
             floatColor.a = min(1.0f, 1.2f - (floatAge / floatFadeTime * 1.2f))
-            drawStringAbsolute(floatText,
-                Screen.width / 2 - floatWidth / 2,
-                Screen.height / 2 - floatHeightAbovePlayer + if (lowerFloater) 150 else 0,
-                floatColor, Screen.smallFont)
+            val x = if (Screen.topModal?.position == Modal.Position.LEFT) {
+                96 + Screen.panels.filter { it is Modal }.maxOf { it.width }
+            } else {
+                Screen.width / 2 - floatWidth / 2
+            }
+            val y = Screen.height / 2 - floatHeightAbovePlayer + if (lowerFloater) 150 else 0
+            drawStringAbsolute(floatText, x, y, floatColor, Screen.smallFont)
         }
     }
 
