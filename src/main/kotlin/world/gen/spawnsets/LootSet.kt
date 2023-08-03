@@ -132,3 +132,14 @@ object TavernWares {
         add(1f, ENERGYDRINK)
     }
 }
+
+// For sale in general stores
+object GeneralStoreWares {
+    val set = LootSet().apply {
+        add(3f, ClothingLoot.set)
+        add(1f, TORCH)
+        add(1f, LIGHTER, 2)
+        add(1f, BANDAGES)
+        add(1f, CANDLE)
+    }
+}

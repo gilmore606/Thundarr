@@ -39,6 +39,7 @@ sealed class Habitation(
                 { isAbandoned, dir -> Tavern(Madlib.tavernName(), dir) }),
         ),
         @Transient val shopDecors: MutableList<Decor> = mutableListOf(
+            GeneralStore(),
             BlacksmithShop(),
             Schoolhouse(),
             Church(),

@@ -46,9 +46,37 @@ sealed class VendorJob(
 }
 
 @Serializable
+class GeneralStoreJob(
+    private val storeRect: Rect,
+    private val storeCaseKey: Thing.Key,
+) : VendorJob(
+    "general store", "store clerk", storeRect, storeCaseKey
+) {
+    override fun ownerComments() = setOf(
+        "Trade is the lifeblood of civilization!  What's left of it...",
+    )
+    override fun announceJobMsg() = listOf(
+        "Time to go open the store."
+    ).random()
+    override fun signText() = listOf(
+        "General Store",
+        "%n's General Store",
+        "%n's Sundries",
+        "Goods n' Such",
+        "Goods By %n",
+        "%n Supplies",
+        "Supplies by %n",
+        "Supply Shop",
+    ).random()
+
+    override fun ownerConverseHelloMsg() = "Welcome to my shop.  What can I help you with?"
+    override fun tradeQuestionMsg() = "Let's see your goods."
+}
+
+@Serializable
 class ForgeJob(
-    val forgeRect: Rect,
-    val forgeCaseKey: Thing.Key,
+    private val forgeRect: Rect,
+    private val forgeCaseKey: Thing.Key,
 ) : VendorJob(
     "forge", "blacksmith", forgeRect, forgeCaseKey
 ) {

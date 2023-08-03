@@ -64,7 +64,7 @@ abstract class SelectionModal(
             colorOverride ?: if (index == selection) Screen.fontColorBold else Screen.fontColor)
         addCol?.also { addCol ->
             drawString(addCol, lx + colX, headerPad + spacing * index - 2,
-                tagColorOverride ?: Screen.fontColorDull, Screen.smallFont)
+                tagColorOverride ?: Screen.fontColorDull, Screen.font)
         }
         addTag?.also { tag ->
             val x = measure(text) + 6

@@ -113,6 +113,18 @@ class StorageCabinet : Container() {
 }
 
 @Serializable
+class StoreCabinet : Container() {
+    override val tag = Tag.WARDROBE
+    override fun name() = "storage cabinet"
+    override fun description() = "A metal cabinet with large, lockable drawers."
+    override fun glyph() = Glyph.FILING_CABINET
+    override fun hue() = 3.2f
+    override fun isPortable() = false
+    override fun openVerb() = "open"
+    override fun isOpenable() = false
+}
+
+@Serializable
 class Bookshelf : Container() {
     override val tag = Tag.BOOKSHELF
     override fun name() = "bookshelf"
