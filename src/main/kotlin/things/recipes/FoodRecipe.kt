@@ -15,7 +15,7 @@ abstract class FoodRecipe : Recipe() {
 }
 
 object SteakRecipe : FoodRecipe() {
-    override val tag = Tag.STEAK
+    override fun tag() = Tag.STEAK
     override fun name() = "seared steak"
     override fun description() = "You can cook a delicious steak from the meat of almost anything."
     override fun ingredients() = listOf(
@@ -27,7 +27,7 @@ object SteakRecipe : FoodRecipe() {
 }
 
 object ChickenRecipe : FoodRecipe() {
-    override val tag = Tag.CHICKEN
+    override fun tag() = Tag.CHICKEN
     override fun name() = "roast chicken"
     override fun description() = "Roasted chicken meat is far tastier and more nutritious."
     override fun ingredients() = listOf(
@@ -39,7 +39,7 @@ object ChickenRecipe : FoodRecipe() {
 }
 
 object StewRecipe : FoodRecipe() {
-    override val tag = Tag.STEW
+    override fun tag() = Tag.STEW
     override fun name() = "stew"
     override fun description() = "Meat and fruit makes a tasty stew."
     override fun ingredients() = listOf(

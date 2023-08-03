@@ -40,7 +40,7 @@ abstract class Recipe {
         STEW("stew", StewRecipe),
     }
 
-    abstract val tag: Tag
+    abstract fun tag(): Tag
 
     class Ingredient(
         val description: String? = null,

@@ -258,6 +258,17 @@ sealed class Thing() : Entity {
     open fun onCreate() { }
     open fun onSpawn() { }
 
+    fun spawnTo(x: Int, y: Int) = spawnTo(XY(x,y))
+    fun spawnTo(xy: XY) {
+        onSpawn()
+        moveTo(xy)
+    }
+    fun spawnTo(actor: Actor) = actor.level?.also { spawnTo(it, actor.xy) }
+    fun spawnTo(level: Level, xy: XY) {
+        onSpawn()
+        moveTo(level, xy)
+    }
+
     open fun uses(): MutableMap<UseTag, Use> = mutableMapOf<UseTag, Use>().apply {
         this[UseTag.USE_BE_LIT] = Use("light ${this@Thing.name()} on fire", 0.5f,
             canDo = { actor, x, y, targ ->

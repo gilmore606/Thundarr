@@ -10,7 +10,7 @@ abstract class ImprovRecipe : Recipe() {
 }
 
 object StoneAxeRecipe : ImprovRecipe() {
-    override val tag = Tag.STONE_AXE
+    override fun tag() = Tag.STONE_AXE
     override fun name() = "stone axe"
     override fun description() = "A rock chipped sharp and tied to a stick makes a somewhat usable axe."
     override fun ingredients() = listOf(

@@ -1,44 +1,56 @@
 package actors.actions
 
 import actors.actors.Actor
+import actors.actors.Player
 import kotlinx.serialization.Serializable
+import render.Screen
 import things.Thing
 import things.Workbench
 import things.recipes.Recipe
+import ui.modals.RecipeModal
+import ui.panels.Console
 import world.level.Level
 
 @Serializable
 class Make(
-    private val benchKey: Thing.Key,
-    private val recipe: Recipe.Tag
-) : Action(recipe.get.makeDuration()) {
+    private val makeDuration: Float = 1f,
+    val recipeTag: Recipe.Tag,
+    val components: List<Thing>,
+) : Action(makeDuration) {
     override fun name() = "make something"
 
     override fun execute(actor: Actor, level: Level) {
-        benchKey.getThing(level)?.also { bench ->
-//            if (bench is Workbench) {
-//                val roll = recipe.skill().resolve(actor, recipe.difficulty())
-//                if (roll < 0f) {
-//                    if (actor is Player) Console.say(recipe.makeFailMsg())
-//                    if (roll < -2f) {
-//                        recipe.ingredients().random().also { thingTag ->
-//                            bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
-//                        }
-//                    } else if (roll < -5f) {
-//                        consumeAllIngredients(bench)
-//                    }
-//                } else {
-//                    if (actor is Player) Console.say(recipe.makeSuccessMsg())
-//                    consumeAllIngredients(bench)
-//                    recipe.product().moveTo(bench)
-//                }
-//            }
+        val recipe = recipeTag.get
+        val bonus = recipe.difficulty()
+        val roll = recipe.skill().resolve(actor, bonus)
+        if (roll >= 0) {
+            doMake(actor, level)
+        } else if (roll < -5) {
+            wasteComponent(actor, level)
+            doFail(actor, level)
+        } else {
+            doFail(actor, level)
+        }
+
+        Screen.topModal?.also {
+            if (it is RecipeModal) it.onMakeFinish()
         }
     }
 
-    private fun consumeAllIngredients(bench: Workbench) {
-//            recipe.ingredients().forEach { thingTag ->
-//                bench.contents().firstOrNull { it.tag == thingTag }?.moveTo(null)
-//            }
+    private fun doMake(actor: Actor, level: Level) {
+        components.forEach { it.moveTo(null) }
+        Console.say(recipeTag.get.makeSuccessMsg())
+        recipeTag.get.product().spawnTo(actor)
+    }
+
+    private fun wasteComponent(actor: Actor, level: Level) {
+        components.random().also {
+            if (actor is Player) Console.say("In your fumbling, you ruined ${it.iname()}.")
+            it.moveTo(null)
+        }
+    }
+
+    private fun doFail(actor: Actor, level: Level) {
+        Console.say(recipeTag.get.makeFailMsg())
     }
 }

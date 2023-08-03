@@ -1,5 +1,6 @@
 package ui.modals
 
+import actors.actions.Make
 import actors.actions.Wait
 import audio.Speaker
 import render.Screen
@@ -36,7 +37,7 @@ class RecipeModal(
     private val spacing = 27
     private val headerPad = 240
     private val buttonX0 = listOf(62, 264)
-    private val buttonX1 = listOf(130, 330)
+    private val buttonX1 = listOf(130, 340)
 
     private val wrappedDesc = wrapText(recipe.description(), width - 64, padding, Screen.font)
 
@@ -137,21 +138,13 @@ class RecipeModal(
     }
 
     private fun tryMake() {
-        // TODO: remove this and actually queue a Make action to finish
-        App.player.queue(Wait(5f))
-        doMake()
+        val components = mutableListOf<Thing>().apply {
+            lineItems.forEach { addAll(it.things) }
+        }
+        App.player.queue(Make(recipe.makeDuration(), recipe.tag(), components))
     }
 
-    private fun doMake() {
-        Console.say(recipe.makeSuccessMsg())
-
-        lineItems.forEach {
-            it.things.forEach {
-                it.moveTo(null)
-            }
-        }
-
-        recipe.product().moveTo(App.player)
+    fun onMakeFinish() {
         updateIngredients()
     }
 
