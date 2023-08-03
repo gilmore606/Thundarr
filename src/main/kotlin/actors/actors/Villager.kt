@@ -300,7 +300,7 @@ class Villager(
     override fun examineInfo(): String {
         if (!App.DEBUG_VISIBLE) return super.examineInfo() else {
             val action = if (queuedActions.isNotEmpty()) queuedActions[0] else null
-            return "targetJob=${targetJob}\ndoing=$action"
+            return "targetJob=${targetJob}\n\ndoing=$action\n\n"
         }
     }
 }

@@ -12,6 +12,7 @@ import util.distanceBetween
 import util.filterOut
 import world.level.Level
 import path.Pather
+import util.forceMainThread
 import world.persist.LevelKeeper
 
 // A delegate class for Level to manage actors in time and space.
@@ -41,17 +42,19 @@ class Director(val level: Level) {
     }
 
     private fun addActor(new: Actor) {
-        KtxAsync.launch {
+        forceMainThread {
             actors.add(new)
             sortActors()
         }
     }
+
     private fun removeActor(old: Actor) {
-        KtxAsync.launch {
+        forceMainThread {
             actors.remove(old)
             sortActors()
         }
     }
+
     private fun sortActors() {
         actors.sortBy { it.xy.y }
     }

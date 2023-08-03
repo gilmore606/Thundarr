@@ -188,7 +188,7 @@ sealed class Habitation(
                 if (citizen is Citizen) {
                     citizen.habitation = this
                 }
-            }
+            } ?: run { log.info("failed to restore citizen-habitation link for $citizenID") }
         }
     }
 

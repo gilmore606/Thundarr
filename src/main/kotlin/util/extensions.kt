@@ -2,6 +2,8 @@ package util
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
 import mu.KotlinLogging
 import org.slf4j.LoggerFactory
 import render.Screen
@@ -415,3 +417,13 @@ fun forXY(rect: Rect, doThis: (Int,Int)->Unit) = forXY(rect.x0, rect.y0, rect.x1
 fun forXY(xy0: XY, xy1: XY, doThis: (Int,Int)->Unit) = forXY(xy0.x, xy0.y, xy1.x, xy1.y, doThis)
 
 fun Float.scaledTo(min: Float, max: Float) = min + this * (max - min)
+
+fun forceMainThread(doThis: ()->Unit) {
+    if (Thread.currentThread().name == "main") {
+        doThis()
+    } else {
+        KtxAsync.launch {
+            doThis()
+        }
+    }
+}
