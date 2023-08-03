@@ -443,6 +443,7 @@ class ThingsModal(
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         cursorLocalX = screenX - x
         cursorLocalY = screenY - y
         if (scrollBarLit && (cursorLocalX in (width - 35)..(width - 4))) {
@@ -458,7 +459,7 @@ class ThingsModal(
             }
             return true
         }
-        return super.onMouseClicked(screenX, screenY, button)
+        return false
     }
 
     override fun mouseToOption(screenX: Int, screenY: Int): Int? {

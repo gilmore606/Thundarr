@@ -196,7 +196,8 @@ class SkillsModal(val actor: Actor) : Modal(400, 550, "- ${actor.name()} -") {
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        if (isOutside(screenX, screenY)) dismiss() else doSelect()
+        if (super.onMouseClicked(screenX, screenY, button)) return true
+        doSelect()
         return true
     }
 

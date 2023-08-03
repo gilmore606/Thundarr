@@ -111,6 +111,7 @@ class RecipeModal(
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        super.onMouseClicked(screenX, screenY, button)
         doSelect()
         return true
     }

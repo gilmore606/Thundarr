@@ -17,6 +17,7 @@ class JournalModal : Modal(600, 600, "- yOUr dEEDs -") {
     val padding = wrapPadding
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         dismiss()
         return true
     }

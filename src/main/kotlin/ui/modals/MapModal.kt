@@ -84,6 +84,7 @@ class MapModal : Modal(Screen.width - RIGHT_PANEL_WIDTH - 150, Screen.height - 1
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         dismiss()
         return true
     }

@@ -188,10 +188,7 @@ class SettingsModal : Modal(300, 420, "- settings -") {
     private var hoveredSection: Int? = null
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
-        if (!(screenX in x until x+width && screenY in y until y+height)) {
-            dismiss()
-            return true
-        }
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         hoveredSection?.also { hovered ->
             if (hovered != selectedSection) Speaker.ui(Speaker.SFX.UISELECT, screenX = x)
             selectedSection = hovered

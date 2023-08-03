@@ -102,6 +102,7 @@ class WorkbenchModal(
     }
 
     override fun onMouseClicked(screenX: Int, screenY: Int, button: Mouse.Button): Boolean {
+        if (super.onMouseClicked(screenX, screenY, button)) return true
         doSelect()
         return true
     }
