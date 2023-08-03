@@ -189,6 +189,7 @@ class Village(
     private fun lockDoor(xy: XY?, owner: Actor) {
         xy?.also { xy ->
             chunk.thingsAt(xy.x, xy.y).firstOrNull { it is Door }?.also { door ->
+                (door as Door).unlockedInside = true
                 (door as Door).lockTo(owner)
                 guards.forEach { door.lockTo(it) }
             }

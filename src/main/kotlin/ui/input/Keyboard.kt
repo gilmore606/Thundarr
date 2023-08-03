@@ -228,10 +228,10 @@ object Keyboard : KtxInputAdapter {
                 DEBUG_CONSOLE -> { Console.openDebug() }
 
                 else -> when (keycode) {
-                    I -> { App.player.debugMove(NORTH) }
-                    J -> { App.player.debugMove(WEST) }
-                    K -> { App.player.debugMove(SOUTH) }
-                    L -> { App.player.debugMove(EAST) }
+                    I -> { App.player.debugMove(NORTH, if (CTRL) 1 else 10) }
+                    J -> { App.player.debugMove(WEST, if (CTRL) 1 else 10) }
+                    K -> { App.player.debugMove(SOUTH, if (CTRL) 1 else 10) }
+                    L -> { App.player.debugMove(EAST, if (CTRL) 1 else 10) }
 
                     F8 -> { (if (Dice.flip()) BlueBells() else Poppies()).moveTo(App.player.level!!, App.player.xy.x + 1, App.player.xy.y) }
                     F9 -> { App.DEBUG_VISIBLE = !App.DEBUG_VISIBLE }

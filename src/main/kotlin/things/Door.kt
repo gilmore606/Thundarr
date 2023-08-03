@@ -15,7 +15,8 @@ import util.XY
 sealed class Door : Thing(), Smashable {
 
     var isOpen = false
-    var lockID: String? = null
+    private var lockID: String? = null
+    var unlockedInside = false
 
     fun lockTo(actor: Actor) {
         if (lockID == null) lockID = UUID()
@@ -25,10 +26,10 @@ sealed class Door : Thing(), Smashable {
     open fun openGlyph() = Glyph.DOOR_OPEN
     open fun closedGlyph() = Glyph.DOOR_CLOSED
 
-    open fun isOpenableBy(actor: Actor) = (lockID == null) || (lockID in actor.keyIDs)
+    open fun isOpenableBy(actor: Actor) = actor.canOpenDoors() && ((lockID == null) || (lockID in actor.keyIDs) || (unlockedInside && level()?.isRoofedAt(actor.xy.x, actor.xy.y) == true))
+    override fun isBlocking(actor: Actor) = !isOpen && !isOpenableBy(actor)
 
     override fun isPortable() = false
-    override fun isBlocking(actor: Actor) = (!isOpen && (!actor.canOpenDoors() || (lockID != null && !actor.keyIDs.contains(lockID))))
     override fun isOpaque() = !isOpen
     override fun announceOnWalk() = false
     override fun glyph() = if (isOpen) openGlyph() else closedGlyph()
@@ -40,7 +41,7 @@ sealed class Door : Thing(), Smashable {
         UseTag.OPEN to Use("open " + name(), 1.0f,
             canDo = { actor,x,y,targ -> isNextTo(actor) && !isOpen },
             toDo = { actor,level,x,y ->
-                if (lockID != null && !actor.keyIDs.contains(lockID))
+                if (lockID != null && !isOpenableBy(actor))
                     Console.sayAct("It's locked.", "", actor)
                 else doOpen()
             }),
@@ -53,7 +54,7 @@ sealed class Door : Thing(), Smashable {
     )
 
     override fun convertMoveAction(actor: Actor): Action? {
-        if (!isOpen && isOpenableBy(actor) && actor.canOpenDoors()) {
+        if (!isOpen && isOpenableBy(actor)) {
             return Use(UseTag.OPEN, this.getKey())
         }
         return null

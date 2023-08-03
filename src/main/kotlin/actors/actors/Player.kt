@@ -324,8 +324,8 @@ open class Player : Actor(), Workbench {
         return true
     }
 
-    fun debugMove(dir: XY) {
-        moveTo(level, xy.x + (dir.x * 20), xy.y + (dir.y * 20))
+    fun debugMove(dir: XY, dist: Int = 1) {
+        moveTo(level, xy.x + (dir.x * dist), xy.y + (dir.y * dist))
     }
 
     fun addWetness(amount: Float, max: Float = 1f) {
