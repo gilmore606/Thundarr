@@ -24,7 +24,7 @@ class Make(
         val bonus = recipe.difficulty()
         val roll = recipe.skill().resolve(actor, bonus)
         if (roll >= 0) {
-            doMake(actor, level)
+            doMake(recipe, actor, level)
         } else if (roll < -5) {
             wasteComponent(actor, level)
             doFail(actor, level)
@@ -37,10 +37,10 @@ class Make(
         }
     }
 
-    private fun doMake(actor: Actor, level: Level) {
+    private fun doMake(recipe: Recipe, actor: Actor, level: Level) {
         components.forEach { it.moveTo(null) }
+        recipe.product().spawnTo(actor)
         Console.say(recipeTag.get.makeSuccessMsg())
-        recipeTag.get.product().spawnTo(actor)
     }
 
     private fun wasteComponent(actor: Actor, level: Level) {

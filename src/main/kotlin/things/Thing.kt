@@ -258,12 +258,10 @@ sealed class Thing() : Entity {
     open fun onCreate() { }
     open fun onSpawn() { }
 
-    fun spawnTo(x: Int, y: Int) = spawnTo(XY(x,y))
-    fun spawnTo(xy: XY) {
+    fun spawnTo(actor: Actor) {
         onSpawn()
-        moveTo(xy)
+        moveTo(actor)
     }
-    fun spawnTo(actor: Actor) = actor.level?.also { spawnTo(it, actor.xy) }
     fun spawnTo(level: Level, xy: XY) {
         onSpawn()
         moveTo(level, xy)
