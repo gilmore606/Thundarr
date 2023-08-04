@@ -22,7 +22,7 @@ class Stickleboar : NPC() {
     }
     override fun corpseMeats() = setOf(RawMeat())
     override fun unarmedWeapon() = hooves
-    override fun unarmedDamage() = 4f
+    override fun unarmedDamage() = 3f
     override fun skinArmor() = 2f
 
     override fun visualRange() = 8f

@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
 import things.Damage.*
 import ui.modals.ExamineModal.StatLine
+import util.Dice
 import world.Entity
 import java.lang.Float.max
 
@@ -61,7 +62,7 @@ sealed class Clothing : Gear() {
     fun armorVs(type: Damage) = material().modify(type, armor())
 
     fun reduceDamage(target: Actor, type: Damage, rawDamage: Float): Float =
-        max(0f, rawDamage - armorVs(type))
+        max(0f, rawDamage - armorVs(type).let { Dice.float(it * 0.5f, it) })
 
     override fun examineStats(compareTo: Entity?) = mutableListOf<StatLine>().apply {
         add(StatLine(isSpacer = true))

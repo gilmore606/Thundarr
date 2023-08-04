@@ -32,11 +32,9 @@ class VillageGuard(
     override fun description() = "A village guard."
     override fun isHuman() = true
     override fun onSpawn() {
-        Strength.set(this, 14f)
-        Speed.set(this, 12f)
-        Brains.set(this, 10f)
-        Senses.set(this, 12f)
+        initStats(14, 12, 10, 12, 14, 5, 2)
     }
+    override fun hpMax() = 40f
     override fun skinArmor() = 2.0f
     override fun idleState() = IdlePatrol(
         0.7f,
@@ -53,6 +51,15 @@ class VillageGuard(
         "Welcome to $villageName.",
         "$villageName is a peaceful town."
     ).random()
+
+    override fun commentLines() = listOf(
+        "I can't let idle chitchat distract me.",
+        "We don't want any trouble.",
+        "I put my life on the line for $villageName.",
+        "$villageName may not be much, but it's worth defending.",
+        "I wish I could buy a new uniform.",
+        "Don't distract me, traveller.",
+    )
 
     override fun couldHaveLore() = false
 

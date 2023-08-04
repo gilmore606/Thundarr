@@ -4,6 +4,8 @@ import actors.actors.NPC
 import actors.actions.Action
 import actors.actions.Move
 import actors.actions.Wait
+import actors.actors.Actor
+import actors.actors.Citizen
 import kotlinx.serialization.Serializable
 import util.*
 
@@ -47,9 +49,15 @@ class IdlePatrol(
     }
 
     override fun considerState(npc: NPC) {
-        if (!bounds.contains(npc.xy)) {
-            npc.pushState(ReturnToArea(bounds))
-            return
+        npc.apply {
+            if (!bounds.contains(xy)) {
+                pushState(ReturnToArea(bounds))
+                return
+            }
+
+            entitiesSeen { it is NPC && it !is Citizen && it.state is Attacking }.keys.firstOrNull()?.also { aggressor ->
+                pushState(Attacking((aggressor as NPC).id))
+            }
         }
         super.considerState(npc)
     }

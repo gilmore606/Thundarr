@@ -151,17 +151,17 @@ class Villager(
     companion object {
         val skinSets = setOf<Set<Skin>>(
             setOf(Skin.PALE, Skin.WHITE),
-            setOf(Skin.PALE, Skin.WHITE),
+            setOf(Skin.WHITE, Skin.PALE),
             setOf(Skin.PALE, Skin.WHITE),
             setOf(Skin.WHITE, Skin.TAN),
-            setOf(Skin.WHITE, Skin.TAN),
+            setOf(Skin.TAN, Skin.WHITE),
             setOf(Skin.WHITE, Skin.TAN),
             setOf(Skin.PALE, Skin.WHITE, Skin.TAN),
             setOf(Skin.TAN, Skin.BLACK),
             setOf(Skin.TAN, Skin.BLACK),
-            setOf(Skin.TAN, Skin.BLACK),
+            setOf(Skin.BLACK, Skin.TAN),
             setOf(Skin.BLACK),
-            setOf(Skin.WHITE, Skin.TAN, Skin.BLACK),
+            setOf(Skin.BLACK, Skin.TAN, Skin.WHITE),
         )
         val allSkins = setOf(Skin.PALE, Skin.WHITE, Skin.TAN, Skin.BLACK)
     }

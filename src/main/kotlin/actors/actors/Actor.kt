@@ -606,7 +606,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     open fun skinReduceDamage(target: Actor, type: Damage, rawDamage: Float): Float =
-        max(0f, rawDamage - skinArmorMaterial().modify(type, skinArmor()))
+        max(0f, rawDamage - skinArmorMaterial().modify(type, skinArmor().let { Dice.float(it * 0.5f, it) }))
 
     ///// action generators
 

@@ -126,25 +126,25 @@ class WorldCarto(
     }
 
     private fun spawnAnimals() {
+        val maxAnimalSpawns = Dice.range(6, 10)
         var spawned = 0
         // Spawn for chunk features
         var spawnForBiomes = true
         meta.features().forEach { feature ->
             feature.animalSet(meta.habitat)?.also { featureAnimals ->
-                spawned = spawnAnimalsFrom(spawned, featureAnimals, feature, feature.animalSpawnCount())
+                spawned = spawnAnimalsFrom(spawned, featureAnimals, feature, feature.animalSpawnCount(), maxAnimalSpawns)
             }
             spawnForBiomes = spawnForBiomes && !feature.preventBiomeAnimalSpawns()
         }
         // Spawn for general biome/habitat
         if (spawnForBiomes) {
             meta.biome.animalSet(meta.habitat)?.also { biomeAnimals ->
-                spawned = spawnAnimalsFrom(spawned, biomeAnimals, meta.biome)
+                spawned = spawnAnimalsFrom(spawned, biomeAnimals, meta.biome, maxAnimalSpawns = maxAnimalSpawns)
             }
         }
     }
 
-    private fun spawnAnimalsFrom(spawnedSoFar: Int, pool: AnimalSet, source: AnimalSpawnSource, limit: Int = Int.MAX_VALUE): Int {
-        val maxAnimalSpawns = Dice.range(2, 6)
+    private fun spawnAnimalsFrom(spawnedSoFar: Int, pool: AnimalSet, source: AnimalSpawnSource, limit: Int = Int.MAX_VALUE, maxAnimalSpawns: Int = 10): Int {
         var spawned = spawnedSoFar
         var spawnedThisTime = 0
         var tries = 0

@@ -150,7 +150,9 @@ sealed class Habitation(
         citizens.add(citizen.id)
         citizen.habitation = this
         if (citizen is RacedCitizen) {
-            val skin = if (Dice.chance(0.95f)) skinSet.random() else Villager.allSkins.random()
+            val skin = if (citizen is VillageGuard) skinSet.first()
+                else if (Dice.chance(0.95f)) skinSet.random()
+                else Villager.allSkins.random()
             citizen.setSkin(skin)
         }
     }
