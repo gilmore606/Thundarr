@@ -160,8 +160,8 @@ class Villager(
             setOf(Skin.TAN, Skin.BLACK),
             setOf(Skin.TAN, Skin.BLACK),
             setOf(Skin.TAN, Skin.BLACK),
+            setOf(Skin.BLACK),
             setOf(Skin.WHITE, Skin.TAN, Skin.BLACK),
-            setOf(Skin.PALE, Skin.BLACK)
         )
         val allSkins = setOf(Skin.PALE, Skin.WHITE, Skin.TAN, Skin.BLACK)
     }
