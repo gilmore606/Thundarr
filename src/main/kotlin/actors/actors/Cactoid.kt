@@ -50,7 +50,8 @@ class Cactoid : NPC() {
     override fun skinArmor() = 1f
 
     override fun visualRange() = 10f
-    override fun aggroRange() = 7f
+    override fun aggroRange() = 6f
+    override fun defendSpecies() = true
     override fun idleState() = IdleWander(0.4f)
     override fun opinionOf(actor: Actor) = when {
         actor.isHuman() -> Opinion.HATE

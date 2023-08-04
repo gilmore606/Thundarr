@@ -24,6 +24,9 @@ sealed class GenericVoltelope : NPC() {
         initStats(8, 14, 6, 13, 8, 1, 2)
     }
 
+    override fun visualRange() = 12f
+    override fun defendSpecies() = true
+    override fun speciesBrothers() = setOf(Tag.VOLTELOPE, Tag.VOLTELOPE_FAWN)
     override fun idleState() = IdleHerd(
         0.6f, 15, true,
         21.0f,

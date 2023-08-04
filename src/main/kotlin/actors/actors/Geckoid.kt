@@ -25,8 +25,9 @@ class Geckoid : NPC() {
     override fun skinArmorMaterial() = Clothing.Material.SCALES
     override fun skinArmor() = 1f
 
-    override fun visualRange() = 10f
-    override fun aggroRange() = 7f
+    override fun visualRange() = 12f
+    override fun aggroRange() = 4f
+    override fun defendSpecies() = true
     override fun idleState() = IdleWander(0.4f)
     override fun opinionOf(actor: Actor) = when {
         actor.isHuman() -> Opinion.HATE

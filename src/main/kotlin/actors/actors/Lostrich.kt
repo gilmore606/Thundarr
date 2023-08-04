@@ -30,5 +30,6 @@ class Lostrich : NPC() {
     override fun unarmedDamage() = 3f
 
     override fun visualRange() = 9f
+    override fun defendSpecies() = true
     override fun idleState() = IdleWander(0.6f)
 }

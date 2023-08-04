@@ -56,7 +56,7 @@ class IdlePatrol(
             }
 
             entitiesSeen { it is NPC && it !is Citizen && it.state is Attacking }.keys.firstOrNull()?.also { aggressor ->
-                pushState(Attacking((aggressor as NPC).id))
+                hostileResponseState(aggressor as NPC)?.also { pushState(it) }
             }
         }
         super.considerState(npc)

@@ -3,6 +3,7 @@ package actors.states
 import actors.actors.Actor
 import actors.actors.NPC
 import actors.actions.Action
+import actors.actions.Attack
 import actors.actions.Wait
 import actors.actions.events.Event
 import kotlinx.serialization.Serializable
@@ -10,6 +11,7 @@ import render.Screen
 import render.tilesets.Glyph
 import util.XY
 import util.distanceBetween
+import util.log
 
 // A State represents a goal the NPC is trying to achieve.
 @Serializable
@@ -37,19 +39,30 @@ sealed class State {
     open fun considerState(npc: NPC) {
         npc.apply {
             entitiesSeen {
-                it is Actor && opinionOf(it) == NPC.Opinion.HATE && distanceBetween(it.xy, xy) <= aggroRange()
+                it is Actor && (opinionOf(it) == NPC.Opinion.HATE && distanceBetween(it.xy, xy) <= aggroRange())
             }.keys.toList().firstOrNull()
                 ?.also { enemy ->
-                    hostileResponseState(enemy as Actor)?.also { hostileState ->
-                        pushState(hostileState)
-                    }
+                    hostileResponseState(enemy as Actor)?.also { pushState(it) }
                 }
         }
     }
 
     open fun pickAction(npc: NPC): Action = Wait(1f)
 
-    open fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) { }
+    open fun witnessEvent(npc: NPC, culprit: Actor?, event: Event, location: XY) {
+        // Defend our species
+        npc.apply {
+            if (state !is Attacking && state !is Fleeing && event is Attack && defendSpecies()) {
+                getActor(event.targetID)?.also { target ->
+                    if (target is NPC && target.tag in speciesBrothers()) {
+                        culprit?.also { culprit ->
+                            hostileResponseState(culprit)?.also { pushState(it) }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     open fun receiveAggression(npc: NPC, attacker: Actor) { }
 

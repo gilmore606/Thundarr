@@ -121,6 +121,8 @@ sealed class NPC : Actor() {
     open fun isHostileTo(target: Actor): Boolean = (opinionOf(target) == Opinion.HATE)
     override fun willAggro(target: Actor) = isHostileTo(target)
     open fun aggroRange() = visualRange()
+    open fun defendSpecies() = false
+    open fun speciesBrothers() = setOf(tag)
 
     override fun visualRange() = 8f + Speed.get(this)
     override fun canSee() = super.canSee() && state.canSee()
