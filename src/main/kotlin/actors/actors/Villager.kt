@@ -22,6 +22,10 @@ import path.Pather
 import world.level.Level
 import world.quests.Quest
 
+interface RacedCitizen {
+    fun setSkin(skin: Villager.Skin)
+}
+
 @Serializable
 class Villager(
     val bedLocation: XY,
@@ -29,11 +33,12 @@ class Villager(
     val isChild: Boolean = false,
     private val initialHomeJob: Job,
     private val initialFulltimeJob: Job? = null,
-) : Citizen() {
+) : Citizen(), RacedCitizen {
 
     enum class Skin(
         val maleGlyphs: Set<Pair<Glyph, Glyph>>,
         val femaleGlyphs: Set<Pair<Glyph, Glyph>>,
+        val guardGlyph: Glyph,
         val childGlyph: Glyph
     ) {
         PALE(
@@ -59,6 +64,7 @@ class Villager(
                 Pair(PORTRAIT_PALE_W_8, PEASANT_PALE_BLOND),
                 Pair(PORTRAIT_PALE_W_9, PEASANT_PALE_GREEN)
             ),
+            PEASANT_PALE_GUARD,
             PEASANT_PALE_CHILD
         ),
         WHITE(
@@ -84,6 +90,7 @@ class Villager(
                 Pair(PORTRAIT_WHITE_W_8, PEASANT_WHITE_GREEN),
                 Pair(PORTRAIT_WHITE_W_9, PEASANT_WHITE_BLOND)
             ),
+            PEASANT_WHITE_GUARD,
             PEASANT_WHITE_CHILD
         ),
         TAN(
@@ -109,6 +116,7 @@ class Villager(
                 Pair(PORTRAIT_TAN_W_8, PEASANT_TAN_GREEN),
                 Pair(PORTRAIT_TAN_W_9, PEASANT_TAN_BLOND)
             ),
+            PEASANT_TAN_GUARD,
             PEASANT_TAN_CHILD
         ),
         BLACK(
@@ -135,6 +143,7 @@ class Villager(
                 Pair(PORTRAIT_BLACK_W_9, PEASANT_BLACK_BLOND)
 
             ),
+            PEASANT_BLACK_GUARD,
             PEASANT_BLACK_CHILD
         )
     }
@@ -180,6 +189,7 @@ class Villager(
         if (newTarget != targetJob) {
             previousTargetJob = targetJob
             targetJob = newTarget
+            log.info("$this changed jobs to $targetJob (was $previousTargetJob)")
         }
     }
 
@@ -193,7 +203,7 @@ class Villager(
         } ?: run { fulltimeJob?.also { setTarget(it) } }
     }
 
-    fun setSkin(skin: Skin) {
+    override fun setSkin(skin: Skin) {
         if (isChild) {
             customGlyph = skin.childGlyph
         } else {

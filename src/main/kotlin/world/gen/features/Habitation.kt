@@ -1,6 +1,8 @@
 package world.gen.features
 
 import actors.actors.Citizen
+import actors.actors.RacedCitizen
+import actors.actors.VillageGuard
 import actors.actors.Villager
 import actors.factions.HabitationFaction
 import actors.jobs.Job
@@ -147,7 +149,7 @@ sealed class Habitation(
     protected fun addCitizen(citizen: Citizen) {
         citizens.add(citizen.id)
         citizen.habitation = this
-        if (citizen is Villager) {
+        if (citizen is RacedCitizen) {
             val skin = if (Dice.chance(0.8f)) skinSet.random() else Villager.allSkins.random()
             citizen.setSkin(skin)
         }

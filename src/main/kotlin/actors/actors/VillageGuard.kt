@@ -18,15 +18,17 @@ class VillageGuard(
     val bounds: Rect,
     val villageName: String,
     val flavor: Habitation.Flavor = Habitation.Flavor.HUMAN,
-) : Citizen() {
+) : Citizen(), RacedCitizen {
 
     val maxChaseRange = 60
     val boundsCenter = XY(bounds.x0 + (bounds.x1 - bounds.x0) / 2, bounds.y0 + (bounds.y1 - bounds.y0) / 2)
 
+    var customGlyph: Glyph = Glyph.BLANK
+    override fun glyph() = customGlyph
+
     override fun toString() = name() + "(" + id + ")"
     override val tag = Tag.VILLAGE_GUARD
     override fun name() = "guard"
-    override fun glyph() = Glyph.SHIELD_GUARD
     override fun description() = "A village guard."
     override fun isHuman() = true
     override fun onSpawn() {
@@ -76,4 +78,7 @@ class VillageGuard(
         return null
     }
 
+    override fun setSkin(skin: Villager.Skin) {
+        customGlyph = skin.guardGlyph
+    }
 }
