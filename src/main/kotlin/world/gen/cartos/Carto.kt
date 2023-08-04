@@ -600,13 +600,4 @@ abstract class Carto(
         return null
     }
 
-    fun getAnimal(
-        biome: Biome, habitat: Habitat, xpLevel: Int
-    ): NPC? {
-        biome.animalSet(habitat)?.getAnimal(xpLevel, habitat)?.also { result ->
-            return result.spawnNPC()
-        }
-        return null
-    }
-
 }

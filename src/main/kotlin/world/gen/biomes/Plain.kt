@@ -11,6 +11,7 @@ import things.Thing.Tag.*
 import world.gen.habitats.*
 import world.gen.spawnsets.AnimalSet
 import actors.actors.NPC.Tag.*
+import util.Dice
 
 @Serializable
 object Plain : Biome(
@@ -117,7 +118,9 @@ object PlainAnimals {
         add(1f, AUROX)
         add(1f, MUSKOX)
         add(1f, KILLDAISY)
+        addGroup(0.2f, KILLDAISY, { Dice.range(3, 6) }, radius = 10f)
         add(0.3f, VOLTELOPE)
         add(0.3f, GECKOID)
+        addGroup(0.1f, GECKOID, { Dice.range(4, 8) }, radius = 8f)
     }
 }

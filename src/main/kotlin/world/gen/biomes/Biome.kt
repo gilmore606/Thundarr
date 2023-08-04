@@ -4,10 +4,7 @@ import actors.actors.NPC
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import util.Dice
-import util.Rect
-import util.XY
-import util.log
+import util.*
 import world.Chunk
 import world.gen.AnimalSpawnSource
 import world.gen.NoisePatches
@@ -109,14 +106,18 @@ sealed class Biome(
         }
     }
 
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? {
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? {
         repeat (200) {
-            val x = chunk.x + Dice.zeroTil(CHUNK_SIZE)
-            val y = chunk.y + Dice.zeroTil(CHUNK_SIZE)
-            // TODO: This should check if the animalType can walk on the square, not the player
-            // but we can't right now because we can only call this with an actual NPC, not the tag
-            // wat do?
-            if (chunk.isWalkableAt(App.player, x, y)) return XY(x,y)
+            val xy = if (near == null || within == null)  XY(
+                chunk.x + Dice.zeroTil(CHUNK_SIZE),
+                chunk.y + Dice.zeroTil(CHUNK_SIZE)
+            ) else XY(
+                (near.x - within.toInt()).let { Dice.range(it, it + within.toInt() * 2) },
+                (near.y - within.toInt()).let { Dice.range(it, it + within.toInt() * 2)}
+            )
+            if (chunk.isWalkableAt(animal, xy.x, xy.y)) {
+                return xy
+            }
         }
         return null
     }

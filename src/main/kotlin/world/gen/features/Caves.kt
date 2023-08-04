@@ -118,5 +118,5 @@ class Caves : Feature() {
 
     override fun animalSpawnCount() = 1
     override fun animalSet(habitat: Habitat) = animalSpawns
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = cavePoints.randomOrNull()
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? = cavePoints.randomOrNull()
 }

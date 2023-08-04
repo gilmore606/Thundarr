@@ -91,6 +91,7 @@ object DesertAnimals {
         add(1f, CACTOID)
         add(1f, SCORPION)
         add(0.3f, GLOCUST)
-        add(0.3f, HYENAMAN)
+        addGroup(0.3f, HYENAMAN, { 2 }, radius = 3f)
+        addGroup(0.05f, HYENAMAN, { Dice.range(4, 6) }, radius = 5f)
     }
 }

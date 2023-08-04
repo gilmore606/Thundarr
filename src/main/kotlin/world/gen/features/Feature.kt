@@ -28,7 +28,7 @@ sealed class Feature : AnimalSpawnSource {
     enum class Stage { TERRAIN, BUILD }
 
     open fun preventBiomeAnimalSpawns() = false
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? = null
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? = null
 
     open fun canBeQuestDestination() = false
     open fun createQuest(): Quest? = null

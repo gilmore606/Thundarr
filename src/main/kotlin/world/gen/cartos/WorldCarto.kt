@@ -1,11 +1,11 @@
 package world.gen.cartos
 
 import App
+import actors.actors.NPC
 import things.NPCDen
 import util.*
 import world.*
 import world.gen.AnimalSpawnSource
-import world.gen.Metamap
 import world.gen.biomes.Biome
 import world.gen.biomes.Ocean
 import world.gen.features.Feature
@@ -149,15 +149,24 @@ class WorldCarto(
         var spawnedThisTime = 0
         var tries = 0
         while (spawned < maxAnimalSpawns && spawnedThisTime < limit && tries < 20) {
-            pool.getAnimal(meta.threatLevel, meta.habitat)?.spawnNPC()?.also { animal ->
-                source.animalSpawnPoint(chunk, animal.tag)?.also { location ->
-                    if (animal.spawnsInDen()) {
-                        spawnThing(location.x, location.y, NPCDen(animal.tag))
-                    } else {
-                        animal.spawnAt(level, location.x, location.y)
+            pool.getAnimals(meta.threatLevel, meta.habitat).also { group ->
+                if (group.countsAsOne) spawned++ ; spawnedThisTime++
+                var firstLoc: XY? = null
+                group.tags.forEach { tag ->
+                    NPC.create(tag).also { animal ->
+                        source.animalSpawnPoint(chunk, animal, firstLoc, group.radius)?.also { location ->
+                            if (firstLoc == null) firstLoc = location
+                            if (animal.spawnsInDen()) {
+                                spawnThing(location.x, location.y, NPCDen(animal.tag))
+                            } else {
+                                animal.spawnAt(level, location.x, location.y)
+                            }
+                            if (!group.countsAsOne) {
+                                spawned++
+                                spawnedThisTime++
+                            }
+                        }
                     }
-                    spawned++
-                    spawnedThisTime++
                 }
             }
             tries++

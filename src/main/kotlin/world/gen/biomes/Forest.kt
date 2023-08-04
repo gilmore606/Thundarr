@@ -110,9 +110,9 @@ object ForestPlantsTropical {
 object ForestAnimals {
     val set = AnimalSet().apply {
         add(1f, BOAR)
-        add(1f, WOOD_SPIDER)
+        addGroup(1f, WOOD_SPIDER, { Dice.range(2, 4) }, radius = 10f)
         add(0.2f, KILLDAISY)
-        add(1f, PINCER_BEETLE)
+        addGroup(1f, PINCER_BEETLE, { Dice.range(2, 5) }, radius = 10f)
         add(0.5f, SALAMAN)
     }
 }

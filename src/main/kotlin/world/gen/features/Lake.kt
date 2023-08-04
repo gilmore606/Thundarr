@@ -97,6 +97,6 @@ class Lake(
     }
 
     override fun animalSet(habitat: Habitat) = animalSpawns
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
-        findSpawnPointForNPCType(chunk, animalType, bounds)
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? =
+        findSpawnPointForNPCType(chunk, animal.tag, bounds)
 }

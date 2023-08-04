@@ -240,6 +240,6 @@ class Rivers(
     }
 
     override fun animalSet(habitat: Habitat) = animalSpawns
-    override fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY? =
-        findSpawnPointForNPCType(chunk, animalType, Rect(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1))
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? =
+        findSpawnPointForNPCType(chunk, animal.tag, Rect(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1))
 }

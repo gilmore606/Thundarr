@@ -5,5 +5,5 @@ import util.XY
 import world.Chunk
 
 interface AnimalSpawnSource {
-    fun animalSpawnPoint(chunk: Chunk, animalType: NPC.Tag): XY?
+    fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY? = null, within: Float? = null): XY?
 }

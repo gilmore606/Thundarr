@@ -91,10 +91,11 @@ object ScrubPlantsTropical {
 
 object ScrubAnimals {
     val set = AnimalSet().apply {
-        add(0.6f, VOLTELOPE)
+        add(1f, VOLTELOPE)
         add(0.6f, VOLTELOPE_FAWN)
         add(1f, STICKLEBOAR)
-        add(1f, HYENAMAN)
+        add(0.5f, HYENAMAN)
+        addGroup(0.1f, HYENAMAN, { Dice.range(3, 6) }, radius = 6f)
         add(1f, GLOCUST)
     }
 }
