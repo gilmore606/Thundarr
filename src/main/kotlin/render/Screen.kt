@@ -622,8 +622,8 @@ object Screen : KtxScreen {
         if (cursorPosition == null) cursorPosition = XY(App.player.xy.x, App.player.xy.y)
         val offset = (8.0 * zoom).toInt()
         val menu = ContextMenu(
-            tileXtoScreenX(cursorPosition!!.x) - dragPixels.x.toInt() - offset,
-            tileYtoScreenY(cursorPosition!!.y) - dragPixels.y.toInt() - offset
+            tileXtoScreenX(cursorPosition!!.x + 2) - dragPixels.x.toInt() - offset,
+            tileYtoScreenY(cursorPosition!!.y - 1) - dragPixels.y.toInt() - offset
         ).apply {
             App.level.makeContextMenu(cursorPosition!!.x, cursorPosition!!.y, this)
         }
