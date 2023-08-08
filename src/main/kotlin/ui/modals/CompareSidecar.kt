@@ -93,7 +93,7 @@ class CompareSidecar(private val parentModal: GearModal) : Modal(500, 580) {
         drawString(gear.name(), x0 + padding, padding, font = Screen.subTitleFont)
         drawWrappedText(desc, x0 + padding, padding + 35, 20, Screen.smallFont)
         beginStats()
-        drawStat("weight", "lb", gear.weight(), x0, compareTo?.let { gear.weight() - it.weight() }, lowerBetter = true)
+        drawStat("weight", "lb", gear.getWeight(), x0, compareTo?.let { gear.getWeight() - it.getWeight() }, lowerBetter = true)
 
         stats?.forEach { statLine ->
             if (statLine.isSpacer) {

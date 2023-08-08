@@ -156,7 +156,7 @@ class GearModal(
         }
         maxSelection = slots.size - 1
 
-        toHit = App.player.meleeWeapon().accuracy() - App.player.armorEncumbrance()
+        toHit = App.player.meleeWeapon().getAccuracy() - App.player.armorEncumbrance()
         insulation = App.player.coldProtection()
         cooling = App.player.heatProtection()
         weather = App.player.weatherProtection()

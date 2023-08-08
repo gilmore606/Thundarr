@@ -68,9 +68,9 @@ class ThingsModal(
         val color: Color? = null
     ) {
         NONE({ things -> "" }),
-        WEIGHT({ things -> String.format("%.1f", things.sumOf { (it.weight() * 10).toInt() } * 0.1f) + "lb" }),
-        SELLPRICE({ things -> "$" + things.sumOf { it.value() }.toString() }, Screen.fontColorGreen),
-        BUYPRICE({ things -> "$" + things.sumOf { it.value() }.toString() }, Screen.fontColorGreen),
+        WEIGHT({ things -> String.format("%.1f", things.sumOf { (it.getWeight() * 10).toInt() } * 0.1f) + "lb" }),
+        SELLPRICE({ things -> "$" + things.sumOf { it.getValue() }.toString() }, Screen.fontColorGreen),
+        BUYPRICE({ things -> "$" + things.sumOf { it.getValue() }.toString() }, Screen.fontColorGreen),
     }
 
     enum class Context { BACKPACK, TO_CONTAINER, FROM_CONTAINER, TO_VENDOR, FROM_VENDOR }
@@ -529,7 +529,7 @@ class ThingsModal(
         }
         grouped = ArrayList<Group>().apply {
             things.forEach { thing ->
-                weightTotal += thing.weight()
+                weightTotal += thing.getWeight()
                 var placed = false
                 forEach {
                     if (it.tag == thing.tag && it.singleName == thing.listName() && thing.canListGrouped()) {
@@ -558,7 +558,7 @@ class ThingsModal(
     private fun shouldShow(thing: Thing): Boolean {
         when (mode) {
             Mode.MAIN_VENDOR -> {
-                return thing.value() > 0
+                return thing.getValue() > 0
             }
             else -> {
                 return true

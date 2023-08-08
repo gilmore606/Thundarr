@@ -18,7 +18,7 @@ class Gladius : MeleeWeapon() {
         val glyphTransform = GlyphTransform(Glyph.SWORD_WORN)
     }
     override val tag = Tag.GLADIUS
-    override fun name() = "gladius"
+    override fun baseName() = "gladius"
     override fun description() = "A double edged iron short sword."
     override fun glyphTransform() = glyphTransform
     override fun skill() = Blades
@@ -37,7 +37,7 @@ class Sunsword : MeleeWeapon(), LightSource {
     override val tag = Tag.SUNSWORD
     override fun glyph() = if (equipped) Glyph.SUNSWORD_LIT else Glyph.SUNSWORD
     override fun glyphTransform() = glyphTransform
-    override fun name() = "sunsword"
+    override fun baseName() = "sunsword"
     override fun description() = "The legendary Sunsword holds the power of sunlight.  Weirdly effective against robots."
     override fun skill() = Blades
     override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {

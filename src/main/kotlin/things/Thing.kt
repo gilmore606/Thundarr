@@ -207,7 +207,9 @@ sealed class Thing() : Entity {
 
     open fun announceOnWalk() = !isIntangible()
     open fun sleepComfort() = -0.1f
+
     open fun value() = 0
+    open fun getValue() = value()
 
     @Transient var holder: ThingHolder? = null
 
@@ -317,6 +319,8 @@ sealed class Thing() : Entity {
     open fun drawExtraGlyphs(toDraw: (Glyph,Float,Float,Float)->Unit) { }
 
     open fun weight() = 0.1f
+    open fun getWeight() = weight()
+
     open fun flammability() = 0f
     open fun onBurn(delta: Float): Float { // return the amount of fuel we provided on this turn
         if (Dice.chance(flammability())) {
@@ -356,7 +360,7 @@ sealed class Thing() : Entity {
     open fun moveSpeedPast(actor: Actor): Float? = null
 
     open fun thrownDamage(thrower: Actor, roll: Float) = defaultThrownDamage()
-    private fun defaultThrownDamage() = min(weight() / 0.1f, 4f)
+    private fun defaultThrownDamage() = min(getWeight() / 0.1f, 4f)
     open fun thrownAccuracy() = -1f
     open fun onThrownOn(target: Actor) { moveTo(target.xy.x, target.xy.y) }
     open fun onThrownAt(level: Level, x: Int, y: Int) { moveTo(level, x, y) }

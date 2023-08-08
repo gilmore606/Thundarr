@@ -13,7 +13,7 @@ import world.terrains.Terrain
 @Serializable
 class Brick : MeleeWeapon() {
     override val tag = Tag.BRICK
-    override fun name() = "brick"
+    override fun baseName() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun skill() = Clubs
     override fun glyph() = Glyph.BRICK
@@ -30,7 +30,7 @@ class Rock : MeleeWeapon() {
         val transform = GlyphTransform(Glyph.ROCK_WORN, 0f, 0f, false)
     }
     override val tag = Tag.ROCK
-    override fun name() = "rock"
+    override fun baseName() = "rock"
     override fun description() = "A chunk of rock.  You could throw it at someone."
     override fun skill() = Clubs
     override fun glyph() = Glyph.ROCK
@@ -50,7 +50,7 @@ class Rebar : MeleeWeapon() {
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.STICK
     override fun hue() = -0.3f
-    override fun name() = "rebar"
+    override fun baseName() = "rebar"
     override fun description() = "A rusted length of metal bar, pulled from ancient ruins."
     override fun skill() = Clubs
     override fun weight() = 1f
@@ -61,7 +61,7 @@ class Rebar : MeleeWeapon() {
 @Serializable
 class Hammer : MeleeWeapon() {
     override val tag = Tag.HAMMER
-    override fun name() = "hammer"
+    override fun baseName() = "hammer"
     override fun description() = "A simple ball-peen hammer."
     override fun skill() = Clubs
     override fun glyph() = Glyph.HAMMER
@@ -76,7 +76,7 @@ class Knife : MeleeWeapon() {
         val glyphTransform = GlyphTransform(Glyph.KNIFE_WORN)
     }
     override val tag = Tag.KNIFE
-    override fun name() = "knife"
+    override fun baseName() = "knife"
     override fun description() = "A single-edged survival knife."
     override fun glyphTransform() = glyphTransform
     override fun skill() = Blades
@@ -95,7 +95,7 @@ class StoneAxe : MeleeWeapon() {
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 0.2f
-    override fun name() = "stone axe"
+    override fun baseName() = "stone axe"
     override fun description() = "A chipped stone and branch fashioned into a crude axe."
     override fun canChopTrees() = true
     override fun skill() = Axes
@@ -112,7 +112,7 @@ class Axe : MeleeWeapon() {
     override val tag = Tag.AXE
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
-    override fun name() = "axe"
+    override fun baseName() = "axe"
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
     override fun canChopTrees() = true
     override fun skill() = Axes
@@ -130,7 +130,7 @@ class Pickaxe : MeleeWeapon() {
     override fun glyphTransform() = glyphTransform
     override fun glyph() = Glyph.AXE
     override fun hue() = 5.2f
-    override fun name() = "pickaxe"
+    override fun baseName() = "pickaxe"
     override fun description() = "A miner's pickaxe.  Looks like it could pick more than flesh.  I'm talking about stone here."
     override fun skill() = Dig
     override fun canDig(terrainType: Terrain.Type) = Terrain.get(terrainType).dataType == Terrain.Type.GENERIC_WALL
@@ -151,7 +151,7 @@ class Pitchfork : MeleeWeapon() {
     override val tag = Tag.PITCHFORK
     override fun glyph() = Glyph.TRIDENT
     override fun glyphTransform() = glyphTransform
-    override fun name() = "pitchfork"
+    override fun baseName() = "pitchfork"
     override fun description() = "A humble farming tool, but also a decent stabbing tool."
     override fun skill() = Spears
     override fun speed() = 1.3f

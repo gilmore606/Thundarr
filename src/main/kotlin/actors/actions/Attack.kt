@@ -39,7 +39,7 @@ class Attack(
 
             val difficulty = (actor.xpLevel - target.xpLevel) / 2 +
                     (mySkill - hisSkill) / 2 +
-                    weapon.accuracy() -
+                    weapon.getAccuracy() -
                     actor.armorEncumbrance() +
                     target.armorEncumbrance() +
                     (targetBodypart?.toHit ?: 0)

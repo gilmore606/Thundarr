@@ -2,8 +2,6 @@ package things
 
 import actors.actors.Actor
 import actors.bodyparts.Bodypart
-import actors.stats.Heart
-import actors.stats.Stat
 import actors.stats.skills.*
 import actors.statuses.Bleeding
 import actors.statuses.Status
@@ -11,9 +9,10 @@ import actors.statuses.Stunned
 import audio.Speaker
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.gearmods.WeaponMod
 import ui.modals.ExamineModal.StatLine
 import util.Dice
-import util.LightColor
+import util.total
 import world.Entity
 import world.terrains.Terrain
 
@@ -77,11 +76,26 @@ enum class Damage(
 
 @Serializable
 sealed class Weapon : Gear() {
+    val mods = mutableListOf<WeaponMod>()
+    fun mod(newMod: WeaponMod) { mods.add(newMod) }
+    override fun canListGrouped() = mods.isEmpty()
+
+    abstract fun baseName(): String
+    override fun name() = mods.joinToString { it.prefix() } + baseName()
+
     abstract fun damageType(): Damage
     abstract fun damage(): Float
-    open fun getDamage(wielder: Actor, roll: Float): Float = damage()
+    open fun getDamage(wielder: Actor, roll: Float): Float = damage() + mods.total { it.damage() }
+
     open fun speed(): Float = 1f
+
     open fun accuracy(): Float = 0f
+    open fun getAccuracy() = accuracy() + mods.total { it.accuracy() }
+
+    override fun getWeight(): Float = weight() + mods.total { it.weight() }
+
+    override fun getValue(): Int = (value() * mods.total { it.valueMod() }).toInt()
+
     open fun critThreshold(): Float = 5f
     open fun critMultiplier(): Float = 0.5f
 
@@ -107,16 +121,16 @@ sealed class Weapon : Gear() {
             compare = compareTo?.let { (it as Weapon).speed() }
         ))
         add(StatLine(
-            "accuracy", accuracy(), showPlus = true,
-            compare = compareTo?.let { (it as Weapon).accuracy() }
+            "accuracy", getAccuracy(), showPlus = true,
+            compare = compareTo?.let { (it as Weapon).getAccuracy() }
         ))
         add(StatLine(isSpacer = true))
         add(StatLine(
             "type", valueString = damageType().displayName
         ))
         add(StatLine(
-            "damage", damage(),
-            compare = compareTo?.let { (it as Weapon).damage() }
+            "damage", getDamage(App.player, 1f),
+            compare = compareTo?.let { (it as Weapon).getDamage(App.player, 1f) }
         ))
         add(StatLine(isSpacer = true))
         add(StatLine(
@@ -146,7 +160,7 @@ sealed class MeleeWeapon : Weapon() {
     open fun missSelfMsg() = "You miss."
     open fun missOtherMsg() = "%Dn misses %dd."
 
-    override fun thrownDamage(thrower: Actor, roll: Float) = damage() * 0.5f
+    override fun thrownDamage(thrower: Actor, roll: Float) = getDamage(thrower, roll) * 0.5f
 
     open fun canDig(terrainType: Terrain.Type): Boolean = false
     open fun skill(): Skill = Fight

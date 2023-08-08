@@ -281,7 +281,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     }
 
     private fun updateEncumbrance() {
-        val carried = contents.total { it.weight() }
+        val carried = contents.total { it.getWeight() }
         val capacity = carryingCapacity()
         if (carried > capacity) {
             removeStatus(Status.Tag.ENCUMBERED)
@@ -583,7 +583,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     fun armorEncumbrance(): Float {
         val kgPerStr = 0.5f
         val encPerKg = 0.5f
-        val weight = gear.values.sumOf { it?.weight() ?: 0f }
+        val weight = gear.values.sumOf { it?.getWeight() ?: 0f }
         val excess = weight - (Strength.get(this) * kgPerStr)
         return if (excess <= 0f) 0f else excess * encPerKg
     }

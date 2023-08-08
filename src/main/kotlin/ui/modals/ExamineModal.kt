@@ -70,7 +70,7 @@ class ExamineModal(
 
         statY = 240
         if (entity is Thing) {
-            if (entity.isPortable()) drawStat("weight", "lb", entity.weight(), statX)
+            if (entity.isPortable()) drawStat("weight", "lb", entity.getWeight(), statX)
 
             examineStats.forEach { statLine ->
                 if (statLine.isSpacer) {
