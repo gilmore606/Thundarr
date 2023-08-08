@@ -5,7 +5,11 @@ import actors.stats.Stat
 import actors.stats.skills.*
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.gearmods.GearMod
+import world.gen.spawnsets.LootSet
 import world.terrains.Terrain
+import world.gen.spawnsets.LootSet.Variant
+import things.gearmods.GearMod.Tag.*
 
 // Simple lower-level weapons
 
@@ -16,6 +20,7 @@ class Brick : MeleeWeapon() {
     override fun baseName() = "brick"
     override fun description() = "A squared hunk of stone.  Could be used to kill, or build."
     override fun skill() = Clubs
+    override fun speed() = 1.2f
     override fun glyph() = Glyph.BRICK
     override fun glyphTransform() = Rock.transform
     override fun weight() = 0.4f
@@ -33,6 +38,7 @@ class Rock : MeleeWeapon() {
     override fun baseName() = "rock"
     override fun description() = "A chunk of rock.  You could throw it at someone."
     override fun skill() = Clubs
+    override fun speed() = 1f
     override fun glyph() = Glyph.ROCK
     override fun glyphTransform() = transform
     override fun weight() = 0.3f
@@ -53,6 +59,7 @@ class Rebar : MeleeWeapon() {
     override fun baseName() = "rebar"
     override fun description() = "A rusted length of metal bar, pulled from ancient ruins."
     override fun skill() = Clubs
+    override fun speed() = 1.2f
     override fun weight() = 1f
     override fun damageType() = Damage.CRUSH
     override fun damage() = 4f
@@ -60,10 +67,19 @@ class Rebar : MeleeWeapon() {
 
 @Serializable
 class Hammer : MeleeWeapon() {
+    companion object {
+        val sellVariants = listOf(
+            Variant(2f, null),
+            Variant(1f, LIGHT),
+            Variant(1f, HEAVY, 2),
+            Variant(1f, FINE, 3),
+        )
+    }
     override val tag = Tag.HAMMER
     override fun baseName() = "hammer"
     override fun description() = "A simple ball-peen hammer."
     override fun skill() = Clubs
+    override fun speed() = 1f
     override fun glyph() = Glyph.HAMMER
     override fun weight() = 0.6f
     override fun damageType() = Damage.CRUSH
@@ -74,12 +90,27 @@ class Hammer : MeleeWeapon() {
 class Knife : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.KNIFE_WORN)
+        val variants = listOf(
+            Variant(1f, RUSTY, 0, 2),
+            Variant(1f, BENT, 0, 2),
+            Variant(2f, null, 2, 4),
+            Variant(1f, LIGHT, 2, 4),
+            Variant(1f, HEAVY, 2, 5),
+            Variant(1f, FINE, 3, 5),
+        )
+        val sellVariants = listOf(
+            Variant(2f, null),
+            Variant(1f, LIGHT),
+            Variant(1f, HEAVY, 2),
+            Variant(1f, FINE, 3),
+        )
     }
     override val tag = Tag.KNIFE
     override fun baseName() = "knife"
     override fun description() = "A single-edged survival knife."
     override fun glyphTransform() = glyphTransform
     override fun skill() = Blades
+    override fun speed() = 0.8f
     override fun glyph() = Glyph.KNIFE
     override fun weight() = 0.2f
     override fun damageType() = Damage.CUT
@@ -99,7 +130,7 @@ class StoneAxe : MeleeWeapon() {
     override fun description() = "A chipped stone and branch fashioned into a crude axe."
     override fun canChopTrees() = true
     override fun skill() = Axes
-    override fun speed() = 1.4f
+    override fun speed() = 1.5f
     override fun damageType() = Damage.CUT
     override fun damage() = 3f
 }
@@ -108,6 +139,20 @@ class StoneAxe : MeleeWeapon() {
 class Axe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE)
+        val variants = listOf(
+            Variant(1f, RUSTY, 0, 2),
+            Variant(1f, BENT, 0, 2),
+            Variant(2f, null, 2, 4),
+            Variant(1f, LIGHT, 2, 4),
+            Variant(1f, HEAVY, 2, 5),
+            Variant(1f, FINE, 3, 5),
+        )
+        val sellVariants = listOf(
+            Variant(2f, null),
+            Variant(1f, LIGHT),
+            Variant(1f, HEAVY, 2),
+            Variant(1f, FINE, 3),
+        )
     }
     override val tag = Tag.AXE
     override fun glyphTransform() = glyphTransform
@@ -116,7 +161,7 @@ class Axe : MeleeWeapon() {
     override fun description() = "A woodsman's axe.  Looks like it could chop more than wood.  I'm talking about flesh here."
     override fun canChopTrees() = true
     override fun skill() = Axes
-    override fun speed() = 1.4f
+    override fun speed() = 1.3f
     override fun damageType() = Damage.CUT
     override fun damage() = 5f
 }
@@ -125,6 +170,20 @@ class Axe : MeleeWeapon() {
 class Pickaxe : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.AXE)
+        val variants = listOf(
+            Variant(1f, RUSTY, 0, 2),
+            Variant(1f, BENT, 0, 2),
+            Variant(2f, null, 2, 4),
+            Variant(1f, LIGHT, 2, 4),
+            Variant(1f, HEAVY, 2, 5),
+            Variant(1f, FINE, 3, 5),
+        )
+        val sellVariants = listOf(
+            Variant(2f, null),
+            Variant(1f, LIGHT),
+            Variant(1f, HEAVY, 2),
+            Variant(1f, FINE, 3),
+        )
     }
     override val tag = Tag.PICKAXE
     override fun glyphTransform() = glyphTransform
@@ -133,11 +192,11 @@ class Pickaxe : MeleeWeapon() {
     override fun baseName() = "pickaxe"
     override fun description() = "A miner's pickaxe.  Looks like it could pick more than flesh.  I'm talking about stone here."
     override fun skill() = Dig
+    override fun speed() = 1.3f
     override fun canDig(terrainType: Terrain.Type) = Terrain.get(terrainType).dataType == Terrain.Type.GENERIC_WALL
     override fun statEffects() = mutableMapOf<Stat.Tag, Float>().apply {
         this[Dig.tag] = 1f
     }
-    override fun speed() = 1.3f
     override fun accuracy() = -2f
     override fun damageType() = Damage.PIERCE
     override fun damage() = 4f
@@ -147,6 +206,12 @@ class Pickaxe : MeleeWeapon() {
 class Pitchfork : MeleeWeapon() {
     companion object {
         val glyphTransform = GlyphTransform(Glyph.TRIDENT)
+        val sellVariants = listOf(
+            Variant(2f, null),
+            Variant(1f, LIGHT),
+            Variant(1f, HEAVY, 2),
+            Variant(1f, FINE, 3),
+        )
     }
     override val tag = Tag.PITCHFORK
     override fun glyph() = Glyph.TRIDENT

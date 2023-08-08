@@ -1,6 +1,7 @@
 package things
 
 import actors.actors.Actor
+import actors.actors.Player
 import actors.bodyparts.Bodypart
 import actors.stats.skills.*
 import actors.statuses.Bleeding
@@ -86,6 +87,7 @@ sealed class Weapon : Gear() {
     open fun getDamage(wielder: Actor, roll: Float): Float = damage() + mods.filterIsInstance<WeaponMod>().total { it.damage() }
 
     open fun speed(): Float = 1f
+    open fun getSpeed() = speed() + mods.filterIsInstance<WeaponMod>().total { it.speed() }
 
     open fun accuracy(): Float = 0f
     open fun getAccuracy() = accuracy() + mods.filterIsInstance<WeaponMod>().total { it.accuracy() }
@@ -95,7 +97,7 @@ sealed class Weapon : Gear() {
     override fun getValue(): Int = (value() * mods.total { it.valueMod() }).toInt()
 
     open fun critThreshold(): Float = 5f
-    open fun critMultiplier(): Float = 0.5f
+    open fun critBonus(): Float = 0.5f
 
     open fun hitSound() = Speaker.SFX.HIT
     open fun bounceSound() = Speaker.SFX.HIT
@@ -104,10 +106,12 @@ sealed class Weapon : Gear() {
     open fun rollDamage(wielder: Actor, roll: Float): Float {
         val base = getDamage(wielder, roll)
         var damage = Dice.float(base * 0.5f, base)
-        if (roll >= critThreshold() * 2) {
-            damage *= (1f + critMultiplier() * 2f)
-        } else if (roll >= critThreshold()) {
-            damage *= (1f + critMultiplier())
+        if (wielder is Player) {  // only the Player gets crits!
+            if (roll >= critThreshold() * 2) {
+                damage *= (1f + critBonus() * 2f)
+            } else if (roll >= critThreshold()) {
+                damage *= (1f + critBonus())
+            }
         }
         return damage
     }
@@ -115,8 +119,8 @@ sealed class Weapon : Gear() {
     override fun examineStats(compareTo: Entity?) = mutableListOf<StatLine>().apply {
         add(StatLine(isSpacer = true))
         add(StatLine(
-            "speed", speed(), lowerBetter = true,
-            compare = compareTo?.let { (it as Weapon).speed() }
+            "speed", getSpeed(), lowerBetter = true,
+            compare = compareTo?.let { (it as Weapon).getSpeed() }
         ))
         add(StatLine(
             "accuracy", getAccuracy(), showPlus = true,
@@ -136,8 +140,8 @@ sealed class Weapon : Gear() {
             compare = compareTo?.let { (it as Weapon).critThreshold() }
         ))
         add(StatLine(
-            "crit bonus", critMultiplier(),
-            compare = compareTo?.let { (it as Weapon).critMultiplier() }
+            "crit bonus", critBonus(),
+            compare = compareTo?.let { (it as Weapon).critBonus() }
         ))
     }
 }

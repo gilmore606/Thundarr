@@ -1,7 +1,6 @@
 package world.gen.spawnsets
 
-import things.Gear
-import things.Thing
+import things.*
 import things.Thing.Tag.*
 import things.gearmods.GearMod
 import things.gearmods.GearMod.Tag.*
@@ -104,8 +103,15 @@ open class LootSet {
 object WeaponLoot {
     val set = LootSet().apply {
         add(1f, STONE_AXE, 0, 2)
-        add(1f, AXE, 1, 5)
-        add(1f, PICKAXE, 1, 5)
+        add(1f, KNIFE, Knife.variants)
+        add(1f, AXE, Axe.variants)
+        add(1f, PICKAXE, Pickaxe.variants)
+        add(1f, CLUB, Club.variants)
+        add(1f, GLADIUS, Gladius.variants)
+        add(1f, LONGSWORD, Longsword.variants)
+        add(1f, WARHAMMER, Warhammer.variants)
+        add(1f, BRONZE_SPEAR, BronzeSpear.variants)
+        add(0.7f, STEEL_SPEAR, SteelSpear.variants)
     }
 }
 
@@ -142,7 +148,7 @@ object FarmToolsLoot {
         Variant(1f, LIGHT, 2,),
         Variant(1f, HEAVY, 2,),
         Variant(1f, FINE, 3),
-        Variant(1f, MASTER, 4),
+        Variant(0.5f, MASTER, 4),
     )
 
     val set = LootSet().apply {
@@ -207,13 +213,17 @@ object ShrineLoot {
 // For sale in village smithy
 object SmithyWares {
     val set = LootSet().apply {
-        add(1f, HAMMER)
-        add(1f, KNIFE)
-        add(1f, STONE_AXE)
-        add(1f, AXE,)
-        add(1f, PICKAXE)
-        add(1f, PITCHFORK)
-        add(1f, GLADIUS)
+        add(1f, HAMMER, Hammer.sellVariants)
+        add(1f, KNIFE, Knife.sellVariants)
+        add(1f, AXE, Axe.sellVariants)
+        add(1f, PICKAXE, Pickaxe.sellVariants)
+        add(1f, PITCHFORK, Pitchfork.sellVariants)
+        add(1f, CLUB, Club.sellVariants)
+        add(1f, GLADIUS, Gladius.sellVariants)
+        add(1f, LONGSWORD, Longsword.sellVariants)
+        add(1f, WARHAMMER, Warhammer.sellVariants)
+        add(1f, BRONZE_SPEAR, BronzeSpear.sellVariants)
+        add(1f, STEEL_SPEAR, SteelSpear.sellVariants)
     }
 }
 
@@ -224,6 +234,7 @@ object TavernWares {
         add(1f, STEAK)
         add(1f, CHICKENLEG)
         add(1f, ENERGYDRINK)
+        add(0.5f, THRALLCHOW)
     }
 }
 

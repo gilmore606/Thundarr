@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class WeaponMod : GearMod() {
     open fun damage(): Float = 0f
     open fun accuracy(): Float = 0f
+    open fun speed(): Float = 0f
 }
 
 @Serializable

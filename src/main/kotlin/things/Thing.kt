@@ -173,6 +173,8 @@ sealed class Thing() : Entity {
         HOOVES("hooves", "hooves", { Hooves() }),
         BEAK("beak", "beaks", { Beak() }),
         BRANCHES("branches", "branches", { Branches() }),
+        WOODSPEAR("wood spear", "wood spears", { UnarmedSpear() }),
+
         BRICK("brick", "bricks", { Brick() }),
         ROCK("rock", "rocks", { Rock() }),
         STICK("stick", "sticks", { Stick() }),
@@ -184,7 +186,11 @@ sealed class Thing() : Entity {
         HAMMER("hammer", "hammers", { Hammer() }),
         KNIFE("knife", "knives", { Knife() }),
         GLADIUS("gladius", "gladii", { Gladius() }),
-        WOODSPEAR("wood spear", "wood spears", { UnarmedSpear() }),
+        CLUB("club", "clubs", { Club() }),
+        LONGSWORD("longsword", "longswords", { Longsword() }),
+        WARHAMMER("warhammer", "warhammers", { Warhammer() }),
+        BRONZE_SPEAR("bronze spear", "bronze spears", { BronzeSpear() }),
+        STEEL_SPEAR("steel spear", "steel spears", { SteelSpear() }),
         SUNSWORD("sunsword", "sunswords", { Sunsword() }),
         ;
     }

@@ -22,7 +22,7 @@ class Attack(
 ): Action(1.0f), Event {
     override fun name() = "attack"
 
-    override fun durationFor(actor: Actor) = super.durationFor(actor) * actor.meleeWeapon().speed()
+    override fun durationFor(actor: Actor) = super.durationFor(actor) * actor.meleeWeapon().getSpeed()
 
     override fun execute(actor: Actor, level: Level) {
         App.level.director.getActor(targetID)?.also { target ->
