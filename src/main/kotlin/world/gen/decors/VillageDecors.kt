@@ -126,7 +126,7 @@ class Garden(
     override fun doFurnish() {
         val inVertRows = Dice.flip()
         val gardenDensity = fertility * 2f
-        val types = mutableListOf<SpawnSet.Result<Thing.Tag>>()
+        val types = mutableListOf<SpawnSet.Result<Thing.Tag, Thing>>()
         repeat (Dice.oneTo(3)) {
             biome.plantSet(Garden)?.getPlant(gardenDensity, habitat)?.also {
                 types.add(it)

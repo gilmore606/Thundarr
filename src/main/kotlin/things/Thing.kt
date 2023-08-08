@@ -21,7 +21,7 @@ import java.lang.RuntimeException
 sealed class Thing() : Entity {
 
     companion object {
-        fun spawn(tag: Tag): Thing = tag.spawn().apply { onSpawn() }
+        fun spawn(tag: Tag): Thing = tag.create().apply { onSpawn() }
     }
 
     @Serializable
@@ -48,7 +48,7 @@ sealed class Thing() : Entity {
     enum class Tag(
         val singularName: String,
         val pluralName: String,
-        val spawn: ()->Thing,
+        val create: ()->Thing,
     ) {
 
         NPCDEN("NPC DEN", "NPC DENS", { NPCDen(NPC.Tag.TUSKLET) }),

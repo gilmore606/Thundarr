@@ -1,11 +1,7 @@
 package things.recipes
 
 import actors.stats.Stat
-import actors.stats.skills.Survive
-import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
-import things.Steak
-import things.Stew
 import things.Thing
 
 abstract class Recipe {
@@ -65,13 +61,13 @@ abstract class Recipe {
         }
         fun glyph(): Glyph {
             glyph?.also { return it }
-            tag?.also { return tag.spawn().glyph() }
-            tags?.also { return tags.first().spawn().glyph() }
+            tag?.also { return tag.create().glyph() }
+            tags?.also { return tags.first().create().glyph() }
             return Glyph.BLANK
         }
         fun hue(): Float {
-            tag?.also { return tag.spawn().hue() }
-            tags?.also { return tags.first().spawn().hue() }
+            tag?.also { return tag.create().hue() }
+            tags?.also { return tags.first().create().hue() }
             return 0f
         }
     }

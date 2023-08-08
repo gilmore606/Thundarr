@@ -63,7 +63,7 @@ sealed class Container : Portable(), ThingHolder {
     open fun withLoot(lootSet: LootSet, lootCount: Int, xpLevel: Int): Container {
         KtxAsync.launch {
             repeat(lootCount) {
-                lootSet.getLoot(xpLevel)?.spawnThing()?.also {
+                lootSet.getLoot(xpLevel)?.also {
                     it.moveTo(this@Container)
                 }
             }

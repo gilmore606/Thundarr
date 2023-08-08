@@ -5,6 +5,7 @@ import actors.stats.Stat
 import actors.statuses.StatEffector
 import kotlinx.serialization.Serializable
 import render.tilesets.Glyph
+import things.gearmods.GearMod
 import util.toEnglishList
 
 @Serializable
@@ -47,6 +48,9 @@ sealed class Gear : Portable(), StatEffector {
     var equipped = false
     var known = false
     abstract val slot: Slot
+
+    val mods: MutableList<GearMod> = mutableListOf()
+    fun addMod(newMod: GearMod) { mods.add(newMod) }
 
     open fun equipSelfMsg() = "You put on your %d."
     open fun equipOtherMsg() = "%Dn puts on %p %d."

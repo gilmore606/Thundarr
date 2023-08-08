@@ -3,7 +3,6 @@ package world.gen.spawnsets
 import actors.actors.NPC
 import things.Thing
 import util.Dice
-import variants.Variant
 import world.Entity
 
 abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
@@ -22,6 +21,7 @@ abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
         val only: T? = null,
         val include: Set<T>? = null,
         val exclude: Set<T>? = null,
+        val customizer: ((O)->Unit)? = null
     ) : Entry<S,O,T>(freq, limit) {
 
         override fun matches(filter: T?): Boolean {
@@ -43,22 +43,29 @@ abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
 
     class Result<S,O> (
         val item: S,
-        val variant: Variant<O>? = null
+        val customizer: ((O)->Unit)? = null
     ) {
-        fun spawnThing() = (item as Thing.Tag).spawn().apply { onSpawn() }
-        fun spawnNPC() = (item as NPC.Tag).spawn().apply { onSpawn() }
+        fun spawnThing() = (item as Thing.Tag).create().apply {
+            customizer?.invoke(this as O)
+            onSpawn()
+        }
+        fun spawnNPC() = (item as NPC.Tag).spawn().apply {
+            customizer?.invoke(this as O)
+            onSpawn()
+        }
     }
 
     val set: MutableSet<Entry<S,O,T>> = mutableSetOf()
 
-    fun addEntry(freq: Float, item: S, limit: Pair<Int,Int> = Pair(0,100), only: T? = null, include: Set<T>? = null, exclude: Set<T>? = null) {
+    fun addEntry(freq: Float, item: S, limit: Pair<Int,Int> = Pair(0,100), only: T? = null, include: Set<T>? = null, exclude: Set<T>? = null, custom: ((O)->Unit)? = null) {
         set.add(ItemEntry(
             freq = freq,
             item = item,
             limit = limit,
             only = only,
             include = include,
-            exclude = exclude
+            exclude = exclude,
+            customizer = custom
         ))
     }
 
@@ -97,7 +104,9 @@ abstract class SpawnSet<S: Any, O: Entity, T: Any>() {
         if (winner is SubsetEntry<S,O,T>) {
             return (winner as SubsetEntry<S,O,T>).roll(limitValue, filterBy)
         } else if (winner is ItemEntry<S,O,T>) {
-            return Result((winner as ItemEntry<S,O,T>).item)
+            (winner as ItemEntry<S,O,T>).also {
+                return Result(it.item, it.customizer)
+            }
         }
 
         return null

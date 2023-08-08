@@ -76,8 +76,6 @@ enum class Damage(
 
 @Serializable
 sealed class Weapon : Gear() {
-    val mods = mutableListOf<WeaponMod>()
-    fun mod(newMod: WeaponMod) { mods.add(newMod) }
     override fun canListGrouped() = mods.isEmpty()
 
     abstract fun baseName(): String
@@ -85,12 +83,12 @@ sealed class Weapon : Gear() {
 
     abstract fun damageType(): Damage
     abstract fun damage(): Float
-    open fun getDamage(wielder: Actor, roll: Float): Float = damage() + mods.total { it.damage() }
+    open fun getDamage(wielder: Actor, roll: Float): Float = damage() + mods.filterIsInstance<WeaponMod>().total { it.damage() }
 
     open fun speed(): Float = 1f
 
     open fun accuracy(): Float = 0f
-    open fun getAccuracy() = accuracy() + mods.total { it.accuracy() }
+    open fun getAccuracy() = accuracy() + mods.filterIsInstance<WeaponMod>().total { it.accuracy() }
 
     override fun getWeight(): Float = weight() + mods.total { it.weight() }
 

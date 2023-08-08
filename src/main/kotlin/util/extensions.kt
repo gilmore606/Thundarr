@@ -81,7 +81,7 @@ fun <T> MutableList<T>.iterateAndEmpty(iteration: (T)->Unit) {
     }
 }
 
-fun <T> MutableList<T>.total(iteration: (T)->Float): Float {
+fun <T> List<T>.total(iteration: (T)->Float): Float {
     var n = 0
     var t = 0f
     while (n < size) {
