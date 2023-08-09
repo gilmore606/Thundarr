@@ -1003,13 +1003,15 @@ object Metamap {
             sayProgress("Choosing start location...")
             var startChunk: XY = XY(100,100)
             // For now just pick a village
-            startChunk = villages.filter { it.y in -1000 .. 1500 }.random()
+//            startChunk = villages.filter { it.y in -1000 .. 1500 }.random()
             // Pick a cabin chunk
-//            forEachScratch { x, y, cell ->
-//                if (cell.hasFeature(Cabin::class)) {
-//                    startChunk = XY(x,y)
-//                }
-//            }
+            val starts = mutableListOf<XY>()
+            forEachScratch { x, y, cell ->
+                if (cell.hasFeature(RuinedBuildings::class)) {
+                    starts.add(XY(x,y))
+                }
+            }
+            startChunk = starts.random()
 
             suggestedPlayerStart.x = xToChunkX(startChunk.x)
             suggestedPlayerStart.y = yToChunkY(startChunk.y)

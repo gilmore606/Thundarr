@@ -132,6 +132,7 @@ sealed class Feature : AnimalSpawnSource {
     protected fun neighborCount(x: Int, y: Int, dirs: List<XY>, match: (x: Int, y: Int)->Boolean) = carto.neighborCount(x, y, dirs, match)
     protected fun boundsCheck(x: Int, y: Int) = (x >= x0 && y >= y0 && x <= x1 && y <= y1)
     protected fun isWalkableAt(x: Int, y: Int) = chunk.isWalkableAt(App.player, x, y)
+    protected fun isRoofedAt(x: Int, y: Int) = chunk.isRoofedAt(x, y)
     protected fun getTerrain(x: Int, y: Int) = chunk.getTerrain(x, y)
     protected fun setTerrain(x: Int, y: Int, type: Terrain.Type) = chunk.setTerrain(x, y, type, Terrain.get(type).isOpaque())
     protected fun safeSetTerrain(x: Int, y: Int, type: Terrain.Type) = carto.safeSetTerrain(x, y, type)
@@ -280,6 +281,20 @@ sealed class Feature : AnimalSpawnSource {
             val x = Dice.range(bounds.x0, bounds.x1)
             val y = Dice.range(bounds.y0, bounds.y1)
             if (chunk.isWalkableAt(npc, x, y) && npc.canSpawnAt(chunk, x, y)) return XY(x,y)
+        }
+        return null
+    }
+
+    protected fun findWalkablePoint(x0: Int, y0: Int, x1: Int, y1: Int, filter: ((XY)->Boolean)? = null): XY? {
+        var tries = 0
+        while (tries < 400) {
+            val tx = Dice.range(x0, x1)
+            val ty = Dice.range(y0, y1)
+            if (boundsCheck(tx, ty) && isWalkableAt(tx, ty)) {
+                if (filter == null) return XY(tx,ty)
+                if (filter.invoke(XY(tx, ty))) return XY(tx, ty)
+            }
+            tries++
         }
         return null
     }

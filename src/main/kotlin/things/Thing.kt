@@ -192,6 +192,8 @@ sealed class Thing() : Entity {
         BRONZE_SPEAR("bronze spear", "bronze spears", { BronzeSpear() }),
         STEEL_SPEAR("steel spear", "steel spears", { SteelSpear() }),
         SUNSWORD("sunsword", "sunswords", { Sunsword() }),
+
+        TREASURE("treasure", "treasures", { Treasure(Dice.range(2, 10)) }),
         ;
     }
 

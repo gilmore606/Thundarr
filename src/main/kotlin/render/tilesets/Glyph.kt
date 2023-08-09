@@ -366,6 +366,7 @@ enum class Glyph(val tall: Boolean = false) {
     CANDLE_ON,
     CANDLE_OFF,
     YELLOW_PROJECTILE,
+    GOLD_TREASURE,
 
     MAP_FOREST,
     MAP_PLAIN,

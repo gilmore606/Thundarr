@@ -3,7 +3,19 @@ package world.gen.spawnsets
 import things.*
 import things.Thing.Tag.*
 import things.gearmods.GearMod.Tag.*
+import util.Dice
 
+
+object TreasureLoot {
+    class TreasureLootSet : LootSet() {
+        override fun getLoot(level: Int): Thing? {
+            val worth = level / 2
+            if (Dice.chance(0.05f)) return Treasure(worth + 5)
+            return Treasure(Dice.range(worth - 2, worth + 3))
+        }
+    }
+    val set = TreasureLootSet()
+}
 
 object WeaponLoot {
     val set = LootSet().apply {

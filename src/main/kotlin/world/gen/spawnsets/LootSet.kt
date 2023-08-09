@@ -58,7 +58,7 @@ open class LootSet {
         }
     }
 
-    fun getLoot(level: Int): Thing? {
+    open fun getLoot(level: Int): Thing? {
         val filtered = mutableListOf<Pair<Float, Entry>>()
         var freqTotal = 0f
         set.forEach { cand ->

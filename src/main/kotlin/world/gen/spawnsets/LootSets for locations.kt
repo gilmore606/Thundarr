@@ -9,6 +9,7 @@ object TravelerLoot {
         add(1f, WeaponLoot.set)
         add(0.5f, BookLoot.set)
         add(1f, ClothingLoot.set)
+        add(0.5f, TreasureLoot.set)
     }
 }
 
@@ -28,6 +29,7 @@ object HutLoot {
         add(1f, FoodLoot.set)
         add(0.5f, FarmToolsLoot.set)
         add(1f, BookLoot.set)
+        add(0.5f, TreasureLoot.set)
     }
 }
 
@@ -37,6 +39,7 @@ object ShrineLoot {
         add(1f, CANDLE)
         add(0.1f, LIGHTER)
         add(0.2f, KNIFE)
+        add(0.2f, TreasureLoot.set)
     }
 }
 
@@ -46,5 +49,6 @@ object RuinLoot {
         add(1f, WeaponLoot.set)
         add(1f, BookLoot.set)
         add(1f, ClothingLoot.set)
+        add(2f, TreasureLoot.set)
     }
 }

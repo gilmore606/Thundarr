@@ -2,6 +2,7 @@ package world.gen.features
 
 import kotlinx.serialization.Serializable
 import things.Bonepile
+import things.Chest
 import things.ModernDoor
 import things.Trunk
 import util.*
@@ -9,6 +10,7 @@ import world.Chunk
 import world.ChunkScratch
 import world.gen.NoisePatches
 import world.gen.cartos.WorldCarto
+import world.gen.spawnsets.RuinLoot
 import world.level.CHUNK_SIZE
 import world.quests.FetchQuest
 import world.terrains.Terrain
@@ -27,7 +29,6 @@ class RuinedBuildings(
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
     }
 
-    private val ruinTreasureChance = 0.4f
     private val ruinIntactChance = 0.25f
 
     override fun trailDestinationChance() = 0.6f
@@ -58,6 +59,8 @@ class RuinedBuildings(
     }
 
     private fun buildRuin(x: Int, y: Int, width: Int, height: Int, isIntact: Boolean = false) {
+        val wallChance = if (isIntact) 0.96f else Dice.float(0.7f, 0.9f)
+        val floorChance = if (isIntact) 2f else 1f
         var blocked = false
         forXY(x,y, x+width-1,y+height-1) { ix,iy ->
             if (ix>=0 && iy>=0 && ix<CHUNK_SIZE && iy<CHUNK_SIZE
@@ -68,11 +71,11 @@ class RuinedBuildings(
         forXY(x,y, x+width-1,y+height-1) { ix,iy ->
             if (boundsCheck(ix + x0, iy + y0)) {
                 if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
-                    val terrain = if (isIntact || Dice.chance(0.9f)) Terrain.Type.TERRAIN_BRICKWALL else null
+                    val terrain = if (Dice.chance(wallChance)) Terrain.Type.TERRAIN_BRICKWALL else null
                     setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
                 } else {
                     val terrain =
-                        if (!isIntact && Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat()))
+                        if (Dice.chance(NoisePatches.get("ruinWear", ix + x0, iy + y0).toFloat() * floorChance))
                             null else Terrain.Type.TERRAIN_STONEFLOOR
                     setRuinTerrain(ix + x0, iy + y0, 0.34f, terrain)
                 }
@@ -97,20 +100,28 @@ class RuinedBuildings(
                 spawnThing(doorx, doory, ModernDoor())
             }
         }
-        if (Dice.chance(ruinTreasureChance)) {
-            var placed = false
-            var tries = 0
-            while (!placed && tries < 200) {
-                val tx = Dice.range(x-2, x+2) + x0
-                val ty = Dice.range(y-2, y+2) + y0
-                if (boundsCheck(tx,ty) && isWalkableAt(tx,ty)) {
-                    val treasure = if (Dice.chance(0.25f)) Trunk() else Bonepile().withDefaultLoot(carto.threatLevel)
-                    spawnThing(tx, ty, treasure)
-                    placed = true
+
+        // Place treasure chest
+        findWalkablePoint(x0+x-2, y0+y-2, x0+x+width+2, y0+y+height+2)?.also { xy ->
+            val treasure = when (Dice.oneTo(3)) {
+                1 -> Trunk()
+                2 -> Chest()
+                else -> Bonepile()
+            }.withLoot(RuinLoot.set, Dice.range(2, 6), carto.threatLevel + 1)
+            spawnThing(xy.x, xy.y, treasure)
+        }
+
+        // Place bonepiles
+        repeat (Dice.zeroTo(2)) {
+            findWalkablePoint(x0 + x - 4, y0 + y - 4, x0 + x + width + 4, y0 + y + height + 4) { xy ->
+                !isRoofedAt(xy.x, xy.y)
+            }?.also { xy ->
+                Bonepile().withDefaultLoot(carto.threatLevel + 1).apply {
+                    spawnThing(xy.x, xy.y, this)
                 }
-                tries++
             }
         }
+
     }
 
     private fun setRuinTerrain(x: Int, y: Int, wear: Float, terrain: Terrain.Type?) {
