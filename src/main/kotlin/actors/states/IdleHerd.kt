@@ -31,7 +31,7 @@ class IdleHerd(
         }
 
         if (Dice.chance(wanderChance)) {
-            return wander(npc, wanderCheck(wanderRadius, wanderChunkOnly, npc))
+            return wander(npc, wanderCheck(wanderRadius, wanderChunkOnly, npc, npc.den?.xy()))
         }
 
         return super.pickAction(npc)

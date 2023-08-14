@@ -1,5 +1,6 @@
 package world.gen.features
 
+import actors.actors.NPC
 import kotlinx.serialization.Serializable
 import things.Bonepile
 import things.Chest
@@ -9,7 +10,10 @@ import util.*
 import world.Chunk
 import world.ChunkScratch
 import world.gen.NoisePatches
+import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
+import world.gen.habitats.Habitat
+import world.gen.spawnsets.AnimalSet
 import world.gen.spawnsets.RuinLoot
 import world.level.CHUNK_SIZE
 import world.quests.FetchQuest
@@ -26,12 +30,28 @@ class RuinedBuildings(
     override fun name() = "ruined building"
 
     companion object {
-        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class)
+        fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class) && meta.biome !in listOf(Ocean)
+
+        val animalSpawns = AnimalSet().apply {
+            add(1f, NPC.Tag.WOLFMAN)
+        }
     }
 
     private val ruinIntactChance = 0.25f
 
+    private var alreadyMadeResident = false
+    private var residentSpawnRect: Rect? = null
+
     override fun trailDestinationChance() = 0.6f
+
+    override fun animalSpawnCount() = when (Dice.oneTo(10)) {
+        1 -> 2
+        2 -> 0
+        else -> 1
+    }
+
+    override fun animalSet(habitat: Habitat) = animalSpawns
+    override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? = residentSpawnRect?.randomPoint()
 
     override fun doDig() {
         repeat (buildingCount) {
@@ -102,13 +122,17 @@ class RuinedBuildings(
         }
 
         // Place treasure chest
-        findWalkablePoint(x0+x-2, y0+y-2, x0+x+width+2, y0+y+height+2)?.also { xy ->
-            val treasure = when (Dice.oneTo(3)) {
-                1 -> Trunk()
-                2 -> Chest()
-                else -> Bonepile()
-            }.withLoot(RuinLoot.set, Dice.range(2, 6), carto.threatLevel + 1)
-            spawnThing(xy.x, xy.y, treasure)
+        if (!alreadyMadeResident) {
+            findWalkablePoint(x0 + x - 2, y0 + y - 2, x0 + x + width + 2, y0 + y + height + 2)?.also { xy ->
+                val treasure = when (Dice.oneTo(3)) {
+                    1 -> Trunk()
+                    2 -> Chest()
+                    else -> Bonepile()
+                }.withLoot(RuinLoot.set, Dice.range(2, 6), carto.threatLevel + 1)
+                spawnThing(xy.x, xy.y, treasure)
+            }
+            residentSpawnRect = Rect(x0 + x + 1, y0 + y + 1, x0 + x + width - 2, y0 + y + height - 2)
+            alreadyMadeResident = true
         }
 
         // Place bonepiles

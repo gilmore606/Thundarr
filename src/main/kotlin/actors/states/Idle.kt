@@ -13,18 +13,16 @@ sealed class Idle : State() {
 
     override fun idleBounceMs() = 1000
 
-    protected fun wanderCheck(wanderRadius: Int, wanderChunkOnly: Boolean, npc: NPC): (XY)->Boolean = { wanderXy ->
-        val den = npc.den
-        if (den != null) {
-            val denXy = den.xy()
-            if (wanderChunkOnly && den.chunk() != npc.level?.chunkAt(wanderXy.x, wanderXy.y)) {
-                false
-            } else if (wanderRadius > 0 && manhattanDistance(denXy, wanderXy) > wanderRadius) {
-                false
-            } else {
-                true
-            }
-        } else true
+    protected fun wanderCheck(wanderRadius: Int, wanderChunkOnly: Boolean, npc: NPC, denLocation: XY? = null): (XY)->Boolean = { wanderXy ->
+        npc.level?.let { level ->
+            denLocation?.let { denLocation ->
+                when {
+                    (wanderChunkOnly && level.chunkAt(denLocation.x, denLocation.y) != level.chunkAt(wanderXy.x, wanderXy.y)) -> false
+                    (wanderRadius > 0 && manhattanDistance(wanderXy, denLocation) > wanderRadius) -> false
+                    else -> true
+                }
+            } ?: (wanderChunkOnly && level.chunkAt(npc.xy.x, npc.xy.y) == level.chunkAt(wanderXy.x, wanderXy.y))
+        } ?: false
     }
 
     override fun considerState(npc: NPC) {
@@ -75,8 +73,8 @@ sealed class Idle : State() {
             if (hour < wakeHour) hour - wakeHour
             else sleepHour - hour
         } else {
-            if (hour < sleepHour) hour - sleepHour
-            else wakeHour - hour
+            if (hour < sleepHour) sleepHour - hour
+            else hour - wakeHour
         }
     }
 }

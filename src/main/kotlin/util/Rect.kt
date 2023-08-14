@@ -34,4 +34,6 @@ data class Rect(var x0: Int, var y0: Int, var x1: Int, var y1: Int) {
     fun width() = (x1 - x0) + 1
     fun height() = (y1 - y0) + 1
     fun area() = width() * height()
+
+    fun randomPoint(): XY = XY(Dice.range(x0, x1), Dice.range(y0, y1))
 }

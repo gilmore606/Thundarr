@@ -1,5 +1,6 @@
 package actors.actors
 
+import actors.states.IdleDen
 import actors.states.IdleWander
 import actors.stats.Brains
 import actors.stats.Speed
@@ -19,19 +20,24 @@ class Wolfman : NPC() {
     override fun name() = "wolfman"
     override fun gender() = Entity.Gender.MALE
     override fun description() = "A snarling wolf, on two legs...no, a man with...Demon dogs!!"
+    override fun xpValue() = 100
     override fun hpMax() = 30f
     override fun onSpawn() {
         initStats(12, 12, 6, 13, 10, 4, 2)
     }
     override fun corpseMeats() = setOf(FurHide())
     override fun unarmedWeapons() = setOf(claws, teeth)
-    override fun unarmedDamage() = 6f
+    override fun unarmedDamage() = 5f
     override fun skinArmorMaterial() = Clothing.Material.FUR
-    override fun skinArmor() = 3f
+    override fun skinArmor() = 2f
 
+    override fun spawnsInDen() = true
+    override fun idleState() = IdleDen(
+        0.5f, 10, true, 10.0f, 17.0f
+    )
+    override fun aggroRange() = 8f
     override fun visualRange() = 10f
     override fun canSeeInDark() = true
-    override fun idleState() = IdleWander(0.4f)
     override fun opinionOf(actor: Actor) = when {
         actor.isHuman() -> Opinion.HATE
         else -> super.opinionOf(actor)

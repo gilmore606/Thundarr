@@ -29,6 +29,7 @@ class Caves : Feature() {
 
         val animalSpawns = AnimalSet().apply {
             add(1f, NPC.Tag.GRIZZLER)
+            add(0.5f, NPC.Tag.WOLFMAN)
         }
     }
 
