@@ -7,6 +7,7 @@ import util.Dice
 import util.Rect
 import util.XY
 import world.Chunk
+import world.ChunkMeta
 import world.ChunkScratch
 import world.gen.biomes.*
 import world.gen.habitats.*
@@ -96,7 +97,7 @@ class Lake(
         printGrid(growBlob(width, height), x, y, Terrain.Type.TEMP1)
     }
 
-    override fun animalSet(habitat: Habitat) = animalSpawns
+    override fun animalSet(meta: ChunkMeta) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? =
         findSpawnPointForNPCType(chunk, animal.tag, bounds)
 }

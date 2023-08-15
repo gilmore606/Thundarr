@@ -30,6 +30,7 @@ sealed class NPC : Actor() {
         GLOCUST({ Glocust() }),
         GRIZZLER({ Grizzler() }),
         GRUB({ Grub() }),
+        HEDGE_WITCH({ HedgeWitch() }),
         HERDER({ Herder() }),
         HERMIT({ Hermit() }),
         HYENAMAN({ Hyenaman() }),
@@ -63,6 +64,7 @@ sealed class NPC : Actor() {
         VILLAGER({ Tick() }), // no free spawn!
         VOLTELOPE({ Voltelope() }),
         VOLTELOPE_FAWN({ VoltelopeFawn() }),
+        WASTED_ONE({ WastedOne() }),
         WOLFMAN({ Wolfman() }),
         WOOD_SPIDER({ WoodSpider() }),
     }

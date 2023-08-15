@@ -41,7 +41,7 @@ sealed class Feature : AnimalSpawnSource {
 
     open fun temperatureMod() = 0
 
-    open fun animalSet(habitat: Habitat): AnimalSet? = null
+    open fun animalSet(meta: ChunkMeta): AnimalSet? = null
     open fun animalSpawnCount() = Dice.oneTo(3)
 
     var worldX = 0
@@ -285,6 +285,7 @@ sealed class Feature : AnimalSpawnSource {
         return null
     }
 
+    protected fun findWalkablePoint(rect: Rect, filter:((XY)->Boolean)? = null) = findWalkablePoint(rect.x0, rect.y0, rect.x1, rect.y1, filter)
     protected fun findWalkablePoint(x0: Int, y0: Int, x1: Int, y1: Int, filter: ((XY)->Boolean)? = null): XY? {
         var tries = 0
         while (tries < 400) {

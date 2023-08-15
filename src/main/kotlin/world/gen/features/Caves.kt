@@ -6,6 +6,7 @@ import render.tilesets.Glyph
 import things.Glowstone
 import util.*
 import world.Chunk
+import world.ChunkMeta
 import world.ChunkScratch
 import world.NaturalCavern
 import world.gen.Metamap
@@ -118,6 +119,6 @@ class Caves : Feature() {
     override fun mapPOIDescription() = if (hasCavern) "An underground cave system." else null
 
     override fun animalSpawnCount() = 1
-    override fun animalSet(habitat: Habitat) = animalSpawns
+    override fun animalSet(meta: ChunkMeta) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? = cavePoints.randomOrNull()
 }

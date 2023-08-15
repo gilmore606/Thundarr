@@ -16,6 +16,10 @@ import world.quests.Quest
 
 @Serializable
 sealed class Citizen : NPC(), ConverseModal.Source {
+
+    override fun isSentient() = true
+    override fun isHuman() = true
+
     @Transient var habitation: Habitation? = null
 
     val questsGiven = mutableListOf<String>()

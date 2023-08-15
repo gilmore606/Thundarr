@@ -31,6 +31,7 @@ class Wolfman : NPC() {
     override fun skinArmorMaterial() = Clothing.Material.FUR
     override fun skinArmor() = 2f
 
+    override fun isSentient() = true
     override fun spawnsInDen() = true
     override fun idleState() = IdleDen(
         0.5f, 10, true, 10.0f, 17.0f

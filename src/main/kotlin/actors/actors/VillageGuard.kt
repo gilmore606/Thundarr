@@ -30,7 +30,6 @@ class VillageGuard(
     override val tag = Tag.VILLAGE_GUARD
     override fun name() = "guard"
     override fun description() = "A village guard."
-    override fun isHuman() = true
     override fun onSpawn() {
         initStats(14, 12, 10, 12, 14, 5, 2)
     }

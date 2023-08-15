@@ -131,7 +131,7 @@ class WorldCarto(
         // Spawn for chunk features
         var spawnForBiomes = true
         meta.features().forEach { feature ->
-            feature.animalSet(meta.habitat)?.also { featureAnimals ->
+            feature.animalSet(meta)?.also { featureAnimals ->
                 spawned = spawnAnimalsFrom(spawned, featureAnimals, feature, feature.animalSpawnCount(), maxAnimalSpawns)
             }
             spawnForBiomes = spawnForBiomes && !feature.preventBiomeAnimalSpawns()

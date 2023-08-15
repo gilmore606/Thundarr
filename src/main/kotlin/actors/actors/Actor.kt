@@ -122,7 +122,7 @@ sealed class Actor : Entity, ThingHolder, LightSource, Temporal {
     @Transient var seenUpdatedAt = 0.0
     @Transient var seenPrevious = mutableMapOf<Entity, Float>()
 
-    open fun isSentient() = true
+    open fun isSentient() = false
     open fun isHuman() = false
     open fun isMonster() = false
     open fun canOpenDoors() = isHuman()

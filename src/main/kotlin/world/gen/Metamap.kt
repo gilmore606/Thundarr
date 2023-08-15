@@ -76,7 +76,7 @@ object Metamap {
     val randomFarmChance = 0.01f
     val randomGraveyardChance = 0.005f
     val randomTavernChance = 0.003f
-    val randomBuildingChance = 0.003f
+    val randomBuildingChance = 0.006f
     val randomLakeChance = 0.006f
     val maxThreatLevel = 40
     val spawnDistanceThreatFactor = 0.24f
@@ -888,8 +888,8 @@ object Metamap {
                     if (buildingCount > 0) cell.addFeature(RuinedBuildings(buildingCount))
                 }
                 // Special attention to cells with no surrounding features
-                if (cell.features().isEmpty() && DIRECTIONS.hasNoneWhere {
-                        boundsCheck(x+it.x,y+it.y) && scratches[x+it.x][y+it.y].features().isNotEmpty() }
+                if (cell.features().none { it !is Rivers && it !is Trails } && DIRECTIONS.hasNoneWhere {
+                        boundsCheck(x+it.x,y+it.y) && !scratches[x+it.x][y+it.y].features().none { it !is Rivers && it !is Trails } }
                 ) {
                     // Farms
                     if (Farm.canBuildOn(cell) && Dice.chance(randomFarmChance)) {

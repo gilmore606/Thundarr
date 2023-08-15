@@ -59,7 +59,8 @@ sealed class Idle : State() {
         return Wait(1f)
     }
 
-    fun shouldSleep(sleepHour: Float, wakeHour: Float): Boolean {
+    fun shouldSleep(sleepHour: Float?, wakeHour: Float?): Boolean {
+        if (sleepHour == null || wakeHour == null) return false
         val hoursFromSleep = hoursFromSleep(sleepHour, wakeHour)
         return if (hoursFromSleep <= -1f) true
         else if (hoursFromSleep <= 0f) Dice.chance(0.7f)
@@ -67,7 +68,8 @@ sealed class Idle : State() {
         else false
     }
 
-    fun hoursFromSleep(sleepHour: Float, wakeHour: Float): Float {
+    fun hoursFromSleep(sleepHour: Float?, wakeHour: Float?): Float {
+        if (sleepHour == null || wakeHour == null) return 0f
         val hour = App.gameTime.hour
         return if (sleepHour > wakeHour) {
             if (hour < wakeHour) hour - wakeHour

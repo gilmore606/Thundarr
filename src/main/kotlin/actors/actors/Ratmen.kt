@@ -13,6 +13,7 @@ import things.Thing
 sealed class GenericRatman(
     val wizardName: String
 ) : NPC() {
+    override fun isSentient() = true
     override fun unarmedWeapons() = setOf(teeth, claws)
     override fun idleState() = IdleInRoom()
 

@@ -16,6 +16,7 @@ class Thrall(
     override fun glyph() = Glyph.THRALL
     override fun name() = "thrall"
     override fun description() = "A pitiful human, enslaved by magic bonds to $wizardName.  ${gender().pp.capitalize()} eyes beg you for rescue."
+    override fun isSentient() = true
     override fun isHuman() = true
     override fun onSpawn() {
         Strength.set(this, 7f)

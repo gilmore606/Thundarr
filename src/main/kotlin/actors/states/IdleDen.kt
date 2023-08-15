@@ -7,6 +7,7 @@ import actors.statuses.Status
 import kotlinx.serialization.Serializable
 import util.Dice
 import path.Pather
+import util.manhattanDistance
 
 
 @Serializable
@@ -14,10 +15,20 @@ class IdleDen(
     val wanderChance: Float,
     val wanderRadius: Int,
     val wanderChunkOnly: Boolean,
-    val sleepHour: Float,
-    val wakeHour: Float,
+    val sleepHour: Float? = null,
+    val wakeHour: Float? = null,
 ) : Idle() {
     override fun toString() = "IdleDen"
+
+    override fun considerState(npc: NPC) {
+        npc.den?.xy()?.also { denXY ->
+            if (manhattanDistance(npc.xy, denXY) > wanderRadius) {
+                npc.pushState(GoDo(denXY))
+                return
+            }
+        }
+        super.considerState(npc)
+    }
 
     // TODO: Change this to just pass the den in constructor
     override fun pickAction(npc: NPC): Action {

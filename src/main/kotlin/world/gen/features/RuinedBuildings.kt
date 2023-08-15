@@ -8,11 +8,13 @@ import things.ModernDoor
 import things.Trunk
 import util.*
 import world.Chunk
+import world.ChunkMeta
 import world.ChunkScratch
 import world.gen.NoisePatches
+import world.gen.biomes.Desert
+import world.gen.biomes.Mountain
 import world.gen.biomes.Ocean
 import world.gen.cartos.WorldCarto
-import world.gen.habitats.Habitat
 import world.gen.spawnsets.AnimalSet
 import world.gen.spawnsets.RuinLoot
 import world.level.CHUNK_SIZE
@@ -32,8 +34,12 @@ class RuinedBuildings(
     companion object {
         fun canBuildOn(meta: ChunkScratch) = !meta.hasFeature(Village::class) && meta.biome !in listOf(Ocean)
 
-        val animalSpawns = AnimalSet().apply {
+        val denizens = AnimalSet().apply {
             add(1f, NPC.Tag.WOLFMAN)
+        }
+        val barrenDenizens = AnimalSet().apply {
+            add(1f, NPC.Tag.WASTED_ONE)
+            add(1f, NPC.Tag.HEDGE_WITCH)
         }
     }
 
@@ -50,7 +56,12 @@ class RuinedBuildings(
         else -> 1
     }
 
-    override fun animalSet(habitat: Habitat) = animalSpawns
+    override fun animalSet(meta: ChunkMeta) = when (meta.biome) {
+        Desert -> barrenDenizens
+        Mountain -> barrenDenizens
+        else -> denizens
+    }
+
     override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? = residentSpawnRect?.randomPoint()
 
     override fun doDig() {
@@ -65,8 +76,8 @@ class RuinedBuildings(
         if (meta.hasFeature(Highways::class)) {
             val offset = Dice.range(3, 8) * Dice.sign()
             val along = Dice.range(2, CHUNK_SIZE /2-2)
-            val width = Dice.range(4, 10)
-            val height = Dice.range(4, 10)
+            val width = Dice.range(5, 10)
+            val height = Dice.range(5, 10)
             when (meta.highways().random().edge) {
                 NORTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), along, width, height, isIntact)
                 SOUTH -> buildRuin(mid + offset + width * (if (offset<0) -1 else 0), CHUNK_SIZE -along, width, height, isIntact)
@@ -74,7 +85,7 @@ class RuinedBuildings(
                 EAST -> buildRuin(CHUNK_SIZE -along, mid + offset + width * (if (offset<0) -1 else 0), width, height, isIntact)
             }
         } else {
-            buildRuin(Dice.range(1, CHUNK_SIZE -10), Dice.range(1, CHUNK_SIZE -10), Dice.range(4, 10), Dice.range(4, 10), isIntact)
+            buildRuin(Dice.range(1, CHUNK_SIZE -10), Dice.range(1, CHUNK_SIZE -10), Dice.range(5, 10), Dice.range(5, 10), isIntact)
         }
     }
 
@@ -88,6 +99,17 @@ class RuinedBuildings(
         }
         if (blocked) return
         carto.addTrailBlock(x0+x, y0+y, x0+x+width-1, y0+y+height-1)
+        val brushDensity = Dice.float(0f, 0.15f)
+        forXY(x-2, y-2, x+width+1, y+height+1) { ix,iy ->
+            if (boundsCheck(ix + x0, iy + y0)) {
+                if ((ix < x || ix > x+width-1) || (iy < y || iy > y+height-1)) {
+                    val density = if (ix == x-2 || ix == x+width+1 || iy == y-2 || iy == y+height+1) 0.5f else 0.8f
+                    if (Dice.chance(density)) {
+                        setRuinTerrain(ix + x0, iy + y0, density * brushDensity, meta.biome.trailSideTerrain(ix + x0, iy + y0))
+                    }
+                }
+            }
+        }
         forXY(x,y, x+width-1,y+height-1) { ix,iy ->
             if (boundsCheck(ix + x0, iy + y0)) {
                 if (ix == x || ix == x + width - 1 || iy == y || iy == y + height - 1) {
@@ -123,15 +145,15 @@ class RuinedBuildings(
 
         // Place treasure chest
         if (!alreadyMadeResident) {
-            findWalkablePoint(x0 + x - 2, y0 + y - 2, x0 + x + width + 2, y0 + y + height + 2)?.also { xy ->
-                val treasure = when (Dice.oneTo(3)) {
-                    1 -> Trunk()
-                    2 -> Chest()
+            residentSpawnRect = Rect(x0 + x + 1, y0 + y + 1, x0 + x + width - 2, y0 + y + height - 2)
+            findWalkablePoint(residentSpawnRect!!)?.also { xy ->
+                val treasure = when (Dice.oneTo(6)) {
+                    1,2,3 -> Trunk()
+                    4,5 -> Chest()
                     else -> Bonepile()
                 }.withLoot(RuinLoot.set, Dice.range(2, 6), carto.threatLevel + 1)
                 spawnThing(xy.x, xy.y, treasure)
             }
-            residentSpawnRect = Rect(x0 + x + 1, y0 + y + 1, x0 + x + width - 2, y0 + y + height - 2)
             alreadyMadeResident = true
         }
 

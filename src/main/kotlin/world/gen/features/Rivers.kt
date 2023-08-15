@@ -8,6 +8,7 @@ import things.Boulder
 import things.WreckedCar
 import util.*
 import world.Chunk
+import world.ChunkMeta
 import world.gen.NoisePatches
 import world.gen.biomes.*
 import world.gen.cartos.WorldCarto
@@ -239,7 +240,7 @@ class Rivers(
         }
     }
 
-    override fun animalSet(habitat: Habitat) = animalSpawns
+    override fun animalSet(meta: ChunkMeta) = animalSpawns
     override fun animalSpawnPoint(chunk: Chunk, animal: NPC, near: XY?, within: Float?): XY? =
         findSpawnPointForNPCType(chunk, animal.tag, Rect(chunk.x, chunk.y, chunk.x + CHUNK_SIZE - 1, chunk.y + CHUNK_SIZE - 1))
 }

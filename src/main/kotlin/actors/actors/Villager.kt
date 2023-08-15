@@ -254,7 +254,6 @@ class Villager(
     override fun glyph() = customGlyph
     override fun portraitGlyph() = portraitGlyph
     override fun hasProperName() = true
-    override fun isHuman() = true
     override fun onSpawn() {
         Strength.set(this, 10f)
         Speed.set(this, 10f)
